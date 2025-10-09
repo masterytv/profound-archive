@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Send, Bot, Loader2, AlertCircle } from "lucide-react"
+import { Send, Bot, Loader2, AlertCircle, ArrowUpRight } from "lucide-react"
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
@@ -13,17 +13,17 @@ export default function ChatPage() {
   const [webhookConfigured, setWebhookConfigured] = useState(true)
 
   const exampleQuestions = [
-    "What do people see during a life review?",
-    "Tell me about the feeling of peace people describe.",
-    "Do people ever have frightening experiences?",
-    "Do pets appear in NDEs?",
+    "What are common themes in NDEs?",
+    "How do cultural backgrounds affect NDE reports?",
+    "What percentage of people report seeing deceased relatives?",
+    "Are there any negative NDEs in the database?",
   ]
 
   useEffect(() => {
     setSessionId(crypto.randomUUID())
-    const webhookUrl = process.env.NEXT_PUBLIC_CHAT_WEBHOOK_URL
-    if (!webhookUrl || webhookUrl === 'YOUR_WEBHOOK_URL_HERE') {
-      console.error("[v0] NEXT_PUBLIC_CHAT_WEBHOOK_URL is not configured")
+    const webhookUrl = process.env.NEXT_PUBLIC_CHAT_2_WEBHOOK_URL
+    if (!webhookUrl || webhookUrl === 'YOUR_CHAT_2_WEBHOOK_URL_HERE') {
+      console.error("[v0] NEXT_PUBLIC_CHAT_2_WEBHOOK_URL is not configured")
       setWebhookConfigured(false)
     } else {
       console.log("[v0] Webhook URL configured:", webhookUrl)
@@ -38,9 +38,9 @@ export default function ChatPage() {
     setIsLoading(true)
 
     try {
-      const webhookUrl = process.env.NEXT_PUBLIC_CHAT_WEBHOOK_URL
+      const webhookUrl = process.env.NEXT_PUBLIC_CHAT_2_WEBHOOK_URL
 
-      if (!webhookUrl || webhookUrl === 'YOUR_WEBHOOK_URL_HERE') {
+      if (!webhookUrl || webhookUrl === 'YOUR_CHAT_2_WEBHOOK_URL_HERE') {
         console.error("[v0] Webhook URL not configured")
         throw new Error("WEBHOOK_NOT_CONFIGURED")
       }
@@ -89,7 +89,7 @@ export default function ChatPage() {
       if (error instanceof Error) {
         if (error.message === "WEBHOOK_NOT_CONFIGURED") {
           errorMessage =
-            "The chatbot webhook is not configured. Please add the NEXT_PUBLIC_CHAT_WEBHOOK_URL environment variable."
+            "The chatbot webhook is not configured. Please add the NEXT_PUBLIC_CHAT_2_WEBHOOK_URL environment variable."
         } else if (error.message.includes("Failed to fetch")) {
           errorMessage =
             "Unable to connect to the chatbot service. Please check that the webhook URL is correct and accessible."
@@ -118,6 +118,46 @@ export default function ChatPage() {
     sendMessage(question)
   }
 
+  const renderMessageContent = (content: string) => {
+    const paragraphs = content.split('\n\n');
+  
+    return paragraphs.map((paragraph, pIndex) => {
+      const referenceRegex = /\[(\d+)\]\s*(.*?)\s*\((https?:\/\/[^\s)]+)\)/;
+      const lines = paragraph.split('\n');
+  
+      return (
+        <div key={pIndex} className="mb-4 last:mb-0">
+          {lines.map((line, lIndex) => {
+            if (line.trim().startsWith('[')) {
+              const match = line.match(referenceRegex);
+              if (match) {
+                const number = match[1];
+                const title = match[2].trim();
+                const url = match[3];
+                
+                return (
+                  <div key={lIndex} className="flex items-start text-sm">
+                    <span className="mr-2">[{number}]</span>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline inline-flex items-center group"
+                    >
+                      <span>{title}</span>
+                      <ArrowUpRight className="w-4 h-4 ml-1 flex-shrink-0" />
+                    </a>
+                  </div>
+                );
+              }
+            }
+            return <span key={lIndex} className="block">{line}</span>;
+          })}
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="bg-white rounded-lg shadow-md p-8 min-h-[600px] flex flex-col">
@@ -125,9 +165,9 @@ export default function ChatPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Bot className="w-8 h-8" />
-            <h1 className="text-3xl font-extrabold text-foreground">NDE Compassionate Chatbot</h1>
+            <h1 className="text-3xl font-extrabold text-foreground">NDE Research Chatbot</h1>
           </div>
-          <p className="text-muted-foreground">Answers Grounded in More than 5000 NDEs</p>
+          <p className="text-muted-foreground">Research-Focused Analysis of Near-Death Experience Data</p>
           <span className="inline-block mt-2 text-xs bg-blue-100 text-primary px-3 py-1 rounded-full">
             experimental
           </span>
@@ -135,7 +175,7 @@ export default function ChatPage() {
           {!webhookConfigured && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2 text-sm text-yellow-800">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>Webhook not configured. Please add NEXT_PUBLIC_CHAT_WEBHOOK_URL environment variable.</span>
+              <span>Webhook not configured. Please add NEXT_PUBLIC_CHAT_2_WEBHOOK_URL environment variable.</span>
             </div>
           )}
         </div>
@@ -171,7 +211,7 @@ export default function ChatPage() {
                   }`}
                   style={message.role === "user" ? { backgroundColor: "#2563eb" } : {}}
                 >
-                  <div className="whitespace-pre-wrap">{message.content}</div>
+                  <div className="whitespace-pre-wrap">{renderMessageContent(message.content)}</div>
                 </div>
               </div>
             ))}
