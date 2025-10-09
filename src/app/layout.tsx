@@ -6,7 +6,7 @@ import SiteFooter from '@/components/site-footer';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'Profound Archive',
+  title: 'Project Profound: Near Death Experiences and Consciousness',
   description: 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences',
   icons: {
     icon: '/favicon.svg',
