@@ -8,6 +8,9 @@ import Script from 'next/script';
 export const metadata: Metadata = {
   title: 'Profound Archive',
   description: 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
