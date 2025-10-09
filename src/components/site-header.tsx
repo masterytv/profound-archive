@@ -43,10 +43,10 @@ export default function SiteHeader() {
           {/* Logo and Icons */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Sun className="w-5 h-5 text-yellow-400" />
-              <Brain className="w-5 h-5 text-purple-400" />
-              <Heart className="w-5 h-5 text-pink-400" />
-              <Lightbulb className="w-5 h-5 text-amber-400" />
+              <Sun className="w-5 h-5 text-orange-500" />
+              <Brain className="w-5 h-5 text-blue-500" />
+              <Heart className="w-5 h-5 text-red-500" />
+              <Lightbulb className="w-5 h-5 text-yellow-500" />
             </div>
             <Link href="/" className="text-xl font-bold hover:opacity-80 transition-opacity">
               Project Profound

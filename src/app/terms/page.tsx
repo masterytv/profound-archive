@@ -31,7 +31,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-foreground mb-3">Disclaimer</h2>
             <p>
               Project Profound is an educational and research platform. We make no claims about the veracity of
-              individual NDE accounts.
+              individual NDE accounts. 1
             </p>
           </section>
         </div>
