@@ -3,17 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Heart, Lightbulb, Sun } from 'lucide-react';
 import Link from 'next/link';
-import ContactForm from './contact-form';
+import ContactSection from './contact-section';
 
 export default function AboutPage() {
   return (
     <div className="container mx-auto max-w-5xl py-12 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center text-center mb-12">
-        <div className="flex items-center gap-4 mb-4 text-primary">
-          <Sun className="h-8 w-8" />
-          <Brain className="h-8 w-8" />
-          <Heart className="h-8 w-8" />
-          <Lightbulb className="h-8 w-8" />
+        <div className="flex items-center gap-4 mb-4">
+          <Sun className="h-8 w-8 text-orange-500" />
+          <Brain className="h-8 w-8 text-blue-500" />
+          <Heart className="h-8 w-8 text-red-500" />
+          <Lightbulb className="h-8 w-8 text-yellow-500" />
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Project Profound
@@ -101,19 +101,7 @@ export default function AboutPage() {
         </Card>
       </section>
 
-      <section id="contact-form">
-        <Card>
-          <CardHeader>
-            <CardTitle>Contact Us</CardTitle>
-            <CardDescription>
-              Have a question, feedback, or want to contribute? We'd love to hear from you.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ContactForm />
-          </CardContent>
-        </Card>
-      </section>
+      <ContactSection />
     </div>
   );
 }
