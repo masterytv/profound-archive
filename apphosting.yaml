@@ -5,3 +5,14 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+# Environment variables that will be available to your application at runtime.
+env:
+  - variable: NEXT_PUBLIC_SEARCH_WEBHOOK_URL
+    value: "https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c"
+  - variable: NEXT_PUBLIC_CHAT_WEBHOOK_URL
+    value: "https://n8n.awetomatic.com/webhook/94eef21e-2018-4850-b381-8296139df419"
+  - variable: NEXT_PUBLIC_CHAT_2_WEBHOOK_URL
+    value: "https://n8n.awetomatic.com/webhook/c2283d8c-d53c-4d57-b481-7f30fea4a643"
+  - variable: NEXT_PUBLIC_N8N_WEBHOOK_URL
+    value: "https://n8n.awetomatic.com/webhook/101a672f-92a4-4d14-8ec8-01d34b51413a"
