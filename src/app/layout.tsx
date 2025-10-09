@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Profound Archive',
@@ -29,6 +30,7 @@ export default function RootLayout({
         <main className="flex-grow">{children}</main>
         <SiteFooter />
         <Toaster />
+        <Script async data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
       </body>
     </html>
   );

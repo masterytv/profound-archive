@@ -146,7 +146,6 @@ export default function SiteHeader() {
             <a
               data-formkit-toggle="893453eeff"
               href="https://project-profound.kit.com/893453eeff"
-              onClick={(e) => e.preventDefault()}
               className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
             >
               <Mail className="w-4 h-4" />
@@ -270,10 +269,6 @@ export default function SiteHeader() {
                   <a
                     data-formkit-toggle="893453eeff"
                     href="https://project-profound.kit.com/893453eeff"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setMobileMenuOpen(false)
-                    }}
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
                   >
                     <Mail className="w-5 h-5" />

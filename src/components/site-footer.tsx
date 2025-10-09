@@ -1,21 +1,22 @@
-import Link from 'next/link';
-import { Button } from './ui/button';
+import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-[#242D3F] text-gray-300">
-      <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
-        <div className="flex items-center gap-6 text-sm">
-          <Link href="#" className="transition-colors hover:text-white">
-            Privacy Policy
-          </Link>
-          <Link href="#" className="transition-colors hover:text-white">
-            Terms of Service
-          </Link>
+    <footer className="bg-[#232c38] text-white py-8 mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-center md:text-left">
+            © 2025 Project Profound. Dive Deep Into The Experience.
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <Link href="/privacy" className="hover:text-gray-300 transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-gray-300 transition-colors">
+              Terms of Service
+            </Link>
+          </div>
         </div>
-        <Button variant="ghost" className="hover:bg-white/10 hover:text-white" asChild>
-          <Link href="/about#contact-form">Feedback</Link>
-        </Button>
       </div>
     </footer>
   );
