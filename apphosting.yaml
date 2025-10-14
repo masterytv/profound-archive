@@ -16,3 +16,5 @@ env:
     value: "https://n8n.awetomatic.com/webhook/c2283d8c-d53c-4d57-b481-7f30fea4a643"
   - variable: NEXT_PUBLIC_N8N_WEBHOOK_URL
     value: "https://n8n.awetomatic.com/webhook/101a672f-92a4-4d14-8ec8-01d34b51413a"
+  - variable: NEXT_PUBLIC_CHAT_TEST_WEBHOOK_URL
+    value: "https://n8n.awetomatic.com/webhook/ced752ef-93c6-4e72-a1bd-f0db75a502e7"
