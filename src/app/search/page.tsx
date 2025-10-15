@@ -14,7 +14,7 @@ interface SearchResult {
   title: string
   thumbnailUrl: string
   date: string | null
-  viewCount: number
+  viewCount: string
   channelName: string
   similarity?: number // Optional, only present for concept match
 }
@@ -25,7 +25,7 @@ interface GroupedVideo {
   title: string
   thumbnailUrl: string
   date: string | null
-  viewCount: number
+  viewCount: string
   channelName: string
   transcripts: Array<{
     content: string
@@ -179,9 +179,31 @@ export default function SearchPage() {
     return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })
   }
 
-  const formatViewCount = (count: number) => {
-    return count.toLocaleString()
-  }
+  const formatViewCount = (viewCountString: string): string => {
+    if (typeof viewCountString !== 'string') {
+      return 'N/A views';
+    }
+  
+    const numberPart = viewCountString.replace(/[^0-9]/g, '');
+    if (!numberPart) {
+      return viewCountString; // Return original if no number found
+    }
+  
+    const num = parseInt(numberPart, 10);
+  
+    if (isNaN(num)) {
+      return viewCountString; // Return original if parsing fails
+    }
+  
+    let formattedNumber;
+    if (num > 9999) {
+      formattedNumber = num.toLocaleString();
+    } else {
+      formattedNumber = num.toString();
+    }
+  
+    return `${formattedNumber} views`;
+  };
 
   const highlightSearchTerm = (text: string, term: string) => {
     if (!term.trim() || searchType !== "keyword") {
@@ -452,7 +474,7 @@ export default function SearchPage() {
                   </a>
                   <div className="text-sm">
                     <div className="font-medium">{video.channelName}</div>
-                    <div className="text-muted-foreground">{formatViewCount(video.viewCount)} views</div>
+                    <div className="text-muted-foreground">{formatViewCount(video.viewCount)}</div>
                     <div className="text-muted-foreground">{formatDate(video.date)}</div>
                   </div>
                 </div>
