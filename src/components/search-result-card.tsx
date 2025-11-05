@@ -131,7 +131,10 @@ export function SearchResultCard({ video, searchTerm, searchType, onTagClick }: 
           <CardContent className="p-0">
             {/* AI Summary */}
             <div className="mb-6">
-              <h4 className="font-semibold text-md mb-2">Summary</h4>
+              <h4 className="font-semibold text-md mb-2">
+                AI Summary 
+                <span className="font-normal text-foreground"> (AI makes mistakes)</span>
+              </h4>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {video.summary || "No summary available."}
               </p>
