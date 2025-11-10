@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import Link from "next/link"
+import { useState } from "react"
 
 interface SearchResultCardProps {
   video: {
@@ -90,6 +91,13 @@ const highlightSearchTerm = (text: string, term: string, searchType: "keyword" |
   }
 
 export function SearchResultCard({ video, searchTerm, searchType, onTagClick }: SearchResultCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // A simple check to see if the summary is long enough to need a "More" button.
+  // Using a character count (e.g., 300) as an approximation.
+  const isLongSummary = (video.summary || "").length > 300;
+
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="flex flex-col md:flex-row">
@@ -135,9 +143,17 @@ export function SearchResultCard({ video, searchTerm, searchType, onTagClick }: 
                 AI Summary 
                 <span className="font-normal text-foreground"> (AI makes mistakes)</span>
               </h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className={`text-sm text-muted-foreground leading-relaxed ${!isExpanded ? 'line-clamp-4' : ''}`}>
                 {video.summary || "No summary available."}
               </p>
+              {isLongSummary && (
+                 <button 
+                   onClick={() => setIsExpanded(!isExpanded)}
+                   className="text-sm text-primary hover:underline mt-1 font-medium"
+                 >
+                   {isExpanded ? "Less" : "More"}
+                 </button>
+              )}
             </div>
 
             {/* Transcript Snippets */}
