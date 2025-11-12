@@ -1,0 +1,10 @@
+[
+    {
+      "table_name": "nde_vids",
+      "trigger_name": "update_nde_vids_ignore_null",
+      "event": "UPDATE",
+      "timing": "BEFORE",
+      "definition": "EXECUTE FUNCTION ignore_null_updates()"
+    }
+  ]
+  

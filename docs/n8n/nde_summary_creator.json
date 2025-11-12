@@ -1,0 +1,922 @@
+{
+    "name": "NDE_Summary_Creator",
+    "nodes": [
+      {
+        "parameters": {},
+        "name": "Start",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          848,
+          -48
+        ],
+        "id": "75522b87-c385-42fe-a7c0-b1ca9ad2526a"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "schema": {
+            "__rl": true,
+            "value": "public",
+            "mode": "list",
+            "cachedResultName": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "nde_vids",
+            "mode": "list",
+            "cachedResultName": "nde_vids"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "videoId": "={{ $('Postgres1').item.json.videoId }}",
+              "analysis_status": "completed",
+              "analysis_nde_summary": "={{ $json.output.nde_summary }}",
+              "analysis_generated_timestamp": "={{ $now }}",
+              "analysis_ai_model_used": "Grok 4 Fast"
+            },
+            "matchingColumns": [
+              "videoId"
+            ],
+            "schema": [
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "title",
+                "displayName": "title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "url",
+                "displayName": "url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "thumbnailUrl",
+                "displayName": "thumbnailUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "viewCount",
+                "displayName": "viewCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "likes",
+                "displayName": "likes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "location",
+                "displayName": "location",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelName",
+                "displayName": "channelName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelUrl",
+                "displayName": "channelUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelId",
+                "displayName": "channelId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelUsername",
+                "displayName": "channelUsername",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "numberOfSubscribers",
+                "displayName": "numberOfSubscribers",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "duration",
+                "displayName": "duration",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "commentsCount",
+                "displayName": "commentsCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "description",
+                "displayName": "description",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles",
+                "displayName": "subtitles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "videoId",
+                "displayName": "videoId",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "isNde",
+                "displayName": "isNde",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "options",
+                "canBeUsedToMatch": true,
+                "options": [
+                  {
+                    "name": "clear_nde",
+                    "value": "clear_nde"
+                  },
+                  {
+                    "name": "possible_nde",
+                    "value": "possible_nde"
+                  },
+                  {
+                    "name": "not_nde",
+                    "value": "not_nde"
+                  },
+                  {
+                    "name": "insufficient_info",
+                    "value": "insufficient_info"
+                  }
+                ],
+                "removed": true
+              },
+              {
+                "id": "isNdeJustification",
+                "displayName": "isNdeJustification",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "experiencerFullName",
+                "displayName": "experiencerFullName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_embedding",
+                "displayName": "subtitles_embedding",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_subtitles",
+                "displayName": "raw_timestamped_subtitles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_cleaned",
+                "displayName": "subtitles_cleaned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_punctuated",
+                "displayName": "subtitles_punctuated",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "embed_status",
+                "displayName": "embed_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_subtitles_cleaned",
+                "displayName": "raw_timestamped_subtitles_cleaned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_punctuated",
+                "displayName": "raw_timestamped_punctuated",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "timestamped_embedding_status",
+                "displayName": "timestamped_embedding_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "greyson_score",
+                "displayName": "greyson_score",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "nde_c_score",
+                "displayName": "nde_c_score",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "nde_analysis_html",
+                "displayName": "nde_analysis_html",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "analysis_status",
+                "displayName": "analysis_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "analysis_nde_summary",
+                "displayName": "analysis_nde_summary",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "analysis_nde_tags",
+                "displayName": "analysis_nde_tags",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "analysis_generated_timestamp",
+                "displayName": "analysis_generated_timestamp",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "analysis_ai_model_used",
+                "displayName": "analysis_ai_model_used",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "analysis_human_reviewed",
+                "displayName": "analysis_human_reviewed",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "boolean",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "analysis_researcher_notes",
+                "displayName": "analysis_researcher_notes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1136,
+          192
+        ],
+        "id": "ad0f0454-16ba-4419-955a-5ccd3ff9b865",
+        "name": "Postgres",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "x-ai/grok-4-fast",
+          "options": {
+            "temperature": 0.5,
+            "topP": 0.9
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          720,
+          384
+        ],
+        "id": "bbd42f2e-42d7-4396-80ec-0bcaf00f82a8",
+        "name": "OpenRouter Chat Model",
+        "credentials": {
+          "openRouterApi": {
+            "id": "ZUTxHzVrskxopbAJ",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"title\": \"NDE Summary Output\",\n  \"description\": \"Structured output containing only the narrative summary of the NDE\",\n  \"properties\": {\n    \"nde_summary\": {\n      \"type\": \"string\",\n      \"description\": \"200-300 word Gladwell-style narrative summary of the NDE\"}\n  },\n  \"required\": [\"nde_summary\"]\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.2,
+        "position": [
+          912,
+          384
+        ],
+        "id": "a6a21ad0-b9df-4cc0-8ec9-17fd7a4ee148",
+        "name": "Structured Output Parser"
+      },
+      {
+        "parameters": {
+          "content": "## Creates Summary of Each NDE \n**Adds summary, time, model used, and changes status to completed**",
+          "width": 520,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          0,
+          0
+        ],
+        "typeVersion": 1,
+        "id": "d2ee778c-81fe-4630-ac96-11af3234f798",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT *\nFROM public.nde_vids\nWHERE\n  \"isNde\" = 'clear_nde' AND\n  analysis_status = 'pending'\nORDER BY\n  RANDOM()\nLIMIT {{ $json.batch_limit }};",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          640,
+          -48
+        ],
+        "id": "45196e39-cbb9-448e-86b3-5b45e8f8990b",
+        "name": "For Testing",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1rH9atcLBo5cW5NtPNy8RAIoZewNLEN1CHlo7cBHG1ok",
+            "mode": "list",
+            "cachedResultName": "Prompt Test - AI Summary and Tags",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rH9atcLBo5cW5NtPNy8RAIoZewNLEN1CHlo7cBHG1ok/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Prompt Test",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rH9atcLBo5cW5NtPNy8RAIoZewNLEN1CHlo7cBHG1ok/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "analysis_nde_summary": "={{ $json.output.nde_summary }}",
+              "analysis_nde_tags": "={{ $json.output.nde_tags }}",
+              "analysis_generated_timestamp": "={{ $('For Testing').item.json.created_at }}",
+              "videoId": "={{ $('For Testing').item.json.videoId }}",
+              "url": "={{ $('For Testing').item.json.url }}",
+              "analysis_ai_model_used": "Grok 4 Fast",
+              "analysis_status": "tested"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Run",
+                "displayName": "Run",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "videoId",
+                "displayName": "videoId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "url",
+                "displayName": "url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "analysis_ai_model_used",
+                "displayName": "analysis_ai_model_used",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "analysis_nde_summary",
+                "displayName": "analysis_nde_summary",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "analysis_nde_tags",
+                "displayName": "analysis_nde_tags",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "analysis_generated_timestamp",
+                "displayName": "analysis_generated_timestamp",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "analysis_status",
+                "displayName": "analysis_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1056,
+          -48
+        ],
+        "id": "8ff56d83-f1ab-450b-b695-1c92801f4434",
+        "name": "Append row in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "om602JZGOJSRNAzx",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsonSchemaExample": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"title\": \"NDE Summary Output\",\n  \"description\": \"Structured output containing only the narrative summary of the NDE\",\n  \"properties\": {\n    \"nde_summary\": {\n      \"type\": \"string\",\n      \"description\": \"200-300 word Gladwell-style narrative summary of the NDE\"}\n  },\n  \"required\": [\"nde_summary\"]\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.3,
+        "position": [
+          896,
+          1280
+        ],
+        "id": "d217da18-7db4-4fca-9632-569d516d6314",
+        "name": "Structured Output Parser3"
+      },
+      {
+        "parameters": {
+          "model": "x-ai/grok-4-fast",
+          "options": {
+            "temperature": 0.5,
+            "topP": 0.9
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          560,
+          1408
+        ],
+        "id": "21254077-25a9-4031-bf4a-a120dc0b8fab",
+        "name": "OpenRouter Chat Model3",
+        "credentials": {
+          "openRouterApi": {
+            "id": "ZUTxHzVrskxopbAJ",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=You will analyze a near-death experience transcript and produce ONLY a JSON object containing a concise, factual summary.\n\nDo NOT use markdown code blocks. Do NOT add any explanation. Output ONLY raw JSON.\n\n## SUMMARY REQUIREMENTS\n\nWrite a clear, 80-150 word summary of the NDE. Use simple sentences. Structure the summary in this exact order:\n\n1.  **Trigger:** Start by stating who the person was and what caused the NDE (e.g., cardiac arrest, accident).\n2.  **Experience:** Briefly list the key events the person experienced *during* the NDE in chronological order (e.g., left their body, saw a light, met relatives, was told to return).\n3.  **Aftermath:** Conclude with the main transformation or change in their life *after* the NDE (e.g., new sense of purpose, career change).\n\n## TONE & STYLE GUIDANCE\n\n- Write for a Grade 8 reading level.\n- Use simple, clear, and direct sentences.\n- Be factual and objective. Do not add narrative flair or emotional language.\n- Report the events as the person described them.\n- Use active voice.\n\n## OUTPUT JSON FORMAT\n\nReturn this exact structure with NO other text:\n\n{\n  \"nde_summary\": \"Your 80-150 word factual summary here.\"\n}\n\n## CRITICAL INSTRUCTIONS\n\n- Output ONLY raw JSON\n- No markdown code blocks\n- No ```json markers\n- No explanation before or after\n- No extra text of any kind\n- Return the JSON object exactly as specified above\n- The summary must be 80-150 words.\n- Write in a simple, factual style.\n\n## TRANSCRIPT TO ANALYZE\n\n{{ $json.subtitles_punctuated }}\n\n---\n\nANALYZE THIS TRANSCRIPT AND RETURN ONLY A JSON OBJECT WITH THE SUMMARY.",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": "=You are an expert NDE researcher. Your task is to analyze transcripts and produce simple, clear, and factual summaries.\n\nYou write at a Grade 8 reading level. You follow instructions precisely.\n\nYou output ONLY raw JSON with no markdown, no code blocks, and no extra text. No explanation. No ```\n\n"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.9,
+        "position": [
+          736,
+          192
+        ],
+        "id": "054833a2-e81c-464f-8759-f6d09c6beb1a",
+        "name": "NDE Summarizer - Gemini 2.5 Flash"
+      },
+      {
+        "parameters": {
+          "model": "grok-4-0709",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+        "typeVersion": 1,
+        "position": [
+          736,
+          1280
+        ],
+        "id": "c2bdc3ee-a3c9-4167-99d0-f39610da44c5",
+        "name": "xAI Grok Chat Model",
+        "credentials": {
+          "xAiApi": {
+            "id": "CU6RfPi1CQj9RLya",
+            "name": "xAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "seconds"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          256,
+          192
+        ],
+        "id": "f9e14c3f-9f03-4994-9279-e211f3fbd5b7",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "operation": "select",
+          "schema": {
+            "__rl": true,
+            "value": "public",
+            "mode": "list",
+            "cachedResultName": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "nde_vids",
+            "mode": "list",
+            "cachedResultName": "nde_vids"
+          },
+          "limit": "=1",
+          "where": {
+            "values": [
+              {
+                "column": "isNde",
+                "value": "clear_nde"
+              },
+              {
+                "column": "analysis_status",
+                "value": "pending"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          496,
+          192
+        ],
+        "id": "ac89579e-d9a9-4d00-b557-9007e1b44fa5",
+        "name": "Postgres1",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Start": {
+        "main": [
+          []
+        ]
+      },
+      "OpenRouter Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "NDE Summarizer - Gemini 2.5 Flash",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Structured Output Parser": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "NDE Summarizer - Gemini 2.5 Flash",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "For Testing": {
+        "main": [
+          []
+        ]
+      },
+      "Structured Output Parser3": {
+        "ai_outputParser": [
+          []
+        ]
+      },
+      "OpenRouter Chat Model3": {
+        "ai_languageModel": [
+          []
+        ]
+      },
+      "NDE Summarizer - Gemini 2.5 Flash": {
+        "main": [
+          [
+            {
+              "node": "Postgres",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "xAI Grok Chat Model": {
+        "ai_languageModel": [
+          []
+        ]
+      },
+      "Postgres1": {
+        "main": [
+          [
+            {
+              "node": "NDE Summarizer - Gemini 2.5 Flash",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Postgres1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1",
+      "saveDataSuccessExecution": "none",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    },
+    "versionId": "429028ba-331d-4190-96b8-288ef6b16453",
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+    },
+    "id": "aUqJAZYsVitA1RYv",
+    "tags": [
+      {
+        "createdAt": "2025-06-18T19:45:39.320Z",
+        "updatedAt": "2025-06-18T19:45:39.320Z",
+        "id": "dG9Gr0gpQsNgvSXL",
+        "name": "NDE Project"
+      }
+    ]
+  }

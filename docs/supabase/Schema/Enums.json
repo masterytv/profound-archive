@@ -1,0 +1,20 @@
+[
+    {
+      "enum_name": "is_nde_options",
+      "enum_value": "clear_nde"
+    },
+    {
+      "enum_name": "is_nde_options",
+      "enum_value": "possible_nde"
+    },
+    {
+      "enum_name": "is_nde_options",
+      "enum_value": "not_nde"
+    },
+    {
+      "enum_name": "is_nde_options",
+      "enum_value": "insufficient_info"
+    }
+  ]
+  
+  

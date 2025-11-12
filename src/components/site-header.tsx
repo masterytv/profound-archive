@@ -7,33 +7,33 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 export default function SiteHeader() {
-  const [aiToolsOpen, setAiToolsOpen] = useState(false)
+  const [toolsOpen, setToolsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [mobileAiToolsOpen, setMobileAiToolsOpen] = useState(false)
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false)
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
 
-  const aiToolsRef = useRef<HTMLDivElement>(null)
+  const toolsRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (aiToolsRef.current && !aiToolsRef.current.contains(event.target as Node)) {
-        setAiToolsOpen(false)
+      if (toolsRef.current && !toolsRef.current.contains(event.target as Node)) {
+        setToolsOpen(false)
       }
       if (aboutRef.current && !aboutRef.current.contains(event.target as Node)) {
         setAboutOpen(false)
       }
     }
 
-    if (aiToolsOpen || aboutOpen) {
+    if (toolsOpen || aboutOpen) {
       document.addEventListener("mousedown", handleClickOutside)
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [aiToolsOpen, aboutOpen])
+  }, [toolsOpen, aboutOpen])
 
 
   return (
@@ -54,38 +54,38 @@ export default function SiteHeader() {
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            {/* AI Tools Dropdown */}
-            <div className="relative" ref={aiToolsRef}>
+            {/* Tools Dropdown */}
+            <div className="relative" ref={toolsRef}>
               <button
                 onClick={() => {
-                  setAiToolsOpen(!aiToolsOpen)
+                  setToolsOpen(!toolsOpen)
                   setAboutOpen(false)
                 }}
                 className="flex items-center gap-1 hover:text-gray-600 transition-colors"
               >
-                AI Tools
-                <ChevronDown className={`w-4 h-4 transition-transform ${aiToolsOpen ? 'rotate-180' : ''}`} />
+                Tools
+                <ChevronDown className={`w-4 h-4 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
               </button>
-              {aiToolsOpen && (
+              {toolsOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
                   <Link
                     href="/search"
                     className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setAiToolsOpen(false)}
+                    onClick={() => setToolsOpen(false)}
                   >
                     Search NDE Videos
                   </Link>
                   <Link
                     href="/chat"
                     className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setAiToolsOpen(false)}
+                    onClick={() => setToolsOpen(false)}
                   >
                     NDE Compassionate Chat
                   </Link>
                   <Link
                     href="/chat-2"
                     className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setAiToolsOpen(false)}
+                    onClick={() => setToolsOpen(false)}
                   >
                     NDE Research Chat
                   </Link>
@@ -95,53 +95,54 @@ export default function SiteHeader() {
 
             {/* About Dropdown */}
             <div className="relative flex items-center" ref={aboutRef}>
-              <Link href="/about" className="hover:text-gray-600 transition-colors">
-                About
-              </Link>
-              <button
-                 onClick={() => {
-                  setAboutOpen(!aboutOpen)
-                  setAiToolsOpen(false)
-                }}
-                className="flex items-center gap-1 hover:text-gray-600 transition-colors"
-              >
-                <ChevronDown className={`w-4 h-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {aboutOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
-                  <Link
-                    href="/about#projects"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setAboutOpen(false)}
-                  >
-                    Projects
-                  </Link>
-                  <Link
-                    href="/about#mission"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setAboutOpen(false)}
-                  >
-                    Mission
-                  </Link>
-                  <Link
-                    href="/about#connect"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setAboutOpen(false)}
-                  >
-                    Connect
-                  </Link>
-                  <a
-                    href="https://blog.projectprofound.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setAboutOpen(false)}
-                  >
-                    Blog
-                  </a>
-                </div>
-              )}
+                <Link href="/about" className="hover:text-gray-600 transition-colors">
+                    About
+                </Link>
+                <button
+                    onClick={() => {
+                    setAboutOpen(!aboutOpen)
+                    setToolsOpen(false)
+                    }}
+                    className="flex items-center gap-1 hover:text-gray-600 transition-colors"
+                >
+                    <ChevronDown className={`w-4 h-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {aboutOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-48 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
+                    <Link
+                        href="/about#projects"
+                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                        onClick={() => setAboutOpen(false)}
+                    >
+                        Projects
+                    </Link>
+                    <Link
+                        href="/about#connect"
+                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                        onClick={() => setAboutOpen(false)}
+                    >
+                        Connect
+                    </Link>
+                    <a
+                        href="https://blog.projectprofound.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                        onClick={() => setAboutOpen(false)}
+                    >
+                        Blog
+                    </a>
+                    <Link
+                        href="/experiencers"
+                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                        onClick={() => setAboutOpen(false)}
+                    >
+                        For Experiencers
+                    </Link>
+                    </div>
+                )}
             </div>
+
 
             <a
               data-formkit-toggle="893453eeff"
@@ -178,18 +179,18 @@ export default function SiteHeader() {
 
                 {/* Menu Items */}
                 <div className="flex-1 px-6 py-4 space-y-6">
-                  {/* AI Tools Section */}
+                  {/* Tools Section */}
                   <div>
                     <button
-                      onClick={() => setMobileAiToolsOpen(!mobileAiToolsOpen)}
+                      onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
                       className="flex items-center justify-between w-full text-xl font-semibold mb-4"
                     >
-                      AI Tools
+                      Tools
                       <ChevronDown
-                        className={`w-5 h-5 transition-transform ${mobileAiToolsOpen ? "rotate-180" : ""}`}
+                        className={`w-5 h-5 transition-transform ${mobileToolsOpen ? "rotate-180" : ""}`}
                       />
                     </button>
-                    {mobileAiToolsOpen && (
+                    {mobileToolsOpen && (
                       <div className="space-y-3 pl-4">
                         <Link
                           href="/search"
@@ -229,22 +230,13 @@ export default function SiteHeader() {
                       </button>
                     </div>
                     {mobileAboutOpen && (
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-500 mb-2 pl-4">About Page Sections</div>
-                        <div className="space-y-3 pl-8">
+                      <div className="space-y-3 pl-4">
                           <Link
                             href="/about#projects"
                             className="block text-gray-900 hover:text-gray-600"
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             Projects
-                          </Link>
-                          <Link
-                            href="/about#mission"
-                            className="block text-gray-900 hover:text-gray-600"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Mission
                           </Link>
                           <Link
                             href="/about#connect"
@@ -260,10 +252,17 @@ export default function SiteHeader() {
                           >
                             Blog
                           </a>
-                        </div>
+                          <Link
+                            href="/experiencers"
+                            className="block text-gray-900 hover:text-gray-600"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            For Experiencers
+                          </Link>
                       </div>
                     )}
                   </div>
+
 
                   {/* Newsletter Link */}
                   <a

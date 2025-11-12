@@ -62,7 +62,7 @@ export default function AboutPage() {
       status: "available now",
       statusColor: "bg-green-100 text-green-700",
       description:
-        "Explore a vast archive of Near-Death Experience video moments. Our unique search tool allows you to instantly find what you&apos;re looking for, whether it&apos;s an exact phrase or a related concept. Pinpoint specific discussions or uncover hidden topics within thousands of hours of NDE testimonies.",
+        "Explore a vast archive of Near-Death Experience video moments. Our unique search tool allows you to instantly find what you're looking for, whether it's an exact phrase or a related concept. Pinpoint specific discussions or uncover hidden topics within thousands of hours of NDE testimonies.",
       buttonText: "Begin Your Search",
       buttonLink: "/search",
     },
@@ -80,7 +80,7 @@ export default function AboutPage() {
       status: "experimental",
       statusColor: "bg-blue-100 text-blue-700",
       description:
-        "Chat a compassionate companion who is grounded in real-world NDE accounts from individuals who have experienced a powerful, transformational event. Whether you are a fellow NDEr or a curious observer, you&apos;ll be able to speak with a compassionate companion who understands.",
+        "Chat a compassionate companion who is grounded in real-world NDE accounts from individuals who have experienced a powerful, transformational event. Whether you are a fellow NDEr or a curious observer, you'll be able to speak with a compassionate companion who understands.",
       buttonText: "Chat with Compassion",
       buttonLink: "/chat",
     },
@@ -221,7 +221,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="text-lg font-bold text-foreground mb-2">Compassionate Inquiry</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    We approach each testimony and each person&apos;s story with empathy, humility, and respect.
+                    We approach each testimony and each person's story with empathy, humility, and respect.
                   </p>
                 </div>
 
@@ -271,7 +271,7 @@ export default function AboutPage() {
           <div className="mb-12 text-center">
             <h1 className="text-4xl font-extrabold text-foreground mb-4">Get In Touch</h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              If you&apos;re interested in participating, partnering, or simply learning more, please fill out the form
+              If you're interested in participating, partnering, or simply learning more, please fill out the form
               below. We look forward to exploring the unknown together.
             </p>
           </div>

@@ -1,0 +1,462 @@
+{
+  "name": "NDE Video Researcher 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4e993b0f-a3be-42ba-925d-4c5f78b3381c",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        112
+      ],
+      "id": "fba12283-a4b8-4445-b55b-6865fee07bff",
+      "name": "Webhook",
+      "webhookId": "4e993b0f-a3be-42ba-925d-4c5f78b3381c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "202fb3e9-662f-4693-9756-8c7167517502",
+              "name": "embedding",
+              "value": "={{ $json.data[0].embedding }}",
+              "type": "string"
+            },
+            {
+              "id": "ae4b5c4d-d87e-41c5-8841-840d5f47efa3",
+              "name": "limit",
+              "value": "={{ $('Webhook').item.json.body.limit }}",
+              "type": "string"
+            },
+            {
+              "id": "e0496ee7-f5e4-449f-9040-0e5f99b5c108",
+              "name": "offset",
+              "value": "={{ $('Webhook').item.json.body.offset }}",
+              "type": "number"
+            },
+            {
+              "id": "29b13b76-6df7-40a0-92dd-bf62bee20b36",
+              "name": "similarityThreshold",
+              "value": "={{ $('Webhook').item.json.body.similarityThreshold }}",
+              "type": "number"
+            },
+            {
+              "id": "8242e909-6aaf-4585-973e-f0c7ef0b1058",
+              "name": "sortColumn",
+              "value": "={{ $('Webhook').item.json.body.sortColumn }}",
+              "type": "string"
+            },
+            {
+              "id": "1b09330f-5531-4d23-ae53-154ee1d6f8cb",
+              "name": "sortDirection",
+              "value": "={{ $('Webhook').item.json.body.sortDirection }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        112
+      ],
+      "id": "4147a11e-49c9-4495-8c26-18a0e5edb1a6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "## Applications \n### Bolt.new, Firebase",
+        "height": 280,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "d5f7ab37-ea20-460f-8c49-eaa0dc86c684",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Convert Query \n### openai-embedding-3-small",
+        "height": 300,
+        "width": 200,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "949b2f63-b7e9-4b94-acc4-a0c39732b86d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## SET Fields \n",
+        "height": 300,
+        "width": 200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "ea66adcf-e739-4231-95c8-165fb47be32a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Search Supabase\n",
+        "height": 580,
+        "width": 200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "050df038-33c3-45bc-a6e5-a62cc9488808",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "65ddb9bb-4036-41e9-8a68-bf3dce37066a",
+              "leftValue": "={{ $json.search_type }}",
+              "rightValue": "semantic",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        272
+      ],
+      "id": "04e33f8e-e77c-4aab-ba4f-468aaba57d22",
+      "name": "Is it Semantic Search?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM public.search_punctuated_embeddings($1, $2, $3, $4, $5, $6);",
+        "options": {
+          "queryReplacement": "=[[\n  {{ $json.embedding }},\n  {{ $json.similarityThreshold }},\n  {{ $json.sortColumn }},\n  {{ $json.sortDirection }},\n  {{ $json.limit }},\n  {{ $json.offset }}\n]\n"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1184,
+        112
+      ],
+      "id": "ca06e17e-ca94-4ca2-8456-927e5fdc5b25",
+      "name": "Postgres Search",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Log Search\n",
+        "height": 280,
+        "width": 200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "f9f30857-6ba7-4313-a4b6-8d497282e175",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "search_logs",
+          "mode": "list",
+          "cachedResultName": "search_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "search_term": "={{ $json.body.searchTerm }}",
+            "search_type": "={{ $json.body.searchType }}",
+            "sort_column": "={{ $json.body.sortColumn }}",
+            "sort_direction": "={{ $json.body.sortDirection }}",
+            "similarity_threshold": "={{ $json.body.similarityThreshold }}\n\n",
+            "results_count": "={{ $json.body.limit }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "search_term",
+              "displayName": "search_term",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "search_type",
+              "displayName": "search_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sort_column",
+              "displayName": "sort_column",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sort_direction",
+              "displayName": "sort_direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "similarity_threshold",
+              "displayName": "similarity_threshold",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "results_count",
+              "displayName": "results_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        112
+      ],
+      "id": "802943cf-63fd-4b85-ba09-f17055244c9a",
+      "name": "Postgres Log Search1",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"text-embedding-3-small\",\n  \"input\": \"{{ $json.search_term }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        112
+      ],
+      "id": "0c7684da-bd39-4326-b58c-00464454de80",
+      "name": "Convert Query to Embedding",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "O85h8AY0w0jLJ62G",
+          "name": "OpenAI Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM public.exact_phrase_search_punctuated($1, $2, $3, $4, $5);",
+        "options": {
+          "queryReplacement": "=[\n  {{ $('Webhook').item.json.body.searchTerm }},\n  {{ $('Webhook').item.json.body.sortColumn }},\n  {{ $('Webhook').item.json.body.sortDirection }},\n  {{ $('Webhook').item.json.body.limit }},\n  {{ $('Webhook').item.json.body.offset }}\n]"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1184,
+        368
+      ],
+      "id": "578b2524-0b00-4c8b-a6a2-d7a60ed55b87",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Postgres Log Search1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Postgres Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is it Semantic Search?": {
+      "main": [
+        [
+          {
+            "node": "Convert Query to Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Log Search1": {
+      "main": [
+        [
+          {
+            "node": "Is it Semantic Search?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Query to Embedding": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "7852fdf9-c798-442d-b72c-f583c9c3e5f9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+  },
+  "id": "hcJfh817KqlpSzQL",
+  "tags": []
+}

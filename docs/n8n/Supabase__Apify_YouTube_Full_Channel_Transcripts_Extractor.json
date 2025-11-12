@@ -1,0 +1,582 @@
+{
+    "name": "Supabase___Apify_YouTube_Full_Channel_Transcripts_Extractor",
+    "nodes": [
+      {
+        "parameters": {
+          "url": "=https://api.apify.com/v2/actor-runs/{{ $json.runId }}?token={{ $json.apifyToken }}",
+          "options": {
+            "response": {}
+          }
+        },
+        "id": "1b8ff71e-9012-4c8b-8a5f-b5fa38aea1d6",
+        "name": "Get Run Details1",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "position": [
+          400,
+          144
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://api.apify.com/v2/datasets/{{ $json.data.defaultDatasetId }}/items",
+          "options": {
+            "response": {}
+          }
+        },
+        "id": "b3241c4e-e049-4990-adf6-80de4f600750",
+        "name": "Fetch Dataset Items Batch1",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "position": [
+          800,
+          144
+        ]
+      },
+      {
+        "parameters": {
+          "batchSize": "={{ $('Set: Config Variables1').item.json.batchLimit }}",
+          "options": {
+            "reset": false
+          }
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          592,
+          144
+        ],
+        "id": "3794968c-7469-4125-8d31-35e7800d107f",
+        "name": "Loop Over Items1"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "f47d76f4-e821-466e-ad64-d5c07e7af04d",
+                "name": "apifyToken",
+                "value": "YOUR_APIFY_TOKEN",
+                "type": "string"
+              },
+              {
+                "id": "ba2883f5-49c4-40c1-8fd1-5b6d5833baf3",
+                "name": "runId",
+                "value": "l2Tskpo7JN0WXfUnv",
+                "type": "string"
+              },
+              {
+                "id": "d692a0ba-6d5e-4412-b5b3-9771198a61c7",
+                "name": "batchLimit",
+                "value": 100,
+                "type": "number"
+              },
+              {
+                "id": "84dc0944-ec0b-4a38-a3d3-6dfdda0e9fcc",
+                "name": "maxLoopIterations",
+                "value": 500,
+                "type": "number"
+              },
+              {
+                "id": "151910ae-26ae-4e94-98bd-aebdfb34982a",
+                "name": "actor",
+                "value": "YbmoVOUovb8Ixfv2z",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          224,
+          144
+        ],
+        "id": "da040f48-7742-47ec-9255-0c46d8256ef9",
+        "name": "Set: Config Variables1"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "b1477095-11e7-4b40-a606-58611cb5377a",
+                "leftValue": "={{ Number($items(\"Fetch Dataset Items Batch1\")[0].json.length) }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          992,
+          144
+        ],
+        "id": "d3493f2c-9bf9-4ab2-b281-994e97a9e622",
+        "name": "If Items in Batch1"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          32,
+          144
+        ],
+        "id": "c9d30caa-4a04-40b9-93bd-831bfbed6243",
+        "name": "When clicking ‘Test workflow’"
+      },
+      {
+        "parameters": {
+          "content": "## Apify YouTube Full Channel Transcripts Extractor\n[karamelo/youtube-full-channel-transcripts-extractor](https://console.apify.com/actors/YbmoVOUovb8Ixfv2z/runs)",
+          "width": 420
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "8d6b9466-8d2a-4bcc-b95e-7762ba209f87",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "content": "## List of Channels Completed\n@LifeAfterLifeNDE-is1kh - Done\n@TiaReneePodcast - Done\n@Beyond_with_Heather_Tesch - Done\n@LoveCoveredLifePodcast - Done\n@NDERadiowithLeeWitting - Done\n@IANDSvideos - Done\n@HeavenAwaits - Done\n@NDETV316 - Done\n@PassionHarvest - Done\n@TheOtherSideNDEYT - Done\n@BeyondTheLightTV - Done\n@ThanatosTVEN - Done\n@ndediary - Done\n@beyonddeath22 - Done\n@roundtripdeath - Done\n@cominghomechannel - Done\n@PrioritizeYourLife - Done\n@Talesofresilience - Done\n@spirittravels - Done\n@CrossingOverNDE - Done\n@TouchingTheAfterlife - Done\n@AfterlifeAtlas - Done\n@JohnBurkeImagineHeaven - Done\n@HeavenIsReal1 - Done\n@ConfessionsEMI-NDE - Done\n@AfterlifeExperiences - Done\n@Lamplighter888 - Done\n@AboutFreedomShow - Done\n@REALNEARDEATHEXPERIENCESTORIES - Done\n@ShamanOaks - Done\n@LogicalNDE - Done\n@lossandfoundpodcast - Done\n@AnthonyCheneProduction - Done\n@DivineEncounters-NDE - Done\n@NDECompilations - Done\n@ndefarmington5731 - Done\n@THAfterlife - Done\n@Wakinguptoheaven - Done\n@NDEaccounts - Done\n@outstandingnear-deathexper34 - Done\n@HawaiianIANDS - Done\n@LifeBeyondtheVeil - Done\n@NDEVideo - Done\n@dorothyshelton - Done\n@iandsnorthernvirginia-nde - Done\n@NewHeavenNewEarth - Done\n@FWJ-NearDeathExperiences - Done\n@TheParadigmExperience - Done\n@NearDeathResearch123 - Done\n@thenextchapternde - Done\n@lifeandbeyondchannel - Done\n@NearDeathExperience-US - Done\n@TrueNDEs - Done\n@afterlifebeyond2619 - Done\n@NotTheEndNDE - Done\n@NearDeathExperiencePodcast - Done\n@muslimnde3612 - Done\n@NDEVault - Done",
+          "height": 1180,
+          "width": 420
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          32,
+          320
+        ],
+        "id": "537974fd-9a80-49af-82ba-079f682f6c25",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "tableId": "nde_vids",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "videoId",
+                "fieldValue": "={{ $json.videoId }}"
+              },
+              {
+                "fieldId": "created_at",
+                "fieldValue": "={{ $json.datePublished }}"
+              },
+              {
+                "fieldId": "type",
+                "fieldValue": "video"
+              },
+              {
+                "fieldId": "title",
+                "fieldValue": "={{ $json.title }}"
+              },
+              {
+                "fieldId": "url",
+                "fieldValue": "=https://www.youtube.com/watch?v={{ $json.videoId }}"
+              },
+              {
+                "fieldId": "thumbnailUrl",
+                "fieldValue": "={{ $json.thumbnailUrl }}"
+              },
+              {
+                "fieldId": "viewCount",
+                "fieldValue": "={{ Number( ($json.viewCount || \"\").replace(\" views\", \"\").replace(/,/g, \"\") ) }}"
+              },
+              {
+                "fieldId": "date",
+                "fieldValue": "={{ $json.uploadDate }}"
+              },
+              {
+                "fieldId": "likes",
+                "fieldValue": "={{    (() => {     const raw = $json.likes || '';     const match = raw.match(/([\\d.]+)\\s*([KMB])?/i);     if (!match) return 0;     const num = parseFloat(match[1]);     const suffix = (match[2] || '').toUpperCase();      const multipliers = {       K: 1_000,       M: 1_000_000,       B: 1_000_000_000,     };      return Math.round(num * (multipliers[suffix] || 1));   })() }}"
+              },
+              {
+                "fieldId": "location"
+              },
+              {
+                "fieldId": "channelName",
+                "fieldValue": "={{ $json.channelName }}"
+              },
+              {
+                "fieldId": "channelUrl",
+                "fieldValue": "=https://www.youtube.com/{{ $json.channelHandle }}"
+              },
+              {
+                "fieldId": "channelId",
+                "fieldValue": "={{ $json.channelID }}"
+              },
+              {
+                "fieldId": "channelUsername",
+                "fieldValue": "={{ $json.channelHandle }}"
+              },
+              {
+                "fieldId": "numberOfSubscribers",
+                "fieldValue": "={{    (() => {     const raw = $json.subscriberCount || '';     const match = raw.match(/([\\d.]+)\\s*([KMB])?/i);     if (!match) return 0;     const num = parseFloat(match[1]);     const suffix = (match[2] || '').toUpperCase();      const multipliers = {       K: 1_000,       M: 1_000_000,       B: 1_000_000_000,     };      return Math.round(num * (multipliers[suffix] || 1));   })() }}"
+              },
+              {
+                "fieldId": "duration",
+                "fieldValue": "={{\n  (() => {\n    const durationStr = $json.duration; // Get the raw duration value\n\n    // Check if durationStr is a string and not empty after trimming\n    if (typeof durationStr === 'string' && durationStr.trim() !== '') {\n      return durationStr; // Return the original string if valid\n    }\n    \n    // Otherwise, return null\n    return null; \n  })()\n}}"
+              },
+              {
+                "fieldId": "commentsCount",
+                "fieldValue": "={{    (() => {     const raw = $json.comments || '';     const match = raw.match(/([\\d.]+)\\s*([KMB])?/i);     if (!match) return 0;     const num = parseFloat(match[1]);     const suffix = (match[2] || '').toUpperCase();      const multipliers = {       K: 1_000,       M: 1_000_000,       B: 1_000_000_000,     };      return Math.round(num * (multipliers[suffix] || 1));   })() }}"
+              },
+              {
+                "fieldId": "description",
+                "fieldValue": "={{ $json.description }}"
+              },
+              {
+                "fieldId": "subtitles",
+                "fieldValue": "={{ $json.captions }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1072,
+          368
+        ],
+        "id": "287588f2-8077-41ed-bb7b-8d6fe87cbc4c",
+        "name": "Supabase"
+      },
+      {
+        "parameters": {
+          "operation": "upsert",
+          "schema": {
+            "__rl": true,
+            "value": "public",
+            "mode": "list",
+            "cachedResultName": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "nde_vids",
+            "mode": "list",
+            "cachedResultName": "nde_vids"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "type": "video",
+              "title": "={{ $json.title }}",
+              "url": "=https://www.youtube.com/watch?v={{ $json.videoId }}",
+              "likes": "={{ \n  (() => {\n    const raw = $json.likes || '';\n    const match = raw.match(/([\\d.]+)\\s*([KMB])?/i);\n    if (!match) return 0;\n    const num = parseFloat(match[1]);\n    const suffix = (match[2] || '').toUpperCase();\n\n    const multipliers = {\n      K: 1_000,\n      M: 1_000_000,\n      B: 1_000_000_000,\n    };\n\n    return Math.round(num * (multipliers[suffix] || 1));\n  })()\n}}",
+              "numberOfSubscribers": "={{ \n  (() => {\n    const raw = $json.subscriberCount || '';\n    const match = raw.match(/([\\d.]+)\\s*([KMB])?/i);\n    if (!match) return 0;\n    const num = parseFloat(match[1]);\n    const suffix = (match[2] || '').toUpperCase();\n\n    const multipliers = {\n      K: 1_000,\n      M: 1_000_000,\n      B: 1_000_000_000,\n    };\n\n    return Math.round(num * (multipliers[suffix] || 1));\n  })()\n}}",
+              "commentsCount": "={{ \n  (() => {\n    const raw = $json.comments || '';\n    const match = raw.match(/([\\d.]+)\\s*([KMB])?/i);\n    if (!match) return 0;\n    const num = parseFloat(match[1]);\n    const suffix = (match[2] || '').toUpperCase();\n\n    const multipliers = {\n      K: 1_000,\n      M: 1_000_000,\n      B: 1_000_000_000,\n    };\n\n    return Math.round(num * (multipliers[suffix] || 1));\n  })()\n}}",
+              "videoId": "={{ $json.videoId }}",
+              "viewCount": "={{\n  (() => {\n    const rawViewCount = $json.viewCount || \"\"; // Get raw value, default to empty string\n    \n    // Clean the string: remove \" views\" and all commas\n    const cleanedStr = String(rawViewCount).replace(/ views/gi, \"\").replace(/,/g, \"\").trim();\n    // Added /i to \" views\" for case-insensitivity, trim() for any leftover spaces\n\n    // If the cleaned string is empty, it means no number was present\n    if (cleanedStr === \"\") {\n      return 0;\n    }\n\n    const num = Number(cleanedStr); // Attempt to convert to number\n\n    // Check if the conversion resulted in NaN\n    // If it's NaN, return 0; otherwise, return the number\n    return isNaN(num) ? 0 : num;\n  })()\n}}",
+              "date": "={{ $json.datePublished }}",
+              "channelName": "={{ $json.channelName }}",
+              "channelUrl": "=https://www.youtube.com/{{ $json.channelHandle }}",
+              "channelId": "={{ $json.channelID }}",
+              "channelUsername": "={{ $json.channelHandle }}",
+              "duration": "={{\n  (() => {\n    const durationStr = $json.duration; // Get the raw duration value\n\n    // Check if durationStr is a string and not empty after trimming\n    if (typeof durationStr === 'string' && durationStr.trim() !== '') {\n      return durationStr; // Return the original string if valid\n    }\n    \n    // Otherwise, return null\n    return null; \n  })()\n}}",
+              "description": "={{ $json.description }}",
+              "subtitles": "={{ $json.captions }}",
+              "thumbnailUrl": "={{ $json.thumbnailUrl }}",
+              "created_at": "={{\n  (() => {\n    const datePublishedStr = $json.datePublished;\n\n    // Check if datePublishedStr is a string and not empty after trimming\n    if (typeof datePublishedStr === 'string' && datePublishedStr.trim() !== '') {\n      return datePublishedStr; // Use the actual datePublished if available\n    }\n    \n    // Otherwise, return the default timestamp string\n    return \"2025-05-21T15:23:24-07:00\"; \n  })()\n}}"
+            },
+            "matchingColumns": [
+              "videoId"
+            ],
+            "schema": [
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "title",
+                "displayName": "title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "url",
+                "displayName": "url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "thumbnailUrl",
+                "displayName": "thumbnailUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "viewCount",
+                "displayName": "viewCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "likes",
+                "displayName": "likes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "location",
+                "displayName": "location",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "channelName",
+                "displayName": "channelName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "channelUrl",
+                "displayName": "channelUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "channelId",
+                "displayName": "channelId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "channelUsername",
+                "displayName": "channelUsername",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "numberOfSubscribers",
+                "displayName": "numberOfSubscribers",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "duration",
+                "displayName": "duration",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "commentsCount",
+                "displayName": "commentsCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "description",
+                "displayName": "description",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "subtitles",
+                "displayName": "subtitles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "videoId",
+                "displayName": "videoId",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1248,
+          144
+        ],
+        "id": "5d93d059-1092-4a04-98cd-a05ab8821ef5",
+        "name": "Postgres1"
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Get Run Details1": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Dataset Items Batch1": {
+        "main": [
+          [
+            {
+              "node": "If Items in Batch1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items1": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Fetch Dataset Items Batch1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set: Config Variables1": {
+        "main": [
+          [
+            {
+              "node": "Get Run Details1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Items in Batch1": {
+        "main": [
+          [
+            {
+              "node": "Postgres1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Test workflow’": {
+        "main": [
+          [
+            {
+              "node": "Set: Config Variables1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "versionId": "8411d681-d22a-4b3f-96dd-94a5e91dda0b",
+    "meta": {
+      "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+    },
+    "id": "gD05KAM7pECOJaPL",
+    "tags": [
+      {
+        "createdAt": "2025-06-18T19:45:39.320Z",
+        "updatedAt": "2025-06-18T19:45:39.320Z",
+        "id": "dG9Gr0gpQsNgvSXL",
+        "name": "NDE Project"
+      }
+    ]
+  }

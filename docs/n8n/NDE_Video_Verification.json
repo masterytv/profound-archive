@@ -1,0 +1,522 @@
+{
+  "name": "NDE_Video_Verification",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        192
+      ],
+      "id": "d0de8f5c-38df-4f7f-8d5a-5079684573d2"
+    },
+    {
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "batch_limit",
+              "value": 200
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Batch Limit",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        192,
+        192
+      ],
+      "id": "4b1cf037-01f8-4ab3-9330-5e6ae53a5612"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $('Set Batch Limit').item.json.batch_limit }}",
+        "options": {}
+      },
+      "name": "Loop Each Row",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        528,
+        192
+      ],
+      "id": "243752af-bbc0-4cd6-ab96-1a3d2fe4b012"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "nde_vids",
+          "mode": "list",
+          "cachedResultName": "nde_vids"
+        },
+        "limit": "={{ $json.batch_limit }}",
+        "where": {
+          "values": [
+            {
+              "column": "isNde",
+              "condition": "IS NULL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        368,
+        192
+      ],
+      "id": "7e8821f6-3833-4b4b-8bad-e09d2da59f68",
+      "name": "Postgres1",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "nde_vids",
+          "mode": "list",
+          "cachedResultName": "nde_vids"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "viewCount": 0,
+            "likes": 0,
+            "numberOfSubscribers": 0,
+            "commentsCount": 0,
+            "isNde": "={{ $json.output.isNde }}",
+            "isNdeJustification": "={{ $json.output.isNdeJustification }}",
+            "videoId": "={{ $('Postgres1').item.json.videoId }}",
+            "experiencerFullName": "={{ $json.output.experiencerFullName }}"
+          },
+          "matchingColumns": [
+            "videoId"
+          ],
+          "schema": [
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "thumbnailUrl",
+              "displayName": "thumbnailUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "viewCount",
+              "displayName": "viewCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "likes",
+              "displayName": "likes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "location",
+              "displayName": "location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "channelName",
+              "displayName": "channelName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "channelUrl",
+              "displayName": "channelUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "channelId",
+              "displayName": "channelId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "channelUsername",
+              "displayName": "channelUsername",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numberOfSubscribers",
+              "displayName": "numberOfSubscribers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duration",
+              "displayName": "duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "commentsCount",
+              "displayName": "commentsCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subtitles",
+              "displayName": "subtitles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "videoId",
+              "displayName": "videoId",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isNde",
+              "displayName": "isNde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "options",
+              "canBeUsedToMatch": true,
+              "options": [
+                {
+                  "name": "insufficient_info",
+                  "value": "insufficient_info"
+                },
+                {
+                  "name": "not_nde",
+                  "value": "not_nde"
+                },
+                {
+                  "name": "possible_nde",
+                  "value": "possible_nde"
+                },
+                {
+                  "name": "clear_nde",
+                  "value": "clear_nde"
+                }
+              ]
+            },
+            {
+              "id": "isNdeJustification",
+              "displayName": "isNdeJustification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "experiencerFullName",
+              "displayName": "experiencerFullName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1072,
+        160
+      ],
+      "id": "2b3d67d8-cbbc-42a2-aba0-d0dfa7766b90",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.5,
+          "topP": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        704,
+        352
+      ],
+      "id": "3ac64ca7-9a12-4550-8b57-ed8a5833ccc5",
+      "name": "OpenRouter Chat Model"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"isNde\": {\n      \"type\": \"string\",\n      \"description\": \"The classification of the NDE testimonial.\",\n      \"enum\": [\n        \"clear_nde\",\n        \"possible_nde\",\n        \"not_nde\",\n        \"insufficient_info\"\n      ]\n    },\n    \"isNdeJustification\": {\n      \"type\": \"string\",\n      \"description\": \"A brief 1-2 sentence justification for the classification.\"\n    },\n    \"experiencerFullName\": {\n      \"type\": [\n        \"string\",\n        \"null\"\n      ],\n      \"description\": \"The full name (or first name if only that is available) of the NDE experiencer if identified from captions, title, or description. Otherwise, null.\"\n    }\n  },\n  \"required\": [\n    \"isNde\",\n    \"isNdeJustification\",\n    \"experiencerFullName\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        368
+      ],
+      "id": "de7011df-0d0f-4b01-b170-147720ef99cd",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=System Prompt:\nYou are an expert NDE researcher and information extraction specialist. Your primary task is to analyze video caption text, the video title, and the video description.\nFirst, determine if the caption text describes a first-person Near-Death Experience (NDE) testimonial.\nSecond, if the text describes an NDE, your goal is to identify the FULL NAME (first and last name, if available) of the person recounting the NDE.\n\nTo find the name, consider these sources in order of preference:\n1.  Explicit self-identification in the captions (e.g., \"My name is Jane Doe...\", \"I, John Smith, experienced...\").\n2.  Introduction by a host in the captions (e.g., \"Welcome to the show, Vinny Barbarino.\", \"Our guest today is Mary Sunshine.\").\n3.  Mentions of the potential experiencer's full name in the provided video TITLE.\n4.  Mentions of the potential experiencer's full name in the provided video DESCRIPTION.\n\nIf a full name is found, provide it. If only a first name is clearly identifiable as the experiencer, provide that. If multiple names are mentioned and it's unclear who the NDEr is, prioritize names clearly linked to the first-person NDE account.\n\nAn NDE typically involves:\n1. A person being clinically dead, believed to be dead, or in a severe life-threatening situation where they perceived themselves as dying.\n2. The person recounts specific experiences during this state, such as:\n    - Out-of-body experience (seeing their own body from outside)\n    - Moving through a tunnel or darkness towards a light\n    - Encountering a brilliant, loving light\n    - Meeting deceased relatives, friends, or spiritual/religious figures\n    - A panoramic life review\n    - Overwhelming feelings of peace, love, joy\n    - A sense of timelessness or being in another realm\n    - A border or point of no return\n    - A conscious decision or being told to return to life\n3. The account must be a first-person testimonial (\"I experienced...\", \"I saw...\").\n\nIt is NOT an NDE if:\n- It's a dream unrelated to a death event.\n- It's a general spiritual awakening or vision without a near-death trigger.\n- It's primarily a philosophical discussion about death or afterlife without a personal experience.\n- It's a second-hand account (\"My mother told me about her NDE\").\n- It's clearly fictional.\n\nUser Prompt:\nVideo Title:\n\"\"\"\n{{ $json.title }}\n\"\"\"\n\nVideo Description:\n\"\"\"\n{{ $json.description }}\n\"\"\"\n\nCaption Text:\n\"\"\"\n{{ $json.subtitles }}\n\"\"\"\n\nBased on the NDE definitions, caption text, video title, and video description provided:\n\n1.  Is the caption text an NDE testimonial?\n    Respond with ONLY one of the following categories for the 'isNde' key:\n    - \"clear_nde\"\n    - \"possible_nde\"\n    - \"not_nde\"\n    - \"insufficient_info\"\n\n2.  Provide a brief 1-2 sentence justification for your NDE classification.\n\n3.  If the classification is \"clear_nde\" or \"possible_nde\":\n    Attempt to identify the full name (first and last) of the NDE experiencer.\n    - If a full name is identified from any of the provided sources (captions, title, description, or host introduction in captions), provide it.\n    - DO NOT include the name of the narrator, host, podcaster, interviewer or person describing someone else's NDE. Only include the name of the first-person NDE experiencer.\n    - If only a first name is clearly identifiable as the experiencer, provide that first name.\n    - If no name is clearly identifiable as the experiencer, or if the classification is \"not_nde\" or \"insufficient_info\", respond with `null` for the experiencer's name.\n    Focus on names directly associated with the first-person NDE account.\n\nIgnore non-verbal cues like '[Music]', '[Applause]', '[Laughter]', or timestamps in the captions unless they are part of a spoken introduction. Focus solely on the recounted experience and explicitly stated or introduced names.\n\nRespond ONLY with a JSON object containing three keys: 'isNde' (with one of the four categories), 'isNdeJustification' (your brief reasoning), and 'experiencerFullName' (the extracted full name, first name, or null). Do not include any other text before or after the JSON object.\n\nExample JSON (full name found in title):\n{\n  \"isNde\": \"clear_nde\",\n  \"isNdeJustification\": \"The text describes a clear NDE. The experiencer's name, Jane Doe, was found in the video title.\",\n  \"experiencerFullName\": \"Jane Doe\"\n}\n\nExample JSON (first name found in captions, host intro):\n{\n  \"isNde\": \"possible_nde\",\n  \"isNdeJustification\": \"The text mentions some NDE elements. The host introduced the experiencer as Vinny.\",\n  \"experiencerFullName\": \"Vinny\"\n}\n\nExample JSON (full name from self-identification in captions):\n{\n  \"isNde\": \"clear_nde\",\n  \"isNdeJustification\": \"The experiencer, John Smith, clearly describes his NDE after a cardiac arrest.\",\n  \"experiencerFullName\": \"John Smith\"\n}\n\nExample JSON (name NOT found or not an NDE):\n{\n  \"isNde\": \"not_nde\",\n  \"isNdeJustification\": \"The text is a philosophical discussion, not an NDE testimonial. No experiencer name relevant.\",\n  \"experiencerFullName\": null\n}\n\n\n",
+        "hasOutputParser": true,
+        "options": {
+          "maxIterations": "={{ $('Set Batch Limit').item.json.batch_limit }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        752,
+        160
+      ],
+      "id": "04489c5c-a89c-4705-89e2-2e298af566d5",
+      "name": "NDE Classifier Agent (AI)"
+    },
+    {
+      "parameters": {
+        "content": "## Validating Videos in Supabase for clear_nde \n**Also finding name of NDEr** ",
+        "width": 520,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "0c85376a-1324-4c8c-ba19-de5de1169df6",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set Batch Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Each Row": {
+      "main": [
+        [
+          {
+            "node": "NDE Classifier Agent (AI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Batch Limit": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres1": {
+      "main": [
+        [
+          {
+            "node": "Loop Each Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "NDE Classifier Agent (AI)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "NDE Classifier Agent (AI)",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NDE Classifier Agent (AI)": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "816f7fbf-aaba-40bf-9420-15027aeaa490",
+  "meta": {
+    "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+  },
+  "id": "KrdUmodJfL4HPFF1",
+  "tags": [
+    {
+      "createdAt": "2025-06-18T19:45:39.320Z",
+      "updatedAt": "2025-06-18T19:45:39.320Z",
+      "id": "dG9Gr0gpQsNgvSXL",
+      "name": "NDE Project"
+    }
+  ]
+}

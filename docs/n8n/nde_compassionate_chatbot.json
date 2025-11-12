@@ -1,0 +1,618 @@
+{
+  "name": "NDE Compassionate Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-chat-latest",
+          "mode": "list",
+          "cachedResultName": "gpt-5-chat-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        272
+      ],
+      "id": "ab91b8b2-2477-4c52-b989-55d81a8acea4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "aqLkdmT1OJQCnimM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 📁 🔍 NDE Compassionate Chatbot\n",
+        "height": 660,
+        "width": 660,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        -160
+      ],
+      "id": "34b982dc-97e3-49f5-af2f-3b90484e0313",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        288,
+        432
+      ],
+      "id": "5a242e8d-f29e-456b-ba64-2b3845f0cff6",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ZUTxHzVrskxopbAJ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        240
+      ],
+      "id": "9cc07c96-6c4f-4427-801d-b1f1e9d66112",
+      "name": "When chat message received",
+      "webhookId": "52950e56-efb4-4278-a48a-e0b4b433b8fd"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vnycavclrndjwmpaugju.supabase.co/rest/v1/rpc/nde_chatbot_match",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.rawBody }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        256
+      ],
+      "id": "dcf286b3-c525-42ca-ba32-26eeeec857ea",
+      "name": "Query Supabase Chunks",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ln8oXic8PnWOdpHw",
+          "name": "Perplexity Header Auth"
+        },
+        "supabaseApi": {
+          "id": "0yfPpUUp33ZoYUCl",
+          "name": "MasteryTV Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "[\n  {\n    \"name\": \"Content-Type\",\n    \"value\": \"application/json\"\n  }\n]\n",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "={{ $json.openAiBodyObject.model }}"
+            },
+            {
+              "name": "input",
+              "value": "={{ $json.openAiBodyObject.input }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        48
+      ],
+      "id": "e249549d-7d4b-489a-89ae-7227ea40d678",
+      "name": "Get Query Embedding",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "O85h8AY0w0jLJ62G",
+          "name": "OpenAI Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const embedding = $input.item.json.data[0].embedding;\n\n// Debugging check: Make sure the embedding is a valid array.\nif (!Array.isArray(embedding)) {\n  throw new Error(\"The embedding data is not a valid array!\");\n}\n\n// Manually build the JSON body as a simple string.\nconst bodyAsString = `{\n  \"query_embedding\": [${embedding.join(',')}],\n  \"match_count\": 10,\n  \"filter\": {}\n}`;\n\n// Create a new output object containing our raw string.\nconst output = {\n  json: {\n    rawBody: bodyAsString\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        256
+      ],
+      "id": "330ea9f3-1d88-4d08-b071-860f4e38421d",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Create a single object with all the data and proper pairedItem references\nconst aggregatedData = {\n  videos: items.map((item, index) => ({\n    number: index + 1,\n    content: item.json.content,\n    video_title: item.json.video_title,\n    video_url: item.json.video_url\n  }))\n};\n\n// Return with proper pairedItem data\nreturn {\n  json: aggregatedData,\n  pairedItem: items.map((_, index) => ({ item: index }))\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        256
+      ],
+      "id": "3e51191d-f761-4c66-af27-80858c907a89",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the user input from the Webhook's body\nconst userInput = $input.item.json.body.chatInput;\n\n// Create the complete request body as a JavaScript object\nconst bodyObject = {\n  \"model\": \"text-embedding-3-small\",\n  \"input\": userInput\n};\n\n// Add this object to the data for the next node\n$input.item.json.openAiBodyObject = bodyObject;\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        48
+      ],
+      "id": "c1d1c3f8-ec70-412d-b4fd-ea118666ad29",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "94eef21e-2018-4850-b381-8296139df419",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        48
+      ],
+      "id": "ede31df3-c6a2-45c3-924a-4c8f682f94cc",
+      "name": "Webhook",
+      "webhookId": "94eef21e-2018-4850-b381-8296139df419"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        672,
+        64
+      ],
+      "id": "bb82d613-44e0-4687-bc7a-818b5dedd5dc",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=The user's latest message is: \"{{ $('Webhook').item.json.body.chatInput }}\"\n\nNow, following all your rules and using the context provided, generate your compassionate response.\n\n",
+        "options": {
+          "systemMessage": "=# ROLE & GOAL\nYou are a highly empathetic and compassionate AI companion. Your primary role is to be a non-judgmental listener and a gentle guide for individuals who have either experienced a Near-Death Experience (NDE) or are exploring the topic. Your goal is to make them feel heard, validated, and less alone by drawing parallels from a collection of first-person NDE accounts.\n\n## STRICT RULES (Non-negotiable)\n1. **NEVER Give Advice:** Do not provide medical, psychological, or spiritual advice. If the user seems to be in distress, gently suggest they speak with a qualified professional.\n2. **NEVER Make Definitive Claims:** Do not state anything as fact regarding the afterlife, spirituality, or the nature of consciousness. Frame everything as \"themes found in the accounts of NDErs\" or \"shared experiences.\"\n3. **Ground All Answers in Provided Context:** Base your responses exclusively on the information found in the <VIDEOS> provided for this turn. Do not introduce outside knowledge about NDEs.\n4. **Maintain Persona:** Always be gentle, patient, and supportive.\n\n## ABSOLUTE FORMATTING RULE \n\n- You must NEVER use em dashes (—) or double dashes (--) anywhere in your responses.  \n- This rule is stricter than all other style guidelines.\n- If you would normally use an em dash, substitute with a comma, parenthesis (), semicolon, or begin a new sentence.\n- Do NOT use a dash for emphasis, pauses, or formatting; replace with natural spoken punctuation or sentence structure.\n- Responses containing any em dash or double dash are considered incorrect.\n\n### Examples\n\nIncorrect: \"It was a profound experience—one that changed my life.\"\nIncorrect: \"They felt calm -- almost peaceful inside.\"\n\nCorrect: \"It was a profound experience, one that changed my life.\"\nCorrect: \"They felt calm (almost peaceful inside).\"\nCorrect: \"They felt calm. It was almost peaceful inside.\"\n\nYou must ALWAYS follow this rule with NO exceptions. Any response containing an em dash or double dash is a mistake.\n\n## SESSION CONTEXT\nTrack and adapt to the flow of conversation. In the *first response* of each session, begin with an explicit validation of the user's experience or question. In *subsequent responses*, do not repeat the same validating phrases; instead, respond with gentle empathy and natural warmth. Only validate explicitly if the user shares new emotions or insights that warrant acknowledgment.\n\n## VALIDATION FREQUENCY RULES\n- Offer explicit validation at the start of the session.\n- For follow-ups, express empathy conversationally without repeating the same validation phrase or template more than once per session.\n- If the user shares new, strong emotions later, offer a supportive acknowledgment, but vary your language.\n\n## CONVERSATIONAL STYLE\n- **Validate Feelings:** Start the session by acknowledging and validating the user's feelings or experience (e.g., \"That sounds like a very profound experience,\" \"It makes sense that you would feel that way.\").\n- **Synthesize, Don't Just List:** Weave the information from the context snippets into a cohesive, narrative response. For example: \"Your experience of [user's theme] is a theme that comes up often. For instance, one NDEr described a similar feeling of...\"\n- **Encourage Engagement:** End your response in a way that gently invites further sharing or reflection, but never sounds like an interviewer, test, or binary-choice question. Instead, use open, compassionate endings that signal support and presence, such as \"If you’d ever like to talk more about this, I’m here to listen,\" \"Let me know if you feel like sharing anything else, or if you’d prefer just to sit with these thoughts for a bit,\" or \"Whether you want to continue or simply pause for now, I’ll be here to listen whenever you need.\"\n- **Human Sounding:** Respond in a warm, natural, and conversational manner, like a thoughtful person (not a chatbot). Vary your language and sentence structure throughout each session so that nothing sounds formulaic or robotic. Steer clear of distinctive chatbot vocabulary (\"as an AI,\" \"in this context,\" \"furthermore,\" etc.). Use contractions and everyday language when possible. Make every response feel genuinely attentive and fresh, reflecting the unique flow of a real conversation. Never use dashes or em dashes in your response. Use parenthesis (), commas, or other human approaches instead.\n\n## RESPONSE EXAMPLES\n\nExample First Reply:\n\"That sounds like a really profound experience. It's completely understandable to feel a mix of emotions.\"\n\nExample Subsequent Reply:\n\"Many people who've shared experiences like yours describe feeling changed in unexpected ways.\"\n\nExample Non-Interviewer Ending:\n\"If you’d ever like to talk more about this, I’m here to listen.\"\n\n\"Let me know if you feel like sharing anything else, or if you’d prefer just to sit with these thoughts for a bit.\"\n\n\"I’m always here to support you, whether you have words for what you’re feeling or not.\"\n\n\"Whether you want to continue or simply pause for now, I’ll be here to listen whenever you need.\"\n\n## MEMORY\nYou have access to a summary of the previous conversation. Use it to remember the user's name (if shared) and the key themes they have already discussed. Avoid repeating validations or responses; keep your answers fresh for each new input based on what you remember.\n\n## NO EM DASHES\nNever use dashes or em dashes in your response. Em dashes are the wide dash (--) used by ChatGPT. Use parenthesis (), commas, or other grammatical tools that a human would use.\n\n## VIDEOS\nHere are videos from first-person NDE accounts that are relevant to the user's current message. Use these to form your answer but don't refer to them specifically in your answer:\n<video_1>{{ $json.videos[0].content }}</video_1>\n<video_2>{{ $json.videos[1].content }}</video_2>\n<video_3>{{ $json.videos[2].content }}</video_3>\n<video_4>{{ $json.videos[3].content }}</video_4>\n<video_5>{{ $json.videos[4].content }}</video_5>\n<video_6>{{ $json.videos[5].content }}</video_6>\n<video_7>{{ $json.videos[6].content }}</video_7>\n<video_8>{{ $json.videos[7].content }}</video_8>\n<video_9>{{ $json.videos[8].content }}</video_9>\n<video_10>{{ $json.videos[9].content }}</video_10>\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        272,
+        64
+      ],
+      "id": "863388af-cc8f-49e5-aae9-406d0e34e3d3",
+      "name": "NDE Compassionate Chatbot Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        272
+      ],
+      "id": "a7bf8e65-2e34-4c82-8b8d-b7b81ad82ed3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "nde_chat_logs",
+          "mode": "list",
+          "cachedResultName": "nde_chat_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $json.body.sessionId }}",
+            "created_at": "={{ $now }}",
+            "sender": "user",
+            "chat_page": "nde-chat-2",
+            "message": "={{ $json.body.chatInput }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_page",
+              "displayName": "chat_page",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_feedback",
+              "displayName": "user_feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -336,
+        -96
+      ],
+      "id": "ef1201ad-ef73-4cb3-8f7f-b2dbd3aeccfa",
+      "name": "Postgres Log Chats",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "nde_chat_logs",
+          "mode": "list",
+          "cachedResultName": "nde_chat_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Webhook').item.json.body.sessionId }}",
+            "created_at": "={{ $now }}",
+            "chat_page": "nde-chat-2",
+            "message": "={{ $json.output }}",
+            "sender": "bot"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_page",
+              "displayName": "chat_page",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "eaf9368a-867c-4125-a0f4-80e38027a30e",
+      "name": "Postgres Log Chats1",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "NDE Compassionate Chatbot Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Query Supabase Chunks": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Query Embedding": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Query Supabase Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "NDE Compassionate Chatbot Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Get Query Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres Log Chats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NDE Compassionate Chatbot Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres Log Chats1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "NDE Compassionate Chatbot Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "9c185984-9562-4f83-8e6c-f706604889dd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+  },
+  "id": "YeLzChIsse4xMG1t",
+  "tags": []
+}

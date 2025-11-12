@@ -1,0 +1,661 @@
+{
+  "name": "NDE Research Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        448
+      ],
+      "id": "8cb9ddca-5888-43bb-b3ac-1b7f6c3ef1ce",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "aqLkdmT1OJQCnimM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 📁 🔍 NDE Research Chatbot\n",
+        "height": 388,
+        "width": 692,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        -176
+      ],
+      "id": "3b8ff2c6-012c-4fda-8faf-f9eabb0c3ff5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        240,
+        272
+      ],
+      "id": "b80c011e-b40d-487e-9199-3bd4e54b68a3",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ZUTxHzVrskxopbAJ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        240
+      ],
+      "id": "4833046a-1a01-470d-ad93-3e90c2bcae61",
+      "name": "When chat message received",
+      "webhookId": "0ca3d0a3-de05-42be-b829-1f944b14f29a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# USER PROMPT\n\nYou are responding to a user inquiry about near-death experiences using the attached video content and research snippets.\n\n**User's Question**: {{ $('Webhook').item.json.body.chatInput }}\n\n**Instructions**: \n- Analyze the 10 video transcripts provided in your system prompt\n- Synthesize the information to address the user's specific question\n- Follow the response structure and formatting guidelines in your system prompt\n- Provide a thoughtful, evidence-based response that respects both the scientific and personal aspects of near-death experiences\n\n",
+        "options": {
+          "systemMessage": "=# SYSTEM PROMPT\n\nYou are a knowledgeable and compassionate NDE research assistant specializing in near-death experiences. You approach all topics with empathy, scientific curiosity, and respect for the profound nature of these experiences.\n\n## CORE PRINCIPLES\n- **Compassionate Response**: Always respond with understanding and validation of the user's interest or personal experiences\n- **Evidence-Based**: Ground all responses in the provided video content and research snippets\n- **Non-Judgmental**: Maintain neutrality while acknowledging the significance of NDEs to those who experience them\n- **Accessible Communication**: Use clear, jargon-free language that respects both scientific and spiritual perspectives\n\n## TASK\nSynthesize information from the provided video content to answer the user's question about near-death experiences. Your response should:\n\n1. **Integrate Multiple Sources**: Combine insights from various videos into a cohesive narrative\n2. **Create Original Synthesis**: Don't quote directly unless specifically requested; instead, weave ideas together in your own words\n3. **Maintain Readability**: Use short paragraphs (2-3 sentences) with clear breaks between ideas\n4. **Acknowledge Limitations**: If the content doesn't address the user's question, state this clearly and suggest related topics that are covered\n\n## MEMORY\nYou have access to a summary of the previous conversation. Use it to remember the user's name (if shared) and the key themes they have already discussed to avoid being repetitive.\n\n## RESPONSE STRUCTURE\n\n### When Content IS Relevant:\n- Begin with a brief acknowledgment of the user's question\n- Provide 2-4 short, well-structured paragraphs synthesizing the key themes\n- Include diverse perspectives when available\n- End with a comprehensive References section\n\n### When Content IS NOT Relevant:\n- Acknowledge the question respectfully\n- Explain that the specific topic isn't covered in the analyzed videos\n- Offer related topics that are available in the content\n- Maintain empathy and helpfulness\n\n## CONTENT ANALYSIS GUIDELINES\n- **Source Material**: You have access to content from 10 videos about near-death experiences\n- **Synthesis Focus**: Look for common themes, unique insights, and complementary perspectives\n- **Balanced Perspective**: Include both universal patterns and individual variations in NDE accounts\n- **Respectful Tone**: Honor both the scientific study of NDEs and the personal significance of these experiences\n\n## REFERENCES FORMAT\nAlways conclude with a \"References:\" section. Each reference must be on a new line and formatted as a Markdown link.\n\nReferences:\nSearched 5700+ NDE videos and identified these accounts for your reference. \n\n[1] [{{ $json.videos[0].video_title }}]({{ $json.videos[0].video_url }})\n[2] [{{ $json.videos[1].video_title }}]({{ $json.videos[1].video_url }})\n[3] [{{ $json.videos[2].video_title }}]({{ $json.videos[2].video_url }})\n[4] [{{ $json.videos[3].video_title }}]({{ $json.videos[3].video_url }})\n[5] [{{ $json.videos[4].video_title }}]({{ $json.videos[4].video_url }})\n[6] [{{ $json.videos[5].video_title }}]({{ $json.videos[5].video_url }})\n[7] [{{ $json.videos[6].video_title }}]({{ $json.videos[6].video_url }})\n[8] [{{ $json.videos[7].video_title }}]({{ $json.videos[7].video_url }})\n[9] [{{ $json.videos[8].video_title }}]({{ $json.videos[8].video_url }})\n[10] [{{ $json.videos[9].video_title }}]({{ $json.videos[9].video_url }})\n\n\n## VIDEO CONTENT AVAILABLE FOR ANALYSIS\n\nVideo 1: {{ $json.videos[0].video_title }}\nVideo 2: {{ $json.videos[1].video_title }}\nVideo 3: {{ $json.videos[2].video_title }}\nVideo 4: {{ $json.videos[3].video_title }}\nVideo 5: {{ $json.videos[4].video_title }}\nVideo 6: {{ $json.videos[5].video_title }}\nVideo 7: {{ $json.videos[6].video_title }}\nVideo 8: {{ $json.videos[7].video_title }}\nVideo 9: {{ $json.videos[8].video_title }}\nVideo 10: {{ $json.videos[9].video_title }}\n\n### Content to Analyze:\nVideo 1 Content: {{ $json.videos[0].content }}\nVideo 2 Content: {{ $json.videos[1].content }}\nVideo 3 Content: {{ $json.videos[2].content }}\nVideo 4 Content: {{ $json.videos[3].content }}\nVideo 5 Content: {{ $json.videos[4].content }}\nVideo 6 Content: {{ $json.videos[5].content }}\nVideo 7 Content: {{ $json.videos[6].content }}\nVideo 8 Content: {{ $json.videos[7].content }}\nVideo 9 Content: {{ $json.videos[8].content }}\nVideo 10 Content: {{ $json.videos[9].content }}\n\n## CRITICAL INSTRUCTIONS\n1. ONLY use the information provided in the Video Content above for analysis\n2. Create short, readable paragraphs that are no longer than three sentences long\n3. Add paragraph breaks or two line breaks before starting the next paragraph\n4. If content is not relevant to the user's question, respond with: \"That question is not covered in the videos we analyzed.\"\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        256,
+        64
+      ],
+      "id": "3f73eff0-5ede-4665-9067-cbd2be3f28fd",
+      "name": "NDE Chatbot Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vnycavclrndjwmpaugju.supabase.co/rest/v1/rpc/nde_chatbot_match",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.rawBody }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        256
+      ],
+      "id": "6852fb54-e791-4a66-b9c5-bb7dfac335aa",
+      "name": "Query Supabase Chunks",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ln8oXic8PnWOdpHw",
+          "name": "Perplexity Header Auth"
+        },
+        "supabaseApi": {
+          "id": "0yfPpUUp33ZoYUCl",
+          "name": "MasteryTV Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "[\n  {\n    \"name\": \"Content-Type\",\n    \"value\": \"application/json\"\n  }\n]\n",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "={{ $json.openAiBodyObject.model }}"
+            },
+            {
+              "name": "input",
+              "value": "={{ $json.openAiBodyObject.input }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        48
+      ],
+      "id": "fdddca01-4135-4ac8-8d7e-81bc9e20b26d",
+      "name": "Get Query Embedding",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "O85h8AY0w0jLJ62G",
+          "name": "OpenAI Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c2283d8c-d53c-4d57-b481-7f30fea4a643",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        48
+      ],
+      "id": "abe9853e-6d9b-4444-84ea-75cc5a377eec",
+      "name": "Webhook",
+      "webhookId": "c2283d8c-d53c-4d57-b481-7f30fea4a643"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        672,
+        64
+      ],
+      "id": "6b95335b-cfec-4d35-ac07-bc51ad2a3c34",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        272
+      ],
+      "id": "fb9466a7-4e69-4709-b962-f38cd061872d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "nde_chat_logs",
+          "mode": "list",
+          "cachedResultName": "nde_chat_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Webhook').item.json.body.sessionId }}",
+            "created_at": "={{ $now }}",
+            "chat_page": "nde-chat",
+            "message": "={{ $json.output }}",
+            "sender": "bot"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_page",
+              "displayName": "chat_page",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "b837a96f-a041-454e-8584-1109ef8b8c25",
+      "name": "Log Chat Response",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "nde_chat_logs",
+          "mode": "list",
+          "cachedResultName": "nde_chat_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $json.body.sessionId }}",
+            "created_at": "={{ $now }}",
+            "sender": "user",
+            "chat_page": "nde-chat",
+            "message": "={{ $json.body.chatInput }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_page",
+              "displayName": "chat_page",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_feedback",
+              "displayName": "user_feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -336,
+        -96
+      ],
+      "id": "92715e2e-a1ed-4ed9-a85f-0ce7da08e499",
+      "name": "Log Chat Questions",
+      "credentials": {
+        "postgres": {
+          "id": "drH7KtKDSyQY4Oyq",
+          "name": "Supabase pooler (MasteryTV)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the user input from the Webhook's body\nconst userInput = $input.item.json.body.chatInput;\n\n// Create the complete request body as a JavaScript object\nconst bodyObject = {\n  \"model\": \"text-embedding-3-small\",\n  \"input\": userInput\n};\n\n// Add this object to the data for the next node\n$input.item.json.openAiBodyObject = bodyObject;\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        48
+      ],
+      "id": "c436a1ab-b158-48db-9e46-a4bc334cd42b",
+      "name": "Convert query to OpenAI Object"
+    },
+    {
+      "parameters": {
+        "jsCode": "const embedding = $input.item.json.data[0].embedding;\n\n// Debugging check: Make sure the embedding is a valid array.\nif (!Array.isArray(embedding)) {\n  throw new Error(\"The embedding data is not a valid array!\");\n}\n\n// Manually build the JSON body as a simple string.\nconst bodyAsString = `{\n  \"query_embedding\": [${embedding.join(',')}],\n  \"match_count\": 10,\n  \"filter\": {}\n}`;\n\n// Create a new output object containing our raw string.\nconst output = {\n  json: {\n    rawBody: bodyAsString\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        256
+      ],
+      "id": "a37615a9-4008-4a93-930e-b3a17e319510",
+      "name": "Convert Output to Raw String"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Create a single object with all the data and proper pairedItem references\nconst aggregatedData = {\n  videos: items.map((item, index) => ({\n    number: index + 1,\n    content: item.json.content,\n    video_title: item.json.video_title,\n    video_url: item.json.video_url\n  }))\n};\n\n// Return with proper pairedItem data\nreturn {\n  json: aggregatedData,\n  pairedItem: items.map((_, index) => ({ item: index }))\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        256
+      ],
+      "id": "d5e0b0f3-b933-49f5-a2fc-f966d8e37be9",
+      "name": "Convert Output to Single Object"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.awetomatic.com",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+            "content-length": "55",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9",
+            "content-type": "application/json",
+            "dnt": "1",
+            "origin": "https://6000-firebase-studio-1750610535823.cluster-joak5ukfbnbyqspg4tewa33d24.cloudworkstations.dev",
+            "priority": "u=1, i",
+            "referer": "https://6000-firebase-studio-1750610535823.cluster-joak5ukfbnbyqspg4tewa33d24.cloudworkstations.dev/",
+            "sec-ch-ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Google Chrome\";v=\"138\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"macOS\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "via": "2.0 Caddy",
+            "x-forwarded-for": "50.170.2.114",
+            "x-forwarded-host": "n8n.awetomatic.com",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "sessionId": "ya0hdb",
+            "chatInput": "how are you today?"
+          },
+          "webhookUrl": "https://n8n.awetomatic.com/webhook/c2283d8c-d53c-4d57-b481-7f30fea4a643",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "NDE Chatbot Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Supabase Chunks": {
+      "main": [
+        [
+          {
+            "node": "Convert Output to Single Object",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Query Embedding": {
+      "main": [
+        [
+          {
+            "node": "Convert Output to Raw String",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Convert query to OpenAI Object",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Chat Questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "NDE Chatbot Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert query to OpenAI Object": {
+      "main": [
+        [
+          {
+            "node": "Get Query Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Output to Raw String": {
+      "main": [
+        [
+          {
+            "node": "Query Supabase Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Output to Single Object": {
+      "main": [
+        [
+          {
+            "node": "NDE Chatbot Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "NDE Chatbot Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "dd5bbc27-8ee0-40cc-811d-4162cb72e71b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+  },
+  "id": "P5IfDBsosR4QR8SG",
+  "tags": []
+}

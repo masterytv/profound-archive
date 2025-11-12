@@ -1,0 +1,24 @@
+
+
+[
+    {
+      "publication_name": "supabase_realtime",
+      "owner": 16384,
+      "all_tables": false,
+      "inserts": true,
+      "updates": true,
+      "deletes": true,
+      "truncates": true
+    },
+    {
+      "publication_name": "supabase_realtime_messages_publication",
+      "owner": 10,
+      "all_tables": false,
+      "inserts": true,
+      "updates": true,
+      "deletes": true,
+      "truncates": true
+    }
+  ]
+  
+  

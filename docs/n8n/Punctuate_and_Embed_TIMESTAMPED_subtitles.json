@@ -1,0 +1,1274 @@
+{
+    "name": "Punctuate and Embed TIMESTAMPED subtitles",
+    "nodes": [
+      {
+        "parameters": {
+          "values": {
+            "number": [
+              {
+                "name": "batch_limit",
+                "value": 1
+              }
+            ]
+          },
+          "options": {}
+        },
+        "name": "Set Batch Limit",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          592,
+          288
+        ],
+        "id": "30a1003e-7e83-4a1b-8149-c98614c369f7"
+      },
+      {
+        "parameters": {
+          "content": "## Updating raw_timestamped_subtitles_cleaned to raw_timestamped_punctuated. \n### Agent looks through the cleaned subtitles that have no punctuation and adds punctuation and paragraphs.  \n",
+          "height": 940,
+          "width": 1188,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          304,
+          128
+        ],
+        "typeVersion": 1,
+        "id": "4563ec05-54ad-46f0-ae77-697ae69fc533",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "operation": "select",
+          "schema": {
+            "__rl": true,
+            "value": "public",
+            "mode": "list",
+            "cachedResultName": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "nde_vids",
+            "mode": "list",
+            "cachedResultName": "nde_vids"
+          },
+          "limit": "={{ $json.batch_limit }}",
+          "where": {
+            "values": [
+              {
+                "column": "timestamped_embedding_status",
+                "value": "pending"
+              },
+              {
+                "column": "isNde",
+                "value": "clear_nde"
+              },
+              {
+                "column": "raw_timestamped_subtitles_cleaned",
+                "condition": "IS NOT NULL"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          368,
+          448
+        ],
+        "id": "63912e91-9c3e-4aa8-8b9d-725289743bae",
+        "name": "Get Records to Process",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "google/gemini-2.5-flash-lite",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          128,
+          560
+        ],
+        "id": "5ab1cf12-df82-4a87-9f9b-3c9ec0b5d3af",
+        "name": "OpenRouter Chat Model",
+        "credentials": {
+          "openRouterApi": {
+            "id": "ZUTxHzVrskxopbAJ",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 4
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          336,
+          288
+        ],
+        "id": "c63a3714-ab1b-4e3e-bd76-691fe8f9f8de",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/embeddings",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"model\": \"text-embedding-3-small\",\n  \"input\": {{ JSON.stringify($json.text) }}\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          848,
+          448
+        ],
+        "id": "5db9c874-3b45-4ec0-9d82-42eb471a61ec",
+        "name": "Convert Output to Embedding",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "O85h8AY0w0jLJ62G",
+            "name": "OpenAI Auth account"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"text\": {\n        \"type\": \"string\",\n        \"description\": \"The fully punctuated sentence or paragraph.\"\n      },\n      \"start\": {\n        \"type\": \"number\",\n        \"description\": \"The start time in seconds of the first word in the text.\"\n      }\n    },\n    \"required\": [\n      \"text\",\n      \"start\"\n    ]\n  }\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.3,
+        "position": [
+          128,
+          368
+        ],
+        "id": "8d1133dc-63ce-402c-b983-ea9219b49738",
+        "name": "Structured Output Parser1",
+        "notesInFlow": false
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=### INSTRUCTIONS\n\nYou are an expert AI copy editor. Your task is to process a raw transcript that consists of lines prefixed with a start time in seconds (e.g., `[123.45] text...`).\n\nYou must combine these lines into logical, grammatically correct sentences and paragraphs. Then, you must return a valid JSON array of objects, where each object contains a full, punctuated sentence or a logical paragraph, along with the start time of the *first word* in that sentence/paragraph.\n\n**RULES:**\n1.  **Input Format:** The input is a series of lines, each starting with `[timestamp]`.\n2.  **Output Format:** Your output **must** be a valid JSON array of objects. Each object must have two keys: `text` (the punctuated string) and `start` (the corresponding start time as a number).\n3.  **Content Integrity:** Do NOT change, add, or remove any of the original words. Only add punctuation (commas, periods, etc.) and combine lines.\n4.  **No Commentary:** Do NOT add any introductory text or explanations. Your output must only be the JSON array.\n\n### EXAMPLE\n\n**Input Text:**\n[6.72] i saw a bright light\n[8.1] it was so peaceful and warm\n[9.5] i knew i was safe\n[12.3] my family was there\n[13.1] they were smiling\n[14.2] it was beautiful\n[16.8] then i was told i had to go back\n[18.2] it wasnt my time\n\n**Correct JSON Output:**\n[\n  {\n    \"text\": \"I saw a bright light. It was so peaceful and warm, and I knew I was safe.\",\n    \"start\": 6.72\n  },\n  {\n    \"text\": \"My family was there. They were smiling. It was beautiful.\",\n    \"start\": 12.3\n  },\n  {\n    \"text\": \"Then I was told I had to go back. It wasn't my time.\",\n    \"start\": 16.8\n  }\n]\n\n---\n### TRANSCRIPT TO PUNCTUATE\n\n{{ $json.formatted_subtitles }}\n\n\n\n\n",
+          "hasOutputParser": true,
+          "needsFallback": true,
+          "batching": {
+            "batchSize": "={{ $('Set Batch Limit').item.json.batch_limit }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.7,
+        "position": [
+          368,
+          656
+        ],
+        "id": "ca72437f-7a44-4fcd-b517-6b44a9b7a57f",
+        "name": "Transcript Punctuation",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const items = $input.item.json.raw_timestamped_subtitles_cleaned;\nlet formatted_text = '';\n\nfor (const line of items) {\n  // Format each line as \"[start_time] text\"\n  const text = line.text || ''; // Ensure text is not null\n  formatted_text += `[${line.start}] ${text.trim()}\\n`;\n}\n\n// Create a new field for the AI prompt to use\n$input.item.json.formatted_subtitles = formatted_text;\n\nreturn $input.item;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          576,
+          448
+        ],
+        "id": "63173177-849c-410e-b7bb-3fbc0ab74de7",
+        "name": "Format Subtitles for AI",
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          848,
+          256
+        ],
+        "id": "20af00bd-531b-41f2-ad29-369e63d2e2e1",
+        "name": "Merge Punctuation & Metadata",
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "jsCode": "// This will hold all paragraphs from all videos in the batch\nconst allFinalChunks = [];\n\n// Loop through each item (each video) that came into this node\nfor (const item of $input.all()) {\n  const videoId = item.json.videoId;\n\n  // This logic finds the array of paragraphs within the current item\n  let parsedParagraphs = [];\n  if (item.json.output && Array.isArray(item.json.output.subtitles)) {\n    parsedParagraphs = item.json.output.subtitles;\n  } else if (item.json.output && Array.isArray(item.json.output)) {\n    parsedParagraphs = item.json.output;\n  }\n\n  // Add the videoId to each paragraph for this video\n  const chunksForThisVideo = parsedParagraphs.map(paragraph => ({\n    ...paragraph,\n    videoId: videoId\n  }));\n\n  // Add this video's chunks to the master list\n  allFinalChunks.push(...chunksForThisVideo);\n}\n\n// Return the single, flat array of all chunks from all videos\nreturn allFinalChunks;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1120,
+          256
+        ],
+        "id": "ef569fac-71dd-4f9f-9f46-5b1c5a43f5b7",
+        "name": "Combine Output and VideoID"
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineByPosition",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          1120,
+          448
+        ],
+        "id": "a5d6739b-656a-4842-8e7e-49040bcac317",
+        "name": "Merge Embedding & Output",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ca1032da-e4ef-447b-b279-4f139b6427de",
+                "name": "videoId",
+                "value": "={{ $json.videoId }}",
+                "type": "string"
+              },
+              {
+                "id": "232c9a91-669b-4315-8375-c37d32b0d3e9",
+                "name": "start",
+                "value": "={{ $json.start }}",
+                "type": "number"
+              },
+              {
+                "id": "d3f4e34f-1f84-45a1-a102-36e24347cee0",
+                "name": "text",
+                "value": "={{ $json.text }}",
+                "type": "string"
+              },
+              {
+                "id": "e45aeb06-6994-499f-af81-2f878f272506",
+                "name": "embedding",
+                "value": "={{ $json.data[0].embedding }}",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          864,
+          672
+        ],
+        "id": "d6c9ed50-c0bc-4115-8e3e-8c78c0aa85a9",
+        "name": "Set Fields for Insert",
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO nde_punctuated_embeddings (video_id, content, start_time, embedding) \nVALUES \n(\n  '{{$json.videoId}}',\n  '{{$json.text.replace(/'/g, \"''\")}}',\n  {{$json.start}},\n  '{{JSON.stringify($json.embedding)}}'\n);",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1120,
+          672
+        ],
+        "id": "a77abec5-fe86-40d2-a00d-187648a10c88",
+        "name": "Insert to nde_punctuated_embeddings",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          128,
+          736
+        ],
+        "id": "c803cd6e-d627-408c-bc7c-0b283bd90ddf",
+        "name": "OpenRouter Chat Model1",
+        "credentials": {
+          "openRouterApi": {
+            "id": "ZUTxHzVrskxopbAJ",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "schema": {
+            "__rl": true,
+            "mode": "list",
+            "value": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "nde_vids",
+            "mode": "list",
+            "cachedResultName": "nde_vids"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "videoId": "={{ $json.videoId }}",
+              "timestamped_embedding_status": "error"
+            },
+            "matchingColumns": [
+              "videoId"
+            ],
+            "schema": [
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "title",
+                "displayName": "title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "url",
+                "displayName": "url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "thumbnailUrl",
+                "displayName": "thumbnailUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "viewCount",
+                "displayName": "viewCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "likes",
+                "displayName": "likes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "location",
+                "displayName": "location",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelName",
+                "displayName": "channelName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelUrl",
+                "displayName": "channelUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelId",
+                "displayName": "channelId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelUsername",
+                "displayName": "channelUsername",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "numberOfSubscribers",
+                "displayName": "numberOfSubscribers",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "duration",
+                "displayName": "duration",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "commentsCount",
+                "displayName": "commentsCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "description",
+                "displayName": "description",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles",
+                "displayName": "subtitles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "videoId",
+                "displayName": "videoId",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "isNde",
+                "displayName": "isNde",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "options",
+                "canBeUsedToMatch": true,
+                "options": [
+                  {
+                    "name": "clear_nde",
+                    "value": "clear_nde"
+                  },
+                  {
+                    "name": "possible_nde",
+                    "value": "possible_nde"
+                  },
+                  {
+                    "name": "not_nde",
+                    "value": "not_nde"
+                  },
+                  {
+                    "name": "insufficient_info",
+                    "value": "insufficient_info"
+                  }
+                ],
+                "removed": true
+              },
+              {
+                "id": "isNdeJustification",
+                "displayName": "isNdeJustification",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "experiencerFullName",
+                "displayName": "experiencerFullName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_embedding",
+                "displayName": "subtitles_embedding",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "options",
+                "canBeUsedToMatch": true,
+                "options": [],
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_subtitles",
+                "displayName": "raw_timestamped_subtitles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_cleaned",
+                "displayName": "subtitles_cleaned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_punctuated",
+                "displayName": "subtitles_punctuated",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "embed_status",
+                "displayName": "embed_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_subtitles_cleaned",
+                "displayName": "raw_timestamped_subtitles_cleaned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_punctuated",
+                "displayName": "raw_timestamped_punctuated",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "timestamped_embedding_status",
+                "displayName": "timestamped_embedding_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          816,
+          896
+        ],
+        "id": "12cb9fb3-0395-477a-8ea4-7c1a3e7a6517",
+        "name": "Update nde_vids status ERROR",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "schema": {
+            "__rl": true,
+            "mode": "list",
+            "value": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "nde_vids",
+            "mode": "list",
+            "cachedResultName": "nde_vids"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "timestamped_embedding_status": "complete",
+              "videoId": "={{ $('Set Fields for Insert').item.json.videoId }}"
+            },
+            "matchingColumns": [
+              "videoId"
+            ],
+            "schema": [
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "title",
+                "displayName": "title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "url",
+                "displayName": "url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "thumbnailUrl",
+                "displayName": "thumbnailUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "viewCount",
+                "displayName": "viewCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "likes",
+                "displayName": "likes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "location",
+                "displayName": "location",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelName",
+                "displayName": "channelName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelUrl",
+                "displayName": "channelUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelId",
+                "displayName": "channelId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "channelUsername",
+                "displayName": "channelUsername",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "numberOfSubscribers",
+                "displayName": "numberOfSubscribers",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "duration",
+                "displayName": "duration",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "commentsCount",
+                "displayName": "commentsCount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "description",
+                "displayName": "description",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles",
+                "displayName": "subtitles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "videoId",
+                "displayName": "videoId",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "isNde",
+                "displayName": "isNde",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "options",
+                "canBeUsedToMatch": true,
+                "options": [
+                  {
+                    "name": "clear_nde",
+                    "value": "clear_nde"
+                  },
+                  {
+                    "name": "possible_nde",
+                    "value": "possible_nde"
+                  },
+                  {
+                    "name": "not_nde",
+                    "value": "not_nde"
+                  },
+                  {
+                    "name": "insufficient_info",
+                    "value": "insufficient_info"
+                  }
+                ],
+                "removed": true
+              },
+              {
+                "id": "isNdeJustification",
+                "displayName": "isNdeJustification",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "experiencerFullName",
+                "displayName": "experiencerFullName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_embedding",
+                "displayName": "subtitles_embedding",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "options",
+                "canBeUsedToMatch": true,
+                "options": [],
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_subtitles",
+                "displayName": "raw_timestamped_subtitles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_cleaned",
+                "displayName": "subtitles_cleaned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "subtitles_punctuated",
+                "displayName": "subtitles_punctuated",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "embed_status",
+                "displayName": "embed_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_subtitles_cleaned",
+                "displayName": "raw_timestamped_subtitles_cleaned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "raw_timestamped_punctuated",
+                "displayName": "raw_timestamped_punctuated",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "timestamped_embedding_status",
+                "displayName": "timestamped_embedding_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1136,
+          896
+        ],
+        "id": "90d97723-ec20-45df-b953-ce024f44c251",
+        "name": "Update nde_vids status COMPLETE",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## UPGRADE to Supabase MEDIUM\nTry to run this again after you Need to increase disk IO",
+          "height": 176,
+          "width": 272,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          32,
+          128
+        ],
+        "typeVersion": 1,
+        "id": "b37e9c00-d87f-4ac4-b991-c12fe066b332",
+        "name": "Sticky Note1"
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Set Batch Limit": {
+        "main": [
+          [
+            {
+              "node": "Get Records to Process",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Records to Process": {
+        "main": [
+          [
+            {
+              "node": "Format Subtitles for AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenRouter Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Transcript Punctuation",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Batch Limit",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Convert Output to Embedding": {
+        "main": [
+          [
+            {
+              "node": "Merge Embedding & Output",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Update nde_vids status ERROR",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Structured Output Parser1": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "Transcript Punctuation",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Transcript Punctuation": {
+        "main": [
+          [
+            {
+              "node": "Merge Punctuation & Metadata",
+              "type": "main",
+              "index": 1
+            }
+          ],
+          [
+            {
+              "node": "Update nde_vids status ERROR",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Subtitles for AI": {
+        "main": [
+          [
+            {
+              "node": "Merge Punctuation & Metadata",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Transcript Punctuation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge Punctuation & Metadata": {
+        "main": [
+          [
+            {
+              "node": "Combine Output and VideoID",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Combine Output and VideoID": {
+        "main": [
+          [
+            {
+              "node": "Convert Output to Embedding",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Merge Embedding & Output",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge Embedding & Output": {
+        "main": [
+          [
+            {
+              "node": "Set Fields for Insert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Fields for Insert": {
+        "main": [
+          [
+            {
+              "node": "Insert to nde_punctuated_embeddings",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Update nde_vids status COMPLETE",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert to nde_punctuated_embeddings": {
+        "main": [
+          []
+        ]
+      },
+      "OpenRouter Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Transcript Punctuation",
+              "type": "ai_languageModel",
+              "index": 1
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1",
+      "saveDataSuccessExecution": "all",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "versionId": "64cabffc-7350-4dbe-9346-9bf5f50fbe0d",
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+    },
+    "id": "Kc3DckDkDzRPPeVj",
+    "tags": []
+  }

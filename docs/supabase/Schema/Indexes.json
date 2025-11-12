@@ -1,0 +1,119 @@
+
+[
+    {
+      "tablename": "n8n_chat_histories",
+      "indexname": "n8n_chat_histories_pkey",
+      "definition": "CREATE UNIQUE INDEX n8n_chat_histories_pkey ON public.n8n_chat_histories USING btree (id)"
+    },
+    {
+      "tablename": "nde_analysis",
+      "indexname": "nde_analysis_pkey",
+      "definition": "CREATE UNIQUE INDEX nde_analysis_pkey ON public.nde_analysis USING btree (video_id)"
+    },
+    {
+      "tablename": "nde_chat_logs",
+      "indexname": "nde_chat_logs_pkey",
+      "definition": "CREATE UNIQUE INDEX nde_chat_logs_pkey ON public.nde_chat_logs USING btree (id)"
+    },
+    {
+      "tablename": "nde_chatbot_chunks",
+      "indexname": "idx_nde_chatbot_chunks_metadata_video_id",
+      "definition": "CREATE INDEX idx_nde_chatbot_chunks_metadata_video_id ON public.nde_chatbot_chunks USING btree (((metadata ->> 'video_id'::text)))"
+    },
+    {
+      "tablename": "nde_chatbot_chunks",
+      "indexname": "idx_nde_chatbot_chunks_video_id_null",
+      "definition": "CREATE INDEX idx_nde_chatbot_chunks_video_id_null ON public.nde_chatbot_chunks USING btree (video_id) WHERE (video_id IS NULL)"
+    },
+    {
+      "tablename": "nde_chatbot_chunks",
+      "indexname": "nde_chatbot_chunks_embedding_idx",
+      "definition": "CREATE INDEX nde_chatbot_chunks_embedding_idx ON public.nde_chatbot_chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists='600')"
+    },
+    {
+      "tablename": "nde_chatbot_chunks",
+      "indexname": "nde_chatbot_chunks_pkey",
+      "definition": "CREATE UNIQUE INDEX nde_chatbot_chunks_pkey ON public.nde_chatbot_chunks USING btree (id)"
+    },
+    {
+      "tablename": "nde_punctuated_embeddings",
+      "indexname": "idx_punctuated_content_fts",
+      "definition": "CREATE INDEX idx_punctuated_content_fts ON public.nde_punctuated_embeddings USING gin (to_tsvector('english'::regconfig, content))"
+    },
+    {
+      "tablename": "nde_punctuated_embeddings",
+      "indexname": "idx_punctuated_embedding_hnsw",
+      "definition": "CREATE INDEX idx_punctuated_embedding_hnsw ON public.nde_punctuated_embeddings USING hnsw (embedding vector_cosine_ops)"
+    },
+    {
+      "tablename": "nde_punctuated_embeddings",
+      "indexname": "idx_punctuated_embedding_video_id",
+      "definition": "CREATE INDEX idx_punctuated_embedding_video_id ON public.nde_punctuated_embeddings USING btree (video_id)"
+    },
+    {
+      "tablename": "nde_punctuated_embeddings",
+      "indexname": "nde_punctuated_embeddings_pkey",
+      "definition": "CREATE UNIQUE INDEX nde_punctuated_embeddings_pkey ON public.nde_punctuated_embeddings USING btree (id)"
+    },
+    {
+      "tablename": "nde_vids",
+      "indexname": "idx_analysis_nde_tags_gin",
+      "definition": "CREATE INDEX idx_analysis_nde_tags_gin ON public.nde_vids USING gin (analysis_nde_tags)"
+    },
+    {
+      "tablename": "nde_vids",
+      "indexname": "idx_analysis_status",
+      "definition": "CREATE INDEX idx_analysis_status ON public.nde_vids USING btree (analysis_status)"
+    },
+    {
+      "tablename": "nde_vids",
+      "indexname": "idx_analysis_status_pending",
+      "definition": "CREATE INDEX idx_analysis_status_pending ON public.nde_vids USING btree (analysis_status) WHERE ((analysis_status)::text = 'pending'::text)"
+    },
+    {
+      "tablename": "nde_vids",
+      "indexname": "idx_gin_nde_vids_raw_subtitles",
+      "definition": "CREATE INDEX idx_gin_nde_vids_raw_subtitles ON public.nde_vids USING gin (((raw_timestamped_subtitles -> 'data'::text)))"
+    },
+    {
+      "tablename": "nde_vids",
+      "indexname": "idx_nde_vids_subtitles_text_search",
+      "definition": "CREATE INDEX idx_nde_vids_subtitles_text_search ON public.nde_vids USING gin (((raw_timestamped_subtitles)::text) gin_trgm_ops)"
+    },
+    {
+      "tablename": "nde_vids",
+      "indexname": "nde_vids_pkey",
+      "definition": "CREATE UNIQUE INDEX nde_vids_pkey ON public.nde_vids USING btree (\"videoId\")"
+    },
+    {
+      "tablename": "nde_vids",
+      "indexname": "nde_vids_subtitles_trgm_idx",
+      "definition": "CREATE INDEX nde_vids_subtitles_trgm_idx ON public.nde_vids USING gin (subtitles_punctuated gin_trgm_ops)"
+    },
+    {
+      "tablename": "nps_feedback",
+      "indexname": "nps_feedback_pp_pkey",
+      "definition": "CREATE UNIQUE INDEX nps_feedback_pp_pkey ON public.nps_feedback USING btree (id)"
+    },
+    {
+      "tablename": "precog_trials",
+      "indexname": "precog_trials_pkey",
+      "definition": "CREATE UNIQUE INDEX precog_trials_pkey ON public.precog_trials USING btree (id)"
+    },
+    {
+      "tablename": "search_logs",
+      "indexname": "search_logs_pkey",
+      "definition": "CREATE UNIQUE INDEX search_logs_pkey ON public.search_logs USING btree (id)"
+    },
+    {
+      "tablename": "uap_embeddings",
+      "indexname": "uap_embeddings_pkey",
+      "definition": "CREATE UNIQUE INDEX uap_embeddings_pkey ON public.uap_embeddings USING btree (id)"
+    },
+    {
+      "tablename": "uap_vids",
+      "indexname": "uap_vids_pkey",
+      "definition": "CREATE UNIQUE INDEX uap_vids_pkey ON public.uap_vids USING btree (video_id)"
+    }
+  ]
+  

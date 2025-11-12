@@ -1,0 +1,356 @@
+{
+    "name": "Vector Subtitles for NDE Chatbot",
+    "nodes": [
+      {
+        "parameters": {
+          "chunkSize": 512,
+          "chunkOverlap": 50,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+        "typeVersion": 1,
+        "position": [
+          80,
+          240
+        ],
+        "id": "24758c36-129f-4bd4-a2dc-32cb2089ca83",
+        "name": "Recursive Character Text Splitter"
+      },
+      {
+        "parameters": {
+          "options": {
+            "dimensions": 1536,
+            "batchSize": 512
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          -208,
+          192
+        ],
+        "id": "aa121509-250b-4aad-9126-558ad3744e15",
+        "name": "Embeddings OpenAI1",
+        "credentials": {
+          "openAiApi": {
+            "id": "aqLkdmT1OJQCnimM",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsonMode": "expressionData",
+          "jsonData": "={{ $json.chunk_text }}",
+          "options": {
+            "metadata": {
+              "metadataValues": [
+                {
+                  "name": "video_id",
+                  "value": "={{ $json.video_id }}"
+                }
+              ]
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+        "typeVersion": 1,
+        "position": [
+          0,
+          64
+        ],
+        "id": "782032c1-e292-4be1-b025-70e1bec8dad8",
+        "name": "Default Data Loader"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 3
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -864,
+          -144
+        ],
+        "id": "fac7eb69-a18c-4a6f-a106-ca1bbe64a2c9",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE nde_chatbot_chunks\nSET video_id = metadata ->> 'video_id'\nWHERE video_id IS NULL;",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          272,
+          -144
+        ],
+        "id": "a3faf87d-d2f4-4482-9a38-50eb2a8017e4",
+        "name": "Update video_id from metadata",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "insert",
+          "tableName": "nde_chatbot_chunks",
+          "embeddingBatchSize": 512,
+          "options": {
+            "columnNames": {
+              "values": {
+                "contentColumnName": "content"
+              }
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+        "typeVersion": 1.3,
+        "position": [
+          -80,
+          -144
+        ],
+        "id": "60ef09bf-daa0-4464-8bbe-307b5231971d",
+        "name": "Add to nde_chatbot_chunks",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT\n  \"videoId\",\n  \"subtitles_punctuated\"\nFROM\n  nde_vids\nWHERE\n  \"embed_status\" = 'pending'\n  AND \"isNde\" = 'clear_nde'\n  AND \"subtitles_punctuated\" IS NOT NULL\n  AND \"subtitles_punctuated\" != ''\nLIMIT 20;",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -640,
+          -144
+        ],
+        "id": "b0f60521-84dc-4a78-948b-9f4dd738632a",
+        "name": "Get subtitles_punctuated not processed",
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3a7d7cd2-750b-43da-8fc4-d9188e6a569c",
+                "name": "video_id",
+                "value": "={{ $json.videoId }}",
+                "type": "string"
+              },
+              {
+                "id": "20841ad6-c469-422b-bb86-b0c718bfbe31",
+                "name": "chunk_text",
+                "value": "={{ $json.subtitles_punctuated }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -336,
+          -80
+        ],
+        "id": "86989e03-6e5a-4b88-98d1-76877eed8acb",
+        "name": "Set video_id and chunk_text"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE nde_vids\nSET embed_status = 'processing'\nWHERE \"videoId\" IN ({{ $items().map(item => `'${item.json.videoId}'`).join(',') }});",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -336,
+          -256
+        ],
+        "id": "3c15c20f-26e8-42a5-8859-fc3ccc0d0cac",
+        "name": "Update embed_status to processing",
+        "executeOnce": true,
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE nde_vids\nSET embed_status = 'complete'\nWHERE \"videoId\" IN ({{ $('Get subtitles_punctuated not processed').all().map(item => `'${item.json.videoId}'`).join(',') }});",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          464,
+          -144
+        ],
+        "id": "440a73cd-fdf0-4ffb-a685-2890b244948b",
+        "name": "Update status to complete",
+        "executeOnce": true,
+        "credentials": {
+          "postgres": {
+            "id": "drH7KtKDSyQY4Oyq",
+            "name": "Supabase pooler (MasteryTV)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## COMPLETED\nThis took several fixes to complete because we were seeing a lot of duplicate entries and believed them to be coming from this workflow. It turns out they were coming from the workflow, Punctuate Transcripts which used Gemini 2.5 flash. \n",
+          "height": 440,
+          "width": 440
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -896,
+          -336
+        ],
+        "typeVersion": 1,
+        "id": "1c831d97-2c52-4777-b374-b1e9562e11cd",
+        "name": "Sticky Note"
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Recursive Character Text Splitter": {
+        "ai_textSplitter": [
+          [
+            {
+              "node": "Default Data Loader",
+              "type": "ai_textSplitter",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings OpenAI1": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Add to nde_chatbot_chunks",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Default Data Loader": {
+        "ai_document": [
+          [
+            {
+              "node": "Add to nde_chatbot_chunks",
+              "type": "ai_document",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get subtitles_punctuated not processed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Add to nde_chatbot_chunks": {
+        "main": [
+          [
+            {
+              "node": "Update video_id from metadata",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get subtitles_punctuated not processed": {
+        "main": [
+          [
+            {
+              "node": "Update embed_status to processing",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Set video_id and chunk_text",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set video_id and chunk_text": {
+        "main": [
+          [
+            {
+              "node": "Add to nde_chatbot_chunks",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update video_id from metadata": {
+        "main": [
+          [
+            {
+              "node": "Update status to complete",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update embed_status to processing": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "versionId": "dce1d69e-6443-4bb7-b359-267a1d897383",
+    "meta": {
+      "instanceId": "1c502fdf306e141c1ca3d2e8bac97174e91ad6382d400a715738e151eb73bf40"
+    },
+    "id": "dEgemxY5iYFiN0To",
+    "tags": []
+  }

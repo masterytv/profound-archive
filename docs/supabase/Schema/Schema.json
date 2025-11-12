@@ -1,0 +1,2662 @@
+[
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "videoId",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "title",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "url",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "date",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "channelName",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "channelUsername",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "description",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "subtitles",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "isNde",
+      "data_type": "USER-DEFINED",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "isNdeJustification",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "experiencerFullName",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "clear_nde_with_names",
+      "column_name": "subtitles_embedding",
+      "data_type": "USER-DEFINED",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "n8n_chat_histories",
+      "column_name": "id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "n8n_chat_histories",
+      "column_name": "session_id",
+      "data_type": "character varying",
+      "character_maximum_length": 255,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "n8n_chat_histories",
+      "column_name": "message",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "video_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": true,
+      "foreign_table_schema": "public",
+      "foreign_table_name": "nde_vids",
+      "foreign_column_name": "videoId"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "total_greyson_score",
+      "data_type": "smallint",
+      "character_maximum_length": null,
+      "numeric_precision": 16,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "meets_nde_criteria",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "total_nde_c_score",
+      "data_type": "smallint",
+      "character_maximum_length": null,
+      "numeric_precision": 16,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "meets_cutoff_criteria",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "greyson_breakdown",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "nde_c_breakdown",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "scale_agreement",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "primary_phenomenology",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "intensity_level",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "analysis_report_html",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_analysis",
+      "column_name": "cleaned_transcript",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chat_logs",
+      "column_name": "id",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chat_logs",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chat_logs",
+      "column_name": "session_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chat_logs",
+      "column_name": "chat_page",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chat_logs",
+      "column_name": "sender",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chat_logs",
+      "column_name": "message",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chat_logs",
+      "column_name": "metadata",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chatbot_chunks",
+      "column_name": "id",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chatbot_chunks",
+      "column_name": "video_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": "public",
+      "foreign_table_name": "nde_vids",
+      "foreign_column_name": "videoId"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chatbot_chunks",
+      "column_name": "content",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chatbot_chunks",
+      "column_name": "embedding",
+      "data_type": "USER-DEFINED",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_chatbot_chunks",
+      "column_name": "metadata",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_punctuated_embeddings",
+      "column_name": "id",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_punctuated_embeddings",
+      "column_name": "video_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_punctuated_embeddings",
+      "column_name": "content",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_punctuated_embeddings",
+      "column_name": "start_time",
+      "data_type": "real",
+      "character_maximum_length": null,
+      "numeric_precision": 24,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_punctuated_embeddings",
+      "column_name": "embedding",
+      "data_type": "USER-DEFINED",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "type",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "title",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "url",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "thumbnailUrl",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "viewCount",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "date",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "likes",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "location",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "channelName",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "channelUrl",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "channelId",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "channelUsername",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "numberOfSubscribers",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "duration",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "commentsCount",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "description",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "subtitles",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "videoId",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "isNde",
+      "data_type": "USER-DEFINED",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "isNdeJustification",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "experiencerFullName",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "subtitles_embedding",
+      "data_type": "USER-DEFINED",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "raw_timestamped_subtitles",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "subtitles_cleaned",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "subtitles_punctuated",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "embed_status",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "raw_timestamped_subtitles_cleaned",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "raw_timestamped_punctuated",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "timestamped_embedding_status",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "greyson_score",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "nde_c_score",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "nde_analysis_html",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "analysis_status",
+      "data_type": "character varying",
+      "character_maximum_length": 50,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "analysis_nde_summary",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "analysis_nde_tags",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "analysis_generated_timestamp",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "analysis_ai_model_used",
+      "data_type": "character varying",
+      "character_maximum_length": 100,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "analysis_human_reviewed",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nde_vids",
+      "column_name": "analysis_researcher_notes",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nps_feedback",
+      "column_name": "id",
+      "data_type": "uuid",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nps_feedback",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nps_feedback",
+      "column_name": "score",
+      "data_type": "smallint",
+      "character_maximum_length": null,
+      "numeric_precision": 16,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nps_feedback",
+      "column_name": "feedback",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nps_feedback",
+      "column_name": "path",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "nps_feedback",
+      "column_name": "country_code",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "id",
+      "data_type": "uuid",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "timestamp",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "experiment_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "prompt_text",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "ai_guess",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "actual_result",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "is_correct",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "is_control",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "model_name",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "prompt_version",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "precog_trials",
+      "column_name": "trial_group",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "id",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "search_term",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "search_type",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "sort_column",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "sort_direction",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "similarity_threshold",
+      "data_type": "double precision",
+      "character_maximum_length": null,
+      "numeric_precision": 53,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "search_logs",
+      "column_name": "results_count",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_embeddings",
+      "column_name": "id",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_embeddings",
+      "column_name": "video_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": "public",
+      "foreign_table_name": "uap_vids",
+      "foreign_column_name": "video_id"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_embeddings",
+      "column_name": "content",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_embeddings",
+      "column_name": "start_time",
+      "data_type": "real",
+      "character_maximum_length": null,
+      "numeric_precision": 24,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_embeddings",
+      "column_name": "embedding",
+      "data_type": "USER-DEFINED",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "video_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": true,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "type",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "title",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "url",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "thumbnail_url",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "view_count",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "date",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "likes",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "location",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "description",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "duration",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "comments_count",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "channel_name",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "channel_url",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "channel_id",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "channel_username",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "subscriber_count",
+      "data_type": "bigint",
+      "character_maximum_length": null,
+      "numeric_precision": 64,
+      "numeric_scale": 0,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "raw_timestamped_subtitles",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "raw_timestamped_punctuated",
+      "data_type": "jsonb",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "timestamped_embedding_status",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uap_vids",
+      "column_name": "timestamped_punctuation_status",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_primary_key": false,
+      "foreign_table_schema": null,
+      "foreign_table_name": null,
+      "foreign_column_name": null
+    }
+  ]
+  
+  
+  ## Supabase Functions (JSON)
+  
+  
+  [
+    {
+      "routine_name": "get_complete_schema",
+      "return_type": "jsonb",
+      "routine_definition": "\nDECLARE\n    result jsonb;\nBEGIN\n    -- Get all enums\n    WITH enum_types AS (\n        SELECT \n            t.typname as enum_name,\n            array_agg(e.enumlabel ORDER BY e.enumsortorder) as enum_values\n        FROM pg_type t\n        JOIN pg_enum e ON t.oid = e.enumtypid\n        JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace\n        WHERE n.nspname = 'public'\n        GROUP BY t.typname\n    )\n    SELECT jsonb_build_object(\n        'enums',\n        COALESCE(\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', enum_name,\n                    'values', to_jsonb(enum_values)\n                )\n            ),\n            '[]'::jsonb\n        )\n    )\n    FROM enum_types\n    INTO result;\n\n    -- Get all tables with their details\n    WITH RECURSIVE \n    columns_info AS (\n        SELECT \n            c.oid as table_oid,\n            c.relname as table_name,\n            a.attname as column_name,\n            format_type(a.atttypid, a.atttypmod) as column_type,\n            a.attnotnull as notnull,\n            pg_get_expr(d.adbin, d.adrelid) as column_default,\n            CASE \n                WHEN a.attidentity != '' THEN true\n                WHEN pg_get_expr(d.adbin, d.adrelid) LIKE 'nextval%' THEN true\n                ELSE false\n            END as is_identity,\n            EXISTS (\n                SELECT 1 FROM pg_constraint con \n                WHERE con.conrelid = c.oid \n                AND con.contype = 'p' \n                AND a.attnum = ANY(con.conkey)\n            ) as is_pk\n        FROM pg_class c\n        JOIN pg_namespace n ON n.oid = c.relnamespace\n        LEFT JOIN pg_attribute a ON a.attrelid = c.oid\n        LEFT JOIN pg_attrdef d ON d.adrelid = c.oid AND d.adnum = a.attnum\n        WHERE n.nspname = 'public' \n        AND c.relkind = 'r'\n        AND a.attnum > 0 \n        AND NOT a.attisdropped\n    ),\n    fk_info AS (\n        SELECT \n            c.oid as table_oid,\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', con.conname,\n                    'column', col.attname,\n                    'foreign_schema', fs.nspname,\n                    'foreign_table', ft.relname,\n                    'foreign_column', fcol.attname,\n                    'on_delete', CASE con.confdeltype\n                        WHEN 'a' THEN 'NO ACTION'\n                        WHEN 'c' THEN 'CASCADE'\n                        WHEN 'r' THEN 'RESTRICT'\n                        WHEN 'n' THEN 'SET NULL'\n                        WHEN 'd' THEN 'SET DEFAULT'\n                        ELSE NULL\n                    END\n                )\n            ) as foreign_keys\n        FROM pg_class c\n        JOIN pg_constraint con ON con.conrelid = c.oid\n        JOIN pg_attribute col ON col.attrelid = con.conrelid AND col.attnum = ANY(con.conkey)\n        JOIN pg_class ft ON ft.oid = con.confrelid\n        JOIN pg_namespace fs ON fs.oid = ft.relnamespace\n        JOIN pg_attribute fcol ON fcol.attrelid = con.confrelid AND fcol.attnum = ANY(con.confkey)\n        WHERE con.contype = 'f'\n        GROUP BY c.oid\n    ),\n    index_info AS (\n        SELECT \n            c.oid as table_oid,\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', i.relname,\n                    'using', am.amname,\n                    'columns', (\n                        SELECT jsonb_agg(a.attname ORDER BY array_position(ix.indkey, a.attnum))\n                        FROM unnest(ix.indkey) WITH ORDINALITY as u(attnum, ord)\n                        JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = u.attnum\n                    )\n                )\n            ) as indexes\n        FROM pg_class c\n        JOIN pg_index ix ON ix.indrelid = c.oid\n        JOIN pg_class i ON i.oid = ix.indexrelid\n        JOIN pg_am am ON am.oid = i.relam\n        WHERE NOT ix.indisprimary\n        GROUP BY c.oid\n    ),\n    policy_info AS (\n        SELECT \n            c.oid as table_oid,\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', pol.polname,\n                    'command', CASE pol.polcmd\n                        WHEN 'r' THEN 'SELECT'\n                        WHEN 'a' THEN 'INSERT'\n                        WHEN 'w' THEN 'UPDATE'\n                        WHEN 'd' THEN 'DELETE'\n                        WHEN '*' THEN 'ALL'\n                    END,\n                    'roles', (\n                        SELECT string_agg(quote_ident(r.rolname), ', ')\n                        FROM pg_roles r\n                        WHERE r.oid = ANY(pol.polroles)\n                    ),\n                    'using', pg_get_expr(pol.polqual, pol.polrelid),\n                    'check', pg_get_expr(pol.polwithcheck, pol.polrelid)\n                )\n            ) as policies\n        FROM pg_class c\n        JOIN pg_policy pol ON pol.polrelid = c.oid\n        GROUP BY c.oid\n    ),\n    trigger_info AS (\n        SELECT \n            c.oid as table_oid,\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', t.tgname,\n                    'timing', CASE \n                        WHEN t.tgtype & 2 = 2 THEN 'BEFORE'\n                        WHEN t.tgtype & 4 = 4 THEN 'AFTER'\n                        WHEN t.tgtype & 64 = 64 THEN 'INSTEAD OF'\n                    END,\n                    'events', (\n                        CASE WHEN t.tgtype & 1 = 1 THEN 'INSERT'\n                             WHEN t.tgtype & 8 = 8 THEN 'DELETE'\n                             WHEN t.tgtype & 16 = 16 THEN 'UPDATE'\n                             WHEN t.tgtype & 32 = 32 THEN 'TRUNCATE'\n                        END\n                    ),\n                    'statement', pg_get_triggerdef(t.oid)\n                )\n            ) as triggers\n        FROM pg_class c\n        JOIN pg_trigger t ON t.tgrelid = c.oid\n        WHERE NOT t.tgisinternal\n        GROUP BY c.oid\n    ),\n    table_info AS (\n        SELECT DISTINCT \n            c.table_oid,\n            c.table_name,\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', c.column_name,\n                    'type', c.column_type,\n                    'notnull', c.notnull,\n                    'default', c.column_default,\n                    'identity', c.is_identity,\n                    'is_pk', c.is_pk\n                ) ORDER BY c.column_name\n            ) as columns,\n            COALESCE(fk.foreign_keys, '[]'::jsonb) as foreign_keys,\n            COALESCE(i.indexes, '[]'::jsonb) as indexes,\n            COALESCE(p.policies, '[]'::jsonb) as policies,\n            COALESCE(t.triggers, '[]'::jsonb) as triggers\n        FROM columns_info c\n        LEFT JOIN fk_info fk ON fk.table_oid = c.table_oid\n        LEFT JOIN index_info i ON i.table_oid = c.table_oid\n        LEFT JOIN policy_info p ON p.table_oid = c.table_oid\n        LEFT JOIN trigger_info t ON t.table_oid = c.table_oid\n        GROUP BY c.table_oid, c.table_name, fk.foreign_keys, i.indexes, p.policies, t.triggers\n    )\n    SELECT result || jsonb_build_object(\n        'tables',\n        COALESCE(\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', table_name,\n                    'columns', columns,\n                    'foreign_keys', foreign_keys,\n                    'indexes', indexes,\n                    'policies', policies,\n                    'triggers', triggers\n                )\n            ),\n            '[]'::jsonb\n        )\n    )\n    FROM table_info\n    INTO result;\n\n    -- Get all functions\n    WITH function_info AS (\n        SELECT \n            p.proname AS name,\n            pg_get_functiondef(p.oid) AS definition\n        FROM pg_proc p\n        JOIN pg_namespace n ON n.oid = p.pronamespace\n        WHERE n.nspname = 'public'\n        AND p.prokind = 'f'\n    )\n    SELECT result || jsonb_build_object(\n        'functions',\n        COALESCE(\n            jsonb_agg(\n                jsonb_build_object(\n                    'name', name,\n                    'definition', definition\n                )\n            ),\n            '[]'::jsonb\n        )\n    )\n    FROM function_info\n    INTO result;\n\n    RETURN result;\nEND;\n"
+    },
+    {
+      "routine_name": "nde_chatbot_match",
+      "return_type": "record",
+      "routine_definition": "\nBEGIN\n    RETURN QUERY\n    SELECT\n        c.id,\n        c.content,\n        c.metadata,\n        c.embedding,\n        1 - (c.embedding <=> query_embedding::text::vector) AS similarity,\n        v.title AS video_title, -- Select the title from nde_vids\n        v.url AS video_url      -- Select the url from nde_vids\n    FROM\n        nde_chatbot_chunks c\n    -- Join the two tables on the video ID\n    LEFT JOIN\n        nde_vids v ON (c.metadata->>'video_id')::text = v.\"videoId\"::text\n    WHERE\n        c.metadata @> filter\n    ORDER BY\n        c.embedding <=> query_embedding::text::vector\n    LIMIT match_count;\nEND;\n"
+    },
+    {
+      "routine_name": "search_moments_vector",
+      "return_type": "record",
+      "routine_definition": "\nBEGIN\n    RAISE LOG 'Starting vector search for query with match_threshold: %, match_count: %', match_threshold, match_count;\n\n    RETURN QUERY\n    SELECT\n        se.id AS moment_id,\n        se.video_id,\n        se.content,\n        se.start_time,\n        1 - (se.embedding <=> query_embedding) AS similarity,\n        -- Get video details by joining back to the main table\n        v.url,\n        v.title,\n        v.\"thumbnailUrl\",\n        v.date,\n        v.\"viewCount\",\n        v.likes,\n        v.\"commentsCount\"\n    FROM\n        public.nde_subtitle_embeddings se\n    JOIN\n        public.nde_vids v ON se.video_id = v.\"videoId\"\n    WHERE\n        1 - (se.embedding <=> query_embedding) > match_threshold\n    ORDER BY\n        similarity DESC\n    LIMIT\n        match_count;\n\n    RAISE LOG 'Finished vector search.';\nEND;\n"
+    },
+    {
+      "routine_name": "vector_in",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_out",
+      "return_type": "cstring",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_typmod_in",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_recv",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_send",
+      "return_type": "bytea",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l2_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "inner_product",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "cosine_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l1_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_dims",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_norm",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l2_normalize",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "binary_quantize",
+      "return_type": "bit",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "subvector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_add",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_sub",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_mul",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_concat",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_lt",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_le",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_eq",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_ne",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_ge",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_gt",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_cmp",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_l2_squared_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_negative_inner_product",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_spherical_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_accum",
+      "return_type": "ARRAY",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_avg",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_combine",
+      "return_type": "ARRAY",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_vector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_vector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_vector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_vector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_to_float4",
+      "return_type": "ARRAY",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "ivfflathandler",
+      "return_type": "index_am_handler",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "hnswhandler",
+      "return_type": "index_am_handler",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "ivfflat_halfvec_support",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "ivfflat_bit_support",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "hnsw_halfvec_support",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "hnsw_bit_support",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "hnsw_sparsevec_support",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_in",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_out",
+      "return_type": "cstring",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_typmod_in",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_recv",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_send",
+      "return_type": "bytea",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l2_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "inner_product",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "cosine_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l1_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_dims",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l2_norm",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l2_normalize",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "binary_quantize",
+      "return_type": "bit",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "subvector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_add",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_sub",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_mul",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_concat",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_lt",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_le",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_eq",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_ne",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_ge",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_gt",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_cmp",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_l2_squared_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_negative_inner_product",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_spherical_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_accum",
+      "return_type": "ARRAY",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_avg",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_combine",
+      "return_type": "ARRAY",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_to_vector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_to_halfvec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_halfvec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_halfvec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_halfvec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_halfvec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_to_float4",
+      "return_type": "ARRAY",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "hamming_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "jaccard_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_in",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_out",
+      "return_type": "cstring",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_typmod_in",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_recv",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_send",
+      "return_type": "bytea",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l2_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "inner_product",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "cosine_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l1_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "exact_phrase_search_punctuated",
+      "return_type": "record",
+      "routine_definition": "\n    SELECT\n        e.content,\n        e.start_time,\n        v.\"videoId\" as video_id,\n        v.url,\n        v.title,\n        v.\"thumbnailUrl\",\n        v.\"date\",\n        v.\"viewCount\",\n        v.\"channelName\",\n        v.analysis_nde_summary\n    FROM\n        public.nde_punctuated_embeddings AS e\n    JOIN\n        public.nde_vids AS v ON e.video_id = v.\"videoId\"\n    WHERE\n        to_tsvector('english', e.content) @@ phraseto_tsquery('english', search_phrase)\n    ORDER BY\n        -- This CASE statement allows for dynamic sorting\n        CASE WHEN sort_direction = 'DESC' THEN\n            CASE\n                WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n                WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n            END\n        END DESC,\n        CASE WHEN sort_direction = 'ASC' THEN\n            CASE\n                WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n                WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n            END\n        END ASC,\n        CASE WHEN sort_direction = 'DESC' THEN\n            CASE\n                WHEN sort_column = 'title' THEN v.title\n                WHEN sort_column = 'channelName' THEN v.\"channelName\"\n            END\n        END DESC,\n        CASE WHEN sort_direction = 'ASC' THEN\n            CASE\n                WHEN sort_column = 'title' THEN v.title\n                WHEN sort_column = 'channelName' THEN v.\"channelName\"\n            END\n        END ASC\n    LIMIT\n        page_limit\n    OFFSET\n        page_offset;\n"
+    },
+    {
+      "routine_name": "l2_norm",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "l2_normalize",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_lt",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_le",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_eq",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_ne",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_ge",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_gt",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_cmp",
+      "return_type": "integer",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_l2_squared_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_negative_inner_product",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "vector_to_sparsevec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_to_vector",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "halfvec_to_sparsevec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "sparsevec_to_halfvec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_sparsevec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_sparsevec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_sparsevec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "array_to_sparsevec",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "search_nde_moments",
+      "return_type": "record",
+      "routine_definition": "\nBEGIN\n    RETURN QUERY\n    WITH all_matching_moments AS (\n        SELECT\n            v.url,\n            v.title,\n            v.\"thumbnailUrl\",\n            subtitle_object.value AS matching_subtitle, -- Calculate total count of all possible matches for this search_text\n            COUNT(*) OVER() as full_count \n        FROM\n            public.nde_vids AS v,\n            jsonb_array_elements(v.raw_timestamped_subtitles -> 'data') AS subtitle_object\n        WHERE\n            v.\"isNde\" = 'clear_nde'\n            AND v.raw_timestamped_subtitles IS NOT NULL\n            -- Efficiently pre-filter videos if possible (e.g., using a GIN trigram index)\n            AND v.raw_timestamped_subtitles::text ILIKE '%' || p_search_text || '%' \n            AND jsonb_typeof(v.raw_timestamped_subtitles -> 'data') = 'array'\n            AND subtitle_object.value ->> 'text' ILIKE '%' || p_search_text || '%'\n    )\n    SELECT\n        amm.url,\n        amm.title,\n        amm.\"thumbnailUrl\",\n        amm.matching_subtitle,\n        amm.full_count -- Return the total count with each row\n    FROM all_matching_moments amm\n    -- IMPORTANT: Add a consistent ORDER BY clause for stable pagination\n    ORDER BY\n        amm.title ASC, \n        (amm.matching_subtitle->>'start')::numeric ASC\n    LIMIT p_page_limit\n    OFFSET p_page_offset;\nEND;\n"
+    },
+    {
+      "routine_name": "clean_subtitles",
+      "return_type": "jsonb",
+      "routine_definition": "\n    -- This single, set-based query is highly efficient.\n    SELECT\n        -- Step 3: Take the original JSONB object and replace its 'subtitles' key\n        -- with the new, cleaned array we build in the subquery.\n        jsonb_set(\n            raw_jsonb,\n            '{subtitles}',\n            (\n                -- Step 2: Aggregate the cleaned subtitle objects back into a single JSONB array.\n                SELECT jsonb_agg(cleaned_item)\n                FROM (\n                    -- Step 1: Unpack the 'subtitles' array and clean each element.\n                    SELECT\n                        jsonb_set(\n                            item,\n                            '{text}',\n                            to_jsonb(\n                                -- Perform the cleaning by nesting replace() calls.\n                                -- 1. Replace ampersand entity\n                                replace(\n                                    -- 2. Replace quote entity\n                                    replace(\n                                        -- 3. Replace apostrophe entity\n                                        replace(\n                                            -- 4. Remove bracketed text like [Music]\n                                            regexp_replace(item->>'text', '\\[.*?\\]', '', 'g'),\n                                        '&#39;', ''''),\n                                    '&quot;', '\"'),\n                                '&amp;', '&')\n                            )\n                        ) AS cleaned_item\n                    FROM\n                        -- Unpack the array into a set of rows (elements)\n                        jsonb_array_elements(raw_jsonb->'subtitles') AS item\n                    WHERE\n                        -- Filter out any subtitles where the text becomes empty after cleaning (e.g., \"[Music]\").\n                        -- This prevents empty subtitle entries in the final result.\n                        trim(regexp_replace(item->>'text', '\\[.*?\\]', '', 'g')) != ''\n                ) AS subquery\n            )\n        )\n"
+    },
+    {
+      "routine_name": "get_all_subtitles_text",
+      "return_type": "text",
+      "routine_definition": "\n  SELECT string_agg(elem ->> 'text', ' ')\n  FROM jsonb_array_elements(\n    CASE WHEN jsonb_typeof(subtitles -> 'data') = 'array' THEN subtitles -> 'data' ELSE '[]'::jsonb END\n  ) AS elem;\n"
+    },
+    {
+      "routine_name": "search_video_subtitles",
+      "return_type": "record",
+      "routine_definition": "\nWITH candidates AS (\n    SELECT\n        id,\n        video_id,\n        content,\n        start_time,\n        -- THE FIX IS HERE: Use cosine distance (1 - result) for similarity\n        1 - (embedding <=> query_embedding) AS similarity\n    FROM\n        public.nde_subtitle_embeddings\n    ORDER BY\n        -- AND THE FIX IS HERE: Use the correct <=> operator in the ORDER BY clause\n        embedding <=> query_embedding\n    LIMIT 100000\n)\n-- [The rest of the function remains the same]\nSELECT\n    c.content,\n    c.start_time,\n    c.similarity,\n    v.\"videoId\" as video_id,\n    v.url,\n    v.title,\n    v.\"thumbnailUrl\",\n    v.\"date\",\n    v.\"viewCount\",\n    v.\"channelName\"\nFROM\n    candidates c\nJOIN\n    public.nde_vids v ON c.video_id = v.\"videoId\"\nWHERE\n    c.similarity >= similarity_threshold\nORDER BY\n    CASE\n        WHEN sort_direction = 'DESC' THEN\n            CASE\n                WHEN sort_column = 'similarity' THEN c.similarity\n                WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n                WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n            END\n    END DESC,\n    CASE\n        WHEN sort_direction = 'ASC' THEN\n            CASE\n                WHEN sort_column = 'similarity' THEN c.similarity\n                WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n                WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n            END\n    END ASC,\n    CASE\n        WHEN sort_direction = 'DESC' THEN\n            CASE\n                WHEN sort_column = 'title' THEN v.title\n                WHEN sort_column = 'channelName' THEN v.\"channelName\"\n            END\n    END DESC,\n    CASE\n        WHEN sort_direction = 'ASC' THEN\n            CASE\n                WHEN sort_column = 'title' THEN v.title\n                WHEN sort_column = 'channelName' THEN v.\"channelName\"\n            END\n    END ASC\nLIMIT\n    page_limit\nOFFSET\n    page_offset;\n"
+    },
+    {
+      "routine_name": "search_video_subtitles_fast",
+      "return_type": "record",
+      "routine_definition": "\nWITH candidates AS (\n    SELECT\n        e.id,\n        e.video_id,\n        e.content,\n        e.start_time,\n        1 - (e.embedding <=> query_embedding) AS similarity\n    FROM\n        public.nde_subtitle_embeddings e\n    WHERE\n        1 - (e.embedding <=> query_embedding) >= similarity_threshold\n    ORDER BY\n        e.embedding <=> query_embedding\n)\nSELECT\n    c.content,\n    c.start_time,\n    c.similarity,\n    v.\"videoId\" as video_id,\n    v.url,\n    v.title,\n    v.\"thumbnailUrl\",\n    v.\"date\",\n    v.\"viewCount\",\n    v.\"channelName\"\nFROM\n    candidates c\nJOIN\n    public.nde_vids v ON c.video_id = v.\"videoId\"\nORDER BY\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END ASC,\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END ASC\nLIMIT\n    page_limit\nOFFSET\n    page_offset;\n"
+    },
+    {
+      "routine_name": "search_nde_moments_paginated_optimized",
+      "return_type": "record",
+      "routine_definition": "\nDECLARE\n    v_offset INT;\n    v_ts_query tsquery;\nBEGIN\n    v_ts_query := websearch_to_tsquery('english', p_search_text);\n    v_offset := (p_page_number - 1) * p_page_size;\n\n    RETURN QUERY\n    WITH matching_videos AS (\n        SELECT\n            v.\"videoId\",\n            v.url,\n            v.title,\n            v.\"thumbnailUrl\",\n            v.raw_timestamped_subtitles,\n            v.date,\n            v.\"viewCount\",\n            v.likes,\n            v.\"commentsCount\",\n            (\n                SELECT jsonb_agg(elem)\n                FROM jsonb_array_elements(v.raw_timestamped_subtitles->'data') AS elem\n                WHERE to_tsvector('english', elem->>'text') @@ v_ts_query\n            ) AS matching_subtitles_array\n        FROM public.nde_vids v\n        WHERE v.\"isNde\" = 'clear_nde'\n          AND v.subtitles_tsvector @@ v_ts_query\n    )\n    SELECT\n        mv.url,\n        mv.title,\n        mv.\"thumbnailUrl\",\n        -- Return the first matching subtitle from the filtered array\n        mv.matching_subtitles_array->0,\n        -- This is a placeholder; a full count is expensive.\n        0::bigint,\n        mv.date,\n        mv.\"viewCount\",\n        mv.likes,\n        mv.\"commentsCount\"\n    FROM matching_videos mv\n    WHERE mv.matching_subtitles_array IS NOT NULL AND jsonb_array_length(mv.matching_subtitles_array) > 0\n    ORDER BY\n        CASE WHEN p_sort_by = 'viewCount' AND p_sort_direction = 'DESC' THEN mv.\"viewCount\" END DESC NULLS LAST,\n        CASE WHEN p_sort_by = 'date' AND p_sort_direction = 'DESC' THEN mv.date END DESC NULLS LAST,\n        mv.date DESC\n    LIMIT p_page_size\n    OFFSET v_offset;\nEND;\n"
+    },
+    {
+      "routine_name": "debug_search_subtitles",
+      "return_type": "record",
+      "routine_definition": "\n-- Use a CTE to first find the nearest neighbors using the index.\nWITH nearest_neighbors AS (\n    SELECT\n        e.id,\n        e.video_id,\n        e.content,\n        e.start_time,\n        1 - (e.embedding <=> query_embedding) as similarity\n    FROM\n        public.nde_subtitle_embeddings e\n    ORDER BY\n        e.embedding <=> query_embedding\n    LIMIT 20 -- Let's look at the Top 20 raw results\n)\n-- Select and join without a similarity filter\nSELECT\n    nn.content,\n    nn.start_time,\n    nn.similarity,\n    v.\"videoId\" as video_id,\n    v.title\nFROM\n    nearest_neighbors nn\nJOIN\n    public.nde_vids v ON nn.video_id = v.\"videoId\"\nORDER BY\n    nn.similarity DESC;\n"
+    },
+    {
+      "routine_name": "set_limit",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "show_limit",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "show_trgm",
+      "return_type": "ARRAY",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "similarity",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "similarity_op",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "word_similarity",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "word_similarity_op",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "word_similarity_commutator_op",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "similarity_dist",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "word_similarity_dist_op",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "word_similarity_dist_commutator_op",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_in",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_out",
+      "return_type": "cstring",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_consistent",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_distance",
+      "return_type": "double precision",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_compress",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_decompress",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_penalty",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_picksplit",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_union",
+      "return_type": "USER-DEFINED",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_same",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gin_extract_value_trgm",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gin_extract_query_trgm",
+      "return_type": "internal",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gin_trgm_consistent",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gin_trgm_triconsistent",
+      "return_type": "\"char\"",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "strict_word_similarity",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "strict_word_similarity_op",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "strict_word_similarity_commutator_op",
+      "return_type": "boolean",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "strict_word_similarity_dist_op",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "strict_word_similarity_dist_commutator_op",
+      "return_type": "real",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "gtrgm_options",
+      "return_type": "void",
+      "routine_definition": null
+    },
+    {
+      "routine_name": "exact_phrase_search_subtitles",
+      "return_type": "record",
+      "routine_definition": "\nSELECT\n    e.content,\n    e.start_time,\n    v.\"videoId\" as video_id,\n    v.url,\n    v.title,\n    v.\"thumbnailUrl\",\n    v.\"date\",\n    v.\"viewCount\",\n    v.\"channelName\"\nFROM\n    public.nde_subtitle_embeddings AS e\nJOIN\n    public.nde_vids AS v ON e.video_id = v.\"videoId\"\nWHERE\n    to_tsvector('english', e.content) @@ phraseto_tsquery('english', search_phrase)\nORDER BY\n    -- This CASE statement allows for dynamic sorting\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n            -- Add other numeric/date columns here if needed\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END ASC,\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n            -- Add other text columns here if needed\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END ASC\nLIMIT\n    page_limit\nOFFSET\n    page_offset;\n"
+    },
+    {
+      "routine_name": "analyze_term_in_clear_ndes",
+      "return_type": "record",
+      "routine_definition": "\n-- We use a Common Table Expression (CTE) to first filter down to only the videos we care about.\nWITH clear_nde_videos AS (\n    SELECT\n        \"videoId\",\n        title,\n        subtitles,\n        raw_timestamped_subtitles\n    FROM\n        public.nde_vids\n    WHERE\n        \"isNde\" = 'clear_nde'\n)\n-- Now, we run our final calculations on this filtered set of videos.\nSELECT\n    -- Metric 1: The total number of videos in our filtered set.\n    COUNT(*) AS total_clear_nde_videos,\n\n    -- Metric 2: The number of unique videos where the search term is mentioned at least once.\n    COUNT(*) FILTER (\n        WHERE title ILIKE ('%' || p_search_term || '%')\n           OR subtitles::text ILIKE ('%' || p_search_term || '%')\n           OR raw_timestamped_subtitles::text ILIKE ('%' || p_search_term || '%')\n    ) AS videos_mentioning_term,\n\n    -- Metric 3: The percentage of videos that mention the term.\n    -- We cast to numeric to ensure accurate floating-point division.\n    ROUND(\n        (COUNT(*) FILTER (\n            WHERE title ILIKE ('%' || p_search_term || '%')\n               OR subtitles::text ILIKE ('%' || p_search_term || '%')\n               OR raw_timestamped_subtitles::text ILIKE ('%' || p_search_term || '%')\n        ) * 100.0 / COUNT(*)),\n        2\n    ) AS percentage_with_term,\n\n    -- Metric 4: The total number of times the word appears across all text fields.\n    SUM(\n        (\n            LENGTH(COALESCE(title, '') || ' ' || COALESCE(subtitles::text, '') || ' ' || COALESCE(raw_timestamped_subtitles::text, '')) -\n            LENGTH(REPLACE(LOWER(COALESCE(title, '') || ' ' || COALESCE(subtitles::text, '') || ' ' || COALESCE(raw_timestamped_subtitles::text, '')), LOWER(p_search_term), ''))\n        ) / LENGTH(p_search_term)\n    )::bigint AS total_term_mentions\nFROM\n    clear_nde_videos;\n"
+    },
+    {
+      "routine_name": "clean_subtitle_data",
+      "return_type": "jsonb",
+      "routine_definition": "\n    -- This set-based query is much faster than a PL/pgSQL loop\n    SELECT\n        jsonb_agg(\n            jsonb_set(item, '{text}', to_jsonb(\n                replace(regexp_replace(item->>'text', '\\[.*?\\]', '', 'g'), '&#39;', '''')\n            ))\n        )\n    FROM\n        -- Unpack the array into a set of rows\n        jsonb_array_elements(\n            -- Gracefully handle NULL or non-array inputs\n            CASE WHEN jsonb_typeof(raw_data) = 'array' THEN raw_data ELSE '[]'::jsonb END\n        ) AS item\n    WHERE\n        -- Filter out lines that become empty after cleaning (like \"[Music]\")\n        regexp_replace(item->>'text', '\\[.*?\\]', '', 'g') != ''\n"
+    },
+    {
+      "routine_name": "populate_nde_vids_tsvector_batch",
+      "return_type": "integer",
+      "routine_definition": "\nDECLARE\n    updated_row_count INT;\nBEGIN\n    -- This is a more advanced query that computes all tsvectors for the batch first,\n    -- which is much more efficient than the previous method.\n    WITH rows_to_process AS (\n        SELECT \"videoId\"\n        FROM public.nde_vids\n        WHERE subtitles_tsvector IS NULL\n          AND raw_timestamped_subtitles IS NOT NULL\n          AND jsonb_typeof(raw_timestamped_subtitles->'data') = 'array'\n        LIMIT p_batch_size\n    ),\n    precomputed_tsvectors AS (\n        SELECT\n            v.\"videoId\",\n            to_tsvector('english', string_agg(elem->>'text', ' ')) AS computed_tsvector\n        FROM public.nde_vids v,\n             jsonb_array_elements(v.raw_timestamped_subtitles->'data') AS elem\n        WHERE v.\"videoId\" IN (SELECT \"videoId\" FROM rows_to_process)\n        GROUP BY v.\"videoId\"\n    )\n    UPDATE public.nde_vids\n    SET subtitles_tsvector = ptv.computed_tsvector\n    FROM precomputed_tsvectors ptv\n    WHERE public.nde_vids.\"videoId\" = ptv.\"videoId\";\n\n    GET DIAGNOSTICS updated_row_count = ROW_COUNT;\n    RETURN updated_row_count;\nEND;\n"
+    },
+    {
+      "routine_name": "search_nde_moments_paginated",
+      "return_type": "record",
+      "routine_definition": "\nDECLARE\n    v_offset INT;\nBEGIN\n    v_offset := (p_page_number - 1) * p_page_size;\n\n    RETURN QUERY\n    WITH limited_raw_videos AS (\n        SELECT\n            v_inner.url,\n            v_inner.title,\n            v_inner.\"thumbnailUrl\",\n            v_inner.raw_timestamped_subtitles,\n            v_inner.date,\n            v_inner.\"viewCount\",\n            v_inner.likes,\n            v_inner.\"commentsCount\"\n        FROM public.nde_vids AS v_inner\n        WHERE v_inner.\"isNde\" = 'clear_nde' AND v_inner.raw_timestamped_subtitles IS NOT NULL\n        ORDER BY -- Order for initial pool selection uses the parameters\n            CASE WHEN p_sort_by = 'title' AND p_sort_direction = 'ASC' THEN v_inner.title END ASC NULLS LAST,\n            CASE WHEN p_sort_by = 'title' AND p_sort_direction = 'DESC' THEN v_inner.title END DESC NULLS LAST,\n            CASE WHEN p_sort_by = 'date' AND p_sort_direction = 'ASC' THEN v_inner.date END ASC NULLS LAST,\n            CASE WHEN p_sort_by = 'date' AND p_sort_direction = 'DESC' THEN v_inner.date END DESC NULLS LAST,\n            CASE WHEN p_sort_by = 'viewCount' AND p_sort_direction = 'ASC' THEN v_inner.\"viewCount\" END ASC NULLS LAST,\n            CASE WHEN p_sort_by = 'viewCount' AND p_sort_direction = 'DESC' THEN v_inner.\"viewCount\" END DESC NULLS LAST,\n            v_inner.date DESC -- Fallback if parameters don't explicitly match, or for tie-breaking.\n                              -- If p_sort_by is 'viewCount' and p_sort_direction 'DESC', it will be primarily sorted by viewCount DESC.\n        LIMIT CASE WHEN p_initial_video_limit > 0 THEN p_initial_video_limit ELSE NULL END\n    ),\n    valid_videos AS (\n      SELECT\n        v.url,\n        v.title,\n        v.\"thumbnailUrl\",\n        v.raw_timestamped_subtitles,\n        v.date,\n        v.\"viewCount\",\n        v.likes,\n        v.\"commentsCount\"\n      FROM\n        limited_raw_videos AS v\n      WHERE\n        v.raw_timestamped_subtitles::text ILIKE '%' || p_search_text || '%'\n        AND jsonb_typeof(v.raw_timestamped_subtitles -> 'data') = 'array'\n    ),\n    all_matching_subtitles AS (\n        SELECT\n          vv.url,\n          vv.title,\n          vv.\"thumbnailUrl\",\n          subtitle_object.value AS matching_subtitle,\n          vv.date,\n          vv.\"viewCount\",\n          vv.likes,\n          vv.\"commentsCount\"\n        FROM\n          valid_videos AS vv,\n          jsonb_array_elements(vv.raw_timestamped_subtitles -> 'data') AS subtitle_object\n        WHERE\n          subtitle_object.value ->> 'text' ILIKE '%' || p_search_text || '%'\n    ),\n    counted_subtitles AS (\n        SELECT *, COUNT(*) OVER() as total_results FROM all_matching_subtitles\n    )\n    SELECT\n        cs.url,\n        cs.title,\n        cs.\"thumbnailUrl\",\n        cs.matching_subtitle,\n        cs.total_results,\n        cs.date,\n        cs.\"viewCount\",\n        cs.likes,\n        cs.\"commentsCount\"\n    FROM counted_subtitles cs\n    ORDER BY -- Order for final paginated results uses the parameters\n        CASE WHEN p_sort_by = 'title' AND p_sort_direction = 'ASC' THEN cs.title END ASC NULLS LAST,\n        CASE WHEN p_sort_by = 'title' AND p_sort_direction = 'DESC' THEN cs.title END DESC NULLS LAST,\n        CASE WHEN p_sort_by = 'date' AND p_sort_direction = 'ASC' THEN cs.date END ASC NULLS LAST,\n        CASE WHEN p_sort_by = 'date' AND p_sort_direction = 'DESC' THEN cs.date END DESC NULLS LAST,\n        CASE WHEN p_sort_by = 'viewCount' AND p_sort_direction = 'ASC' THEN cs.\"viewCount\" END ASC NULLS LAST,\n        CASE WHEN p_sort_by = 'viewCount' AND p_sort_direction = 'DESC' THEN cs.\"viewCount\" END DESC NULLS LAST,\n        (cs.matching_subtitle->>'start')::numeric ASC\n    LIMIT p_page_size\n    OFFSET v_offset;\n\nEND;\n"
+    },
+    {
+      "routine_name": "ignore_null_updates",
+      "return_type": "trigger",
+      "routine_definition": "\nBEGIN\n    NEW.\"created_at\" = COALESCE(NEW.\"created_at\", OLD.\"created_at\");\n    NEW.\"type\" = COALESCE(NEW.\"type\", OLD.\"type\");\n    NEW.\"title\" = COALESCE(NEW.\"title\", OLD.\"title\");\n    NEW.\"url\" = COALESCE(NEW.\"url\", OLD.\"url\");\n    NEW.\"thumbnailUrl\" = COALESCE(NEW.\"thumbnailUrl\", OLD.\"thumbnailUrl\"); -- Corrected\n    NEW.\"viewCount\" = COALESCE(NEW.\"viewCount\", OLD.\"viewCount\");         -- Corrected\n    NEW.\"date\" = COALESCE(NEW.\"date\", OLD.\"date\");\n    NEW.\"likes\" = COALESCE(NEW.\"likes\", OLD.\"likes\");\n    NEW.\"location\" = COALESCE(NEW.\"location\", OLD.\"location\");\n    NEW.\"channelName\" = COALESCE(NEW.\"channelName\", OLD.\"channelName\");   -- Corrected\n    NEW.\"channelUrl\" = COALESCE(NEW.\"channelUrl\", OLD.\"channelUrl\");     -- Corrected\n    NEW.\"channelId\" = COALESCE(NEW.\"channelId\", OLD.\"channelId\");       -- Corrected\n    NEW.\"channelUsername\" = COALESCE(NEW.\"channelUsername\", OLD.\"channelUsername\"); -- Corrected\n    NEW.\"numberOfSubscribers\" = COALESCE(NEW.\"numberOfSubscribers\", OLD.\"numberOfSubscribers\"); -- Corrected\n    NEW.\"duration\" = COALESCE(NEW.\"duration\", OLD.\"duration\");\n    NEW.\"commentsCount\" = COALESCE(NEW.\"commentsCount\", OLD.\"commentsCount\"); -- Corrected\n    NEW.\"description\" = COALESCE(NEW.\"description\", OLD.\"description\");\n    NEW.\"subtitles\" = COALESCE(NEW.\"subtitles\", OLD.\"subtitles\");\n    NEW.\"videoId\" = COALESCE(NEW.\"videoId\", OLD.\"videoId\");             -- Corrected\n    NEW.\"isNde\" = COALESCE(NEW.\"isNde\", OLD.\"isNde\");                   -- Corrected\n    NEW.\"isNdeJustification\" = COALESCE(NEW.\"isNdeJustification\", OLD.\"isNdeJustification\"); -- Corrected\n    NEW.\"experiencerFullName\" = COALESCE(NEW.\"experiencerFullName\", OLD.\"experiencerFullName\"); -- Corrected\n    NEW.\"subtitles_embedding\" = COALESCE(NEW.\"subtitles_embedding\", OLD.\"subtitles_embedding\");\n    NEW.\"raw_timestamped_subtitles\" = COALESCE(NEW.\"raw_timestamped_subtitles\", OLD.\"raw_timestamped_subtitles\");\n    RETURN NEW;\nEND;\n"
+    },
+    {
+      "routine_name": "match_nde_moments_semantic",
+      "return_type": "record",
+      "routine_definition": "\nDECLARE\n    v_offset INT;\nBEGIN\n    v_offset := (p_page_number - 1) * p_page_size;\n\n    RETURN QUERY\n    SELECT\n        v.url,\n        v.title,\n        v.\"thumbnailUrl\",\n        jsonb_build_object('text', s.content, 'start', s.start_time) AS matching_subtitle,\n        (1 - (s.embedding <=> query_embedding))::float AS similarity_score,\n        v.date,\n        v.\"viewCount\",\n        v.likes,\n        v.\"commentsCount\"\n    FROM\n        public.nde_subtitle_embeddings s\n    JOIN\n        public.nde_vids v ON s.video_id = v.\"videoId\"\n    WHERE\n        1 - (s.embedding <=> query_embedding) > p_match_threshold\n    ORDER BY\n        similarity_score DESC\n    LIMIT p_page_size\n    OFFSET v_offset;\nEND;\n"
+    },
+    {
+      "routine_name": "uap_semantic_search",
+      "return_type": "record",
+      "routine_definition": "\nBEGIN\n    -- This query returns the most relevant chunks based on vector similarity.\n    RETURN QUERY\n    SELECT\n        -- Select relevant columns from the embeddings table\n        e.id,\n        e.content,\n        e.metadata,\n        e.embedding,\n        -- Calculate cosine similarity from the distance. 1 is most similar, 0 is least.\n        1 - (e.embedding <=> query_embedding) AS similarity,\n        -- Select the title and URL from the videos table\n        v.title AS video_title,\n        v.url AS video_url\n    FROM\n        uap_embeddings e\n    -- Join with the videos table to get video metadata\n    LEFT JOIN\n        uap_vids v ON e.video_id = v.video_id\n    WHERE\n        -- Pre-filter the embeddings based on the provided metadata filter.\n        -- The '@>' operator checks if the metadata on the left contains the JSONB on the right.\n        e.metadata @> filter\n    ORDER BY\n        -- The '<=>' operator calculates the cosine distance between the query and chunk embeddings.\n        -- A smaller distance means higher similarity, so we order by this to get the best matches first.\n        e.embedding <=> query_embedding\n    LIMIT match_count;\nEND;\n"
+    },
+    {
+      "routine_name": "search_video_subtitles_diversified",
+      "return_type": "record",
+      "routine_definition": "\nWITH ranked_subtitles AS (\n    SELECT\n        e.id,\n        e.video_id,\n        e.content,\n        e.start_time,\n        1 - (e.embedding <=> query_embedding) AS similarity,\n        -- Rank subtitles within each video group by their similarity score\n        ROW_NUMBER() OVER(PARTITION BY e.video_id ORDER BY e.embedding <=> query_embedding ASC) as rn\n    FROM\n        public.nde_subtitle_embeddings e\n    WHERE\n        1 - (e.embedding <=> query_embedding) >= similarity_threshold\n)\n-- Now, join and sort the diversified results\nSELECT\n    c.content,\n    c.start_time,\n    c.similarity,\n    v.\"videoId\" as video_id,\n    v.url,\n    v.title,\n    v.\"thumbnailUrl\",\n    v.\"date\",\n    v.\"viewCount\",\n    v.\"channelName\"\nFROM\n    -- Use only the #1 ranked subtitle from each video\n    ranked_subtitles c\nJOIN\n    public.nde_vids v ON c.video_id = v.\"videoId\"\nWHERE\n    c.rn = 1\nORDER BY\n    -- The user's sorting logic now operates on the diversified set\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END ASC,\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END ASC\nLIMIT\n    page_limit\nOFFSET\n    page_offset;\n"
+    },
+    {
+      "routine_name": "search_nde_moments",
+      "return_type": "record",
+      "routine_definition": "\nBEGIN\n    RETURN QUERY\n    WITH limited_raw_videos AS (\n        SELECT\n            v_inner.url,\n            v_inner.title,\n            v_inner.\"thumbnailUrl\",\n            v_inner.raw_timestamped_subtitles,\n            v_inner.\"isNde\"\n        FROM public.nde_vids AS v_inner\n        WHERE v_inner.\"isNde\" = 'clear_nde' AND v_inner.raw_timestamped_subtitles IS NOT NULL\n        -- Example: ORDER BY created_at DESC if you want to limit by \"most recent\"\n        -- This ORDER BY should ideally align with an index for performance\n        ORDER BY v_inner.created_at DESC -- Ensure 'created_at' column exists and is indexed\n        LIMIT CASE WHEN p_initial_video_limit IS NOT NULL AND p_initial_video_limit > 0 THEN p_initial_video_limit ELSE NULL END\n    ),\n    valid_videos AS (\n      SELECT\n        v.url,\n        v.title,\n        v.\"thumbnailUrl\",\n        v.raw_timestamped_subtitles\n      FROM\n        limited_raw_videos AS v\n      WHERE\n        v.raw_timestamped_subtitles::text ILIKE '%' || p_search_text || '%'\n        AND jsonb_typeof(v.raw_timestamped_subtitles -> 'data') = 'array'\n    )\n    SELECT\n      vv.url,\n      vv.title,\n      vv.\"thumbnailUrl\",\n      subtitle_object.value AS matching_subtitle\n    FROM\n      valid_videos AS vv,\n      jsonb_array_elements(vv.raw_timestamped_subtitles -> 'data') AS subtitle_object\n    WHERE\n      subtitle_object.value ->> 'text' ILIKE '%' || p_search_text || '%'\n    ORDER BY vv.title ASC, (subtitle_object.value->>'start')::numeric ASC; -- Added ORDER BY for consistency\nEND;\n"
+    },
+    {
+      "routine_name": "search_punctuated_embeddings",
+      "return_type": "record",
+      "routine_definition": "\n    WITH candidates AS (\n        -- Find the top 2000 most similar results from the punctuated embeddings table.\n        SELECT\n            e.id,\n            e.video_id,\n            e.content,\n            e.start_time,\n            1 - (e.embedding <=> query_embedding) AS similarity\n        FROM\n            public.nde_punctuated_embeddings e\n        WHERE\n            1 - (e.embedding <=> query_embedding) >= similarity_threshold\n        ORDER BY\n            e.embedding <=> query_embedding\n        LIMIT 2000 -- Pre-filter to a smaller set for better join/sort performance.\n    )\n    -- Join with video details and apply final sorting/pagination.\n    SELECT\n        c.content,\n        c.start_time,\n        c.similarity,\n        v.\"videoId\" as video_id,\n        v.url,\n        v.title,\n        v.\"thumbnailUrl\",\n        v.\"date\",\n        v.\"viewCount\",\n        v.\"channelName\",\n        v.analysis_nde_summary -- Added the summary column to the final SELECT\n    FROM\n        candidates c\n    JOIN\n        public.nde_vids v ON c.video_id = v.\"videoId\"\n    ORDER BY\n        -- Dynamic sorting for numeric/date columns\n        CASE WHEN sort_direction = 'DESC' THEN\n            CASE\n                WHEN sort_column = 'similarity' THEN c.similarity\n                WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n                WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n            END\n        END DESC,\n        CASE WHEN sort_direction = 'ASC' THEN\n            CASE\n                WHEN sort_column = 'similarity' THEN c.similarity\n                WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n                WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n            END\n        END ASC,\n        -- Dynamic sorting for text columns\n        CASE WHEN sort_direction = 'DESC' THEN\n            CASE\n                WHEN sort_column = 'title' THEN v.title\n                WHEN sort_column = 'channelName' THEN v.\"channelName\"\n            END\n        END DESC,\n        CASE WHEN sort_direction = 'ASC' THEN\n            CASE\n                WHEN sort_column = 'title' THEN v.title\n                WHEN sort_column = 'channelName' THEN v.\"channelName\"\n            END\n        END ASC\n    LIMIT\n        page_limit\n    OFFSET\n        page_offset;\n"
+    },
+    {
+      "routine_name": "update_subtitles_tsvector",
+      "return_type": "trigger",
+      "routine_definition": "\nBEGIN\n    -- This checks if the subtitles have actually changed before doing work.\n    IF (TG_OP = 'INSERT' OR NEW.raw_timestamped_subtitles <> OLD.raw_timestamped_subtitles) THEN\n        -- It combines all subtitle text into a single block and converts it to a tsvector.\n        NEW.subtitles_tsvector := (\n            SELECT to_tsvector('english', string_agg(elem ->> 'text', ' '))\n            FROM jsonb_array_elements(NEW.raw_timestamped_subtitles -> 'data') AS elem\n        );\n    END IF;\n    RETURN NEW;\nEND;\n"
+    },
+    {
+      "routine_name": "match_documents",
+      "return_type": "record",
+      "routine_definition": "\nBEGIN\n  RETURN QUERY\n  SELECT\n    chunks.id,\n    chunks.video_id,\n    chunks.content,\n    vids.title, -- Added\n    vids.url,   -- Added\n    1 - (chunks.embedding <=> query_embedding) AS similarity\n  FROM\n    nde_chatbot_chunks AS chunks\n  JOIN -- Added Join\n    nde_vids AS vids ON chunks.video_id = vids.\"videoId\"\n  ORDER BY\n    chunks.embedding <=> query_embedding\n  LIMIT match_count;\nEND;\n"
+    },
+    {
+      "routine_name": "search_video_subtitles_hybrid",
+      "return_type": "record",
+      "routine_definition": "\nWITH top_candidates AS (\n    -- STAGE 1: Quickly get a large pool of the best matches using LIMIT. This is fast.\n    SELECT\n        e.id,\n        e.video_id,\n        e.content,\n        e.start_time,\n        1 - (e.embedding <=> query_embedding) AS similarity\n    FROM\n        public.nde_subtitle_embeddings e\n    WHERE\n        1 - (e.embedding <=> query_embedding) >= similarity_threshold\n    ORDER BY\n        e.embedding <=> query_embedding\n    LIMIT 2000 -- Get a large enough pool to ensure diversity\n),\nranked_candidates AS (\n    -- STAGE 2: Now, diversify only this small, pre-filtered set of 2000. This is also fast.\n    SELECT\n        *,\n        ROW_NUMBER() OVER(PARTITION BY video_id ORDER BY similarity DESC) as rn\n    FROM\n        top_candidates\n)\n-- Now join the final, diversified set and complete the query.\nSELECT\n    c.content,\n    c.start_time,\n    c.similarity,\n    v.\"videoId\" as video_id,\n    v.url,\n    v.title,\n    v.\"thumbnailUrl\",\n    v.\"date\",\n    v.\"viewCount\",\n    v.\"channelName\"\nFROM\n    ranked_candidates c\nJOIN\n    public.nde_vids v ON c.video_id = v.\"videoId\"\nWHERE\n    c.rn = 1\nORDER BY\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END ASC,\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END ASC\nLIMIT\n    page_limit\nOFFSET\n    page_offset;\n"
+    },
+    {
+      "routine_name": "uap_semantic_search",
+      "return_type": "record",
+      "routine_definition": "\nBEGIN\n    -- This query returns the most relevant chunks based on vector similarity\n    -- and joins with the videos table to enrich the results.\n    RETURN QUERY\n    SELECT\n        -- Select relevant columns from the embeddings table\n        e.id,\n        e.content,\n        e.start_time,\n        -- Calculate cosine similarity from the distance. 1 is most similar.\n        1 - (e.embedding <=> query_embedding) AS similarity,\n        -- Select detailed information from the videos table\n        v.title AS video_title,\n        v.url AS video_url,\n        v.channel,\n        v.views,\n        v.thumbnail\n    FROM\n        uap_embeddings e\n    -- Join with the videos table to get video metadata\n    LEFT JOIN\n        uap_vids v ON e.video_id = v.video_id\n    ORDER BY\n        -- The '<=>' operator calculates the cosine distance.\n        -- Ordering by this puts the most relevant results first.\n        e.embedding <=> query_embedding\n    LIMIT match_count;\nEND;\n"
+    },
+    {
+      "routine_name": "search_video_subtitles_optimized",
+      "return_type": "record",
+      "routine_definition": "\nWITH candidates AS (\n    -- Find the top 200 most similar results that also meet the quality threshold\n    SELECT\n        e.id,\n        e.video_id,\n        e.content,\n        e.start_time,\n        1 - (e.embedding <=> query_embedding) AS similarity\n    FROM\n        public.nde_subtitle_embeddings e\n    WHERE\n        1 - (e.embedding <=> query_embedding) >= similarity_threshold\n    ORDER BY\n        e.embedding <=> query_embedding\n    LIMIT 2000 -- This is the key change!\n)\n-- Now, the JOIN and complex SORT only operate on a maximum of 2000 rows\nSELECT\n    c.content,\n    c.start_time,\n    c.similarity,\n    v.\"videoId\" as video_id,\n    v.url,\n    v.title,\n    v.\"thumbnailUrl\",\n    v.\"date\",\n    v.\"viewCount\",\n    v.\"channelName\"\nFROM\n    candidates c\nJOIN\n    public.nde_vids v ON c.video_id = v.\"videoId\"\nORDER BY\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'similarity' THEN c.similarity\n            WHEN sort_column = 'viewCount' THEN v.\"viewCount\"::float\n            WHEN sort_column = 'date' THEN EXTRACT(EPOCH FROM v.\"date\")\n        END\n    END ASC,\n    CASE WHEN sort_direction = 'DESC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END DESC,\n    CASE WHEN sort_direction = 'ASC' THEN\n        CASE\n            WHEN sort_column = 'title' THEN v.title\n            WHEN sort_column = 'channelName' THEN v.\"channelName\"\n        END\n    END ASC\nLIMIT\n    page_limit\nOFFSET\n    page_offset;\n"
+    },
+    {
+      "routine_name": "debug_search_concentration",
+      "return_type": "bigint",
+      "routine_definition": "\n    WITH top_candidates AS (\n        SELECT\n            e.video_id\n        FROM\n            public.nde_subtitle_embeddings e\n        ORDER BY\n            e.embedding <=> query_embedding\n        LIMIT 5000\n    )\n    SELECT COUNT(DISTINCT video_id)\n    FROM top_candidates;\n"
+    },
+    {
+      "routine_name": "debug_reverse_search",
+      "return_type": "record",
+      "routine_definition": "\n    WITH reference_embedding AS (\n      SELECT embedding FROM public.nde_subtitle_embeddings WHERE id = subtitle_id_to_search\n    )\n    SELECT\n        e.content,\n        1 - (e.embedding <=> (SELECT embedding FROM reference_embedding)) AS similarity\n    FROM\n        public.nde_subtitle_embeddings e\n    -- Avoid matching the same subtitle with itself\n    WHERE e.id != subtitle_id_to_search\n    ORDER BY\n        e.embedding <=> (SELECT embedding FROM reference_embedding)\n    LIMIT 5;\n"
+    }
+  ]
+  
+  
