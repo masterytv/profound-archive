@@ -1,196 +1,141 @@
 "use client"
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
+import { Star } from "lucide-react"
+import FavoriteButton from "./favorite-button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
+import { Button } from "./ui/button"
+
+// Define the structure of a search result item
+interface SearchResult {
+  content: string;
+  start_time?: number;
+  video_id: string;
+  url: string;
+  title: string;
+  thumbnailUrl: string;
+  date: string;
+  viewCount: number;
+  channelName: string;
+  similarity?: number;
+  analysisNdeSummary?: string; // Add the summary property
+}
 
 interface SearchResultCardProps {
-  video: {
-    video_id: string
-    url: string
-    title: string
-    thumbnailUrl: string
-    date: string | null
-    viewCount: string
-    channelName: string
-    summary: string // AI-generated summary
-    tags: string[] // AI-generated tags - kept for data model consistency
-    transcripts: Array<{
-      content: string
-      start_time: number
-      similarity?: number
-    }>
-  }
-  searchTerm: string
-  searchType: "keyword" | "concept"
-  onTagClick: (tag: string) => void // Kept for prop consistency, but not used.
+  result: SearchResult;
 }
 
-const formatTimestamp = (seconds: number) => {
-  const roundedSeconds = Math.round(seconds)
-  const hours = Math.floor(roundedSeconds / 3600)
-  const minutes = Math.floor((roundedSeconds % 3600) / 60)
-  const secs = roundedSeconds % 60
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-  }
-  return `${minutes}:${secs.toString().padStart(2, "0")}`
-}
-
-const formatDate = (dateString: string | null) => {
-  if (!dateString) return "Date unavailable"
-  const date = new Date(dateString)
-  if (isNaN(date.getTime())) {
-    return "Invalid date"
-  }
-  return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })
-}
-
-const formatViewCount = (viewCountString: string): string => {
-  if (typeof viewCountString !== 'string') {
-    return 'N/A views';
-  }
-  const numberPart = viewCountString.replace(/[^0-9]/g, '');
-  if (!numberPart) {
-    return viewCountString;
-  }
-  const num = parseInt(numberPart, 10);
-  if (isNaN(num)) {
-    return viewCountString;
-  }
-  let formattedNumber;
-  if (num > 9999) {
-    formattedNumber = num.toLocaleString();
-  } else {
-    formattedNumber = num.toString();
-  }
-  return `${formattedNumber} views`;
-};
-
-const highlightSearchTerm = (text: string, term: string, searchType: "keyword" | "concept") => {
-    if (!term.trim() || searchType !== "keyword") {
-      return <span>{text}</span>
-    }
-  
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    const regex = new RegExp(`(${escapedTerm})`, "gi")
-    const parts = text.split(regex)
-  
-    return (
-      <>
-        {parts.map((part, index) =>
-          regex.test(part) ? <strong key={index}>{part}</strong> : <span key={index}>{part}</span>
-        )}
-      </>
-    )
-  }
-
-export function SearchResultCard({ video, searchTerm, searchType, onTagClick }: SearchResultCardProps) {
+export function SearchResultCard({ result }: SearchResultCardProps) {
+  const [user, setUser] = useState<User | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // A simple check to see if the summary is long enough to need a "More" button.
-  // Using a character count (e.g., 300) as an approximation.
-  const isLongSummary = (video.summary || "").length > 300;
+  // Guard Clause: If result is null or undefined, don't render anything.
+  if (!result) {
+    return null;
+  }
 
+  const supabase = createClient()
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      setUser(data.user)
+    }
+    getUser()
+  }, [supabase])
+
+  const formatTimestamp = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return [h, m, s]
+      .map((v) => (v < 10 ? "0" + v : v))
+      .filter((v, i) => v !== "00" || i > 0)
+      .join(":");
+  };
+
+  const hasTimestamp = typeof result.start_time === 'number';
+  const timestamp = hasTimestamp ? formatTimestamp(result.start_time) : null;
+  const videoUrlWithTimestamp = hasTimestamp ? `${result.url}&t=${Math.floor(result.start_time)}s` : result.url;
+
+  const summary = result.analysisNdeSummary || "";
+  const isLongSummary = summary.length > 250;
+  const displayedSummary = isExpanded ? summary : `${summary.substring(0, 250)}${isLongSummary ? "..." : ""}`;
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="flex flex-col md:flex-row">
-        {/* Left Column: Thumbnail and Video Info */}
-        <div className="md:w-80 flex-shrink-0 bg-gray-50 p-4">
-          <Link
-            href={`${video.url}&t=${Math.round(video.transcripts[0].start_time)}s`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <div className="aspect-video bg-gray-300 rounded mb-3 overflow-hidden relative group">
-              <img
-                src={video.thumbnailUrl || "/placeholder.svg"}
-                alt={video.title}
-                className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-              />
-            </div>
+    <Card className="flex flex-col overflow-hidden transition-shadow duration-300 ease-in-out hover:shadow-lg">
+      <CardHeader className="p-0">
+        <div className="relative">
+          <Link href={videoUrlWithTimestamp} target="_blank">
+            <img
+              src={result.thumbnailUrl}
+              alt={result.title}
+              className="aspect-video w-full object-cover"
+            />
           </Link>
-          <div className="text-sm space-y-1">
-            <div className="font-medium">{video.channelName}</div>
-            <div className="text-muted-foreground">{formatViewCount(video.viewCount)}</div>
-            <div className="text-muted-foreground">{formatDate(video.date)}</div>
-          </div>
+          {timestamp && (
+            <span className="absolute bottom-2 right-2 rounded bg-black/75 px-2 py-1 text-xs font-semibold text-white">
+              {timestamp}
+            </span>
+          )}
         </div>
-
-        {/* Right Column: Title, Summary, Transcripts */}
-        <div className="flex-1 p-6">
-          <CardHeader className="p-0 mb-4">
-            <Link
-              href={`${video.url}&t=${Math.round(video.transcripts[0].start_time)}s`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <CardTitle className="text-xl hover:text-primary transition-colors">{video.title}</CardTitle>
-            </Link>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            {/* AI Summary */}
-            <div className="mb-6">
-              <h4 className="font-semibold text-md mb-2">
-                AI Summary 
-                <span className="font-normal text-foreground"> (AI makes mistakes)</span>
-              </h4>
-              <p className={`text-sm text-muted-foreground leading-relaxed ${!isExpanded ? 'line-clamp-4' : ''}`}>
-                {video.summary || "No summary available."}
-              </p>
-              {isLongSummary && (
-                 <button 
-                   onClick={() => setIsExpanded(!isExpanded)}
-                   className="text-sm text-primary hover:underline mt-1 font-medium"
-                 >
-                   {isExpanded ? "Less" : "More"}
-                 </button>
-              )}
-            </div>
-
-            {/* Transcript Snippets */}
+      </CardHeader>
+      <CardContent className="flex-grow p-4">
+        <CardTitle className="mb-2 text-lg leading-tight">
+          <Link
+            href={videoUrlWithTimestamp}
+            target="_blank"
+            className="hover:text-primary"
+          >
+            {result.title}
+          </Link>
+        </CardTitle>
+        {/* Moment Text */}
+        <p
+          className="mb-3 text-sm text-muted-foreground border-l-2 pl-3"
+          dangerouslySetInnerHTML={{ __html: result.content }}
+        />
+        {/* Summary Text */}
+        {summary && (
             <div>
-              <h4 className="font-semibold text-md mb-3">Relevant Moments</h4>
-              <div className="space-y-3">
-                {video.transcripts.map((transcript, index) => (
-                  <div
-                    key={`${video.video_id}-${transcript.start_time}-${index}`}
-                    className="flex items-start gap-3"
-                  >
-                    <Link
-                      href={`${video.url}&t=${Math.round(transcript.start_time)}s`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-primary hover:underline whitespace-nowrap"
-                    >
-                      {formatTimestamp(transcript.start_time)}
-                    </Link>
-                    <Link
-                      href={`${video.url}&t=${Math.round(transcript.start_time)}s`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-foreground leading-relaxed hover:text-primary transition-colors"
-                    >
-                      {highlightSearchTerm(transcript.content, searchTerm, searchType)}
-                      {searchType === "concept" && transcript.similarity !== undefined && (
-                        <span className="text-muted-foreground ml-1">({transcript.similarity.toFixed(2)})</span>
-                      )}
-                    </Link>
-                  </div>
-                ))}
-              </div>
+                <p className="text-sm text-foreground">{displayedSummary}</p>
+                {isLongSummary && (
+                    <Button variant="link" className="p-0 h-auto text-xs" onClick={() => setIsExpanded(!isExpanded)}>
+                        {isExpanded ? "Read Less" : "Read More"}
+                    </Button>
+                )}
             </div>
-          </CardContent>
+        )}
+      </CardContent>
+      <CardFooter className="flex items-center justify-between p-4 pt-0">
+        <div className="text-xs text-muted-foreground">
+          <p>{result.channelName}</p>
+          <p>{new Date(result.date).toLocaleDateString()}</p>
+          <p>{result.viewCount.toLocaleString()} views</p>
+          {result.similarity != null && (
+            <p>Similarity: {(result.similarity * 100).toFixed(1)}%</p>
+          )}
         </div>
-      </div>
+        <div>
+          {user ? (
+            <FavoriteButton
+              videoId={result.video_id}
+              videoTitle={result.title}
+            />
+          ) : (
+            <Link
+              href="/login"
+              className="p-2 rounded-full hover:bg-muted"
+              title="Log in to favorite this video"
+            >
+              <Star className="h-5 w-5 text-gray-400" />
+            </Link>
+          )}
+        </div>
+      </CardFooter>
     </Card>
-  )
+  );
 }
