@@ -32,7 +32,6 @@ async function fetchAll(supabase: any, table: string, select: string) {
 
 async function main() {
   // --- 1. Validate Env ---
-  // Note: On the server, we will use a standard .env file, so standard loading works.
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY || !process.env.TYPESENSE_HOST || !process.env.TYPESENSE_API_KEY) {
     throw new Error("Missing env variables. Ensure NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_KEY, TYPESENSE_HOST, and TYPESENSE_API_KEY are set.");
   }
@@ -42,7 +41,7 @@ async function main() {
   const typesense = new Typesense.Client({
     nodes: [{
       host: process.env.TYPESENSE_HOST,
-      port: 8108,
+      'port': 8108,
       protocol: 'http'
     }],
     apiKey: process.env.TYPESENSE_API_KEY,
@@ -64,7 +63,7 @@ async function main() {
       { name: 'url', type: 'string' },
       { name: 'start_time', type: 'float' },
     ],
-    defaultSortingField: 'viewCount' // Correct CamelCase for JS Client
+    default_sorting_field: 'viewCount' // Corrected back to snake_case per TypeScript error
   };
 
   try {
@@ -79,9 +78,6 @@ async function main() {
   const videos = await fetchAll(supabase, 'nde_vids', 'videoId, title, url, thumbnailUrl, date, viewCount, channelName, isNde');
   const videoMap = new Map(videos.map((v: any) => [v.videoId, v]));
 
-  // Fetching embeddings could take a while/memory. 
-  // ideally we stream this, but for <1M simple rows, memory might hold. 
-  // If this crashes on the server, we process in chunks.
   const embeddings = await fetchAll(supabase, 'nde_punctuated_embeddings', 'content, start_time, video_id');
 
   // --- 5. Transform & Index ---
@@ -106,7 +102,6 @@ async function main() {
 
   console.log(`Starting import of ${documents.length} documents to Typesense...`);
   
-  // Import in batches using Typesense's optimized importer
   try {
     const results = await typesense.collections('videos').documents().import(documents, { action: 'upsert', batch_size: 2000 });
     const failed = results.filter((r: any) => r.success === false);
