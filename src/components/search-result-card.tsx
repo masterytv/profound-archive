@@ -113,14 +113,30 @@ export function SearchResultCard({ result, video, searchTerm }: SearchResultCard
       .join(":");
   };
 
+  // Safe Date Formatter
+  const formatDate = (dateString: string) => {
+      if (!dateString) return 'Unknown Date';
+      try {
+          const d = new Date(dateString);
+          if (isNaN(d.getTime())) return 'Invalid Date';
+          return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) {
+          return 'Invalid Date';
+      }
+  };
+
   // Helper for Highlighting
   const highlightTerm = (text: string, term?: string) => {
       if (!term || !term.trim()) return text;
-      const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      const parts = text.split(regex);
-      return parts.map((part, i) => 
-          regex.test(part) ? <strong key={i} className="text-primary font-bold bg-yellow-100 px-1 rounded">{part}</strong> : part
-      );
+      try {
+        const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        const parts = text.split(regex);
+        return parts.map((part, i) => 
+            regex.test(part) ? <strong key={i} className="text-primary font-bold bg-yellow-100 px-1 rounded">{part}</strong> : part
+        );
+      } catch (e) {
+          return text;
+      }
   };
 
   const summary = displayData.summary;
@@ -154,7 +170,7 @@ export function SearchResultCard({ result, video, searchTerm }: SearchResultCard
                 {/* Metadata Lines */}
                 <div className="text-sm text-muted-foreground space-y-1">
                     <p className="font-medium text-foreground">{displayData.channelName}</p>
-                    <p>{displayData.date ? new Date(displayData.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown Date'}</p>
+                    <p>{formatDate(displayData.date)}</p>
                     <p>{Number(displayData.viewCount).toLocaleString()} views</p>
                     <div className="pt-2">
                         {user ? (
