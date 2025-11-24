@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, MessageSquare, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { SearchResultCard } from "@/components/search-result-card"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 
 interface SearchResult {
   content: string
@@ -19,7 +20,7 @@ interface SearchResult {
   channelName: string
   similarity?: number
   analysis_nde_summary?: string
-  tags?: string[] // Kept for data structure consistency, but not used in UI
+  tags?: string[]
 }
 
 interface GroupedVideo {
@@ -39,62 +40,110 @@ interface GroupedVideo {
   }>
 }
 
-export default function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [searchType, setSearchType] = useState<"keyword" | "concept">("keyword")
-  const [sortBy, setSortBy] = useState("viewCount")
-  const [direction, setDirection] = useState("descending")
-  const [similarity, setSimilarity] = useState(0.5)
-  const [hasSearched, setHasSearched] = useState(false)
+function SearchPageContent() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Defaults per spec
+  const DEFAULT_TYPE = "semantic"
+  const DEFAULT_SORT = "similarity"
+  const DEFAULT_DIR = "DESC"
+  const DEFAULT_SIM = 0.78
+
+  // Initialize state from URL or defaults
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "")
+  // Map URL param 'type' (semantic/exact) to internal state
+  const [searchType, setSearchType] = useState<"semantic" | "exact">((searchParams.get("type") as "semantic" | "exact") || DEFAULT_TYPE)
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || DEFAULT_SORT)
+  const [direction, setDirection] = useState(searchParams.get("dir") || DEFAULT_DIR)
+  const [similarity, setSimilarity] = useState(parseFloat(searchParams.get("sim") || String(DEFAULT_SIM)))
+  
+  // Internal state for results
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [offset, setOffset] = useState(0)
+  
+  // Pagination
+  const initialPage = parseInt(searchParams.get("page") || "1", 10)
+  const [offset, setOffset] = useState((initialPage - 1) * 12)
   const [hasMoreResults, setHasMoreResults] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
 
+  // Sync Input Fields with URL if URL changes
   useEffect(() => {
-    if (searchType === "keyword") {
-      setSortBy("viewCount")
+    const q = searchParams.get("q") || ""
+    const type = (searchParams.get("type") as "semantic" | "exact") || DEFAULT_TYPE
+    const sort = searchParams.get("sort") || DEFAULT_SORT
+    const dir = searchParams.get("dir") || DEFAULT_DIR
+    const sim = parseFloat(searchParams.get("sim") || String(DEFAULT_SIM))
+    
+    setSearchTerm(q)
+    setSearchType(type)
+    setSortBy(sort)
+    setDirection(dir)
+    setSimilarity(sim)
+    
+    if (q) {
+      const page = parseInt(searchParams.get("page") || "1", 10)
+      const calculatedOffset = (page - 1) * 12
+      performSearch(q, type, sort, dir, sim, calculatedOffset)
     } else {
-      setSortBy("similarity")
+        setResults([])
+        setHasSearched(false)
     }
-  }, [searchType])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      setError("Please enter a search term")
-      return
+  const updateUrl = (newParams: Record<string, string | number | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString())
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === "") {
+        params.delete(key)
+      } else {
+        params.set(key, String(value))
+      }
+    })
+    
+    // Default reset page to 1 unless specified
+    if (newParams.page === undefined) {
+        params.set("page", "1")
     }
+
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  const performSearch = async (
+    term: string, 
+    type: "semantic" | "exact", 
+    sort: string, 
+    dir: string, 
+    sim: number, 
+    searchOffset: number
+  ) => {
+    if (!term.trim()) return
 
     setIsLoading(true)
     setError(null)
     setHasSearched(true)
-    setOffset(0)
-    setHasMoreResults(true)
-
+    
     try {
-      const webhookUrl = process.env.NEXT_PUBLIC_SEARCH_WEBHOOK_URL
-      if (!webhookUrl || webhookUrl === 'YOUR_SEARCH_WEBHOOK_URL_HERE') {
-        throw new Error("Search webhook URL is not configured")
-      }
-
-      const searchTypeValue = searchType === "keyword" ? "exact" : "semantic"
-      const sortDirectionValue = direction === "descending" ? "DESC" : "ASC"
-
+      const webhookUrl = "https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c"
+      
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          searchTerm: searchTerm.trim(),
-          similarityThreshold: similarity,
-          sortColumn: sortBy,
-          sortDirection: sortDirectionValue,
-          searchType: searchTypeValue,
+          searchTerm: term.trim(),
+          similarityThreshold: sim,
+          sortColumn: sort,
+          sortDirection: dir,
+          searchType: type,
           limit: 12,
-          offset: 0,
+          offset: searchOffset,
         }),
       })
 
@@ -103,9 +152,14 @@ export default function SearchPage() {
       }
 
       const data = await response.json()
+      
       setResults(data)
+      setOffset(searchOffset)
+      
       if (data.length < 12) {
         setHasMoreResults(false)
+      } else {
+        setHasMoreResults(true)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred while searching")
@@ -115,18 +169,27 @@ export default function SearchPage() {
     }
   }
 
+  const onSearchClick = () => {
+    if (!searchTerm.trim()) {
+      setError("Please enter a search term")
+      return
+    }
+    updateUrl({
+      q: searchTerm,
+      type: searchType,
+      sort: sortBy,
+      dir: direction,
+      sim: similarity,
+      page: "1"
+    })
+  }
+
   const handleLoadMore = async () => {
     setIsLoadingMore(true)
     setError(null)
 
     try {
-      const webhookUrl = process.env.NEXT_PUBLIC_SEARCH_WEBHOOK_URL
-      if (!webhookUrl || webhookUrl === 'YOUR_SEARCH_WEBHOOK_URL_HERE') {
-        throw new Error("Search webhook URL is not configured")
-      }
-
-      const searchTypeValue = searchType === "keyword" ? "exact" : "semantic"
-      const sortDirectionValue = direction === "descending" ? "DESC" : "ASC"
+      const webhookUrl = "https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c"
       const newOffset = offset + 12
 
       const response = await fetch(webhookUrl, {
@@ -138,8 +201,8 @@ export default function SearchPage() {
           searchTerm: searchTerm.trim(),
           similarityThreshold: similarity,
           sortColumn: sortBy,
-          sortDirection: sortDirectionValue,
-          searchType: searchTypeValue,
+          sortDirection: direction,
+          searchType: searchType,
           limit: 12,
           offset: newOffset,
         }),
@@ -152,6 +215,10 @@ export default function SearchPage() {
       const data = await response.json()
       setResults((prevResults) => [...prevResults, ...data])
       setOffset(newOffset)
+      
+      // Note: We do NOT update the URL 'page' here to avoid replacing the list with just the new page
+      // via the useEffect mechanism.
+      
       if (data.length < 12) {
         setHasMoreResults(false)
       }
@@ -191,7 +258,6 @@ export default function SearchPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      {/* Search Controls */}
       <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">Search Engine for the Soul</h1>
         <p className="text-muted-foreground mb-6">Find specific moments in more than 5000 NDE YouTube videos.</p>
@@ -204,33 +270,32 @@ export default function SearchPage() {
           <label className="block text-sm font-medium mb-2">Search Term</label>
           <Input
             type="text"
-            placeholder="e.g., 'life review' (keyword), 'visited dead relatives' (concept)"
+            placeholder="e.g., 'life review' (semantic), 'visited dead relatives'"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }}
+            onKeyDown={(e) => { if (e.key === "Enter") onSearchClick() }}
             className="w-full"
           />
         </div>
         
         <div className="space-y-6">
-            {/* Search Type and Similarity */}
             <div className="flex flex-col md:flex-row md:items-center gap-6">
                 <div className="flex-shrink-0">
                     <label className="block text-sm font-medium mb-2">Search Type</label>
                     <div className="flex gap-4">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="searchType" value="keyword" checked={searchType === "keyword"} onChange={() => setSearchType("keyword")} />
-                            Keyword
+                            <input type="radio" name="searchType" value="semantic" checked={searchType === "semantic"} onChange={() => setSearchType("semantic")} />
+                            Semantic
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="searchType" value="concept" checked={searchType === "concept"} onChange={() => setSearchType("concept")} />
-                            Concept
+                            <input type="radio" name="searchType" value="exact" checked={searchType === "exact"} onChange={() => setSearchType("exact")} />
+                            Exact Match
                         </label>
                     </div>
                 </div>
-                {searchType === "concept" && (
+                {searchType === "semantic" && (
                 <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-medium mb-2">Similarity: <span className="font-semibold text-primary">{similarity.toFixed(2)}</span></label>
+                    <label className="block text-sm font-medium mb-2">Similarity Threshold: <span className="font-semibold text-primary">{similarity.toFixed(2)}</span></label>
                     <input
                         type="range"
                         min="0"
@@ -244,7 +309,6 @@ export default function SearchPage() {
                 )}
             </div>
 
-            {/* Sort By and Direction */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label htmlFor="sortBy" className="block text-sm font-medium mb-2">Sort By</label>
@@ -254,7 +318,7 @@ export default function SearchPage() {
                         onChange={(e) => setSortBy(e.target.value)}
                         className="w-full p-2 border border-gray-300 rounded-md"
                     >
-                        {searchType === "concept" && <option value="similarity">Similarity</option>}
+                        {searchType === "semantic" && <option value="similarity">Similarity</option>}
                         <option value="viewCount">View Count</option>
                         <option value="date">Date</option>
                         <option value="title">Title</option>
@@ -269,21 +333,20 @@ export default function SearchPage() {
                         onChange={(e) => setDirection(e.target.value)}
                         className="w-full p-2 border border-gray-300 rounded-md"
                     >
-                        <option value="descending">Descending</option>
-                        <option value="ascending">Ascending</option>
+                        <option value="DESC">Descending</option>
+                        <option value="ASC">Ascending</option>
                     </select>
                 </div>
             </div>
         </div>
 
         <div className="flex justify-end mt-6">
-          <Button onClick={handleSearch} disabled={isLoading} className="bg-primary text-primary-foreground px-8">
+          <Button onClick={onSearchClick} disabled={isLoading} className="bg-primary text-primary-foreground px-8">
             {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Searching...</> : <><Search className="w-4 h-4 mr-2" />Search</>}
           </Button>
         </div>
       </div>
 
-      {/* Search Results */}
       <main>
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-8">
@@ -295,18 +358,26 @@ export default function SearchPage() {
             <p className="text-muted-foreground">No results found. Try adjusting your search parameters.</p>
           </div>
         )}
-        {hasSearched && results.length > 0 && (
+        {(results.length > 0 || isLoading) && (
           <div className="space-y-6">
+            {isLoading && results.length === 0 && (
+                <div className="text-center py-12">
+                     <Loader2 className="w-8 h-8 mx-auto animate-spin mb-4" />
+                     <p>Searching...</p>
+                </div>
+            )}
+            
             {groupedResults.map((video) => (
               <SearchResultCard 
                 key={video.video_id} 
                 video={video} 
                 searchTerm={searchTerm}
-                searchType={searchType}
-                onTagClick={() => {}} // Pass an empty function as onTagClick is required by the component
+                searchType={searchType === "semantic" ? "concept" : "keyword"}
+                onTagClick={() => {}} 
               />
             ))}
-            {hasMoreResults && (
+            
+            {hasSearched && !isLoading && hasMoreResults && (
               <div className="flex justify-center pt-4">
                 <Button onClick={handleLoadMore} disabled={isLoadingMore} className="bg-primary text-primary-foreground px-8">
                   {isLoadingMore ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Loading...</> : "Load More"}
@@ -317,5 +388,13 @@ export default function SearchPage() {
         )}
       </main>
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin" /></div>}>
+      <SearchPageContent />
+    </Suspense>
   )
 }
