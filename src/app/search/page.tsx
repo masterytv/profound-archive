@@ -45,15 +45,14 @@ function SearchPageContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // Defaults per spec
-  const DEFAULT_TYPE = "semantic"
-  const DEFAULT_SORT = "similarity"
+  // Default to "exact" (Exact Match)
+  const DEFAULT_TYPE = "exact"
+  const DEFAULT_SORT = "viewCount" // Changed default sort to viewCount for exact search usually
   const DEFAULT_DIR = "DESC"
   const DEFAULT_SIM = 0.78
 
   // Initialize state from URL or defaults
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "")
-  // Map URL param 'type' (semantic/exact) to internal state
   const [searchType, setSearchType] = useState<"semantic" | "exact">((searchParams.get("type") as "semantic" | "exact") || DEFAULT_TYPE)
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || DEFAULT_SORT)
   const [direction, setDirection] = useState(searchParams.get("dir") || DEFAULT_DIR)
@@ -75,7 +74,10 @@ function SearchPageContent() {
   useEffect(() => {
     const q = searchParams.get("q") || ""
     const type = (searchParams.get("type") as "semantic" | "exact") || DEFAULT_TYPE
-    const sort = searchParams.get("sort") || DEFAULT_SORT
+    
+    // Logic for default sort depends on type usually, but we'll stick to URL or sensible defaults
+    const sort = searchParams.get("sort") || (type === "semantic" ? "similarity" : "viewCount")
+    
     const dir = searchParams.get("dir") || DEFAULT_DIR
     const sim = parseFloat(searchParams.get("sim") || String(DEFAULT_SIM))
     
@@ -141,7 +143,7 @@ function SearchPageContent() {
           similarityThreshold: sim,
           sortColumn: sort,
           sortDirection: dir,
-          searchType: type,
+          searchType: type, // This matches the N8N workflow expectation (exact or semantic)
           limit: 12,
           offset: searchOffset,
         }),
@@ -216,9 +218,6 @@ function SearchPageContent() {
       setResults((prevResults) => [...prevResults, ...data])
       setOffset(newOffset)
       
-      // Note: We do NOT update the URL 'page' here to avoid replacing the list with just the new page
-      // via the useEffect mechanism.
-      
       if (data.length < 12) {
         setHasMoreResults(false)
       }
@@ -270,7 +269,7 @@ function SearchPageContent() {
           <label className="block text-sm font-medium mb-2">Search Term</label>
           <Input
             type="text"
-            placeholder="e.g., 'life review' (semantic), 'visited dead relatives'"
+            placeholder="e.g., 'life review' (Exact), 'visited dead relatives' (Semantic)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") onSearchClick() }}
@@ -284,12 +283,12 @@ function SearchPageContent() {
                     <label className="block text-sm font-medium mb-2">Search Type</label>
                     <div className="flex gap-4">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="searchType" value="semantic" checked={searchType === "semantic"} onChange={() => setSearchType("semantic")} />
-                            Semantic
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="searchType" value="exact" checked={searchType === "exact"} onChange={() => setSearchType("exact")} />
                             Exact Match
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="searchType" value="semantic" checked={searchType === "semantic"} onChange={() => setSearchType("semantic")} />
+                            Similar (Semantic)
                         </label>
                     </div>
                 </div>
