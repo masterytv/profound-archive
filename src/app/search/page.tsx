@@ -66,8 +66,8 @@ function SearchPageContent() {
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
 
-  // Use the API route again
-  const API_URL = "/api/search";
+  // Direct N8N URL from Env or Hardcoded Fallback
+  const WEBHOOK_URL = process.env.NEXT_PUBLIC_SEARCH_WEBHOOK_URL || "https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c";
 
   useEffect(() => {
     const q = searchParams.get("q") || ""
@@ -125,8 +125,8 @@ function SearchPageContent() {
     setHasSearched(true)
     
     try {
-      console.log("Fetching from API:", API_URL);
-      const response = await fetch(API_URL, {
+      // Direct Client-Side Fetch
+      const response = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +147,6 @@ function SearchPageContent() {
       }
 
       const data = await response.json()
-      console.log("Data received:", data);
       
       if (!Array.isArray(data)) {
         console.error("Data is not an array:", data);
@@ -194,7 +193,7 @@ function SearchPageContent() {
     try {
       const newOffset = offset + 12
 
-      const response = await fetch(API_URL, {
+      const response = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
