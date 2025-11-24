@@ -18,3 +18,10 @@ env:
     value: "https://n8n.awetomatic.com/webhook/101a672f-92a4-4d14-8ec8-01d34b51413a"
   - variable: NEXT_PUBLIC_CHAT_TEST_WEBHOOK_URL
     value: "https://n8n.awetomatic.com/webhook/ced752ef-93c6-4e72-a1bd-f0db75a502e7"
+  
+  # Typesense Configuration (Required for /search2)
+  # REPLACE THESE VALUES WITH YOUR REAL TYPESENSE CONFIGURATION
+  - variable: TYPESENSE_HOST
+    value: 5.161.239.93 
+  - variable: TYPESENSE_API_KEY
+    value: fRgxFBt4RzenMc3v8xf7afE9ICs+Hfqvvm8vLkhwBU4=
