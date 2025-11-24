@@ -379,6 +379,18 @@ function SearchPageContent() {
                 onTagClick={() => {}} 
               />
             ))}
+
+            {/* PRODUCTION DIAGNOSTIC: Render raw list if cards failed but data exists */}
+            {groupedResults.length > 0 && (
+                <div className="mt-12 p-4 bg-gray-100 text-xs text-gray-500 hidden">
+                    <p>Diagnostic Data Load:</p>
+                    <ul>
+                        {groupedResults.map(g => (
+                            <li key={g.video_id}>{g.title} ({g.transcripts.length} matches)</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             
             {hasSearched && !isLoading && hasMoreResults && (
               <div className="flex justify-center pt-4">
