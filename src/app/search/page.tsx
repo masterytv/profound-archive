@@ -45,39 +45,34 @@ function SearchPageContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // Default to "exact" (Exact Match)
   const DEFAULT_TYPE = "exact"
-  const DEFAULT_SORT = "viewCount" // Changed default sort to viewCount for exact search usually
+  const DEFAULT_SORT = "viewCount" 
   const DEFAULT_DIR = "DESC"
   const DEFAULT_SIM = 0.78
 
-  // Initialize state from URL or defaults
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "")
   const [searchType, setSearchType] = useState<"semantic" | "exact">((searchParams.get("type") as "semantic" | "exact") || DEFAULT_TYPE)
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || DEFAULT_SORT)
   const [direction, setDirection] = useState(searchParams.get("dir") || DEFAULT_DIR)
   const [similarity, setSimilarity] = useState(parseFloat(searchParams.get("sim") || String(DEFAULT_SIM)))
   
-  // Internal state for results
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
-  // Pagination
   const initialPage = parseInt(searchParams.get("page") || "1", 10)
   const [offset, setOffset] = useState((initialPage - 1) * 12)
   const [hasMoreResults, setHasMoreResults] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
 
-  // Sync Input Fields with URL if URL changes
+  // Use the API route again
+  const API_URL = "/api/search";
+
   useEffect(() => {
     const q = searchParams.get("q") || ""
     const type = (searchParams.get("type") as "semantic" | "exact") || DEFAULT_TYPE
-    
-    // Logic for default sort depends on type usually, but we'll stick to URL or sensible defaults
     const sort = searchParams.get("sort") || (type === "semantic" ? "similarity" : "viewCount")
-    
     const dir = searchParams.get("dir") || DEFAULT_DIR
     const sim = parseFloat(searchParams.get("sim") || String(DEFAULT_SIM))
     
@@ -108,7 +103,6 @@ function SearchPageContent() {
       }
     })
     
-    // Default reset page to 1 unless specified
     if (newParams.page === undefined) {
         params.set("page", "1")
     }
@@ -131,9 +125,8 @@ function SearchPageContent() {
     setHasSearched(true)
     
     try {
-      const webhookUrl = "https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c"
-      
-      const response = await fetch(webhookUrl, {
+      console.log("Fetching from API:", API_URL);
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,7 +136,7 @@ function SearchPageContent() {
           similarityThreshold: sim,
           sortColumn: sort,
           sortDirection: dir,
-          searchType: type, // This matches the N8N workflow expectation (exact or semantic)
+          searchType: type,
           limit: 12,
           offset: searchOffset,
         }),
@@ -154,7 +147,14 @@ function SearchPageContent() {
       }
 
       const data = await response.json()
+      console.log("Data received:", data);
       
+      if (!Array.isArray(data)) {
+        console.error("Data is not an array:", data);
+        setResults([]);
+        return;
+      }
+
       setResults(data)
       setOffset(searchOffset)
       
@@ -164,6 +164,7 @@ function SearchPageContent() {
         setHasMoreResults(true)
       }
     } catch (err) {
+      console.error("Search Error:", err);
       setError(err instanceof Error ? err.message : "An error occurred while searching")
       setResults([])
     } finally {
@@ -191,10 +192,9 @@ function SearchPageContent() {
     setError(null)
 
     try {
-      const webhookUrl = "https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c"
       const newOffset = offset + 12
 
-      const response = await fetch(webhookUrl, {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -230,7 +230,11 @@ function SearchPageContent() {
 
   const groupResultsByVideo = (results: SearchResult[]): GroupedVideo[] => {
     const grouped = new Map<string, GroupedVideo>()
+    if (!Array.isArray(results)) return [];
+    
     results.forEach((result) => {
+      if (!result || !result.video_id) return;
+      
       if (!grouped.has(result.video_id)) {
         grouped.set(result.video_id, {
           video_id: result.video_id,
@@ -253,6 +257,7 @@ function SearchPageContent() {
     })
     return Array.from(grouped.values())
   }
+  
   const groupedResults = groupResultsByVideo(results)
 
   return (
@@ -366,7 +371,7 @@ function SearchPageContent() {
                 </div>
             )}
             
-            {groupedResults.map((video) => (
+            {groupedResults.length > 0 && groupedResults.map((video) => (
               <SearchResultCard 
                 key={video.video_id} 
                 video={video} 
