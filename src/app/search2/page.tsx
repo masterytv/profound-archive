@@ -26,6 +26,24 @@ interface HitDocument {
     url: string;
     start_time: number;
 }
+
+// Shape for grouping results by video (same as /search)
+interface GroupedVideo {
+    video_id: string;
+    url: string;
+    title: string;
+    thumbnailUrl: string;
+    date: string | null;
+    viewCount: string;
+    channelName: string;
+    summary: string;
+    tags: string[];
+    transcripts: Array<{
+        content: string;
+        start_time: number;
+        similarity?: number;
+    }>;
+}
   
 // Shape of the facet counts from the API
 interface FacetCount {
@@ -50,14 +68,6 @@ function SearchV2Content() {
 
     // Initialize state from URL params
     const initialQuery = searchParams.get("q") || "";
-    // filter param might look like: "channelName:Some Channel,isNde:true"
-    // We need to parse that back into the Record<string, string[]> format if we want complex filter support from URL
-    // For now, let's assume simple stringified JSON or comma separated. 
-    // The requirement said `filter` -> `filter_by` for Typesense. 
-    // Let's adopt a standard format for the URL: `filter=field:value1,field:value2` 
-    // But Typesense `filter_by` syntax is `field:=value`. 
-    // Let's use a URL-friendly format. 
-    // We will serialize activeFilters to URL.
     
     const [searchTerm, setSearchTerm] = useState(initialQuery);
     const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
@@ -74,9 +84,6 @@ function SearchV2Content() {
     useEffect(() => {
         const filterParam = searchParams.get("filter");
         if (filterParam) {
-             // Let's assume filterParam is JSON for maximum flexibility or a specific custom format
-             // The simple format "category:A,category:B" is ambiguous if values contain colons/commas.
-             // Let's try to parse as JSON first, fallback to none.
              try {
                 const parsed = JSON.parse(filterParam);
                 setActiveFilters(parsed);
@@ -84,17 +91,9 @@ function SearchV2Content() {
                  // Ignore or handle legacy format
              }
         }
-    }, [searchParams]); // Run once on mount basically, or if back button changes it.
+    }, [searchParams]); 
 
-    // Sync state with URL whenever search params change (Back/Forward navigation)
-    // We need to trigger search when URL changes.
-    // However, our state `searchTerm` and `activeFilters` drive the UI.
-    // `performSearch` drives the fetch. 
-    
-    // Strategy:
-    // 1. User Interaction -> Update URL.
-    // 2. URL Change (via Interaction or Back/Forward) -> Update State -> Trigger Search.
-
+    // Sync state with URL whenever search params change
     useEffect(() => {
         const q = searchParams.get("q") || "";
         setSearchTerm(q);
@@ -113,7 +112,6 @@ function SearchV2Content() {
         if (q || filterParam) {
              performSearch(q, filters, page);
         } else {
-             // Reset if empty
              setResults([]);
              setHasSearched(false);
         }
@@ -121,8 +119,6 @@ function SearchV2Content() {
     }, [searchParams]);
 
     const performSearch = async (term: string, filters: Record<string, string[]>, page: number = 1) => {
-        // If empty term and no filters, maybe we don't search? 
-        // Typesense usually allows `*` for everything.
         const query = term.trim() || "*";
         
         setIsLoading(true);
@@ -171,7 +167,6 @@ function SearchV2Content() {
             params.delete("filter");
         }
         
-        // Reset page to 1 on new search/filter
         params.set("page", "1");
 
         router.push(`${pathname}?${params.toString()}`);
@@ -196,9 +191,37 @@ function SearchV2Content() {
             delete newFilters[facetField];
         }
         
-        // Update URL immediately on filter change
         updateUrl(searchTerm, newFilters);
     };
+
+    // Group results by video logic (copied and adapted from /search)
+    const groupResultsByVideo = (results: HitDocument[]): GroupedVideo[] => {
+        const grouped = new Map<string, GroupedVideo>();
+        results.forEach((doc) => {
+            if (!grouped.has(doc.videoId)) {
+                grouped.set(doc.videoId, {
+                    video_id: doc.videoId,
+                    url: doc.url,
+                    title: doc.title,
+                    thumbnailUrl: doc.thumbnailUrl,
+                    date: new Date(doc.date * 1000).toISOString(), // Typesense returns unix timestamp usually? If number
+                    viewCount: doc.viewCount.toString(),
+                    channelName: doc.channelName,
+                    summary: "", // Typesense might not return summary in this hit, leave empty or add field if available
+                    tags: [],
+                    transcripts: [],
+                });
+            }
+            grouped.get(doc.videoId)!.transcripts.push({
+                content: doc.content,
+                start_time: doc.start_time,
+                similarity: undefined, // Typesense results are exact/text match, not vector similarity usually unless configured
+            });
+        });
+        return Array.from(grouped.values());
+    };
+
+    const groupedResults = groupResultsByVideo(results);
 
     // Component to render the filter sidebar
     const FilterSidebar = () => (
@@ -254,8 +277,9 @@ function SearchV2Content() {
                 
                 <div className="w-full lg:flex-1">
                     {isLoading ? (
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                            {Array.from({ length: 9 }).map((_, i) => <Skeleton key={i} className="h-96 w-full" />)}
+                        // Single column skeleton for consistency
+                        <div className="space-y-6">
+                            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
                         </div>
                     ) : hasSearched ? (
                         <>
@@ -268,22 +292,16 @@ function SearchV2Content() {
                                     <p className="text-muted-foreground">Try a different search term or adjust your filters.</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                                    {results.map(doc => {
-                                        // We need to transform the Typesense document to match the props of SearchResultCard
-                                        const cardProps = {
-                                            content: doc.content,
-                                            start_time: doc.start_time,
-                                            video_id: doc.videoId,
-                                            url: doc.url,
-                                            title: doc.title,
-                                            thumbnailUrl: doc.thumbnailUrl,
-                                            date: new Date(doc.date * 1000).toISOString(),
-                                            viewCount: doc.viewCount.toString(), // Ensure string for compatibility
-                                            channelName: doc.channelName,
-                                        };
-                                        return <SearchResultCard key={doc.id} result={cardProps} />;
-                                    })}
+                                // Changed to single column stack
+                                <div className="space-y-6">
+                                    {groupedResults.map(video => (
+                                        <SearchResultCard 
+                                            key={video.video_id} 
+                                            video={video} 
+                                            searchTerm={searchTerm} 
+                                            onTagClick={() => {}}
+                                        />
+                                    ))}
                                 </div>
                             )}
                         </>
