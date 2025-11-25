@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
       'facet_by': 'channelName,isNde',
       'filter_by': filterConditions,
       'sort_by': sortQuery,
+      'max_facet_values': 100, // Fetch up to 100 facet values per field
     };
 
     const searchResults = await client.collections('videos').documents().search(searchParameters);

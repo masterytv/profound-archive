@@ -4,6 +4,8 @@ import { Toaster } from '@/components/ui/toaster';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import Script from 'next/script';
+import AuthConfirmationToast from '@/components/auth-confirmation-toast';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Project Profound: Near Death Experiences and Consciousness',
@@ -35,6 +37,9 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-grow">{children}</main>
         <SiteFooter />
+        <Suspense fallback={null}>
+          <AuthConfirmationToast />
+        </Suspense>
         <Toaster />
         <Script async data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
       </body>
