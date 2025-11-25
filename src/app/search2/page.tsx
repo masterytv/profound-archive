@@ -77,7 +77,13 @@ function SearchV2Content() {
     const [facets, setFacets] = useState<FacetCount[]>([]);
     const [totalHits, setTotalHits] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
+    
+    // Pagination state
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+
     const { toast } = useToast();
 
     // Initial parsing of filters from URL
@@ -107,10 +113,12 @@ function SearchV2Content() {
         }
         setActiveFilters(filters);
         
-        const page = parseInt(searchParams.get("page") || "1", 10);
+        // Reset page to 1 when URL params change (new search context)
+        // NOTE: This logic assumes standard navigation. "Load More" does NOT change URL page param currently.
+        setPage(1);
         
         if (q || filterParam) {
-             performSearch(q, filters, page);
+             performSearch(q, filters, 1, true);
         } else {
              setResults([]);
              setHasSearched(false);
@@ -118,16 +126,20 @@ function SearchV2Content() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
 
-    const performSearch = async (term: string, filters: Record<string, string[]>, page: number = 1) => {
+    const performSearch = async (term: string, filters: Record<string, string[]>, pageNum: number, isNewSearch: boolean) => {
         const query = term.trim() || "*";
         
-        setIsLoading(true);
+        if (isNewSearch) {
+            setIsLoading(true);
+        } else {
+            setIsLoadingMore(true);
+        }
 
         try {
             const response = await fetch('/api/search2', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ searchTerm: query, filters, page }),
+                body: JSON.stringify({ searchTerm: query, filters, page: pageNum }),
             });
 
             if (!response.ok) {
@@ -135,10 +147,23 @@ function SearchV2Content() {
             }
 
             const data: SearchResponse = await response.json();
-            setResults(data.hits.map(hit => hit.document));
-            setFacets(data.facet_counts);
-            setTotalHits(data.found);
-            setHasSearched(true);
+            const newHits = data.hits.map(hit => hit.document);
+
+            if (isNewSearch) {
+                setResults(newHits);
+                setFacets(data.facet_counts);
+                setTotalHits(data.found);
+                setHasSearched(true);
+            } else {
+                setResults(prev => [...prev, ...newHits]);
+            }
+            
+            // Determine if there are more results
+            if (newHits.length < 12 || (results.length + newHits.length) >= data.found) {
+                setHasMore(false);
+            } else {
+                setHasMore(true);
+            }
 
         } catch (error) {
             console.error("Search failed:", error);
@@ -149,6 +174,7 @@ function SearchV2Content() {
             });
         } finally {
             setIsLoading(false);
+            setIsLoadingMore(false);
         }
     };
 
@@ -192,6 +218,12 @@ function SearchV2Content() {
         }
         
         updateUrl(searchTerm, newFilters);
+    };
+
+    const handleLoadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        performSearch(searchTerm, activeFilters, nextPage, false);
     };
 
     // Group results by video logic (copied and adapted from /search)
@@ -302,6 +334,27 @@ function SearchV2Content() {
                                             onTagClick={() => {}}
                                         />
                                     ))}
+                                    
+                                    {/* Load More Button */}
+                                    {hasMore && (
+                                        <div className="flex justify-center pt-6 pb-8">
+                                            <Button 
+                                                onClick={handleLoadMore} 
+                                                disabled={isLoadingMore} 
+                                                variant="outline"
+                                                className="w-full md:w-auto px-8"
+                                            >
+                                                {isLoadingMore ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Loading more...
+                                                    </>
+                                                ) : (
+                                                    "Load More Results"
+                                                )}
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </>
