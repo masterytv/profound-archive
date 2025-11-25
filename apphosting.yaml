@@ -25,3 +25,11 @@ env:
     value: 5.161.239.93 
   - variable: TYPESENSE_API_KEY
     value: fRgxFBt4RzenMc3v8xf7afE9ICs+Hfqvvm8vLkhwBU4=
+
+  # Supabase Configuration
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    value: "https://vnycavclrndjwmpaugju.supabase.co"
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZueWNhdmNscm5kandtcGF1Z2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNTcyNzksImV4cCI6MjA2MjYzMzI3OX0.L_ExCXhKaHxK_PnOokOlgTjp-eVOlolkj0TAG9WsojI
+  - variable: SUPABASE_SERVICE_KEY
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZueWNhdmNscm5kandtcGF1Z2p1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzA1NzI3OSwiZXhwIjoyMDYyNjMzMjc5fQ.kvzmBgZGD43CEF3AHYp77-KokVZOsdAD5cXpLY910p8
