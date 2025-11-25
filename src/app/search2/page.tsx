@@ -384,16 +384,22 @@ function SearchV2Content() {
             <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
                 <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">Search Engine for the Soul</h1>
                 <p className="text-muted-foreground mb-6">Find specific moments in more than 5000 NDE YouTube videos.</p>
-                <Link href="/chat" className="text-primary hover:underline text-sm flex items-center gap-1 mb-8">
-                    <MessageSquare className="w-4 h-4" />
-                    Chat Instead
-                </Link>
+                <div className="flex items-center gap-4 mb-8">
+                    <Link href="/chat" className="text-primary hover:underline text-sm flex items-center gap-1">
+                        <MessageSquare className="w-4 h-4" />
+                        Chat Instead
+                    </Link>
+                    <span className="text-gray-300">|</span>
+                    <Link href="/search" className="text-primary hover:underline text-sm flex items-center gap-1">
+                        Semantic Search
+                    </Link>
+                </div>
 
                 <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Search Term</label>
                     <Input
                         type="text"
-                        placeholder="e.g., 'life review' (Exact), 'visited dead relatives' (Semantic)"
+                        placeholder="e.g., 'life review', 'tunnel', 'light beings'"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter") onSearchClick() }}
