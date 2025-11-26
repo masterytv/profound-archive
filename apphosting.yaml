@@ -31,6 +31,7 @@ env:
   - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
     value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZueWNhdmNscm5kandtcGF1Z2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNTcyNzksImV4cCI6MjA2MjYzMzI3OX0.L_ExCXhKaHxK_PnOokOlgTjp-eVOlolkj0TAG9WsojI
   
-  # Securely reference the Supabase Service Key from Secret Manager in Google Console (https://console.cloud.google.com/security/secret-manager/secret/SUPABASE_SERVICE_KEY/versions?project=studio-9638832619-7f197)
+  # Securely reference the Supabase Service Key from Secret Manager
   - variable: SUPABASE_SERVICE_KEY
     secret: SUPABASE_SERVICE_KEY
+# Trigger new build after granting secret access
