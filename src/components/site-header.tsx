@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
-// No longer need useRouter
-// import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +29,7 @@ export default function SiteHeader() {
   const toolsRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
   const supabase = createClient();
-  // const router = useRouter(); // Removed this line
+  const router = useRouter();
 
   useEffect(() => {
     // Fetch initial session
@@ -69,7 +68,6 @@ export default function SiteHeader() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setMobileMenuOpen(false); // Close mobile menu on logout
-    // Replace router.refresh() with a standard window reload
     window.location.reload();
   };
 
@@ -225,6 +223,9 @@ export default function SiteHeader() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem asChild>
                               <Link href="/dashboard">Dashboard</Link>
+                          </DropdownMenuItem>
+                           <DropdownMenuItem asChild>
+                              <Link href="/profile">Profile</Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={handleLogout}>
