@@ -1,57 +1,158 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { addVideoToFavorites } from '@/app/actions'
-import { Star } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
-import { cn } from '@/lib/utils'
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
+import { Star, Loader2 } from 'lucide-react';
+import { Button } from './ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface FavoriteButtonProps {
   videoId: string;
   videoTitle: string;
+  videoThumbnailUrl?: string;
 }
 
-export default function FavoriteButton({ videoId, videoTitle }: FavoriteButtonProps) {
-  const [isFavorited, setIsFavorited] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl }: FavoriteButtonProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start loading to check initial state
+  const supabase = createClient();
+  const { toast } = useToast();
 
-  const handleFavorite = async (e: React.MouseEvent) => {
-    e.preventDefault() 
-    setIsLoading(true)
+  useEffect(() => {
+    const checkUserAndFavoriteStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
 
-    const result = await addVideoToFavorites(videoId, videoTitle)
-    
-    setIsLoading(false)
+      if (user) {
+        // Find the 'Favorites' collection ID
+        const { data: collection } = await supabase
+          .from('collections')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('name', 'Favorites')
+          .single();
 
-    if (result.error) {
+        if (collection) {
+          // Check if this video is already favorited in that collection
+          const { data: favorite } = await supabase
+            .from('favorites')
+            .select('id')
+            .eq('collection_id', collection.id)
+            .eq('video_id', videoId)
+            .single();
+            
+          setIsFavorited(!!favorite);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    checkUserAndFavoriteStatus();
+  }, [supabase, videoId]);
+
+  const toggleFavorite = async () => {
+    if (!user) {
       toast({
-        title: "Error",
-        description: result.error,
+        title: "Login Required",
+        description: "You must be logged in to save favorites.",
         variant: "destructive",
-      })
-    } else {
-      setIsFavorited(true)
-      toast({
-        title: "Success",
-        description: result.message,
-      })
+      });
+      return;
     }
+
+    setIsLoading(true);
+
+    // 1. Get or create the default 'Favorites' collection
+    let { data: collection } = await supabase
+      .from('collections')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('name', 'Favorites')
+      .single();
+
+    if (!collection) {
+      const { data: newCollection, error } = await supabase
+        .from('collections')
+        .insert({ user_id: user.id, name: 'Favorites' })
+        .select('id')
+        .single();
+      
+      if (error) {
+        console.error('Error creating collection:', error);
+        toast({ title: 'Error', description: 'Could not create a favorites collection.', variant: 'destructive' });
+        setIsLoading(false);
+        return;
+      }
+      collection = newCollection;
+    }
+    
+    if (!collection) {
+        // Handle case where collection creation fails but doesn't throw
+        setIsLoading(false);
+        return;
+    }
+
+    // 2. Add or remove from favorites
+    if (isFavorited) {
+      // Remove from favorites
+      const { error } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('collection_id', collection.id)
+        .eq('video_id', videoId);
+
+      if (error) {
+        console.error('Error removing favorite:', error);
+        toast({ title: 'Error', description: 'Could not remove from favorites.', variant: 'destructive' });
+      } else {
+        setIsFavorited(false);
+        toast({ title: 'Removed from Favorites' });
+      }
+    } else {
+      // Add to favorites
+      const { error } = await supabase.from('favorites').insert({
+        user_id: user.id,
+        collection_id: collection.id,
+        video_id: videoId,
+        video_title: videoTitle,
+        video_thumbnail_url: videoThumbnailUrl || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+      });
+
+      if (error) {
+        console.error('Error adding favorite:', error);
+        toast({ title: 'Error', description: 'Could not add to favorites.', variant: 'destructive' });
+      } else {
+        setIsFavorited(true);
+        toast({ title: 'Added to Favorites!' });
+      }
+    }
+
+    setIsLoading(false);
+  };
+
+  if (!user) {
+      return null; // Don't show the button if the user isn't logged in
   }
 
   return (
-    <button 
-      onClick={handleFavorite} 
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleFavorite}
       disabled={isLoading}
-      aria-label="Favorite this video"
-      className="p-2 rounded-full hover:bg-muted disabled:opacity-50"
+      aria-label="Toggle Favorite"
     >
-      <Star className={cn(
-        "h-5 w-5 transition-colors",
-        isFavorited 
-          ? "text-yellow-400 fill-yellow-400" 
-          : "text-gray-400 hover:text-yellow-400"
-      )} />
-    </button>
-  )
+      {isLoading ? (
+        <Loader2 className="h-5 w-5 animate-spin" />
+      ) : (
+        <Star
+          className={`h-5 w-5 ${
+            isFavorited ? 'text-yellow-500 fill-yellow-400' : 'text-gray-400'
+          }`}
+        />
+      )}
+    </Button>
+  );
 }
