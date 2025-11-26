@@ -3,10 +3,13 @@
 import { useState, useEffect, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, MessageSquare, Loader2 } from "lucide-react"
+import { Search, MessageSquare, Loader2, Bookmark } from "lucide-react"
 import Link from "next/link"
 import { SearchResultCard } from "@/components/search-result-card"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
+import { useToast } from "@/hooks/use-toast"
 
 interface SearchResult {
   content: string
@@ -44,6 +47,10 @@ function SearchPageContent() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const supabase = createClient();
+  const { toast } = useToast();
+
+  const [user, setUser] = useState<User | null>(null);
 
   const DEFAULT_TYPE = "exact"
   const DEFAULT_SORT = "viewCount" 
@@ -66,8 +73,15 @@ function SearchPageContent() {
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
 
-  // Direct N8N URL from Env or Hardcoded Fallback
   const WEBHOOK_URL = process.env.NEXT_PUBLIC_SEARCH_WEBHOOK_URL || "https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c";
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    }
+    getUser();
+  }, [supabase]);
 
   useEffect(() => {
     const q = searchParams.get("q") || ""
@@ -90,7 +104,6 @@ function SearchPageContent() {
         setResults([])
         setHasSearched(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
 
   const updateUrl = (newParams: Record<string, string | number | undefined>) => {
@@ -125,7 +138,6 @@ function SearchPageContent() {
     setHasSearched(true)
     
     try {
-      // Direct Client-Side Fetch
       const response = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
@@ -172,10 +184,6 @@ function SearchPageContent() {
   }
 
   const onSearchClick = () => {
-    if (!searchTerm.trim()) {
-      setError("Please enter a search term")
-      return
-    }
     updateUrl({
       q: searchTerm,
       type: searchType,
@@ -185,6 +193,24 @@ function SearchPageContent() {
       page: "1"
     })
   }
+  
+  const handleSaveSearch = async () => {
+    if (!user) return;
+    if (!searchTerm.trim()) {
+        toast({ title: 'Cannot save empty search', variant: 'destructive' });
+        return;
+    }
+
+    const { error } = await supabase
+        .from('saved_searches')
+        .insert({ user_id: user.id, search_term: searchTerm.trim() });
+    
+    if (error) {
+        toast({ title: 'Error saving search', description: error.message, variant: 'destructive' });
+    } else {
+        toast({ title: 'Search Saved!', description: `"${searchTerm.trim()}" has been saved to your dashboard.` });
+    }
+  };
 
   const handleLoadMore = async () => {
     setIsLoadingMore(true)
@@ -343,10 +369,15 @@ function SearchPageContent() {
             </div>
         </div>
 
-        <div className="flex justify-end mt-6">
-          <Button onClick={onSearchClick} disabled={isLoading} className="bg-primary text-primary-foreground px-8">
-            {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Searching...</> : <><Search className="w-4 h-4 mr-2" />Search</>}
-          </Button>
+        <div className="flex justify-end items-center mt-6 gap-2">
+            {user && searchTerm.trim() && (
+                <Button variant="outline" size="icon" onClick={handleSaveSearch} title="Save this search">
+                    <Bookmark className="h-4 w-4" />
+                </Button>
+            )}
+            <Button onClick={onSearchClick} disabled={isLoading} className="bg-primary text-primary-foreground px-8">
+                {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Searching...</> : <><Search className="w-4 h-4 mr-2" />Search</>}
+            </Button>
         </div>
       </div>
 
@@ -379,18 +410,6 @@ function SearchPageContent() {
                 onTagClick={() => {}} 
               />
             ))}
-
-            {/* PRODUCTION DIAGNOSTIC: Render raw list if cards failed but data exists */}
-            {groupedResults.length > 0 && (
-                <div className="mt-12 p-4 bg-gray-100 text-xs text-gray-500 hidden">
-                    <p>Diagnostic Data Load:</p>
-                    <ul>
-                        {groupedResults.map(g => (
-                            <li key={g.video_id}>{g.title} ({g.transcripts.length} matches)</li>
-                        ))}
-                    </ul>
-                </div>
-            )}
             
             {hasSearched && !isLoading && hasMoreResults && (
               <div className="flex justify-center pt-4">

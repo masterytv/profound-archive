@@ -18,7 +18,7 @@ interface Favorite {
 
 interface SavedSearch {
   id: number;
-  query_text: string;
+  search_term: string;
 }
 
 interface Collection {
@@ -151,15 +151,15 @@ export default function DashboardPage() {
                 {savedSearches.length > 0 ? (
                     <div className="space-y-2">
                         {savedSearches.map(search => (
-                            <Link href={`/search2?q=${encodeURIComponent(search.query_text)}`} key={search.id} className="block p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
-                                <p className="font-mono text-sm text-primary">"{search.query_text}"</p>
+                            <Link href={`/search2?q=${encodeURIComponent(search.search_term)}`} key={search.id} className="block p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                                <p className="font-mono text-sm text-primary">"{search.search_term}"</p>
                             </Link>
                         ))}
                     </div>
                 ) : (
                     <div className="bg-gray-50 rounded-lg p-8 text-center">
                         <p className="text-muted-foreground">You haven't saved any searches yet.</p>
-                         <p className="text-sm text-gray-400 mt-2">(Feature coming soon)</p>
+                         <p className="text-sm text-gray-400 mt-2">Click the bookmark icon next to the search button to save a query.</p>
                     </div>
                 )}
             </div>

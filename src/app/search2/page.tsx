@@ -9,8 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Loader2, MessageSquare, Search, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, MessageSquare, Search, ChevronDown, ChevronUp, Bookmark } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 
 // Shape of a single document returned from our Typesense-like API
@@ -66,6 +68,10 @@ function SearchV2Content() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const supabase = createClient();
+
+    // User state
+    const [user, setUser] = useState<User | null>(null);
 
     // Initialize state from URL params
     const initialQuery = searchParams.get("q") || "";
@@ -92,6 +98,16 @@ function SearchV2Content() {
     const [hasMore, setHasMore] = useState(true);
 
     const { toast } = useToast();
+    
+    // Check for user on mount
+    useEffect(() => {
+        const getUser = async () => {
+          const { data } = await supabase.auth.getUser();
+          setUser(data.user);
+        }
+        getUser();
+    }, [supabase]);
+
 
     // Initial parsing of filters from URL
     useEffect(() => {
@@ -241,9 +257,6 @@ function SearchV2Content() {
     };
 
     const onSearchClick = () => {
-        if (!searchTerm.trim()) {
-             // Optional: allow empty search
-        }
         updateUrl(searchTerm, activeFilters, sortBy, direction);
     };
 
@@ -280,6 +293,24 @@ function SearchV2Content() {
             ...prev,
             [fieldName]: !prev[fieldName]
         }));
+    };
+
+     const handleSaveSearch = async () => {
+        if (!user) return;
+        if (!searchTerm.trim()) {
+            toast({ title: 'Cannot save empty search', variant: 'destructive' });
+            return;
+        }
+
+        const { error } = await supabase
+            .from('saved_searches')
+            .insert({ user_id: user.id, search_term: searchTerm.trim() });
+        
+        if (error) {
+            toast({ title: 'Error saving search', description: error.message, variant: 'destructive' });
+        } else {
+            toast({ title: 'Search Saved!', description: `"${searchTerm.trim()}" has been saved to your dashboard.` });
+        }
     };
 
     const groupResultsByVideo = (results: HitDocument[]): GroupedVideo[] => {
@@ -399,7 +430,7 @@ function SearchV2Content() {
                     <label className="block text-sm font-medium mb-2">Search Term</label>
                     <Input
                         type="text"
-                        placeholder="e.g., 'life review', 'tunnel', 'light beings'"
+                        placeholder="e.g., 'life review' (Exact), 'visited dead relatives' (Semantic)"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter") onSearchClick() }}
@@ -438,7 +469,12 @@ function SearchV2Content() {
                     </div>
                 </div>
 
-                <div className="flex justify-end mt-6">
+                <div className="flex justify-end items-center mt-6 gap-2">
+                    {user && searchTerm.trim() && (
+                        <Button variant="outline" size="icon" onClick={handleSaveSearch} title="Save this search">
+                            <Bookmark className="h-4 w-4" />
+                        </Button>
+                    )}
                     <Button onClick={onSearchClick} disabled={isLoading} className="bg-primary text-primary-foreground px-8">
                         {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Searching...</> : <><Search className="w-4 h-4 mr-2" />Search</>}
                     </Button>
