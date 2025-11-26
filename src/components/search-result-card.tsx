@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { Star } from "lucide-react"
 import FavoriteButton from "./favorite-button"
+import AddToCollectionButton from "./add-to-collection-button"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
@@ -172,35 +173,42 @@ export function SearchResultCard({ result, video, searchTerm }: SearchResultCard
                     <p className="font-medium text-foreground">{displayData.channelName}</p>
                     <p>{formatDate(displayData.date)}</p>
                     <p>{Number(displayData.viewCount).toLocaleString()} views</p>
-                    <div className="pt-2">
-                        {user ? (
-                            <FavoriteButton
-                            videoId={displayData.video_id}
-                            videoTitle={displayData.title}
-                            />
-                        ) : (
-                            <Link
-                            href="/login"
-                            className="inline-flex items-center gap-1 text-xs hover:text-primary transition-colors"
-                            title="Log in to favorite"
-                            >
-                            <Star className="h-4 w-4" />
-                            <span>Favorite</span>
-                            </Link>
-                        )}
-                    </div>
                 </div>
             </div>
 
             {/* Right Column (Content) - Approx 2/3 width (8/12) */}
             <div className="md:col-span-8 flex flex-col gap-4">
-                {/* Title */}
-                <div>
+                {/* Title & Actions */}
+                 <div className="flex justify-between items-start gap-2">
                     <h3 className="text-xl font-bold leading-tight hover:text-primary transition-colors">
                         <Link href={displayData.url} target="_blank">
                             {displayData.title}
                         </Link>
                     </h3>
+                    <div className="flex items-center flex-shrink-0">
+                        {user ? (
+                            <>
+                                <FavoriteButton
+                                videoId={displayData.video_id}
+                                videoTitle={displayData.title}
+                                videoThumbnailUrl={displayData.thumbnailUrl}
+                                />
+                                <AddToCollectionButton
+                                videoId={displayData.video_id}
+                                videoTitle={displayData.title}
+                                videoThumbnailUrl={displayData.thumbnailUrl}
+                                />
+                            </>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors p-2"
+                                title="Log in to save"
+                            >
+                                <Star className="h-4 w-4" />
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
                 {/* Summary */}
