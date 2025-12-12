@@ -52,10 +52,10 @@ function SearchPageContent() {
 
   const [user, setUser] = useState<User | null>(null);
 
-  const DEFAULT_TYPE = "exact"
+  const DEFAULT_TYPE = "semantic"
   const DEFAULT_SORT = "viewCount" 
   const DEFAULT_DIR = "DESC"
-  const DEFAULT_SIM = 0.78
+  const DEFAULT_SIM = 0.50
 
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "")
   const [searchType, setSearchType] = useState<"semantic" | "exact">((searchParams.get("type") as "semantic" | "exact") || DEFAULT_TYPE)
@@ -313,12 +313,12 @@ function SearchPageContent() {
                     <label className="block text-sm font-medium mb-2">Search Type</label>
                     <div className="flex gap-4">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="searchType" value="exact" checked={searchType === "exact"} onChange={() => setSearchType("exact")} />
-                            Exact Match
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="searchType" value="semantic" checked={searchType === "semantic"} onChange={() => setSearchType("semantic")} />
                             Similar (Semantic)
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="searchType" value="exact" checked={searchType === "exact"} onChange={() => setSearchType("exact")} />
+                            Exact Match
                         </label>
                     </div>
                 </div>

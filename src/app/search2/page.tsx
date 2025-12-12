@@ -430,7 +430,7 @@ function SearchV2Content() {
                     <label className="block text-sm font-medium mb-2">Search Term</label>
                     <Input
                         type="text"
-                        placeholder="e.g., 'life review' (Exact), 'visited dead relatives' (Semantic)"
+                        placeholder="e.g., 'life review' 'tunnel' 'angels' 'more real than real' "
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter") onSearchClick() }}
