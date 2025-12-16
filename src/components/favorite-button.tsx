@@ -6,6 +6,8 @@ import type { User } from '@supabase/supabase-js';
 import { Star, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { ToastAction } from '@/components/ui/toast';
 
 interface FavoriteButtonProps {
   videoId: string;
@@ -16,9 +18,10 @@ interface FavoriteButtonProps {
 export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl }: FavoriteButtonProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Start loading to check initial state
+  const [isLoading, setIsLoading] = useState(true); 
   const supabase = createClient();
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     const checkUserAndFavoriteStatus = async () => {
@@ -58,6 +61,11 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl 
         title: "Login Required",
         description: "You must be logged in to save favorites.",
         variant: "destructive",
+        action: (
+          <ToastAction altText="Login" onClick={() => router.push('/login')}>
+            Login
+          </ToastAction>
+        ),
       });
       return;
     }
@@ -89,7 +97,6 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl 
     }
     
     if (!collection) {
-        // Handle case where collection creation fails but doesn't throw
         setIsLoading(false);
         return;
     }
@@ -132,10 +139,7 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl 
     setIsLoading(false);
   };
 
-  if (!user) {
-      return null; // Don't show the button if the user isn't logged in
-  }
-
+  // Render the button even if user is null (so they can click and be prompted)
   return (
     <Button
       variant="ghost"

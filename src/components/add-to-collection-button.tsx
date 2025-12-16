@@ -3,17 +3,21 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import { Bookmark, Loader2, PlusCircle, Check } from 'lucide-react';
+import { Bookmark, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from './ui/checkbox';
 import { Input } from './ui/input';
+import { useRouter } from 'next/navigation';
+import { ToastAction } from '@/components/ui/toast';
 
-interface AddToCollectionButtonProps {
+interface SaveToCollectionButtonProps {
   videoId: string;
   videoTitle: string;
   videoThumbnailUrl?: string;
+  startTime: number;
+  content: string;
 }
 
 interface Collection {
@@ -23,7 +27,7 @@ interface Collection {
   hasVideo: boolean;
 }
 
-export default function AddToCollectionButton({ videoId, videoTitle, videoThumbnailUrl }: AddToCollectionButtonProps) {
+export default function SaveToCollectionButton({ videoId, videoTitle, videoThumbnailUrl, startTime, content }: SaveToCollectionButtonProps) {
   const [user, setUser] = useState<User | null>(null);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,22 +35,39 @@ export default function AddToCollectionButton({ videoId, videoTitle, videoThumbn
   const [newCollectionName, setNewCollectionName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
+  // Fix: Ensure startTime is an integer because the database column 'start_time' is type int4.
+  // Sending a float (e.g., 1041.6) causes a 400 Bad Request error.
+  const integerStartTime = typeof startTime === 'number' ? Math.floor(startTime) : 0;
+
   const supabase = createClient();
   const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (!user) setIsLoading(false); // Stop loading if no user
+    };
+    getUser();
+  }, [supabase]);
 
   const fetchData = async (currentUser: User) => {
     setIsLoading(true);
+    
     // Fetch all collections and this video's memberships in parallel
     const { data: collectionsData, error: collectionsError } = await supabase
       .from('collections')
       .select('id, name')
       .eq('user_id', currentUser.id);
 
+    // Use integerStartTime for the query
     const { data: memberships, error: membershipsError } = await supabase
       .from('favorites')
       .select('collection_id')
       .eq('user_id', currentUser.id)
-      .eq('video_id', videoId);
+      .eq('video_id', videoId)
+      .eq('start_time', integerStartTime); 
     
     if (collectionsError || membershipsError) {
       console.error("Error fetching data:", collectionsError || membershipsError);
@@ -66,14 +87,6 @@ export default function AddToCollectionButton({ videoId, videoTitle, videoThumbn
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    getUser();
-  }, [supabase]);
-
   // When the popover is opened, fetch fresh data
   useEffect(() => {
     if (isPopoverOpen && user) {
@@ -92,9 +105,11 @@ export default function AddToCollectionButton({ videoId, videoTitle, videoThumbn
       const { error } = await supabase.from('favorites').delete()
         .eq('user_id', user.id)
         .eq('collection_id', collectionId)
-        .eq('video_id', videoId);
+        .eq('video_id', videoId)
+        .eq('start_time', integerStartTime); // Use integer version
       
       if (error) {
+        console.error('Error removing from collection:', error);
         toast({ title: 'Error', description: 'Failed to remove from collection.', variant: 'destructive'});
         // Revert UI on error
         setCollections(prev => prev.map(c => c.id === collectionId ? { ...c, hasVideo: true } : c));
@@ -109,9 +124,12 @@ export default function AddToCollectionButton({ videoId, videoTitle, videoThumbn
         video_id: videoId,
         video_title: videoTitle,
         video_thumbnail_url: videoThumbnailUrl || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+        start_time: integerStartTime, // Use integer version
+        content: content,
       });
 
       if (error) {
+        console.error('Error adding to collection:', error);
         toast({ title: 'Error', description: 'Failed to add to collection.', variant: 'destructive'});
         // Revert UI on error
         setCollections(prev => prev.map(c => c.id === collectionId ? { ...c, hasVideo: false } : c));
@@ -134,6 +152,7 @@ export default function AddToCollectionButton({ videoId, videoTitle, videoThumbn
         .single();
       
       if (createError) {
+          console.error('Error creating collection:', createError);
           toast({ title: 'Error', description: 'Could not create collection.', variant: 'destructive' });
           setIsCreating(false);
           return;
@@ -148,12 +167,38 @@ export default function AddToCollectionButton({ videoId, videoTitle, videoThumbn
       setIsCreating(false);
   };
   
-  if (!user) return null;
+  const handleLoginPrompt = () => {
+    toast({
+      title: "Login Required",
+      description: "You must be logged in to save collections.",
+      variant: "destructive",
+      action: (
+        <ToastAction altText="Login" onClick={() => router.push('/login')}>
+          Login
+        </ToastAction>
+      ),
+    });
+  };
 
+  // If not logged in, show button that triggers toast
+  if (!user) {
+    return (
+        <Button 
+            variant="ghost" 
+            size="icon" 
+            aria-label="Save to Collection"
+            onClick={handleLoginPrompt}
+        >
+            <Bookmark className="h-5 w-5 text-gray-400" />
+        </Button>
+    );
+  }
+
+  // If logged in, show full functionality
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Add to Collection">
+            <Button variant="ghost" size="icon" aria-label="Save to Collection">
                 <Bookmark className="h-5 w-5 text-gray-400" />
             </Button>
         </PopoverTrigger>

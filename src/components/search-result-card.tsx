@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { Star } from "lucide-react"
 import FavoriteButton from "./favorite-button"
-import AddToCollectionButton from "./add-to-collection-button"
+import SaveToCollectionButton from "./add-to-collection-button"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
@@ -186,28 +186,11 @@ export function SearchResultCard({ result, video, searchTerm }: SearchResultCard
                         </Link>
                     </h3>
                     <div className="flex items-center flex-shrink-0">
-                        {user ? (
-                            <>
-                                <FavoriteButton
-                                videoId={displayData.video_id}
-                                videoTitle={displayData.title}
-                                videoThumbnailUrl={displayData.thumbnailUrl}
-                                />
-                                <AddToCollectionButton
-                                videoId={displayData.video_id}
-                                videoTitle={displayData.title}
-                                videoThumbnailUrl={displayData.thumbnailUrl}
-                                />
-                            </>
-                        ) : (
-                            <Link
-                                href="/login"
-                                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors p-2"
-                                title="Log in to save"
-                            >
-                                <Star className="h-4 w-4" />
-                            </Link>
-                        )}
+                        <FavoriteButton
+                            videoId={displayData.video_id}
+                            videoTitle={displayData.title}
+                            videoThumbnailUrl={displayData.thumbnailUrl}
+                        />
                     </div>
                 </div>
 
@@ -243,17 +226,26 @@ export function SearchResultCard({ result, video, searchTerm }: SearchResultCard
                                     <div className="text-sm text-foreground/80 leading-relaxed">
                                         "{highlightTerm(t.content, searchTerm)}"
                                     </div>
-                                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                                        {timestampStr && (
-                                            <span className="bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                                {timestampStr}
-                                            </span>
-                                        )}
-                                        {t.similarity != null && (
-                                            <span>Match: {(t.similarity * 100).toFixed(0)}%</span>
-                                        )}
-                                    </div>
                                 </Link>
+                                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                                    {timestampStr && (
+                                        <span className="bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                            {timestampStr}
+                                        </span>
+                                    )}
+                                    {t.similarity != null && (
+                                        <span>Match: {(t.similarity * 100).toFixed(0)}%</span>
+                                    )}
+                                    {hasTimestamp && (
+                                        <SaveToCollectionButton
+                                            videoId={displayData.video_id}
+                                            videoTitle={displayData.title}
+                                            videoThumbnailUrl={displayData.thumbnailUrl}
+                                            startTime={t.start_time!}
+                                            content={t.content}
+                                        />
+                                    )}
+                                </div>
                             </div>
                         )
                     })}
