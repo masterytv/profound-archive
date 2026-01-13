@@ -24,6 +24,10 @@ env:
     value: 5.161.239.93 
   - variable: TYPESENSE_API_KEY
     value: fRgxFBt4RzenMc3v8xf7afE9ICs+Hfqvvm8vLkhwBU4=
+  - variable: TYPESENSE_PORT
+    value: "8108"
+  - variable: TYPESENSE_PROTOCOL
+    value: "http"
 
   # Supabase Configuration
   - variable: NEXT_PUBLIC_SUPABASE_URL
