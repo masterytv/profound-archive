@@ -8,7 +8,7 @@ export default function Home() {
         Archive of the Extraordinary
       </h1>
       <p className="max-w-2xl text-muted-foreground md:text-xl mb-8">
-        Search and Chat with 5000+ First-Person Accounts of Near Death Experiences
+        Search and Chat with 5000+ First-Person Accounts of Near Death Experiences.
       </p>
       <div className="flex gap-4">
         <Button asChild size="lg">
