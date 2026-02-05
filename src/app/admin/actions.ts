@@ -33,7 +33,9 @@ async function getSupabase() {
 async function checkAdmin() {
     const supabase = await getSupabase();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Unauthorized");
+    if (!user) {
+        throw new Error("Unauthorized: No session");
+    }
 
     const { data: profile } = await supabase
         .from("profiles")
@@ -42,47 +44,68 @@ async function checkAdmin() {
         .single();
 
     if (!profile || (profile.role !== "admin" && profile.role !== "super_admin")) {
-        throw new Error("Unauthorized");
+        throw new Error("Unauthorized: Insufficient permissions");
     }
     return { supabase, user };
 }
 
 export async function toggleBanUser(userId: string, currentStatus: boolean) {
     try {
-        const { supabase } = await checkAdmin();
+        const { user } = await checkAdmin();
 
         // Prevent banning yourself
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user!.id === userId) {
+        if (user.id === userId) {
             throw new Error("You cannot ban yourself.");
         }
 
-        const { error } = await supabase
+        // Use service role client for the update to bypass RLS
+        const adminSupabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_KEY!,
+            {
+                cookies: {
+                    getAll() { return [] },
+                    setAll() { },
+                },
+            }
+        );
+
+        const { data, error } = await adminSupabase
             .from("profiles")
             .update({ is_banned: !currentStatus })
-            .eq("id", userId);
+            .eq("id", userId)
+            .select();
 
         if (error) throw error;
+        if (!data || data.length === 0) {
+            throw new Error("No profile found to update.");
+        }
 
         revalidatePath("/admin/users");
         return { success: true };
     } catch (error: any) {
+        console.error("toggleBanUser error:", error.message);
         return { success: false, error: error.message };
     }
 }
 
 export async function updateUserRole(userId: string, newRole: "user" | "admin" | "super_admin") {
     try {
-        const { supabase } = await checkAdmin();
+        await checkAdmin();
 
-        // Prevent changing your own role (optional, but good safety)
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user!.id === userId) {
-            // throw new Error("You cannot change your own role."); 
-            // Allowing it for now but be careful
-        }
+        // Use service role client for the update to bypass RLS
+        const adminSupabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_KEY!,
+            {
+                cookies: {
+                    getAll() { return [] },
+                    setAll() { },
+                },
+            }
+        );
 
-        const { error } = await supabase
+        const { error } = await adminSupabase
             .from("profiles")
             .update({ role: newRole })
             .eq("id", userId);
@@ -92,6 +115,7 @@ export async function updateUserRole(userId: string, newRole: "user" | "admin" |
         revalidatePath("/admin/users");
         return { success: true };
     } catch (error: any) {
+        console.error("updateUserRole error:", error.message);
         return { success: false, error: error.message };
     }
 }
