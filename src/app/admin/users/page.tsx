@@ -23,23 +23,39 @@ export default async function AdminUsersPage() {
         }
     );
 
-    // We need emails from auth.users, but we can't query auth.users directly with the anon client easily 
-    // unless we are using the service role key which we try to avoid in Client code.
-    // HOWEVER, this is a Server Component.
-    // BUT `createServerClient` with ANON key still matches RLS.
-    // To get emails, we usually rely on `profiles` table having email sync, OR we use the Service Role client here.
-    // Since we don't want to modify global envs or leak keys, let's check if we can get emails via a joined query?
-    // No, `profiles` doesn't have email column in schema we saw.
-    // Workaround: We will just show detailed profile info. 
-    // IF we really need emails, we should add an `email` column to `profiles` and sync it via trigger on `auth.users`,
-    // OR use the Service Role client just for this page.
-    // Let's assume for now we just show what's in profiles.
+    // Use service role client to fetch emails from auth.users
+    const adminSupabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY!,
+        {
+            cookies: {
+                getAll() { return [] },
+                setAll() { },
+            },
+        }
+    );
 
-    const { data: profiles } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("full_name", { ascending: true })
-        .limit(50);
+    // Fetch both auth users and profiles
+    const [
+        { data: { users: authUsers }, error: authError },
+        { data: profiles, error: profilesError }
+    ] = await Promise.all([
+        adminSupabase.auth.admin.listUsers(),
+        supabase.from("profiles").select("*").order("full_name", { ascending: true }).limit(50)
+    ]);
+
+    if (authError || profilesError) {
+        console.error("Error fetching users:", authError || profilesError);
+    }
+
+    // Merge profile data with email from auth users
+    const usersWithEmails = profiles?.map((profile: any) => {
+        const authUser = authUsers?.find((u: any) => u.id === profile.id);
+        return {
+            ...profile,
+            email: authUser?.email
+        };
+    }) || [];
 
     return (
         <div>
@@ -78,8 +94,8 @@ export default async function AdminUsersPage() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {profiles?.map((profile) => (
-                            <UserRow key={profile.id} profile={profile} />
+                        {usersWithEmails.map((user: any) => (
+                            <UserRow key={user.id} profile={user} email={user.email} />
                         ))}
                         {(!profiles || profiles.length === 0) && (
                             <tr>
