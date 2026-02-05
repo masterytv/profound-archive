@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { User, Settings, LogOut, Users, Shield } from "lucide-react";
+import { User, Settings, LogOut, Users, Shield, MessageSquare } from "lucide-react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -79,6 +79,15 @@ export default async function AdminLayout({
                             <Users className="w-5 h-5" />
                             Users
                         </Link>
+                        {profile?.role === "super_admin" && (
+                            <Link
+                                href="/admin/chatbot"
+                                className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                            >
+                                <MessageSquare className="w-5 h-5 text-indigo-500" />
+                                Chatbot Editor
+                            </Link>
+                        )}
                     </nav>
 
                     <div className="border-t border-gray-200 pt-4">

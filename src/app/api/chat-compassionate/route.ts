@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -14,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req: NextRequest) {
     try {
-        const { sessionId, chatInput } = await req.json();
+        const { sessionId, chatInput, test } = await req.json();
 
         if (!sessionId || !chatInput) {
             return NextResponse.json(
@@ -23,53 +25,56 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // 1. Generate Embedding for the user's input
-        const embeddingResponse = await openai.embeddings.create({
-            model: 'text-embedding-3-small',
-            input: chatInput,
-        });
-        const embedding = embeddingResponse.data[0].embedding;
+        // --- DYNAMIC PROMPT LOGIC ---
+        let systemPrompt = '';
+        try {
+            // Fetch configuration from DB
+            const { data: config } = await supabase
+                .from('chatbot_configs')
+                .select('*')
+                .eq('id', 'chat-compassionate')
+                .single();
 
-        // 2. Retrieve Relevant Context (Videos) from Supabase
-        const { data: videos, error: rpcError } = await supabase.rpc('nde_chatbot_match', {
-            query_embedding: embedding,
-            match_count: 10,
-            filter: {},
-        });
+            if (test && config?.staging_prompt) {
+                // SECURITY CHECK for test mode
+                const cookieStore = await cookies();
+                const clientSupabase = createServerClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                    {
+                        cookies: {
+                            getAll() { return cookieStore.getAll(); },
+                            setAll() { },
+                        },
+                    }
+                );
 
-        if (rpcError) {
-            console.error('Error fetching context:', rpcError);
-            // Continue without context or handle error? For now, log and continue, 
-            // but the prompt relies on videos. We might get empty videos array.
+                const { data: { user } } = await clientSupabase.auth.getUser();
+                if (user) {
+                    const { data: profile } = await clientSupabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (profile?.role === 'super_admin') {
+                        systemPrompt = config.staging_prompt;
+                        console.log("Using STAGING prompt for Super Admin test");
+                    }
+                }
+            }
+
+            // Fallback to live_prompt if not testing or test failed security
+            if (!systemPrompt && config?.live_prompt) {
+                systemPrompt = config.live_prompt;
+            }
+        } catch (dbError) {
+            console.error('Error fetching dynamic prompt:', dbError);
         }
 
-        // Format videos for the prompt
-        let videosContext = '';
-        if (videos && Array.isArray(videos)) {
-            videosContext = videos.map((v: any, index: number) => {
-                return `<video_${index + 1}>${v.content}</video_${index + 1}>`;
-            }).join('\n');
-        }
-
-        // 3. Fetch Conversation History for Context
-        const { data: historyData } = await supabase
-            .from('nde_chat_logs')
-            .select('message, sender')
-            .eq('session_id', sessionId)
-            .order('created_at', { ascending: false })
-            .limit(10);
-
-        // Reverse to chronological order
-        const history = historyData ? historyData.reverse() : [];
-
-        // Format history for OpenAI messages
-        const previousMessages = history.map((entry: any) => ({
-            role: entry.sender === 'user' ? 'user' : 'assistant',
-            content: entry.message,
-        }));
-
-        // 4. Construct System Prompt
-        const systemPrompt = `# ROLE & GOAL
+        // ULTIMATE FALLBACK: Current Hardcoded Prompt (as of migration)
+        if (!systemPrompt) {
+            systemPrompt = `# ROLE & GOAL
 You are a highly empathetic and compassionate AI companion. Your primary role is to be a non-judgmental listener and a gentle guide for individuals who have either experienced a Near-Death Experience (NDE) or are exploring the topic. Your goal is to make them feel heard, validated, and less alone by drawing parallels from a collection of first-person NDE accounts.
 
 ## STRICT RULES (Non-negotiable)
@@ -119,8 +124,56 @@ Never use dashes or em dashes in your response. Em dashes are the wide dash (--)
 
 ## VIDEOS
 Here are videos from first-person NDE accounts that are relevant to the user's current message. Use these to form your answer but don't refer to them specifically in your answer:
-${videosContext}
 `;
+        }
+
+        // 1. Generate Embedding for the user's input
+        const embeddingResponse = await openai.embeddings.create({
+            model: 'text-embedding-3-small',
+            input: chatInput,
+        });
+        const embedding = embeddingResponse.data[0].embedding;
+
+        // 2. Retrieve Relevant Context (Videos) from Supabase
+        const { data: videos, error: rpcError } = await supabase.rpc('nde_chatbot_match', {
+            query_embedding: embedding,
+            match_count: 10,
+            filter: {},
+        });
+
+        if (rpcError) {
+            console.error('Error fetching context:', rpcError);
+            // Continue without context or handle error? For now, log and continue, 
+            // but the prompt relies on videos. We might get empty videos array.
+        }
+
+        // Format videos for the prompt
+        let videosContext = '';
+        if (videos && Array.isArray(videos)) {
+            videosContext = videos.map((v: any, index: number) => {
+                return `<video_${index + 1}>${v.content}</video_${index + 1}>`;
+            }).join('\n');
+        }
+
+        // 3. Fetch Conversation History for Context
+        const { data: historyData } = await supabase
+            .from('nde_chat_logs')
+            .select('message, sender')
+            .eq('session_id', sessionId)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        // Reverse to chronological order
+        const history = historyData ? historyData.reverse() : [];
+
+        // Format history for OpenAI messages
+        const previousMessages = history.map((entry: any) => ({
+            role: entry.sender === 'user' ? 'user' : 'assistant',
+            content: entry.message,
+        }));
+
+        // 4. Construct Final System Prompt (append the VIDEOS content)
+        const finalSystemPrompt = systemPrompt + `\n${videosContext}\n`;
 
         // 5. Build Messages Array
         // Match n8n's prompt structure exactly for the final user message
@@ -129,7 +182,7 @@ ${videosContext}
 Now, following all your rules and using the context provided, generate your compassionate response.`;
 
         const messages: any[] = [
-            { role: 'system', content: systemPrompt },
+            { role: 'system', content: finalSystemPrompt },
             ...previousMessages,
             { role: 'user', content: userMessageContent }
         ];
