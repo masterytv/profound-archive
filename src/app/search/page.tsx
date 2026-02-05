@@ -53,7 +53,7 @@ function SearchPageContent() {
   const [user, setUser] = useState<User | null>(null);
 
   const DEFAULT_TYPE = "semantic"
-  const DEFAULT_SORT = "viewCount" 
+  const DEFAULT_SORT = "viewCount"
   const DEFAULT_DIR = "DESC"
   const DEFAULT_SIM = 0.50
 
@@ -62,11 +62,11 @@ function SearchPageContent() {
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || DEFAULT_SORT)
   const [direction, setDirection] = useState(searchParams.get("dir") || DEFAULT_DIR)
   const [similarity, setSimilarity] = useState(parseFloat(searchParams.get("sim") || String(DEFAULT_SIM)))
-  
+
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const initialPage = parseInt(searchParams.get("page") || "1", 10)
   const [offset, setOffset] = useState((initialPage - 1) * 12)
   const [hasMoreResults, setHasMoreResults] = useState(true)
@@ -89,20 +89,20 @@ function SearchPageContent() {
     const sort = searchParams.get("sort") || (type === "semantic" ? "similarity" : "viewCount")
     const dir = searchParams.get("dir") || DEFAULT_DIR
     const sim = parseFloat(searchParams.get("sim") || String(DEFAULT_SIM))
-    
+
     setSearchTerm(q)
     setSearchType(type)
     setSortBy(sort)
     setDirection(dir)
     setSimilarity(sim)
-    
+
     if (q) {
       const page = parseInt(searchParams.get("page") || "1", 10)
       const calculatedOffset = (page - 1) * 12
       performSearch(q, type, sort, dir, sim, calculatedOffset)
     } else {
-        setResults([])
-        setHasSearched(false)
+      setResults([])
+      setHasSearched(false)
     }
   }, [searchParams])
 
@@ -115,20 +115,20 @@ function SearchPageContent() {
         params.set(key, String(value))
       }
     })
-    
+
     if (newParams.page === undefined) {
-        params.set("page", "1")
+      params.set("page", "1")
     }
 
     router.push(`${pathname}?${params.toString()}`)
   }
 
   const performSearch = async (
-    term: string, 
-    type: "semantic" | "exact", 
-    sort: string, 
-    dir: string, 
-    sim: number, 
+    term: string,
+    type: "semantic" | "exact",
+    sort: string,
+    dir: string,
+    sim: number,
     searchOffset: number
   ) => {
     if (!term.trim()) return
@@ -136,7 +136,7 @@ function SearchPageContent() {
     setIsLoading(true)
     setError(null)
     setHasSearched(true)
-    
+
     try {
       const response = await fetch(WEBHOOK_URL, {
         method: "POST",
@@ -159,7 +159,7 @@ function SearchPageContent() {
       }
 
       const data = await response.json()
-      
+
       if (!Array.isArray(data)) {
         console.error("Data is not an array:", data);
         setResults([]);
@@ -168,7 +168,7 @@ function SearchPageContent() {
 
       setResults(data)
       setOffset(searchOffset)
-      
+
       if (data.length < 12) {
         setHasMoreResults(false)
       } else {
@@ -193,22 +193,22 @@ function SearchPageContent() {
       page: "1"
     })
   }
-  
+
   const handleSaveSearch = async () => {
     if (!user) return;
     if (!searchTerm.trim()) {
-        toast({ title: 'Cannot save empty search', variant: 'destructive' });
-        return;
+      toast({ title: 'Cannot save empty search', variant: 'destructive' });
+      return;
     }
 
     const { error } = await supabase
-        .from('saved_searches')
-        .insert({ user_id: user.id, search_term: searchTerm.trim() });
-    
+      .from('saved_searches')
+      .insert({ user_id: user.id, search_term: searchTerm.trim() });
+
     if (error) {
-        toast({ title: 'Error saving search', description: error.message, variant: 'destructive' });
+      toast({ title: 'Error saving search', description: error.message, variant: 'destructive' });
     } else {
-        toast({ title: 'Search Saved!', description: `"${searchTerm.trim()}" has been saved to your dashboard.` });
+      toast({ title: 'Search Saved!', description: `"${searchTerm.trim()}" has been saved to your dashboard.` });
     }
   };
 
@@ -242,7 +242,7 @@ function SearchPageContent() {
       const data = await response.json()
       setResults((prevResults) => [...prevResults, ...data])
       setOffset(newOffset)
-      
+
       if (data.length < 12) {
         setHasMoreResults(false)
       }
@@ -256,10 +256,10 @@ function SearchPageContent() {
   const groupResultsByVideo = (results: SearchResult[]): GroupedVideo[] => {
     const grouped = new Map<string, GroupedVideo>()
     if (!Array.isArray(results)) return [];
-    
+
     results.forEach((result) => {
       if (!result || !result.video_id) return;
-      
+
       if (!grouped.has(result.video_id)) {
         grouped.set(result.video_id, {
           video_id: result.video_id,
@@ -282,7 +282,7 @@ function SearchPageContent() {
     })
     return Array.from(grouped.values())
   }
-  
+
   const groupedResults = groupResultsByVideo(results)
 
   return (
@@ -290,7 +290,7 @@ function SearchPageContent() {
       <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">Search Engine for the Soul</h1>
         <p className="text-muted-foreground mb-6">Find specific moments in more than 5000 NDE YouTube videos.</p>
-        <Link href="/chat" className="text-primary hover:underline text-sm flex items-center gap-1 mb-8">
+        <Link href="/chat-compassionate" className="text-primary hover:underline text-sm flex items-center gap-1 mb-8">
           <MessageSquare className="w-4 h-4" />
           Chat Instead
         </Link>
@@ -306,78 +306,78 @@ function SearchPageContent() {
             className="w-full"
           />
         </div>
-        
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center gap-6">
-                <div className="flex-shrink-0">
-                    <label className="block text-sm font-medium mb-2">Search Type</label>
-                    <div className="flex gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="searchType" value="semantic" checked={searchType === "semantic"} onChange={() => setSearchType("semantic")} />
-                            Similar (Semantic)
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="searchType" value="exact" checked={searchType === "exact"} onChange={() => setSearchType("exact")} />
-                            Exact Match
-                        </label>
-                    </div>
-                </div>
-                {searchType === "semantic" && (
-                <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-medium mb-2">Similarity Threshold: <span className="font-semibold text-primary">{similarity.toFixed(2)}</span></label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={similarity}
-                        onChange={(e) => setSimilarity(parseFloat(e.target.value))}
-                        className="w-full"
-                    />
-                </div>
-                )}
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label htmlFor="sortBy" className="block text-sm font-medium mb-2">Sort By</label>
-                    <select
-                        id="sortBy"
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                        {searchType === "semantic" && <option value="similarity">Similarity</option>}
-                        <option value="viewCount">View Count</option>
-                        <option value="date">Date</option>
-                        <option value="title">Title</option>
-                        <option value="channelName">Channel Name</option>
-                    </select>
-                </div>
-                <div>
-                    <label htmlFor="direction" className="block text-sm font-medium mb-2">Direction</label>
-                    <select
-                        id="direction"
-                        value={direction}
-                        onChange={(e) => setDirection(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                        <option value="DESC">Descending</option>
-                        <option value="ASC">Ascending</option>
-                    </select>
-                </div>
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-6">
+            <div className="flex-shrink-0">
+              <label className="block text-sm font-medium mb-2">Search Type</label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="searchType" value="semantic" checked={searchType === "semantic"} onChange={() => setSearchType("semantic")} />
+                  Similar (Semantic)
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="searchType" value="exact" checked={searchType === "exact"} onChange={() => setSearchType("exact")} />
+                  Exact Match
+                </label>
+              </div>
             </div>
+            {searchType === "semantic" && (
+              <div className="flex-1 min-w-0">
+                <label className="block text-sm font-medium mb-2">Similarity Threshold: <span className="font-semibold text-primary">{similarity.toFixed(2)}</span></label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={similarity}
+                  onChange={(e) => setSimilarity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="sortBy" className="block text-sm font-medium mb-2">Sort By</label>
+              <select
+                id="sortBy"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                {searchType === "semantic" && <option value="similarity">Similarity</option>}
+                <option value="viewCount">View Count</option>
+                <option value="date">Date</option>
+                <option value="title">Title</option>
+                <option value="channelName">Channel Name</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="direction" className="block text-sm font-medium mb-2">Direction</label>
+              <select
+                id="direction"
+                value={direction}
+                onChange={(e) => setDirection(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="DESC">Descending</option>
+                <option value="ASC">Ascending</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div className="flex justify-end items-center mt-6 gap-2">
-            {user && searchTerm.trim() && (
-                <Button variant="outline" size="icon" onClick={handleSaveSearch} title="Save this search">
-                    <Bookmark className="h-4 w-4" />
-                </Button>
-            )}
-            <Button onClick={onSearchClick} disabled={isLoading} className="bg-primary text-primary-foreground px-8">
-                {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Searching...</> : <><Search className="w-4 h-4 mr-2" />Search</>}
+          {user && searchTerm.trim() && (
+            <Button variant="outline" size="icon" onClick={handleSaveSearch} title="Save this search">
+              <Bookmark className="h-4 w-4" />
             </Button>
+          )}
+          <Button onClick={onSearchClick} disabled={isLoading} className="bg-primary text-primary-foreground px-8">
+            {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Searching...</> : <><Search className="w-4 h-4 mr-2" />Search</>}
+          </Button>
         </div>
       </div>
 
@@ -395,22 +395,22 @@ function SearchPageContent() {
         {(results.length > 0 || isLoading) && (
           <div className="space-y-6">
             {isLoading && results.length === 0 && (
-                <div className="text-center py-12">
-                     <Loader2 className="w-8 h-8 mx-auto animate-spin mb-4" />
-                     <p>Searching...</p>
-                </div>
+              <div className="text-center py-12">
+                <Loader2 className="w-8 h-8 mx-auto animate-spin mb-4" />
+                <p>Searching...</p>
+              </div>
             )}
-            
+
             {groupedResults.length > 0 && groupedResults.map((video) => (
-              <SearchResultCard 
-                key={video.video_id} 
-                video={video} 
+              <SearchResultCard
+                key={video.video_id}
+                video={video}
                 searchTerm={searchTerm}
                 searchType={searchType === "semantic" ? "concept" : "keyword"}
-                onTagClick={() => {}} 
+                onTagClick={() => { }}
               />
             ))}
-            
+
             {hasSearched && !isLoading && hasMoreResults && (
               <div className="flex justify-center pt-4">
                 <Button onClick={handleLoadMore} disabled={isLoadingMore} className="bg-primary text-primary-foreground px-8">

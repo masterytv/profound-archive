@@ -64,7 +64,7 @@ export default function AboutPage() {
       description:
         "Explore a vast archive of Near-Death Experience video moments. Our unique search tool allows you to instantly find what you're looking for, whether it's an exact phrase or a related concept. Pinpoint specific discussions or uncover hidden topics within thousands of hours of NDE testimonies.",
       buttonText: "Begin Your Search",
-      buttonLink: "/search",
+      buttonLink: "/search3",
     },
     {
       title: "NDE Research Chatbot",
@@ -82,7 +82,7 @@ export default function AboutPage() {
       description:
         "Chat a compassionate companion who is grounded in real-world NDE accounts from individuals who have experienced a powerful, transformational event. Whether you are a fellow NDEr or a curious observer, you'll be able to speak with a compassionate companion who understands.",
       buttonText: "Chat with Compassion",
-      buttonLink: "/chat",
+      buttonLink: "/chat-compassionate",
     },
     {
       title: "AI Analysis of NDE Testimonies",

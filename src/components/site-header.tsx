@@ -34,7 +34,7 @@ export default function SiteHeader() {
   useEffect(() => {
     // Fetch initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-        setUser(session?.user ?? null);
+      setUser(session?.user ?? null);
     });
 
     // Listen for auth state changes
@@ -105,14 +105,14 @@ export default function SiteHeader() {
               {toolsOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
                   <Link
-                    href="/search2"
+                    href="/search3"
                     className="block px-4 py-2 hover:bg-gray-100 transition-colors"
                     onClick={() => setToolsOpen(false)}
                   >
                     Search NDE Videos
                   </Link>
                   <Link
-                    href="/chat"
+                    href="/chat-compassionate"
                     className="block px-4 py-2 hover:bg-gray-100 transition-colors"
                     onClick={() => setToolsOpen(false)}
                   >
@@ -131,52 +131,52 @@ export default function SiteHeader() {
 
             {/* About Dropdown */}
             <div className="relative flex items-center" ref={aboutRef}>
-                <Link href="/about" className="hover:text-gray-600 transition-colors">
-                    About
-                </Link>
-                <button
-                    onClick={() => {
-                    setAboutOpen(!aboutOpen)
-                    setToolsOpen(false)
-                    }}
-                    className="flex items-center gap-1 hover:text-gray-600 transition-colors"
-                >
-                    <ChevronDown className={`w-4 h-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {aboutOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
-                    <Link
-                        href="/about#projects"
-                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                        onClick={() => setAboutOpen(false)}
-                    >
-                        Projects
-                    </Link>
-                    <Link
-                        href="/about#connect"
-                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                        onClick={() => setAboutOpen(false)}
-                    >
-                        Connect
-                    </Link>
-                    <a
-                        href="https://blog.projectprofound.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                        onClick={() => setAboutOpen(false)}
-                    >
-                        Blog
-                    </a>
-                    <Link
-                        href="/experiencers"
-                        className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                        onClick={() => setAboutOpen(false)}
-                    >
-                        For Experiencers
-                    </Link>
-                    </div>
-                )}
+              <Link href="/about" className="hover:text-gray-600 transition-colors">
+                About
+              </Link>
+              <button
+                onClick={() => {
+                  setAboutOpen(!aboutOpen)
+                  setToolsOpen(false)
+                }}
+                className="flex items-center gap-1 hover:text-gray-600 transition-colors"
+              >
+                <ChevronDown className={`w-4 h-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {aboutOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
+                  <Link
+                    href="/about#projects"
+                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    onClick={() => setAboutOpen(false)}
+                  >
+                    Projects
+                  </Link>
+                  <Link
+                    href="/about#connect"
+                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    onClick={() => setAboutOpen(false)}
+                  >
+                    Connect
+                  </Link>
+                  <a
+                    href="https://blog.projectprofound.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    onClick={() => setAboutOpen(false)}
+                  >
+                    Blog
+                  </a>
+                  <Link
+                    href="/experiencers"
+                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    onClick={() => setAboutOpen(false)}
+                  >
+                    For Experiencers
+                  </Link>
+                </div>
+              )}
             </div>
 
 
@@ -196,47 +196,47 @@ export default function SiteHeader() {
             >
               Contribute
             </a>
-            
+
             {/* Auth Button */}
             <div className="flex items-center">
               {user ? (
-                  <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                              <Avatar className="h-8 w-8">
-                                  <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email} />
-                                  <AvatarFallback>
-                                      <UserIcon className="h-5 w-5" />
-                                  </AvatarFallback>
-                              </Avatar>
-                          </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56" align="end" forceMount>
-                          <DropdownMenuLabel className="font-normal">
-                          <div className="flex flex-col space-y-1">
-                              <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || user.email}</p>
-                              <p className="text-xs leading-none text-muted-foreground">
-                              {user.email}
-                              </p>
-                          </div>
-                          </DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem asChild>
-                              <Link href="/dashboard">Dashboard</Link>
-                          </DropdownMenuItem>
-                           <DropdownMenuItem asChild>
-                              <Link href="/profile">Profile</Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={handleLogout}>
-                              Log out
-                          </DropdownMenuItem>
-                      </DropdownMenuContent>
-                  </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email} />
+                        <AvatarFallback>
+                          <UserIcon className="h-5 w-5" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || user.email}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard">Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                  <Button asChild>
-                      <Link href="/login">Login</Link>
-                  </Button>
+                <Button asChild>
+                  <Link href="/login">Login</Link>
+                </Button>
               )}
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function SiteHeader() {
               <div className="flex flex-col h-full">
                 {/* Header with Close button */}
                 <div className="flex items-center justify-between p-4 border-b">
-                   <h2 className="text-lg font-semibold">Menu</h2>
+                  <h2 className="text-lg font-semibold">Menu</h2>
                   <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
                     <X className="h-6 w-6" />
                   </Button>
@@ -259,33 +259,33 @@ export default function SiteHeader() {
 
                 {/* Menu Items */}
                 <div className="flex-1 px-6 py-4 space-y-6 overflow-y-auto">
-                   {/* User Profile / Login */}
-                   {user ? (
+                  {/* User Profile / Login */}
+                  {user ? (
                     <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-3">
-                            <Avatar>
-                                <AvatarImage src={user.user_metadata?.avatar_url} />
-                                <AvatarFallback><UserIcon /></AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col">
-                                <span className="font-semibold text-sm">{user.user_metadata?.full_name || user.email}</span>
-                                <Link href="/dashboard" className="text-xs text-primary hover:underline" onClick={() => setMobileMenuOpen(false)}>View Dashboard</Link>
-                            </div>
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarImage src={user.user_metadata?.avatar_url} />
+                          <AvatarFallback><UserIcon /></AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-sm">{user.user_metadata?.full_name || user.email}</span>
+                          <Link href="/dashboard" className="text-xs text-primary hover:underline" onClick={() => setMobileMenuOpen(false)}>View Dashboard</Link>
                         </div>
-                         <Button variant="outline" onClick={handleLogout}>
-                            <LogOut className="w-4 h-4 mr-2" />
-                            Logout
-                        </Button>
+                      </div>
+                      <Button variant="outline" onClick={handleLogout}>
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Logout
+                      </Button>
                     </div>
                   ) : (
                     <Button asChild className="w-full">
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                            <LogIn className="w-4 h-4 mr-2" />
-                            Login / Sign Up
-                        </Link>
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                        <LogIn className="w-4 h-4 mr-2" />
+                        Login / Sign Up
+                      </Link>
                     </Button>
                   )}
-                  
+
                   <div className="w-full h-[1px] bg-gray-200" />
 
                   {/* Tools Section */}
@@ -302,14 +302,14 @@ export default function SiteHeader() {
                     {mobileToolsOpen && (
                       <div className="space-y-3 pl-4">
                         <Link
-                          href="/search2"
+                          href="/search3"
                           className="block text-gray-600 hover:text-gray-900"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Search NDE Videos
                         </Link>
                         <Link
-                          href="/chat"
+                          href="/chat-compassionate"
                           className="block text-gray-600 hover:text-gray-900"
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -340,34 +340,34 @@ export default function SiteHeader() {
                     </div>
                     {mobileAboutOpen && (
                       <div className="space-y-3 pl-4">
-                          <Link
-                            href="/about#projects"
-                            className="block text-gray-900 hover:text-gray-600"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Projects
-                          </Link>
-                          <Link
-                            href="/about#connect"
-                            className="block text-gray-900 hover:text-gray-600"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Connect
-                          </Link>
-                          <a
-                            href="https://blog.projectprofound.org"
-                            className="block text-gray-900 hover:text-gray-600"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Blog
-                          </a>
-                          <Link
-                            href="/experiencers"
-                            className="block text-gray-900 hover:text-gray-600"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            For Experiencers
-                          </Link>
+                        <Link
+                          href="/about#projects"
+                          className="block text-gray-900 hover:text-gray-600"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Projects
+                        </Link>
+                        <Link
+                          href="/about#connect"
+                          className="block text-gray-900 hover:text-gray-600"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Connect
+                        </Link>
+                        <a
+                          href="https://blog.projectprofound.org"
+                          className="block text-gray-900 hover:text-gray-600"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Blog
+                        </a>
+                        <Link
+                          href="/experiencers"
+                          className="block text-gray-900 hover:text-gray-600"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          For Experiencers
+                        </Link>
                       </div>
                     )}
                   </div>

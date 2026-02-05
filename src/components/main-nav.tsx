@@ -21,22 +21,13 @@ export function MainNav() {
       </Link>
       <nav className="flex items-center gap-6 text-sm">
         <Link
-          href="/search"
+          href="/search3"
           className={cn(
             "transition-colors hover:text-foreground/80",
-            pathname === "/search" ? "text-foreground" : "text-foreground/60"
+            pathname === "/search3" ? "text-foreground" : "text-foreground/60"
           )}
         >
           Search
-        </Link>
-        <Link
-          href="/search2"
-          className={cn(
-            "transition-colors hover:text-foreground/80",
-            pathname === "/search2" ? "text-foreground" : "text-foreground/60"
-          )}
-        >
-          Search V2
         </Link>
         <Link
           href="/about"
