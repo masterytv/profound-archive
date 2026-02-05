@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { User, Shield, Ban, CheckCircle } from "lucide-react";
-import { toggleBanUser, updateUserRole } from "../actions";
+import { User, Shield, Ban, CheckCircle, Trash2 } from "lucide-react";
+import { toggleBanUser, updateUserRole, deleteUser } from "../actions";
 
 type Profile = {
     id: string;
@@ -40,6 +40,18 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
         }
     };
 
+    const handleDelete = async () => {
+        if (!confirm("Are you sure you want to PERMANENTLY delete this user? This action cannot be undone.")) return;
+
+        setIsUpdating(true);
+        const result = await deleteUser(profile.id);
+        setIsUpdating(false);
+
+        if (!result.success) {
+            alert("Error deleting user: " + result.error);
+        }
+    };
+
     return (
         <tr className="hover:bg-gray-50">
             <td className="px-6 py-4 whitespace-nowrap">
@@ -67,8 +79,8 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
                     value={profile.role || "user"}
                     onChange={(e) => handleRoleChange(e.target.value as any)}
                     className={`text-xs font-semibold inline-flex px-2 py-1 leading-5 rounded-full ${profile.role === 'super_admin' ? 'bg-purple-100 text-purple-800' :
-                            profile.role === 'admin' ? 'bg-blue-100 text-blue-800' :
-                                'bg-gray-100 text-gray-800'
+                        profile.role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
                         }`}
                 >
                     <option value="user">User</option>
@@ -79,8 +91,8 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
             <td className="px-6 py-4 whitespace-nowrap">
                 <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${profile.is_banned
-                            ? "bg-red-100 text-red-800"
-                            : "bg-green-100 text-green-800"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-green-100 text-green-800"
                         }`}
                 >
                     {profile.is_banned ? "Banned" : "Active"}
@@ -94,6 +106,14 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
                         } font-bold`}
                 >
                     {profile.is_banned ? "Unban" : "Ban"}
+                </button>
+                <button
+                    onClick={handleDelete}
+                    disabled={isUpdating}
+                    className="ml-4 text-red-600 hover:text-red-900 font-bold"
+                    title="Delete User"
+                >
+                    <Trash2 className="h-5 w-5" />
                 </button>
             </td>
         </tr>

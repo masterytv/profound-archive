@@ -44,18 +44,20 @@ export async function middleware(request: NextRequest) {
         }
 
         // Check for admin role
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
             .from("profiles")
             .select("role, is_banned")
             .eq("id", user.id)
             .single();
 
         if (!profile || (profile.role !== "admin" && profile.role !== "super_admin")) {
+            console.log("Middleware Access Denied -> Redirecting to /");
             // Redirect to home or a 403 page
             return NextResponse.redirect(new URL("/", request.url));
         }
 
-        if (profile.is_banned) {
+        if (profile && profile.is_banned) {
+            console.log("User is banned -> Redirecting");
             // Redirect to banned page or show error (using home for now with param)
             return NextResponse.redirect(new URL("/?error=banned", request.url));
         }

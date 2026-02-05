@@ -38,10 +38,7 @@ export default async function AdminUsersPage() {
     const { data: profiles } = await supabase
         .from("profiles")
         .select("*")
-        .order("created_at", { ascending: false, nullsFirst: false } as any) // created_at might not exist on profiles based on schema?
-        // checking schema: profiles has id, full_name, avatar_url, role, is_banned. NO created_at.
-        // So we just order by full_name or id.
-        .order("full_name")
+        .order("full_name", { ascending: true })
         .limit(50);
 
     return (

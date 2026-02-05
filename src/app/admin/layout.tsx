@@ -50,6 +50,7 @@ export default async function AdminLayout({
         .single();
 
     if (!profile || (profile.role !== "admin" && profile.role !== "super_admin")) {
+        console.log("Admin Access Denied. Redirecting to /");
         redirect("/");
     }
 
