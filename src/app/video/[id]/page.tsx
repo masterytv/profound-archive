@@ -10,6 +10,7 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
+import { GreysonScoreCard, GreysonBreakdown } from "@/components/video/GreysonScoreCard";
 
 interface VideoPageProps {
     params: Promise<{ id: string }>;
@@ -146,6 +147,18 @@ export default async function VideoPage({ params }: VideoPageProps) {
         notFound();
     }
 
+    // Fetch analysis data separately to avoid join issues
+    const { data: analysis, error: analysisError } = await supabase
+        .from("nde_analysis")
+        .select("total_greyson_score, scale_agreement, greyson_breakdown")
+        .eq("video_id", id)
+        .single();
+
+    console.log(`[VideoPage] ID: ${id}`);
+    console.log(`[VideoPage] Analysis Error:`, analysisError);
+    console.log(`[VideoPage] Analysis Data:`, analysis ? 'Present' : 'Null');
+    if (analysis) console.log(JSON.stringify(analysis, null, 2));
+
     const youtubeEmbedUrl = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`;
 
     return (
@@ -220,65 +233,78 @@ export default async function VideoPage({ params }: VideoPageProps) {
                     </Link>
                 </div>
 
-                {/* AI Summary and Veridical Score - side by side, responsive */}
-                <div className="flex flex-col lg:flex-row gap-6 mb-8">
-                    {/* AI Summary - takes more space */}
+                {/* Scores & Summary Section - 3 Column Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
+                    {/* 1. AI Summary */}
                     {video.analysis_nde_summary && (
-                        <Card className="flex-1 lg:flex-[2]">
+                        <Card className="h-full flex flex-col">
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-2 text-lg">
                                     <Sparkles className="w-5 h-5 text-purple-500" />
                                     AI Summary
-                                    <Badge variant="outline" className="text-[10px] font-normal ml-2">
-                                        AI-generated • May contain errors
+                                    <Badge variant="outline" className="text-[10px] font-normal ml-auto">
+                                        AI-generated
                                     </Badge>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <p className="text-foreground/90 leading-relaxed whitespace-pre-line">
+                            <CardContent className="flex-1">
+                                <p className="text-foreground/90 leading-relaxed whitespace-pre-line text-sm">
                                     {video.analysis_nde_summary}
                                 </p>
                             </CardContent>
                         </Card>
                     )}
 
-                    {/* Veridical Perception Score */}
+                    {/* 2. Greyson Scale - Middle */}
+                    {analysis && analysis.greyson_breakdown && (
+                        <GreysonScoreCard
+                            totalScore={analysis.total_greyson_score}
+                            classification={analysis.scale_agreement}
+                            breakdown={analysis.greyson_breakdown as GreysonBreakdown}
+                        />
+                    )}
+
+                    {/* 3. Veridical Perception Score - Right */}
                     {(video.rvnde_total_score !== null || video.rvnde_level) && (
-                        <Card className={`flex-1 lg:flex-[1] border-2 ${getLevelColor(video.rvnde_level)}`}>
+                        <Card className={`h-full flex flex-col border-2 ${getLevelColor(video.rvnde_level)}`}>
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-2 text-base">
                                     <TrendingUp className="w-5 h-5" />
-                                    Veridical Perception Score (rvNDE)
+                                    Veridical Perception (rvNDE)
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3">
+                            <CardContent className="space-y-3 flex-1">
                                 {video.rvnde_total_score !== null && (
-                                    <div className="text-4xl font-bold">
-                                        {video.rvnde_total_score}
-                                        <span className="text-lg font-normal text-muted-foreground">/28</span>
+                                    <div className="flex items-baseline gap-2">
+                                        <div className="text-4xl font-bold">
+                                            {video.rvnde_total_score}
+                                        </div>
+                                        <div className="text-lg font-normal text-muted-foreground">/ 28</div>
+                                        {video.rvnde_level && (
+                                            <Badge variant="secondary" className={`${getLevelColor(video.rvnde_level)} ml-auto`}>
+                                                {video.rvnde_level}
+                                            </Badge>
+                                        )}
                                     </div>
-                                )}
-
-                                {video.rvnde_level && (
-                                    <Badge variant="secondary" className={getLevelColor(video.rvnde_level)}>
-                                        {video.rvnde_level}
-                                    </Badge>
                                 )}
 
                                 {video.rvnde_summary_reason && (
                                     <p className="text-sm text-foreground/80">{video.rvnde_summary_reason}</p>
                                 )}
 
+                                {/* Spacer to push details to bottom if needed, or just flow naturally */}
+                                <div className="flex-1" />
+
                                 {video.rvnde_details && (
                                     <Collapsible>
                                         <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" size="sm" className="w-full justify-between text-xs">
+                                            <Button variant="ghost" size="sm" className="w-full justify-between text-xs mt-2">
                                                 View Details
                                                 <ChevronDown className="w-4 h-4" />
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="pt-2">
-                                            <div className="text-sm bg-white/50 p-4 rounded-md max-h-80 overflow-y-auto">
+                                            <div className="text-sm bg-white/50 p-3 rounded-md max-h-60 overflow-y-auto">
                                                 {formatRvndeDetails(video.rvnde_details)}
                                             </div>
                                         </CollapsibleContent>

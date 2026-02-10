@@ -38,4 +38,8 @@ env:
   # Securely reference the Supabase Service Key from Secret Manager
   - variable: SUPABASE_SERVICE_KEY
     secret: SUPABASE_SERVICE_KEY
+
+  # Secret for securing Cron/Automated jobs
+  - variable: CRON_SECRET
+    secret: CRON_SECRET
 # Trigger new build after granting secret access
