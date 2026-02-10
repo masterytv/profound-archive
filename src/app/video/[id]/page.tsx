@@ -270,7 +270,10 @@ export default async function VideoPage({ params }: VideoPageProps) {
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-2 text-base">
                                     <TrendingUp className="w-5 h-5" />
-                                    Veridical Perception (rvNDE)
+                                    <span>Veridical Perception (<Link href="/scale/cvnde" target="_blank" className="hover:underline">cvNDE</Link>)</span>
+                                    <Link href="/scale/cvnde" target="_blank" className="ml-1 text-muted-foreground hover:text-primary transition-colors">
+                                        <ExternalLink className="w-4 h-4" />
+                                    </Link>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3 flex-1">
