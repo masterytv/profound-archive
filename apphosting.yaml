@@ -40,7 +40,7 @@ env:
     secret: SUPABASE_SERVICE_KEY
 
   - variable: OPENAI_API_KEY
-    secret: projects/studio-9638832619-7f197/secrets/OPENAI_API_KEY/versions/1
+    secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/1
 
   # Secret for securing Cron/Automated jobs
 #   - variable: CRON_SECRET
