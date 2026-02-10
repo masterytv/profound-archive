@@ -43,6 +43,6 @@ env:
     secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/1
 
   # Secret for securing Cron/Automated jobs
-#   - variable: CRON_SECRET
-#     secret: projects/432036554831/secrets/CRON_SECRET/versions/1
+  - variable: CRON_SECRET
+    secret: CRON_SECRET
 # Trigger new build after granting secret access
