@@ -17,3 +17,18 @@
 
 ## 3. Persistent Bugs to Watch Out For
 - **Auth State:** `SupabaseAuthContext` generally handles state, checking `supabase.auth.getUser()` in generic layouts can be flaky.
+
+## 4. Deployment & Build Gotchas (Firebase App Hosting)
+### A. Build-Time vs Run-Time Errors
+- **Lazy Initialization Required:** Next.js tries to execute top-level code in API routes during the build process (static analysis). If you have `const openai = new OpenAI(...)` at the top level, the build will **FAIL** because secrets like `OPENAI_API_KEY` are not available in the build environment.
+  - **Fix:** Always initialize clients *inside* the handler function or use a lazy getter: `const getOpenAI = () => new OpenAI(...)`.
+
+### B. Secrets & IAM Permissions
+- **Service Account Confusion:** App Hosting builds run as `firebase-app-hosting-compute@...`, **NOT** the default compute service account. Always check the build logs for the exact email.
+- **Project-Level Permissions:** For Secret Manager access, granting permission on the specific secret resource is sometimes insufficient for the build process to "discover" the secret.
+  - **Fix:** Grant `Secret Manager Secret Accessor` at the **Project Level** (IAM Page), not just on the Secret itself.
+- **Secret Reference Format:** in `apphosting.yaml`, references to secrets work most reliably using the **Project Number**, not the Project ID.
+  - **Good:** `projects/123456789/secrets/MY_SECRET/versions/1`
+  - **Bad:** `projects/my-project-id/secrets/MY_SECRET/versions/1`
+- **Version Pinning (Critical):** The `Secret Manager Secret Accessor` role **does not** allow resolving `versions/latest`.
+  - **Fix:** You *MUST* pin the specific version number (e.g., `versions/1` or `versions/3`) in `apphosting.yaml`. attempting to use `latest` will result in `PermissionDenied` errors during build.
