@@ -44,5 +44,5 @@ env:
 
   # Secret for securing Cron/Automated jobs
   - variable: CRON_SECRET
-    secret: projects/432036554831/secrets/CRON_SECRET/versions/latest
+    secret: projects/432036554831/secrets/CRON_SECRET/versions/3
 # Trigger new build after granting secret access
