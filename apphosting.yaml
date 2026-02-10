@@ -40,6 +40,6 @@ env:
     secret: SUPABASE_SERVICE_KEY
 
   # Secret for securing Cron/Automated jobs
-  - variable: CRON_SECRET
-    secret: projects/432036554831/secrets/CRON_SECRET/versions/1
+#   - variable: CRON_SECRET
+#     secret: projects/432036554831/secrets/CRON_SECRET/versions/1
 # Trigger new build after granting secret access
