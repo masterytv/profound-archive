@@ -4,9 +4,14 @@ import OpenAI from 'openai';
 // Initialize OpenAI client
 // Note: In server-side contexts, we can instantiate this here.
 // In edge functions, we might need to instantiate inside the function.
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client lazily
+const getOpenAIClient = () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        throw new Error("Missing OPENAI_API_KEY environment variable");
+    }
+    return new OpenAI({ apiKey });
+};
 
 export const GREYSON_ANALYSIS_PROMPT = `You are an expert NDE researcher. Analyze the following NDE account using the Greyson NDE Scale.
 The scale has 16 items across 4 categories. Each item is scored 0 (not present), 1 (mildly or ambiguously present), or 2 (definitely present).
@@ -121,6 +126,7 @@ export async function analyzeGreysonScore(subtitles: string): Promise<GreysonAna
     const truncatedSubtitles = subtitles.slice(0, 50000);
 
     try {
+        const openai = getOpenAIClient();
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
