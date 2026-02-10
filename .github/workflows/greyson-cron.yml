@@ -9,7 +9,7 @@ on:
       limit:
         description: 'Number of videos to process per batch call'
         required: true
-        default: '10'
+        default: '3'
       loops:
         description: 'Number of batch calls to make'
         required: true
@@ -23,7 +23,7 @@ jobs:
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          BATCH_LIMIT: ${{ inputs.limit || '10' }}
+          BATCH_LIMIT: ${{ inputs.limit || '3' }}
           LOOP_COUNT: ${{ inputs.loops || '50' }}
         run: |
           echo "Starting batch processing..."

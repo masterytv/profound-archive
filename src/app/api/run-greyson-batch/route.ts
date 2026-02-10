@@ -8,18 +8,36 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+export const maxDuration = 300; // 5 minutes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const targetVideoId = searchParams.get('videoId');
         const verifyMode = searchParams.get('verify') === 'true';
         const limitStr = searchParams.get('limit');
-        const limit = limitStr ? parseInt(limitStr) : (targetVideoId ? 1 : 5);
+        const limit = limitStr ? parseInt(limitStr) : (targetVideoId ? 1 : 3);
 
         // Security Check
         const authHeader = request.headers.get('authorization');
-        if (authHeader !== `Bearer ${process.env.CRON_SECRET}` && !process.env.IS_DEBUG_MODE) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const expectedSecret = process.env.CRON_SECRET;
+
+        // DEBUG LOGGING
+        console.log('--- DEBUG AUTH ---');
+        console.log(`Has Auth Header: ${!!authHeader}`);
+        console.log(`Auth Header Length: ${authHeader?.length}`);
+        console.log(`Has Server Secret: ${!!expectedSecret}`);
+        console.log(`Server Secret Length: ${expectedSecret?.length}`);
+
+        if (!expectedSecret) {
+            console.error('CRON_SECRET is not set on the server!');
+            return NextResponse.json({ error: 'Unauthorized: Server configuration error (Secret missing)' }, { status: 500 });
+        }
+
+        if (authHeader !== `Bearer ${expectedSecret}` && !process.env.IS_DEBUG_MODE) {
+            console.warn('Auth token mismatch.');
+            return NextResponse.json({ error: `Unauthorized: Token mismatch (Received ${authHeader?.length || 0} chars, Expected ${expectedSecret.length + 7} chars)` }, { status: 401 });
         }
 
         console.log(`Starting Greyson Analysis Batch via API... (Limit: ${limit}, Target: ${targetVideoId || 'None'})`);
