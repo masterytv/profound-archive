@@ -74,11 +74,12 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: 'No videos found.' }, { status: 404 });
         }
 
-        const results = [];
-        let processedCount = 0;
 
+
+        // Identify videos to process
+        const videosToProcess = [];
         for (const video of videos) {
-            if (processedCount >= limit) break;
+            if (videosToProcess.length >= limit) break;
 
             // Check if analysis already exists
             const { data: existingAnalysis } = await supabase
@@ -87,61 +88,80 @@ export async function GET(request: Request) {
                 .eq('video_id', video.videoId)
                 .single();
 
-            // Skip if exists AND NOT targeting specific video (if targeting, we overwrite/update)
+            // Skip if exists AND NOT targeting specific video
             if (!targetVideoId && existingAnalysis?.greyson_breakdown) {
-                // console.log(`Skipping ${video.videoId} - already analyzed.`);
                 continue;
             }
 
-            console.log(`Analyzing: ${video.title} (${video.videoId})...`);
-
             if (!video.subtitles_punctuated) continue;
 
-            const analysisResult = await analyzeGreysonScore(video.subtitles_punctuated);
-
-            if (analysisResult) {
-                // Save to Database
-                const { data: checkRow } = await supabase
-                    .from('nde_analysis')
-                    .select('video_id')
-                    .eq('video_id', video.videoId)
-                    .single();
-
-                let dbOp;
-                if (checkRow) {
-                    dbOp = await supabase
-                        .from('nde_analysis')
-                        .update({
-                            total_greyson_score: analysisResult.total_score,
-                            scale_agreement: analysisResult.classification,
-                            greyson_breakdown: analysisResult.breakdown as any
-                        })
-                        .eq('video_id', video.videoId);
-                } else {
-                    dbOp = await supabase
-                        .from('nde_analysis')
-                        .insert({
-                            video_id: video.videoId,
-                            total_greyson_score: analysisResult.total_score,
-                            scale_agreement: analysisResult.classification,
-                            greyson_breakdown: analysisResult.breakdown as any
-                        });
-                }
-
-                if (dbOp.error) {
-                    console.error(`Error saving ${video.videoId}:`, dbOp.error);
-                    results.push({ videoId: video.videoId, status: 'error', error: dbOp.error.message });
-                } else {
-                    console.log(`Saved analysis for ${video.videoId}`);
-                    results.push({ videoId: video.videoId, status: 'success', score: analysisResult.total_score });
-                    processedCount++;
-                }
-
-            } else {
-                console.error(`Failed to analyze ${video.videoId}`);
-                results.push({ videoId: video.videoId, status: 'failed_analysis' });
-            }
+            videosToProcess.push(video);
         }
+
+        if (videosToProcess.length === 0) {
+            return NextResponse.json({
+                message: `Batch complete. No new videos to process.`,
+                processedCount: 0,
+                results: []
+            });
+        }
+
+        // Process in Parallel
+        console.log(`Processing ${videosToProcess.length} videos in parallel...`);
+
+        const processPromises = videosToProcess.map(async (video) => {
+            try {
+                console.log(`Analyzing: ${video.title} (${video.videoId})...`);
+                const analysisResult = await analyzeGreysonScore(video.subtitles_punctuated);
+
+                if (analysisResult) {
+                    // Save to Database
+                    const { data: checkRow } = await supabase
+                        .from('nde_analysis')
+                        .select('video_id')
+                        .eq('video_id', video.videoId)
+                        .single();
+
+                    let dbOp;
+                    if (checkRow) {
+                        dbOp = await supabase
+                            .from('nde_analysis')
+                            .update({
+                                total_greyson_score: analysisResult.total_score,
+                                scale_agreement: analysisResult.classification,
+                                greyson_breakdown: analysisResult.breakdown as any
+                            })
+                            .eq('video_id', video.videoId);
+                    } else {
+                        dbOp = await supabase
+                            .from('nde_analysis')
+                            .insert({
+                                video_id: video.videoId,
+                                total_greyson_score: analysisResult.total_score,
+                                scale_agreement: analysisResult.classification,
+                                greyson_breakdown: analysisResult.breakdown as any
+                            });
+                    }
+
+                    if (dbOp.error) {
+                        console.error(`Error saving ${video.videoId}:`, dbOp.error);
+                        return { videoId: video.videoId, status: 'error', error: dbOp.error.message };
+                    } else {
+                        console.log(`Saved analysis for ${video.videoId}`);
+                        return { videoId: video.videoId, status: 'success', score: analysisResult.total_score };
+                    }
+                } else {
+                    console.error(`Failed to analyze ${video.videoId}`);
+                    return { videoId: video.videoId, status: 'failed_analysis' };
+                }
+            } catch (err: any) {
+                console.error(`Exception analyzing ${video.videoId}:`, err);
+                return { videoId: video.videoId, status: 'error', error: err.message };
+            }
+        });
+
+        const results = await Promise.all(processPromises);
+        const processedCount = results.filter(r => r.status === 'success').length;
 
         return NextResponse.json({
             message: `Batch complete. Processed ${processedCount} videos.`,
