@@ -8,7 +8,7 @@
 |---|---|---|---|
 | **NDE Compassionate Chatbot** | 🔄 Hybrid | Chat | `src/app/api/chat-compassionate` (Logic moved, maybe n8n used for backup?) |
 | **NDE Research Chatbot** | ⬜ Not Started | Chat | - |
-| **Search Logic** | ⚠️ Proxy | Search | `src/app/api/search` (Proxies to n8n Webhook) |
+| **Search Logic** | ✅ Native | Search | `src/app/api/search3` (Integrated) |
 | **NDE Video Verification** | ⬜ Not Started | Data Pipeline | - |
 | **NDE Summary Creator** | ⬜ Not Started | Data Pipeline | - |
 | **NDE Video Researcher 2** | ⬜ Not Started | Research | - |

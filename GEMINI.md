@@ -51,7 +51,7 @@ All detailed documentation lives in the `/docs` folder. Start here:
 
 ## Current Development Status
 ### Completed
-- Core NDE search and display.
+- Core NDE search and display (Search3/Native).
 - Compassionate Chat (Hybrid native/Supabase).
 - User Auth & Profiles.
 

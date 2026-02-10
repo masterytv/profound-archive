@@ -1,6 +1,6 @@
 # Search / Vector Search Logic
 
-**Status:** ⚠️ Native Proxy -> n8n
+**Status:** ✅ Native Logic
 **File:** N/A (Likely part of a larger workflow or one of the vector/search JSONs)
 
 ## Description
