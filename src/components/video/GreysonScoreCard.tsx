@@ -4,7 +4,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Info, Brain, Heart, Sparkles, Ghost } from 'lucide-react';
+import { ExternalLink, Brain, Heart, Sparkles, Ghost } from 'lucide-react';
+import Link from 'next/link';
 import {
     Tooltip,
     TooltipContent,
@@ -109,16 +110,9 @@ export function GreysonScoreCard({ totalScore, classification, breakdown }: Grey
                 <CardTitle className="flex items-center justify-between text-base">
                     <div className="flex items-center gap-2">
                         Greyson NDE Scale
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Info className="w-3 h-3 text-muted-foreground hover:text-foreground transition-colors" />
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-sm">
-                                    <p>The Greyson Scale is a validated scientific measure of NDE depth. It rates 16 items across 4 categories. A score of 7+ typically indicates a genuine NDE. Maximum score is 32.</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <Link href="/scale/greyson" target="_blank" className="text-muted-foreground hover:text-primary transition-colors">
+                            <ExternalLink className="w-4 h-4" />
+                        </Link>
                     </div>
                 </CardTitle>
             </CardHeader>
