@@ -13,46 +13,62 @@ interface FavoriteButtonProps {
   videoId: string;
   videoTitle: string;
   videoThumbnailUrl?: string;
+  user?: User | null;
 }
 
-export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl }: FavoriteButtonProps) {
-  const [user, setUser] = useState<User | null>(null);
+export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl, user: initialUser }: FavoriteButtonProps) {
+  const [user, setUser] = useState<User | null>(initialUser || null);
   const [isFavorited, setIsFavorited] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); 
-  const supabase = createClient();
+  const [isLoading, setIsLoading] = useState(true);
+  const [supabase] = useState(() => createClient());
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
+    let isMounted = true;
     const checkUserAndFavoriteStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      console.log(`[FavoriteButton] Checking status for ${videoId}`);
+      try {
+        let currentUser = initialUser;
+        if (!currentUser) {
+          const { data: { session } } = await supabase.auth.getSession();
+          currentUser = session?.user ?? null;
+        }
 
-      if (user) {
-        // Find the 'Favorites' collection ID
-        const { data: collection } = await supabase
-          .from('collections')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('name', 'Favorites')
-          .single();
+        if (!isMounted) return;
+        setUser(currentUser);
 
-        if (collection) {
-          // Check if this video is already favorited in that collection
-          const { data: favorite } = await supabase
-            .from('favorites')
+        if (currentUser) {
+          const { data: collection } = await supabase
+            .from('collections')
             .select('id')
-            .eq('collection_id', collection.id)
-            .eq('video_id', videoId)
+            .eq('user_id', currentUser.id)
+            .eq('name', 'Favorites')
             .single();
-            
-          setIsFavorited(!!favorite);
+
+          if (collection && isMounted) {
+            const { data: favorite } = await supabase
+              .from('favorites')
+              .select('id')
+              .eq('collection_id', collection.id)
+              .eq('video_id', videoId)
+              .single();
+
+            if (isMounted) setIsFavorited(!!favorite);
+          }
+        }
+      } catch (error) {
+        console.error(`[FavoriteButton] Error for ${videoId}:`, error);
+      } finally {
+        if (isMounted) {
+          console.log(`[FavoriteButton] Check complete for ${videoId}`);
+          setIsLoading(false);
         }
       }
-      setIsLoading(false);
     };
 
     checkUserAndFavoriteStatus();
+    return () => { isMounted = false; };
   }, [supabase, videoId]);
 
   const toggleFavorite = async () => {
@@ -86,7 +102,7 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl 
         .insert({ user_id: user.id, name: 'Favorites' })
         .select('id')
         .single();
-      
+
       if (error) {
         console.error('Error creating collection:', error);
         toast({ title: 'Error', description: 'Could not create a favorites collection.', variant: 'destructive' });
@@ -95,10 +111,10 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl 
       }
       collection = newCollection;
     }
-    
+
     if (!collection) {
-        setIsLoading(false);
-        return;
+      setIsLoading(false);
+      return;
     }
 
     // 2. Add or remove from favorites
@@ -152,9 +168,8 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl 
         <Loader2 className="h-5 w-5 animate-spin" />
       ) : (
         <Star
-          className={`h-5 w-5 ${
-            isFavorited ? 'text-yellow-500 fill-yellow-400' : 'text-gray-400'
-          }`}
+          className={`h-5 w-5 ${isFavorited ? 'text-yellow-500 fill-yellow-400' : 'text-gray-400'
+            }`}
         />
       )}
     </Button>

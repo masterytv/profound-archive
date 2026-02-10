@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
 import { SearchResultCard } from "@/components/search-result-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -339,7 +339,7 @@ function SearchV2Content() {
         return Array.from(grouped.values());
     };
 
-    const groupedResults = groupResultsByVideo(results);
+    const groupedResults = useMemo(() => groupResultsByVideo(results), [results]);
 
     const formatFacetTitle = (fieldName: string) => {
         if (fieldName === 'isNde') return 'Is NDE?';
@@ -515,6 +515,7 @@ function SearchV2Content() {
                                             video={video}
                                             searchTerm={searchTerm}
                                             onTagClick={() => { }}
+                                            user={user}
                                         />
                                     ))}
 

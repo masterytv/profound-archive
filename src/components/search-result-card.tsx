@@ -38,20 +38,13 @@ interface SearchResultCardProps {
     searchTerm?: string;
     searchType?: string;
     onTagClick?: (tag: string) => void;
+    user?: User | null;
 }
 
-export function SearchResultCard({ result, video, searchTerm }: SearchResultCardProps) {
-    const [user, setUser] = useState<User | null>(null);
+export function SearchResultCard({ result, video, searchTerm, user }: SearchResultCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const supabase = createClient()
 
-    useEffect(() => {
-        const getUser = async () => {
-            const { data } = await supabase.auth.getUser()
-            setUser(data.user)
-        }
-        getUser()
-    }, [supabase])
 
     // Data Normalization
     let displayData: {
@@ -186,10 +179,19 @@ export function SearchResultCard({ result, video, searchTerm }: SearchResultCard
                             </Link>
                         </h3>
                         <div className="flex items-center flex-shrink-0">
+                            <SaveToCollectionButton
+                                videoId={displayData.video_id}
+                                videoTitle={displayData.title}
+                                videoThumbnailUrl={displayData.thumbnailUrl}
+                                startTime={0}
+                                content={displayData.summary}
+                                user={user}
+                            />
                             <FavoriteButton
                                 videoId={displayData.video_id}
                                 videoTitle={displayData.title}
                                 videoThumbnailUrl={displayData.thumbnailUrl}
+                                user={user}
                             />
                         </div>
                     </div>
@@ -243,6 +245,7 @@ export function SearchResultCard({ result, video, searchTerm }: SearchResultCard
                                                 videoThumbnailUrl={displayData.thumbnailUrl}
                                                 startTime={t.start_time!}
                                                 content={t.content}
+                                                user={user}
                                             />
                                         )}
                                     </div>

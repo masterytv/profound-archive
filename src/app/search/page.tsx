@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, MessageSquare, Loader2, Bookmark } from "lucide-react"
@@ -283,7 +283,7 @@ function SearchPageContent() {
     return Array.from(grouped.values())
   }
 
-  const groupedResults = groupResultsByVideo(results)
+  const groupedResults = useMemo(() => groupResultsByVideo(results), [results])
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -408,6 +408,7 @@ function SearchPageContent() {
                 searchTerm={searchTerm}
                 searchType={searchType === "semantic" ? "concept" : "keyword"}
                 onTagClick={() => { }}
+                user={user}
               />
             ))}
 

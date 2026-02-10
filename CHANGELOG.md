@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-02-10
+### Added
+- **Documentation System:** Complete overhaul of project documentation in `/docs`.
+- **Environment config:** added `.env.example` and `docs/ENVIRONMENT.md`.
+- **Guides:** Added guides for Vibecoding, New Features, and API Integrations.
+- **Workflow Tracking:** Documented n8n workflow migration status.
+- **AI Context:** Added `GEMINI.md` for AI-assisted development.
+
+### Changed
+- Standardized `README.md` to point to the new documentation.
+
 ### Added
 - **New About Us Page:** Created a new `/aboutus` page with updated content and a responsive, card-based layout.
 - **About Us Submenu:** Added a dropdown menu to the "About Us" navigation link with quick links to the "Connect" section and the external blog.
