@@ -12,6 +12,8 @@ The application uses the **Next.js 14+ App Router**. Routes are defined by the f
 | `/search` | `src/app/search/page.tsx` | Main Search Interface | No |
 | `/chat-compassionate` | `src/app/chat-compassionate/page.tsx` | AI Chat | No (but sessions logged) |
 | `/video/[id]` | `src/app/video/[id]/page.tsx` | Video Details Page | No |
+| `/scale/greyson` | `src/app/scale/greyson/page.tsx` | Greyson NDE Scale Info | No |
+| `/scale/cvnde` | `src/app/scale/cvnde/page.tsx` | cvNDE Perception Scale Info | No |
 | `/profile` | `src/app/profile/page.tsx` | User Profile | **Yes** |
 | `/dashboard` | `src/app/dashboard/page.tsx` | User Dashboard | **Yes** |
 | `/admin` | `src/app/admin/page.tsx` | Admin Dashboard | **Yes (Admin Role)** |

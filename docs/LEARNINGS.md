@@ -40,4 +40,16 @@
 - **The Fix:**
   1.  **Parallel Processing:** Always use `Promise.all()` to process batch items concurrently. This changes the total duration from `sum(video_times)` to `max(video_time)`.
   2.  **Small Batches:** Reduce batch size (e.g., to 3-5) and run more frequently, rather than trying to process large chunks at once.
+### B. Secrets Management for Automated Workflows
+- **Cron Secrets:** When calling internal API endpoints from GitHub Actions or cron jobs, ensure the `CRON_SECRET` env var is set and the endpoint validates it.
 
+## 6. Local Development Environment
+### A. npm Permissions (EPERM Errors)
+- **Root-Owned Cache:** Running `npm install` with `sudo` (even accidentally) can leave root-owned files in `~/.npm`. This causes persistent `EPERM` errors.
+  - **Fix:** `sudo chown -R $(whoami) ~/.npm` and `sudo chown -R $(whoami) .` in the project directory.
+- **macOS Quarantine (esbuild Error -88):** After a fresh `npm install`, macOS Gatekeeper may quarantine downloaded binaries (like `esbuild`), causing `Unknown system error -88`.
+  - **Fix:** 
+    1. `npm install --ignore-scripts`
+    2. `xattr -dr com.apple.quarantine node_modules/esbuild node_modules/@esbuild`
+    3. `node node_modules/esbuild/install.js`
+- **Nuclear Option:** If permissions are hopelessly broken, delete the entire cache: `sudo rm -rf ~/.npm` then `rm -rf node_modules package-lock.json && npm install`.
