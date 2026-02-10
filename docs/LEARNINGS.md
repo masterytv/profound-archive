@@ -32,3 +32,12 @@
   - **Bad:** `projects/my-project-id/secrets/MY_SECRET/versions/1`
 - **Version Pinning (Critical):** The `Secret Manager Secret Accessor` role **does not** allow resolving `versions/latest`.
   - **Fix:** You *MUST* pin the specific version number (e.g., `versions/1` or `versions/3`) in `apphosting.yaml`. attempting to use `latest` will result in `PermissionDenied` errors during build.
+
+## 5. Video Processing & Batch Workflows
+### A. Timeouts (Cloudflare / Vercel / Firebase)
+- **The Limit:** Most serverless environments have a strict timeout (often 60s default, max 300s).
+- **The Problem:** Sequential processing of long videos (e.g., 20-50s per analysis) will quickly exceed this limit even with small batch sizes (e.g., 10 videos * 20s = 200s).
+- **The Fix:**
+  1.  **Parallel Processing:** Always use `Promise.all()` to process batch items concurrently. This changes the total duration from `sum(video_times)` to `max(video_time)`.
+  2.  **Small Batches:** Reduce batch size (e.g., to 3-5) and run more frequently, rather than trying to process large chunks at once.
+
