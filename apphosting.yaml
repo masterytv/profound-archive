@@ -39,6 +39,9 @@ env:
   - variable: SUPABASE_SERVICE_KEY
     secret: SUPABASE_SERVICE_KEY
 
+  - variable: OPENAI_API_KEY
+    secret: OPENAI_API_KEY
+
   # Secret for securing Cron/Automated jobs
 #   - variable: CRON_SECRET
 #     secret: projects/432036554831/secrets/CRON_SECRET/versions/1

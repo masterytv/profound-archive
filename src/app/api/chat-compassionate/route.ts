@@ -4,10 +4,14 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client lazily to avoid build-time errors
+const getOpenAIClient = () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        throw new Error("Missing OPENAI_API_KEY environment variable");
+    }
+    return new OpenAI({ apiKey });
+};
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -128,6 +132,7 @@ Here are videos from first-person NDE accounts that are relevant to the user's c
         }
 
         // 1. Generate Embedding for the user's input
+        const openai = getOpenAIClient();
         const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: chatInput,
