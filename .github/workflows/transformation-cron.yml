@@ -1,0 +1,64 @@
+name: Transformation Analysis Cron
+
+on:
+  schedule:
+    # Run every 4 hours
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Number of videos to process per batch call'
+        required: true
+        default: '3'
+      loops:
+        description: 'Number of batch calls to make'
+        required: true
+        default: '50'
+
+jobs:
+  run-batch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Transformation Batch Analysis
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BATCH_LIMIT: ${{ inputs.limit || '3' }}
+          LOOP_COUNT: ${{ inputs.loops || '50' }}
+        run: |
+          echo "Starting transformation batch processing..."
+          echo "Site: $SITE_URL"
+          echo "Limit per call: $BATCH_LIMIT"
+          echo "Expected total videos: $(($BATCH_LIMIT * $LOOP_COUNT))"
+
+          for ((i=1; i<=LOOP_COUNT; i++)); do
+            echo "--- Batch $i of $LOOP_COUNT ---"
+            
+            # Call API
+            RESPONSE=$(curl -s -X GET "$SITE_URL/api/run-transformation-batch?limit=$BATCH_LIMIT" \
+              -H "Authorization: Bearer $CRON_SECRET")
+            
+            # Print minimal response (truncate long outputs)
+            echo "Response: ${RESPONSE:0:200}..."
+
+            # Check if we should stop (processedCount == 0 or error)
+            COUNT=$(echo "$RESPONSE" | grep -o '"processedCount":[0-9]*' | grep -o '[0-9]*')
+            
+            if [ -z "$COUNT" ]; then
+                echo "Warning: Could not parse processedCount. Response might be an error."
+                if [[ "$RESPONSE" == *"error"* ]]; then
+                   echo "Error detected in response. Stopping."
+                   exit 1
+                fi
+            elif [ "$COUNT" -eq 0 ]; then
+                echo "Processed 0 videos. Queue is empty. Stopping."
+                break
+            else
+                echo "Processed $COUNT videos."
+            fi
+
+            # Sleep to be nice to the server
+            sleep 5
+          done
+          
+          echo "Transformation batch run finished."
