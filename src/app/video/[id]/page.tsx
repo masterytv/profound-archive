@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { GreysonScoreCard, GreysonBreakdown } from "@/components/video/GreysonScoreCard";
+import { TransformationScoreCard } from "@/components/video/TransformationScoreCard";
 
 interface VideoPageProps {
     params: Promise<{ id: string }>;
@@ -150,7 +151,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
     // Fetch analysis data separately to avoid join issues
     const { data: analysis, error: analysisError } = await supabase
         .from("nde_analysis")
-        .select("total_greyson_score, scale_agreement, greyson_breakdown")
+        .select("total_greyson_score, scale_agreement, greyson_breakdown, transformation_score, transformation_classification, transformation_breakdown")
         .eq("video_id", id)
         .single();
 
@@ -233,8 +234,9 @@ export default async function VideoPage({ params }: VideoPageProps) {
                     </Link>
                 </div>
 
-                {/* Scores & Summary Section - 3 Column Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
+                {/* Scores & Summary Section - Two Rows of Two Columns */}
+                {/* Row 1: AI Summary + Greyson Scale */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 items-stretch">
                     {/* 1. AI Summary */}
                     {video.analysis_nde_summary && (
                         <Card className="h-full flex flex-col">
@@ -255,7 +257,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
                         </Card>
                     )}
 
-                    {/* 2. Greyson Scale - Middle */}
+                    {/* 2. Greyson Scale */}
                     {analysis && analysis.greyson_breakdown && (
                         <GreysonScoreCard
                             totalScore={analysis.total_greyson_score}
@@ -263,8 +265,11 @@ export default async function VideoPage({ params }: VideoPageProps) {
                             breakdown={analysis.greyson_breakdown as GreysonBreakdown}
                         />
                     )}
+                </div>
 
-                    {/* 3. Veridical Perception Score - Right */}
+                {/* Row 2: Veridical Perception + Transformation Index */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-stretch">
+                    {/* 3. Veridical Perception Score */}
                     {(video.rvnde_total_score !== null || video.rvnde_level) && (
                         <Card className={`h-full flex flex-col border-2 ${getLevelColor(video.rvnde_level)}`}>
                             <CardHeader className="pb-2">
@@ -315,6 +320,15 @@ export default async function VideoPage({ params }: VideoPageProps) {
                                 )}
                             </CardContent>
                         </Card>
+                    )}
+
+                    {/* 4. NDE Transformation Index */}
+                    {analysis && analysis.transformation_breakdown && (
+                        <TransformationScoreCard
+                            totalScore={analysis.transformation_score}
+                            classification={analysis.transformation_classification}
+                            breakdown={analysis.transformation_breakdown as any}
+                        />
                     )}
                 </div>
 
