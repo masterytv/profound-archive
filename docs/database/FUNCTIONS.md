@@ -45,6 +45,14 @@
 ### `populate_nde_vids_tsvector_batch`
 - **Purpose:** Maintenance function to update Full Text Search (FTS) vectors in batches.
 
+## Batch Processing Functions
+
+### `get_unanalyzed_greyson_videos`
+- **Purpose:** Returns `clear_nde` videos with transcripts that have NOT yet been analyzed with the Greyson Scale. Uses a LEFT JOIN to efficiently bypass the Supabase client's default 1,000-row limit.
+- **Args:** `batch_limit` (int, default 3): Number of videos to return.
+- **Returns:** List of `{ videoId, title, subtitles_punctuated }`.
+- **Called by:** `/api/run-greyson-batch`
+
 ## Usage
 Call these functions via the Supabase client:
 ```typescript
