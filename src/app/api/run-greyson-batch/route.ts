@@ -53,49 +53,34 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: 'Verification Fetch', analysis });
         }
 
-        // Build Query
-        let query = supabase
-            .from('nde_vids')
-            .select('videoId, title, subtitles_punctuated')
-            .not('subtitles_punctuated', 'is', null)
-            .order('created_at', { ascending: false });
+        // Fetch videos to process
+        let videosToProcess: { videoId: string; title: string; subtitles_punctuated: string }[] = [];
 
         if (targetVideoId) {
-            query = query.eq('videoId', targetVideoId);
-        }
-
-        const { data: videos, error } = await query;
-
-        if (error) {
-            return NextResponse.json({ error: error.message }, { status: 500 });
-        }
-
-        if (!videos || videos.length === 0) {
-            return NextResponse.json({ message: 'No videos found.' }, { status: 404 });
-        }
-
-
-
-        // Identify videos to process
-        const videosToProcess = [];
-        for (const video of videos) {
-            if (videosToProcess.length >= limit) break;
-
-            // Check if analysis already exists
-            const { data: existingAnalysis } = await supabase
-                .from('nde_analysis')
-                .select('video_id, greyson_breakdown')
-                .eq('video_id', video.videoId)
+            // Single video mode - fetch directly
+            const { data: video, error } = await supabase
+                .from('nde_vids')
+                .select('videoId, title, subtitles_punctuated')
+                .eq('videoId', targetVideoId)
                 .single();
 
-            // Skip if exists AND NOT targeting specific video
-            if (!targetVideoId && existingAnalysis?.greyson_breakdown) {
-                continue;
+            if (error || !video) {
+                return NextResponse.json({ error: error?.message || 'Video not found' }, { status: 404 });
             }
+            if (!video.subtitles_punctuated) {
+                return NextResponse.json({ error: 'Video has no transcript' }, { status: 400 });
+            }
+            videosToProcess = [video];
+        } else {
+            // Batch mode - use RPC to get unanalyzed videos efficiently
+            // This bypasses the Supabase default 1000-row limit and avoids N+1 queries
+            const { data: videos, error } = await supabase
+                .rpc('get_unanalyzed_greyson_videos', { batch_limit: limit });
 
-            if (!video.subtitles_punctuated) continue;
-
-            videosToProcess.push(video);
+            if (error) {
+                return NextResponse.json({ error: error.message }, { status: 500 });
+            }
+            videosToProcess = videos || [];
         }
 
         if (videosToProcess.length === 0) {
