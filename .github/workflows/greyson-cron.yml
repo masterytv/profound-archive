@@ -2,8 +2,8 @@ name: Greyson Analysis Cron
 
 on:
   schedule:
-    # Run every 4 hours
-    - cron: '0 */4 * * *'
+    # Run every hour (at minute 10 to avoid GitHub top-of-hour congestion)
+    - cron: '10 * * * *'
   workflow_dispatch:
     inputs:
       limit:

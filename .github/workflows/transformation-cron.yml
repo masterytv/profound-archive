@@ -2,8 +2,8 @@ name: Transformation Analysis Cron
 
 on:
   schedule:
-    # Run every 4 hours
-    - cron: '0 */4 * * *'
+    # Run every hour (at minute 40, offset from Greyson cron at minute 10)
+    - cron: '40 * * * *'
   workflow_dispatch:
     inputs:
       limit:
