@@ -30,35 +30,71 @@ jobs:
           echo "Site: $SITE_URL"
           echo "Limit per call: $BATCH_LIMIT"
           echo "Expected total videos: $(($BATCH_LIMIT * $LOOP_COUNT))"
+          
+          CONSECUTIVE_FAILURES=0
+          TOTAL_PROCESSED=0
+          TOTAL_FAILURES=0
 
           for ((i=1; i<=LOOP_COUNT; i++)); do
             echo "--- Batch $i of $LOOP_COUNT ---"
             
-            # Call API
-            RESPONSE=$(curl -s -X GET "$SITE_URL/api/run-transformation-batch?limit=$BATCH_LIMIT" \
+            # Call API with 120s timeout (Cloudflare times out at 100s)
+            RESPONSE=$(curl -s --max-time 120 -X GET "$SITE_URL/api/run-transformation-batch?limit=$BATCH_LIMIT" \
               -H "Authorization: Bearer $CRON_SECRET")
+            CURL_EXIT=$?
             
-            # Print minimal response (truncate long outputs)
+            # Handle curl timeout (exit code 28) or empty response
+            if [ $CURL_EXIT -ne 0 ] || [ -z "$RESPONSE" ]; then
+                echo "Warning: curl failed (exit=$CURL_EXIT). Retrying in 10s..."
+                sleep 10
+                RESPONSE=$(curl -s --max-time 120 -X GET "$SITE_URL/api/run-transformation-batch?limit=$BATCH_LIMIT" \
+                  -H "Authorization: Bearer $CRON_SECRET")
+                CURL_EXIT=$?
+            fi
+
+            # Print minimal response
             echo "Response: ${RESPONSE:0:200}..."
 
-            # Check if we should stop (processedCount == 0 or error)
+            # Check for Cloudflare 524 timeout
+            if [[ "$RESPONSE" == *"524"* ]] || [[ "$RESPONSE" == *"error code"* ]]; then
+                echo "Warning: Server timeout (524). Skipping batch, will retry next iteration."
+                CONSECUTIVE_FAILURES=$((CONSECUTIVE_FAILURES + 1))
+                TOTAL_FAILURES=$((TOTAL_FAILURES + 1))
+                if [ $CONSECUTIVE_FAILURES -ge 3 ]; then
+                    echo "3 consecutive failures. Stopping to avoid wasting resources."
+                    break
+                fi
+                sleep 15
+                continue
+            fi
+
+            # Parse processedCount
             COUNT=$(echo "$RESPONSE" | grep -o '"processedCount":[0-9]*' | grep -o '[0-9]*')
             
             if [ -z "$COUNT" ]; then
-                echo "Warning: Could not parse processedCount. Response might be an error."
-                if [[ "$RESPONSE" == *"error"* ]]; then
-                   echo "Error detected in response. Stopping."
+                echo "Warning: Could not parse processedCount."
+                if [[ "$RESPONSE" == *"Unauthorized"* ]]; then
+                   echo "Auth error. Stopping."
                    exit 1
                 fi
+                CONSECUTIVE_FAILURES=$((CONSECUTIVE_FAILURES + 1))
+                TOTAL_FAILURES=$((TOTAL_FAILURES + 1))
+                if [ $CONSECUTIVE_FAILURES -ge 3 ]; then
+                    echo "3 consecutive failures. Stopping."
+                    break
+                fi
+                sleep 10
+                continue
             elif [ "$COUNT" -eq 0 ]; then
                 echo "Processed 0 videos. Queue is empty. Stopping."
                 break
             else
                 echo "Processed $COUNT videos."
+                TOTAL_PROCESSED=$((TOTAL_PROCESSED + COUNT))
+                CONSECUTIVE_FAILURES=0
             fi
 
-            # Sleep to be nice to the server
             sleep 5
           done
           
-          echo "Transformation batch run finished."
+          echo "Transformation batch run finished. Total processed: $TOTAL_PROCESSED, Total failures: $TOTAL_FAILURES"
