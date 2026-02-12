@@ -2,8 +2,8 @@ name: Greyson Analysis Cron
 
 on:
   schedule:
-    # Run every hour (at minute 10 to avoid GitHub top-of-hour congestion)
-    - cron: '10 * * * *'
+    # Run every 3 hours (at minute 10) — offset 1hr from Transformation
+    - cron: '10 */3 * * *'
   workflow_dispatch:
     inputs:
       limit:
