@@ -68,8 +68,9 @@ jobs:
                 continue
             fi
 
-            # Parse processedCount
+            # Parse processedCount and attemptedCount
             COUNT=$(echo "$RESPONSE" | grep -o '"processedCount":[0-9]*' | grep -o '[0-9]*')
+            ATTEMPTED=$(echo "$RESPONSE" | grep -o '"attemptedCount":[0-9]*' | grep -o '[0-9]*')
             
             if [ -z "$COUNT" ]; then
                 echo "Warning: Could not parse processedCount."
@@ -85,9 +86,14 @@ jobs:
                 fi
                 sleep 10
                 continue
-            elif [ "$COUNT" -eq 0 ]; then
-                echo "Processed 0 videos. Queue is empty. Stopping."
+            elif [ "$COUNT" -eq 0 ] && [ "${ATTEMPTED:-0}" -eq 0 ]; then
+                echo "No videos returned from queue. Queue is empty. Stopping."
                 break
+            elif [ "$COUNT" -eq 0 ]; then
+                echo "Warning: $ATTEMPTED videos attempted but all failed. Continuing to next batch..."
+                TOTAL_FAILURES=$((TOTAL_FAILURES + 1))
+                sleep 5
+                continue
             else
                 echo "Processed $COUNT videos."
                 TOTAL_PROCESSED=$((TOTAL_PROCESSED + COUNT))

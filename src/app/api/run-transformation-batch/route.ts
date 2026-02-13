@@ -95,50 +95,61 @@ export async function GET(request: Request) {
                 console.log(`Analyzing transformation: ${video.title} (${video.videoId})...`);
                 const analysisResult = await analyzeTransformationScore(video.subtitles_punctuated);
 
+                // Determine score and classification
+                let score: number;
+                let classification: string;
+                let breakdown: any;
+
                 if (analysisResult) {
-                    const score = analysisResult.quantitative_metrics.overall_transformation_score;
-                    const classification = classifyTransformationScore(score);
-
-                    // Check if a row already exists for this video
-                    const { data: checkRow } = await supabase
-                        .from('nde_analysis')
-                        .select('video_id')
-                        .eq('video_id', video.videoId)
-                        .single();
-
-                    let dbOp;
-                    if (checkRow) {
-                        // Update existing row
-                        dbOp = await supabase
-                            .from('nde_analysis')
-                            .update({
-                                transformation_score: score,
-                                transformation_classification: classification,
-                                transformation_breakdown: analysisResult as any
-                            })
-                            .eq('video_id', video.videoId);
-                    } else {
-                        // Insert new row
-                        dbOp = await supabase
-                            .from('nde_analysis')
-                            .insert({
-                                video_id: video.videoId,
-                                transformation_score: score,
-                                transformation_classification: classification,
-                                transformation_breakdown: analysisResult as any
-                            });
-                    }
-
-                    if (dbOp.error) {
-                        console.error(`Error saving ${video.videoId}:`, dbOp.error);
-                        return { videoId: video.videoId, status: 'error', error: dbOp.error.message };
-                    } else {
-                        console.log(`Saved transformation analysis for ${video.videoId}: Score ${score} (${classification})`);
-                        return { videoId: video.videoId, status: 'success', score, classification };
-                    }
+                    score = analysisResult.quantitative_metrics.overall_transformation_score;
+                    classification = classifyTransformationScore(score);
+                    breakdown = analysisResult;
                 } else {
-                    console.error(`Failed to analyze ${video.videoId}`);
+                    // Save sentinel value so the RPC skips this video on future batches
+                    // instead of retrying the same failing videos infinitely
+                    console.warn(`Analysis returned null for ${video.videoId} — saving sentinel (-1).`);
+                    score = -1;
+                    classification = 'analysis_failed';
+                    breakdown = { error: 'AI analysis returned null', timestamp: new Date().toISOString() };
+                }
+
+                // Upsert: check if row exists, then update or insert
+                const { data: checkRow } = await supabase
+                    .from('nde_analysis')
+                    .select('video_id')
+                    .eq('video_id', video.videoId)
+                    .single();
+
+                let dbOp;
+                if (checkRow) {
+                    dbOp = await supabase
+                        .from('nde_analysis')
+                        .update({
+                            transformation_score: score,
+                            transformation_classification: classification,
+                            transformation_breakdown: breakdown
+                        })
+                        .eq('video_id', video.videoId);
+                } else {
+                    dbOp = await supabase
+                        .from('nde_analysis')
+                        .insert({
+                            video_id: video.videoId,
+                            transformation_score: score,
+                            transformation_classification: classification,
+                            transformation_breakdown: breakdown
+                        });
+                }
+
+                if (dbOp.error) {
+                    console.error(`Error saving ${video.videoId}:`, dbOp.error);
+                    return { videoId: video.videoId, status: 'error', error: dbOp.error.message };
+                } else if (score === -1) {
+                    console.log(`Marked ${video.videoId} as failed_analysis (sentinel saved).`);
                     return { videoId: video.videoId, status: 'failed_analysis' };
+                } else {
+                    console.log(`Saved transformation analysis for ${video.videoId}: Score ${score} (${classification})`);
+                    return { videoId: video.videoId, status: 'success', score, classification };
                 }
             } catch (err: any) {
                 console.error(`Exception analyzing ${video.videoId}:`, err);
@@ -147,11 +158,14 @@ export async function GET(request: Request) {
         });
 
         const results = await Promise.all(processPromises);
-        const processedCount = results.filter(r => r.status === 'success').length;
+        const successCount = results.filter(r => r.status === 'success').length;
+        const failedCount = results.filter(r => r.status === 'failed_analysis').length;
 
         return NextResponse.json({
-            message: `Batch complete. Processed ${processedCount} videos.`,
-            processedCount,
+            message: `Batch complete. Processed ${successCount} videos (${failedCount} failed).`,
+            processedCount: successCount,
+            attemptedCount: results.length,
+            failedCount,
             results
         });
 
