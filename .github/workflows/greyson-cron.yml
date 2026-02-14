@@ -1,3 +1,7 @@
+# ⚠️ STATUS: DISABLED via GitHub Actions UI on 2026-02-14.
+# Greyson analysis is COMPLETE for all videos. Do NOT re-enable this workflow
+# unless explicitly instructed by a human. To re-enable: GitHub repo → Actions tab
+# → "Greyson Analysis Cron" in sidebar → "Enable workflow" button.
 name: Greyson Analysis Cron
 
 on:
