@@ -78,7 +78,7 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
                     disabled={isUpdating}
                     value={profile.role || "user"}
                     onChange={(e) => handleRoleChange(e.target.value as any)}
-                    className={`text-xs font-semibold inline-flex px-2 py-1 leading-5 rounded-full ${profile.role === 'super_admin' ? 'bg-purple-100 text-purple-800' :
+                    className={`text-xs font-semibold inline-flex px-2 py-1 leading-5 rounded-full ${profile.role === 'super_admin' ? 'bg-blue-100 text-blue-800' :
                         profile.role === 'admin' ? 'bg-blue-100 text-blue-800' :
                             'bg-gray-100 text-gray-800'
                         }`}

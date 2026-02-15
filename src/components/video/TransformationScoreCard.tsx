@@ -70,7 +70,7 @@ const directionColor = (dir: string): string => {
     switch (dir) {
         case 'up': return 'text-emerald-700';
         case 'down': return 'text-amber-600';
-        case 'mixed': return 'text-purple-700';
+        case 'mixed': return 'text-blue-700';
         case 'shifted': return 'text-blue-700';
         case 'new': return 'text-cyan-700';
         default: return 'text-muted-foreground';
@@ -78,7 +78,7 @@ const directionColor = (dir: string): string => {
 };
 
 const getScoreColor = (score: number): string => {
-    if (score >= 41) return "text-purple-700";  // Comprehensive
+    if (score >= 41) return "text-blue-700";  // Comprehensive
     if (score >= 31) return "text-blue-700";     // Major
     if (score >= 21) return "text-emerald-700";  // Significant
     if (score >= 11) return "text-amber-600";    // Moderate

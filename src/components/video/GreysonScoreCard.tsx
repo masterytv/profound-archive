@@ -59,7 +59,7 @@ const formatLabel = (key: string) => {
 };
 
 const getScoreColor = (score: number) => {
-    if (score >= 20) return "text-purple-400"; // Deep
+    if (score >= 20) return "text-blue-400"; // Deep
     if (score >= 13) return "text-blue-400";   // Moderate
     if (score >= 7) return "text-yellow-400";  // Mild
     return "text-gray-400"; // Not NDE

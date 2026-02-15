@@ -29,8 +29,9 @@ The project uses a component-based architecture built with React and Shadcn UI.
 - **Purpose:** Opens a dialog to add a video to a specific user collection.
 
 ### Homepage Components (`src/components/home/`)
+- **`HeroSearchBar.tsx`**: Client island for the homepage hero. Renders a search bar with keyword/semantic toggle (using `BrainCircuit` icon). On submit, navigates to `/search3?q=...` with query params.
 - **`VideoThumbnailCard.tsx`**: Compact video card with thumbnail, score badge, title, channel. Used in homepage curated grid.
-- **`CuratedVideoColumn.tsx`**: Column wrapper with themed header, card list, and "Explore All →" link.
+- **`CuratedVideoColumn.tsx`**: Column wrapper with themed header (clickable, links to `/explore/` page), card list, and "Explore All →" link. Color-coded: Veridical = emerald, Transformation = red, Greyson = blue.
 
 ### Explorer Components (`src/components/explore/`)
 - **`ExplorerVideoCard.tsx`**: Rich video card with optional sub-score badges (breadth/depth, category totals).

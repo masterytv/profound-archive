@@ -284,7 +284,7 @@ export default function GreysonScalePage() {
                             <TableRow>
                                 <TableCell className="font-medium">21–32</TableCell>
                                 <TableCell>
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                         Deep NDE
                                     </span>
                                 </TableCell>

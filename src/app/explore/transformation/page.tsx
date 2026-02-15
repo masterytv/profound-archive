@@ -114,7 +114,7 @@ export default async function TransformationExplorerPage({ searchParams }: PageP
                 </Link>
 
                 <div className="flex items-center gap-3 mb-2">
-                    <Sparkles className="w-6 h-6 text-purple-600" />
+                    <Sparkles className="w-6 h-6 text-red-600" />
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                         NDE Transformation Index
                     </h1>

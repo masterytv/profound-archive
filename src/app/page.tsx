@@ -1,11 +1,10 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TrendingUp, Sparkles, Brain } from "lucide-react";
 import {
   CuratedVideoColumn,
   type CuratedVideo,
 } from "@/components/home/CuratedVideoColumn";
+import { HeroSearchBar } from "@/components/home/HeroSearchBar";
 
 // --- ISR: revalidate every 6 hours (21600 seconds) ---
 export const revalidate = 21600;
@@ -140,23 +139,15 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* ─── Compact Hero ─── */}
+      {/* ─── Hero with Search Bar ─── */}
       <section className="pt-10 pb-8 px-4 text-center">
         <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-foreground mb-3">
           Archive of the Extraordinary
         </h1>
-        <p className="max-w-2xl mx-auto text-muted-foreground md:text-lg mb-6">
-          Search and Chat with 5,000+ First-Person Accounts of Near Death
-          Experiences.
+        <p className="max-w-2xl mx-auto text-muted-foreground md:text-lg mb-8">
+          Search 5,000+ First-Person Accounts of Near Death Experiences.
         </p>
-        <div className="flex justify-center gap-4">
-          <Button asChild size="lg">
-            <Link href="/search3">Search</Link>
-          </Button>
-          <Button asChild variant="secondary" size="lg">
-            <Link href="/chat-compassionate">Chat</Link>
-          </Button>
-        </div>
+        <HeroSearchBar />
       </section>
 
       {/* ─── Curated Video Columns ─── */}
@@ -187,8 +178,8 @@ export default async function Home() {
           <CuratedVideoColumn
             title="Transformation"
             description="Experiences that led to profound life changes — shifts in values, relationships, and worldview."
-            icon={<Sparkles className="w-5 h-5 text-purple-600" />}
-            accentColor="border-t-purple-500"
+            icon={<Sparkles className="w-5 h-5 text-red-600" />}
+            accentColor="border-t-red-500"
             videos={transformation}
             scoreMax={50}
             exploreHref="/explore/transformation"

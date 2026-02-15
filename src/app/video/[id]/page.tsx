@@ -238,7 +238,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
                         <Card className="h-full flex flex-col">
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Sparkles className="w-5 h-5 text-purple-500" />
+                                    <Sparkles className="w-5 h-5 text-blue-500" />
                                     AI Summary
                                     <Badge variant="outline" className="text-[10px] font-normal ml-auto">
                                         AI-generated

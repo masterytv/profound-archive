@@ -226,7 +226,7 @@ export default function ChatPopup() {
                                 {/* Welcome bubble */}
                                 <div className="flex gap-2.5">
                                     <div className="w-7 h-7 rounded-full bg-white/10 flex-shrink-0 flex items-center justify-center mt-0.5">
-                                        <Bot className="w-4 h-4 text-purple-300" />
+                                        <Bot className="w-4 h-4 text-blue-300" />
                                     </div>
                                     <div className="bg-white/10 rounded-xl rounded-tl-sm px-3.5 py-2.5 max-w-[85%]">
                                         <p className="text-sm leading-relaxed">
@@ -267,7 +267,7 @@ export default function ChatPopup() {
                                 >
                                     {message.role === "assistant" && (
                                         <div className="w-7 h-7 rounded-full bg-white/10 flex-shrink-0 flex items-center justify-center mt-0.5">
-                                            <Bot className="w-4 h-4 text-purple-300" />
+                                            <Bot className="w-4 h-4 text-blue-300" />
                                         </div>
                                     )}
                                     <div
@@ -292,10 +292,10 @@ export default function ChatPopup() {
                         {isLoading && (
                             <div className="flex gap-2.5">
                                 <div className="w-7 h-7 rounded-full bg-white/10 flex-shrink-0 flex items-center justify-center">
-                                    <Bot className="w-4 h-4 text-purple-300" />
+                                    <Bot className="w-4 h-4 text-blue-300" />
                                 </div>
                                 <div className="bg-white/10 rounded-xl rounded-tl-sm px-3.5 py-2.5">
-                                    <Loader2 className="w-4 h-4 animate-spin text-purple-300" />
+                                    <Loader2 className="w-4 h-4 animate-spin text-blue-300" />
                                 </div>
                             </div>
                         )}

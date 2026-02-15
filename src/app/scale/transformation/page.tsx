@@ -153,7 +153,7 @@ export default function TransformationScalePage() {
                                 <TableCell>Decreased</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell className="font-medium text-purple-700">↕</TableCell>
+                                <TableCell className="font-medium text-blue-700">↕</TableCell>
                                 <TableCell>Mixed / Complex</TableCell>
                             </TableRow>
                             <TableRow>
@@ -392,7 +392,7 @@ export default function TransformationScalePage() {
                             <TableRow>
                                 <TableCell className="font-medium">41–50</TableCell>
                                 <TableCell>
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                         Comprehensive Profound
                                     </span>
                                 </TableCell>

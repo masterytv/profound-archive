@@ -45,10 +45,10 @@ export function CuratedVideoColumn({
         <div className="flex flex-col">
             {/* Column Header */}
             <div className={`rounded-t-xl p-4 border-t-4 ${accentColor}`}>
-                <div className="flex items-center gap-2 mb-1">
+                <Link href={exploreHref} className="flex items-center gap-2 mb-1 group">
                     {icon}
-                    <h2 className="text-lg font-bold text-foreground">{title}</h2>
-                </div>
+                    <h2 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">{title}</h2>
+                </Link>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                     {description}
                 </p>

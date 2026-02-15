@@ -9,8 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Loader2, MessageSquare, Search, ChevronDown, ChevronUp, Bookmark, SlidersHorizontal, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { Loader2, Search, ChevronDown, ChevronUp, Bookmark, SlidersHorizontal, BrainCircuit } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -460,13 +459,7 @@ function SearchV3Content() {
         <div className="container mx-auto p-4 py-12 max-w-6xl">
             <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
                 <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">Search Engine for the Soul</h1>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <p className="text-muted-foreground">Find specific moments in more than 5000 NDE YouTube videos.</p>
-                    <Link href="/chat-compassionate" className="text-primary hover:underline text-sm flex items-center gap-1 font-medium bg-primary/10 px-3 py-1 rounded-full">
-                        <MessageSquare className="w-4 h-4" />
-                        Chat with our AI
-                    </Link>
-                </div>
+                <p className="text-muted-foreground mb-6">Find specific moments in more than 5000 NDE YouTube videos.</p>
 
                 <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Search Term</label>
@@ -498,9 +491,9 @@ function SearchV3Content() {
                                 </button>
                                 <button
                                     onClick={() => setSearchType('semantic')}
-                                    className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors flex items-center gap-2 ${searchType === 'semantic' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-700 hover:bg-purple-50'}`}
+                                    className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors flex items-center gap-2 ${searchType === 'semantic' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
                                 >
-                                    <Sparkles className="w-3 h-3" />
+                                    <BrainCircuit className="w-3 h-3" />
                                     Semantic AI
                                 </button>
                             </div>
@@ -514,7 +507,7 @@ function SearchV3Content() {
                             <div className="flex-1 min-w-[200px]">
                                 <label className="text-sm font-medium mb-2 flex justify-between">
                                     <span>Similarity Threshold</span>
-                                    <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs font-bold">{similarity.toFixed(2)}</span>
+                                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">{similarity.toFixed(2)}</span>
                                 </label>
                                 <div className="pt-2">
                                     <Slider
@@ -572,7 +565,7 @@ function SearchV3Content() {
                             <Bookmark className="h-4 w-4" />
                         </Button>
                     )}
-                    <Button onClick={onSearchClick} disabled={isLoading} className={`px-8 h-12 text-lg ${searchType === 'semantic' ? "bg-purple-600 hover:bg-purple-700" : ""}`}>
+                    <Button onClick={onSearchClick} disabled={isLoading} className={`px-8 h-12 text-lg ${searchType === 'semantic' ? "bg-blue-600 hover:bg-blue-700" : ""}`}>
                         {isLoading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Searching...</> : <><Search className="w-5 h-5 mr-2" />Search</>}
                     </Button>
                 </div>
