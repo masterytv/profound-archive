@@ -45,6 +45,9 @@
 - **Rule of Thumb:** If your query could return more than 1,000 rows, always use `.range()`, pagination, or an RPC.
 ### C. Secrets Management for Automated Workflows
 - **Cron Secrets:** When calling internal API endpoints from GitHub Actions or cron jobs, ensure the `CRON_SECRET` env var is set and the endpoint validates it.
+### D. Completed & Disabled Workflows (DO NOT RE-ENABLE)
+- **Greyson Analysis Cron** (`greyson-cron.yml`): **DISABLED via GitHub Actions UI on 2026-02-14.** All videos have been fully analyzed. Do NOT re-enable unless explicitly instructed by a human.
+- To re-enable: GitHub repo → Actions tab → select workflow in sidebar → click "Enable workflow."
 
 ## 6. Local Development Environment
 ### A. npm Permissions (EPERM Errors)

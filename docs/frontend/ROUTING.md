@@ -7,13 +7,17 @@ The application uses the **Next.js 14+ App Router**. Routes are defined by the f
 
 | Path | File | Purpose | Auth Required? |
 |---|---|---|---|
-| `/` | `src/app/page.tsx` | Home Page / Landing | No |
+| `/` | `src/app/page.tsx` | Home Page — curated video grid (ISR 6h) | No |
 | `/login` | `src/app/login/page.tsx` | User Login/Signup | No |
 | `/search` | `src/app/search/page.tsx` | Main Search Interface | No |
 | `/chat-compassionate` | `src/app/chat-compassionate/page.tsx` | AI Chat | No (but sessions logged) |
 | `/video/[id]` | `src/app/video/[id]/page.tsx` | Video Details Page | No |
+| `/explore/transformation` | `src/app/explore/transformation/page.tsx` | NDE-TI Explorer (sort/filter/paginate) | No |
+| `/explore/veridical` | `src/app/explore/veridical/page.tsx` | cvNDE Explorer (sort/filter/paginate) | No |
+| `/explore/greyson` | `src/app/explore/greyson/page.tsx` | Greyson Scale Explorer (sort/filter/paginate) | No |
 | `/scale/greyson` | `src/app/scale/greyson/page.tsx` | Greyson NDE Scale Info | No |
 | `/scale/cvnde` | `src/app/scale/cvnde/page.tsx` | cvNDE Perception Scale Info | No |
+| `/scale/transformation` | `src/app/scale/transformation/page.tsx` | NDE-TI Scale Info | No |
 | `/profile` | `src/app/profile/page.tsx` | User Profile | **Yes** |
 | `/dashboard` | `src/app/dashboard/page.tsx` | User Dashboard | **Yes** |
 | `/admin` | `src/app/admin/page.tsx` | Admin Dashboard | **Yes (Admin Role)** |

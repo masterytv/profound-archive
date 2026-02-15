@@ -37,6 +37,19 @@ Project Profound is a modern web application built on the **T3 Stack** principle
 4. LLM generates compassionate response using context.
 5. Interaction logged to `nde_chat_logs`.
 
+### Homepage Curated Grid (ISR)
+1. Page revalidates every 6 hours (`revalidate = 21600`).
+2. Seed = `Math.floor(Date.now() / 21600000)` — deterministic per window.
+3. Top 50 videos fetched per score type (Veridical from `nde_vids`, Transformation & Greyson from `nde_analysis`).
+4. Seeded shuffle selects 6 per column.
+5. CDN caches the result for the entire 6-hour window.
+
+### Explorer Pages (`/explore/*`)
+1. Server component reads URL search params (`sort`, `dir`, `filter`, `page`).
+2. Supabase query fetches sorted/filtered data with `count: "exact"` for pagination.
+3. Video metadata joined from `nde_vids` via a second query.
+4. Client `ExplorerControls` component manages sort/filter/pagination via URL params.
+
 ## Security Model
 - **RLS:** All database access is guarded by Row Level Security.
 - **Environment Variables:** Secrets stored in `.env.local` (local) or Vercel/Supabase env configs.

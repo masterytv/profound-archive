@@ -28,6 +28,14 @@ The project uses a component-based architecture built with React and Shadcn UI.
 - **Path:** `src/components/add-to-collection-button.tsx`
 - **Purpose:** Opens a dialog to add a video to a specific user collection.
 
+### Homepage Components (`src/components/home/`)
+- **`VideoThumbnailCard.tsx`**: Compact video card with thumbnail, score badge, title, channel. Used in homepage curated grid.
+- **`CuratedVideoColumn.tsx`**: Column wrapper with themed header, card list, and "Explore All →" link.
+
+### Explorer Components (`src/components/explore/`)
+- **`ExplorerVideoCard.tsx`**: Rich video card with optional sub-score badges (breadth/depth, category totals).
+- **`ExplorerControls.tsx`**: URL-param-driven sort/filter/pagination controls. Shared across all `/explore/*` pages.
+
 ## Design System (Shadcn UI)
 We use [Shadcn UI](https://ui.shadcn.com/) components.
 - **Styling:** Tailwind CSS classes.
