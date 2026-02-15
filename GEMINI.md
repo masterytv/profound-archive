@@ -54,6 +54,9 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - Core NDE search and display (Search3/Native).
 - Compassionate Chat (Hybrid native/Supabase).
 - User Auth & Profiles.
+- Homepage curated video grid (ISR 6h rotation) with 3 score columns.
+- Explorer pages: `/explore/transformation`, `/explore/veridical`, `/explore/greyson`.
+- Scale info pages: `/scale/greyson`, `/scale/cvnde`, `/scale/transformation`.
 
 ### In Progress
 - Migrating n8n workflows to native code (See `docs/workflows/OVERVIEW.md`).
