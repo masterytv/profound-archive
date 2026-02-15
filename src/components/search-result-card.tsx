@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { Star } from "lucide-react"
@@ -147,13 +148,12 @@ export function SearchResultCard({ result, video, searchTerm, user }: SearchResu
                     <div className="relative rounded-md overflow-hidden aspect-video w-full bg-gray-100">
                         <Link href={`/video/${displayData.video_id}`}>
                             {displayData.thumbnailUrl ? (
-                                <img
-                                    src={displayData.thumbnailUrl}
+                                <Image
+                                    src={displayData.thumbnailUrl.replace("maxresdefault", "hqdefault")}
                                     alt={displayData.title}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = "https://placehold.co/600x400?text=No+Thumbnail";
-                                    }}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    className="object-cover"
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-gray-400">No Image</div>

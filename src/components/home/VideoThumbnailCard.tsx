@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 
 interface VideoThumbnailCardProps {
@@ -32,11 +33,12 @@ export function VideoThumbnailCard({
             {/* Thumbnail */}
             <div className="relative aspect-video bg-muted overflow-hidden">
                 {thumbnailUrl ? (
-                    <img
-                        src={thumbnailUrl}
+                    <Image
+                        src={thumbnailUrl.replace("maxresdefault", "hqdefault")}
                         alt={title || "Video thumbnail"}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground text-sm">

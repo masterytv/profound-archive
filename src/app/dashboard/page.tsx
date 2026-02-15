@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { Loader2, Search, Folder, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   AlertDialog,
@@ -211,7 +212,7 @@ export default function DashboardPage() {
                             return (
                               <Link href={videoUrl} key={fav.id} target="_blank" className="group">
                                 <div className="aspect-video bg-gray-200 rounded-md overflow-hidden relative">
-                                  <img src={fav.video_thumbnail_url || `https://i.ytimg.com/vi/${fav.video_id}/hqdefault.jpg`} alt={fav.video_title || ''} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                  <Image src={fav.video_thumbnail_url || `https://i.ytimg.com/vi/${fav.video_id}/hqdefault.jpg`} alt={fav.video_title || ''} fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw" className="object-cover transition-transform group-hover:scale-105" />
                                   {fav.start_time && fav.start_time > 0 && (
                                     <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
                                       timestamped

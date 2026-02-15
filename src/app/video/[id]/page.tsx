@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { GreysonScoreCard, GreysonBreakdown } from "@/components/video/GreysonScoreCard";
 import { TransformationScoreCard } from "@/components/video/TransformationScoreCard";
+import { YouTubePlayer } from "@/components/video/YouTubePlayer";
 
 interface VideoPageProps {
     params: Promise<{ id: string }>;
@@ -160,8 +161,6 @@ export default async function VideoPage({ params }: VideoPageProps) {
     console.log(`[VideoPage] Analysis Data:`, analysis ? 'Present' : 'Null');
     if (analysis) console.log(JSON.stringify(analysis, null, 2));
 
-    const youtubeEmbedUrl = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`;
-
     return (
         <div className="min-h-screen bg-background">
             {/* Top Navigation */}
@@ -177,14 +176,11 @@ export default async function VideoPage({ params }: VideoPageProps) {
 
             {/* Main Content */}
             <div className="container mx-auto px-4 pb-12 max-w-6xl">
-                {/* Video Player */}
+                {/* Video Player — Click-to-play: loads iframe only on user interaction */}
                 <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-lg mb-6">
-                    <iframe
-                        src={youtubeEmbedUrl}
+                    <YouTubePlayer
+                        videoId={video.videoId}
                         title={video.title || "Video"}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="absolute inset-0 w-full h-full"
                     />
                 </div>
 
