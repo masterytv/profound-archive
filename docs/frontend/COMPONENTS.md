@@ -36,6 +36,17 @@ The project uses a component-based architecture built with React and Shadcn UI.
 - **`ExplorerVideoCard.tsx`**: Rich video card with optional sub-score badges (breadth/depth, category totals).
 - **`ExplorerControls.tsx`**: URL-param-driven sort/filter/pagination controls. Shared across all `/explore/*` pages.
 
+### `ChatPopup.tsx`
+- **Path:** `src/components/chat-popup.tsx`
+- **Purpose:** Site-wide floating chat widget rendered in root `layout.tsx`. Provides quick access to the Compassionate Chat AI from any page.
+- **Behavior:**
+  - Fixed "Chat with NDEs" pill button in the bottom-right corner.
+  - Opens a dark-themed panel (380×550px) with welcome message, 3 randomized NDE questions (from a pool of 50), and an input bar.
+  - Auto-hides on `/chat-compassionate` to avoid duplicating the full-page experience.
+  - Chat history persists across page navigations within the same session.
+- **Dependencies:** `/api/chat-compassionate` endpoint, `lucide-react` icons.
+- **Animations:** Custom Tailwind keyframes (`chat-slide-up`, `chat-slide-down`, `subtle-pulse`) defined in `tailwind.config.ts`.
+
 ## Design System (Shadcn UI)
 We use [Shadcn UI](https://ui.shadcn.com/) components.
 - **Styling:** Tailwind CSS classes.

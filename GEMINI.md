@@ -57,6 +57,7 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - Homepage curated video grid (ISR 6h rotation) with 3 score columns.
 - Explorer pages: `/explore/transformation`, `/explore/veridical`, `/explore/greyson`.
 - Scale info pages: `/scale/greyson`, `/scale/cvnde`, `/scale/transformation`.
+- Site-wide Chat Popup widget (`ChatPopup`) — floating "Chat with NDEs" on all pages.
 
 ### In Progress
 - Migrating n8n workflows to native code (See `docs/workflows/OVERVIEW.md`).
@@ -71,5 +72,6 @@ See [Environment Variables Doc](./docs/ENVIRONMENT.md).
 | Supabase Client Init | `src/lib/supabase/client.ts` |
 | Database Types | `src/lib/supabase/database.types.ts` |
 | Chat Logic | `src/app/api/chat-compassionate/route.ts` |
+| Chat Popup Widget | `src/components/chat-popup.tsx` |
 | Search Logic | `src/app/api/search/route.ts` |
 | UI Components | `src/components/` |

@@ -37,6 +37,12 @@ Project Profound is a modern web application built on the **T3 Stack** principle
 4. LLM generates compassionate response using context.
 5. Interaction logged to `nde_chat_logs`.
 
+### Chat Popup Widget
+- A global `ChatPopup` component is rendered in `src/app/layout.tsx`.
+- Reuses the same `/api/chat-compassionate` endpoint as the full-page chat.
+- Auto-hides on `/chat-compassionate` via `usePathname()` check.
+- Client-side only — no additional server or database requirements.
+
 ### Homepage Curated Grid (ISR)
 1. Page revalidates every 6 hours (`revalidate = 21600`).
 2. Seed = `Math.floor(Date.now() / 21600000)` — deterministic per window.
