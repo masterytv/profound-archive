@@ -7,7 +7,7 @@
 | Issue | Incorrect Command/Pattern | Correct Solution |
 |---|---|---|
 | **Supabase CLI** | `supabase db push` (Standard) | Use `supabase db reset` for local dev or migration files for prod. |
-| **Next.js Images** | `<img />` | Always use `<Image />` from `next/image`. |
+| **Next.js Images** | `<img />` | Always use `<Image />` from `next/image`. See **Section 7** for full rules. |
 | **Shadcn** | `npx shadcn-ui@latest add` | Use `npx shadcn@latest add` (v2 CLI syntax). |
 
 ## 2. Project-Specific constraints
@@ -59,3 +59,51 @@
     2. `xattr -dr com.apple.quarantine node_modules/esbuild node_modules/@esbuild`
     3. `node node_modules/esbuild/install.js`
 - **Nuclear Option:** If permissions are hopelessly broken, delete the entire cache: `sudo rm -rf ~/.npm` then `rm -rf node_modules package-lock.json && npm install`.
+
+## 7. Image & Video Memory Optimization (CRITICAL)
+
+> **Context:** In Feb 2026, we traced a severe browser memory leak (GPU exhaustion, tab rendering corruption, tabs failing to close) to unoptimized images and eager YouTube iframe loading. The fixes below are **mandatory** for all future development.
+
+### A. Never Use Raw `<img>` for Thumbnails
+- **Rule:** Every thumbnail in the app MUST use Next.js `<Image>` from `next/image`, never `<img>`.
+- **Why:** `<Image>` automatically converts to WebP (~70% smaller), respects `sizes` for responsive loading, and handles lazy loading via the framework. Raw `<img>` loads full-resolution JPEG files into GPU memory with no optimization.
+- **Pattern:**
+  ```tsx
+  import Image from "next/image";
+  
+  <Image
+    src={thumbnailUrl.replace("maxresdefault", "hqdefault")}
+    alt={title}
+    fill
+    sizes="(max-width: 768px) 100vw, 33vw"
+    className="object-cover"
+  />
+  ```
+- **Key details:**
+  - Always use `hqdefault` (480×360) instead of `maxresdefault` (1280×720) for card-sized thumbnails.
+  - Always include a `sizes` attribute that matches the component's actual rendered size.
+  - The parent container MUST have `position: relative` and a defined aspect ratio (e.g., `aspect-video`).
+
+### B. Never Auto-Play YouTube Embeds
+- **Rule:** YouTube videos MUST use the click-to-play `<YouTubePlayer>` component (`src/components/video/YouTubePlayer.tsx`), never a raw `<iframe>` with `autoplay=1`.
+- **Why:** Each YouTube iframe consumes ~150MB of GPU memory. During extended browsing, these accumulate and crash the browser's compositor.
+- **Pattern:** `<YouTubePlayer videoId={id} title={title} />`
+
+### C. `next.config.ts` — Remote Image Domains
+- If you add images from a new domain, you MUST add it to `remotePatterns` in `next.config.ts`.
+- Currently configured: `placehold.co`, `images.unsplash.com`, `picsum.photos`, `i.ytimg.com`.
+
+### D. Third-Party Scripts
+- **Rule:** All third-party scripts in `layout.tsx` MUST use `strategy="lazyOnload"` unless they are critical for first render.
+- **Why:** Eager scripts attach DOM observers and timers that persist across Next.js client-side navigations, accumulating memory.
+
+### E. Page Size Limits
+- **Rule:** Grid pages (explorers, search results) should display **≤12 image cards** per page.
+- **Why:** 24 cards × 200KB = ~4.8MB of images per page load. With WebP and hqdefault, 12 cards ≈ 850KB.
+
+### F. Audit Checklist (run before any PR that adds images/video)
+1. `grep -r '<img' src/` — Should return ZERO hits (except `admin/users/user-row.tsx` avatar).
+2. `grep -r 'autoplay=1' src/` — Should return ZERO hits.
+3. `grep -r 'maxresdefault' src/` — Should return ZERO hits in component code.
+4. Check `next.config.ts` `remotePatterns` includes any new image domains.
+
