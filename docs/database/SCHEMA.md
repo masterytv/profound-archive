@@ -87,6 +87,8 @@ The database is hosted on Supabase (PostgreSQL). It stores NDE (Near-Death Exper
 | journey_nde_type | string | YES | positive, distressing, mixed, neutral |
 | journey_sequence | Json | YES | Chronological 25-element NDE journey sequence |
 | journey_notes | string | YES | Notes about journey extraction |
+| phenomenology | Json | YES | Phenomenological quality: vividness, sensory modalities, cognition |
+| entities | Json | YES | Entity encounters: identity, appearance, messages |
 
 **Relationships:**
 - `video_id` → `nde_vids.videoId` (One-to-One)

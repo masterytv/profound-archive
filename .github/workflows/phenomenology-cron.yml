@@ -1,0 +1,100 @@
+name: Phenomenology & Entities Analysis Cron
+
+on:
+  schedule:
+    # Run every 3 hours (at minute 50) — offset from Core Elements (:20) and Journey Flow (:40)
+    - cron: '50 */3 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Number of videos to process per batch call'
+        required: true
+        default: '3'
+      loops:
+        description: 'Number of batch calls to make'
+        required: true
+        default: '50'
+
+jobs:
+  run-batch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Phenomenology & Entities Batch Analysis
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BATCH_LIMIT: ${{ inputs.limit || '3' }}
+          LOOP_COUNT: ${{ inputs.loops || '50' }}
+        run: |
+          echo "Starting Phenomenology & Entities batch processing..."
+          echo "Site: $SITE_URL"
+          echo "Limit per call: $BATCH_LIMIT"
+          echo "Expected total videos: $(($BATCH_LIMIT * $LOOP_COUNT))"
+          
+          CONSECUTIVE_FAILURES=0
+          TOTAL_PROCESSED=0
+          TOTAL_FAILURES=0
+
+          for ((i=1; i<=LOOP_COUNT; i++)); do
+            echo "--- Batch $i of $LOOP_COUNT ---"
+            
+            # Call API with 120s timeout (Cloudflare times out at 100s)
+            RESPONSE=$(curl -s --max-time 120 -X GET "$SITE_URL/api/run-phenomenology-batch?limit=$BATCH_LIMIT" \
+              -H "Authorization: Bearer $CRON_SECRET")
+            CURL_EXIT=$?
+            
+            # Handle curl timeout (exit code 28) or empty response
+            if [ $CURL_EXIT -ne 0 ] || [ -z "$RESPONSE" ]; then
+                echo "Warning: curl failed (exit=$CURL_EXIT). Retrying in 10s..."
+                sleep 10
+                RESPONSE=$(curl -s --max-time 120 -X GET "$SITE_URL/api/run-phenomenology-batch?limit=$BATCH_LIMIT" \
+                  -H "Authorization: Bearer $CRON_SECRET")
+                CURL_EXIT=$?
+            fi
+
+            # Print minimal response
+            echo "Response: ${RESPONSE:0:200}..."
+
+            # Check for Cloudflare 524 timeout
+            if [[ "$RESPONSE" == *"524"* ]] || [[ "$RESPONSE" == *"error code"* ]]; then
+                echo "Warning: Server timeout (524). Skipping batch, will retry next iteration."
+                CONSECUTIVE_FAILURES=$((CONSECUTIVE_FAILURES + 1))
+                TOTAL_FAILURES=$((TOTAL_FAILURES + 1))
+                if [ $CONSECUTIVE_FAILURES -ge 3 ]; then
+                    echo "3 consecutive failures. Stopping to avoid wasting resources."
+                    break
+                fi
+                sleep 15
+                continue
+            fi
+
+            # Parse processedCount
+            COUNT=$(echo "$RESPONSE" | grep -o '"processedCount":[0-9]*' | grep -o '[0-9]*')
+            
+            if [ -z "$COUNT" ]; then
+                echo "Warning: Could not parse processedCount."
+                if [[ "$RESPONSE" == *"Unauthorized"* ]]; then
+                   echo "Auth error. Stopping."
+                   exit 1
+                fi
+                CONSECUTIVE_FAILURES=$((CONSECUTIVE_FAILURES + 1))
+                TOTAL_FAILURES=$((TOTAL_FAILURES + 1))
+                if [ $CONSECUTIVE_FAILURES -ge 3 ]; then
+                    echo "3 consecutive failures. Stopping."
+                    break
+                fi
+                sleep 10
+                continue
+            elif [ "$COUNT" -eq 0 ]; then
+                echo "Processed 0 videos. Queue is empty. Stopping."
+                break
+            else
+                echo "Processed $COUNT videos."
+                TOTAL_PROCESSED=$((TOTAL_PROCESSED + COUNT))
+                CONSECUTIVE_FAILURES=0
+            fi
+
+            sleep 5
+          done
+          
+          echo "Phenomenology & Entities batch run finished. Total processed: $TOTAL_PROCESSED, Total failures: $TOTAL_FAILURES"
