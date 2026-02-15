@@ -422,7 +422,7 @@ function SearchV2Content() {
                     </Link>
                     <span className="text-gray-300">|</span>
                     <Link href="/search" className="text-primary hover:underline text-sm flex items-center gap-1">
-                        Semantic Search
+                        Concept Search
                     </Link>
                 </div>
 

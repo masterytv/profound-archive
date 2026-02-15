@@ -401,7 +401,7 @@ function SearchV3Content() {
             </h2>
             {searchType === 'semantic' ? (
                 <div className="bg-blue-50 text-blue-800 p-4 rounded-md text-sm">
-                    Filters are currently disabled in Semantic Mode. Switch to Keyword Search to filter by Channel, NDE status, etc.
+                    Filters are currently disabled in Concept Mode. Switch to Keyword Search to filter by Channel, NDE status, etc.
                 </div>
             ) : (
                 <Accordion type="multiple" defaultValue={facets.map(f => f.field_name)} className="w-full">
@@ -494,7 +494,7 @@ function SearchV3Content() {
                                     className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors flex items-center gap-2 ${searchType === 'semantic' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
                                 >
                                     <BrainCircuit className="w-3 h-3" />
-                                    Semantic AI
+                                    Concept AI
                                 </button>
                             </div>
                             <p className="text-xs text-muted-foreground mt-2">
@@ -502,7 +502,7 @@ function SearchV3Content() {
                             </p>
                         </div>
 
-                        {/* Similarity Slider (Semantic Only) */}
+                        {/* Similarity Slider (Concept Only) */}
                         {searchType === 'semantic' && (
                             <div className="flex-1 min-w-[200px]">
                                 <label className="text-sm font-medium mb-2 flex justify-between">

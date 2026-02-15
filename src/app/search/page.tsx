@@ -299,7 +299,7 @@ function SearchPageContent() {
           <label className="block text-sm font-medium mb-2">Search Term</label>
           <Input
             type="text"
-            placeholder="e.g., 'life review' (Exact), 'visited dead relatives' (Semantic)"
+            placeholder="e.g., 'life review' (Exact), 'visited dead relatives' (Concept)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") onSearchClick() }}
@@ -314,7 +314,7 @@ function SearchPageContent() {
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="searchType" value="semantic" checked={searchType === "semantic"} onChange={() => setSearchType("semantic")} />
-                  Similar (Semantic)
+                  Similar (Concept)
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="searchType" value="exact" checked={searchType === "exact"} onChange={() => setSearchType("exact")} />

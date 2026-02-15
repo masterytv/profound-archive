@@ -255,7 +255,7 @@ export default function DashboardPage() {
                     <div className="flex justify-between items-center">
                       <p className="font-mono text-sm text-primary">"{search.search_term}"</p>
                       <span className="text-xs text-muted-foreground uppercase bg-gray-200 px-2 py-1 rounded">
-                        {search.search_type === 'semantic' ? 'Semantic' : 'Keyword'}
+                        {search.search_type === 'semantic' ? 'Concept' : 'Keyword'}
                       </span>
                     </div>
                   </Link>

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 
 /**
  * Client island for the homepage hero.
- * Renders a search bar + keyword/semantic toggle.
+ * Renders a search bar + keyword/concept toggle.
  * On submit, navigates to /search3 with the appropriate query params.
  */
 export function HeroSearchBar() {
@@ -83,7 +83,7 @@ export function HeroSearchBar() {
                             }`}
                     >
                         <BrainCircuit className="w-3 h-3" />
-                        Semantic AI
+                        Concept AI
                     </button>
                 </div>
             </div>
