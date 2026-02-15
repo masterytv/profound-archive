@@ -72,6 +72,21 @@ The database is hosted on Supabase (PostgreSQL). It stores NDE (Near-Death Exper
 | scale_agreement | string | YES | Agreement metric |
 | total_greyson_score | number | YES | Score |
 | total_nde_c_score | number | YES | Score |
+| transformation_score | number | YES | NDE-TI overall score (0-50) |
+| transformation_classification | string | YES | NDE-TI classification |
+| transformation_breakdown | Json | YES | NDE-TI domain analysis |
+| experience_type | string | YES | NDERF type: nde, obe, sde, adc, ste, etc. |
+| experience_type_confidence | smallint | YES | Confidence 0-100 |
+| core_elements | Json | YES | 15 standard NDE elements with confidence/quotes |
+| trigger_category | string | YES | What caused the experience |
+| trigger_description | string | YES | Free text trigger description |
+| overall_tone | string | YES | very_positive → very_negative or mixed |
+| intensity_rating | smallint | YES | 1-10 intensity score |
+| content_safety | Json | YES | Safety flags (suicide, self-harm, etc.) |
+| journey_valid | boolean | YES | Whether journey flow extraction succeeded |
+| journey_nde_type | string | YES | positive, distressing, mixed, neutral |
+| journey_sequence | Json | YES | Chronological 25-element NDE journey sequence |
+| journey_notes | string | YES | Notes about journey extraction |
 
 **Relationships:**
 - `video_id` → `nde_vids.videoId` (One-to-One)
