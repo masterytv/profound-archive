@@ -5,6 +5,7 @@ import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import Script from 'next/script';
 import AuthConfirmationToast from '@/components/auth-confirmation-toast';
+import ChatPopup from '@/components/chat-popup';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-grow">{children}</main>
         <SiteFooter />
+        <ChatPopup />
         <Suspense fallback={null}>
           <AuthConfirmationToast />
         </Suspense>

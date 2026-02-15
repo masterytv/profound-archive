@@ -1,4 +1,4 @@
-import type {Config} from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
@@ -88,10 +88,41 @@ export default {
             height: '0',
           },
         },
+        'chat-slide-up': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(20px) scale(0.95)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0) scale(1)',
+          },
+        },
+        'chat-slide-down': {
+          '0%': {
+            opacity: '1',
+            transform: 'translateY(0) scale(1)',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translateY(20px) scale(0.95)',
+          },
+        },
+        'subtle-pulse': {
+          '0%, 100%': {
+            boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.3)',
+          },
+          '50%': {
+            boxShadow: '0 10px 40px -5px rgba(99, 102, 241, 0.5)',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'chat-slide-up': 'chat-slide-up 0.3s ease-out forwards',
+        'chat-slide-down': 'chat-slide-down 0.2s ease-in forwards',
+        'subtle-pulse': 'subtle-pulse 3s ease-in-out infinite',
       },
     },
   },
