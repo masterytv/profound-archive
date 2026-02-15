@@ -11,7 +11,7 @@ export const metadata = {
         "Browse NDE accounts ranked by veridical (evidential) perception — sort by total score or individual criteria, filter by evidential strength level.",
 };
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 12;
 
 const SORT_OPTIONS: SortOption[] = [
     { value: "score", label: "Total Score" },

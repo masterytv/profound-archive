@@ -41,7 +41,7 @@ export default function RootLayout({
           <AuthConfirmationToast />
         </Suspense>
         <Toaster />
-        <Script async data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
+        <Script strategy="lazyOnload" data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
       </body>
     </html>
   );

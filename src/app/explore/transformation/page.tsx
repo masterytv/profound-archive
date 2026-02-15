@@ -11,7 +11,7 @@ export const metadata = {
         "Browse NDE accounts ranked by the NDE Transformation Index — sort by overall score, breadth, depth, or filter by classification.",
 };
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 12;
 
 const SORT_OPTIONS: SortOption[] = [
     { value: "score", label: "Overall Score" },
