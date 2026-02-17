@@ -12,10 +12,7 @@ export const metadata: Metadata = {
   title: 'Project Profound: Near Death Experiences and Consciousness',
   description: 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences.',
   icons: {
-    // Modern SVG icon for most browsers
-    icon: '/favicon.svg',
-    // Traditional ICO for fallback compatibility
-    shortcut: '/favicon.ico',
+    icon: '/icon.png',
   },
 };
 
