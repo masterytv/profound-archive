@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Shield, Ban, CheckCircle, Trash2 } from "lucide-react";
+import { User, Trash2 } from "lucide-react";
 import { toggleBanUser, updateUserRole, deleteUser } from "../actions";
 
 type Profile = {
@@ -52,24 +52,30 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
         }
     };
 
+    const getRoleBadgeClass = (role: string | null) => {
+        if (role === "super_admin") return "bg-blue-100 text-blue-700";
+        if (role === "admin") return "bg-indigo-100 text-indigo-700";
+        return "bg-slate-100 text-slate-600";
+    };
+
     return (
-        <tr className="hover:bg-gray-50">
+        <tr className="hover:bg-slate-50/50 transition-colors">
             <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
+                    <div className="flex-shrink-0 h-9 w-9">
                         {profile.avatar_url ? (
-                            <img className="h-10 w-10 rounded-full" src={profile.avatar_url} alt="" />
+                            <img className="h-9 w-9 rounded-xl object-cover" src={profile.avatar_url} alt="" />
                         ) : (
-                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <User className="h-6 w-6 text-gray-500" />
+                            <div className="h-9 w-9 rounded-xl bg-slate-100 flex items-center justify-center">
+                                <User className="h-4 w-4 text-slate-400" />
                             </div>
                         )}
                     </div>
-                    <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                    <div className="ml-3.5">
+                        <div className="text-sm font-medium text-slate-900">
                             {profile.full_name || "Unknown"}
                         </div>
-                        <div className="text-sm text-gray-500">{email || "No Email"}</div>
+                        <div className="text-xs text-slate-400">{email || "No Email"}</div>
                     </div>
                 </div>
             </td>
@@ -78,10 +84,7 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
                     disabled={isUpdating}
                     value={profile.role || "user"}
                     onChange={(e) => handleRoleChange(e.target.value as any)}
-                    className={`text-xs font-semibold inline-flex px-2 py-1 leading-5 rounded-full ${profile.role === 'super_admin' ? 'bg-blue-100 text-blue-800' :
-                        profile.role === 'admin' ? 'bg-blue-100 text-blue-800' :
-                            'bg-gray-100 text-gray-800'
-                        }`}
+                    className={`text-xs font-semibold px-2.5 py-1 rounded-lg border-0 cursor-pointer ${getRoleBadgeClass(profile.role)}`}
                 >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
@@ -90,30 +93,32 @@ export function UserRow({ profile, email }: { profile: Profile; email?: string }
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${profile.is_banned
-                        ? "bg-red-100 text-red-800"
-                        : "bg-green-100 text-green-800"
+                    className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-lg ${profile.is_banned
+                        ? "bg-red-100 text-red-700"
+                        : "bg-emerald-100 text-emerald-700"
                         }`}
                 >
                     {profile.is_banned ? "Banned" : "Active"}
                 </span>
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                 <button
                     onClick={handleBanToggle}
                     disabled={isUpdating}
-                    className={`${profile.is_banned ? "text-green-600 hover:text-green-900" : "text-red-600 hover:text-red-900"
-                        } font-bold`}
+                    className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${profile.is_banned
+                        ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                        : "bg-red-50 text-red-600 hover:bg-red-100"
+                        }`}
                 >
                     {profile.is_banned ? "Unban" : "Ban"}
                 </button>
                 <button
                     onClick={handleDelete}
                     disabled={isUpdating}
-                    className="ml-4 text-red-600 hover:text-red-900 font-bold"
+                    className="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-red-50"
                     title="Delete User"
                 >
-                    <Trash2 className="h-5 w-5" />
+                    <Trash2 className="h-4 w-4" />
                 </button>
             </td>
         </tr>

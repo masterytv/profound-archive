@@ -101,7 +101,7 @@ async function handleKeywordSearch(searchTerm: string, filters: any, sortBy: any
         'page': page,
         'per_page': perPage,
         'facet_by': 'channelName,isNde',
-        'filter_by': filterConditions,
+        'filter_by': [filterConditions, 'isNde:!=not_nde'].filter(Boolean).join(' && '),
         'sort_by': sortQuery,
         'max_facet_values': 100,
     };

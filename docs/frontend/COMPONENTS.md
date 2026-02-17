@@ -41,8 +41,8 @@ The project uses a component-based architecture built with React and Shadcn UI.
 - **Path:** `src/components/chat-popup.tsx`
 - **Purpose:** Site-wide floating chat widget rendered in root `layout.tsx`. Provides quick access to the Compassionate Chat AI from any page.
 - **Behavior:**
-  - Fixed "Chat with NDEs" pill button in the bottom-right corner.
-  - Opens a dark-themed panel (380×550px) with welcome message, 3 randomized NDE questions (from a pool of 50), and an input bar.
+  - Fixed "Chat with NDEs" pill button (`#2563EB`) in the bottom-right corner.
+  - Opens a light-themed panel (white bg, 380×550px) with blue header, welcome message, 3 randomized NDE questions (from a pool of 50), and an input bar.
   - Auto-hides on `/chat-compassionate` to avoid duplicating the full-page experience.
   - Chat history persists across page navigations within the same session.
 - **Dependencies:** `/api/chat-compassionate` endpoint, `lucide-react` icons.
@@ -58,3 +58,30 @@ To add a new component:
 ```bash
 npx shadcn-ui@latest add [component-name]
 ```
+
+## Auth & Admin Pages
+
+### Profile Page (`src/app/profile/page.tsx`)
+- Client component with gradient header, breadcrumb, Crimson Pro title.
+- Two card sections: "Edit Profile" (email, name) and "Account Management" (password change).
+- Uses Supabase client for auth operations.
+
+### Dashboard Page (`src/app/dashboard/page.tsx`)
+- Client component with gradient header and icon badge.
+- "My Collections" accordion with thumbnail grids and delete dialogs.
+- "Saved Searches" section with interactive parameter pills.
+
+### Admin Layout (`src/app/admin/layout.tsx`)
+- Server component with sidebar navigation (Overview, Users, Chatbot Editor).
+- Role-based access: redirects non-admin users.
+- Sidebar: slate-50 background, rounded-xl nav items with icon badges.
+
+### Admin Overview (`src/app/admin/page.tsx`)
+- Server component fetching user stats from Supabase.
+- Three stats cards (Total Users, Banned, Admins) with icon badges.
+
+### Admin Users (`src/app/admin/users/page.tsx`, `user-row.tsx`)
+- Server component fetching profiles + auth emails.
+- User table with rounded-2xl container, role/status badge pills.
+- Client `UserRow` component with ban/unban toggle, role selector, delete.
+

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { User, Settings, LogOut, Users, Shield, MessageSquare } from "lucide-react";
+import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard } from "lucide-react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -26,8 +26,6 @@ export default async function AdminLayout({
                         );
                     } catch {
                         // The `setAll` method was called from a Server Component.
-                        // This can be ignored if you have middleware refreshing
-                        // user sessions.
                     }
                 },
             },
@@ -42,7 +40,6 @@ export default async function AdminLayout({
         redirect("/login");
     }
 
-    // Double check (Middleware should catch this, but safe to have)
     const { data: profile } = await supabase
         .from("profiles")
         .select("role")
@@ -55,44 +52,57 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen flex" style={{ background: "#F8FAFC" }}>
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-gray-200 hidden md:block">
-                <div className="p-6 h-full flex flex-col">
-                    <div className="flex items-center gap-2 mb-8">
-                        <Shield className="w-8 h-8 text-blue-600" />
-                        <span className="text-xl font-bold text-gray-900">Admin</span>
+            <aside className="w-64 bg-white border-r border-slate-200/60 hidden md:flex md:flex-col">
+                <div className="p-5 flex-1 flex flex-col">
+                    {/* Sidebar Header */}
+                    <div className="flex items-center gap-3 mb-8 px-2">
+                        <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+                            <Shield className="w-4.5 h-4.5 text-blue-600" />
+                        </div>
+                        <span
+                            className="text-lg font-bold text-slate-900"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            Admin
+                        </span>
                     </div>
 
+                    {/* Nav Items */}
                     <nav className="space-y-1 flex-1">
                         <Link
                             href="/admin"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
                         >
-                            <Settings className="w-5 h-5" />
+                            <LayoutDashboard className="w-4 h-4" />
                             Overview
                         </Link>
                         <Link
                             href="/admin/users"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
                         >
-                            <Users className="w-5 h-5" />
+                            <Users className="w-4 h-4" />
                             Users
                         </Link>
                         {profile?.role === "super_admin" && (
                             <Link
                                 href="/admin/chatbot"
-                                className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                                className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
                             >
-                                <MessageSquare className="w-5 h-5 text-indigo-500" />
+                                <MessageSquare className="w-4 h-4 text-indigo-500" />
                                 Chatbot Editor
                             </Link>
                         )}
                     </nav>
 
-                    <div className="border-t border-gray-200 pt-4">
-                        <Link href="/" className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                            <LogOut className="w-5 h-5" />
+                    {/* Exit Link */}
+                    <div className="border-t border-slate-200/60 pt-4">
+                        <Link
+                            href="/"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                        >
+                            <LogOut className="w-4 h-4" />
                             Exit Admin
                         </Link>
                     </div>
@@ -101,7 +111,7 @@ export default async function AdminLayout({
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto">
-                <div className="p-8">
+                <div className="p-6 md:p-8 max-w-6xl">
                     {children}
                 </div>
             </main>

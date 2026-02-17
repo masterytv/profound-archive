@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
-import { Sparkles, ArrowLeft } from "lucide-react";
+import { Sparkles, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { ExplorerVideoCard } from "@/components/explore/ExplorerVideoCard";
+import Image from "next/image";
 import { ExplorerControls, type SortOption, type FilterOption } from "@/components/explore/ExplorerControls";
 
 export const metadata = {
@@ -27,6 +27,15 @@ const FILTER_OPTIONS: FilterOption[] = [
     { value: "Minimal Transformation", label: "Minimal" },
 ];
 
+// Color map for classification badges
+function getClassColor(classification: string | null | undefined): string {
+    if (!classification) return "bg-slate-100 text-slate-600";
+    if (classification.includes("Comprehensive") || classification.includes("Major")) return "bg-rose-100 text-rose-800";
+    if (classification.includes("Significant")) return "bg-amber-100 text-amber-800";
+    if (classification.includes("Moderate")) return "bg-blue-100 text-blue-800";
+    return "bg-slate-100 text-slate-600";
+}
+
 interface PageProps {
     searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
@@ -40,30 +49,18 @@ export default async function TransformationExplorerPage({ searchParams }: PageP
 
     const supabase = await createClient();
 
-    // Build query
     let query = supabase
         .from("nde_analysis")
         .select("video_id, transformation_score, transformation_classification, transformation_breakdown", { count: "exact" })
         .not("transformation_score", "is", null)
         .gt("transformation_score", 0);
 
-    // Apply filter
     if (filter) {
         query = query.eq("transformation_classification", filter);
     }
 
-    // Apply sort
-    if (sort === "breadth") {
-        // Sort by JSONB nested field — Supabase doesn't support this directly,
-        // so we sort by score as proxy and re-sort client-side
-        query = query.order("transformation_score", { ascending: direction === "asc" });
-    } else if (sort === "depth") {
-        query = query.order("transformation_score", { ascending: direction === "asc" });
-    } else {
-        query = query.order("transformation_score", { ascending: direction === "asc" });
-    }
+    query = query.order("transformation_score", { ascending: direction === "asc" });
 
-    // Paginate
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
     query = query.range(from, to);
@@ -72,7 +69,7 @@ export default async function TransformationExplorerPage({ searchParams }: PageP
     const totalResults = count || 0;
     const totalPages = Math.ceil(totalResults / PAGE_SIZE);
 
-    // Client-side re-sort for breadth/depth if needed
+    // Client-side re-sort for breadth/depth
     let sortedData = analysisData || [];
     if (sort === "breadth" || sort === "depth") {
         sortedData = [...sortedData].sort((a, b) => {
@@ -102,54 +99,75 @@ export default async function TransformationExplorerPage({ searchParams }: PageP
     const metaMap = new Map((videoMeta || []).map((v) => [v.videoId, v]));
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <div className="container mx-auto px-4 py-6 max-w-7xl">
-                <Link
-                    href="/"
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back to Home
-                </Link>
+        <div className="min-h-screen" style={{ background: "#F8FAFC" }}>
+            {/* ─── Header ─── */}
+            <div
+                className="border-b border-slate-200"
+                style={{ background: "linear-gradient(135deg, #FFF1F2 0%, #F8FAFC 100%)" }}
+            >
+                <div className="container mx-auto px-4 py-8 max-w-7xl">
+                    {/* Breadcrumb */}
+                    <nav className="flex items-center gap-1.5 text-sm text-slate-400 mb-6">
+                        <Link href="/" className="hover:text-blue-600 transition-colors">
+                            Home
+                        </Link>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                        <Link href="/" className="hover:text-blue-600 transition-colors">
+                            Explore
+                        </Link>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                        <span className="text-slate-700 font-medium">Transformation Index</span>
+                    </nav>
 
-                <div className="flex items-center gap-3 mb-2">
-                    <Sparkles className="w-6 h-6 text-red-600" />
-                    <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                        NDE Transformation Index
-                    </h1>
+                    <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center shrink-0">
+                            <Sparkles className="w-6 h-6 text-rose-600" />
+                        </div>
+                        <div>
+                            <h1
+                                className="text-3xl md:text-4xl font-bold text-slate-900 mb-2"
+                                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                            >
+                                NDE Transformation Index
+                            </h1>
+                            <p className="text-slate-500 max-w-2xl leading-relaxed">
+                                Browse experiences ranked by the depth and breadth of life transformation
+                                they describe. Sort by overall score, number of domains affected, or
+                                average depth of change.
+                            </p>
+                            <Link
+                                href="/scale/transformation"
+                                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 mt-3 font-medium"
+                            >
+                                Learn about the Transformation Index
+                                <ChevronRight className="w-3.5 h-3.5" />
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-                <p className="text-muted-foreground max-w-2xl mb-1">
-                    Browse experiences ranked by the depth and breadth of life transformation
-                    they describe. Sort by overall score, number of domains affected, or
-                    average depth of change.
-                </p>
-                <Link
-                    href="/scale/transformation"
-                    className="text-sm text-primary hover:underline"
-                >
-                    Learn about the Transformation Index →
-                </Link>
             </div>
 
-            {/* Controls + Grid */}
-            <div className="container mx-auto px-4 pb-16 max-w-7xl">
-                <Suspense fallback={null}>
-                    <ExplorerControls
-                        sortOptions={SORT_OPTIONS}
-                        filterOptions={FILTER_OPTIONS}
-                        filterLabel="Classification"
-                        currentSort={sort}
-                        currentDirection={direction}
-                        currentFilter={filter}
-                        currentPage={page}
-                        totalPages={totalPages}
-                        totalResults={totalResults}
-                    />
-                </Suspense>
+            {/* ─── Controls + Grid ─── */}
+            <div className="container mx-auto px-4 py-8 max-w-7xl">
+                {/* Controls */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 mb-8">
+                    <Suspense fallback={null}>
+                        <ExplorerControls
+                            sortOptions={SORT_OPTIONS}
+                            filterOptions={FILTER_OPTIONS}
+                            filterLabel="Classification"
+                            currentSort={sort}
+                            currentDirection={direction}
+                            currentFilter={filter}
+                            currentPage={page}
+                            totalPages={totalPages}
+                            totalResults={totalResults}
+                        />
+                    </Suspense>
+                </div>
 
                 {/* Video Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {sortedData.map((item) => {
                         const meta = metaMap.get(item.video_id);
                         if (!meta) return null;
@@ -158,34 +176,92 @@ export default async function TransformationExplorerPage({ searchParams }: PageP
                         const breadth = breakdown?.quantitative_metrics?.transformation_breadth;
                         const depth = breakdown?.quantitative_metrics?.transformation_depth;
 
+                        const sortLabel = sort !== "score" ? SORT_OPTIONS.find((o) => o.value === sort)?.label : null;
+                        const subScore =
+                            sort === "breadth" && breadth != null
+                                ? `${breadth}/10`
+                                : sort === "depth" && depth != null
+                                    ? `${Number(depth).toFixed(1)}/5`
+                                    : null;
+
                         return (
-                            <ExplorerVideoCard
+                            <Link
                                 key={item.video_id}
-                                videoId={item.video_id}
-                                title={meta.title || "Untitled"}
-                                thumbnailUrl={meta.thumbnailUrl}
-                                channelName={meta.channelName}
-                                score={item.transformation_score}
-                                scoreMax={50}
-                                scoreLabel={item.transformation_classification}
-                                subScores={[
-                                    ...(breadth != null ? [{ label: "Breadth", value: `${breadth}/10` }] : []),
-                                    ...(depth != null ? [{ label: "Depth", value: `${Number(depth).toFixed(1)}/5` }] : []),
-                                ]}
-                            />
+                                href={`/video/${item.video_id}`}
+                                className="group block bg-white rounded-2xl overflow-hidden border border-slate-200/60 hover:shadow-xl hover:border-rose-200 transition-all duration-300 cursor-pointer"
+                            >
+                                {/* Thumbnail */}
+                                <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                                    {meta.thumbnailUrl ? (
+                                        <Image
+                                            src={meta.thumbnailUrl.replace("maxresdefault", "hqdefault")}
+                                            alt={meta.title || "Video thumbnail"}
+                                            fill
+                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full text-slate-400 text-sm">
+                                            No Thumbnail
+                                        </div>
+                                    )}
+
+                                    {/* Score badge */}
+                                    {item.transformation_score !== null && (
+                                        <div className="absolute top-2.5 right-2.5">
+                                            <span className="inline-flex items-center gap-1 bg-white/90 backdrop-blur-sm text-slate-900 text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm">
+                                                {item.transformation_score}
+                                                <span className="text-slate-400 font-normal">/50</span>
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Content */}
+                                <div className="p-4 space-y-2.5">
+                                    <h3
+                                        className="text-sm font-semibold leading-snug line-clamp-2 text-slate-800 group-hover:text-rose-600 transition-colors"
+                                        style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: "15px" }}
+                                    >
+                                        {meta.title || "Untitled"}
+                                    </h3>
+
+                                    <div className="flex items-center justify-between gap-2">
+                                        {meta.channelName && (
+                                            <p className="text-xs text-slate-400 truncate">
+                                                {meta.channelName}
+                                            </p>
+                                        )}
+                                        {item.transformation_classification && (
+                                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${getClassColor(item.transformation_classification)}`}>
+                                                {item.transformation_classification.replace(" Transformation", "")}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Sub-score when sorting by breadth/depth */}
+                                    {sortLabel && subScore && (
+                                        <div className="pt-1">
+                                            <span className="text-[11px] bg-slate-50 px-2 py-1 rounded-lg text-slate-500">
+                                                {sortLabel}: <strong className="text-slate-700">{subScore}</strong>
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </Link>
                         );
                     })}
                 </div>
 
                 {sortedData.length === 0 && (
-                    <div className="text-center py-16 text-muted-foreground">
-                        No results found. Try adjusting your filters.
+                    <div className="text-center py-20">
+                        <p className="text-slate-400 text-lg">No results found. Try adjusting your filters.</p>
                     </div>
                 )}
 
                 {/* Bottom pagination */}
                 {totalPages > 1 && (
-                    <div className="mt-8">
+                    <div className="mt-10 bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4">
                         <Suspense fallback={null}>
                             <ExplorerControls
                                 sortOptions={SORT_OPTIONS}

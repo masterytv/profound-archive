@@ -9,12 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Loader2, Search, ChevronDown, ChevronUp, Bookmark, SlidersHorizontal, BrainCircuit } from "lucide-react";
+import { Loader2, Search, ChevronDown, ChevronUp, Bookmark, SlidersHorizontal, BrainCircuit, ArrowUpDown } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { Card, CardContent } from "@/components/ui/card";
 
 // Shape of a single document returned from our API
 interface HitDocument {
@@ -33,7 +31,6 @@ interface HitDocument {
     similarity?: number;
 }
 
-// Shape for grouping results by video
 interface GroupedVideo {
     video_id: string;
     url: string;
@@ -51,7 +48,6 @@ interface GroupedVideo {
     }>;
 }
 
-// Shape of the facet counts from the API
 interface FacetCount {
     field_name: string;
     counts: Array<{
@@ -60,23 +56,19 @@ interface FacetCount {
     }>;
 }
 
-// Shape of the entire API response
 interface SearchResponse {
     found: number;
     hits: Array<{ document: HitDocument }>;
     facet_counts: FacetCount[];
 }
 
-function SearchV3Content() {
+function SearchV3Alt1Content() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const supabase = createClient();
 
-    // User state
     const [user, setUser] = useState<User | null>(null);
-
-    // Initialize state from URL params
     const initialQuery = searchParams.get("q") || "";
     const initialSortBy = searchParams.get("sort") || "viewCount";
     const initialDirection = (searchParams.get("dir") as "asc" | "desc") || "desc";
@@ -90,7 +82,6 @@ function SearchV3Content() {
     const [similarity, setSimilarity] = useState(initialSimilarity);
     const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
 
-    // Internal state
     const [results, setResults] = useState<HitDocument[]>([]);
     const [facets, setFacets] = useState<FacetCount[]>([]);
     const [totalHits, setTotalHits] = useState(0);
@@ -99,14 +90,11 @@ function SearchV3Content() {
     const [hasSearched, setHasSearched] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [expandedFacets, setExpandedFacets] = useState<Record<string, boolean>>({});
-
-    // Pagination state
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
     const { toast } = useToast();
 
-    // Check for user on mount
     useEffect(() => {
         const getUser = async () => {
             const { data } = await supabase.auth.getUser();
@@ -115,47 +103,34 @@ function SearchV3Content() {
         getUser();
     }, [supabase]);
 
-
-    // Initial parsing of filters from URL
     useEffect(() => {
         const filterParam = searchParams.get("filter");
         if (filterParam) {
             try {
                 const parsed = JSON.parse(filterParam);
                 setActiveFilters(parsed);
-            } catch (e) {
-                // Ignore or handle legacy format
-            }
+            } catch (e) { }
         }
     }, [searchParams]);
 
-    // Sync state with URL whenever search params change
     useEffect(() => {
         const q = searchParams.get("q") || "";
         setSearchTerm(q);
-
         const sort = searchParams.get("sort") || "viewCount";
         setSortBy(sort);
-
         const dir = (searchParams.get("dir") as "asc" | "desc") || "desc";
         setDirection(dir);
-
         const type = (searchParams.get("type") as "keyword" | "semantic") || "keyword";
         setSearchType(type);
-
         const sim = parseFloat(searchParams.get("sim") || "0.50");
         setSimilarity(sim);
 
         const filterParam = searchParams.get("filter");
         let filters = {};
         if (filterParam) {
-            try {
-                filters = JSON.parse(filterParam);
-            } catch (e) { }
+            try { filters = JSON.parse(filterParam); } catch (e) { }
         }
         setActiveFilters(filters);
-
-        // Reset page to 1 when URL params change (new search context)
         setPage(1);
 
         if (q || filterParam) {
@@ -178,7 +153,6 @@ function SearchV3Content() {
         currentSim: number = similarity
     ) => {
         const query = term.trim() || "*";
-
         if (isNewSearch) {
             setIsLoading(true);
             setError(null);
@@ -194,8 +168,6 @@ function SearchV3Content() {
             else if (currentSort === 'title') sortParam = `title:${currentDir}`;
             else if (currentSort === 'channelName') sortParam = `channelName:${currentDir}`;
         } else {
-            // For semantic, map to what routes.ts expectation or let route handle it
-            // Route expects "column:DIRECTION" or just "column"
             if (currentSort === 'relevance' || currentSort === 'text_match') sortParam = 'similarity';
             sortParam = `${sortParam}:${currentDir}`;
         }
@@ -206,7 +178,7 @@ function SearchV3Content() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     searchTerm: query,
-                    filters: currentType === 'keyword' ? filters : {}, // Disable filters for semantic for now
+                    filters: currentType === 'keyword' ? filters : {},
                     page: pageNum,
                     sortBy: sortParam,
                     type: currentType,
@@ -231,8 +203,6 @@ function SearchV3Content() {
                 setResults(prev => [...prev, ...newHits]);
             }
 
-            // Determine if there are more results
-            // Typesense returns strict found count, RPC returns dummy 100 sometimes or exact
             const total = data.found;
             if (newHits.length < 12 || (results.length + newHits.length) >= total) {
                 setHasMore(false);
@@ -263,25 +233,17 @@ function SearchV3Content() {
         sim: number
     ) => {
         const params = new URLSearchParams(searchParams.toString());
-
-        if (term.trim()) {
-            params.set("q", term.trim());
-        } else {
-            params.delete("q");
-        }
-
+        if (term.trim()) { params.set("q", term.trim()); } else { params.delete("q"); }
         if (type === 'keyword' && Object.keys(filters).length > 0) {
             params.set("filter", JSON.stringify(filters));
         } else {
             params.delete("filter");
         }
-
         params.set("sort", sort);
         params.set("dir", dir);
         params.set("type", type);
         params.set("sim", sim.toString());
         params.set("page", "1");
-
         router.push(`${pathname}?${params.toString()}`);
     };
 
@@ -289,25 +251,17 @@ function SearchV3Content() {
         updateUrl(searchTerm, activeFilters, sortBy, direction, searchType, similarity);
     };
 
-    const handleSearchSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onSearchClick();
-    };
-
     const handleFilterChange = (facetField: string, value: string) => {
         const newFilters = { ...activeFilters };
         const currentFilterValues = newFilters[facetField] || [];
-
         if (currentFilterValues.includes(value)) {
             newFilters[facetField] = currentFilterValues.filter(v => v !== value);
         } else {
             newFilters[facetField] = [...currentFilterValues, value];
         }
-
         if (newFilters[facetField].length === 0) {
             delete newFilters[facetField];
         }
-
         updateUrl(searchTerm, newFilters, sortBy, direction, searchType, similarity);
     };
 
@@ -318,10 +272,7 @@ function SearchV3Content() {
     };
 
     const toggleFacetExpansion = (fieldName: string) => {
-        setExpandedFacets(prev => ({
-            ...prev,
-            [fieldName]: !prev[fieldName]
-        }));
+        setExpandedFacets(prev => ({ ...prev, [fieldName]: !prev[fieldName] }));
     };
 
     const handleSaveSearch = async () => {
@@ -330,7 +281,6 @@ function SearchV3Content() {
             toast({ title: 'Cannot save empty search', variant: 'destructive' });
             return;
         }
-
         const { error } = await supabase
             .from('saved_searches')
             .insert({
@@ -341,7 +291,6 @@ function SearchV3Content() {
                 sort_direction: direction,
                 similarity_threshold: similarity
             });
-
         if (error) {
             toast({ title: 'Error saving search', description: error.message, variant: 'destructive' });
         } else {
@@ -362,7 +311,7 @@ function SearchV3Content() {
                     viewCount: doc.viewCount.toString(),
                     channelName: doc.channelName,
                     summary: doc.analysis_nde_summary || "",
-                    tags: [], // Not returned by Typesense yet
+                    tags: [],
                     transcripts: [],
                 });
             }
@@ -393,257 +342,307 @@ function SearchV3Content() {
         return value;
     };
 
-    const FilterSidebar = () => (
-        <div className="w-full lg:w-1/4 xl:w-1/5 space-y-6">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-                <SlidersHorizontal className="w-5 h-5" />
-                Filters
-            </h2>
-            {searchType === 'semantic' ? (
-                <div className="bg-blue-50 text-blue-800 p-4 rounded-md text-sm">
-                    Filters are currently disabled in Concept Mode. Switch to Keyword Search to filter by Channel, NDE status, etc.
-                </div>
-            ) : (
-                <Accordion type="multiple" defaultValue={facets.map(f => f.field_name)} className="w-full">
-                    {facets.map(facet => {
-                        const isExpanded = expandedFacets[facet.field_name] || false;
-                        const visibleItems = isExpanded ? facet.counts : facet.counts.slice(0, 10);
-                        const hasMoreItems = facet.counts.length > 10;
-
-                        return (
-                            <AccordionItem value={facet.field_name} key={facet.field_name}>
-                                <AccordionTrigger className="capitalize">{formatFacetTitle(facet.field_name)}</AccordionTrigger>
-                                <AccordionContent>
-                                    <div className="space-y-2">
-                                        {visibleItems.map(item => (
-                                            <div className="flex items-center space-x-2" key={item.value}>
-                                                <Checkbox
-                                                    id={`${facet.field_name}-${item.value}`}
-                                                    onCheckedChange={() => handleFilterChange(facet.field_name, item.value)}
-                                                    checked={(activeFilters[facet.field_name] || []).includes(item.value)}
-                                                />
-                                                <label htmlFor={`${facet.field_name}-${item.value}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    {formatFacetValue(facet.field_name, item.value)} ({item.count})
-                                                </label>
-                                            </div>
-                                        ))}
-                                        {hasMoreItems && (
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 px-2 text-xs font-medium mt-2 w-full justify-between"
-                                                onClick={() => toggleFacetExpansion(facet.field_name)}
-                                            >
-                                                {isExpanded ? (
-                                                    <>
-                                                        Show Fewer <ChevronUp className="h-3 w-3 ml-1" />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        Show {facet.counts.length - 10} More <ChevronDown className="h-3 w-3 ml-1" />
-                                                    </>
-                                                )}
-                                            </Button>
-                                        )}
-                                    </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                        );
-                    })}
-                </Accordion>
-            )}
-        </div>
-    );
-
     return (
-        <div className="container mx-auto p-4 py-12 max-w-6xl">
-            <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
-                <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">Search Engine for the Soul</h1>
-                <p className="text-muted-foreground mb-6">Find specific moments in more than 5000 NDE YouTube videos.</p>
+        <div className="min-h-screen" style={{ background: "#F8FAFC" }}>
+            {/* ─── Search Header ─── */}
+            <div
+                className="border-b border-slate-200"
+                style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%)" }}
+            >
+                <div className="container mx-auto px-4 py-10 max-w-5xl">
+                    <h1
+                        className="text-3xl md:text-4xl font-bold text-slate-900 text-center mb-2"
+                        style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                    >
+                        Search Engine for the{" "}
+                        <span className="text-blue-600" style={{ fontStyle: "italic" }}>Soul</span>
+                    </h1>
+                    <p className="text-slate-500 text-center mb-8">
+                        Find specific moments in more than 5,000 NDE YouTube videos.
+                    </p>
 
-                <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">Search Term</label>
-                    <div className="relative">
-                        <Input
-                            type="text"
-                            placeholder={searchType === 'keyword' ? "e.g., 'life review' 'tunnel' 'angels' (Exact keywords)" : "e.g., 'what happens after we die?' 'meeting loved ones' (Natural language)"}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === "Enter") onSearchClick() }}
-                            className="w-full pl-10 h-12 text-lg"
-                        />
-                        <Search className="w-5 h-5 absolute left-3 top-3.5 text-muted-foreground" />
-                    </div>
-                </div>
+                    {/* Search Input */}
+                    <div className="max-w-3xl mx-auto">
+                        <form onSubmit={(e) => { e.preventDefault(); onSearchClick(); }}>
+                            <div className="relative">
+                                <Input
+                                    type="text"
+                                    placeholder={searchType === 'keyword'
+                                        ? "Search for 'life review', 'tunnel', 'angels'..."
+                                        : "Ask a question like 'what happens after we die?'..."
+                                    }
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-12 pr-32 h-14 text-lg rounded-2xl border-2 border-slate-200 focus:border-blue-400 shadow-sm bg-white"
+                                    style={{ fontSize: "16px" }}
+                                />
+                                <Search className="w-5 h-5 absolute left-4 top-4.5 text-slate-400" />
+                                <div className="absolute right-1.5 top-1.5 flex items-center gap-1.5">
+                                    {user && searchTerm.trim() && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={handleSaveSearch}
+                                            className="h-11 w-11 text-slate-400 hover:text-blue-600"
+                                        >
+                                            <Bookmark className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                    <Button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className={`rounded-xl px-6 h-11 font-medium ${searchType === 'semantic'
+                                            ? "bg-blue-600 hover:bg-blue-700"
+                                            : "bg-slate-900 hover:bg-slate-800"
+                                            }`}
+                                    >
+                                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Search"}
+                                    </Button>
+                                </div>
+                            </div>
+                        </form>
 
-                <div className="space-y-6">
-                    {/* Controls Row */}
-                    <div className="flex flex-col md:flex-row gap-6 p-4 bg-gray-50 rounded-lg border">
-                        {/* Search Type Toggle */}
-                        <div className="flex-1">
-                            <label className="text-sm font-medium mb-2 block">Search Mode</label>
-                            <div className="flex bg-white p-1 rounded-md border w-fit">
+                        {/* Mode + Sort Controls */}
+                        <div className="flex flex-wrap items-center justify-between mt-4 gap-3">
+                            {/* Search Type Pills */}
+                            <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
                                 <button
                                     onClick={() => setSearchType('keyword')}
-                                    className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors ${searchType === 'keyword' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-gray-100'}`}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${searchType === 'keyword'
+                                        ? 'bg-slate-900 text-white shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                        }`}
                                 >
                                     Keyword Match
                                 </button>
                                 <button
                                     onClick={() => setSearchType('semantic')}
-                                    className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors flex items-center gap-2 ${searchType === 'semantic' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-700 hover:bg-blue-50'}`}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${searchType === 'semantic'
+                                        ? 'bg-blue-600 text-white shadow-sm'
+                                        : 'text-blue-600 hover:bg-blue-50'
+                                        }`}
                                 >
-                                    <BrainCircuit className="w-3 h-3" />
+                                    <BrainCircuit className="w-3.5 h-3.5" />
                                     Concept AI
                                 </button>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-2">
-                                {searchType === 'keyword' ? "Best for finding exact words and filtering by channel." : "Best for finding concepts and meaning, even if words don't match exactly."}
-                            </p>
+
+                            {/* Sort controls */}
+                            <div className="flex items-center gap-2">
+                                <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="text-sm text-slate-600 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                                >
+                                    <option value="relevance">Relevance</option>
+                                    <option value="viewCount">View Count</option>
+                                    <option value="date">Date</option>
+                                    <option value="title">Title</option>
+                                    <option value="channelName">Channel</option>
+                                </select>
+                                <button
+                                    onClick={() => setDirection(d => d === "desc" ? "asc" : "desc")}
+                                    className="text-xs text-slate-500 bg-white border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors"
+                                >
+                                    {direction === "desc" ? "↓ High" : "↑ Low"}
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Similarity Slider (Concept Only) */}
+                        {/* Similarity slider for concept mode */}
                         {searchType === 'semantic' && (
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="text-sm font-medium mb-2 flex justify-between">
-                                    <span>Similarity Threshold</span>
-                                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">{similarity.toFixed(2)}</span>
-                                </label>
-                                <div className="pt-2">
-                                    <Slider
-                                        defaultValue={[0.5]}
-                                        min={0}
-                                        max={1}
-                                        step={0.01}
-                                        value={[similarity]}
-                                        onValueChange={(vals) => setSimilarity(vals[0])}
-                                        className="w-full"
-                                    />
+                            <div className="mt-4 bg-white rounded-xl border border-slate-200 p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm font-medium text-slate-700">Similarity Threshold</span>
+                                    <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-lg">{similarity.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                                <Slider
+                                    defaultValue={[0.5]}
+                                    min={0} max={1} step={0.01}
+                                    value={[similarity]}
+                                    onValueChange={(vals) => setSimilarity(vals[0])}
+                                    className="w-full"
+                                />
+                                <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                                     <span>Broad</span>
                                     <span>Exact</span>
                                 </div>
                             </div>
                         )}
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label htmlFor="sortBy" className="block text-sm font-medium mb-2">Sort By</label>
-                            <select
-                                id="sortBy"
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded-md h-10"
-                            >
-                                <option value="relevance">Relevance</option>
-                                <option value="viewCount">View Count</option>
-                                <option value="date">Date</option>
-                                <option value="title">Title</option>
-                                <option value="channelName">Channel Name</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="direction" className="block text-sm font-medium mb-2">Direction</label>
-                            <select
-                                id="direction"
-                                value={direction}
-                                onChange={(e) => setDirection(e.target.value as "asc" | "desc")}
-                                className="w-full p-2 border border-gray-300 rounded-md h-10"
-                            >
-                                <option value="desc">Descending</option>
-                                <option value="asc">Ascending</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex justify-end items-center mt-6 gap-2">
-                    {user && searchTerm.trim() && (
-                        <Button variant="outline" size="icon" onClick={handleSaveSearch} title="Save this search">
-                            <Bookmark className="h-4 w-4" />
-                        </Button>
-                    )}
-                    <Button onClick={onSearchClick} disabled={isLoading} className={`px-8 h-12 text-lg ${searchType === 'semantic' ? "bg-blue-600 hover:bg-blue-700" : ""}`}>
-                        {isLoading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Searching...</> : <><Search className="w-5 h-5 mr-2" />Search</>}
-                    </Button>
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-8">
-                {hasSearched && !isLoading && (
-                    <FilterSidebar />
-                )}
+            {/* ─── Results Area ─── */}
+            <div className="container mx-auto px-4 py-8 max-w-6xl">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Sidebar Filters */}
+                    {hasSearched && !isLoading && (
+                        <div className="w-full lg:w-64 shrink-0">
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24">
+                                <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                                    <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+                                    Filters
+                                </h2>
+                                {searchType === 'semantic' ? (
+                                    <div className="bg-blue-50 text-blue-700 p-3 rounded-xl text-xs leading-relaxed">
+                                        Filters are disabled in Concept Mode. Switch to Keyword Search to filter.
+                                    </div>
+                                ) : (
+                                    <Accordion type="multiple" defaultValue={facets.map(f => f.field_name)} className="w-full">
+                                        {facets.map(facet => {
+                                            const isExpanded = expandedFacets[facet.field_name] || false;
+                                            const visibleItems = isExpanded ? facet.counts : facet.counts.slice(0, 10);
+                                            const hasMoreItems = facet.counts.length > 10;
 
-                <div className="w-full lg:flex-1">
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-8">
-                            <p className="font-medium">Error: <span className="font-normal">{error}</span></p>
-                        </div>
-                    )}
-
-                    {isLoading ? (
-                        <div className="space-y-6">
-                            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
-                        </div>
-                    ) : hasSearched ? (
-                        <>
-                            <div className="mb-4">
-                                <p className="text-sm text-muted-foreground">{totalHits >= 2000 ? "2000+" : totalHits.toLocaleString()} results found.</p>
+                                            return (
+                                                <AccordionItem value={facet.field_name} key={facet.field_name} className="border-b-0">
+                                                    <AccordionTrigger className="text-xs font-semibold uppercase tracking-wider text-slate-500 py-3 hover:no-underline">
+                                                        {formatFacetTitle(facet.field_name)}
+                                                    </AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-2">
+                                                            {visibleItems.map(item => (
+                                                                <div className="flex items-center space-x-2" key={item.value}>
+                                                                    <Checkbox
+                                                                        id={`alt1-${facet.field_name}-${item.value}`}
+                                                                        onCheckedChange={() => handleFilterChange(facet.field_name, item.value)}
+                                                                        checked={(activeFilters[facet.field_name] || []).includes(item.value)}
+                                                                    />
+                                                                    <label
+                                                                        htmlFor={`alt1-${facet.field_name}-${item.value}`}
+                                                                        className="text-sm text-slate-600 leading-none cursor-pointer"
+                                                                    >
+                                                                        {formatFacetValue(facet.field_name, item.value)}{" "}
+                                                                        <span className="text-slate-400">({item.count})</span>
+                                                                    </label>
+                                                                </div>
+                                                            ))}
+                                                            {hasMoreItems && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-7 px-2 text-xs w-full justify-between text-blue-600 hover:text-blue-700"
+                                                                    onClick={() => toggleFacetExpansion(facet.field_name)}
+                                                                >
+                                                                    {isExpanded ? (
+                                                                        <>Show Fewer <ChevronUp className="h-3 w-3 ml-1" /></>
+                                                                    ) : (
+                                                                        <>Show {facet.counts.length - 10} More <ChevronDown className="h-3 w-3 ml-1" /></>
+                                                                    )}
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            );
+                                        })}
+                                    </Accordion>
+                                )}
                             </div>
-                            {results.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <h3 className="text-lg font-semibold">No results found.</h3>
-                                    <p className="text-muted-foreground">Try a different search term or adjust your filters.</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-6">
-                                    {groupedResults.map(video => (
-                                        <SearchResultCard
-                                            key={video.video_id}
-                                            video={video}
-                                            searchTerm={searchTerm}
-                                            onTagClick={() => { }}
-                                            user={user}
-                                        />
-                                    ))}
-
-                                    {hasMore && (
-                                        <div className="flex justify-center pt-6 pb-8">
-                                            <Button
-                                                onClick={handleLoadMore}
-                                                disabled={isLoadingMore}
-                                                variant="outline"
-                                                className="w-full md:w-auto px-8"
-                                            >
-                                                {isLoadingMore ? (
-                                                    <>
-                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                        Loading more...
-                                                    </>
-                                                ) : (
-                                                    "Load More Results"
-                                                )}
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        null
+                        </div>
                     )}
+
+                    {/* Main Results */}
+                    <div className="w-full lg:flex-1 min-w-0">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-4 mb-6 text-sm">
+                                <strong>Error:</strong> {error}
+                            </div>
+                        )}
+
+                        {isLoading ? (
+                            <div className="space-y-4">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <div key={i} className="bg-white rounded-2xl border border-slate-200/60 p-6">
+                                        <div className="flex gap-4">
+                                            <Skeleton className="w-48 h-28 rounded-xl shrink-0" />
+                                            <div className="flex-1 space-y-3">
+                                                <Skeleton className="h-5 w-3/4" />
+                                                <Skeleton className="h-4 w-1/2" />
+                                                <Skeleton className="h-16 w-full" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : hasSearched ? (
+                            <>
+                                <div className="mb-5 flex items-center justify-between">
+                                    <p className="text-sm text-slate-500">
+                                        <strong className="text-slate-800">{totalHits >= 2000 ? "2,000+" : totalHits.toLocaleString()}</strong> results found
+                                    </p>
+                                </div>
+
+                                {results.length === 0 ? (
+                                    <div className="text-center py-20">
+                                        <h3 className="text-lg font-semibold text-slate-800 mb-2">No results found.</h3>
+                                        <p className="text-slate-500">Try a different search term or adjust your filters.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {groupedResults.map(video => (
+                                            <SearchResultCard
+                                                key={video.video_id}
+                                                video={video}
+                                                searchTerm={searchTerm}
+                                                onTagClick={() => { }}
+                                                user={user}
+                                            />
+                                        ))}
+
+                                        {hasMore && (
+                                            <div className="flex justify-center pt-6 pb-4">
+                                                <Button
+                                                    onClick={handleLoadMore}
+                                                    disabled={isLoadingMore}
+                                                    className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-600/20"
+                                                >
+                                                    {isLoadingMore ? (
+                                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Loading...</>
+                                                    ) : (
+                                                        "Load More Results"
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            /* Empty state before first search */
+                            <div className="text-center py-20">
+                                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-blue-50 flex items-center justify-center">
+                                    <Search className="w-7 h-7 text-blue-400" />
+                                </div>
+                                <h3
+                                    className="text-xl font-bold text-slate-800 mb-2"
+                                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                                >
+                                    Start your search
+                                </h3>
+                                <p className="text-slate-400 max-w-md mx-auto">
+                                    Enter a keyword or question above to find relevant NDE accounts across 5,000+ transcripts.
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-export default function SearchV3Page() {
+export default function SearchV3Alt1Page() {
     return (
-        <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin" /></div>}>
-            <SearchV3Content />
+        <Suspense fallback={
+            <div className="flex justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            </div>
+        }>
+            <SearchV3Alt1Content />
         </Suspense>
     );
 }

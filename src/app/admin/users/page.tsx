@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { UserRow } from "./user-row";
+import { Users } from "lucide-react";
 
 export default async function AdminUsersPage() {
     const cookieStore = await cookies();
@@ -23,7 +24,6 @@ export default async function AdminUsersPage() {
         }
     );
 
-    // Use service role client to fetch emails from auth.users
     const adminSupabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_KEY!,
@@ -35,7 +35,6 @@ export default async function AdminUsersPage() {
         }
     );
 
-    // Fetch both auth users and profiles
     const [
         { data: { users: authUsers }, error: authError },
         { data: profiles, error: profilesError }
@@ -48,7 +47,6 @@ export default async function AdminUsersPage() {
         console.error("Error fetching users:", authError || profilesError);
     }
 
-    // Merge profile data with email from auth users
     const usersWithEmails = profiles?.map((profile: any) => {
         const authUser = authUsers?.find((u: any) => u.id === profile.id);
         return {
@@ -59,47 +57,56 @@ export default async function AdminUsersPage() {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+            <div className="flex items-center gap-3 mb-6">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <Users className="w-4.5 h-4.5 text-blue-600" />
+                </div>
+                <h1
+                    className="text-2xl font-bold text-slate-900"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                >
+                    Users
+                </h1>
+                <span className="text-xs text-slate-400 ml-auto">{usersWithEmails.length} users</span>
             </div>
 
-            <div className="bg-white shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
+            <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
+                <table className="min-w-full divide-y divide-slate-200/60">
+                    <thead>
+                        <tr className="bg-slate-50/80">
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wider"
                             >
                                 User
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wider"
                             >
                                 Role
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                className="px-6 py-3 text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wider"
                             >
                                 Status
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                className="px-6 py-3 text-right text-[10px] font-semibold text-slate-400 uppercase tracking-wider"
                             >
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-slate-100">
                         {usersWithEmails.map((user: any) => (
                             <UserRow key={user.id} profile={user} email={user.email} />
                         ))}
                         {(!profiles || profiles.length === 0) && (
                             <tr>
-                                <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                                <td colSpan={4} className="px-6 py-8 text-center text-slate-400 text-sm">
                                     No users found.
                                 </td>
                             </tr>

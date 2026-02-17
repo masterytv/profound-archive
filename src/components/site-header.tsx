@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Sun, Brain, Heart, Lightbulb, ChevronDown, Menu, X, Mail, User as UserIcon, LogIn, LogOut, Shield } from "lucide-react"
+import Image from "next/image"
+import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, LogIn, LogOut, Shield, Search } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -21,12 +22,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [exploreOpen, setExploreOpen] = useState(false)
   const [toolsOpen, setToolsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileExploreOpen, setMobileExploreOpen] = useState(false)
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false)
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
 
+  const exploreRef = useRef<HTMLDivElement>(null)
   const toolsRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
   const supabase = createClient();
@@ -69,6 +73,9 @@ export default function SiteHeader() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      if (exploreRef.current && !exploreRef.current.contains(event.target as Node)) {
+        setExploreOpen(false)
+      }
       if (toolsRef.current && !toolsRef.current.contains(event.target as Node)) {
         setToolsOpen(false)
       }
@@ -77,74 +84,147 @@ export default function SiteHeader() {
       }
     }
 
-    if (toolsOpen || aboutOpen) {
+    if (exploreOpen || toolsOpen || aboutOpen) {
       document.addEventListener("mousedown", handleClickOutside)
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [toolsOpen, aboutOpen])
+  }, [exploreOpen, toolsOpen, aboutOpen])
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setMobileMenuOpen(false); // Close mobile menu on logout
+    setMobileMenuOpen(false);
     window.location.reload();
   };
 
+  const closeAll = () => {
+    setExploreOpen(false)
+    setToolsOpen(false)
+    setAboutOpen(false)
+  }
+
 
   return (
-    <nav className="bg-white/70 backdrop-blur-md text-foreground sticky top-0 z-50 border-b border-gray-200/50">
+    <nav className="bg-white/80 backdrop-blur-xl text-foreground sticky top-0 z-50 border-b border-slate-200/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Icons */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Sun className="w-5 h-5 text-orange-500" />
-              <Brain className="w-5 h-5 text-blue-500" />
-              <Heart className="w-5 h-5 text-red-500" />
-              <Lightbulb className="w-5 h-5 text-yellow-500" />
-            </div>
-            <Link href="/" className="text-xl font-bold hover:opacity-80 transition-opacity">
+          {/* ─── Logo ─── */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <Image
+              src="/logo-transparent.png"
+              alt="Project Profound logo"
+              width={36}
+              height={36}
+              className="w-9 h-9"
+              priority
+            />
+            <span
+              className="text-xl font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors"
+              style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+            >
               Project Profound
-            </Link>
-          </div>
+            </span>
+          </Link>
 
-          <div className="hidden md:flex items-center gap-6">
+          {/* ─── Desktop Nav ─── */}
+          <div className="hidden md:flex items-center gap-1">
+            {/* Explore Dropdown */}
+            <div className="relative" ref={exploreRef}>
+              <button
+                onClick={() => {
+                  setExploreOpen(!exploreOpen)
+                  setToolsOpen(false)
+                  setAboutOpen(false)
+                }}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+              >
+                Explore
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${exploreOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {exploreOpen && (
+                <div className="absolute top-full left-0 mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
+                  <Link
+                    href="/explore/veridical"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    onClick={() => setExploreOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800">Veridical Perception</div>
+                      <div className="text-xs text-slate-400">Evidential out-of-body reports</div>
+                    </div>
+                  </Link>
+                  <Link
+                    href="/explore/greyson"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    onClick={() => setExploreOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                      <Brain className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800">Greyson Scale</div>
+                      <div className="text-xs text-slate-400">NDE depth measurement</div>
+                    </div>
+                  </Link>
+                  <Link
+                    href="/explore/transformation"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    onClick={() => setExploreOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-rose-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800">Transformation Index</div>
+                      <div className="text-xs text-slate-400">Life-changing impact scores</div>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Search Link */}
+            <Link
+              href="/search3"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+            >
+              <Search className="w-3.5 h-3.5" />
+              Search
+            </Link>
+
             {/* Tools Dropdown */}
             <div className="relative" ref={toolsRef}>
               <button
                 onClick={() => {
                   setToolsOpen(!toolsOpen)
+                  setExploreOpen(false)
                   setAboutOpen(false)
                 }}
-                className="flex items-center gap-1 hover:text-gray-600 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
               >
-                Tools
-                <ChevronDown className={`w-4 h-4 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
+                Chat
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
               </button>
               {toolsOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
-                  <Link
-                    href="/search3"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-                    onClick={() => setToolsOpen(false)}
-                  >
-                    Search NDE Videos
-                  </Link>
+                <div className="absolute top-full left-0 mt-1.5 w-56 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
                   <Link
                     href="/chat-compassionate"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     onClick={() => setToolsOpen(false)}
                   >
-                    NDE Compassionate Chat
+                    Compassionate Chat
                   </Link>
                   <Link
                     href="/chat-2"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     onClick={() => setToolsOpen(false)}
                   >
-                    NDE Research Chat
+                    Research Chat
                   </Link>
                 </div>
               )}
@@ -152,30 +232,34 @@ export default function SiteHeader() {
 
             {/* About Dropdown */}
             <div className="relative flex items-center" ref={aboutRef}>
-              <Link href="/about" className="hover:text-gray-600 transition-colors">
+              <Link
+                href="/about"
+                className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+              >
                 About
               </Link>
               <button
                 onClick={() => {
                   setAboutOpen(!aboutOpen)
+                  setExploreOpen(false)
                   setToolsOpen(false)
                 }}
-                className="flex items-center gap-1 hover:text-gray-600 transition-colors"
+                className="p-1 rounded text-slate-400 hover:text-slate-600 transition-colors -ml-1"
               >
-                <ChevronDown className={`w-4 h-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
               </button>
               {aboutOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white text-foreground rounded-lg shadow-lg py-2 z-50">
+                <div className="absolute top-full left-0 mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
                   <Link
                     href="/about#projects"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     Projects
                   </Link>
                   <Link
                     href="/about#connect"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     Connect
@@ -184,14 +268,14 @@ export default function SiteHeader() {
                     href="https://blog.projectprofound.org"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     Blog
                   </a>
                   <Link
                     href="/experiencers"
-                    className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     For Experiencers
@@ -200,26 +284,31 @@ export default function SiteHeader() {
               )}
             </div>
 
+            {/* Divider */}
+            <div className="w-px h-5 bg-slate-200 mx-1" />
 
+            {/* Newsletter */}
             <a
               data-formkit-toggle="893453eeff"
               href="https://project-profound.kit.com/893453eeff"
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50/60 transition-all"
             >
-              <Mail className="w-4 h-4" />
+              <Mail className="w-3.5 h-3.5" />
               Newsletter
             </a>
+
+            {/* Contribute */}
             <a
               href="https://www.gofundme.com/f/project-profound"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-600 hover:text-green-700 transition-colors font-medium"
+              className="px-3 py-1.5 rounded-lg text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-all"
             >
               Contribute
             </a>
 
             {/* Auth Button */}
-            <div className="flex items-center">
+            <div className="flex items-center ml-1">
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -232,7 +321,7 @@ export default function SiteHeader() {
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 rounded-xl" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || user.email}</p>
@@ -263,13 +352,14 @@ export default function SiteHeader() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button asChild>
+                <Button asChild size="sm" className="rounded-lg bg-slate-900 hover:bg-slate-800 text-white">
                   <Link href="/login">Login</Link>
                 </Button>
               )}
             </div>
           </div>
 
+          {/* ─── Mobile Menu ─── */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon">
@@ -278,78 +368,136 @@ export default function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-sm p-0">
               <div className="flex flex-col h-full">
-                {/* Header with Close button */}
-                <div className="flex items-center justify-between p-4 border-b">
-                  <h2 className="text-lg font-semibold">Menu</h2>
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b border-slate-100">
+                  <div className="flex items-center gap-2.5">
+                    <Image
+                      src="/logo-transparent.png"
+                      alt="Project Profound logo"
+                      width={32}
+                      height={32}
+                      className="w-8 h-8"
+                    />
+                    <span
+                      className="text-lg font-bold text-slate-900"
+                      style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                    >
+                      Project Profound
+                    </span>
+                  </div>
                   <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
-                    <X className="h-6 w-6" />
+                    <X className="h-5 w-5" />
                   </Button>
                 </div>
 
                 {/* Menu Items */}
-                <div className="flex-1 px-6 py-4 space-y-6 overflow-y-auto">
+                <div className="flex-1 px-5 py-4 space-y-5 overflow-y-auto">
                   {/* User Profile / Login */}
                   {user ? (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-3 pb-4 border-b border-slate-100">
                       <div className="flex items-center gap-3">
-                        <Avatar>
+                        <Avatar className="h-10 w-10">
                           <AvatarImage src={user.user_metadata?.avatar_url} />
-                          <AvatarFallback><UserIcon /></AvatarFallback>
+                          <AvatarFallback><UserIcon className="h-5 w-5" /></AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <span className="font-semibold text-sm">{user.user_metadata?.full_name || user.email}</span>
-                          <Link href="/dashboard" className="text-xs text-primary hover:underline" onClick={() => setMobileMenuOpen(false)}>View Dashboard</Link>
+                          <span className="font-semibold text-sm text-slate-900">{user.user_metadata?.full_name || user.email}</span>
+                          <Link href="/dashboard" className="text-xs text-blue-600 hover:underline" onClick={() => setMobileMenuOpen(false)}>View Dashboard</Link>
                         </div>
                       </div>
-                      <Button variant="outline" onClick={handleLogout}>
+                      <Button variant="outline" size="sm" onClick={handleLogout} className="rounded-lg">
                         <LogOut className="w-4 h-4 mr-2" />
                         Logout
                       </Button>
                     </div>
                   ) : (
-                    <Button asChild className="w-full">
-                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                        <LogIn className="w-4 h-4 mr-2" />
-                        Login / Sign Up
-                      </Link>
-                    </Button>
+                    <div className="pb-4 border-b border-slate-100">
+                      <Button asChild className="w-full rounded-lg bg-slate-900 hover:bg-slate-800">
+                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                          <LogIn className="w-4 h-4 mr-2" />
+                          Login / Sign Up
+                        </Link>
+                      </Button>
+                    </div>
                   )}
 
-                  <div className="w-full h-[1px] bg-gray-200" />
+                  {/* Explore Section */}
+                  <div>
+                    <button
+                      onClick={() => setMobileExploreOpen(!mobileExploreOpen)}
+                      className="flex items-center justify-between w-full text-base font-semibold text-slate-900 mb-3"
+                    >
+                      Explore by Score
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${mobileExploreOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                    {mobileExploreOpen && (
+                      <div className="space-y-1 pl-1">
+                        <Link
+                          href="/explore/veridical"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <TrendingUp className="w-4 h-4 text-emerald-600" />
+                          Veridical Perception
+                        </Link>
+                        <Link
+                          href="/explore/greyson"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Brain className="w-4 h-4 text-blue-600" />
+                          Greyson Scale
+                        </Link>
+                        <Link
+                          href="/explore/transformation"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Sparkles className="w-4 h-4 text-rose-600" />
+                          Transformation Index
+                        </Link>
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Tools Section */}
+                  {/* Search */}
+                  <Link
+                    href="/search3"
+                    className="flex items-center gap-3 text-base font-semibold text-slate-900"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Search className="w-4 h-4 text-slate-500" />
+                    Search
+                  </Link>
+
+                  {/* Chat Section */}
                   <div>
                     <button
                       onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
-                      className="flex items-center justify-between w-full text-xl font-semibold mb-4"
+                      className="flex items-center justify-between w-full text-base font-semibold text-slate-900 mb-3"
                     >
-                      Tools
+                      Chat
                       <ChevronDown
-                        className={`w-5 h-5 transition-transform ${mobileToolsOpen ? "rotate-180" : ""}`}
+                        className={`w-4 h-4 transition-transform ${mobileToolsOpen ? "rotate-180" : ""}`}
                       />
                     </button>
                     {mobileToolsOpen && (
-                      <div className="space-y-3 pl-4">
-                        <Link
-                          href="/search3"
-                          className="block text-gray-600 hover:text-gray-900"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Search NDE Videos
-                        </Link>
+                      <div className="space-y-1 pl-4">
                         <Link
                           href="/chat-compassionate"
-                          className="block text-gray-600 hover:text-gray-900"
+                          className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          NDE Compassionate Chat
+                          Compassionate Chat
                         </Link>
                         <Link
                           href="/chat-2"
-                          className="block text-gray-600 hover:text-gray-900"
+                          className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          NDE Research Chat
+                          Research Chat
                         </Link>
                       </div>
                     )}
@@ -357,42 +505,42 @@ export default function SiteHeader() {
 
                   {/* About Section */}
                   <div>
-                    <div className="flex items-center justify-between w-full mb-4">
-                      <Link href="/about" className="text-xl font-semibold" onClick={() => setMobileMenuOpen(false)}>
+                    <div className="flex items-center justify-between w-full mb-3">
+                      <Link href="/about" className="text-base font-semibold text-slate-900" onClick={() => setMobileMenuOpen(false)}>
                         About
                       </Link>
                       <button onClick={() => setMobileAboutOpen(!mobileAboutOpen)}>
                         <ChevronDown
-                          className={`w-5 h-5 transition-transform ${mobileAboutOpen ? "rotate-180" : ""}`}
+                          className={`w-4 h-4 transition-transform ${mobileAboutOpen ? "rotate-180" : ""}`}
                         />
                       </button>
                     </div>
                     {mobileAboutOpen && (
-                      <div className="space-y-3 pl-4">
+                      <div className="space-y-1 pl-4">
                         <Link
                           href="/about#projects"
-                          className="block text-gray-900 hover:text-gray-600"
+                          className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Projects
                         </Link>
                         <Link
                           href="/about#connect"
-                          className="block text-gray-900 hover:text-gray-600"
+                          className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Connect
                         </Link>
                         <a
                           href="https://blog.projectprofound.org"
-                          className="block text-gray-900 hover:text-gray-600"
+                          className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Blog
                         </a>
                         <Link
                           href="/experiencers"
-                          className="block text-gray-900 hover:text-gray-600"
+                          className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           For Experiencers
@@ -401,27 +549,29 @@ export default function SiteHeader() {
                     )}
                   </div>
 
+                  {/* Divider */}
+                  <div className="border-t border-slate-100 pt-4 space-y-3">
+                    {/* Newsletter */}
+                    <a
+                      data-formkit-toggle="893453eeff"
+                      href="https://project-profound.kit.com/893453eeff"
+                      className="flex items-center gap-2.5 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Newsletter
+                    </a>
 
-                  {/* Newsletter Link */}
-                  <a
-                    data-formkit-toggle="893453eeff"
-                    href="https://project-profound.kit.com/893453eeff"
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
-                  >
-                    <Mail className="w-5 h-5" />
-                    Newsletter
-                  </a>
-
-                  {/* Contribute Link */}
-                  <a
-                    href="https://www.gofundme.com/f/project-profound"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-green-600 hover:text-green-700 font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Contribute
-                  </a>
+                    {/* Contribute */}
+                    <a
+                      href="https://www.gofundme.com/f/project-profound"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Contribute
+                    </a>
+                  </div>
                 </div>
               </div>
             </SheetContent>
