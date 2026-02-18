@@ -42,6 +42,18 @@ The project uses a component-based architecture built with React and Shadcn UI.
 - **`ChannelSearch.tsx`**: Client search input for filtering channels by name. Drives URL `q` param.
 - **`ExpandableDescription.tsx`**: Client component for expandable text with "Show more/less" toggle and auto-linkified URLs. Used on channel detail pages.
 
+### Analysis Components (`src/components/analysis/`)
+> **Pattern:** All data is fetched **server-side** and passed as props to these client components. Never use client-side `useEffect`/`createClient` to fetch analysis data — see LEARNINGS.md §8 for the full explanation.
+
+- **`NderfAnalysisSection.tsx`**: Top-level container for NDERF analysis data on video pages. Renders collapsible sections for badges, journey flow, core elements, phenomenology, and entity encounters. Accepts `NderfAnalysisData` prop from the server component.
+- **`ExperienceBadges.tsx`**: Displays classification badges (NDE type, trigger, tone, intensity) in a responsive grid.
+- **`JourneyFlowTimeline.tsx`**: Horizontal scrollable timeline showing the sequence of NDE events (e.g., "Observing Body → Tunnel → Light → Being of Light").
+- **`CoreElementsGrid.tsx`**: Grid of detected NDE elements with confidence indicators. Shows which classic NDE elements were found in the account.
+- **`PhenomenologyCard.tsx`**: Detailed phenomenological analysis card with expandable sub-sections for sensory, cognitive, emotional, and temporal categories.
+- **`EntityEncounters.tsx`**: Displays entity encounter data (deceased relatives, beings of light, religious figures) with relationship types and interaction details.
+- **`ChannelAnalysisSummary.tsx`**: Aggregate analysis overview for channel pages. Shows stacked bar charts for experience types, emotional tone, and trigger categories + average intensity. Accepts pre-fetched `stats` prop from channel `page.tsx`.
+- **`SimilarExperiences.tsx`**: Displays pgvector-based similar NDE cards with thumbnails, similarity percentages, and type/tone badges. Accepts pre-fetched `results` prop from video `page.tsx`.
+
 ### `ChatPopup.tsx`
 - **Path:** `src/components/chat-popup.tsx`
 - **Purpose:** Site-wide floating chat widget rendered in root `layout.tsx`. Provides quick access to the Compassionate Chat AI from any page.

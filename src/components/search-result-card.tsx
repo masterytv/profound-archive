@@ -11,6 +11,7 @@ import SaveToCollectionButton from "./add-to-collection-button"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
+import { ExperienceBadges } from "./analysis/ExperienceBadges"
 
 interface SearchResult {
     content: string;
@@ -45,6 +46,14 @@ interface SearchResultCardProps {
 export function SearchResultCard({ result, video, searchTerm, user }: SearchResultCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const supabase = createClient()
+
+    // Fetch NDERF analysis data for badges
+    const [nderfData, setNderfData] = useState<{
+        experience_type: string | null;
+        trigger_category: string | null;
+        tone: string | null;
+        intensity_rating: number | null;
+    } | null>(null);
 
 
     // Data Normalization
@@ -135,6 +144,22 @@ export function SearchResultCard({ result, video, searchTerm, user }: SearchResu
     };
 
     const summary = displayData.summary;
+
+    // Fetch NDERF data once we have a valid video_id
+    useEffect(() => {
+        if (!displayData?.video_id) return;
+        const fetchNderf = async () => {
+            const { data } = await supabase
+                .from("nde_analysis")
+                .select("experience_type, trigger_category, overall_tone, intensity_rating")
+                .eq("video_id", displayData!.video_id)
+                .single();
+            if (data) setNderfData({ ...data, tone: data.overall_tone } as any);
+        };
+        fetchNderf();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [displayData?.video_id]);
+
     const isLongSummary = summary.length > 250;
     const displayedSummary = isExpanded ? summary : `${summary.substring(0, 250)}${isLongSummary ? "..." : ""}`;
 
@@ -211,6 +236,17 @@ export function SearchResultCard({ result, video, searchTerm, user }: SearchResu
                                 )}
                             </p>
                         </div>
+                    )}
+
+                    {/* Experience Badges (NDERF) */}
+                    {nderfData && (
+                        <ExperienceBadges
+                            experienceType={nderfData.experience_type}
+                            triggerCategory={nderfData.trigger_category}
+                            tone={nderfData.tone}
+                            intensityRating={nderfData.intensity_rating}
+                            size="sm"
+                        />
                     )}
 
                     {/* Transcripts (Matches) */}

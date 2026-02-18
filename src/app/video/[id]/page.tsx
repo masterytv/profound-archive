@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import { GreysonScoreCard, GreysonBreakdown } from "@/components/video/GreysonScoreCard";
 import { TransformationScoreCard } from "@/components/video/TransformationScoreCard";
 import { YouTubePlayer } from "@/components/video/YouTubePlayer";
+import { NderfAnalysisSection } from "@/components/analysis/NderfAnalysisSection";
+import { SimilarExperiences, type SimilarExperience } from "@/components/analysis/SimilarExperiences";
 
 interface VideoPageProps {
     params: Promise<{ id: string }>;
@@ -159,10 +161,18 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
     const { data: analysis } = await supabase
         .from("nde_analysis")
         .select(
-            "total_greyson_score, scale_agreement, greyson_breakdown, transformation_score, transformation_classification, transformation_breakdown"
+            "total_greyson_score, scale_agreement, greyson_breakdown, transformation_score, transformation_classification, transformation_breakdown, experience_type, core_elements, trigger_category, overall_tone, intensity_rating, journey_sequence, journey_notes, phenomenology, entities, content_safety"
         )
         .eq("video_id", id)
         .single();
+
+    // Fetch similar experiences server-side (avoids client-side AbortError from React strict mode)
+    const { data: similarData } = await supabase.rpc("find_similar_experiences", {
+        target_video_id: id,
+        match_count: 6,
+        similarity_threshold: 0.7,
+    });
+    const similarExperiences: SimilarExperience[] = (similarData || []) as SimilarExperience[];
 
     const levelColor = getLevelColor(video.rvnde_level);
     const hasVeridical = video.rvnde_total_score !== null || video.rvnde_level;
@@ -328,6 +338,27 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                                 </div>
                             </div>
                         )}
+
+                        {/* ─── Experience Analysis (NDERF) ─── */}
+                        {analysis && (
+                            <NderfAnalysisSection
+                                data={{
+                                    experience_type: analysis.experience_type as string | null,
+                                    trigger_category: analysis.trigger_category as string | null,
+                                    tone: analysis.overall_tone as string | null,
+                                    intensity_rating: analysis.intensity_rating as number | null,
+                                    nde_elements: analysis.core_elements as any,
+                                    journey_flow: analysis.journey_sequence as any,
+                                    phenomenology: analysis.phenomenology as any,
+                                    entities: analysis.entities as any,
+                                    content_safety: analysis.content_safety as any,
+                                    nde_summary: null,
+                                }}
+                            />
+                        )}
+
+                        {/* ─── Similar Experiences (pgvector) ─── */}
+                        <SimilarExperiences results={similarExperiences} />
 
                         {/* Veridical Perception — detailed inline card */}
                         {hasVeridical && (

@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { ChannelAnalysisSummary, type ChannelNderfStats } from '@/components/analysis/ChannelAnalysisSummary'
 
 const PAGE_SIZE = 12
 
@@ -134,6 +135,11 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
 
     const totalViews = statsData?.reduce((sum, v) => sum + (v.viewCount || 0), 0) || 0
 
+    // Fetch NDERF analysis stats server-side (avoids client-side AbortError from React strict mode)
+    const { data: nderfStats } = await supabase.rpc('get_channel_nderf_stats', {
+        target_channel_id: channelId,
+    })
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
 
@@ -211,6 +217,11 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                         <ExpandableDescription text={channelEnriched.description} />
                     )}
                 </div>
+            </div>
+
+            {/* ─── Channel NDERF Analysis Summary ─── */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+                <ChannelAnalysisSummary stats={nderfStats as ChannelNderfStats | null} />
             </div>
 
             {/* Controls + Grid */}

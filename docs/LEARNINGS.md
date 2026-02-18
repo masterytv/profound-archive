@@ -107,3 +107,38 @@
 3. `grep -r 'maxresdefault' src/` — Should return ZERO hits in component code.
 4. Check `next.config.ts` `remotePatterns` includes any new image domains.
 
+## 8. Supabase Client-Side Fetch AbortError (CRITICAL)
+
+> **Context:** In Feb 2026, analysis sections on video and channel pages were silently disappearing after showing a "Loading..." spinner. Root cause: React strict mode + Supabase singleton client.
+
+### A. The Problem
+- `createClient()` in `src/lib/supabase/client.ts` returns a **singleton** browser client.
+- React 18 strict mode (and Next.js dev Fast Refresh) **double-mounts** components — mount → unmount → mount.
+- The Supabase singleton's internal `AbortController` persists across re-renders. When the first mount's RPC call is in-flight during unmount, the second mount **aborts it**.
+- Supabase returns the abort as `error.message: "signal is aborted without reason"` (not a thrown exception), which error handlers interpret as a real failure → set data to `null` → component returns `null` → section vanishes.
+
+### B. The Fix
+- **Never fetch Supabase data via `useEffect` in client components.** Instead:
+  1. Fetch the data in the **server component** (e.g., `page.tsx`) using the server Supabase client.
+  2. Pass the fetched data as **props** to the client component.
+- This is faster (no loading spinner), more reliable, and completely sidesteps the abort issue.
+
+### C. Pattern
+```tsx
+// ✅ CORRECT — server component fetches, client component renders
+// page.tsx (server component)
+const { data } = await supabase.rpc('my_function', { ... });
+return <MyComponent data={data} />;
+
+// ❌ WRONG — client component fetches (AbortError-prone)
+// MyComponent.tsx ("use client")
+useEffect(() => {
+  const supabase = createClient(); // singleton!
+  supabase.rpc('my_function', { ... }).then(...)
+}, []);
+```
+
+### D. Affected Components (Fixed)
+- `ChannelAnalysisSummary.tsx` — stats fetched in `channel/[channelId]/page.tsx`
+- `SimilarExperiences.tsx` — results fetched in `video/[id]/page.tsx`
+

@@ -60,6 +60,8 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - Site-wide Chat Popup widget (`ChatPopup`) — floating "Chat with NDEs" on all pages.
 - Channel pages: `/channels` directory with logo-centric cards, `/channel/[channelId]` detail pages.
 - YouTube channel metadata enrichment via `scripts/enrich-channels.ts` → `channels` table.
+- NDERF analysis visualization: video-level analysis (phenomenology, entities, journey flow, core elements), channel-level aggregate stats, similar experiences (pgvector).
+- Experience fingerprint generation + pgvector similarity search (`find_similar_experiences` RPC).
 
 ### In Progress
 - Migrating n8n workflows to native code (See `docs/workflows/OVERVIEW.md`).
@@ -81,3 +83,5 @@ See [Environment Variables Doc](./docs/ENVIRONMENT.md).
 | Channel Directory | `src/app/channels/page.tsx` |
 | Channel Detail | `src/app/channel/[channelId]/page.tsx` |
 | Channel Enrichment | `scripts/enrich-channels.ts` |
+| Analysis Components | `src/components/analysis/` |
+| Batch API Routes | `src/app/api/batch/` |
