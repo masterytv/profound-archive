@@ -4,7 +4,7 @@ export default function SiteFooter() {
   return (
     <footer className="border-t border-slate-200/60 bg-slate-50 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <h3
@@ -44,6 +44,42 @@ export default function SiteFooter() {
               >
                 Blog
               </a>
+            </div>
+          </div>
+
+          {/* Community & Research */}
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+              Community & Research
+            </h4>
+            <div className="space-y-2 text-sm">
+              <a
+                href="https://noeticmap.com/research/literature"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-slate-600 hover:text-blue-600 transition-colors"
+              >
+                Academic Literature ↗
+              </a>
+              <a
+                href="https://noeticmap.com/answers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-slate-600 hover:text-blue-600 transition-colors"
+              >
+                Evidence-Based Q&A ↗
+              </a>
+              <a
+                href="https://www.nderf.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-slate-600 hover:text-blue-600 transition-colors"
+              >
+                NDERF Archive ↗
+              </a>
+              <Link href="/resources" className="block text-slate-600 hover:text-blue-600 transition-colors">
+                All Resources
+              </Link>
             </div>
           </div>
 

@@ -411,6 +411,105 @@ export default async function HomeAlt1() {
                 </div>
             </section>
 
+            {/* ─── Explore the Ecosystem ─── */}
+            <section className="container mx-auto px-4 pt-6 pb-16 max-w-7xl">
+                <div className="text-center mb-10">
+                    <h2
+                        className="text-2xl md:text-3xl font-bold text-slate-900 mb-3"
+                        style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                    >
+                        Explore the NDE Ecosystem
+                    </h2>
+                    <p className="text-slate-500 max-w-xl mx-auto">
+                        Discover the organizations and researchers advancing our understanding of near-death experiences.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {/* Card 1: NoeticMap Academic Literature */}
+                    <a
+                        href="https://noeticmap.com/research/literature"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg hover:border-violet-200 transition-all duration-300"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center mb-4 group-hover:bg-violet-100 transition-colors">
+                            <span className="text-lg">📚</span>
+                        </div>
+                        <h3
+                            className="font-bold text-slate-900 mb-1 group-hover:text-violet-700 transition-colors"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            Academic Literature
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-3">
+                            Search 1,100+ AI-analyzed peer-reviewed papers on consciousness research, with 9,000+ extracted findings.
+                        </p>
+                        <span className="text-xs font-medium text-violet-600 group-hover:text-violet-700 transition-colors">
+                            NoeticMap.com ↗
+                        </span>
+                    </a>
+
+                    {/* Card 2: NDERF Archive */}
+                    <a
+                        href="https://www.nderf.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg hover:border-amber-200 transition-all duration-300"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-4 group-hover:bg-amber-100 transition-colors">
+                            <span className="text-lg">🌍</span>
+                        </div>
+                        <h3
+                            className="font-bold text-slate-900 mb-1 group-hover:text-amber-700 transition-colors"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            World&apos;s Largest NDE Archive
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-3">
+                            5,300+ documented near-death experiences collected since 1998 by Dr. Jeffrey Long, available in 37 languages.
+                        </p>
+                        <span className="text-xs font-medium text-amber-600 group-hover:text-amber-700 transition-colors">
+                            NDERF.org ↗
+                        </span>
+                    </a>
+
+                    {/* Card 3: NoeticMap Q&A */}
+                    <a
+                        href="https://noeticmap.com/answers"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg hover:border-teal-200 transition-all duration-300"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center mb-4 group-hover:bg-teal-100 transition-colors">
+                            <span className="text-lg">❓</span>
+                        </div>
+                        <h3
+                            className="font-bold text-slate-900 mb-1 group-hover:text-teal-700 transition-colors"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            Your Questions, Answered
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-3">
+                            30+ evidence-based answers to questions like &quot;Are NDEs real?&quot; and &quot;What happens when we die?&quot;
+                        </p>
+                        <span className="text-xs font-medium text-teal-600 group-hover:text-teal-700 transition-colors">
+                            NoeticMap.com ↗
+                        </span>
+                    </a>
+                </div>
+
+                <div className="text-center">
+                    <Link
+                        href="/resources"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                    >
+                        View All Resources
+                        <ArrowRight className="w-4 h-4" />
+                    </Link>
+                </div>
+            </section>
+
             {/* ─── Bottom CTA ─── */}
             <section className="py-16 text-center" style={{ background: "linear-gradient(to bottom, #F8FAFC, #EFF6FF)" }}>
                 <h2

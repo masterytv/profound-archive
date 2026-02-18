@@ -44,42 +44,26 @@ const ELEMENT_LABELS: Record<string, string> = {
     future_visions: "Future Visions",
 };
 
-// Assign a rich color to each step based on its position in the journey
-// Uses a warm-to-cool gradient arc: gold → amber → rose → violet → indigo → blue → teal
-const STEP_COLORS = [
-    { bg: "bg-amber-500", text: "text-white", ring: "ring-amber-200" },
-    { bg: "bg-orange-500", text: "text-white", ring: "ring-orange-200" },
-    { bg: "bg-rose-500", text: "text-white", ring: "ring-rose-200" },
-    { bg: "bg-pink-500", text: "text-white", ring: "ring-pink-200" },
-    { bg: "bg-fuchsia-500", text: "text-white", ring: "ring-fuchsia-200" },
-    { bg: "bg-violet-500", text: "text-white", ring: "ring-violet-200" },
-    { bg: "bg-indigo-500", text: "text-white", ring: "ring-indigo-200" },
-    { bg: "bg-blue-500", text: "text-white", ring: "ring-blue-200" },
-    { bg: "bg-sky-500", text: "text-white", ring: "ring-sky-200" },
-    { bg: "bg-cyan-500", text: "text-white", ring: "ring-cyan-200" },
-    { bg: "bg-teal-500", text: "text-white", ring: "ring-teal-200" },
-    { bg: "bg-emerald-500", text: "text-white", ring: "ring-emerald-200" },
+// Ghost/outline pill colors — light tinted bg, colored border + text
+// Follows BRAND.md "Classification Pills" pattern: bg-{color}-50, border-{color}-200, text-{color}-700
+const STEP_STYLES = [
+    { bg: "bg-amber-50", border: "border-amber-300", text: "text-amber-700", dot: "bg-amber-500", arrow: "text-amber-300" },
+    { bg: "bg-orange-50", border: "border-orange-300", text: "text-orange-700", dot: "bg-orange-500", arrow: "text-orange-300" },
+    { bg: "bg-rose-50", border: "border-rose-300", text: "text-rose-700", dot: "bg-rose-500", arrow: "text-rose-300" },
+    { bg: "bg-pink-50", border: "border-pink-300", text: "text-pink-700", dot: "bg-pink-500", arrow: "text-pink-300" },
+    { bg: "bg-fuchsia-50", border: "border-fuchsia-300", text: "text-fuchsia-700", dot: "bg-fuchsia-500", arrow: "text-fuchsia-300" },
+    { bg: "bg-violet-50", border: "border-violet-300", text: "text-violet-700", dot: "bg-violet-500", arrow: "text-violet-300" },
+    { bg: "bg-indigo-50", border: "border-indigo-300", text: "text-indigo-700", dot: "bg-indigo-500", arrow: "text-indigo-300" },
+    { bg: "bg-blue-50", border: "border-blue-300", text: "text-blue-700", dot: "bg-blue-500", arrow: "text-blue-300" },
+    { bg: "bg-sky-50", border: "border-sky-300", text: "text-sky-700", dot: "bg-sky-500", arrow: "text-sky-300" },
+    { bg: "bg-cyan-50", border: "border-cyan-300", text: "text-cyan-700", dot: "bg-cyan-500", arrow: "text-cyan-300" },
+    { bg: "bg-teal-50", border: "border-teal-300", text: "text-teal-700", dot: "bg-teal-500", arrow: "text-teal-300" },
+    { bg: "bg-emerald-50", border: "border-emerald-300", text: "text-emerald-700", dot: "bg-emerald-500", arrow: "text-emerald-300" },
 ];
 
-function getStepColor(index: number) {
-    return STEP_COLORS[index % STEP_COLORS.length];
+function getStepStyle(index: number) {
+    return STEP_STYLES[index % STEP_STYLES.length];
 }
-
-// Connector arrow color based on position
-const CONNECTOR_COLORS = [
-    "text-amber-300",
-    "text-orange-300",
-    "text-rose-300",
-    "text-pink-300",
-    "text-fuchsia-300",
-    "text-violet-300",
-    "text-indigo-300",
-    "text-blue-300",
-    "text-sky-300",
-    "text-cyan-300",
-    "text-teal-300",
-    "text-emerald-300",
-];
 
 // --- Component ---
 
@@ -107,31 +91,33 @@ export function JourneyFlowTimeline({
 
     return (
         <div className={cn("space-y-3", className)}>
-            {/* Timeline — a horizontal row of colorful pill badges connected by arrows */}
+            {/* Timeline — ghost/outline pills connected by chevron arrows */}
             <div className="overflow-x-auto pb-1 -mx-1 px-1">
                 <div className="flex items-center gap-1 min-w-max">
                     {displayed.map((el, idx) => {
                         const label = ELEMENT_LABELS[el.element] || el.element.replace(/_/g, " ");
-                        const color = getStepColor(idx);
+                        const style = getStepStyle(idx);
                         const isLast = idx === displayed.length - 1 && showAll;
 
                         return (
                             <div key={`${el.element}-${el.order}`} className="flex items-center">
-                                {/* Step pill */}
+                                {/* Ghost pill — light bg, colored border + text */}
                                 <div
                                     className={cn(
-                                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full ring-2 shadow-sm",
+                                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full border",
                                         "text-xs font-semibold whitespace-nowrap",
-                                        color.bg,
-                                        color.text,
-                                        color.ring,
+                                        "transition-all duration-200",
+                                        style.bg,
+                                        style.border,
+                                        style.text,
                                     )}
                                     title={`Step ${idx + 1}: ${label} (confidence: ${el.confidence ?? "N/A"}%)`}
                                 >
-                                    {/* Step number */}
-                                    <span className="w-4 h-4 rounded-full bg-white/25 flex items-center justify-center text-[10px] font-bold">
-                                        {idx + 1}
-                                    </span>
+                                    {/* Colored dot as step indicator */}
+                                    <span className={cn(
+                                        "w-2 h-2 rounded-full flex-shrink-0",
+                                        style.dot,
+                                    )} />
                                     {label}
                                 </div>
 
@@ -140,7 +126,7 @@ export function JourneyFlowTimeline({
                                     <ChevronRight
                                         className={cn(
                                             "w-4 h-4 flex-shrink-0",
-                                            CONNECTOR_COLORS[idx % CONNECTOR_COLORS.length],
+                                            style.arrow,
                                         )}
                                     />
                                 )}
@@ -153,14 +139,14 @@ export function JourneyFlowTimeline({
                         <div className="flex items-center">
                             <ChevronRight
                                 className={cn(
-                                    "w-4 h-4 flex-shrink-0",
-                                    CONNECTOR_COLORS[displayed.length % CONNECTOR_COLORS.length],
+                                    "w-4 h-4 flex-shrink-0 text-slate-300",
                                 )}
                             />
                             <button
                                 onClick={() => setIsExpanded(true)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full ring-2 ring-slate-200 bg-slate-100 text-slate-600 text-xs font-semibold whitespace-nowrap hover:bg-slate-200 hover:ring-slate-300 transition-colors cursor-pointer shadow-sm"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-slate-500 text-xs font-semibold whitespace-nowrap hover:bg-slate-100 hover:border-slate-300 hover:text-slate-700 transition-all duration-200 cursor-pointer"
                             >
+                                <span className="w-2 h-2 rounded-full bg-slate-300" />
                                 +{hiddenCount} more
                             </button>
                         </div>
