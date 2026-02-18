@@ -62,10 +62,11 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - YouTube channel metadata enrichment via `scripts/enrich-channels.ts` → `channels` table.
 - NDERF analysis visualization: video-level analysis (phenomenology, entities, journey flow, core elements), channel-level aggregate stats, similar experiences (pgvector).
 - Experience fingerprint generation + pgvector similarity search (`find_similar_experiences` RPC).
+- Resources page: `/resources` — NDE research ecosystem directory with 7 sections (orgs, academic, research, accounts, intro, books, support).
+- Alt1 design system redesign: profile, dashboard, admin pages, chat popup (light theme), and new logo.
 
 ### In Progress
 - Migrating n8n workflows to native code (See `docs/workflows/OVERVIEW.md`).
-- Admin Dashboard enhancements.
 
 ## Environment Variables
 See [Environment Variables Doc](./docs/ENVIRONMENT.md).
@@ -85,3 +86,6 @@ See [Environment Variables Doc](./docs/ENVIRONMENT.md).
 | Channel Enrichment | `scripts/enrich-channels.ts` |
 | Analysis Components | `src/components/analysis/` |
 | Batch API Routes | `src/app/api/batch/` |
+| Resources Page | `src/app/resources/page.tsx` |
+| Brand Guidelines | `docs/BRAND.md` |
+| Logo (transparent) | `public/logo-transparent.png` |

@@ -22,6 +22,7 @@ The application uses the **Next.js 14+ App Router**. Routes are defined by the f
 | `/dashboard` | `src/app/dashboard/page.tsx` | User Dashboard | **Yes** |
 | `/channels` | `src/app/channels/page.tsx` | Channel Directory (sort/filter/paginate) | No |
 | `/channel/[channelId]` | `src/app/channel/[channelId]/page.tsx` | Channel Detail — videos, stats, description | No |
+| `/resources` | `src/app/resources/page.tsx` | NDE Research Ecosystem Directory — organizations, academic, books, support | No |
 | `/admin` | `src/app/admin/page.tsx` | Admin Dashboard | **Yes (Admin Role)** |
 
 ## Data Fetching

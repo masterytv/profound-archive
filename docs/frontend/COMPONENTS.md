@@ -65,6 +65,31 @@ The project uses a component-based architecture built with React and Shadcn UI.
 - **Dependencies:** `/api/chat-compassionate` endpoint, `lucide-react` icons.
 - **Animations:** Custom Tailwind keyframes (`chat-slide-up`, `chat-slide-down`, `subtle-pulse`) defined in `tailwind.config.ts`.
 
+## Resources Page (`src/app/resources/page.tsx`)
+
+A comprehensive NDE research ecosystem directory with 8 sections and 3 reusable sub-components.
+
+### Sub-Components (defined inline)
+- **`ResourceCard`**: Linked card with icon badge, title, org, description, optional stat. Opens external links in new tab.
+- **`BookCard`**: Non-linked card for books with Crimson Pro italic title, author, year, and description.
+- **`SectionHeader`**: Icon badge + Crimson Pro title + subtitle. Used to introduce each section.
+
+### Sections
+1. **Organizations & Nonprofits** — IANDS, NDERF, NoeticMap, Shared Crossing, ADCRF, Eternea
+2. **Academic Institutions** — UVA DOPS, NYU AWARE Study, Journal of Near-Death Studies
+3. **Research & Academic Literature** — NoeticMap literature search, findings, paper browser, cases, NDERF research
+4. **First-Hand Account Databases** — NDERF archive, NoeticMap community
+5. **New to NDEs? Start Here** — Educational resources from IANDS, NDERF, NoeticMap
+6. **Essential Books** — 6 foundational NDE books (Moody, Long, Greyson, Alexander, van Lommel, Moorjani)
+7. **Support & Community** — IANDS support groups, conference, NDERF submission
+8. **About These Organizations** — Detailed bios for IANDS, NDERF, NoeticMap, Shared Crossing Project
+
+### Design
+- Hero with gradient background and dot pattern overlay
+- Alt1 design system: rounded-2xl cards, icon badges, Crimson Pro headings
+- Fully responsive 1/2/3 column grid
+- Closing "About These Organizations" section with detailed org descriptions
+
 ## Design System (Shadcn UI)
 We use [Shadcn UI](https://ui.shadcn.com/) components.
 - **Styling:** Tailwind CSS classes.

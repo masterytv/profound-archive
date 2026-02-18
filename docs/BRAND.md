@@ -209,6 +209,7 @@ Body class: `font-body antialiased flex flex-col min-h-screen bg-background`
 | Greyson explorer | `src/app/explore/greyson/page.tsx` |
 | Transformation explorer | `src/app/explore/transformation/page.tsx` |
 | Video detail | `src/app/video/[id]/page.tsx` |
+| Resources page | `src/app/resources/page.tsx` |
 | Profile page | `src/app/profile/page.tsx` |
 | Dashboard page | `src/app/dashboard/page.tsx` |
 | Admin layout | `src/app/admin/layout.tsx` |
