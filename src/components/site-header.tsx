@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, LogIn, LogOut, Shield, Search } from "lucide-react"
+import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, LogIn, LogOut, Shield, Search, Tv } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -182,6 +182,19 @@ export default function SiteHeader() {
                     <div>
                       <div className="text-sm font-medium text-slate-800">Transformation Index</div>
                       <div className="text-xs text-slate-400">Life-changing impact scores</div>
+                    </div>
+                  </Link>
+                  <Link
+                    href="/channels"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    onClick={() => setExploreOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                      <Tv className="w-4 h-4 text-indigo-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800">Channels</div>
+                      <div className="text-xs text-slate-400">Browse by source channel</div>
                     </div>
                   </Link>
                 </div>
@@ -457,6 +470,14 @@ export default function SiteHeader() {
                         >
                           <Sparkles className="w-4 h-4 text-rose-600" />
                           Transformation Index
+                        </Link>
+                        <Link
+                          href="/channels"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Tv className="w-4 h-4 text-indigo-600" />
+                          Channels
                         </Link>
                       </div>
                     )}

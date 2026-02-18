@@ -44,6 +44,31 @@ The database is hosted on Supabase (PostgreSQL). It stores NDE (Near-Death Exper
 
 ---
 
+### `channels`
+**Purpose:** Stores enriched YouTube channel metadata fetched via YouTube Data API v3. Populated by `scripts/enrich-channels.ts`.
+
+| Column | Type | Nullable | Description |
+|---|---|---|---|
+| channel_id | text | NO | Primary Key (YouTube channel ID) |
+| name | text | NO | Channel display name |
+| description | text | YES | Channel description |
+| avatar_url | text | YES | Channel avatar/logo URL |
+| banner_url | text | YES | Channel banner URL |
+| custom_url | text | YES | YouTube custom URL (e.g., @handle) |
+| country | text | YES | Channel country code |
+| subscriber_count | bigint | YES | Total subscribers |
+| total_video_count | bigint | YES | Total videos on channel |
+| total_view_count | bigint | YES | Total views across all videos |
+| published_at | timestamptz | YES | Channel creation date |
+| fetched_at | timestamptz | YES | When metadata was last fetched |
+
+**Relationships:**
+- `channel_id` matches `nde_vids.channelId`
+
+**RPC:** `get_channel_stats()` LEFT JOINs this table with aggregated `nde_vids` data.
+
+---
+
 ### `n8n_chat_histories`
 **Purpose:** Stores chat history for n8n workflows.
 

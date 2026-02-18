@@ -34,7 +34,7 @@ interface ExplorerControlsProps {
     /** Current sort direction */
     currentDirection: "asc" | "desc";
     /** Current filter value (empty = all) */
-    currentFilter: string;
+    currentFilter?: string;
     /** Current page */
     currentPage: number;
     /** Total pages */

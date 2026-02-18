@@ -20,6 +20,8 @@ The application uses the **Next.js 14+ App Router**. Routes are defined by the f
 | `/scale/transformation` | `src/app/scale/transformation/page.tsx` | NDE-TI Scale Info | No |
 | `/profile` | `src/app/profile/page.tsx` | User Profile | **Yes** |
 | `/dashboard` | `src/app/dashboard/page.tsx` | User Dashboard | **Yes** |
+| `/channels` | `src/app/channels/page.tsx` | Channel Directory (sort/filter/paginate) | No |
+| `/channel/[channelId]` | `src/app/channel/[channelId]/page.tsx` | Channel Detail — videos, stats, description | No |
 | `/admin` | `src/app/admin/page.tsx` | Admin Dashboard | **Yes (Admin Role)** |
 
 ## Data Fetching

@@ -37,6 +37,11 @@ The project uses a component-based architecture built with React and Shadcn UI.
 - **`ExplorerVideoCard.tsx`**: Rich video card with optional sub-score badges (breadth/depth, category totals).
 - **`ExplorerControls.tsx`**: URL-param-driven sort/filter/pagination controls. Shared across all `/explore/*` pages.
 
+### Channel Components (`src/components/channels/`)
+- **`ChannelCard.tsx`**: Logo-centric card with large circular YouTube avatar, channel name, country badge, and 3-column stats grid (Videos/Views/Subs). Used on both homepage and `/channels` directory.
+- **`ChannelSearch.tsx`**: Client search input for filtering channels by name. Drives URL `q` param.
+- **`ExpandableDescription.tsx`**: Client component for expandable text with "Show more/less" toggle and auto-linkified URLs. Used on channel detail pages.
+
 ### `ChatPopup.tsx`
 - **Path:** `src/components/chat-popup.tsx`
 - **Purpose:** Site-wide floating chat widget rendered in root `layout.tsx`. Provides quick access to the Compassionate Chat AI from any page.

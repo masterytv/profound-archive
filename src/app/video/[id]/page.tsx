@@ -134,6 +134,7 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
       videoId,
       title,
       channelName,
+      channelId,
       channelUrl,
       date,
       viewCount,
@@ -212,8 +213,7 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                             <div className="flex flex-wrap items-center gap-3 text-sm">
                                 {video.channelName && (
                                     <Link
-                                        href={video.channelUrl || "#"}
-                                        target="_blank"
+                                        href={video.channelId ? `/channel/${video.channelId}` : (video.channelUrl || "#")}
                                         className="flex items-center gap-1.5 font-medium text-slate-800 hover:text-blue-600 transition-colors"
                                     >
                                         <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">

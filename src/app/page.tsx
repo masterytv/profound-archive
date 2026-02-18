@@ -1,14 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu } from "lucide-react";
+import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu, Tv } from "lucide-react";
+import Image from "next/image";
 import {
     CuratedVideoColumn,
     type CuratedVideo,
 } from "@/components/home/CuratedVideoColumn";
 import { HeroSearchBar } from "@/components/home/HeroSearchBar";
+import { ChannelCard } from "@/components/channels/ChannelCard";
 import Link from "next/link";
 
-// --- ISR: revalidate every 6 hours (21600 seconds) ---
-export const revalidate = 21600;
+// --- ISR: revalidate every 3 hours (10800 seconds) ---
+export const revalidate = 10800;
 
 // --- Seeded shuffle: deterministic within each 6-hour window ---
 function seededShuffle<T>(array: T[], seed: number): T[] {
@@ -117,9 +119,22 @@ async function fetchCuratedVideos(
 
 export default async function HomeAlt1() {
     const supabase = await createClient();
-    const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
-    const seed = Math.floor(Date.now() / SIX_HOURS_MS);
+    const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
+    const seed = Math.floor(Date.now() / THREE_HOURS_MS);
     const { veridical, transformation, greyson } = await fetchCuratedVideos(supabase, seed);
+
+    // Fetch channels for "Explore by Channel" section
+    const { data: allChannels } = await supabase.rpc('get_channel_stats');
+    const channelPool = (allChannels || []) as Array<{
+        channel_id: string;
+        channel_name: string;
+        channel_url: string | null;
+        video_count: number;
+        total_views: number;
+        subscriber_count: number;
+        sample_thumbnail: string | null;
+    }>;
+    const featuredChannels = seededShuffle(channelPool, seed + 10).slice(0, 4);
 
     return (
         <div className="min-h-screen">
@@ -180,6 +195,42 @@ export default async function HomeAlt1() {
                             <span><strong className="text-slate-800 font-semibold">AI-Powered</strong> Analysis</span>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* ─── Explore by Channel ─── */}
+            <section className="container mx-auto px-4 pt-6 pb-12 max-w-7xl">
+                <div className="text-center mb-10">
+                    <div className="flex items-center justify-center gap-2.5 mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                            <Tv className="w-5 h-5 text-indigo-600" />
+                        </div>
+                        <h2
+                            className="text-2xl md:text-3xl font-bold text-slate-900"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            Explore by Channel
+                        </h2>
+                    </div>
+                    <p className="text-slate-500 max-w-xl mx-auto">
+                        Discover NDE channels sharing first-person accounts.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                    {featuredChannels.map((channel) => (
+                        <ChannelCard key={channel.channel_id} channel={channel} />
+                    ))}
+                </div>
+
+                <div className="text-center">
+                    <Link
+                        href="/channels"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-medium hover:bg-indigo-100 transition-colors"
+                    >
+                        Browse All Channels
+                        <ArrowRight className="w-4 h-4" />
+                    </Link>
                 </div>
             </section>
 
