@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard } from "lucide-react";
+import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload } from "lucide-react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -84,6 +84,13 @@ export default async function AdminLayout({
                         >
                             <Users className="w-4 h-4" />
                             Users
+                        </Link>
+                        <Link
+                            href="/admin/intake"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                        >
+                            <Upload className="w-4 h-4" />
+                            Video Intake
                         </Link>
                         {profile?.role === "super_admin" && (
                             <Link

@@ -142,3 +142,117 @@ useEffect(() => {
 - `ChannelAnalysisSummary.tsx` — stats fetched in `channel/[channelId]/page.tsx`
 - `SimilarExperiences.tsx` — results fetched in `video/[id]/page.tsx`
 
+## 9. YouTube Video Scraping (CRITICAL)
+
+> **Context:** In Feb 2026, we built the native intake pipeline to replace n8n. Several YouTube-related gotchas surfaced during development.
+
+### A. Caption Fetching — Don't Use `innertube`
+- **The Problem:** The npm `innertube` package (YouTube's internal API client) is unstable, heavy (~20MB), and frequently breaks with YouTube API changes.
+- **The Fix:** Fetch captions directly via YouTube's `timedtext` API:
+  1. Fetch the video page HTML
+  2. Parse `captionTracks` from the `ytInitialPlayerResponse` JSON blob
+  3. Hit the `timedtext` URL with `&fmt=json3` for structured JSON
+- **Key Detail:** The default `timedtext` response is **XML**. You MUST append `&fmt=json3` to the URL to get JSON with proper timestamps.
+- **Fallback Chain:** `en` manual → `en` auto-generated (ASR) → first available language
+
+### B. Caption Parsing — Event Structure
+- YouTube's `json3` format uses `events[]` where each event has:
+  - `tStartMs` — start time in milliseconds
+  - `segs[]` — array of text segments, each with `utf8` content
+- Events without `segs` are timing markers — skip them.
+- Some segments contain only `\n` — filter these out.
+
+### C. Transcript Chunking Strategy
+- **Search chunks** (25 chunks): Fixed-count chunking with timestamps, stored in `nde_punctuated_embeddings` for semantic/concept search.
+- **Chat chunks** (15 chunks): Larger, timestamp-free chunks stored in `nde_chatbot_chunks` for conversational AI context.
+- Both chunk types are generated from the same raw transcript but optimized for different use cases.
+
+### D. Video Metadata — Scraping Without API Key
+- Video metadata (title, description, publish date, view count, duration) can be scraped from the video page HTML by parsing the `ytInitialPlayerResponse` and `ytInitialData` JSON objects embedded in `<script>` tags.
+- Channel metadata requires the YouTube Data API v3 (API key needed) for subscriber count and custom URLs.
+
+## 10. Supabase pgvector Gotchas (CRITICAL)
+
+### A. Insert Timeout with Large Vectors
+- **The Problem:** Inserting 25 rows each containing a 1536-dimension float vector (`text-embedding-3-small`) in a single `.insert()` call exceeds Supabase's default statement timeout. Each vector is ~12KB serialized, so 25 rows ≈ 300KB of vector data per statement.
+- **The Fix:** Batch inserts into **groups of 5 rows**. This keeps each statement under 60KB and well within the timeout.
+- **Pattern:**
+  ```typescript
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+      const batch = rows.slice(i, i + BATCH_SIZE);
+      const { error } = await supabase.from('table').insert(batch);
+      if (error) throw new Error(`Batch ${i}: ${error.message}`);
+  }
+  ```
+
+### B. Re-Processing Embeddings — Delete-Before-Insert
+- **The Problem:** Using `.insert()` on re-processed videos fails silently (or throws a unique constraint error) because embedding rows already exist from the first run. Using `.upsert()` requires a unique constraint on `(video_id, content)` which is impractical for text columns.
+- **The Fix:** Delete existing rows first, then insert fresh ones:
+  ```typescript
+  await supabase.from('nde_punctuated_embeddings').delete().eq('video_id', videoId);
+  await supabase.from('nde_chatbot_chunks').delete().eq('video_id', videoId);
+  // Then insert new rows...
+  ```
+- **Rule:** Any pipeline step that writes to a table without a natural primary key must use delete-before-insert for re-processing safety.
+
+### C. Silent Errors vs Thrown Errors
+- **The Problem:** The original embedding code used `console.error()` on failure, which logs the error but allows the pipeline to continue and mark the video as "complete" — even though embeddings were never created. The video appears in the DB but not in search results.
+- **The Fix:** Always `throw new Error()` on embedding/indexing failures so the pipeline status reflects the actual state. This surfaces the error in the admin UI step log.
+
+## 11. Intake Pipeline Architecture
+
+### A. Pipeline Step Order (14 Steps)
+1. Parse URL → videoId
+2. Check Database (new vs re-process)
+3. Scrape video + channel metadata
+4. Enrich channel (YouTube Data API)
+5. Fetch + process captions
+6. Insert initial video record
+7. Classify experience (lightweight AI gate)
+8. Run 7 analysis passes in parallel (Greyson, Transformation, Core Elements, Phenomenology, Journey Flow, cvNDE, NDE Summary)
+9. Save analysis results
+10. Generate embeddings (search + chat)
+11. Sync to Typesense (keyword search index)
+12. Generate experience fingerprint (pgvector similarity)
+13. Mark complete
+
+### B. Classification Gate Pattern
+- The classification step costs ~$0.001 and takes ~2s. It determines if the video contains a genuine profound experience before running the full 7-pass analysis suite (~$0.02-0.05, ~20-30s).
+- Gate outcomes: `clear_nde`, `possible_nde`, `not_nde`, `insufficient_info`
+- Videos classified as `not_nde` skip the expensive analysis passes entirely but are still recorded in the database.
+
+### C. Experiencer Name Extraction Rules
+- Added to the classification step (not a separate AI call) to extract the experiencer's full name.
+- **Critical rules in the prompt:**
+  - Extract ONLY the person who experienced the NDE
+  - DO NOT return the host, interviewer, narrator, podcaster, or commentator name
+  - DO NOT return names from secondhand accounts ("my mother had an NDE...")
+  - Return `null` if no name is identifiable
+- Uses video title + description + transcript for maximum context.
+
+### D. Typesense Auto-Indexing
+- After embedding generation, the pipeline automatically syncs search chunks to Typesense for keyword search.
+- **Graceful degradation:** If `TYPESENSE_HOST` or `TYPESENSE_API_KEY` env vars are not set, the step is silently skipped.
+- **Non-fatal:** Typesense indexing errors are caught and logged but don't fail the pipeline.
+- Uses `upsert` action so re-processing updates existing documents.
+
+## 12. Admin UI Patterns
+
+### A. Brand Consistency in Admin Pages
+- Admin pages MUST NOT use their own dark theme (`bg-gray-950`). The admin layout (`admin/layout.tsx`) provides a light `#F8FAFC` background and white sidebar.
+- Follow the established patterns from `BRAND.md` Section 10:
+  - Cards: `rounded-2xl border border-slate-200/60 bg-white`
+  - Headings: Crimson Pro serif with blue icon badge
+  - Icons: Lucide React, never emojis
+  - Inputs: `rounded-xl` with slate-200 borders and blue focus rings
+
+### B. Processing Step Display
+- Use SVG status icons (CheckCircle2, XCircle, Loader2) instead of emoji (✅, ❌, 🔄)
+- Step name colors by status: success → `text-slate-900`, failed → `text-red-600`, running → `text-blue-600`, skipped → `text-slate-400`
+- Duration displayed in `font-mono text-xs text-slate-300`
+
+### C. Result Link Visibility
+- The "See Video and Analysis" link should only appear when `result.status === 'complete' || result.status === 'already_exists'`
+- For failed, not_profound, or error results, hide the link to avoid linking to incomplete data.
+

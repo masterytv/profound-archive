@@ -64,9 +64,11 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - Experience fingerprint generation + pgvector similarity search (`find_similar_experiences` RPC).
 - Resources page: `/resources` — NDE research ecosystem directory with 7 sections (orgs, academic, research, accounts, intro, books, support).
 - Alt1 design system redesign: profile, dashboard, admin pages, chat popup (light theme), and new logo.
+- **Native video intake pipeline** (`src/lib/pipeline/`) — replaces n8n: scrape → classify → 7-pass analysis → embeddings → Typesense index → fingerprint.
+- Admin intake page (`/admin/intake`) — branded UI for single-video processing with real-time step progress.
 
 ### In Progress
-- Migrating n8n workflows to native code (See `docs/workflows/OVERVIEW.md`).
+- Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
 
 ## Environment Variables
 See [Environment Variables Doc](./docs/ENVIRONMENT.md).
@@ -89,3 +91,7 @@ See [Environment Variables Doc](./docs/ENVIRONMENT.md).
 | Resources Page | `src/app/resources/page.tsx` |
 | Brand Guidelines | `docs/BRAND.md` |
 | Logo (transparent) | `public/logo-transparent.png` |
+| Intake Pipeline | `src/lib/pipeline/intake.ts` |
+| Pipeline Modules | `src/lib/pipeline/` (scraper, classifier, embeddings, etc.) |
+| Admin Intake Page | `src/app/admin/intake/page.tsx` |
+| Intake API Route | `src/app/api/intake/route.ts` |

@@ -4,7 +4,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Brain, Heart, Sparkles, Ghost } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import {
     Tooltip,
@@ -65,41 +65,60 @@ const getScoreColor = (score: number) => {
     return "text-gray-400"; // Not NDE
 };
 
+// Normalize an item that may be a GreysonItem, a raw number, or an unknown shape
+const normalizeItem = (item: any): GreysonItem => {
+    if (typeof item === 'number') {
+        return { score: (isNaN(item) ? 0 : item) as 0 | 1 | 2, reasoning: '' };
+    }
+    if (item && typeof item === 'object' && 'score' in item) {
+        const s = Number(item.score);
+        return { score: (isNaN(s) ? 0 : s) as 0 | 1 | 2, reasoning: String(item.reasoning || '') };
+    }
+    // Fallback for completely unknown shapes
+    return { score: 0, reasoning: '' };
+};
+
 const CategorySection = ({
     title,
     items
 }: {
     title: string;
-    items: Record<string, GreysonItem>
-}) => (
-    <div className="space-y-2">
-        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider border-b pb-1">
-            {title}
+    items: Record<string, any>
+}) => {
+    if (!items || typeof items !== 'object') return null;
+    return (
+        <div className="space-y-2">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider border-b pb-1">
+                {title}
+            </div>
+            <div className="space-y-1">
+                {Object.entries(items).map(([key, rawItem]) => {
+                    const item = normalizeItem(rawItem);
+                    return (
+                        <div key={key} className="flex justify-between items-center text-xs group">
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="text-foreground/80 cursor-help hover:text-foreground transition-colors truncate max-w-[120px]">
+                                            {formatLabel(key)}
+                                        </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-xs">
+                                        <p className="font-medium mb-1">{formatLabel(key)}</p>
+                                        <p className="text-xs text-muted-foreground">{item.reasoning || 'No reasoning available'}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <span className={`font-mono font-medium ${item.score > 0 ? 'text-primary' : 'text-muted-foreground/40'}`}>
+                                {item.score}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
-        <div className="space-y-1">
-            {Object.entries(items).map(([key, item]) => (
-                <div key={key} className="flex justify-between items-center text-xs group">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <span className="text-foreground/80 cursor-help hover:text-foreground transition-colors truncate max-w-[120px]">
-                                    {formatLabel(key)}
-                                </span>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="max-w-xs">
-                                <p className="font-medium mb-1">{formatLabel(key)}</p>
-                                <p className="text-xs text-muted-foreground">{item.reasoning}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                    <span className={`font-mono font-medium ${item.score > 0 ? 'text-primary' : 'text-muted-foreground/40'}`}>
-                        {item.score}
-                    </span>
-                </div>
-            ))}
-        </div>
-    </div>
-);
+    );
+};
 
 export function GreysonScoreCard({ totalScore, classification, breakdown }: GreysonScoreCardProps) {
     if (!breakdown) return null;
