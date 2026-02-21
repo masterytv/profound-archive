@@ -1,0 +1,50 @@
+{
+  "node": {
+    "60093b26322dc325d7b9ea7c9f92381b1f14692ef0": {
+      "workers": {
+        "app/admin/users/page": {
+          "moduleId": 36969,
+          "async": false,
+          "exportedName": "toggleBanUser",
+          "filename": "Documents/Antigravity/ProjectProfound/profound-archive/src/app/admin/actions.ts"
+        }
+      },
+      "layer": {
+        "app/admin/users/page": "action-browser"
+      },
+      "exportedName": "toggleBanUser",
+      "filename": "Documents/Antigravity/ProjectProfound/profound-archive/src/app/admin/actions.ts"
+    },
+    "60e0f0ab48865761a8874a91d0cce635179a3119df": {
+      "workers": {
+        "app/admin/users/page": {
+          "moduleId": 36969,
+          "async": false,
+          "exportedName": "updateUserRole",
+          "filename": "Documents/Antigravity/ProjectProfound/profound-archive/src/app/admin/actions.ts"
+        }
+      },
+      "layer": {
+        "app/admin/users/page": "action-browser"
+      },
+      "exportedName": "updateUserRole",
+      "filename": "Documents/Antigravity/ProjectProfound/profound-archive/src/app/admin/actions.ts"
+    },
+    "40e2800ae044504704b2c97c78cb80d9bc9858e73e": {
+      "workers": {
+        "app/admin/users/page": {
+          "moduleId": 36969,
+          "async": false,
+          "exportedName": "deleteUser",
+          "filename": "Documents/Antigravity/ProjectProfound/profound-archive/src/app/admin/actions.ts"
+        }
+      },
+      "layer": {
+        "app/admin/users/page": "action-browser"
+      },
+      "exportedName": "deleteUser",
+      "filename": "Documents/Antigravity/ProjectProfound/profound-archive/src/app/admin/actions.ts"
+    }
+  },
+  "edge": {}
+}

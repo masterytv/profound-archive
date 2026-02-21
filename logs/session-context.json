@@ -1,0 +1,19 @@
+{
+    "project": "Project Profound",
+    "last_updated": "2026-02-21T17:17:17-05:00",
+    "summary": "Completed a massive UX/UI sprint resulting in the Alt1 design system upgrades, brand logo updates, a unified Home/Search gateway, and advanced numerical score filters correctly hooked up to Typesense and Supabase RPCs.",
+    "topics_covered": [
+        "Search filters",
+        "pgvector RPC parameters",
+        "Tailwind UI / Shadcn forms",
+        "Logo & brand update",
+        "Routing & API params"
+    ],
+    "decisions": [
+        "Merged home and search pages via a central hero search bar.",
+        "Renamed Semantic search to Concept search for users on the frontend.",
+        "Implemented minimum score numeric sliders acting directly on the API route to override default filter arrays.",
+        "Redesigned the Admin Intake page to the light slate theme for consistency with other admin UI."
+    ],
+    "blockers": []
+}

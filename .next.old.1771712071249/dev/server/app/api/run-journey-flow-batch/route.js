@@ -1,0 +1,10 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/run-journey-flow-batch/route.js")
+R.c("server/chunks/26d59_next_6b738a6a._.js")
+R.c("server/chunks/26d59_@opentelemetry_api_build_esm_fdab1fec._.js")
+R.c("server/chunks/26d59_@supabase_auth-js_dist_module_b5d26d80._.js")
+R.c("server/chunks/26d59_openai_b15a005a._.js")
+R.c("server/chunks/26d59_28d0e9c8._.js")
+R.c("server/chunks/[root-of-the-server]__37d3932b._.js")
+R.c("server/chunks/e2c0f__next-internal_server_app_api_run-journey-flow-batch_route_actions_3ce8f818.js")
+R.m("[project]/Documents/Antigravity/ProjectProfound/profound-archive/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/Documents/Antigravity/ProjectProfound/profound-archive/src/app/api/run-journey-flow-batch/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/Documents/Antigravity/ProjectProfound/profound-archive/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/Documents/Antigravity/ProjectProfound/profound-archive/src/app/api/run-journey-flow-batch/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

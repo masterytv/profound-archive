@@ -64,6 +64,8 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - Experience fingerprint generation + pgvector similarity search (`find_similar_experiences` RPC).
 - Resources page: `/resources` — NDE research ecosystem directory with 7 sections (orgs, academic, research, accounts, intro, books, support).
 - Alt1 design system redesign: profile, dashboard, admin pages, chat popup (light theme), and new logo.
+- Merged Home/Search experiences: Hero section now features a comprehensive search bar gateway.
+- Advanced Search Filters (`/search3`): Integrated Greyson, Transformation, and Veridical sliding score filters across Keyword and Concept (formerly Semantic) search modes correctly updating URL params, Typesense Schema, and pgvector RPCs.
 - **Native video intake pipeline** (`src/lib/pipeline/`) — replaces n8n: scrape → classify → 7-pass analysis → embeddings → Typesense index → fingerprint.
 - Admin intake page (`/admin/intake`) — branded UI for single-video processing with real-time step progress.
 

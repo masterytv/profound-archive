@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         console.log(`Executing /search3 (${type}): "${searchTerm}" page ${pageNum}`);
 
         if (type === 'semantic') {
-            return await handleSemanticSearch(searchTerm, pageNum, perPage, similarity, sortBy);
+            return await handleSemanticSearch(searchTerm, filters, pageNum, perPage, similarity, sortBy);
         } else {
             return await handleKeywordSearch(searchTerm, filters, sortBy, pageNum, perPage);
         }
@@ -76,13 +76,22 @@ async function handleKeywordSearch(searchTerm: string, filters: any, sortBy: any
     const typesense = getTypesenseClient();
 
     // 1. Prepare Filters
-    const filterConditions = Object.entries(filters || {})
-        .filter(([field, values]) => Array.isArray(values) && values.length > 0)
-        .map(([field, values]) => {
-            const fieldValues = (values as string[]).map(v => `\`${v}\``).join(', ');
-            return `${field}:=[${fieldValues}]`;
-        })
-        .join(' && ');
+    const filterArr: string[] = [];
+    Object.entries(filters || {}).forEach(([field, values]: [string, any]) => {
+        if (!Array.isArray(values) || values.length === 0) return;
+
+        if (field === 'minGreyson') {
+            filterArr.push(`greysonScore:>=${parseInt(values[0])}`);
+        } else if (field === 'minTransformation') {
+            filterArr.push(`transformationScore:>=${parseInt(values[0])}`);
+        } else if (field === 'minVeridical') {
+            filterArr.push(`veridicalScore:>=${parseInt(values[0])}`);
+        } else {
+            const fieldValues = values.map((v: string) => `\`${v}\``).join(', ');
+            filterArr.push(`${field}:=[${fieldValues}]`);
+        }
+    });
+    const filterConditions = filterArr.join(' && ');
 
     // 2. Prepare Sort
     let sortQuery = 'viewCount:desc';
@@ -100,7 +109,7 @@ async function handleKeywordSearch(searchTerm: string, filters: any, sortBy: any
         'query_by': 'content,title',
         'page': page,
         'per_page': perPage,
-        'facet_by': 'channelName,isNde',
+        'facet_by': 'channelName,isNde,experienceType,triggerCategory,overallTone,intensityBucket',
         'filter_by': [filterConditions, 'isNde:!=not_nde'].filter(Boolean).join(' && '),
         'sort_by': sortQuery,
         'max_facet_values': 100,
@@ -139,7 +148,7 @@ async function handleKeywordSearch(searchTerm: string, filters: any, sortBy: any
 }
 
 // --- Semantic Search (OpenAI + Supabase Vector RPC) ---
-async function handleSemanticSearch(searchTerm: string, page: number, perPage: number, similarityThreshold: number, sortBy: any) {
+async function handleSemanticSearch(searchTerm: string, filters: any, page: number, perPage: number, similarityThreshold: number, sortBy: any) {
     const supabase = getSupabaseClient();
     const openai = getOpenAIClient();
 
@@ -168,16 +177,48 @@ async function handleSemanticSearch(searchTerm: string, page: number, perPage: n
 
     if (sortColumn === '_text_match') sortColumn = 'similarity'; // Map typesense sort to supabase sort
 
-    // 3. Call RPC
+    // 3. Process filters for Semantic Search RPC
+    const filterExperienceType = filters?.experienceType?.length > 0 ? filters.experienceType : null;
+    const filterTriggerCategory = filters?.triggerCategory?.length > 0 ? filters.triggerCategory : null;
+    const filterOverallTone = filters?.overallTone?.length > 0 ? filters.overallTone : null;
+    const filterMinGreyson = filters?.minGreyson?.length > 0 ? parseInt(filters.minGreyson[0]) : null;
+    const filterMinTransformation = filters?.minTransformation?.length > 0 ? parseInt(filters.minTransformation[0]) : null;
+    const filterMinVeridical = filters?.minVeridical?.length > 0 ? parseInt(filters.minVeridical[0]) : null;
+
+    // Convert intensityBucket selected labels to min/max rating values
+    let filterIntensityMin = null;
+    let filterIntensityMax = null;
+    if (filters?.intensityBucket?.length > 0) {
+        let min = 10;
+        let max = 1;
+        if (filters.intensityBucket.includes('Mild')) { min = Math.min(min, 1); max = Math.max(max, 3); }
+        if (filters.intensityBucket.includes('Moderate')) { min = Math.min(min, 4); max = Math.max(max, 5); }
+        if (filters.intensityBucket.includes('Deep')) { min = Math.min(min, 6); max = Math.max(max, 7); }
+        if (filters.intensityBucket.includes('Profound')) { min = Math.min(min, 8); max = Math.max(max, 10); }
+        if (min <= max) {
+            filterIntensityMin = min;
+            filterIntensityMax = max;
+        }
+    }
+
+    // 4. Call RPC
     const offset = (page - 1) * perPage;
 
-    const { data, error } = await supabase.rpc('search_punctuated_embeddings', {
+    const { data, error } = await supabase.rpc('search_punctuated_embeddings_filtered', {
         query_embedding: embedding,
         similarity_threshold: similarityThreshold,
         sort_column: sortColumn,
         sort_direction: sortDirection,
         page_limit: perPage,
-        page_offset: offset
+        page_offset: offset,
+        filter_experience_type: filterExperienceType,
+        filter_trigger_category: filterTriggerCategory,
+        filter_overall_tone: filterOverallTone,
+        filter_intensity_min: filterIntensityMin,
+        filter_intensity_max: filterIntensityMax,
+        filter_greyson_min: filterMinGreyson,
+        filter_transformation_min: filterMinTransformation,
+        filter_veridical_min: filterMinVeridical
     });
 
     if (error) {
@@ -210,10 +251,26 @@ async function handleSemanticSearch(searchTerm: string, page: number, perPage: n
         highlights: [] // No highlights for vector search
     }));
 
+    // 5. Fetch global facet counts from Typesense so the sidebar still works
+    let facetCounts: any[] = [];
+    try {
+        const typesense = getTypesenseClient();
+        const facetParams = {
+            'q': '*',
+            'per_page': 0,
+            'facet_by': 'channelName,isNde,experienceType,triggerCategory,overallTone,intensityBucket',
+            'max_facet_values': 100,
+        };
+        const tsResult: any = await typesense.collections('videos').documents().search(facetParams);
+        facetCounts = tsResult.facet_counts || [];
+    } catch (err) {
+        console.error("Failed to fetch facets for semantic search:", err);
+    }
+
     return NextResponse.json({
         found: 100, // Approx or just indicate there are results. RPC doesn't return count.
         hits: hits,
-        facet_counts: [], // No facets in semantic mode yet
+        facet_counts: facetCounts,
         page: page
     });
 }

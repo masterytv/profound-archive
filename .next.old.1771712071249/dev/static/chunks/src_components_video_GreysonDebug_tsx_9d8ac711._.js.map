@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/src/components/video/GreysonDebug.tsx"],"sourcesContent":["\n\"use client\"\n\nimport React from 'react';\n\nexport function GreysonDebug({ score }: { score: number }) {\n    return (\n        <div className=\"p-4 border-4 border-green-500 bg-green-100 text-green-900 font-bold text-3xl\">\n            DEBUG COMPONENT WORKS: Score {score}\n        </div>\n    );\n}\n"],"names":[],"mappings":";;;;;AACA;;AAIO,SAAS,aAAa,EAAE,KAAK,EAAqB;IACrD,qBACI,6LAAC;QAAI,WAAU;;YAA+E;YAC5D;;;;;;;AAG1C;KANgB"}}]
+}

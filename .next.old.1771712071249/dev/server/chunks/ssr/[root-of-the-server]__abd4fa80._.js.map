@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/src/app/test-greyson-ui/page.tsx"],"sourcesContent":["\nimport React from 'react';\nimport { GreysonDebug } from '@/components/video/GreysonDebug';\n\nexport const dynamic = 'force-dynamic';\n\nexport default function TestGreysonPage() {\n    return (\n        <div className=\"p-10 space-y-10\">\n            <h1 className=\"text-3xl font-bold\">Greyson UI Test Page</h1>\n            <div className=\"border p-4 rounded-xl bg-gray-50\">\n                {/* <GreysonDebug score={99} /> */}\n                <div className=\"p-4 border-4 border-purple-500 bg-purple-100 text-purple-900 font-bold text-3xl\">\n                    INLINE RENDER TEST: Score 99\n                </div>\n            </div>\n        </div>\n    );\n}\n"],"names":[],"mappings":";;;;;;;;AAIO,MAAM,UAAU;AAER,SAAS;IACpB,qBACI,8OAAC;QAAI,WAAU;;0BACX,8OAAC;gBAAG,WAAU;0BAAqB;;;;;;0BACnC,8OAAC;gBAAI,WAAU;0BAEX,cAAA,8OAAC;oBAAI,WAAU;8BAAkF;;;;;;;;;;;;;;;;;AAMjH"}}]
+}

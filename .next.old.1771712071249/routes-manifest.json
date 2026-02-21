@@ -1,0 +1,295 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/channel/[channelId]",
+      "regex": "^/channel/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPchannelId": "nxtPchannelId"
+      },
+      "namedRegex": "^/channel/(?<nxtPchannelId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/video/[id]",
+      "regex": "^/video/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/video/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/about",
+      "regex": "^/about(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/about(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/chatbot",
+      "regex": "^/admin/chatbot(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/chatbot(?:/)?$"
+    },
+    {
+      "page": "/admin/users",
+      "regex": "^/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/users(?:/)?$"
+    },
+    {
+      "page": "/api/chat",
+      "regex": "^/api/chat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/chat(?:/)?$"
+    },
+    {
+      "page": "/api/chat-compassionate",
+      "regex": "^/api/chat\\-compassionate(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/chat\\-compassionate(?:/)?$"
+    },
+    {
+      "page": "/api/run-core-elements-batch",
+      "regex": "^/api/run\\-core\\-elements\\-batch(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/run\\-core\\-elements\\-batch(?:/)?$"
+    },
+    {
+      "page": "/api/run-greyson-batch",
+      "regex": "^/api/run\\-greyson\\-batch(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/run\\-greyson\\-batch(?:/)?$"
+    },
+    {
+      "page": "/api/run-journey-flow-batch",
+      "regex": "^/api/run\\-journey\\-flow\\-batch(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/run\\-journey\\-flow\\-batch(?:/)?$"
+    },
+    {
+      "page": "/api/run-phenomenology-batch",
+      "regex": "^/api/run\\-phenomenology\\-batch(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/run\\-phenomenology\\-batch(?:/)?$"
+    },
+    {
+      "page": "/api/run-transformation-batch",
+      "regex": "^/api/run\\-transformation\\-batch(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/run\\-transformation\\-batch(?:/)?$"
+    },
+    {
+      "page": "/api/search",
+      "regex": "^/api/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/search(?:/)?$"
+    },
+    {
+      "page": "/api/search2",
+      "regex": "^/api/search2(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/search2(?:/)?$"
+    },
+    {
+      "page": "/api/search3",
+      "regex": "^/api/search3(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/search3(?:/)?$"
+    },
+    {
+      "page": "/auth/callback",
+      "regex": "^/auth/callback(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/callback(?:/)?$"
+    },
+    {
+      "page": "/channels",
+      "regex": "^/channels(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/channels(?:/)?$"
+    },
+    {
+      "page": "/chat",
+      "regex": "^/chat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/chat(?:/)?$"
+    },
+    {
+      "page": "/chat-2",
+      "regex": "^/chat\\-2(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/chat\\-2(?:/)?$"
+    },
+    {
+      "page": "/chat-compassionate",
+      "regex": "^/chat\\-compassionate(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/chat\\-compassionate(?:/)?$"
+    },
+    {
+      "page": "/chat-test",
+      "regex": "^/chat\\-test(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/chat\\-test(?:/)?$"
+    },
+    {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/experiencers",
+      "regex": "^/experiencers(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/experiencers(?:/)?$"
+    },
+    {
+      "page": "/explore/greyson",
+      "regex": "^/explore/greyson(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/explore/greyson(?:/)?$"
+    },
+    {
+      "page": "/explore/transformation",
+      "regex": "^/explore/transformation(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/explore/transformation(?:/)?$"
+    },
+    {
+      "page": "/explore/veridical",
+      "regex": "^/explore/veridical(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/explore/veridical(?:/)?$"
+    },
+    {
+      "page": "/icon.png",
+      "regex": "^/icon\\.png(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/icon\\.png(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/privacy",
+      "regex": "^/privacy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/privacy(?:/)?$"
+    },
+    {
+      "page": "/profile",
+      "regex": "^/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profile(?:/)?$"
+    },
+    {
+      "page": "/scale/cvnde",
+      "regex": "^/scale/cvnde(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/scale/cvnde(?:/)?$"
+    },
+    {
+      "page": "/scale/greyson",
+      "regex": "^/scale/greyson(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/scale/greyson(?:/)?$"
+    },
+    {
+      "page": "/scale/transformation",
+      "regex": "^/scale/transformation(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/scale/transformation(?:/)?$"
+    },
+    {
+      "page": "/search",
+      "regex": "^/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/search(?:/)?$"
+    },
+    {
+      "page": "/search2",
+      "regex": "^/search2(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/search2(?:/)?$"
+    },
+    {
+      "page": "/search3",
+      "regex": "^/search3(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/search3(?:/)?$"
+    },
+    {
+      "page": "/terms",
+      "regex": "^/terms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/terms(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
