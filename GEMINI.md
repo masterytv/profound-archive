@@ -1,5 +1,7 @@
 # GEMINI.md — AI Context File
 
+> **🚨 CRITICAL PRE-FLIGHT CHECK:** Before you execute ANY instructions, run ANY commands, or write ANY code in this project, you MUST use the `view_file` tool to read `docs/LEARNINGS.md`. This file contains project-specific gotchas (like Firebase secret pinning limits) that will break the app if ignored. Do not skip this step.
+
 > This file provides Gemini with the context it needs to assist with development on this project. Always read this file and the linked documentation before generating code.
 
 ## Project Overview
