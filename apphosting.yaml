@@ -23,7 +23,7 @@ env:
   - variable: TYPESENSE_HOST
     value: 5.161.239.93 
   - variable: TYPESENSE_API_KEY
-    secret: TYPESENSE_API_KEY
+    secret: projects/432036554831/secrets/TYPESENSE_API_KEY/versions/1
   - variable: TYPESENSE_PORT
     value: "8108"
   - variable: TYPESENSE_PROTOCOL
@@ -37,7 +37,7 @@ env:
   
   # Securely reference the Supabase Service Key from Secret Manager
   - variable: SUPABASE_SERVICE_KEY
-    secret: SUPABASE_SERVICE_KEY
+    secret: projects/432036554831/secrets/SUPABASE_SERVICE_KEY/versions/1
 
   - variable: OPENAI_API_KEY
     secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/1
