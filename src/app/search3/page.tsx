@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, useMemo } from "react";
-import { SearchResultCard } from "@/components/search-result-card";
+import { SearchResultCardV4 } from "@/components/search-result-card-v4";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,10 +9,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Loader2, Search, ChevronDown, ChevronUp, Bookmark, SlidersHorizontal, BrainCircuit, ArrowUpDown } from "lucide-react";
+import { Loader2, Search, ChevronDown, ChevronUp, Bookmark, SlidersHorizontal, BrainCircuit, ArrowUpDown, FlaskConical } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { Slider } from "@/components/ui/slider";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import Link from "next/link";
 
 // Shape of a single document returned from our API
 interface HitDocument {
@@ -62,7 +64,7 @@ interface SearchResponse {
     facet_counts: FacetCount[];
 }
 
-function SearchV3Alt1Content() {
+function SearchContent() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -93,6 +95,20 @@ function SearchV3Alt1Content() {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
+    // Filter panel collapsible state (mobile responsive)
+    const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+
+    const [localGreyson, setLocalGreyson] = useState<number>(0);
+    const [localTransformation, setLocalTransformation] = useState<number>(0);
+    const [localVeridical, setLocalVeridical] = useState<number>(0);
+
+    // Sync local state when activeFilters change from URL
+    useEffect(() => {
+        setLocalGreyson(activeFilters.minGreyson?.length ? parseInt(activeFilters.minGreyson[0]) : 0);
+        setLocalTransformation(activeFilters.minTransformation?.length ? parseInt(activeFilters.minTransformation[0]) : 0);
+        setLocalVeridical(activeFilters.minVeridical?.length ? parseInt(activeFilters.minVeridical[0]) : 0);
+    }, [activeFilters]);
+
     const { toast } = useToast();
 
     useEffect(() => {
@@ -101,6 +117,21 @@ function SearchV3Alt1Content() {
             setUser(data.user);
         }
         getUser();
+
+        // Setup initial responsive filter state
+        const handleResize = () => {
+            if (window.innerWidth < 1024) {
+                setIsFiltersOpen(false);
+            } else {
+                setIsFiltersOpen(true);
+            }
+        };
+
+        // Trigger once on mount
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, [supabase]);
 
     useEffect(() => {
@@ -178,7 +209,7 @@ function SearchV3Alt1Content() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     searchTerm: query,
-                    filters: currentType === 'keyword' ? filters : {},
+                    filters: filters,
                     page: pageNum,
                     sortBy: sortParam,
                     type: currentType,
@@ -234,7 +265,7 @@ function SearchV3Alt1Content() {
     ) => {
         const params = new URLSearchParams(searchParams.toString());
         if (term.trim()) { params.set("q", term.trim()); } else { params.delete("q"); }
-        if (type === 'keyword' && Object.keys(filters).length > 0) {
+        if (Object.keys(filters).length > 0) {
             params.set("filter", JSON.stringify(filters));
         } else {
             params.delete("filter");
@@ -261,6 +292,16 @@ function SearchV3Alt1Content() {
         }
         if (newFilters[facetField].length === 0) {
             delete newFilters[facetField];
+        }
+        updateUrl(searchTerm, newFilters, sortBy, direction, searchType, similarity);
+    };
+
+    const handleScoreFilterChange = (field: string, value: number) => {
+        const newFilters = { ...activeFilters };
+        if (value > 0) {
+            newFilters[field] = [value.toString()];
+        } else {
+            delete newFilters[field];
         }
         updateUrl(searchTerm, newFilters, sortBy, direction, searchType, similarity);
     };
@@ -329,6 +370,10 @@ function SearchV3Alt1Content() {
     const formatFacetTitle = (fieldName: string) => {
         if (fieldName === 'isNde') return 'Is NDE?';
         if (fieldName === 'channelName') return 'Channel';
+        if (fieldName === 'experienceType') return 'Experience Type';
+        if (fieldName === 'triggerCategory') return 'Trigger Category';
+        if (fieldName === 'overallTone') return 'Overall Tone';
+        if (fieldName === 'intensityBucket') return 'Intensity';
         return fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
     };
 
@@ -481,18 +526,37 @@ function SearchV3Alt1Content() {
                     {/* Sidebar Filters */}
                     {hasSearched && !isLoading && (
                         <div className="w-full lg:w-64 shrink-0">
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24">
-                                <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
-                                    <SlidersHorizontal className="w-4 h-4 text-slate-500" />
-                                    Filters
-                                </h2>
-                                {searchType === 'semantic' ? (
-                                    <div className="bg-blue-50 text-blue-700 p-3 rounded-xl text-xs leading-relaxed">
-                                        Filters are disabled in Concept Mode. Switch to Keyword Search to filter.
+                            <Collapsible
+                                open={isFiltersOpen}
+                                onOpenChange={setIsFiltersOpen}
+                                className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+                            >
+                                <CollapsibleTrigger asChild className="lg:hidden w-full cursor-pointer hover:bg-slate-50 rounded-xl transition-colors">
+                                    <div className="flex items-center justify-between mb-0 pb-4">
+                                        <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                            <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+                                            Filters
+                                        </h2>
+                                        <div className="h-8 w-8 flex flex-col justify-center items-center text-slate-400">
+                                            {isFiltersOpen ? (
+                                                <ChevronUp className="h-4 w-4" />
+                                            ) : (
+                                                <ChevronDown className="h-4 w-4" />
+                                            )}
+                                        </div>
                                     </div>
-                                ) : (
+                                </CollapsibleTrigger>
+
+                                {/* Desktop static header (hidden on mobile) */}
+                                <div className="hidden lg:flex items-center justify-between mb-4">
+                                    <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                        <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+                                        Filters
+                                    </h2>
+                                </div>
+                                <CollapsibleContent className="space-y-4 pt-2">
                                     <Accordion type="multiple" defaultValue={facets.map(f => f.field_name)} className="w-full">
-                                        {facets.map(facet => {
+                                        {facets.filter(f => f.field_name !== 'isNde').map(facet => {
                                             const isExpanded = expandedFacets[facet.field_name] || false;
                                             const visibleItems = isExpanded ? facet.counts : facet.counts.slice(0, 10);
                                             const hasMoreItems = facet.counts.length > 10;
@@ -507,12 +571,12 @@ function SearchV3Alt1Content() {
                                                             {visibleItems.map(item => (
                                                                 <div className="flex items-center space-x-2" key={item.value}>
                                                                     <Checkbox
-                                                                        id={`alt1-${facet.field_name}-${item.value}`}
+                                                                        id={`v4-${facet.field_name}-${item.value}`}
                                                                         onCheckedChange={() => handleFilterChange(facet.field_name, item.value)}
                                                                         checked={(activeFilters[facet.field_name] || []).includes(item.value)}
                                                                     />
                                                                     <label
-                                                                        htmlFor={`alt1-${facet.field_name}-${item.value}`}
+                                                                        htmlFor={`v4-${facet.field_name}-${item.value}`}
                                                                         className="text-sm text-slate-600 leading-none cursor-pointer"
                                                                     >
                                                                         {formatFacetValue(facet.field_name, item.value)}{" "}
@@ -540,8 +604,72 @@ function SearchV3Alt1Content() {
                                             );
                                         })}
                                     </Accordion>
-                                )}
-                            </div>
+
+                                    {/* Numeric Score Filters */}
+                                    <div className="mt-6 pt-4 border-t border-slate-200">
+                                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Minimum Scores</h3>
+
+                                        <div className="space-y-6">
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-600 font-medium">Greyson Scale</span>
+                                                    <span className="text-primary font-bold">{localGreyson}+</span>
+                                                </div>
+                                                <Slider
+                                                    min={0}
+                                                    max={32}
+                                                    step={1}
+                                                    value={[localGreyson]}
+                                                    onValueChange={(val) => setLocalGreyson(val[0])}
+                                                    onValueCommit={(val) => handleScoreFilterChange('minGreyson', val[0])}
+                                                />
+                                                <div className="flex justify-between text-xs text-slate-400">
+                                                    <span>0</span>
+                                                    <span>32</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-600 font-medium">Transformation</span>
+                                                    <span className="text-primary font-bold">{localTransformation}+</span>
+                                                </div>
+                                                <Slider
+                                                    min={0}
+                                                    max={50}
+                                                    step={1}
+                                                    value={[localTransformation]}
+                                                    onValueChange={(val) => setLocalTransformation(val[0])}
+                                                    onValueCommit={(val) => handleScoreFilterChange('minTransformation', val[0])}
+                                                />
+                                                <div className="flex justify-between text-xs text-slate-400">
+                                                    <span>0</span>
+                                                    <span>50</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-600 font-medium">Veridical (M-CVNDE)</span>
+                                                    <span className="text-primary font-bold">{localVeridical}+</span>
+                                                </div>
+                                                <Slider
+                                                    min={0}
+                                                    max={25}
+                                                    step={1}
+                                                    value={[localVeridical]}
+                                                    onValueChange={(val) => setLocalVeridical(val[0])}
+                                                    onValueCommit={(val) => handleScoreFilterChange('minVeridical', val[0])}
+                                                />
+                                                <div className="flex justify-between text-xs text-slate-400">
+                                                    <span>0</span>
+                                                    <span>25</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CollapsibleContent>
+                            </Collapsible>
                         </div>
                     )}
 
@@ -563,6 +691,11 @@ function SearchV3Alt1Content() {
                                                 <Skeleton className="h-5 w-3/4" />
                                                 <Skeleton className="h-4 w-1/2" />
                                                 <Skeleton className="h-16 w-full" />
+                                                <div className="flex gap-2">
+                                                    <Skeleton className="h-5 w-12 rounded-full" />
+                                                    <Skeleton className="h-5 w-16 rounded-full" />
+                                                    <Skeleton className="h-5 w-20 rounded-full" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -584,11 +717,10 @@ function SearchV3Alt1Content() {
                                 ) : (
                                     <div className="space-y-4">
                                         {groupedResults.map(video => (
-                                            <SearchResultCard
+                                            <SearchResultCardV4
                                                 key={video.video_id}
                                                 video={video}
                                                 searchTerm={searchTerm}
-                                                onTagClick={() => { }}
                                                 user={user}
                                             />
                                         ))}
@@ -634,15 +766,14 @@ function SearchV3Alt1Content() {
         </div>
     );
 }
-
-export default function SearchV3Alt1Page() {
+export default function SearchPage() {
     return (
         <Suspense fallback={
             <div className="flex justify-center py-20">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
             </div>
         }>
-            <SearchV3Alt1Content />
+            <SearchContent />
         </Suspense>
     );
 }

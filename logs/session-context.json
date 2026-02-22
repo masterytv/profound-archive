@@ -1,19 +1,21 @@
 {
     "project": "Project Profound",
-    "last_updated": "2026-02-21T17:17:17-05:00",
-    "summary": "Completed a massive UX/UI sprint resulting in the Alt1 design system upgrades, brand logo updates, a unified Home/Search gateway, and advanced numerical score filters correctly hooked up to Typesense and Supabase RPCs.",
+    "last_updated": "2026-02-22T18:27:00-05:00",
+    "summary": "Completed a massive UX/UI sprint resulting in the Alt1 design system upgrades, brand logo updates, a unified Home/Search gateway, and advanced numerical score filters correctly hooked up to Typesense and Supabase RPCs. Fixed a subsequent 500 Error in the Concept Search API by resolving ambiguous overloaded functions in Postgres and perfectly aligning the RPC column data types.",
     "topics_covered": [
         "Search filters",
         "pgvector RPC parameters",
         "Tailwind UI / Shadcn forms",
         "Logo & brand update",
-        "Routing & API params"
+        "Routing & API params",
+        "PostgreSQL function overloading & column types"
     ],
     "decisions": [
         "Merged home and search pages via a central hero search bar.",
         "Renamed Semantic search to Concept search for users on the frontend.",
         "Implemented minimum score numeric sliders acting directly on the API route to override default filter arrays.",
-        "Redesigned the Admin Intake page to the light slate theme for consistency with other admin UI."
+        "Redesigned the Admin Intake page to the light slate theme for consistency with other admin UI.",
+        "Cleaned the database of duplicate search_punctuated_embeddings_filtered functions that were causing candidate resolution errors and strictly aligned the return table column types (bigint, timestamp with time zone, real) to match the actual schema definitions."
     ],
     "blockers": []
 }

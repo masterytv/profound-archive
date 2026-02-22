@@ -13,6 +13,7 @@ import { Loader2, Search, ChevronDown, ChevronUp, Bookmark, SlidersHorizontal, B
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { Slider } from "@/components/ui/slider";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import Link from "next/link";
 
 // Shape of a single document returned from our API
@@ -94,6 +95,9 @@ function SearchV4Content() {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
+    // Filter panel collapsible state (mobile responsive)
+    const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+
     const [localGreyson, setLocalGreyson] = useState<number>(0);
     const [localTransformation, setLocalTransformation] = useState<number>(0);
     const [localVeridical, setLocalVeridical] = useState<number>(0);
@@ -113,6 +117,21 @@ function SearchV4Content() {
             setUser(data.user);
         }
         getUser();
+
+        // Setup initial responsive filter state
+        const handleResize = () => {
+            if (window.innerWidth < 1024) {
+                setIsFiltersOpen(false);
+            } else {
+                setIsFiltersOpen(true);
+            }
+        };
+
+        // Trigger once on mount
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, [supabase]);
 
     useEffect(() => {
@@ -520,125 +539,150 @@ function SearchV4Content() {
                     {/* Sidebar Filters */}
                     {hasSearched && !isLoading && (
                         <div className="w-full lg:w-64 shrink-0">
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
-                                <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
-                                    <SlidersHorizontal className="w-4 h-4 text-slate-500" />
-                                    Filters
-                                </h2>
-                                <Accordion type="multiple" defaultValue={facets.map(f => f.field_name)} className="w-full">
-                                    {facets.filter(f => f.field_name !== 'isNde').map(facet => {
-                                        const isExpanded = expandedFacets[facet.field_name] || false;
-                                        const visibleItems = isExpanded ? facet.counts : facet.counts.slice(0, 10);
-                                        const hasMoreItems = facet.counts.length > 10;
+                            <Collapsible
+                                open={isFiltersOpen}
+                                onOpenChange={setIsFiltersOpen}
+                                className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+                            >
+                                <CollapsibleTrigger asChild className="lg:hidden w-full cursor-pointer hover:bg-slate-50 rounded-xl transition-colors">
+                                    <div className="flex items-center justify-between mb-0 pb-4">
+                                        <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                            <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+                                            Filters
+                                        </h2>
+                                        <div className="h-8 w-8 flex flex-col justify-center items-center text-slate-400">
+                                            {isFiltersOpen ? (
+                                                <ChevronUp className="h-4 w-4" />
+                                            ) : (
+                                                <ChevronDown className="h-4 w-4" />
+                                            )}
+                                        </div>
+                                    </div>
+                                </CollapsibleTrigger>
 
-                                        return (
-                                            <AccordionItem value={facet.field_name} key={facet.field_name} className="border-b-0">
-                                                <AccordionTrigger className="text-xs font-semibold uppercase tracking-wider text-slate-500 py-3 hover:no-underline">
-                                                    {formatFacetTitle(facet.field_name)}
-                                                </AccordionTrigger>
-                                                <AccordionContent>
-                                                    <div className="space-y-2">
-                                                        {visibleItems.map(item => (
-                                                            <div className="flex items-center space-x-2" key={item.value}>
-                                                                <Checkbox
-                                                                    id={`v4-${facet.field_name}-${item.value}`}
-                                                                    onCheckedChange={() => handleFilterChange(facet.field_name, item.value)}
-                                                                    checked={(activeFilters[facet.field_name] || []).includes(item.value)}
-                                                                />
-                                                                <label
-                                                                    htmlFor={`v4-${facet.field_name}-${item.value}`}
-                                                                    className="text-sm text-slate-600 leading-none cursor-pointer"
+                                {/* Desktop static header (hidden on mobile) */}
+                                <div className="hidden lg:flex items-center justify-between mb-4">
+                                    <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                        <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+                                        Filters
+                                    </h2>
+                                </div>
+                                <CollapsibleContent className="space-y-4 pt-2">
+                                    <Accordion type="multiple" defaultValue={facets.map(f => f.field_name)} className="w-full">
+                                        {facets.filter(f => f.field_name !== 'isNde').map(facet => {
+                                            const isExpanded = expandedFacets[facet.field_name] || false;
+                                            const visibleItems = isExpanded ? facet.counts : facet.counts.slice(0, 10);
+                                            const hasMoreItems = facet.counts.length > 10;
+
+                                            return (
+                                                <AccordionItem value={facet.field_name} key={facet.field_name} className="border-b-0">
+                                                    <AccordionTrigger className="text-xs font-semibold uppercase tracking-wider text-slate-500 py-3 hover:no-underline">
+                                                        {formatFacetTitle(facet.field_name)}
+                                                    </AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-2">
+                                                            {visibleItems.map(item => (
+                                                                <div className="flex items-center space-x-2" key={item.value}>
+                                                                    <Checkbox
+                                                                        id={`v4-${facet.field_name}-${item.value}`}
+                                                                        onCheckedChange={() => handleFilterChange(facet.field_name, item.value)}
+                                                                        checked={(activeFilters[facet.field_name] || []).includes(item.value)}
+                                                                    />
+                                                                    <label
+                                                                        htmlFor={`v4-${facet.field_name}-${item.value}`}
+                                                                        className="text-sm text-slate-600 leading-none cursor-pointer"
+                                                                    >
+                                                                        {formatFacetValue(facet.field_name, item.value)}{" "}
+                                                                        <span className="text-slate-400">({item.count})</span>
+                                                                    </label>
+                                                                </div>
+                                                            ))}
+                                                            {hasMoreItems && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-7 px-2 text-xs w-full justify-between text-blue-600 hover:text-blue-700"
+                                                                    onClick={() => toggleFacetExpansion(facet.field_name)}
                                                                 >
-                                                                    {formatFacetValue(facet.field_name, item.value)}{" "}
-                                                                    <span className="text-slate-400">({item.count})</span>
-                                                                </label>
-                                                            </div>
-                                                        ))}
-                                                        {hasMoreItems && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-7 px-2 text-xs w-full justify-between text-blue-600 hover:text-blue-700"
-                                                                onClick={() => toggleFacetExpansion(facet.field_name)}
-                                                            >
-                                                                {isExpanded ? (
-                                                                    <>Show Fewer <ChevronUp className="h-3 w-3 ml-1" /></>
-                                                                ) : (
-                                                                    <>Show {facet.counts.length - 10} More <ChevronDown className="h-3 w-3 ml-1" /></>
-                                                                )}
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        );
-                                    })}
-                                </Accordion>
+                                                                    {isExpanded ? (
+                                                                        <>Show Fewer <ChevronUp className="h-3 w-3 ml-1" /></>
+                                                                    ) : (
+                                                                        <>Show {facet.counts.length - 10} More <ChevronDown className="h-3 w-3 ml-1" /></>
+                                                                    )}
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            );
+                                        })}
+                                    </Accordion>
 
-                                {/* Numeric Score Filters */}
-                                <div className="mt-6 pt-4 border-t border-slate-200">
-                                    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Minimum Scores</h3>
+                                    {/* Numeric Score Filters */}
+                                    <div className="mt-6 pt-4 border-t border-slate-200">
+                                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Minimum Scores</h3>
 
-                                    <div className="space-y-6">
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-slate-600 font-medium">Greyson Scale</span>
-                                                <span className="text-primary font-bold">{localGreyson}+</span>
+                                        <div className="space-y-6">
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-600 font-medium">Greyson Scale</span>
+                                                    <span className="text-primary font-bold">{localGreyson}+</span>
+                                                </div>
+                                                <Slider
+                                                    min={0}
+                                                    max={32}
+                                                    step={1}
+                                                    value={[localGreyson]}
+                                                    onValueChange={(val) => setLocalGreyson(val[0])}
+                                                    onValueCommit={(val) => handleScoreFilterChange('minGreyson', val[0])}
+                                                />
+                                                <div className="flex justify-between text-xs text-slate-400">
+                                                    <span>0</span>
+                                                    <span>32</span>
+                                                </div>
                                             </div>
-                                            <Slider
-                                                min={0}
-                                                max={32}
-                                                step={1}
-                                                value={[localGreyson]}
-                                                onValueChange={(val) => setLocalGreyson(val[0])}
-                                                onValueCommit={(val) => handleScoreFilterChange('minGreyson', val[0])}
-                                            />
-                                            <div className="flex justify-between text-xs text-slate-400">
-                                                <span>0</span>
-                                                <span>32</span>
-                                            </div>
-                                        </div>
 
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-slate-600 font-medium">Transformation</span>
-                                                <span className="text-primary font-bold">{localTransformation}+</span>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-600 font-medium">Transformation</span>
+                                                    <span className="text-primary font-bold">{localTransformation}+</span>
+                                                </div>
+                                                <Slider
+                                                    min={0}
+                                                    max={50}
+                                                    step={1}
+                                                    value={[localTransformation]}
+                                                    onValueChange={(val) => setLocalTransformation(val[0])}
+                                                    onValueCommit={(val) => handleScoreFilterChange('minTransformation', val[0])}
+                                                />
+                                                <div className="flex justify-between text-xs text-slate-400">
+                                                    <span>0</span>
+                                                    <span>50</span>
+                                                </div>
                                             </div>
-                                            <Slider
-                                                min={0}
-                                                max={50}
-                                                step={1}
-                                                value={[localTransformation]}
-                                                onValueChange={(val) => setLocalTransformation(val[0])}
-                                                onValueCommit={(val) => handleScoreFilterChange('minTransformation', val[0])}
-                                            />
-                                            <div className="flex justify-between text-xs text-slate-400">
-                                                <span>0</span>
-                                                <span>50</span>
-                                            </div>
-                                        </div>
 
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-slate-600 font-medium">Veridical (M-CVNDE)</span>
-                                                <span className="text-primary font-bold">{localVeridical}+</span>
-                                            </div>
-                                            <Slider
-                                                min={0}
-                                                max={25}
-                                                step={1}
-                                                value={[localVeridical]}
-                                                onValueChange={(val) => setLocalVeridical(val[0])}
-                                                onValueCommit={(val) => handleScoreFilterChange('minVeridical', val[0])}
-                                            />
-                                            <div className="flex justify-between text-xs text-slate-400">
-                                                <span>0</span>
-                                                <span>25</span>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-600 font-medium">Veridical (M-CVNDE)</span>
+                                                    <span className="text-primary font-bold">{localVeridical}+</span>
+                                                </div>
+                                                <Slider
+                                                    min={0}
+                                                    max={25}
+                                                    step={1}
+                                                    value={[localVeridical]}
+                                                    onValueChange={(val) => setLocalVeridical(val[0])}
+                                                    onValueCommit={(val) => handleScoreFilterChange('minVeridical', val[0])}
+                                                />
+                                                <div className="flex justify-between text-xs text-slate-400">
+                                                    <span>0</span>
+                                                    <span>25</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                </CollapsibleContent>
+                            </Collapsible>
                         </div>
                     )}
 
