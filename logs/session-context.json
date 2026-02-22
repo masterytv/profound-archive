@@ -15,7 +15,8 @@
         "Renamed Semantic search to Concept search for users on the frontend.",
         "Implemented minimum score numeric sliders acting directly on the API route to override default filter arrays.",
         "Redesigned the Admin Intake page to the light slate theme for consistency with other admin UI.",
-        "Cleaned the database of duplicate search_punctuated_embeddings_filtered functions that were causing candidate resolution errors and strictly aligned the return table column types (bigint, timestamp with time zone, real) to match the actual schema definitions."
+        "Cleaned the database of duplicate search_punctuated_embeddings_filtered functions that were causing candidate resolution errors and strictly aligned the return table column types (bigint, timestamp with time zone, real) to match the actual schema definitions.",
+        "Updated App Hosting configuration to point to 'versions/latest' for the Typesense API key to natively handle future rotations, and correctly bound the Cloud Build IAM SecretAccessor permissions to the backend."
     ],
     "blockers": []
 }
