@@ -155,12 +155,21 @@ export async function runScannerTick(
                         ? 'skipped'
                         : 'failed';
 
+                // Capture error from intake result (soft failure — pipeline finished but with issues)
+                const resultError = result.error
+                    || (finalStatus === 'failed' ? `Intake returned status: ${result.status}` : null);
+
+                if (finalStatus === 'failed') {
+                    console.error(`[Scanner] Video ${item.video_id} failed:`, resultError);
+                }
+
                 await supabase
                     .from('scan_queue')
                     .update({
                         status: finalStatus,
                         processed_at: new Date().toISOString(),
                         intake_result: result.status,
+                        error: resultError,
                     })
                     .eq('id', item.id);
 
@@ -169,16 +178,19 @@ export async function runScannerTick(
                     url: item.video_url,
                     status: result.status,
                     isNde: result.classification?.isNde_value || null,
-                    error: null,
+                    error: resultError,
                 });
 
             } catch (err: any) {
+                const errorMsg = err.message || String(err);
+                console.error(`[Scanner] Video ${item.video_id} threw error:`, errorMsg);
+
                 await supabase
                     .from('scan_queue')
                     .update({
                         status: 'failed',
                         processed_at: new Date().toISOString(),
-                        error: err.message,
+                        error: errorMsg,
                     })
                     .eq('id', item.id);
 
@@ -187,7 +199,7 @@ export async function runScannerTick(
                     url: item.video_url,
                     status: 'failed',
                     isNde: null,
-                    error: err.message,
+                    error: errorMsg,
                 });
             }
         }
