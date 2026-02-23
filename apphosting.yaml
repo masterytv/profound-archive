@@ -54,4 +54,8 @@ env:
   # YouTube Data API key for channel scanner
   - variable: YOUTUBE_API_KEY
     secret: projects/432036554831/secrets/YOUTUBE_API_KEY/versions/latest
+
+  # Apify API token for YouTube transcript scraping (required by intake pipeline)
+  - variable: APIFY_API_TOKEN
+    secret: APIFY_API_TOKEN
 # Trigger new build after granting secret access
