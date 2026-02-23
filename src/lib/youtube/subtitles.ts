@@ -10,7 +10,13 @@
  * in real browser environments that bypass this restriction.
  * 
  * Actor: pintostudio/youtube-transcript-scraper
- * Pricing: ~$0.005 per run on Apify free tier (100 runs/month)
+ * 
+ * Strategy: async polling instead of a single long-poll HTTP connection.
+ * The waitForFinish=N approach keeps one HTTP connection open for N seconds,
+ * which is fragile under Firebase/serverless timeouts. Instead we:
+ * 1. Start the run (non-blocking)
+ * 2. Poll the run status every 5s until SUCCEEDED or FAILED
+ * 3. Fetch the dataset
  */
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -31,18 +37,19 @@ export interface CaptionResult {
 
 const APIFY_ACTOR_ID = 'pintostudio~youtube-transcript-scraper';
 const APIFY_BASE_URL = 'https://api.apify.com/v2';
-const APIFY_TIMEOUT_SECS = 120; // Max wait for actor run
+
+/** Maximum total seconds to wait for the actor to complete */
+const APIFY_MAX_WAIT_SECS = 100;
+/** Polling interval in milliseconds */
+const APIFY_POLL_INTERVAL_MS = 5000;
 
 // ─── Caption Fetching ────────────────────────────────────────────────────────
 
 /**
  * Fetch timestamped captions for a YouTube video via Apify.
  * 
- * Strategy:
- * 1. Call Apify's YouTube Transcript Scraper actor with the video URL
- * 2. Wait for the actor run to complete (synchronous mode)
- * 3. Fetch results from the default dataset
- * 4. Map Apify's output to our CaptionSegment format
+ * Uses async polling (start run → poll every 5s) to avoid keeping a single
+ * long-lived HTTP connection open, which is fragile on serverless platforms.
  * 
  * @returns CaptionResult with segments, or null if no captions available
  */
@@ -54,12 +61,12 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
     }
 
     try {
-        // Step 1: Start the actor run (synchronous — waits for completion)
         const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
         console.log(`[Apify] Starting transcript fetch for ${videoId}...`);
 
-        const runResponse = await fetch(
-            `${APIFY_BASE_URL}/acts/${APIFY_ACTOR_ID}/runs?waitForFinish=${APIFY_TIMEOUT_SECS}`,
+        // Step 1: Start the actor run (non-blocking — do NOT wait for finish here)
+        const startRes = await fetchWithTimeout(
+            `${APIFY_BASE_URL}/acts/${APIFY_ACTOR_ID}/runs`,
             {
                 method: 'POST',
                 headers: {
@@ -67,52 +74,88 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
                     'Authorization': `Bearer ${apiToken}`,
                 },
                 body: JSON.stringify({ videoUrl }),
-            }
+            },
+            15000, // 15s to start the run — if this fails, it's a real API error
         );
 
-        if (!runResponse.ok) {
-            const errorBody = await runResponse.text();
-            console.error(`[Apify] Actor run failed (${runResponse.status}):`, errorBody);
+        if (!startRes.ok) {
+            const errorBody = await startRes.text();
+            console.error(`[Apify] Failed to start actor run (${startRes.status}):`, errorBody);
             return null;
         }
 
-        const runData = await runResponse.json();
-        const runStatus = runData?.data?.status;
-        const datasetId = runData?.data?.defaultDatasetId;
+        const startData = await startRes.json();
+        const runId = startData?.data?.id;
+        if (!runId) {
+            console.error('[Apify] No run ID returned from actor start');
+            return null;
+        }
+
+        console.log(`[Apify] Run started: ${runId} — polling for completion...`);
+
+        // Step 2: Poll the run status until SUCCEEDED, FAILED, or timeout
+        const deadline = Date.now() + APIFY_MAX_WAIT_SECS * 1000;
+        let runStatus: string = 'RUNNING';
+        let datasetId: string | null = null;
+
+        while (Date.now() < deadline) {
+            await sleep(APIFY_POLL_INTERVAL_MS);
+
+            const statusRes = await fetchWithTimeout(
+                `${APIFY_BASE_URL}/actor-runs/${runId}`,
+                { headers: { 'Authorization': `Bearer ${apiToken}` } },
+                10000,
+            );
+
+            if (!statusRes.ok) {
+                console.warn(`[Apify] Status poll failed (${statusRes.status}), retrying...`);
+                continue;
+            }
+
+            const statusData = await statusRes.json();
+            runStatus = statusData?.data?.status || 'UNKNOWN';
+            datasetId = statusData?.data?.defaultDatasetId || null;
+
+            console.log(`[Apify] Run ${runId} status: ${runStatus}`);
+
+            if (runStatus === 'SUCCEEDED' || runStatus === 'FAILED' || runStatus === 'ABORTED' || runStatus === 'TIMED-OUT') {
+                break;
+            }
+        }
 
         if (runStatus !== 'SUCCEEDED') {
-            console.error(`[Apify] Actor run did not succeed. Status: ${runStatus}`);
+            console.error(`[Apify] Actor run did not succeed. Final status: ${runStatus} (runId: ${runId})`);
             return null;
         }
 
         if (!datasetId) {
-            console.error('[Apify] No dataset ID returned from actor run');
+            console.error('[Apify] No dataset ID from completed run');
             return null;
         }
 
-        // Step 2: Fetch results from the dataset
-        const datasetResponse = await fetch(
+        // Step 3: Fetch results from the dataset
+        const datasetRes = await fetchWithTimeout(
             `${APIFY_BASE_URL}/datasets/${datasetId}/items?format=json`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${apiToken}`,
-                },
-            }
+            { headers: { 'Authorization': `Bearer ${apiToken}` } },
+            15000,
         );
 
-        if (!datasetResponse.ok) {
-            console.error(`[Apify] Failed to fetch dataset (${datasetResponse.status})`);
+        if (!datasetRes.ok) {
+            console.error(`[Apify] Failed to fetch dataset (${datasetRes.status})`);
             return null;
         }
 
-        const items = await datasetResponse.json();
+        const items = await datasetRes.json();
 
-        // Step 3: Extract transcript segments from the response
-        // The actor returns items with a searchResult array
+        // Step 4: Extract transcript segments from the response
         const segments = extractSegments(items);
 
         if (segments.length === 0) {
-            console.log(`[Apify] No transcript segments found for ${videoId}`);
+            console.log(`[Apify] No transcript segments found for ${videoId} (dataset had ${items?.length ?? 0} items)`);
+            // Log the raw first item for debugging so we can catch new response shapes
+            if (items?.length > 0) {
+                console.log(`[Apify] First item keys: ${Object.keys(items[0]).join(', ')}`);
+            }
             return null;
         }
 
@@ -121,10 +164,10 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
         return {
             segments,
             language: 'en', // Actor defaults to English
-            isAutoGenerated: true, // Conservative assumption
+            isAutoGenerated: true,
         };
-    } catch (error) {
-        console.error(`[Apify] Error fetching captions for ${videoId}:`, error);
+    } catch (error: any) {
+        console.error(`[Apify] Error fetching captions for ${videoId}:`, error?.message || error);
         return null;
     }
 }
@@ -132,10 +175,28 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
 // ─── Internal Helpers ────────────────────────────────────────────────────────
 
 /**
+ * fetch() with an explicit AbortController timeout.
+ * Prevents connections from hanging indefinitely on serverless platforms.
+ */
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Extract CaptionSegment[] from Apify dataset items.
  * 
  * The Pinto Studio actor returns data in this format:
- * [{ searchResult: [{ start: "0.320", dur: "4.080", text: "..." }, ...] }]
+ * [{ data: [{ start: "0.320", dur: "4.080", text: "..." }, ...] }]
  * 
  * We also handle potential variations in the response shape.
  */
@@ -147,9 +208,8 @@ function extractSegments(items: any[]): CaptionSegment[] {
     const segments: CaptionSegment[] = [];
 
     for (const item of items) {
-        // Primary format: { data: [...] } (confirmed from pintostudio actor)
-        // Also handle alternate formats: { searchResult: [...] }, { transcript: [...] }
-        const results = item.data || item.searchResult || item.transcript || item.captions || [];
+        // Known formats from pintostudio actor (data is the confirmed primary key)
+        const results = item.data || item.searchResult || item.transcript || item.captions || item.subtitles || [];
 
         if (Array.isArray(results)) {
             for (const entry of results) {

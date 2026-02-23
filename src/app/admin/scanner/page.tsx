@@ -268,13 +268,15 @@ export default function ScannerAdminPage() {
                         ) : (
                             <div className="text-sm space-y-1">
                                 <p className="text-slate-700">
-                                    Channel: <span className="font-medium">{tickResult.channel?.name || 'None'}</span>
+                                    <span className="text-slate-400">Scanned:</span>{' '}
+                                    <span className="font-medium">{tickResult.channel?.name || 'None'}</span>
+                                    <span className="text-slate-400 ml-2 text-xs">(discovery only)</span>
                                 </p>
                                 <p className="text-slate-500">
                                     Discovered: {tickResult.discovered} • Processed: {tickResult.processed} • Duration: {tickResult.durationMs}ms
                                 </p>
                                 {tickResult.results?.map((r: any, i: number) => (
-                                    <p key={i} className={`text-xs ${r.status === 'complete' ? 'text-emerald-600' : r.status === 'failed' ? 'text-red-600' : 'text-slate-500'}`}>
+                                    <p key={i} className={`text-xs font-mono ${r.status === 'complete' ? 'text-emerald-600' : r.status === 'failed' ? 'text-red-600' : 'text-slate-500'}`}>
                                         {r.videoId}: {r.status} {r.isNde ? `(${r.isNde})` : ''} {r.error || ''}
                                     </p>
                                 ))}
