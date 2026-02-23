@@ -5,6 +5,11 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+  # Increase timeout to allow AI analysis pipeline to complete (each video takes 60-120s)
+  # Firebase App Hosting max is 3600s. The scanner tick processes 1 video at a time.
+  timeoutSeconds: 300
+  # 2 CPUs ensures AI inference calls aren't CPU-throttled
+  cpu: 2
 
 # Environment variables that will be available to your application at runtime.
 env:
