@@ -141,18 +141,42 @@ export async function runScannerTick(
 
     // Track IDs we've already set to 'processing' to avoid re-grabbing them
     const touchedIds = new Set<number>();
+    // Track channel IDs picked this tick to maximize diversity across channels
+    const touchedChannelIds = new Set<string>();
 
     while (meaningfulCount < videosPerTick && totalAttempts < maxAttempts) {
-        // Fetch the next pending item
+        // Round-robin: pick a random channel that has pending items,
+        // then grab its oldest pending video. This ensures no single channel
+        // dominates the queue even if it has thousands of items.
+        const { data: pendingRows } = await supabase
+            .from('scan_queue')
+            .select('channel_id')
+            .eq('status', 'pending')
+            .limit(500); // sample a pool large enough to cover all channels
+        if (!pendingRows || pendingRows.length === 0) break; // Queue exhausted
+
+        // Deduplicate channel_ids and pick one at random for fairness
+        const channelIds: string[] = [...new Set<string>(
+            pendingRows.map((r: any) => r.channel_id).filter((id: any): id is string => typeof id === 'string')
+        )];
+        // Exclude channels we already touched this tick so we truly diversify
+        const untouchedChannels: string[] = channelIds.filter(id => !touchedChannelIds.has(id));
+        const poolToPickFrom = untouchedChannels.length > 0 ? untouchedChannels : channelIds;
+        const pickedChannelId = poolToPickFrom[Math.floor(Math.random() * poolToPickFrom.length)];
+
+        // Fetch the oldest pending item from the picked channel
         const { data: items, error: queueError } = await supabase
             .from('scan_queue')
             .select('id, video_url, video_id, channel_id')
             .eq('status', 'pending')
+            .eq('channel_id', pickedChannelId)
             .order('created_at', { ascending: true })
             .limit(1);
+        // Record that we've picked from this channel this tick
+        touchedChannelIds.add(pickedChannelId);
 
         if (queueError) throw new Error(`Queue fetch: ${queueError.message}`);
-        if (!items || items.length === 0) break; // Queue exhausted
+        if (!items || items.length === 0) continue; // This channel was just drained, try another
 
         const item = items[0];
 

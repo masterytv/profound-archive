@@ -193,6 +193,70 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        case 'discover_all': {
+            // Phase 1: Scan ALL enabled channels and queue all discovered videos.
+            // Run this once to fill the pool before relying on per-tick discovery.
+            try {
+                const { data: channels } = await supabase
+                    .from('channels')
+                    .select('channel_id, name, uploads_playlist_id')
+                    .eq('scanner_enabled', true)
+                    .order('name');
+
+                if (!channels || channels.length === 0) {
+                    return NextResponse.json({ success: true, totalQueued: 0, channels: 0 });
+                }
+
+                const allChannelIds = channels.map((c: any) => c.channel_id);
+                const existingVideoIds = await getExistingVideoIds(supabase, allChannelIds);
+
+                let totalQueued = 0;
+                const results: any[] = [];
+
+                for (const channel of channels) {
+                    if (!channel.uploads_playlist_id) continue;
+                    try {
+                        const discovery = await discoverNewVideos(
+                            channel.channel_id,
+                            channel.uploads_playlist_id,
+                            channel.name,
+                            existingVideoIds,
+                            500,  // fetch more videos per channel than audit (no limit)
+                            50,   // max new videos to queue per channel per run
+                        );
+
+                        // Queue discovered videos
+                        if (discovery.newVideos.length > 0) {
+                            const queueItems = discovery.newVideos.map(v => ({
+                                video_id: v.videoId,
+                                video_url: `https://www.youtube.com/watch?v=${v.videoId}`,
+                                channel_id: channel.channel_id,
+                                status: 'pending',
+                            }));
+                            await supabase
+                                .from('scan_queue')
+                                .upsert(queueItems, { onConflict: 'video_url', ignoreDuplicates: true });
+                            totalQueued += discovery.newVideos.length;
+                        }
+
+                        // Mark channel as scanned
+                        await supabase
+                            .from('channels')
+                            .update({ last_scanned_at: new Date().toISOString() })
+                            .eq('channel_id', channel.channel_id);
+
+                        results.push({ channelId: channel.channel_id, channelName: channel.name, queued: discovery.newVideos.length });
+                    } catch (err: any) {
+                        results.push({ channelId: channel.channel_id, channelName: channel.name, queued: 0, error: err.message });
+                    }
+                }
+
+                return NextResponse.json({ success: true, totalQueued, channels: channels.length, results });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+        }
+
         case 'run_tick': {
             try {
                 const videosPerTick = body.videosPerTick || 1;

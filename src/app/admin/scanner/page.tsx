@@ -46,6 +46,7 @@ export default function ScannerAdminPage() {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [auditResult, setAuditResult] = useState<any>(null);
     const [tickResult, setTickResult] = useState<any>(null);
+    const [discoverAllResult, setDiscoverAllResult] = useState<any>(null);
 
     const fetchData = useCallback(async () => {
         try {
@@ -116,6 +117,25 @@ export default function ScannerAdminPage() {
         }
     };
 
+    const discoverAll = async () => {
+        setActionLoading('discover_all');
+        setDiscoverAllResult(null);
+        try {
+            const res = await fetch('/api/admin/scanner', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'discover_all' }),
+            });
+            const data = await res.json();
+            setDiscoverAllResult(data);
+            fetchData(); // Refresh queue count
+        } catch (err: any) {
+            setDiscoverAllResult({ error: err.message });
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     const enabledCount = channels.filter(c => c.scanner_enabled).length;
 
     if (loading) {
@@ -180,6 +200,19 @@ export default function ScannerAdminPage() {
                     Scanner Controls
                 </h2>
                 <div className="flex flex-wrap gap-3">
+                    <button
+                        onClick={discoverAll}
+                        disabled={!!actionLoading}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                        title="Scan all enabled channels and queue their videos at once — run this first to fill the pool before processing"
+                    >
+                        {actionLoading === 'discover_all' ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Search className="w-4 h-4" />
+                        )}
+                        Queue All Channels
+                    </button>
                     <button
                         onClick={runAudit}
                         disabled={actionLoading === 'audit'}
