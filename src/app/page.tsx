@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu, Tv } from "lucide-react";
+import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu, Tv, Plus } from "lucide-react";
 import Image from "next/image";
 import {
     CuratedVideoColumn,
@@ -136,6 +136,24 @@ export default async function HomeAlt1() {
     }>;
     const featuredChannels = seededShuffle(channelPool, seed + 10).slice(0, 4);
 
+    // Fetch "Just Added" — latest 5 clear_nde videos by created_at
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: justAddedVideos } = await supabase
+        .from('nde_vids')
+        .select('"videoId", title, "thumbnailUrl", "channelName", created_at')
+        .eq('isNde', 'clear_nde')
+        .gte('created_at', thirtyDaysAgo)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+    const justAdded = (justAddedVideos || []) as Array<{
+        videoId: string;
+        title: string;
+        thumbnailUrl: string | null;
+        channelName: string | null;
+        created_at: string;
+    }>;
+
     return (
         <div className="min-h-screen">
             {/* ─── Hero Section ─── */}
@@ -197,6 +215,60 @@ export default async function HomeAlt1() {
                     </div>
                 </div>
             </section>
+
+            {/* ─── Just Added ─── */}
+            {justAdded.length > 0 && (
+                <section className="container mx-auto px-4 pt-6 pb-4 max-w-7xl">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
+                                <Plus className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div>
+                                <h2
+                                    className="text-2xl md:text-3xl font-bold text-slate-900"
+                                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                                >
+                                    Just Added
+                                </h2>
+                                <p className="text-sm text-slate-500">Recently imported experiences</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {justAdded.map((video) => (
+                            <Link
+                                key={video.videoId}
+                                href={`/video/${video.videoId}`}
+                                className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden hover:shadow-lg transition-all duration-300"
+                            >
+                                <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                                    {video.thumbnailUrl && (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            src={video.thumbnailUrl.replace('maxresdefault', 'hqdefault')}
+                                            alt={video.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    )}
+                                    <span className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                                        NEW
+                                    </span>
+                                </div>
+                                <div className="p-3">
+                                    <p className="text-sm font-medium text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                                        {video.title}
+                                    </p>
+                                    {video.channelName && (
+                                        <p className="text-[11px] text-slate-400 mt-1 truncate">{video.channelName}</p>
+                                    )}
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* ─── Explore by Channel ─── */}
             <section className="container mx-auto px-4 pt-6 pb-12 max-w-7xl">
