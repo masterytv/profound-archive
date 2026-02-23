@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/src/app/test-greyson-ui-2/page.tsx"],"sourcesContent":["\nimport React from 'react';\n\nexport const dynamic = 'force-dynamic';\n\nexport default function TestGreysonPage2() {\n    return (\n        <div className=\"p-10 space-y-10\">\n            <h1 className=\"text-3xl font-bold\">Greyson UI Test Page 2</h1>\n            <h2>DEBUG SECTION H2</h2>\n            <p>DEBUG SECTION PARAGRAPH - Score 99</p>\n            <div className=\"p-4 border-4 border-purple-500 bg-purple-100 text-purple-900 font-bold text-3xl\">\n                INLINE RENDER TEST 2: Score 99\n            </div>\n        </div>\n    );\n}\n"],"names":[],"mappings":";;;;;;;;AAGO,MAAM,UAAU;AAER,SAAS;IACpB,qBACI,8OAAC;QAAI,WAAU;;0BACX,8OAAC;gBAAG,WAAU;0BAAqB;;;;;;0BACnC,8OAAC;0BAAG;;;;;;0BACJ,8OAAC;0BAAE;;;;;;0BACH,8OAAC;gBAAI,WAAU;0BAAkF;;;;;;;;;;;;AAK7G"}}]
-}
