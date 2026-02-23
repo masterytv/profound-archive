@@ -310,11 +310,24 @@ useEffect(() => {
 ### B. The Fix: Async Polling
 
 - **Never use `waitForFinish=N` for Apify calls on serverless platforms.** Switch to:
-  1. `POST /acts/{actor}/runs` — starts the run (non-blocking, 15s timeout)
-  2. Poll `GET /actor-runs/{runId}` every 5s until `status = SUCCEEDED/FAILED` (10s timeout per poll)
+  1. `POST /acts/{actor}/runs` — starts the run (non-blocking, **30s** timeout)
+  2. Poll `GET /actor-runs/{runId}` every 5s until `status = SUCCEEDED/FAILED` (**15s** timeout per poll)
   3. `GET /datasets/{datasetId}/items` — fetch results (15s timeout)
 - Each individual HTTP call is short and independent. If a poll fails, the next interval retries it. This cannot be silently killed by Firebase.
 - **Always use `AbortController`** on every `fetch()` call with an explicit ms timeout. Never rely on the platform's default timeout for external API calls.
+- **CRITICAL: Wrap each individual poll in its own `try/catch` inside the while loop.** `fetchWithTimeout` throws `AbortError` when its timeout fires — this throw propagates OUT of the while loop to the outer catch, returning `null` → `no_captions`. The `if (!statusRes.ok)` guard only handles HTTP error status codes, NOT thrown exceptions. Pattern:
+  ```typescript
+  while (Date.now() < deadline) {
+      await sleep(POLL_INTERVAL_MS);
+      try {
+          const res = await fetchWithTimeout(url, opts, timeoutMs);
+          // handle res...
+      } catch (pollErr) {
+          // Single poll timeout — just retry on next interval
+          console.warn('Poll error, retrying...');
+      }
+  }
+  ```
 - **File:** `src/lib/youtube/subtitles.ts` — see `fetchWithTimeout()` helper.
 
 ### C. Apify Response Shape (pintostudio actor)
