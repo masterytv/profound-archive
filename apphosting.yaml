@@ -57,5 +57,5 @@ env:
 
   # Apify API token for YouTube transcript scraping (required by intake pipeline)
   - variable: APIFY_API_TOKEN
-    secret: APIFY_API_TOKEN
+    secret: projects/432036554831/secrets/APIFY_API_TOKEN/versions/1
 # Trigger new build after granting secret access
