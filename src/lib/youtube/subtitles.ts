@@ -75,7 +75,7 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
                 },
                 body: JSON.stringify({ videoUrl }),
             },
-            15000, // 15s to start the run — if this fails, it's a real API error
+            30000, // 30s to start the run — more headroom for Apify cold starts
         );
 
         if (!startRes.ok) {
@@ -101,25 +101,34 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
         while (Date.now() < deadline) {
             await sleep(APIFY_POLL_INTERVAL_MS);
 
-            const statusRes = await fetchWithTimeout(
-                `${APIFY_BASE_URL}/actor-runs/${runId}`,
-                { headers: { 'Authorization': `Bearer ${apiToken}` } },
-                10000,
-            );
+            // IMPORTANT: wrap each individual poll in try/catch.
+            // fetchWithTimeout throws AbortError on timeout — that throw would
+            // propagate out of the while loop to the outer catch and kill the
+            // entire fetch. We want a failed poll to just retry, not abort.
+            try {
+                const statusRes = await fetchWithTimeout(
+                    `${APIFY_BASE_URL}/actor-runs/${runId}`,
+                    { headers: { 'Authorization': `Bearer ${apiToken}` } },
+                    15000, // 15s per poll attempt
+                );
 
-            if (!statusRes.ok) {
-                console.warn(`[Apify] Status poll failed (${statusRes.status}), retrying...`);
-                continue;
-            }
+                if (!statusRes.ok) {
+                    console.warn(`[Apify] Status poll HTTP error (${statusRes.status}), retrying...`);
+                    continue;
+                }
 
-            const statusData = await statusRes.json();
-            runStatus = statusData?.data?.status || 'UNKNOWN';
-            datasetId = statusData?.data?.defaultDatasetId || null;
+                const statusData = await statusRes.json();
+                runStatus = statusData?.data?.status || 'UNKNOWN';
+                datasetId = statusData?.data?.defaultDatasetId || null;
 
-            console.log(`[Apify] Run ${runId} status: ${runStatus}`);
+                console.log(`[Apify] Run ${runId} status: ${runStatus}`);
 
-            if (runStatus === 'SUCCEEDED' || runStatus === 'FAILED' || runStatus === 'ABORTED' || runStatus === 'TIMED-OUT') {
-                break;
+                if (runStatus === 'SUCCEEDED' || runStatus === 'FAILED' || runStatus === 'ABORTED' || runStatus === 'TIMED-OUT') {
+                    break;
+                }
+            } catch (pollErr: any) {
+                // Timeout or network error on this specific poll — just retry next interval
+                console.warn(`[Apify] Poll error for run ${runId}: ${pollErr?.message || pollErr}, retrying in ${APIFY_POLL_INTERVAL_MS}ms...`);
             }
         }
 
