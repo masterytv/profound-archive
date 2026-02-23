@@ -70,23 +70,22 @@ export async function GET(req: NextRequest) {
         .order('started_at', { ascending: false })
         .limit(20);
 
-    // Aggregate stats from scan_runs
-    const { data: aggregateStats } = await supabase
-        .from('scan_runs')
-        .select('videos_discovered, videos_processed, videos_accepted, videos_rejected, videos_failed')
-        .then(({ data }: any) => {
-            const totals = { discovered: 0, processed: 0, accepted: 0, rejected: 0, failed: 0 };
-            if (data) {
-                for (const run of data) {
-                    totals.discovered += run.videos_discovered || 0;
-                    totals.processed += run.videos_processed || 0;
-                    totals.accepted += run.videos_accepted || 0;
-                    totals.rejected += run.videos_rejected || 0;
-                    totals.failed += run.videos_failed || 0;
-                }
-            }
-            return { data: totals };
-        });
+    // Live intake stats from nde_vids — same source as Queue Inspector.
+    // Using nde_vids instead of scan_runs so numbers react to retries and match Queue Inspector.
+    const { data: ndeVidCounts } = await supabase
+        .from('nde_vids')
+        .select('intake_status')
+        .not('intake_status', 'is', null);
+
+    const intakeTotals = { accepted: 0, rejected: 0, failed: 0 };
+    if (ndeVidCounts) {
+        for (const row of ndeVidCounts) {
+            if (row.intake_status === 'complete') intakeTotals.accepted++;
+            else if (row.intake_status === 'not_profound') intakeTotals.rejected++;
+            else if (['failed', 'no_captions', 'indexing'].includes(row.intake_status)) intakeTotals.failed++;
+        }
+    }
+    const aggregateStats = intakeTotals;
 
     return NextResponse.json({
         channels,
