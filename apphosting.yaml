@@ -45,4 +45,8 @@ env:
   # Secret for securing Cron/Automated jobs
   - variable: CRON_SECRET
     secret: projects/432036554831/secrets/CRON_SECRET/versions/3
+
+  # YouTube Data API key for channel scanner
+  - variable: YOUTUBE_API_KEY
+    secret: projects/432036554831/secrets/YOUTUBE_API_KEY/versions/latest
 # Trigger new build after granting secret access
