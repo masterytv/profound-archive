@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { discoverNewVideos, getExistingVideoIds } from '@/lib/scanner/discover';
+import { runScannerTick } from '@/lib/scanner/tick';
 
 /**
  * Admin Scanner API
@@ -112,6 +114,87 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ success: true, enabled: ids.length });
             }
             return NextResponse.json({ success: true, enabled: 0 });
+        }
+
+        case 'run_audit': {
+            try {
+                const { data: channels } = await supabase
+                    .from('channels')
+                    .select('channel_id, name, uploads_playlist_id, subscriber_count')
+                    .eq('scanner_enabled', true)
+                    .order('name');
+
+                if (!channels || channels.length === 0) {
+                    return NextResponse.json({ results: [], totals: { channels: 0, newToImport: 0 } });
+                }
+
+                const channelIds = channels.map((c: any) => c.channel_id);
+                const existingVideoIds = await getExistingVideoIds(supabase, channelIds);
+
+                const results: any[] = [];
+                for (const channel of channels) {
+                    if (!channel.uploads_playlist_id) continue;
+                    try {
+                        const discovery = await discoverNewVideos(
+                            channel.channel_id,
+                            channel.uploads_playlist_id,
+                            channel.name,
+                            existingVideoIds,
+                            50, 10,
+                        );
+                        results.push({
+                            channelId: discovery.channelId,
+                            channelName: discovery.channelName,
+                            totalFetched: discovery.totalFetched,
+                            alreadyInDb: discovery.alreadyInDb,
+                            newToImport: discovery.newVideos.length,
+                        });
+                    } catch (err: any) {
+                        results.push({
+                            channelId: channel.channel_id,
+                            channelName: channel.name,
+                            totalFetched: 0, alreadyInDb: 0, newToImport: -1,
+                        });
+                    }
+                }
+
+                const totals = results.reduce((acc, r) => ({
+                    channels: acc.channels + 1,
+                    totalFetched: acc.totalFetched + r.totalFetched,
+                    alreadyInDb: acc.alreadyInDb + r.alreadyInDb,
+                    newToImport: acc.newToImport + Math.max(0, r.newToImport),
+                }), { channels: 0, totalFetched: 0, alreadyInDb: 0, newToImport: 0 });
+
+                const estimatedCost = totals.newToImport * 0.017;
+                return NextResponse.json({
+                    results: results.sort((a: any, b: any) => b.newToImport - a.newToImport),
+                    totals,
+                    estimate: {
+                        totalEstimatedCost: `$${estimatedCost.toFixed(2)}`,
+                        daysToComplete: Math.ceil(totals.newToImport / 60),
+                    },
+                });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+        }
+
+        case 'run_tick': {
+            try {
+                const videosPerTick = body.videosPerTick || 1;
+                const result = await runScannerTick(supabase, videosPerTick);
+                return NextResponse.json({
+                    success: true,
+                    channel: result.channel,
+                    discovered: result.discovered,
+                    queued: result.queued,
+                    processed: result.processed.length,
+                    results: result.processed,
+                    durationMs: result.totalDurationMs,
+                });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
         }
 
         default:

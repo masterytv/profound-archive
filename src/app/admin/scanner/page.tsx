@@ -83,10 +83,10 @@ export default function ScannerAdminPage() {
         setActionLoading('audit');
         setAuditResult(null);
         try {
-            const res = await fetch('/api/scanner/audit', {
+            const res = await fetch('/api/admin/scanner', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ secret: 'admin-trigger' }),
+                body: JSON.stringify({ action: 'run_audit' }),
             });
             const data = await res.json();
             setAuditResult(data);
@@ -101,10 +101,10 @@ export default function ScannerAdminPage() {
         setActionLoading('tick');
         setTickResult(null);
         try {
-            const res = await fetch('/api/scanner/tick', {
+            const res = await fetch('/api/admin/scanner', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ secret: 'admin-trigger', videosPerTick: 1 }),
+                body: JSON.stringify({ action: 'run_tick', videosPerTick: 1 }),
             });
             const data = await res.json();
             setTickResult(data);
