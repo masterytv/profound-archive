@@ -9,7 +9,7 @@ on:
       videos_per_tick:
         description: 'Number of videos to process per tick'
         required: false
-        default: '1'
+        default: '3'
 
 jobs:
   scanner-tick:
@@ -20,7 +20,7 @@ jobs:
           HTTP_CODE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -L \
             "${{ secrets.APP_URL }}/api/scanner/tick?secret=${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
-            -d '{"videosPerTick": ${{ github.event.inputs.videos_per_tick || 1 }}}' \
+            -d '{"videosPerTick": ${{ github.event.inputs.videos_per_tick || 3 }}}' \
             --max-time 330)
           echo "HTTP Status: $HTTP_CODE"
           cat /tmp/response.txt
