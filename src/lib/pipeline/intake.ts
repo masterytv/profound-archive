@@ -615,17 +615,17 @@ async function generateEmbeddings(
             embedding: searchEmbeddings[i] ? `[${searchEmbeddings[i].join(',')}]` : null,
         }));
 
-        // Insert in batches of 5 to avoid statement timeout (vectors are large)
-        const BATCH_SIZE = 5;
-        for (let i = 0; i < searchRows.length; i += BATCH_SIZE) {
-            const batch = searchRows.slice(i, i + BATCH_SIZE);
+        // Insert 1 row at a time — pgvector rows are ~6KB each; batching triggers Supabase statement timeouts
+        for (let i = 0; i < searchRows.length; i++) {
             const { error: searchError } = await supabase
                 .from('nde_punctuated_embeddings')
-                .insert(batch);
+                .insert(searchRows[i]);
 
             if (searchError) {
                 throw new Error(`Failed to insert search embeddings batch ${i}: ${searchError.message}`);
             }
+            // Brief pause to avoid overwhelming the connection pool
+            if (i < searchRows.length - 1) await new Promise(r => setTimeout(r, 100));
         }
         console.log(`[Intake] Inserted ${searchRows.length} search embedding chunks for ${videoId}`);
     }
@@ -642,17 +642,16 @@ async function generateEmbeddings(
             metadata: chunk.metadata,
         }));
 
-        // Insert in batches of 5 to avoid statement timeout
-        const BATCH_SIZE = 5;
-        for (let i = 0; i < chatRows.length; i += BATCH_SIZE) {
-            const batch = chatRows.slice(i, i + BATCH_SIZE);
+        // Insert 1 row at a time — same reason as search embeddings above
+        for (let i = 0; i < chatRows.length; i++) {
             const { error: chatError } = await supabase
                 .from('nde_chatbot_chunks')
-                .insert(batch);
+                .insert(chatRows[i]);
 
             if (chatError) {
                 throw new Error(`Failed to insert chat embeddings batch ${i}: ${chatError.message}`);
             }
+            if (i < chatRows.length - 1) await new Promise(r => setTimeout(r, 100));
         }
         console.log(`[Intake] Inserted ${chatRows.length} chat embedding chunks for ${videoId}`);
     }
