@@ -17,8 +17,25 @@ function getAdminSupabase() {
     );
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     const supabase = getAdminSupabase();
+    const { searchParams } = new URL(req.url);
+
+    // Queue inspector view: returns failed + skipped items with details
+    if (searchParams.get('view') === 'queue') {
+        const { data: items } = await supabase
+            .from('scan_queue')
+            .select(`
+                id, video_id, video_url, channel_id, status, intake_result,
+                error, processed_at, created_at,
+                channels!scan_queue_channel_id_fkey(name, avatar_url)
+            `)
+            .in('status', ['failed', 'skipped'])
+            .order('processed_at', { ascending: false })
+            .limit(200);
+
+        return NextResponse.json({ items: items || [] });
+    }
 
     // Fetch channels with scanner info + video counts
     const { data: channels, error: channelError } = await supabase
@@ -195,6 +212,29 @@ export async function POST(req: NextRequest) {
             } catch (err: any) {
                 return NextResponse.json({ error: err.message }, { status: 500 });
             }
+        }
+
+        case 'reset_item': {
+            // Reset a single queue item back to pending for manual retry
+            const { queueId } = body;
+            const { error } = await supabase
+                .from('scan_queue')
+                .update({ status: 'pending', error: null, processed_at: null, intake_result: null })
+                .eq('id', queueId);
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ success: true });
+        }
+
+        case 'reset_all_skipped': {
+            // Reset ALL skipped items back to pending (mass retry for no_captions)
+            const { error } = await supabase
+                .from('scan_queue')
+                .update({ status: 'pending', error: null, processed_at: null, intake_result: null })
+                .eq('status', 'skipped');
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ success: true });
         }
 
         default:
