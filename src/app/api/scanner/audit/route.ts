@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { discoverNewVideos, getExistingVideoIds } from '@/lib/scanner/discover';
 
 /**
- * POST /api/scanner/audit
+ * GET|POST /api/scanner/audit
  * 
  * Scans ALL scanner_enabled channels to count how many new videos are available.
  * This is a read-only operation — no videos are processed, no AI costs incurred.
@@ -11,7 +11,7 @@ import { discoverNewVideos, getExistingVideoIds } from '@/lib/scanner/discover';
  * 
  * Returns a per-channel breakdown and grand totals for budgeting.
  */
-export async function POST(req: NextRequest) {
+async function handleAudit(req: NextRequest) {
     // Auth check
     const { searchParams } = new URL(req.url);
     const body = await req.json().catch(() => ({}));
@@ -135,4 +135,12 @@ export async function POST(req: NextRequest) {
         console.error('Audit error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
+}
+
+export async function GET(req: NextRequest) {
+    return handleAudit(req);
+}
+
+export async function POST(req: NextRequest) {
+    return handleAudit(req);
 }

@@ -3,15 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 import { runScannerTick } from '@/lib/scanner/tick';
 
 /**
- * POST /api/scanner/tick
+ * GET|POST /api/scanner/tick
  * 
  * Executes a single scanner tick: discover new videos from 1 channel,
  * queue them, and process up to 5 pending items through the intake pipeline.
  * 
  * Secured with CRON_SECRET. Called by GitHub Actions cron (every 2h)
  * or manually from the admin panel.
+ * 
+ * Supports both GET (for simple cron triggers) and POST (for custom params).
  */
-export async function POST(req: NextRequest) {
+
+async function handleTick(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const body = await req.json().catch(() => ({}));
     const secret = searchParams.get('secret') || body.secret;
@@ -43,4 +46,12 @@ export async function POST(req: NextRequest) {
         console.error('Scanner tick error:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
+}
+
+export async function GET(req: NextRequest) {
+    return handleTick(req);
+}
+
+export async function POST(req: NextRequest) {
+    return handleTick(req);
 }
