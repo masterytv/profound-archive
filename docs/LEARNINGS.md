@@ -297,3 +297,71 @@ useEffect(() => {
 | `CRON_SECRET` | Authenticating automated jobs | ✅ `versions/3` |
 
 > **Note on version pinning:** The `Secret Manager Secret Accessor` role does NOT allow resolving `versions/latest` (see Section 4B). When rotating a key, create a new version in Secret Manager and update the version number in `apphosting.yaml`.
+
+## 14. Apify Caption Fetching — Avoid Long-Poll HTTP (CRITICAL)
+
+> **Context:** In Feb 2026, we discovered videos with valid captions were being flagged as `no_captions`. Apify returned 302 segments correctly in isolation — the failure was infrastructure, not content.
+
+### A. Root Cause: `waitForFinish=N` Long-Poll on Serverless
+
+- **The Problem:** The original implementation called Apify with `?waitForFinish=120` — a single HTTP connection held open for up to 120 seconds. Firebase serverless drops long-lived idle connections before that, so Apify completed successfully but our pipeline never received the response. The connection was silently dropped → `runResponse.ok` was false → `null` returned → `no_captions`.
+- **Diagnosis pattern:** If a `no_captions` error appears but Apify confirms the actor SUCCEEDED for that videoId with a non-empty dataset, it's always a connection timeout — never a content issue.
+
+### B. The Fix: Async Polling
+
+- **Never use `waitForFinish=N` for Apify calls on serverless platforms.** Switch to:
+  1. `POST /acts/{actor}/runs` — starts the run (non-blocking, 15s timeout)
+  2. Poll `GET /actor-runs/{runId}` every 5s until `status = SUCCEEDED/FAILED` (10s timeout per poll)
+  3. `GET /datasets/{datasetId}/items` — fetch results (15s timeout)
+- Each individual HTTP call is short and independent. If a poll fails, the next interval retries it. This cannot be silently killed by Firebase.
+- **Always use `AbortController`** on every `fetch()` call with an explicit ms timeout. Never rely on the platform's default timeout for external API calls.
+- **File:** `src/lib/youtube/subtitles.ts` — see `fetchWithTimeout()` helper.
+
+### C. Apify Response Shape (pintostudio actor)
+
+```json
+[{ "data": [{ "start": "0.240", "dur": "7.519", "text": "..." }, ...] }]
+```
+
+The confirmed primary key is `data`. The `extractSegments()` function also handles `searchResult`, `transcript`, `captions`, `subtitles` as fallbacks.
+
+## 15. Scanner Queue Architecture (CRITICAL)
+
+> **Context:** In Feb 2026, we built the Channel Scanner with a persistent queue. Several design decisions about queue management and fairness were settled definitively.
+
+### A. Two Data Sources — Never Confuse Them
+
+| Table | Purpose | Data lifetime |
+|---|---|---|
+| `scan_queue` | Transient processing queue | Items reset on retry → NOT a source of truth |
+| `nde_vids.intake_status` | Persistent intake result | Survives retries → source of truth for Queue Inspector |
+
+- **Dashboard stats** (Total Failed, Total Accepted) must read from `nde_vids.intake_status`, never from `scan_runs` aggregate columns. `scan_runs` is an append-only historical log — its `videos_failed` column never decreases when you retry.
+- **Queue Inspector** (`/admin/scanner/queue`) reads `nde_vids.intake_status IN ('failed', 'no_captions', 'indexing', 'not_profound')`.
+- **Retry action:** Clears `intake_status` in `nde_vids` → upserts back into `scan_queue` as `pending`.
+
+### B. Two-Phase Queue Strategy
+
+**Phase 1 — Discover All (run once):** Use the "Queue All Channels" admin button (`discover_all` API action). Scans all 47 enabled channels and queues up to 50 videos each. Safe to run multiple times — uses `ignoreDuplicates: true` on `video_url` conflict.
+
+**Phase 2 — Process with Round-Robin (ongoing cron):** The tick picks from the queue using random channel selection:
+1. Sample 500 pending rows, extract unique `channel_id`s
+2. Exclude channels already touched this tick (`touchedChannelIds` Set)
+3. Pick a random channel from the untouched pool
+4. Grab that channel's oldest pending video → process
+5. If the picked channel has no pending items, `continue` (don't `break`) — try another channel
+
+- **Key gotcha:** When a channel is depleted mid-tick, use `continue` not `break` — the overall queue may not be exhausted, just that specific channel.
+
+### C. Cron Throughput (as of Feb 2026)
+
+| Setting | Value |
+|---|---|
+| Frequency | Hourly (`0 * * * *`) |
+| Videos per tick | 3 (default dispatched) |
+| Estimated throughput | ~72 videos/day |
+| Max before 330s timeout | ~5 videos/tick |
+| GitHub Actions file | `.github/workflows/scanner-cron.yml` |
+
+- The cron dispatches with `videosPerTick: 3` (default). Manual `workflow_dispatch` also accepts this as an input.
+- Do not increase `videosPerTick` above 5 — the `--max-time 330` curl limit will fire and abort the job.

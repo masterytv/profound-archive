@@ -70,6 +70,12 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - Advanced Search Filters (`/search3`): Integrated Greyson, Transformation, and Veridical sliding score filters across Keyword and Concept (formerly Semantic) search modes correctly updating URL params, Typesense Schema, and pgvector RPCs (resolved candidate function overloading conflicts).
 - **Native video intake pipeline** (`src/lib/pipeline/`) — replaces n8n: scrape → classify → 7-pass analysis → embeddings → Typesense index → fingerprint.
 - Admin intake page (`/admin/intake`) — branded UI for single-video processing with real-time step progress.
+- **Queue Inspector** (`/admin/scanner/queue`) — persistent view of failed/skipped/stuck videos from `nde_vids.intake_status`, with per-item retry and bulk reset. Separate from transient `scan_queue`.
+- **Scanner stats fixed** — Total Failed/Accepted on scanner dashboard now reads from `nde_vids` (live) not `scan_runs` aggregate (never-decreases on retry).
+- **Apify async polling** (`src/lib/youtube/subtitles.ts`) — replaced fragile `waitForFinish=120` long-poll with start→poll→fetch pattern using `AbortController` per call. Fixes false `no_captions` on Firebase serverless.
+- **Round-robin queue processing** (`src/lib/scanner/tick.ts`) — tick now picks a random channel per iteration (sampling 500 pending rows, deduplicating channel_ids, tracking `touchedChannelIds` per tick) instead of globally oldest-first. Prevents one channel from monopolizing the queue.
+- **Discover All Channels** (`discover_all` admin API action + "Queue All Channels" admin button) — bulk-queues 50 videos per channel across all 47 enabled channels in one shot. Safe to re-run (idempotent via `ignoreDuplicates`).
+- **Hourly cron** (`.github/workflows/scanner-cron.yml`) — increased from every 2h to every 1h (~72 videos/day throughput).
 
 ### In Progress
 - Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
