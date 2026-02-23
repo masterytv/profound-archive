@@ -21,19 +21,17 @@ export async function GET(req: NextRequest) {
     const supabase = getAdminSupabase();
     const { searchParams } = new URL(req.url);
 
-    // Queue inspector view: returns failed + skipped items with details
+    // Queue inspector: query nde_vids (persistent source of truth) not scan_queue (transient)
+    // scan_queue items get reset to 'pending' on retry — nde_vids always holds the real intake status
     if (searchParams.get('view') === 'queue') {
-        const { data: items } = await supabase
-            .from('scan_queue')
-            .select(`
-                id, video_id, video_url, channel_id, status, intake_result,
-                error, processed_at, created_at,
-                channels!scan_queue_channel_id_fkey(name, avatar_url)
-            `)
-            .in('status', ['failed', 'skipped'])
-            .order('processed_at', { ascending: false })
+        const { data: items, error: qErr } = await supabase
+            .from('nde_vids')
+            .select('"videoId", title, "channelId", channelName, intake_status, intake_error, intake_submitted_at, intake_completed_at')
+            .in('intake_status', ['failed', 'no_captions', 'not_profound', 'indexing'])
+            .order('intake_completed_at', { ascending: false })
             .limit(200);
 
+        if (qErr) return NextResponse.json({ error: qErr.message }, { status: 500 });
         return NextResponse.json({ items: items || [] });
     }
 
@@ -215,14 +213,36 @@ export async function POST(req: NextRequest) {
         }
 
         case 'reset_item': {
-            // Reset a single queue item back to pending for manual retry
-            const { queueId } = body;
-            const { error } = await supabase
-                .from('scan_queue')
-                .update({ status: 'pending', error: null, processed_at: null, intake_result: null })
-                .eq('id', queueId);
+            // Reset a single video for retry:
+            // 1. Clear intake_status in nde_vids so it can be re-processed
+            // 2. Upsert back into scan_queue as pending
+            const { videoId } = body;
+            if (!videoId) return NextResponse.json({ error: 'Missing videoId' }, { status: 400 });
 
-            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            // Fetch the video's channel_id from nde_vids
+            const { data: vid } = await supabase
+                .from('nde_vids')
+                .select('"videoId", "channelId"')
+                .eq('"videoId"', videoId)
+                .single();
+
+            // Reset intake status
+            await supabase
+                .from('nde_vids')
+                .update({ intake_status: null, intake_error: null, intake_completed_at: null })
+                .eq('"videoId"', videoId);
+
+            // Re-queue it
+            await supabase.from('scan_queue').upsert({
+                video_id: videoId,
+                video_url: `https://www.youtube.com/watch?v=${videoId}`,
+                channel_id: vid?.channelId || null,
+                status: 'pending',
+                error: null,
+                processed_at: null,
+                intake_result: null,
+            }, { onConflict: 'video_url', ignoreDuplicates: false });
+
             return NextResponse.json({ success: true });
         }
 
