@@ -1,30 +1,94 @@
 # Environment Variables
 
 > This document lists all environment variables required to run the project.
+> For security rules, see [LEARNINGS.md Section 13](./LEARNINGS.md#13-api-key-security--leak-prevention-critical).
 
-## Required Variables
+## Local Development (`.env.local`)
 
-### Supabase (Client & Server)
-| Variable | Description | Required? |
+`.env.local` is **never committed to git** (covered by `.gitignore`). Copy `.env.example` and fill in values.
+
+### Supabase
+| Variable | Description | Scope |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase Project URL | ✅ Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public/Anon API Key | ✅ Yes |
-| `SUPABASE_SERVICE_KEY` | Service Role Key (Admin Access) | ✅ Yes (for API routes) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL | Client + Server |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public/Anon API Key | Client + Server |
+| `SUPABASE_SERVICE_KEY` | Service Role Key (Admin access, bypasses RLS) | Server-only |
+| `SUPABASE_SERVICE_ROLE_KEY` | Legacy alias for `SUPABASE_SERVICE_KEY` | Server-only |
 
-### OpenAI (AI Features)
-| Variable | Description | Required? |
+### AI & Analysis
+| Variable | Description | Scope |
 |---|---|---|
-| `OPENAI_API_KEY` | OpenAI API Key (needs GPT-4/5 access) | ✅ Yes |
+| `OPENAI_API_KEY` | OpenAI API Key (GPT-4o-mini, text-embedding-3-small) | Server-only |
 
-## Optional / Legacy Variables
-| Variable | Description | Required? |
+### Search
+| Variable | Description | Scope |
 |---|---|---|
-| `GOOGLE_GENERATIVE_AI_API_KEY` | For Genkit/Gemini integration | ❌ Optional |
+| `TYPESENSE_HOST` | IP address of self-hosted Typesense server (Hetzner/Coolify) | Server-only |
+| `TYPESENSE_API_KEY` | Typesense Admin API Key (rotated Feb 2026) | Server-only |
+| `TYPESENSE_PORT` | Typesense port (default: `8108`) | Server-only |
+| `TYPESENSE_PROTOCOL` | Typesense protocol (`http` or `https`) | Server-only |
+
+### Intake Pipeline
+| Variable | Description | Scope |
+|---|---|---|
+| `APIFY_API_TOKEN` | Apify API token for YouTube transcript scraping (rotated Feb 2026) | Server-only |
+| `YOUTUBE_API_KEY` | YouTube Data API v3 key for channel metadata enrichment | Server-only |
+
+### Automation
+| Variable | Description | Scope |
+|---|---|---|
+| `CRON_SECRET` | Bearer token for authenticating internal cron/scheduler calls | Server-only |
+
+### n8n Webhooks (Legacy — being phased out)
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_SEARCH_WEBHOOK_URL` | n8n search webhook (legacy) |
+| `NEXT_PUBLIC_CHAT_WEBHOOK_URL` | n8n chat webhook (legacy) |
+| `NEXT_PUBLIC_CHAT_2_WEBHOOK_URL` | n8n chat v2 webhook (legacy) |
+| `NEXT_PUBLIC_N8N_WEBHOOK_URL` | n8n general webhook (legacy) |
+| `NEXT_PUBLIC_CHAT_TEST_WEBHOOK_URL` | n8n test webhook (legacy) |
+
+### Debug / Misc
+| Variable | Description |
+|---|---|
+| `IS_DEBUG_MODE` | Set to `true` to bypass auth in local dev intake API |
+| `CLAUDE_API` | Anthropic API key (optional, used in early experiments) |
+
+---
+
+## Production (Firebase App Hosting — `apphosting.yaml`)
+
+Production secrets are stored in **Google Cloud Secret Manager** (project `432036554831`).
+They are referenced in `apphosting.yaml` using `secret:` references — **never `value:`**.
+
+| Secret Name | Secret Manager Reference | Rotated? |
+|---|---|---|
+| `OPENAI_API_KEY` | `projects/432036554831/secrets/OPENAI_API_KEY/versions/1` | ✅ Feb 2026 |
+| `SUPABASE_SERVICE_KEY` | `projects/432036554831/secrets/SUPABASE_SERVICE_KEY/versions/1` | — |
+| `TYPESENSE_API_KEY` | `TYPESENSE_API_KEY` | ✅ Feb 2026 |
+| `APIFY_API_TOKEN` | `APIFY_API_TOKEN` | ✅ Feb 2026 |
+| `YOUTUBE_API_KEY` | `projects/432036554831/secrets/YOUTUBE_API_KEY/versions/latest` | — |
+| `CRON_SECRET` | `projects/432036554831/secrets/CRON_SECRET/versions/3` | — |
+
+> **When rotating a key:** Create a new version in Secret Manager, then update the `versions/N` number in `apphosting.yaml` and redeploy.
+
+---
 
 ## Development Setup
-1. Copy `.env.example` to `.env.local`:
+
+1. Copy the example env file:
    ```bash
    cp .env.example .env.local
    ```
-2. Fill in the values from your Supabase Dashboard and OpenAI Platform.
-3. Restart the dev server (`npm run dev`) to apply changes.
+2. Fill in values from your Supabase Dashboard, OpenAI Platform, Apify Dashboard, etc.
+3. Restart the dev server:
+   ```bash
+   npm run dev
+   ```
+
+## ⚠️ Security Rules
+
+See **[LEARNINGS.md Section 13](./LEARNINGS.md#13-api-key-security--leak-prevention-critical)** for the full incident report and permanent rules. TL;DR:
+- Never run `git add .` — always inspect `git status` and add files explicitly.
+- Never add secret values directly to `apphosting.yaml`. Always use `secret:` references.
+- Never commit `.next`, `.next.old*`, or `.env*` files.

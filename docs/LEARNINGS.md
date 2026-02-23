@@ -256,3 +256,44 @@ useEffect(() => {
 - The "See Video and Analysis" link should only appear when `result.status === 'complete' || result.status === 'already_exists'`
 - For failed, not_profound, or error results, hide the link to avoid linking to incomplete data.
 
+## 13. API Key Security & Leak Prevention (CRITICAL)
+
+> **Context:** In Feb 2026, we received leak notifications from OpenAI and Apify via GitHub Secret Scanning. Both keys were traced to the same root cause: the `.next.old` build cache directory was accidentally committed to git.
+
+### A. Root Cause: `.next.old` Build Cache in Git
+
+- **What happened:** Next.js dev server creates a `.next.old.*` directory when it rotates build caches. During a `git add .` operation, this directory (containing thousands of compiled binary files) was committed and pushed to GitHub.
+- **Why it causes a leak:** Next.js **embeds the values of environment variables from `.env.local` into compiled bundle and cache files**. This means secrets like `OPENAI_API_KEY`, `APIFY_API_TOKEN`, etc. were embedded inside binary `.sst` files in the cache. GitHub Secret Scanning detected them and notified the affected API providers.
+- **Which keys were leaked:** OpenAI (`sk-proj-...l4A`) and Apify (`apify_api_...6AXuC`)
+- **Key that was NOT leaked from this repo:** The Typesense API key was hardcoded in `apphosting.yaml` (tracked by git) — a separate vulnerability fixed at the same time.
+
+### B. Remediation Steps Taken (2026-02-22)
+
+1. **Rotated all exposed keys** — New keys generated in OpenAI and Apify dashboards. Old keys were immediately invalidated.
+2. **Updated `.env.local`** with the new OpenAI and Apify API keys.
+3. **Removed `.next.old` from git tracking** (`git rm -r --cached .next.old.1771712071249`) and pushed.
+4. **Confirmed `.gitignore` already had the rule** (`/.next.old*/`) — the issue was the directory was committed once before this rule existed. `git rm --cached` fixed the outstanding tracking.
+5. **Moved Typesense API key to Secret Manager** — Removed `value: <key>` from `apphosting.yaml`, replaced with `secret: TYPESENSE_API_KEY`. Also updated Firebase Google Cloud Secret Manager with the new value.
+6. **Added `APIFY_API_TOKEN` to `apphosting.yaml`** via Secret Manager — it was missing entirely, meaning intake requests from projectprofound.org would have silently failed.
+7. **Updated Firebase Secret Manager** with new OpenAI and Apify keys via `firebase apphosting:secrets:set`.
+
+### C. Permanent Rules Going Forward
+
+- **NEVER run `git add .` without inspecting `git status` first.** The `.next`, `.next.old*` directories are huge and must never be committed. Use `git add -p` (patch mode) or explicitly name files.
+- **ALL secrets in `apphosting.yaml` must use `secret:` references**, never `value:` for sensitive keys. Webhook URLs are okay as `value:` since they are not credentials.
+- **Always rotate a key immediately** when a leak notification is received. Even if you remove it from git history (which is impractical), the key itself is what needs to change.
+- **`.env.local` is never committed.** It is in `.gitignore` as `.env*`. This is correct and must stay this way.
+- **New intake pipeline env vars must be added to `apphosting.yaml`** at the same time as they are added to `.env.local`. Otherwise local dev works but production silently fails.
+
+### D. Current Secret Manager Inventory (all production secrets)
+
+| Secret Name | Purpose | In `apphosting.yaml`? |
+|---|---|---|
+| `OPENAI_API_KEY` | AI analysis & embeddings | ✅ `versions/1` → update version on rotation |
+| `SUPABASE_SERVICE_KEY` | Admin DB access | ✅ `versions/1` |
+| `TYPESENSE_API_KEY` | Keyword search | ✅ `TYPESENSE_API_KEY` |
+| `APIFY_API_TOKEN` | YouTube transcript scraping | ✅ `APIFY_API_TOKEN` |
+| `YOUTUBE_API_KEY` | Channel metadata enrichment | ✅ `versions/latest` |
+| `CRON_SECRET` | Authenticating automated jobs | ✅ `versions/3` |
+
+> **Note on version pinning:** The `Secret Manager Secret Accessor` role does NOT allow resolving `versions/latest` (see Section 4B). When rotating a key, create a new version in Secret Manager and update the version number in `apphosting.yaml`.
