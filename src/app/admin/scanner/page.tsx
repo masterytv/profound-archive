@@ -144,7 +144,7 @@ export default function ScannerAdminPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <StatCard
                     label="Channels Enabled"
                     value={enabledCount}
@@ -160,6 +160,12 @@ export default function ScannerAdminPage() {
                     label="Total Accepted"
                     value={aggregateStats?.accepted || 0}
                     icon={<TrendingUp className="w-4 h-4 text-emerald-600" />}
+                />
+                <StatCard
+                    label="Total Skipped"
+                    value={queueStats?.skipped || 0}
+                    icon={<BarChart3 className="w-4 h-4 text-slate-400" />}
+                    subtitle="no captions / not NDE"
                 />
                 <StatCard
                     label="Total Failed"
@@ -350,11 +356,12 @@ export default function ScannerAdminPage() {
     );
 }
 
-function StatCard({ label, value, total, icon }: {
+function StatCard({ label, value, total, icon, subtitle }: {
     label: string;
     value: number;
     total?: number;
     icon: React.ReactNode;
+    subtitle?: string;
 }) {
     return (
         <div className="rounded-2xl border border-slate-200/60 bg-white p-4 hover:shadow-lg transition-all">
@@ -368,6 +375,9 @@ function StatCard({ label, value, total, icon }: {
                     <span className="text-sm font-normal text-slate-400"> / {total}</span>
                 )}
             </p>
+            {subtitle && (
+                <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
+            )}
         </div>
     );
 }
