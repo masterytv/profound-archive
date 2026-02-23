@@ -1,0 +1,24 @@
+name: Channel Scanner (every 2h)
+
+on:
+  schedule:
+    # Run every 2 hours
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      videos_per_tick:
+        description: 'Number of videos to process per tick'
+        required: false
+        default: '5'
+
+jobs:
+  scanner-tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Scanner Tick
+        run: |
+          curl -s -X POST \
+            "${{ secrets.APP_URL }}/api/scanner/tick?secret=${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{"videosPerTick": ${{ github.event.inputs.videos_per_tick || 5 }}}' \
+            --max-time 120
