@@ -137,12 +137,10 @@ export default async function HomeAlt1() {
     const featuredChannels = seededShuffle(channelPool, seed + 10).slice(0, 4);
 
     // Fetch "Just Added" — latest 5 clear_nde videos by created_at
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const { data: justAddedVideos } = await supabase
         .from('nde_vids')
         .select('"videoId", title, "thumbnailUrl", "channelName", created_at')
         .eq('isNde', 'clear_nde')
-        .gte('created_at', thirtyDaysAgo)
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -219,21 +217,21 @@ export default async function HomeAlt1() {
             {/* ─── Just Added ─── */}
             {justAdded.length > 0 && (
                 <section className="container mx-auto px-4 pt-6 pb-4 max-w-7xl">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2.5">
+                    <div className="text-center mb-10">
+                        <div className="flex items-center justify-center gap-2.5 mb-3">
                             <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
                                 <Plus className="w-5 h-5 text-green-600" />
                             </div>
-                            <div>
-                                <h2
-                                    className="text-2xl md:text-3xl font-bold text-slate-900"
-                                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-                                >
-                                    Just Added
-                                </h2>
-                                <p className="text-sm text-slate-500">Recently imported experiences</p>
-                            </div>
+                            <h2
+                                className="text-2xl md:text-3xl font-bold text-slate-900"
+                                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                            >
+                                Just Added
+                            </h2>
                         </div>
+                        <p className="text-slate-500 max-w-xl mx-auto">
+                            Recently imported experiences
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
