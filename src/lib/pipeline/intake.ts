@@ -445,7 +445,7 @@ async function updateIntakeStatus(
     error?: string,
 ) {
     const update: Record<string, any> = { intake_status: status };
-    if (status === 'complete' || status === 'not_profound' || status === 'no_captions') {
+    if (['complete', 'not_profound', 'no_captions', 'failed'].includes(status)) {
         update.intake_completed_at = new Date().toISOString();
     }
     if (error) {
