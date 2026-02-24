@@ -6,6 +6,7 @@ import {
     ToggleLeft, ToggleRight, Loader2, AlertTriangle, Search,
     TrendingUp, TrendingDown, BarChart3
 } from 'lucide-react';
+import Link from 'next/link';
 
 interface Channel {
     channel_id: string;
@@ -181,17 +182,15 @@ export default function ScannerAdminPage() {
                     value={aggregateStats?.accepted || 0}
                     icon={<TrendingUp className="w-4 h-4 text-emerald-600" />}
                 />
-                <StatCard
-                    label="Total Skipped"
-                    value={queueStats?.skipped || 0}
-                    icon={<BarChart3 className="w-4 h-4 text-slate-400" />}
-                    subtitle="no captions / not NDE"
-                />
-                <StatCard
-                    label="Total Failed"
-                    value={aggregateStats?.failed || 0}
-                    icon={<AlertTriangle className="w-4 h-4 text-red-500" />}
-                />
+                <Link href="/admin/scanner/queue" className="block cursor-pointer">
+                    <StatCard
+                        label="Total Not Accepted"
+                        value={(aggregateStats?.rejected || 0) + (aggregateStats?.failed || 0)}
+                        icon={<AlertTriangle className="w-4 h-4 text-red-500" />}
+                        className="hover:border-red-200 hover:bg-red-50/50"
+                        subtitle="Click to view details"
+                    />
+                </Link>
             </div>
 
             {/* Actions */}
@@ -391,15 +390,16 @@ export default function ScannerAdminPage() {
     );
 }
 
-function StatCard({ label, value, total, icon, subtitle }: {
+function StatCard({ label, value, total, icon, subtitle, className }: {
     label: string;
     value: number;
     total?: number;
     icon: React.ReactNode;
     subtitle?: string;
+    className?: string;
 }) {
     return (
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 hover:shadow-lg transition-all">
+        <div className={`rounded-2xl border border-slate-200/60 bg-white p-4 hover:shadow-lg transition-all ${className || ''}`}>
             <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 bg-slate-50 rounded-lg">{icon}</div>
                 <span className="text-xs text-slate-500">{label}</span>

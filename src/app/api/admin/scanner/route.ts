@@ -28,8 +28,7 @@ export async function GET(req: NextRequest) {
             .from('nde_vids')
             .select('"videoId", title, "channelId", channelName, intake_status, intake_error, intake_submitted_at, intake_completed_at')
             .in('intake_status', ['failed', 'no_captions', 'not_profound', 'indexing'])
-            .order('intake_completed_at', { ascending: false })
-            .limit(200);
+            .order('intake_completed_at', { ascending: false });
 
         if (qErr) return NextResponse.json({ error: qErr.message }, { status: 500 });
         return NextResponse.json({ items: items || [] });

@@ -82,7 +82,7 @@ export default function QueueInspectorPage() {
     const filtered = filter === 'all' ? items : items.filter(i => i.intake_status === filter);
 
     const TAB_OPTIONS = [
-        { key: 'all', label: `All (${counts.all})` },
+        { key: 'all', label: `Total Not Accepted (${counts.all})` },
         { key: 'failed', label: `Failed (${counts.failed})` },
         { key: 'no_captions', label: `No Captions (${counts.no_captions})` },
         { key: 'indexing', label: `Stuck (${counts.indexing})` },
@@ -117,8 +117,8 @@ export default function QueueInspectorPage() {
                         key={tab.key}
                         onClick={() => setFilter(tab.key)}
                         className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${filter === tab.key
-                                ? 'bg-white text-slate-900 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-700'
+                            ? 'bg-white text-slate-900 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700'
                             }`}
                     >
                         {tab.label}
