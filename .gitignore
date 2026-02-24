@@ -40,6 +40,11 @@ next-env.d.ts
 
 .genkit/*
 .env*
+.npm-cache/
+test*.*
+scripts/test*.ts
+get_errors.*
+get_errs.*
 
 # firebase
 firebase-debug.log
