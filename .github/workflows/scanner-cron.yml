@@ -2,14 +2,14 @@ name: Channel Scanner (hourly)
 
 on:
   schedule:
-    # Run every hour
-    - cron: '0 * * * *'
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
       videos_per_tick:
         description: 'Number of videos to process per tick'
         required: false
-        default: '3'
+        default: '1'
 
 jobs:
   scanner-tick:
