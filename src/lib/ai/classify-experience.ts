@@ -164,6 +164,6 @@ export async function classifyExperience(
         };
     } catch (error) {
         console.error('Error in classifyExperience:', error);
-        return null;
+        throw error; // Re-throw so intake.ts can catch the actual message
     }
 }

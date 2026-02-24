@@ -213,16 +213,22 @@ export async function processVideoIntake(
         // ─── Step 8: Classify experience ─────────────────────────────
         const startClassify = Date.now();
         logStep('Classify Experience', 'running');
-        const classification = await classifyExperience(
-            transcripts.punctuated,
-            metadata.title || undefined,
-            metadata.description || undefined,
-        );
+        let classificationErrorStr = '';
+        let classification;
+        try {
+            classification = await classifyExperience(
+                transcripts.punctuated,
+                metadata.title || undefined,
+                metadata.description || undefined,
+            );
+        } catch (e: any) {
+            classificationErrorStr = e.message || String(e);
+        }
 
         if (!classification) {
-            logStep('Classify Experience', 'failed', 'Classification returned null');
-            await updateIntakeStatus(supabase, videoId, 'failed', 'Classification failed');
-            return { status: 'failed', videoId, title: metadata.title || undefined, steps, error: 'Classification failed' };
+            logStep('Classify Experience', 'failed', 'Classification returned null: ' + classificationErrorStr);
+            await updateIntakeStatus(supabase, videoId, 'failed', 'Classification failed: ' + classificationErrorStr);
+            return { status: 'failed', videoId, title: metadata.title || undefined, steps, error: 'Classification failed: ' + classificationErrorStr };
         }
 
         logStep('Classify Experience', 'success',
