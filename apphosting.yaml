@@ -26,9 +26,9 @@ env:
 
   # Telegram Failure Notifications
   - variable: TELEGRAM_BOT_TOKEN
-    secret: projects/432036554831/secrets/TELEGRAM_BOT_TOKEN/versions/latest
+    secret: projects/432036554831/secrets/TELEGRAM_BOT_TOKEN/versions/1
   - variable: TELEGRAM_CHAT_ID
-    secret: projects/432036554831/secrets/TELEGRAM_CHAT_ID/versions/latest
+    secret: projects/432036554831/secrets/TELEGRAM_CHAT_ID/versions/1
   
   # Typesense Configuration (Required for /search2)
   - variable: TYPESENSE_HOST
