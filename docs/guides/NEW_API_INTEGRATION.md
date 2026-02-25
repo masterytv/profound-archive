@@ -5,8 +5,10 @@
 ## Verification
 1. Is there an existing SDK? (e.g. `openai`, `stripe`). Use it.
 2. Does it require a Secret Key?
-   - Add to `.env.local`.
+   - Add to `.env.local` for local development.
    - Add to `docs/ENVIRONMENT.md` and `.env.example`.
+   - Add to `apphosting.yaml` as a `secret:` reference (never a `value:`).
+   - **Google Cloud Secret Manager (Firebase):** You MUST create the secret in Google Cloud and explicitly grant the `Secret Manager Secret Accessor` role to **BOTH** the `firebase-app-hosting-compute@...` (runtime) and `<project-number>-compute@developer...` (build) service accounts. See `docs/LEARNINGS.md` Section 4B.
    - **Never** expose it to the client (use separate `NEXT_PUBLIC_` var only if safe).
 
 ## implementation Pattern

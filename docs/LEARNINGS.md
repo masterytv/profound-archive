@@ -24,9 +24,12 @@
   - **Fix:** Always initialize clients *inside* the handler function or use a lazy getter: `const getOpenAI = () => new OpenAI(...)`.
 
 ### B. Secrets & IAM Permissions
-- **Service Account Confusion:** App Hosting builds run as `firebase-app-hosting-compute@...`, **NOT** the default compute service account. Always check the build logs for the exact email.
-- **Project-Level Permissions:** For Secret Manager access, granting permission on the specific secret resource is sometimes insufficient for the build process to "discover" the secret.
-  - **Fix:** Grant `Secret Manager Secret Accessor` at the **Project Level** (IAM Page), not just on the Secret itself.
+- **Double Service Account Requirement (CRITICAL):** App Hosting requires the `Secret Manager Secret Accessor` role on **TWO** different service accounts for secrets to work:
+  1. The **Runtime** account (`firebase-app-hosting-compute@...`)
+  2. The **Build** account (`<project-number>-compute@developer.gserviceaccount.com` aka the "Default compute service account")
+- **The Gotcha:** If you only grant access to the runtime account, the cloud deploy will fail during the build step with `PermissionDenied` because the builder can't package the secret.
+- **Fix:** In Google Cloud Secret Manager → Permissions tab, click "+ Grant access" and add BOTH service accounts as a `Secret Manager Secret Accessor`. Do NOT try to edit the inherited Editor role on the build account; just explicitly add the new role via "+ Grant access".
+- **Project-Level Permissions:** For Secret Manager access, granting permission on the specific secret resource is usually sufficient if both accounts are added.
 - **Secret Reference Format:** in `apphosting.yaml`, references to secrets work most reliably using the **Project Number**, not the Project ID.
   - **Good:** `projects/123456789/secrets/MY_SECRET/versions/1`
   - **Bad:** `projects/my-project-id/secrets/MY_SECRET/versions/1`
