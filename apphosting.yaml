@@ -23,6 +23,12 @@ env:
     value: "https://n8n.awetomatic.com/webhook/101a672f-92a4-4d14-8ec8-01d34b51413a"
   - variable: NEXT_PUBLIC_CHAT_TEST_WEBHOOK_URL
     value: "https://n8n.awetomatic.com/webhook/ced752ef-93c6-4e72-a1bd-f0db75a502e7"
+
+  # Telegram Failure Notifications
+  - variable: TELEGRAM_BOT_TOKEN
+    secret: projects/432036554831/secrets/TELEGRAM_BOT_TOKEN/versions/latest
+  - variable: TELEGRAM_CHAT_ID
+    secret: projects/432036554831/secrets/TELEGRAM_CHAT_ID/versions/latest
   
   # Typesense Configuration (Required for /search2)
   - variable: TYPESENSE_HOST

@@ -456,6 +456,26 @@ async function updateIntakeStatus(
         .from('nde_vids')
         .update(update)
         .eq('videoId', videoId);
+
+    // Fire Telegram alert if processing failed and bot/chat are configured
+    if (status === 'failed' && process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+        try {
+            const text = `🚨 *Intake Pipeline Failure*\n\n*Video ID*: [${videoId}](https://youtube.com/watch?v=${videoId})\n*Error*: \`${error}\``;
+            const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+            await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: process.env.TELEGRAM_CHAT_ID,
+                    text: text,
+                    parse_mode: 'Markdown'
+                })
+            });
+        } catch (e) {
+            console.error('Failed to send Telegram alert:', e);
+        }
+    }
 }
 
 // ─── Helper: Save Analysis Results ───────────────────────────────────────────
