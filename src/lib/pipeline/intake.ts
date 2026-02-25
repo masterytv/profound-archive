@@ -456,19 +456,6 @@ async function updateIntakeStatus(
         .from('nde_vids')
         .update(update)
         .eq('videoId', videoId);
-
-    // Fire webhook if processing failed and a webhook is configured
-    if (status === 'failed' && process.env.ADMIN_ALERT_WEBHOOK_URL) {
-        try {
-            await fetch(process.env.ADMIN_ALERT_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ videoId, status, error })
-            });
-        } catch (e) {
-            console.error('Failed to send admin alert webhook:', e);
-        }
-    }
 }
 
 // ─── Helper: Save Analysis Results ───────────────────────────────────────────
