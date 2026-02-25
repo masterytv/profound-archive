@@ -24,6 +24,9 @@ env:
   - variable: NEXT_PUBLIC_CHAT_TEST_WEBHOOK_URL
     value: "https://n8n.awetomatic.com/webhook/ced752ef-93c6-4e72-a1bd-f0db75a502e7"
   
+  # For sending failure alerts to n8n
+  - variable: ADMIN_ALERT_WEBHOOK_URL
+    value: "https://n8n.awetomatic.com/webhook/YOUR-NEW-WEBHOOK-ID-HERE"
   # Typesense Configuration (Required for /search2)
   - variable: TYPESENSE_HOST
     value: 5.161.239.93 
@@ -45,7 +48,7 @@ env:
     secret: projects/432036554831/secrets/SUPABASE_SERVICE_KEY/versions/1
 
   - variable: OPENAI_API_KEY
-    secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/1
+    secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/2
 
   # Secret for securing Cron/Automated jobs
   - variable: CRON_SECRET
