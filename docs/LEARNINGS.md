@@ -33,8 +33,9 @@
 - **Secret Reference Format:** in `apphosting.yaml`, references to secrets work most reliably using the **Project Number**, not the Project ID.
   - **Good:** `projects/123456789/secrets/MY_SECRET/versions/1`
   - **Bad:** `projects/my-project-id/secrets/MY_SECRET/versions/1`
-- **Version Pinning (Critical):** The `Secret Manager Secret Accessor` role **does not** allow resolving `versions/latest`.
-  - **Fix:** You *MUST* pin the specific version number (e.g., `versions/1` or `versions/3`) in `apphosting.yaml`. attempting to use `latest` will result in `PermissionDenied` errors during build.
+- **Version Pinning (THE ULTIMATE TRAP - DO NOT IGNORE):** The `Secret Manager Secret Accessor` role **does not** allow resolving `versions/latest`. 
+  - The AI has made the mistake of setting `versions/latest` multiple times. **DO NOT EVER DO IT AGAIN.**
+  - **Fix:** You *MUST ALWAYS* pin the specific version number (e.g., `versions/1` or `versions/3`) in `apphosting.yaml`. Attempting to use `latest` will result in `PermissionDenied` errors during the cloud build phase because the builder service account cannot resolve the pointer.
 
 ## 5. Video Processing & Batch Workflows
 ### A. Timeouts (Cloudflare / Vercel / Firebase)
