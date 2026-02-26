@@ -383,3 +383,14 @@ The scanner was split into two independent GitHub Actions workflows to fix Cloud
 - **Cloudflare safe:** Each call handles 1 unit of work, well under the 100s timeout
 - **`videosPerTick` cap:** Do NOT increase above 1 for the process workflow — each video takes 30–90s through the 14-step AI pipeline
 - **Legacy endpoint:** `/api/scanner/tick` and the admin panel manual trigger still work unchanged (calls both discover + process in sequence via `runScannerTick`)
+
+### D. Fire-and-Forget Pattern (CRITICAL for process endpoint)
+
+The intake pipeline (Apify caption fetch up to 100s + 7 AI passes) regularly takes **140–180s per video**, which always exceeds Cloudflare's hard **100-second connection cutoff** — even for a single video.
+
+**The fix:** `/api/scanner/process` returns **`202 Accepted` immediately** and runs `runProcessTick()` as an unawaited background promise. Cloud Run keeps the instance alive until the Node.js event loop drains (up to `timeoutSeconds: 300` in `apphosting.yaml`).
+
+- The GitHub Actions workflow uses `--max-time 15` — just long enough to receive the 202
+- **DO NOT** make the process route await the result — this will always timeout
+- **Result tracking:** Check `scan_queue.status` and `scan_runs` in Supabase, not the HTTP response
+- The discover endpoint (`/api/scanner/discover`) is synchronous and fast (~10s) — no fire-and-forget needed

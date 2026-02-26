@@ -5,13 +5,22 @@ import { runProcessTick } from '@/lib/scanner/tick';
 /**
  * GET|POST /api/scanner/process
  *
- * Picks 1 video from the pending scan_queue and runs it through the full
- * 14-step intake pipeline. Does NOT discover new videos.
+ * Fire-and-forget: returns 202 immediately, then processes 1 video from the
+ * pending scan_queue in the background.
  *
- * 1 video per call keeps response time under ~90s, safely within Cloudflare's
- * 100s timeout limit. Called every 10 minutes by GitHub Actions.
+ * WHY FIRE-AND-FORGET:
+ * The full intake pipeline (Apify caption fetch + 7 AI analysis passes) takes
+ * 140-180s per video. Cloudflare hard-cuts HTTP connections at 100s, so a
+ * synchronous response always times out. By returning 202 before the work
+ * begins, the HTTP connection closes cleanly while Cloud Run continues
+ * executing the promise in its event loop (up to timeoutSeconds: 300 in
+ * apphosting.yaml).
  *
- * Secured with CRON_SECRET.
+ * RESULT TRACKING:
+ * Success/failure is tracked in scan_queue (status column) and scan_runs table,
+ * not via HTTP response. Check those tables to monitor outcomes.
+ *
+ * Secured with CRON_SECRET. Called every 10 minutes by GitHub Actions.
  */
 async function handleProcess(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -22,8 +31,7 @@ async function handleProcess(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Default to 1 video per call — keeps latency under the Cloudflare limit.
-    // Do NOT increase above 1 without re-evaluating pipeline duration.
+    // Default to 1 video per call. Do NOT increase — Apify alone can take 100s.
     const videosPerTick = body.videosPerTick ?? 1;
 
     const supabase = createClient(
@@ -31,19 +39,17 @@ async function handleProcess(req: NextRequest) {
         process.env.SUPABASE_SERVICE_KEY!,
     );
 
-    try {
-        const result = await runProcessTick(supabase, videosPerTick);
+    // Fire processing in the background — do NOT await.
+    // Cloud Run keeps the instance alive (up to 300s) until this resolves.
+    runProcessTick(supabase, videosPerTick).catch((err) => {
+        console.error('[Scanner/Process] Background tick error:', err?.message || err);
+    });
 
-        return NextResponse.json({
-            success: true,
-            processed: result.processed.length,
-            results: result.processed,
-            durationMs: result.durationMs,
-        });
-    } catch (err: any) {
-        console.error('Scanner process error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
-    }
+    // Return immediately so GitHub Actions (and Cloudflare) don't time out.
+    return NextResponse.json(
+        { success: true, message: 'Processing dispatched', videosPerTick },
+        { status: 202 },
+    );
 }
 
 export async function GET(req: NextRequest) {
