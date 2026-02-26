@@ -2,49 +2,70 @@
 
 /**
  * Scanner Tick Orchestrator
- * 
- * Performs a single "tick" of the channel scanner:
- * 1. Pick the next scanner_enabled channel (round-robin by last_scanned_at)
- * 2. Discover new videos from that channel
- * 3. Queue them in scan_queue
- * 4. Process queue items until N *meaningful* results are achieved
- *    (no_captions and already_exists are skipped without counting toward the limit)
- * 5. Log results to scan_runs
+ *
+ * Provides three exported functions:
+ *
+ * - runDiscoverTick(supabase)
+ *     Pick the least-recently-scanned channel, discover new videos, and queue
+ *     them in scan_queue. Fast (~5-10s). Called hourly.
+ *
+ * - runProcessTick(supabase, count)
+ *     Pull `count` videos from the pending queue and run each through the full
+ *     14-step intake pipeline. Can be slow (30-90s per video). Called every
+ *     10 minutes with count=1 to stay well under Cloudflare's 100s timeout.
+ *
+ * - runScannerTick(supabase, videosPerTick)
+ *     Legacy combined wrapper — calls runDiscoverTick then runProcessTick.
+ *     Used by the admin panel's manual trigger and /api/scanner/tick.
  */
 
 import { discoverNewVideos, getExistingVideoIds } from './discover';
 import { processVideoIntake } from '../pipeline/intake';
 
+// ---------------------------------------------------------------------------
+// Shared types
+// ---------------------------------------------------------------------------
+
+export interface DiscoverResult {
+    channel: { id: string; name: string } | null;
+    discovered: number;
+    queued: number;
+    durationMs: number;
+}
+
+export interface ProcessedVideo {
+    videoId: string;
+    url: string;
+    status: string;
+    isNde: string | null;
+    error: string | null;
+}
+
+export interface ProcessResult {
+    processed: ProcessedVideo[];
+    durationMs: number;
+}
+
 export interface TickResult {
     channel: { id: string; name: string } | null;
     discovered: number;
     queued: number;
-    processed: Array<{
-        videoId: string;
-        url: string;
-        status: string;
-        isNde: string | null;
-        error: string | null;
-    }>;
+    processed: ProcessedVideo[];
     totalDurationMs: number;
 }
 
+// ---------------------------------------------------------------------------
+// runDiscoverTick — channel scan + queue population only
+// ---------------------------------------------------------------------------
+
 /**
- * Execute a single scanner tick.
- * 
- * @param supabase - Supabase client with service_role key
- * @param videosPerTick - Target number of MEANINGFUL results per tick (default 3)
- *   A "meaningful" result is one that was classified (accepted, rejected, or failed).
- *   no_captions and already_exists are skipped without counting toward this limit.
- *   Max total attempts = videosPerTick × 5 to prevent runaway loops.
+ * Pick the least-recently-scanned scanner-enabled channel, discover new
+ * videos, and add them to scan_queue. No video processing happens here.
  */
-export async function runScannerTick(
-    supabase: any,
-    videosPerTick: number = 3,
-): Promise<TickResult> {
+export async function runDiscoverTick(supabase: any): Promise<DiscoverResult> {
     const startTime = Date.now();
 
-    // 1. Pick the next channel to scan (least recently scanned)
+    // Pick the next channel to scan (least recently scanned)
     const { data: channels, error: channelError } = await supabase
         .from('channels')
         .select('channel_id, name, uploads_playlist_id')
@@ -56,13 +77,11 @@ export async function runScannerTick(
 
     const channel = channels?.[0];
 
-    // 2. If we have a channel to scan, discover new videos
     let discovered = 0;
     let queued = 0;
 
     if (channel && channel.uploads_playlist_id) {
         try {
-            // Get existing video IDs for this channel
             const existingIds = await getExistingVideoIds(supabase, [channel.channel_id]);
 
             // Also exclude videos already in the queue
@@ -89,7 +108,6 @@ export async function runScannerTick(
 
             discovered = discovery.newVideos.length;
 
-            // Queue new videos
             if (discovery.newVideos.length > 0) {
                 const queueItems = discovery.newVideos.map((v) => ({
                     video_url: `https://www.youtube.com/watch?v=${v.videoId}`,
@@ -98,7 +116,7 @@ export async function runScannerTick(
                     status: 'pending',
                 }));
 
-                // Insert in batches, ignoring duplicates (UNIQUE constraint on video_url)
+                // Insert in batches, ignoring duplicates
                 for (const item of queueItems) {
                     const { error: insertError } = await supabase
                         .from('scan_queue')
@@ -108,7 +126,6 @@ export async function runScannerTick(
                 }
             }
 
-            // Update last_scanned_at
             await supabase
                 .from('channels')
                 .update({ last_scanned_at: new Date().toISOString() })
@@ -116,10 +133,9 @@ export async function runScannerTick(
 
         } catch (err: any) {
             console.error(`Discovery error for ${channel.name}:`, err.message);
-            // Log error but continue to process queue items
             await supabase.from('scan_runs').insert({
                 channel_id: channel.channel_id,
-                run_type: 'tick',
+                run_type: 'discover',
                 completed_at: new Date().toISOString(),
                 videos_discovered: 0,
                 error: err.message,
@@ -127,44 +143,75 @@ export async function runScannerTick(
         }
     }
 
-    // 3. Process queue items until N meaningful classifications happen.
-    //
-    // "Meaningful" = the video went through the AI classifier (accepted, rejected, or failed).
-    // "Skipped"    = no_captions or already_exists — we immediately grab the next video in queue.
-    //
-    // Max attempts = videosPerTick × 5 to prevent runaway loops in channels
-    // where most videos have no captions.
-    const processed: TickResult['processed'] = [];
+    await supabase.from('scan_runs').insert({
+        channel_id: channel?.channel_id || null,
+        run_type: 'discover',
+        completed_at: new Date().toISOString(),
+        videos_discovered: discovered,
+        videos_processed: 0,
+        videos_accepted: 0,
+        videos_rejected: 0,
+        videos_failed: 0,
+    });
+
+    console.log(`[Scanner/Discover] ${channel?.name ?? 'no channel'}: ${discovered} discovered, ${queued} queued (${Date.now() - startTime}ms)`);
+
+    return {
+        channel: channel ? { id: channel.channel_id, name: channel.name } : null,
+        discovered,
+        queued,
+        durationMs: Date.now() - startTime,
+    };
+}
+
+// ---------------------------------------------------------------------------
+// runProcessTick — queue processing only
+// ---------------------------------------------------------------------------
+
+/**
+ * Pull up to `videosPerTick` meaningful videos from the pending scan_queue
+ * and run each through the full intake pipeline.
+ *
+ * "Meaningful" = classified by AI (accepted, rejected, failed).
+ * "Skipped"    = no_captions or already_exists — pulled from queue but not
+ *                counted toward the limit; the next item is tried immediately.
+ *
+ * Max total attempts = videosPerTick × 5 to prevent runaway loops.
+ *
+ * IMPORTANT: Keep videosPerTick=1 when called from the 10-minute cron to
+ * stay under Cloudflare's 100s connection timeout.
+ */
+export async function runProcessTick(
+    supabase: any,
+    videosPerTick: number = 1,
+): Promise<ProcessResult> {
+    const startTime = Date.now();
+
+    const processed: ProcessedVideo[] = [];
     let meaningfulCount = 0;
     let totalAttempts = 0;
     const maxAttempts = videosPerTick * 5;
 
-    // Track IDs we've already set to 'processing' to avoid re-grabbing them
     const touchedIds = new Set<number>();
-    // Track channel IDs picked this tick to maximize diversity across channels
     const touchedChannelIds = new Set<string>();
 
     while (meaningfulCount < videosPerTick && totalAttempts < maxAttempts) {
-        // Round-robin: pick a random channel that has pending items,
-        // then grab its oldest pending video. This ensures no single channel
-        // dominates the queue even if it has thousands of items.
+        // Round-robin: sample pending rows, pick a random untouched channel
         const { data: pendingRows } = await supabase
             .from('scan_queue')
             .select('channel_id')
             .eq('status', 'pending')
-            .limit(500); // sample a pool large enough to cover all channels
-        if (!pendingRows || pendingRows.length === 0) break; // Queue exhausted
+            .limit(500);
 
-        // Deduplicate channel_ids and pick one at random for fairness
+        if (!pendingRows || pendingRows.length === 0) break;
+
         const channelIds: string[] = [...new Set<string>(
             pendingRows.map((r: any) => r.channel_id).filter((id: any): id is string => typeof id === 'string')
         )];
-        // Exclude channels we already touched this tick so we truly diversify
-        const untouchedChannels: string[] = channelIds.filter(id => !touchedChannelIds.has(id));
+        const untouchedChannels = channelIds.filter(id => !touchedChannelIds.has(id));
         const poolToPickFrom = untouchedChannels.length > 0 ? untouchedChannels : channelIds;
         const pickedChannelId = poolToPickFrom[Math.floor(Math.random() * poolToPickFrom.length)];
 
-        // Fetch the oldest pending item from the picked channel
         const { data: items, error: queueError } = await supabase
             .from('scan_queue')
             .select('id, video_url, video_id, channel_id')
@@ -172,20 +219,18 @@ export async function runScannerTick(
             .eq('channel_id', pickedChannelId)
             .order('created_at', { ascending: true })
             .limit(1);
-        // Record that we've picked from this channel this tick
+
         touchedChannelIds.add(pickedChannelId);
 
         if (queueError) throw new Error(`Queue fetch: ${queueError.message}`);
-        if (!items || items.length === 0) continue; // This channel was just drained, try another
+        if (!items || items.length === 0) continue;
 
         const item = items[0];
 
-        // Safety: if somehow the same item appears again (race condition), stop
         if (touchedIds.has(item.id)) break;
         touchedIds.add(item.id);
         totalAttempts++;
 
-        // Mark as processing immediately so concurrent ticks don't grab it
         await supabase
             .from('scan_queue')
             .update({ status: 'processing' })
@@ -213,23 +258,22 @@ export async function runScannerTick(
                 || (finalStatus === 'failed' ? `Intake returned status: ${result.status}` : null);
 
             if (finalStatus === 'failed') {
-                console.error(`[Scanner] Video ${item.video_id} failed:`, resultError);
+                console.error(`[Scanner/Process] Video ${item.video_id} failed:`, resultError);
             }
 
             if (isSkipped) {
-                console.log(`[Scanner] Skipped ${item.video_id} (${result.status}) — pulling next video from queue`);
+                console.log(`[Scanner/Process] Skipped ${item.video_id} (${result.status}) — pulling next`);
             } else {
-                // Only count as meaningful if the classifier ran
                 meaningfulCount++;
             }
 
         } catch (err: any) {
             const errorMsg = err.message || String(err);
-            console.error(`[Scanner] Video ${item.video_id} threw error:`, errorMsg);
+            console.error(`[Scanner/Process] Video ${item.video_id} threw error:`, errorMsg);
             finalStatus = 'failed';
             intakeStatus = 'failed';
             resultError = errorMsg;
-            meaningfulCount++; // A hard failure still counts as an attempt
+            meaningfulCount++;
         }
 
         await supabase
@@ -250,33 +294,57 @@ export async function runScannerTick(
             error: resultError,
         });
 
-        console.log(`[Scanner] Tick progress: ${meaningfulCount}/${videosPerTick} meaningful (${totalAttempts}/${maxAttempts} attempts)`);
+        console.log(`[Scanner/Process] Progress: ${meaningfulCount}/${videosPerTick} meaningful (${totalAttempts}/${maxAttempts} attempts)`);
     }
 
-    // 4. Log the scan run
+    // Log to scan_runs
     const accepted = processed.filter((p) => p.isNde === 'clear_nde' || p.isNde === 'possible_nde').length;
     const rejected = processed.filter((p) => p.isNde === 'not_nde').length;
     const failed = processed.filter((p) => p.status === 'failed').length;
-    const skipped = processed.filter((p) => p.status === 'no_captions' || p.status === 'already_exists').length;
 
     await supabase.from('scan_runs').insert({
-        channel_id: channel?.channel_id || null,
-        run_type: 'tick',
+        channel_id: null, // process tick is not tied to a specific channel
+        run_type: 'process',
         completed_at: new Date().toISOString(),
-        videos_discovered: discovered,
+        videos_discovered: 0,
         videos_processed: processed.length,
         videos_accepted: accepted,
         videos_rejected: rejected,
         videos_failed: failed,
     });
 
-    console.log(`[Scanner] Tick complete: ${accepted} accepted, ${rejected} rejected, ${failed} failed, ${skipped} skipped (${totalAttempts} total attempts, ${Date.now() - startTime}ms)`);
+    console.log(`[Scanner/Process] Done: ${accepted} accepted, ${rejected} rejected, ${failed} failed (${Date.now() - startTime}ms)`);
 
     return {
-        channel: channel ? { id: channel.channel_id, name: channel.name } : null,
-        discovered,
-        queued,
         processed,
+        durationMs: Date.now() - startTime,
+    };
+}
+
+// ---------------------------------------------------------------------------
+// runScannerTick — legacy combined wrapper (used by admin panel + /api/scanner/tick)
+// ---------------------------------------------------------------------------
+
+/**
+ * Execute a single combined scanner tick: discover then process.
+ *
+ * @param supabase - Supabase client with service_role key
+ * @param videosPerTick - Target number of meaningful results per tick (default 3)
+ */
+export async function runScannerTick(
+    supabase: any,
+    videosPerTick: number = 3,
+): Promise<TickResult> {
+    const startTime = Date.now();
+
+    const discoverResult = await runDiscoverTick(supabase);
+    const processResult = await runProcessTick(supabase, videosPerTick);
+
+    return {
+        channel: discoverResult.channel,
+        discovered: discoverResult.discovered,
+        queued: discoverResult.queued,
+        processed: processResult.processed,
         totalDurationMs: Date.now() - startTime,
     };
 }

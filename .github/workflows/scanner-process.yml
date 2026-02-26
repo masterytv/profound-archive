@@ -1,0 +1,30 @@
+name: Video Processor (10m)
+
+on:
+  schedule:
+    # Process 1 video from the queue every 10 minutes.
+    # 1 video per call keeps response time ~60-90s, safely under
+    # Cloudflare's 100s connection timeout.
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      videos_per_tick:
+        description: 'Number of videos to process (keep at 1 to avoid CF timeout)'
+        required: false
+        default: '1'
+
+jobs:
+  scanner-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Video Processing
+        run: |
+          HTTP_CODE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST \
+            "${{ secrets.APP_URL }}/api/scanner/process" \
+            -H "Content-Type: application/json" \
+            -d "{\"secret\": \"${{ secrets.CRON_SECRET }}\", \"videosPerTick\": ${{ github.event.inputs.videos_per_tick || 1 }}}" \
+            --max-time 120)
+          echo "HTTP Status: $HTTP_CODE"
+          cat /tmp/response.txt
+          echo ""
+          if [ "$HTTP_CODE" -ge 400 ]; then exit 1; fi

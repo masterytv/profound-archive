@@ -370,15 +370,16 @@ The confirmed primary key is `data`. The `extractSegments()` function also handl
 
 - **Key gotcha:** When a channel is depleted mid-tick, use `continue` not `break` — the overall queue may not be exhausted, just that specific channel.
 
-### C. Cron Throughput (as of Feb 2026)
+### C. Cron Architecture — Two Separate Workflows (updated Feb 2026)
 
-| Setting | Value |
-|---|---|
-| Frequency | Hourly (`0 * * * *`) |
-| Videos per tick | 3 (default dispatched) |
-| Estimated throughput | ~72 videos/day |
-| Max before 330s timeout | ~5 videos/tick |
-| GitHub Actions file | `.github/workflows/scanner-cron.yml` |
+The scanner was split into two independent GitHub Actions workflows to fix Cloudflare 524 timeout errors. The original single `scanner-cron.yml` was processing multiple videos per call and routinely exceeded Cloudflare's 100-second connection limit.
 
-- The cron dispatches with `videosPerTick: 3` (default). Manual `workflow_dispatch` also accepts this as an input.
-- Do not increase `videosPerTick` above 5 — the `--max-time 330` curl limit will fire and abort the job.
+| Workflow | File | Schedule | Endpoint | What it does | Typical duration |
+|---|---|---|---|---|---|
+| **Channel Discovery** | `scanner-discover.yml` | Every hour (`0 * * * *`) | `/api/scanner/discover` | Scans 1 channel, queues new videos | ~5–10s |
+| **Video Processor** | `scanner-process.yml` | Every 10 min (`*/10 * * * *`) | `/api/scanner/process` | Processes 1 video from the queue | ~60–90s |
+
+- **Throughput:** ~144 videos/day (1 video × 6 per hour × 24h)
+- **Cloudflare safe:** Each call handles 1 unit of work, well under the 100s timeout
+- **`videosPerTick` cap:** Do NOT increase above 1 for the process workflow — each video takes 30–90s through the 14-step AI pipeline
+- **Legacy endpoint:** `/api/scanner/tick` and the admin panel manual trigger still work unchanged (calls both discover + process in sequence via `runScannerTick`)

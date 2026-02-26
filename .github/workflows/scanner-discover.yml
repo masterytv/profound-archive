@@ -1,0 +1,23 @@
+name: Channel Discovery (Hourly)
+
+on:
+  schedule:
+    # Scan one channel for new videos every hour and queue them
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  scanner-discover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Channel Discovery
+        run: |
+          HTTP_CODE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST \
+            "${{ secrets.APP_URL }}/api/scanner/discover" \
+            -H "Content-Type: application/json" \
+            -d "{\"secret\": \"${{ secrets.CRON_SECRET }}\"}" \
+            --max-time 60)
+          echo "HTTP Status: $HTTP_CODE"
+          cat /tmp/response.txt
+          echo ""
+          if [ "$HTTP_CODE" -ge 400 ]; then exit 1; fi
