@@ -127,3 +127,34 @@ npx shadcn-ui@latest add [component-name]
 - User table with rounded-2xl container, role/status badge pills.
 - Client `UserRow` component with ban/unban toggle, role selector, delete.
 
+## Video Page (`src/app/video/[id]/page.tsx`)
+
+A server component displaying the full detail view for a single NDE video.
+
+### Layout (Desktop — `lg`)
+Two-column grid: `grid-cols-[1fr_340px]`
+
+| Left Column | Right Sidebar (`hidden lg:block`) |
+|---|---|
+| YouTube player | Research Scores summary (mini-cards) |
+| Title & metadata | **Veridical Perception** (full card) |
+| AI Summary | Greyson Scale (full card) |
+| Experience Analysis (NDERF) | Transformation Analysis (full card) |
+| Similar Experiences | |
+| Transcript (collapsible) | |
+
+### Layout (Mobile — single column)
+The right sidebar is hidden. Analysis cards are rendered inline in the left column using `lg:hidden`:
+1. Research Scores mini-cards (3-up grid)
+2. Veridical Perception full card (`id="section-veridical-mobile"`)
+3. Greyson Scale full card (`id="section-greyson"`)
+4. Transformation Analysis full card (`id="section-transformation"`)
+
+### Analysis Score Cards
+- **Veridical Perception (cvNDE):** Score `/28`, level badge, summary reason, collapsible criteria breakdown. Color-coded from `getLevelColor()` (emerald/amber/blue).
+- **Greyson Scale:** `<GreysonScoreCard>` component (score `/32`, classification, breakdown).
+- **Transformation Analysis:** `<TransformationScoreCard>` component (score `/50`, classification, breakdown).
+
+> **Rule:** Always add new analysis cards to both the right sidebar (desktop) AND as an `lg:hidden` block in the left column (mobile). Use distinct `id` attributes for mobile vs desktop anchors to avoid scroll conflicts.
+
+

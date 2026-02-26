@@ -360,9 +360,10 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                         {/* ─── Similar Experiences (pgvector) ─── */}
                         <SimilarExperiences results={similarExperiences} />
 
-                        {/* Veridical Perception — detailed inline card */}
+
+                        {/* ─── Mobile-only: Veridical + Greyson + Transformation breakdowns ─── */}
                         {hasVeridical && (
-                            <div id="section-veridical" className={`bg-white rounded-2xl border-2 ${levelColor.border} shadow-sm overflow-hidden scroll-mt-16`}>
+                            <div id="section-veridical-mobile" className={`lg:hidden bg-white rounded-2xl border-2 ${levelColor.border} shadow-sm overflow-hidden scroll-mt-16`}>
                                 <div className={`px-6 py-4 ${levelColor.bg} flex items-center gap-3`}>
                                     <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center">
                                         <TrendingUp className="w-5 h-5 text-emerald-600" />
@@ -399,13 +400,11 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                                             About this scale <ExternalLink className="w-3 h-3" />
                                         </Link>
                                     </div>
-
                                     {video.rvnde_summary_reason && (
                                         <p className="text-sm text-slate-600 leading-relaxed">
                                             {video.rvnde_summary_reason}
                                         </p>
                                     )}
-
                                     {video.rvnde_details && (
                                         <Collapsible>
                                             <CollapsibleTrigger asChild>
@@ -426,8 +425,6 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                                 </div>
                             </div>
                         )}
-
-                        {/* ─── Mobile-only: Greyson + Transformation breakdowns ─── */}
                         {hasGreyson && (
                             <div id="section-greyson" className="lg:hidden scroll-mt-16">
                                 <GreysonScoreCard
@@ -586,6 +583,73 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                                 </Link>
                             </div>
                         </div>
+
+                        {/* Full Veridical Perception Breakdown (sidebar widget) */}
+                        {hasVeridical && (
+                            <div id="section-veridical" className={`bg-white rounded-2xl border-2 ${levelColor.border} shadow-sm overflow-hidden scroll-mt-16`}>
+                                <div className={`px-6 py-4 ${levelColor.bg} flex items-center gap-3`}>
+                                    <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center">
+                                        <TrendingUp className="w-5 h-5 text-emerald-600" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h2
+                                            className="text-lg font-bold text-slate-900"
+                                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                                        >
+                                            Veridical Perception{" "}
+                                            <span className="text-slate-400 font-normal text-base">(cvNDE)</span>
+                                        </h2>
+                                    </div>
+                                    {video.rvnde_total_score !== null && (
+                                        <div className="flex items-baseline gap-1 bg-white/90 px-4 py-2 rounded-xl shadow-sm">
+                                            <span className="text-3xl font-bold text-slate-900">{video.rvnde_total_score}</span>
+                                            <span className="text-slate-400 text-lg">/28</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="px-6 py-5 space-y-4">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        {video.rvnde_level && (
+                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${levelColor.bg} ${levelColor.text}`}>
+                                                <span className={`w-2 h-2 rounded-full ${levelColor.dot}`} />
+                                                {video.rvnde_level}
+                                            </span>
+                                        )}
+                                        <Link
+                                            href="/scale/cvnde"
+                                            target="_blank"
+                                            className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                                        >
+                                            About this scale <ExternalLink className="w-3 h-3" />
+                                        </Link>
+                                    </div>
+
+                                    {video.rvnde_summary_reason && (
+                                        <p className="text-sm text-slate-600 leading-relaxed">
+                                            {video.rvnde_summary_reason}
+                                        </p>
+                                    )}
+
+                                    {video.rvnde_details && (
+                                        <Collapsible>
+                                            <CollapsibleTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="w-full justify-between text-sm text-slate-600 hover:text-blue-600"
+                                                >
+                                                    View Criteria Breakdown
+                                                    <ChevronDown className="w-4 h-4" />
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent className="pt-3">
+                                                <RvndeDetailsSection details={video.rvnde_details} />
+                                            </CollapsibleContent>
+                                        </Collapsible>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Full Greyson Breakdown (sidebar widget) */}
                         {hasGreyson && (
