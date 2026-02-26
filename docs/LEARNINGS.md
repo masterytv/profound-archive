@@ -384,13 +384,14 @@ The scanner was split into two independent GitHub Actions workflows to fix Cloud
 - **`videosPerTick` cap:** Do NOT increase above 1 for the process workflow — each video takes 30–90s through the 14-step AI pipeline
 - **Legacy endpoint:** `/api/scanner/tick` and the admin panel manual trigger still work unchanged (calls both discover + process in sequence via `runScannerTick`)
 
-### D. Fire-and-Forget Pattern (CRITICAL for process endpoint)
+### D. Cloudflare Bypass for Long-Running Cron Jobs (CRITICAL)
 
-The intake pipeline (Apify caption fetch up to 100s + 7 AI passes) regularly takes **140–180s per video**, which always exceeds Cloudflare's hard **100-second connection cutoff** — even for a single video.
+The intake pipeline (Apify caption fetch up to 100s + 7 AI analysis passes) takes **140–180s per video**, always exceeding Cloudflare's hard **100-second** connection cutoff. Fire-and-forget was tried but failed because Cloud Run throttles CPU after the response is sent, stalling the background promise.
 
-**The fix:** `/api/scanner/process` returns **`202 Accepted` immediately** and runs `runProcessTick()` as an unawaited background promise. Cloud Run keeps the instance alive until the Node.js event loop drains (up to `timeoutSeconds: 300` in `apphosting.yaml`).
+**The fix:** GitHub Actions calls the **Firebase App Hosting direct URL** (`APP_DIRECT_URL` secret) instead of the Cloudflare-proxied domain (`projectprofound.org`). This bypasses Cloudflare entirely.
 
-- The GitHub Actions workflow uses `--max-time 15` — just long enough to receive the 202
-- **DO NOT** make the process route await the result — this will always timeout
-- **Result tracking:** Check `scan_queue.status` and `scan_runs` in Supabase, not the HTTP response
-- The discover endpoint (`/api/scanner/discover`) is synchronous and fast (~10s) — no fire-and-forget needed
+- **Direct URL format:** `https://profound-archive--studio-XXXXXXX.us-east4.hosted.app`
+- **`--max-time 280`** in curl — safely under Cloud Run's `timeoutSeconds: 300`
+- **DO NOT** call `/api/scanner/process` via `projectprofound.org` from automated jobs — Cloudflare will cut the connection at 100s
+- **DO NOT** use fire-and-forget on this endpoint — Cloud Run throttles CPU after the response, stalling the event loop
+- The `/api/scanner/discover` endpoint is fast (~10s) and safe to call via either URL
