@@ -277,7 +277,7 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                                 </h3>
                                 <div className="grid grid-cols-3 gap-3">
                                     {hasVeridical && (
-                                        <a href="#section-veridical" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-emerald-300 transition-all ${levelColor.bg} ${levelColor.border} border">
+                                        <a href="#section-veridical-mobile" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-emerald-300 transition-all ${levelColor.bg} ${levelColor.border} border">
                                             <div className="flex items-center gap-1.5 mb-1">
                                                 <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
                                                 <span className="text-[10px] font-semibold text-slate-700">Veridical</span>
