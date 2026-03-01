@@ -411,19 +411,20 @@ The intake pipeline (Apify caption fetch up to 100s + 7 AI analysis passes) take
 - **1 transcript = 1 credit.** At ~144 videos/day if all need captions, that's ~4,320/month — requires a paid plan with auto-recharge.
 - **Auto-recharge rate:** $10 per 1,000 extra credits = $0.01/video.
 
-### B. Rate Limit Response
+### B. Response Codes & Log Tags
 
-When the rate limit is exceeded, Supadata returns **HTTP 429**.
+All errors are handled distinctly in `src/lib/youtube/subtitles.ts`. Search these tags in Firebase logs:
 
-Our code (`src/lib/youtube/subtitles.ts`) handles this with a distinct error log:
+| HTTP | Meaning | Firebase log tag | Action |
+|---|---|---|---|
+| 200 | Success | `[Supadata] ✅` | — |
+| 401 | Invalid API key | `[Supadata] INVALID API KEY` | Check `SUPADATA_API_KEY` in Secret Manager |
+| 402 | Out of credits | `[Supadata] PAYMENT REQUIRED` | Add credits at [dash.supadata.ai](https://dash.supadata.ai) |
+| 404 | No captions on video | `[Supadata] No captions available` | Expected — video genuinely has no captions |
+| 429 | Rate limit exceeded | `[Supadata] RATE LIMITED` | Burst: wait; Monthly: add credits or upgrade plan |
+| 5xx | Supadata server error | `[Supadata] SERVER ERROR` | Transient — retry later |
 
-```
-[Supadata] RATE LIMITED (429) for {videoId} — monthly credit limit reached or burst limit exceeded.
-```
-
-**To detect in Firebase Logs:** Search for `[Supadata] RATE LIMITED`.
-
-**What happens to the video:** Returns `null` → pipeline marks it `no_captions` → appears in Queue Inspector for manual retry later.
+**What happens to the video on any error:** Returns `null` → pipeline marks it `no_captions` → appears in Queue Inspector for manual retry later.
 
 ### C. If Rate Limiting Becomes Frequent
 
