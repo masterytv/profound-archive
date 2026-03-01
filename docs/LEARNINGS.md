@@ -296,7 +296,7 @@ useEffect(() => {
 | `OPENAI_API_KEY` | AI analysis & embeddings | ✅ `versions/1` → update version on rotation |
 | `SUPABASE_SERVICE_KEY` | Admin DB access | ✅ `versions/1` |
 | `TYPESENSE_API_KEY` | Keyword search | ✅ `TYPESENSE_API_KEY` |
-| `APIFY_API_TOKEN` | YouTube transcript scraping | ✅ `projects/432036554831/secrets/APIFY_API_TOKEN/versions/1` |
+| `SUPADATA_API_KEY` | YouTube transcript fetching (replaces Apify) | ✅ `projects/432036554831/secrets/SUPADATA_API_KEY/versions/1` |
 | `YOUTUBE_API_KEY` | Channel metadata enrichment | ✅ `versions/latest` |
 | `CRON_SECRET` | Authenticating automated jobs | ✅ `versions/3` |
 

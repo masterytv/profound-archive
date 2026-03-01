@@ -31,7 +31,7 @@
 ### Intake Pipeline
 | Variable | Description | Scope |
 |---|---|---|
-| `APIFY_API_TOKEN` | Apify API token for YouTube transcript scraping (rotated Feb 2026) | Server-only |
+| `SUPADATA_API_KEY` | Supadata API key for YouTube transcript fetching (replaces Apify, Mar 2026) | Server-only |
 | `YOUTUBE_API_KEY` | YouTube Data API v3 key for channel metadata enrichment | Server-only |
 
 ### Automation
@@ -66,7 +66,7 @@ They are referenced in `apphosting.yaml` using `secret:` references — **never 
 | `OPENAI_API_KEY` | `projects/432036554831/secrets/OPENAI_API_KEY/versions/1` | ✅ Feb 2026 |
 | `SUPABASE_SERVICE_KEY` | `projects/432036554831/secrets/SUPABASE_SERVICE_KEY/versions/1` | — |
 | `TYPESENSE_API_KEY` | `TYPESENSE_API_KEY` | ✅ Feb 2026 |
-| `APIFY_API_TOKEN` | `APIFY_API_TOKEN` | ✅ Feb 2026 |
+| `SUPADATA_API_KEY` | `projects/432036554831/secrets/SUPADATA_API_KEY/versions/1` | ✅ Mar 2026 |
 | `YOUTUBE_API_KEY` | `projects/432036554831/secrets/YOUTUBE_API_KEY/versions/latest` | — |
 | `CRON_SECRET` | `projects/432036554831/secrets/CRON_SECRET/versions/3` | — |
 
@@ -80,7 +80,7 @@ They are referenced in `apphosting.yaml` using `secret:` references — **never 
    ```bash
    cp .env.example .env.local
    ```
-2. Fill in values from your Supabase Dashboard, OpenAI Platform, Apify Dashboard, etc.
+2. Fill in values from your Supabase Dashboard, OpenAI Platform, Supadata Dashboard, etc.
 3. Restart the dev server:
    ```bash
    npm run dev
