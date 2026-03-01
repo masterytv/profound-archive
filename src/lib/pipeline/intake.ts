@@ -25,6 +25,7 @@ import { parseYouTubeUrl, fetchVideoMetadata, fetchChannelMetadata, type VideoMe
 import { fetchCaptions } from '@/lib/youtube/subtitles';
 import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/transcript-processor';
 import { classifyExperience, type ClassificationResult } from '@/lib/ai/classify-experience';
+import { parseIsoDuration } from '@/lib/scanner/discover';
 import { analyzeGreysonScore } from '@/lib/ai/greyson';
 import { analyzeTransformationScore, classifyTransformationScore } from '@/lib/ai/transformation';
 import { analyzeCoreElements } from '@/lib/ai/core-elements';
@@ -45,7 +46,8 @@ export type IntakeStatus =
     | 'failed'
     | 'not_profound'
     | 'no_captions'
-    | 'already_exists';
+    | 'already_exists'
+    | 'is_short';
 
 export interface IntakeResult {
     status: IntakeStatus;
@@ -147,6 +149,24 @@ export async function processVideoIntake(
             return { status: 'failed', videoId, steps, error: 'Video not found on YouTube' };
         }
         logStep('Scrape Metadata', 'success', `"${metadata.title}"`, Date.now() - startMeta);
+
+        // ─── Step 3b: Shorts gate ─────────────────────────────────────
+        // YouTube Shorts max = 180s (as of Oct 2024). Reject before fetching
+        // captions or running AI — saves Apify + OpenAI cost entirely.
+        if (metadata.duration) {
+            const durationSecs = parseIsoDuration(metadata.duration);
+            if (durationSecs !== null && durationSecs <= 180) {
+                logStep('Shorts Gate', 'skipped',
+                    `Duration ${durationSecs}s ≤ 180s — YouTube Short, skipping pipeline`);
+                await insertVideoRecord(supabase, videoId, metadata, null, 'not_nde', 'is_short');
+                return {
+                    status: 'is_short',
+                    videoId,
+                    title: metadata.title || undefined,
+                    steps,
+                };
+            }
+        }
 
         // ─── Step 4: Ensure channel exists ───────────────────────────
         if (metadata.channelId) {

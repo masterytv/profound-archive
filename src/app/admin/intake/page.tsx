@@ -105,6 +105,12 @@ const resultBadge: Record<string, {
         cardClass: 'bg-red-50 border-red-200',
         iconBgClass: 'bg-red-100',
     },
+    is_short: {
+        label: 'YouTube Short — Skipped',
+        icon: <SkipForward className="w-5 h-5 text-violet-500" />,
+        cardClass: 'bg-violet-50 border-violet-200',
+        iconBgClass: 'bg-violet-100',
+    },
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -307,10 +313,10 @@ export default function IntakePage() {
                                         </span>
                                         <div className="min-w-0 flex-1">
                                             <span className={`font-medium ${step.status === 'failed' ? 'text-red-600'
-                                                    : step.status === 'success' ? 'text-slate-900'
-                                                        : step.status === 'skipped' ? 'text-slate-400'
-                                                            : step.status === 'running' ? 'text-blue-600'
-                                                                : 'text-slate-500'
+                                                : step.status === 'success' ? 'text-slate-900'
+                                                    : step.status === 'skipped' ? 'text-slate-400'
+                                                        : step.status === 'running' ? 'text-blue-600'
+                                                            : 'text-slate-500'
                                                 }`}>
                                                 {step.name}
                                             </span>
