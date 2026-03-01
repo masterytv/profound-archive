@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List } from "lucide-react";
+import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List, ListVideo } from "lucide-react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -105,6 +105,13 @@ export default async function AdminLayout({
                         >
                             <List className="w-4 h-4" />
                             Queue Inspector
+                        </Link>
+                        <Link
+                            href="/admin/scanner/pending"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                        >
+                            <ListVideo className="w-4 h-4" />
+                            Pending Queue
                         </Link>
                         {profile?.role === "super_admin" && (
                             <Link

@@ -26,6 +26,7 @@ export interface DiscoveryResult {
         title: string;
         publishedAt: string;
         thumbnailUrl: string;
+        duration_seconds: number | null; // null = unknown (kept by default)
     }>;
 }
 
@@ -87,6 +88,7 @@ export async function discoverNewVideos(
                     title: item.snippet.title || '',
                     publishedAt: item.snippet.publishedAt || '',
                     thumbnailUrl: item.snippet.thumbnails?.medium?.url || '',
+                    duration_seconds: null, // populated by filterOutShorts below
                 });
             }
         }
@@ -136,6 +138,7 @@ export function parseIsoDuration(iso: string): number | null {
  *
  * Calls YouTube Data API videos.list?part=contentDetails in batches of 50.
  * Videos whose duration cannot be determined are kept (safe default).
+ * Duration is attached to each passing video for storage in scan_queue.
  *
  * @param videos  - The newly discovered video list from discoverNewVideos()
  * @param apiKey  - YouTube Data API key
@@ -152,7 +155,8 @@ async function filterOutShorts(
     const SHORTS_MAX_SECONDS = 180;
     const BATCH_SIZE = 50; // YouTube API max per call
 
-    const shortIds = new Set<string>();
+    // Map videoId → duration in seconds (null = unparseable)
+    const durationMap = new Map<string, number | null>();
     const ids = videos.map(v => v.videoId);
 
     for (let i = 0; i < ids.length; i += BATCH_SIZE) {
@@ -173,10 +177,8 @@ async function filterOutShorts(
             const items: Array<{ id: string; contentDetails: { duration: string } }> = data.items || [];
 
             for (const item of items) {
-                const durationSecs = parseIsoDuration(item.contentDetails?.duration || '');
-                if (durationSecs !== null && durationSecs <= SHORTS_MAX_SECONDS) {
-                    shortIds.add(item.id);
-                }
+                const secs = parseIsoDuration(item.contentDetails?.duration || '');
+                durationMap.set(item.id, secs);
             }
         } catch (err: any) {
             // Non-fatal: if the check fails, keep all videos in this batch
@@ -184,11 +186,21 @@ async function filterOutShorts(
         }
     }
 
+    const shortIds = new Set<string>();
+    for (const [id, secs] of durationMap) {
+        if (secs !== null && secs <= SHORTS_MAX_SECONDS) {
+            shortIds.add(id);
+        }
+    }
+
     if (shortIds.size > 0) {
         console.log(`[Discovery/Shorts] Filtered ${shortIds.size} Short(s) from ${label}: ${[...shortIds].join(', ')}`);
     }
 
-    return videos.filter(v => !shortIds.has(v.videoId));
+    // Return passing videos with duration_seconds populated
+    return videos
+        .filter(v => !shortIds.has(v.videoId))
+        .map(v => ({ ...v, duration_seconds: durationMap.get(v.videoId) ?? null }));
 }
 
 /**

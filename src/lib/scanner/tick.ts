@@ -113,6 +113,8 @@ export async function runDiscoverTick(supabase: any): Promise<DiscoverResult> {
                     video_url: `https://www.youtube.com/watch?v=${v.videoId}`,
                     video_id: v.videoId,
                     channel_id: channel.channel_id,
+                    title: v.title || null,
+                    duration_seconds: v.duration_seconds ?? null,
                     status: 'pending',
                 }));
 

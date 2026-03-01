@@ -243,6 +243,8 @@ export async function POST(req: NextRequest) {
                                 video_id: v.videoId,
                                 video_url: `https://www.youtube.com/watch?v=${v.videoId}`,
                                 channel_id: channel.channel_id,
+                                title: v.title || null,
+                                duration_seconds: v.duration_seconds ?? null,
                                 status: 'pending',
                             }));
                             await supabase
