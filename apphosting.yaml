@@ -61,8 +61,12 @@ env:
   - variable: YOUTUBE_API_KEY
     secret: projects/432036554831/secrets/YOUTUBE_API_KEY/versions/latest
 
-  # Supadata API key for YouTube transcript fetching (replaces Apify — Mar 2026)
-  # Apify's pintostudio actor was IP-blocked by YouTube; Supadata is not.
+  # Supadata API key for YouTube transcript fetching (active — Mar 2026)
+  # Replaced Apify pintostudio actor which was being IP-blocked by YouTube.
   - variable: SUPADATA_API_KEY
     secret: projects/432036554831/secrets/SUPADATA_API_KEY/versions/1
+
+  # Apify API token — kept for potential future use (currently unused)
+  - variable: APIFY_API_TOKEN
+    secret: projects/432036554831/secrets/APIFY_API_TOKEN/versions/1
 # Trigger new build after granting secret access
