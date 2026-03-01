@@ -395,3 +395,53 @@ The intake pipeline (Apify caption fetch up to 100s + 7 AI analysis passes) take
 - **DO NOT** call `/api/scanner/process` via `projectprofound.org` from automated jobs — Cloudflare will cut the connection at 100s
 - **DO NOT** use fire-and-forget on this endpoint — Cloud Run throttles CPU after the response, stalling the event loop
 - The `/api/scanner/discover` endpoint is fast (~10s) and safe to call via either URL
+
+## 16. Supadata Transcript API — Rate Limits (CRITICAL)
+
+> **Context:** In Mar 2026, we switched from Apify pintostudio to Supadata for YouTube transcript fetching. Apify was IP-blocked by YouTube returning empty data silently. Supadata uses its own rotating proxies and is not blocked.
+
+### A. Rate Limit Tiers
+
+| Plan | Credits/month | Rate limit | Auto-recharge |
+|---|---|---|---|
+| Free | 100 | 1 req/s | No |
+| Basic ($5/mo) | 300 | 10 req/s | $10/1,000 |
+| Pro ($17/mo) | 3,000 | 10 req/s | $10/1,000 |
+
+- **1 transcript = 1 credit.** At ~144 videos/day if all need captions, that's ~4,320/month — requires a paid plan with auto-recharge.
+- **Auto-recharge rate:** $10 per 1,000 extra credits = $0.01/video.
+
+### B. Rate Limit Response
+
+When the rate limit is exceeded, Supadata returns **HTTP 429**.
+
+Our code (`src/lib/youtube/subtitles.ts`) handles this with a distinct error log:
+
+```
+[Supadata] RATE LIMITED (429) for {videoId} — monthly credit limit reached or burst limit exceeded.
+```
+
+**To detect in Firebase Logs:** Search for `[Supadata] RATE LIMITED`.
+
+**What happens to the video:** Returns `null` → pipeline marks it `no_captions` → appears in Queue Inspector for manual retry later.
+
+### C. If Rate Limiting Becomes Frequent
+
+1. **Check Supadata dashboard** at [dash.supadata.ai](https://dash.supadata.ai) — confirms whether it's a monthly credit exhaustion or burst rate limit.
+2. **Monthly credits:** Upgrade plan or enable auto-recharge in the dashboard.
+3. **Burst rate (1 req/s on free):** The scanner processes 1 video per run (every 10 min) — well under burst limits. Only an issue if manually retrying many videos at once.
+4. **Fallback:** `APIFY_API_TOKEN` is still available in `apphosting.yaml` — code in `subtitles.ts` could be updated to fall back to Apify if Supadata returns 429.
+
+### D. Response Shape (for future reference)
+
+```json
+{
+  "lang": "en",
+  "availableLangs": ["en"],
+  "content": [
+    { "text": "...", "offset": 0, "duration": 5000, "lang": "en" }
+  ]
+}
+```
+
+Note: `offset` and `duration` are in **milliseconds** — divide by 1000 for seconds.

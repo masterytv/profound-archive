@@ -68,7 +68,11 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
 
         if (!res.ok) {
             const body = await res.text();
-            if (res.status === 404) {
+            if (res.status === 429) {
+                // Rate limited — Supadata free tier: 1 req/s, 100/mo. Paid: 10 req/s.
+                // Search Firebase logs for "[Supadata] RATE LIMITED" to detect this.
+                console.error(`[Supadata] RATE LIMITED (429) for ${videoId} — monthly credit limit reached or burst limit exceeded. Response: ${body}`);
+            } else if (res.status === 404) {
                 // 404 = video has no captions / captions disabled
                 console.log(`[Supadata] No captions available for ${videoId} (404)`);
             } else {
