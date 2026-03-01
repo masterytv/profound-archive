@@ -47,20 +47,33 @@ export async function GET(req: NextRequest) {
     // Get video counts per channel
     const { data: videoCounts } = await supabase.rpc('get_channel_scanner_stats');
 
-    // Get queue stats
-    const { data: queueStats } = await supabase
-        .from('scan_queue')
-        .select('status')
-        .then(({ data }: any) => {
-            const stats = { pending: 0, processing: 0, complete: 0, failed: 0, skipped: 0, total: 0 };
-            if (data) {
-                for (const item of data) {
-                    stats[item.status as keyof typeof stats] = (stats[item.status as keyof typeof stats] || 0) + 1;
-                    stats.total++;
-                }
-            }
-            return { data: stats };
-        });
+    // Get queue stats using server-side COUNT per status.
+    // Why: Fetching all rows and counting in JS breaks above 1000 rows (Supabase default limit).
+    // { count: 'exact', head: true } sends a HEAD request — zero row data transferred.
+    const countByStatus = async (status: string) => {
+        const { count } = await supabase
+            .from('scan_queue')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', status);
+        return count ?? 0;
+    };
+
+    const [pendingCount, processingCount, completeCount, failedCount, skippedCount] = await Promise.all([
+        countByStatus('pending'),
+        countByStatus('processing'),
+        countByStatus('complete'),
+        countByStatus('failed'),
+        countByStatus('skipped'),
+    ]);
+
+    const queueStats = {
+        pending: pendingCount,
+        processing: processingCount,
+        complete: completeCount,
+        failed: failedCount,
+        skipped: skippedCount,
+        total: pendingCount + processingCount + completeCount + failedCount + skippedCount,
+    };
 
     // Get recent scan runs
     const { data: recentRuns } = await supabase
