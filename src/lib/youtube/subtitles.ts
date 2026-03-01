@@ -66,28 +66,27 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
             clearTimeout(timer);
         }
 
-        if (!res.ok) {
+        if (!res.ok && res.status !== 206) {
             const body = await res.text();
             if (res.status === 401) {
-                // API key is missing or invalid — check SUPADATA_API_KEY env var
                 console.error(`[Supadata] INVALID API KEY (401) for ${videoId} — check SUPADATA_API_KEY environment variable.`);
             } else if (res.status === 402) {
-                // Out of credits — payment required. Go to dash.supadata.ai to add credits.
-                // Search Firebase logs for "[Supadata] PAYMENT REQUIRED" to detect this.
                 console.error(`[Supadata] PAYMENT REQUIRED (402) for ${videoId} — monthly credits exhausted. Add credits at https://dash.supadata.ai`);
             } else if (res.status === 429) {
-                // Burst rate limit exceeded (1 req/s free, 10 req/s paid).
-                // Search Firebase logs for "[Supadata] RATE LIMITED" to detect this.
                 console.error(`[Supadata] RATE LIMITED (429) for ${videoId} — request rate exceeded. Response: ${body}`);
             } else if (res.status === 404) {
-                // Video has no captions or captions are disabled — expected for some videos.
                 console.log(`[Supadata] No captions available for ${videoId} (404)`);
             } else if (res.status >= 500) {
-                // Supadata server error — transient, worth retrying later.
                 console.error(`[Supadata] SERVER ERROR (${res.status}) for ${videoId} — Supadata infrastructure issue. Response: ${body}`);
             } else {
                 console.error(`[Supadata] HTTP ${res.status} for ${videoId}: ${body}`);
             }
+            return null;
+        }
+
+        // 206 = Supadata's "transcript-unavailable" — video exists but has no captions
+        if (res.status === 206) {
+            console.log(`[Supadata] Transcript unavailable for ${videoId} (206) — video has no captions.`);
             return null;
         }
 

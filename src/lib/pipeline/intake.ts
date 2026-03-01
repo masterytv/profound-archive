@@ -676,7 +676,8 @@ async function generateEmbeddings(
                 .insert(searchRows[i]);
 
             if (searchError) {
-                throw new Error(`Failed to insert search embeddings batch ${i}: ${searchError.message}`);
+                const msg = (searchError.message || '').replace(/\s+/g, ' ').slice(0, 200);
+                throw new Error(`Failed to insert search embeddings batch ${i}: ${msg}`);
             }
             // Brief pause to avoid overwhelming the connection pool
             if (i < searchRows.length - 1) await new Promise(r => setTimeout(r, 100));
