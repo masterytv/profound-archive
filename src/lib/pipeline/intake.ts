@@ -124,9 +124,17 @@ export async function processVideoIntake(
             .single();
 
         if (existing) {
-            // Only block if the video was FULLY processed successfully
-            if (existing.intake_status === 'complete') {
-                logStep('Check Database', 'success', `Already exists: "${existing.title}" (${existing.isNde})`, Date.now() - startCheck);
+            // Conclusive statuses — no benefit to re-running, would waste Apify + OpenAI credits.
+            // complete    = accepted NDE, already in the archive
+            // not_profound = AI conclusively rejected it as not an NDE
+            // is_short     = filtered as YouTube Short (<= 180s)
+            const conclusive: string[] = ['complete', 'not_profound', 'is_short'];
+            if (conclusive.includes(existing.intake_status ?? '')) {
+                const label =
+                    existing.intake_status === 'complete' ? `Already accepted: "${existing.title}" (${existing.isNde})` :
+                        existing.intake_status === 'not_profound' ? `Already rejected as not NDE: "${existing.title}"` :
+                            `Already filtered as YouTube Short: "${existing.title}"`;
+                logStep('Check Database', 'skipped', label, Date.now() - startCheck);
                 return {
                     status: 'already_exists',
                     videoId,
@@ -134,8 +142,8 @@ export async function processVideoIntake(
                     steps,
                 };
             }
-            // Video exists but wasn't fully processed — allow re-processing
-            logStep('Check Database', 'success', `Re-processing (previous status: ${existing.intake_status})`, Date.now() - startCheck);
+            // Transient failures (failed, no_captions) — worth retrying
+            logStep('Check Database', 'success', `Re-processing (previous status: ${existing.intake_status ?? 'unknown'})`, Date.now() - startCheck);
         } else {
             logStep('Check Database', 'success', 'New video — proceeding', Date.now() - startCheck);
         }
