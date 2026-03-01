@@ -90,11 +90,16 @@ export async function fetchCaptions(videoId: string): Promise<CaptionResult | nu
             return null;
         }
 
-        const data = await res.json() as {
-            lang: string;
-            availableLangs: string[];
-            content: Array<{ text: string; offset: number; duration: number; lang: string }>;
-        };
+        // Read body as text first — if Supadata's CDN returns an HTML error page with
+        // a 200 status, res.json() would throw an ugly "Unexpected token '<'" error.
+        const rawBody = await res.text();
+        let data: { lang: string; availableLangs: string[]; content: Array<{ text: string; offset: number; duration: number; lang: string }> };
+        try {
+            data = JSON.parse(rawBody);
+        } catch {
+            console.error(`[Supadata] Non-JSON response for ${videoId} (HTTP ${res.status}): ${rawBody.slice(0, 150).replace(/\s+/g, ' ')}`);
+            return null;
+        }
 
         const content = data?.content;
         if (!Array.isArray(content) || content.length === 0) {
