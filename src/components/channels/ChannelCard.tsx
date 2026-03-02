@@ -5,20 +5,33 @@ import Image from 'next/image'
 import { Users, Eye, Film, Globe } from 'lucide-react'
 
 export interface ChannelStats {
+    // Basic identity
     channel_id: string
     channel_name: string
     channel_url: string | null
     channel_username: string | null
+    // Engagement
     video_count: number
     total_views: number
     total_likes: number
     subscriber_count: number
     latest_video_date: string | null
     sample_thumbnail: string | null
+    // Enriched channel metadata
     avatar_url?: string | null
     description?: string | null
     banner_url?: string | null
     country?: string | null
+    // Analysis aggregates (null for channels with no analysed videos)
+    total_analyzed?: number | null
+    avg_intensity?: number | null
+    avg_greyson_score?: number | null
+    avg_transformation_score?: number | null
+    avg_veridical_score?: number | null
+    pct_positive_tone?: number | null
+    pct_negative_tone?: number | null
+    experience_types?: Record<string, number> | null
+    tone_distribution?: Record<string, number> | null
 }
 
 function formatNumber(num: number): string {

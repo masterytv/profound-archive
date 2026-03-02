@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { ChannelCard, type ChannelStats } from '@/components/channels/ChannelCard'
+import { ChannelListRow, type ChannelStats } from '@/components/channels/ChannelListRow'
 import { ChannelSearch } from '@/components/channels/ChannelSearch'
 import { ExplorerControls } from '@/components/explore/ExplorerControls'
 import { Film, Tv } from 'lucide-react'
@@ -8,18 +8,33 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
     title: 'NDE Channels | Project Profound',
-    description: 'Browse all near-death experience channels. Explore NDE video collections from top YouTube channels covering near-death experiences, afterlife accounts, and consciousness research.',
+    description: 'Browse all near-death experience channels. Sort by intensity, emotional tone, Greyson score, and more.',
 }
 
 const SORT_OPTIONS = [
+    // Basic
     { value: 'video_count', label: 'Most Videos' },
     { value: 'total_views', label: 'Most Views' },
     { value: 'subscriber_count', label: 'Most Subscribers' },
-    { value: 'latest_video_date', label: 'Most Recent' },
     { value: 'channel_name', label: 'Alphabetical' },
+    // Analysis
+    { value: 'avg_intensity', label: 'Avg. Intensity' },
+    { value: 'pct_positive_tone', label: 'Most Positive' },
+    { value: 'pct_negative_tone', label: 'Most Distressing' },
+    { value: 'avg_greyson_score', label: 'Avg. Greyson Score' },
+    { value: 'avg_transformation_score', label: 'Avg. Transformation' },
+    { value: 'avg_veridical_score', label: 'Avg. Veridical Score' },
+    { value: 'total_analyzed', label: 'Most Analyzed' },
 ]
 
-const ITEMS_PER_PAGE = 12
+// Channels with no analysis data sort to the bottom for analysis-based sorts
+const ANALYSIS_SORT_KEYS = new Set([
+    'avg_intensity', 'pct_positive_tone', 'pct_negative_tone',
+    'avg_greyson_score', 'avg_transformation_score', 'avg_veridical_score',
+    'total_analyzed',
+])
+
+const ITEMS_PER_PAGE = 20
 
 export default async function ChannelsPage({
     searchParams,
@@ -55,26 +70,31 @@ export default async function ChannelsPage({
 
     // Sort
     channels.sort((a, b) => {
-        let cmp = 0
-        switch (sort) {
-            case 'video_count':
-                cmp = a.video_count - b.video_count
-                break
-            case 'total_views':
-                cmp = a.total_views - b.total_views
-                break
-            case 'subscriber_count':
-                cmp = a.subscriber_count - b.subscriber_count
-                break
-            case 'latest_video_date':
-                cmp = (a.latest_video_date || '').localeCompare(b.latest_video_date || '')
-                break
-            case 'channel_name':
-                cmp = a.channel_name.localeCompare(b.channel_name)
-                break
-            default:
-                cmp = a.video_count - b.video_count
+        const isAnalysisSort = ANALYSIS_SORT_KEYS.has(sort)
+
+        // For analysis sorts: push nulls to the end regardless of direction
+        if (isAnalysisSort) {
+            const av = (a as Record<string, unknown>)[sort]
+            const bv = (b as Record<string, unknown>)[sort]
+            if (av == null && bv == null) return 0
+            if (av == null) return 1   // a goes after b
+            if (bv == null) return -1  // b goes after a
         }
+
+        let cmp = 0
+        const av = (a as Record<string, unknown>)[sort]
+        const bv = (b as Record<string, unknown>)[sort]
+
+        if (sort === 'channel_name') {
+            cmp = a.channel_name.localeCompare(b.channel_name)
+        } else if (sort === 'latest_video_date') {
+            cmp = (a.latest_video_date || '').localeCompare(b.latest_video_date || '')
+        } else if (typeof av === 'number' && typeof bv === 'number') {
+            cmp = av - bv
+        } else if (typeof av === 'string' && typeof bv === 'string') {
+            cmp = parseFloat(av) - parseFloat(bv)
+        }
+
         return direction === 'desc' ? -cmp : cmp
     })
 
@@ -85,9 +105,12 @@ export default async function ChannelsPage({
         page * ITEMS_PER_PAGE
     )
 
+    const rankOffset = (page - 1) * ITEMS_PER_PAGE
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+
                 {/* Header */}
                 <div className="mb-8 sm:mb-10">
                     <div className="flex items-center gap-3 mb-3">
@@ -102,13 +125,13 @@ export default async function ChannelsPage({
                         </h1>
                     </div>
                     <p className="text-slate-500 text-sm sm:text-base max-w-2xl">
-                        Browse {channels.length} channels sharing near-death experience accounts.
-                        Each channel page features searchable and sortable video collections.
+                        {channels.length} channels sharing near-death experience accounts,
+                        ranked by experience analysis. Sort by intensity, emotional tone, Greyson score, and more.
                     </p>
                 </div>
 
                 {/* Controls */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                     <Suspense fallback={null}>
                         <ChannelSearch currentQuery={query} />
                     </Suspense>
@@ -122,11 +145,16 @@ export default async function ChannelsPage({
                     />
                 </div>
 
-                {/* Grid */}
+                {/* List */}
                 {paginatedChannels.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                        {paginatedChannels.map((channel) => (
-                            <ChannelCard key={channel.channel_id} channel={channel} />
+                    <div className="flex flex-col gap-2">
+                        {paginatedChannels.map((channel, i) => (
+                            <ChannelListRow
+                                key={channel.channel_id}
+                                channel={channel}
+                                rank={rankOffset + i + 1}
+                                activeSortKey={sort}
+                            />
                         ))}
                     </div>
                 ) : (

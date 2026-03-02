@@ -65,7 +65,21 @@ The database is hosted on Supabase (PostgreSQL). It stores NDE (Near-Death Exper
 **Relationships:**
 - `channel_id` matches `nde_vids.channelId`
 
-**RPC:** `get_channel_stats()` LEFT JOINs this table with aggregated `nde_vids` data.
+**RPC:** `get_channel_stats()` LEFT JOINs this table with aggregated `nde_vids` and `nde_analysis` data. Returns all channel metadata plus analysis aggregates:
+
+| Column | Description |
+|---|---|
+| `total_analyzed` | Count of videos with NDERF analysis |
+| `avg_intensity` | AVG(`nde_analysis.intensity_rating`), 1–10 |
+| `avg_greyson_score` | AVG(`nde_analysis.total_greyson_score`), 0–16 |
+| `avg_transformation_score` | AVG(`nde_analysis.transformation_score`), 0–50 |
+| `avg_veridical_score` | AVG(`nde_vids.rvnde_total_score`) |
+| `pct_positive_tone` | % of videos with very_positive or positive tone |
+| `pct_negative_tone` | % of videos with very_negative tone |
+| `experience_types` | JSONB object `{ "nde": N, "obe": N, "ste": N, ... }` |
+| `tone_distribution` | JSONB object `{ "very_positive": N, "positive": N, ... }` |
+
+Used by `/channels` list page (11 sort options) and homepage. Migration: `20260302_expand_channel_stats_with_analysis.sql`.
 
 ---
 
