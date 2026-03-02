@@ -216,6 +216,7 @@ export default function ScannerAdminPage() {
                         onClick={runAudit}
                         disabled={actionLoading === 'audit'}
                         className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        title="Read-only scan — shows how many new videos exist per channel and estimates cost. Does not queue anything."
                     >
                         {actionLoading === 'audit' ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
