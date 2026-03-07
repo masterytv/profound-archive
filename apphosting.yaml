@@ -40,6 +40,10 @@ env:
   - variable: TYPESENSE_PROTOCOL
     value: "http"
 
+  # Canonical production URL — used by auth redirects (login/callback)
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: "https://projectprofound.org"
+
   # Supabase Configuration
   - variable: NEXT_PUBLIC_SUPABASE_URL
     value: "https://vnycavclrndjwmpaugju.supabase.co"
