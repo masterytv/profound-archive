@@ -94,9 +94,11 @@ export default function SiteHeader() {
   }, [exploreOpen, toolsOpen, aboutOpen])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    // scope: 'global' invalidates the token on Supabase's servers, preventing
+    // middleware from re-hydrating the session from a stale cookie on next request.
+    await supabase.auth.signOut({ scope: 'global' });
     setMobileMenuOpen(false);
-    window.location.reload();
+    router.push('/login');
   };
 
   const closeAll = () => {

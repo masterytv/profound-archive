@@ -20,6 +20,10 @@ export async function GET(request: Request) {
       redirectUrl.searchParams.set('confirmed', 'true');
       return NextResponse.redirect(redirectUrl.toString());
     }
+    // Log the exact error so it appears in Firebase logs for diagnosis
+    console.error('[AUTH CALLBACK ERROR] exchangeCodeForSession failed:', error.message, error);
+  } else {
+    console.error('[AUTH CALLBACK ERROR] No code param present in callback URL');
   }
 
   // return the user to an error page with instructions
