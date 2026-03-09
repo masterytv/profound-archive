@@ -297,7 +297,7 @@ export default async function QuestionsPage() {
         <div className="min-h-screen bg-background text-foreground">
             {/* ── Hero ─────────────────────────────────────────────────── */}
             <section
-                className="relative overflow-hidden py-16 md:py-24"
+                className="relative overflow-visible py-16 md:py-24"
                 style={{ background: "linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 40%, #EFF6FF 100%)" }}
             >
                 <div

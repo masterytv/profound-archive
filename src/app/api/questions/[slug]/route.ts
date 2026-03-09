@@ -4,43 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-// Supabase client with service key for server-side operations
+// Use service key — needed to read user_questions (RLS allows it, but anon key fine too)
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_KEY!
 );
 
 const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-
-/** Convert a URL slug back into a human-readable question */
-function slugToQuestion(slug: string): string {
-    return slug
-        .split('-')
-        .map((word, i) => (i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
-        .join(' ')
-        .replace(/\s*\?$/, '') + '?';
-}
-
-/** Generate a question-specific hypothetical ideal answer via GPT — used to produce a focused embedding (HyDE trick).
- *  This is the crucial step: a generic placeholder would make EVERY question return the same top chunks. */
-async function buildHypotheticalAnswer(openai: OpenAI, question: string): Promise<string> {
-    const resp = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        temperature: 0.3,
-        max_tokens: 200,
-        messages: [
-            {
-                role: 'system',
-                content:
-                    'You are an expert in near-death experiences. Write a concise, specific 2-3 sentence ideal NDE account ' +
-                    'that would perfectly answer the given question. Use first-person witnessing language as if you are an NDE researcher ' +
-                    'summarising what experiencers report. Be concrete and specific to the question — do NOT give a generic NDE overview.',
-            },
-            { role: 'user', content: question },
-        ],
-    });
-    return resp.choices[0].message.content ?? question;
-}
 
 /** Format large viewcount numbers as readable strings like "1.2M" */
 function formatViewCount(count: number | null | bigint): string {
@@ -51,12 +21,12 @@ function formatViewCount(count: number | null | bigint): string {
     return `${n}`;
 }
 
-// ─── Shape returned by nde_questions_match RPC ───────────────────────────────
+// ─── Shape returned by nde_questions_match RPC ────────────────────────────────
 interface MatchedMoment {
     id: number;
     content: string;
     similarity: number;
-    start_time: number;    // Real column — always present
+    start_time: number;
     video_id: string;
     video_url: string;
     title: string | null;
@@ -68,6 +38,17 @@ interface MatchedMoment {
     date: string | null;
 }
 
+/**
+ * Similarity thresholds for the no-results guard:
+ * - CURATED: lower bar (0.50) because ai_query is a hand-written NDE HyDE passage —
+ *   we can trust it's NDE-relevant, so even a moderate match is real evidence.
+ * - USER: higher bar (0.58) because ai_query is raw question text — off-topic queries
+ *   (cooking, sports, etc.) need a steeper cutoff to fire the no-results page.
+ */
+const MIN_SIMILARITY_CURATED = 0.50;
+const MIN_SIMILARITY_USER    = 0.58;
+
+
 export async function GET(
     _req: NextRequest,
     { params }: { params: Promise<{ slug: string }> }
@@ -76,19 +57,47 @@ export async function GET(
 
     try {
         const openai = getOpenAI();
-        const question = slugToQuestion(slug);
 
-        // Step 1: Generate a question-specific hypothetical ideal answer for HyDE embedding
-        // IMPORTANT: must be async + question-specific or every question gets the same embedding
-        const hypotheticalAnswer = await buildHypotheticalAnswer(openai, question);
+        // ── Step 1: Look up the question + ai_query from either table ──────────
+        // Check nde_questions first (curated, pre-written ai_query)
+        let question: string;
+        let ai_query: string;
+        let isCurated = false;
+
+        const { data: curated } = await supabase
+            .from('nde_questions')
+            .select('consumer_question, ai_query')
+            .eq('slug', slug)
+            .eq('is_active', true)
+            .maybeSingle();
+
+        if (curated) {
+            question = curated.consumer_question;
+            ai_query = curated.ai_query;
+            isCurated = true;
+        } else {
+            // Fall back to user_questions
+            const { data: userQ } = await supabase
+                .from('user_questions')
+                .select('question, ai_query')
+                .eq('slug', slug)
+                .maybeSingle();
+
+            if (!userQ) {
+                return NextResponse.json({ error: 'Question not found' }, { status: 404 });
+            }
+            question = userQ.question;
+            ai_query = userQ.ai_query;
+        }
+
+        // ── Step 2: Embed the pre-written ai_query (no GPT HyDE call needed) ──
         const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-3-small',
-            input: hypotheticalAnswer,
+            input: ai_query,
         });
         const embedding = embeddingResponse.data[0].embedding;
 
-        // Step 2: Semantic search via nde_questions_match (queries nde_punctuated_embeddings)
-        // This RPC returns start_time as a real column — no metadata parsing needed.
+        // ── Step 3: Semantic search via nde_questions_match ───────────────────
         const { data: matchedMoments, error: rpcError } = await supabase.rpc('nde_questions_match', {
             query_embedding: embedding,
             match_count: 20,
@@ -101,11 +110,20 @@ export async function GET(
 
         const moments = (matchedMoments ?? []) as MatchedMoment[];
 
-        if (moments.length === 0) {
-            return NextResponse.json({ error: 'No results found' }, { status: 404 });
+        // ── Step 4: No-results guard ──────────────────────────────────────────
+        // If there are no moments, or the best similarity is below threshold, bail out
+        const bestSimilarity = moments.length > 0 ? moments[0].similarity : 0;
+        const minSimilarity = isCurated ? MIN_SIMILARITY_CURATED : MIN_SIMILARITY_USER;
+        if (moments.length === 0 || bestSimilarity < minSimilarity) {
+            return NextResponse.json({
+                no_results: true,
+                question,
+                slug,
+                best_similarity: bestSimilarity,
+            });
         }
 
-        // Step 3: Group moments by video_id, sort within each group by similarity desc
+        // ── Step 5: Group moments by video, sort by similarity ────────────────
         const videoMomentsMap: Record<string, MatchedMoment[]> = {};
         for (const moment of moments) {
             const vid = moment.video_id;
@@ -113,25 +131,23 @@ export async function GET(
             if (!videoMomentsMap[vid]) videoMomentsMap[vid] = [];
             videoMomentsMap[vid].push(moment);
         }
-        // Sort within each video group: highest similarity first
         for (const vid of Object.keys(videoMomentsMap)) {
             videoMomentsMap[vid].sort((a, b) => b.similarity - a.similarity);
         }
 
-        // Step 4: Sort videos by their best moment similarity
         const sortedVideoIds = Object.entries(videoMomentsMap)
             .map(([vid, moms]) => ({
                 vid,
-                bestSimilarity: moms[0].similarity,  // already sorted, so first = best
+                bestSimilarity: moms[0].similarity,
                 moments: moms,
-                meta: moms[0],  // all moments for a video share same meta fields
+                meta: moms[0],
             }))
             .sort((a, b) => b.bestSimilarity - a.bestSimilarity);
 
         const referencedVids = sortedVideoIds.slice(0, 4);
         const moreVids = sortedVideoIds.slice(4);
 
-        // Step 5: Synthesize answer via GPT-4o using the top transcript snippets
+        // ── Step 6: Synthesize answer via GPT-4o ──────────────────────────────
         const contextForGPT = referencedVids.map(({ meta, moments }) => {
             const topSnippets = moments.slice(0, 2).map(m => m.content).join('\n');
             return `VIDEO: ${meta.title ?? meta.video_id}\n${topSnippets}`;
@@ -178,7 +194,7 @@ Rules:
             paragraphs = ['Unable to generate answer at this time.'];
         }
 
-        // Step 6: Build the response structure matching the existing QuestionAnswer interface
+        // ── Step 7: Build the QuestionAnswer response shape ───────────────────
         const referencedVideos = referencedVids.map(({ vid, meta, moments }) => ({
             video_id: vid,
             url: meta.video_url ?? `https://www.youtube.com/watch?v=${vid}`,
@@ -190,7 +206,7 @@ Rules:
             summary: meta.nde_summary ?? moments[0]?.content ?? '',
             transcripts: moments.slice(0, 3).map(m => ({
                 content: m.content,
-                start_time: m.start_time,  // Real column — no more 00:00
+                start_time: m.start_time,
                 similarity: m.similarity,
             })),
         }));
@@ -222,7 +238,6 @@ Rules:
 
         return NextResponse.json(result, {
             headers: {
-                // Cache for 24 hours
                 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=3600',
             },
         });

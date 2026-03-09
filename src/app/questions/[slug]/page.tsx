@@ -256,7 +256,9 @@ function formatDate(dateString: string | null): string {
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
-async function fetchQuestionData(slug: string): Promise<QuestionAnswer | null> {
+type QuestionResult = QuestionAnswer | { no_results: true; question: string; slug: string } | null;
+
+async function fetchQuestionData(slug: string): Promise<QuestionResult> {
     // Check dummy data first (instant, no network)
     if (DUMMY_ANSWERS[slug]) return DUMMY_ANSWERS[slug];
 
@@ -265,10 +267,13 @@ async function fetchQuestionData(slug: string): Promise<QuestionAnswer | null> {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
             ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         const res = await fetch(`${baseUrl}/api/questions/${encodeURIComponent(slug)}`, {
-            next: { revalidate: 86400 }, // cache for 24h
+            cache: 'no-store', // API is force-dynamic; do not cache the no_results state across threshold changes
         });
         if (!res.ok) return null;
-        return (await res.json()) as QuestionAnswer;
+        const json = await res.json();
+        // API returns { no_results: true } when similarity < 50%
+        if (json.no_results) return json as { no_results: true; question: string; slug: string };
+        return json as QuestionAnswer;
     } catch (err) {
         console.error('[QuestionsPage] fetch error:', err);
         return null;
@@ -291,6 +296,57 @@ export async function generateMetadata({
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
+function NoResultsPage({ question }: { question: string }) {
+    return (
+        <div className="min-h-screen bg-background text-foreground">
+            <div className="border-b border-border/60 bg-muted/30">
+                <div className="container mx-auto px-4 max-w-5xl py-3">
+                    <Link
+                        href="/questions"
+                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        All Questions
+                    </Link>
+                </div>
+            </div>
+            <div className="container mx-auto px-4 max-w-2xl py-24 text-center">
+                <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-6">
+                    <BookOpen className="w-8 h-8 text-slate-400" />
+                </div>
+                <h1
+                    className="text-2xl font-bold text-slate-900 mb-3"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                >
+                    Not enough NDE evidence found
+                </h1>
+                <p className="text-slate-600 text-base leading-relaxed mb-2">
+                    We searched 5,000+ near-death experience accounts for:
+                </p>
+                <p className="text-slate-800 font-medium italic mb-8 text-lg">&#8220;{question}&#8221;</p>
+                <p className="text-slate-500 text-sm leading-relaxed mb-8">
+                    Our database doesn&apos;t have enough relevant testimony to give you a reliable answer
+                    to this specific question. NDEs are a rich but finite dataset.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Link
+                        href="/questions"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
+                    >
+                        Browse curated questions
+                    </Link>
+                    <Link
+                        href="/search3"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                        Search NDE accounts directly
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default async function QuestionResultPage({
     params,
 }: {
@@ -308,6 +364,11 @@ export default async function QuestionResultPage({
                 </Link>
             </div>
         );
+    }
+
+    // No-results state — insufficient NDE evidence
+    if ('no_results' in data) {
+        return <NoResultsPage question={data.question} />;
     }
 
     return (
