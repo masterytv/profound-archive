@@ -36,7 +36,7 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
         }
 
         if (!isMounted) return;
-        setUser(currentUser);
+        setUser(currentUser ?? null);
 
         if (currentUser) {
           const { data: collection } = await supabase
@@ -58,6 +58,8 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
           }
         }
       } catch (error) {
+        // AbortError = navigator.lock contention from Strict Mode double-mount; harmless noise.
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error(`[FavoriteButton] Error for ${videoId}:`, error);
       } finally {
         if (isMounted) {

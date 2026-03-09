@@ -52,13 +52,15 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
         let currentUser = initialUser;
         if (!currentUser) {
           const { data: { session } } = await supabase.auth.getSession();
-          currentUser = session?.user ?? null;
+          currentUser = (session?.user ?? null) as typeof currentUser;
         }
 
         if (isMounted) {
-          setUser(currentUser);
+          setUser(currentUser ?? null);
         }
       } catch (error) {
+        // AbortError = navigator.lock contention from Strict Mode double-mount; harmless noise.
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error(`[SaveButton] Auth error for ${videoId}:`, error);
       } finally {
         if (isMounted) {
@@ -92,9 +94,9 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
         throw collectionsError || membershipsError;
       }
 
-      const membershipSet = new Set(memberships.map(m => (m as any).collection_id));
+      const membershipSet = new Set(memberships.map((m: { collection_id: number }) => m.collection_id));
 
-      const combinedData = collectionsData.map(c => ({
+      const combinedData = collectionsData.map((c: { id: number; name: string }) => ({
         ...c,
         hasVideo: membershipSet.has(c.id),
       }));

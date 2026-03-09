@@ -613,25 +613,37 @@ Use the provider-prefixed format:
 - `anthropic/claude-opus-4-5` — higher quality, ~5-10x more expensive
 - `openai/gpt-4o` — fallback if needed
 
-### D. `response_format` Is OpenAI-Only — DO NOT USE WITH CLAUDE
-**The most important gotcha:** `response_format: { type: 'json_object' }` is ignored by Claude via OpenRouter. Claude will return JSON but wrap it in markdown code fences:
-````
-```json
-{ "key": "value" }
-```
-````
-This silently breaks `JSON.parse()` and causes the fallback error message to render.
+### D. Claude JSON Compliance — The ONLY Reliable Fix: Assistant Prefill (CRITICAL — READ FIRST)
 
-**Fix — always strip fences before parsing when using Claude:**
+**The problem:** Claude regularly ignores JSON format instructions in the system prompt and returns plain prose, regardless of how emphatic the instruction is. Simply saying "Return ONLY a valid JSON object" does not work. Even the brace-anchored extraction (`rawContent.indexOf('{')`) fails when there is no `{` at all.
+
+**Terminal evidence:** The server logs show `[Questions API] No JSON object found in response. Raw (500 chars): Those who die suddenly often receive...` — Claude is returning full prose paragraphs with no JSON structure.
+
+**Why fence-stripping is NOT enough:** Previous advice (§17D original) said to strip markdown fences. This handles Claude wrapping JSON in ` ```json ``` ` blocks, but does not handle Claude ignoring JSON entirely and returning prose.
+
+**The definitive fix — Assistant Prefill:**
+Add a final `{ role: 'assistant', content: '{' }` message to the messages array. This starts the assistant's turn with `{`, and because Claude continues an existing turn rather than starting fresh, it is physically constrained to complete a valid JSON object.
+
 ```typescript
-const rawContent = response.choices[0].message.content ?? '{}';
-const cleaned = rawContent
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```\s*$/, '')
-    .trim();
-const parsed = JSON.parse(cleaned);
+messages: [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Question: ${question}\n\nNDE Accounts:\n\n${context}` },
+    // Prefill forces Claude to continue a JSON object — the ONLY reliable method.
+    { role: 'assistant', content: '{' },
+],
 ```
-Enforce JSON compliance via the **system prompt** instead: `"Return ONLY a valid JSON object, no markdown wrapping."`
+
+**Parsing adjustment required:** The model response now starts mid-JSON (no opening brace), so prepend `'{'` before parsing:
+```typescript
+// The prefill sent '{'; the response is the remainder. Reconstruct before parsing.
+const rawContent = '{' + (gptResponse.choices[0].message.content ?? '');
+const firstBrace = rawContent.indexOf('{');
+const lastBrace  = rawContent.lastIndexOf('}');
+const jsonStr    = rawContent.slice(firstBrace, lastBrace + 1);
+const parsed     = JSON.parse(jsonStr);
+```
+
+**Do NOT rely on system prompt alone.** The prefill is the authoritative solution.
 
 ### E. Secret Manager Setup
 Add to `.env.local` for local dev. For Firebase App Hosting:
@@ -643,3 +655,35 @@ Add to `.env.local` for local dev. For Firebase App Hosting:
 - variable: OPENROUTER_API_KEY
   secret: projects/432036554831/secrets/OPENROUTER_API_KEY/versions/1
 ```
+
+### F. Supabase Browser Client — Turbopack HMR Singleton (CRITICAL)
+
+**The Problem:** Storing the Supabase browser client in a module-level variable (`let client = null`) does NOT work in development with Turbopack. Turbopack re-executes the module on every HMR file save, resetting `client` to `null`. This causes a new `GoTrueClient` to be created, which tries to acquire `navigator.lock` — but the old client still holds the lock, resulting in `AbortError: signal is aborted without reason` flooding the console. In React Strict Mode, this doubles (mount → unmount → remount), making it much worse.
+
+**Cascading effect:** Even `useMemo` in components that call `createClient()` doesn't help, because the singleton they cache is itself reset on HMR.
+
+**The Fix — globalThis Singleton:**
+```typescript
+// src/lib/supabase/client.ts
+declare global {
+  var __supabaseBrowserClient: ReturnType<typeof createBrowserClient> | undefined;
+}
+
+export function createClient() {
+  if (globalThis.__supabaseBrowserClient) return globalThis.__supabaseBrowserClient;
+  globalThis.__supabaseBrowserClient = createBrowserClient(url, key);
+  return globalThis.__supabaseBrowserClient;
+}
+```
+
+`globalThis` maps to the browser's `window` object, which only resets on full page refresh — not HMR. This guarantees exactly one `GoTrueClient` instance per browser session.
+
+**Residual noise — AbortError in card components:** Even with a singleton client, React Strict Mode double-mounts every component. Components that call `supabase.auth.getSession()` in a `useEffect` will generate `AbortError` noise from concurrent lock acquisitions. Silently swallow these in catch blocks:
+```typescript
+} catch (error) {
+  // AbortError = navigator.lock contention from Strict Mode double-mount; harmless noise.
+  if (error instanceof Error && error.name === 'AbortError') return;
+  console.error('Real error:', error);
+}
+```
+This only affects dev (`Strict Mode` is disabled in production builds).

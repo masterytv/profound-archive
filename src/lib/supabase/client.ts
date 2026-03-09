@@ -1,9 +1,15 @@
 import { createBrowserClient } from '@supabase/ssr'
 
-let client: ReturnType<typeof createBrowserClient> | null = null;
+// Store client on globalThis so it survives Turbopack HMR module resets.
+// Without this, each hot-reload clears the module-level variable, causing
+// GoTrueClient to re-acquire navigator.lock and throw AbortErrors in Strict Mode.
+declare global {
+  // eslint-disable-next-line no-var
+  var __supabaseBrowserClient: ReturnType<typeof createBrowserClient> | undefined;
+}
 
 export function createClient() {
-  if (client) return client;
+  if (globalThis.__supabaseBrowserClient) return globalThis.__supabaseBrowserClient;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -16,6 +22,6 @@ export function createClient() {
     );
   }
 
-  client = createBrowserClient(supabaseUrl, supabaseKey);
-  return client;
+  globalThis.__supabaseBrowserClient = createBrowserClient(supabaseUrl, supabaseKey);
+  return globalThis.__supabaseBrowserClient;
 }

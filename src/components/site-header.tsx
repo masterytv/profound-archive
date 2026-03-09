@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, LogIn, LogOut, Shield, Search, Tv, HelpCircle } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { createClient } from "@/lib/supabase/client"
@@ -33,7 +33,9 @@ export default function SiteHeader() {
   const exploreRef = useRef<HTMLDivElement>(null)
   const toolsRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient();
+  // Stable singleton: creating a new client on every render causes GoTrueClient to
+  // fight over the same navigator.lock in dev Strict Mode, producing AbortErrors.
+  const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function SiteHeader() {
     fetchUserAndRole();
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: string, session: import('@supabase/supabase-js').Session | null) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         const { data: profile } = await supabase
@@ -68,7 +70,8 @@ export default function SiteHeader() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // supabase is stable (useMemo) — empty dep array is correct here
 
 
   useEffect(() => {

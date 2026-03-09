@@ -14,7 +14,8 @@ import { createClient } from "@/lib/supabase/server";
 interface QuestionAnswer {
     slug: string;
     question: string;
-    ai_query?: string;  // HyDE passage used for semantic search — shown for debugging
+    ai_query?: string;         // raw HyDE passage
+    embedding_input?: string;  // question + ai_query combined — what was actually embedded
     shortAnswer: string;
     answer: {
         paragraphs: string[];
@@ -80,7 +81,12 @@ async function fetchQuestionData(slug: string): Promise<QuestionResult> {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
             ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         const res = await fetch(`${baseUrl}/api/questions/${encodeURIComponent(slug)}`, {
-            cache: 'no-store',
+            // next.revalidate=0 disables caching without inheriting the parent SSR abort signal.
+            // AbortSignal.timeout prevents a stuck Claude call from hanging indefinitely.
+            // Why: Turbopack dev HMR can abort the SSR request mid-Claude-call, causing "Unable
+            // to generate answer" — the explicit signal breaks that inheritance chain.
+            next: { revalidate: 0 },
+            signal: AbortSignal.timeout(60_000),
         });
         if (!res.ok) return null;
         const json = await res.json();
@@ -248,15 +254,15 @@ export default async function QuestionResultPage({
                     </h1>
 
                     {/* HyDE ai_query panel — admin only */}
-                    {isAdmin && data.ai_query && (
+                    {isAdmin && (data.embedding_input || data.ai_query) && (
                         <details className="mb-5 group">
                             <summary className="cursor-pointer text-xs font-mono text-slate-400 hover:text-slate-600 transition-colors select-none list-none flex items-center gap-1.5">
                                 <span className="inline-block w-3 h-3 rotate-0 group-open:rotate-90 transition-transform">▶</span>
-                                <span>Search query used (ai_query) — <span className="text-amber-500 font-bold">Admin only</span></span>
+                                <span>Search query used (embedding_input) — <span className="text-amber-500 font-bold">Admin only</span></span>
                             </summary>
                             <div className="mt-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
-                                <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 mb-1">HyDE Passage (embedded for semantic search) — Admin only</p>
-                                <p className="text-sm text-amber-900 leading-relaxed italic">{data.ai_query}</p>
+                                <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 mb-1">Embedding input (question + HyDE) — Admin only</p>
+                                <p className="text-sm text-amber-900 leading-relaxed italic">{data.embedding_input ?? data.ai_query}</p>
                             </div>
                         </details>
                     )}

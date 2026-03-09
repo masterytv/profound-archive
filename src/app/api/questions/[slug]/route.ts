@@ -148,10 +148,12 @@ export async function GET(
             ai_query = userQ.ai_query;
         }
 
-        // ── Step 2: Embed the ai_query (HyDE passage for both curated and user) ─
+        // Option A: embed question + ai_query combined so literal keywords from the
+        // question (e.g. "accidents", "suddenly") anchor the vector alongside the HyDE passage.
+        const embeddingInput = `${question} ${ai_query}`;
         const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-3-small',
-            input: ai_query,
+            input: embeddingInput,
         });
         const embedding = embeddingResponse.data[0].embedding;
 
@@ -224,37 +226,69 @@ Rules:
   "paragraphs": ["paragraph 1 text", "paragraph 2 text", "paragraph 3 text"]
 }`;
 
-        const gptResponse = await getOpenRouter().chat.completions.create({
-            model: 'anthropic/claude-sonnet-4-5',
-            temperature: 0.7,
-            // NOTE: response_format is OpenAI-only — Claude ignores it.
-            // JSON compliance is enforced via the system prompt instead.
-            messages: [
-                { role: 'system', content: systemPrompt },
-                {
-                    role: 'user',
-                    content: `Question: ${question}\n\nNDE Accounts:\n\n${contextForGPT}`,
-                },
-            ],
-        });
-
         let shortAnswer = '';
         let paragraphs: string[] = [];
 
         try {
-            // Claude often wraps JSON in markdown code fences (```json ... ```).
-            // Strip them before parsing so JSON.parse doesn't throw.
-            const rawContent = gptResponse.choices[0].message.content ?? '{}';
-            const cleaned = rawContent
-                .replace(/^```(?:json)?\s*/i, '')
-                .replace(/\s*```\s*$/, '')
-                .trim();
-            const parsed = JSON.parse(cleaned);
-            shortAnswer = parsed.shortAnswer ?? '';
-            paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
+            // Pass an independent signal so the Claude call can't be killed by
+            // the route handler's abort (triggered by Turbopack HMR in dev mode).
+            const gptResponse = await getOpenRouter().chat.completions.create(
+                {
+                    model: 'anthropic/claude-sonnet-4-5',
+                    temperature: 0.7,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        {
+                            role: 'user',
+                            content: `Question: ${question}\n\nNDE Accounts:\n\n${contextForGPT}`,
+                        },
+                        // ── Assistant prefill ──────────────────────────────────
+                        // Claude ignores response_format. The only reliable way to
+                        // force JSON output is to start the assistant turn with '{'
+                        // so the model *continues* rather than starting fresh prose.
+                        // The response will be the tail of the JSON (no opening brace),
+                        // so we prepend '{' back before parsing below.
+                        { role: 'assistant', content: '{' },
+                    ],
+                },
+                { signal: AbortSignal.timeout(55_000) },
+            );
+
+
+            // Guard: OpenRouter can return empty choices on rate-limit or content filter
+            if (!gptResponse.choices?.length) {
+                console.error('[Questions API] Empty choices from OpenRouter. Full response:', JSON.stringify(gptResponse).substring(0, 500));
+                paragraphs = ['Unable to generate answer at this time.'];
+            } else {
+                // Extract JSON by anchoring to the first '{' and last '}' in the response.
+                // This handles ALL Claude formatting variants:
+                //   - plain JSON
+                //   - ```json ... ``` code fences
+                //   - preamble text like "Here's the JSON:" before the brace
+                //   - trailing notes after the closing brace
+                // The assistant prefill sent '{' as the start; the model response is the
+                // remainder of the JSON. Reconstruct the full JSON string before parsing.
+                const rawContent = '{' + (gptResponse.choices[0].message.content ?? '');
+                const firstBrace = rawContent.indexOf('{');
+                const lastBrace  = rawContent.lastIndexOf('}');
+
+                if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+                    console.error('[Questions API] No JSON object found in response. Raw (500 chars):', rawContent.substring(0, 500));
+                    paragraphs = ['Unable to generate answer at this time.'];
+                } else {
+                    const jsonStr = rawContent.slice(firstBrace, lastBrace + 1);
+                    const parsed  = JSON.parse(jsonStr);
+                    shortAnswer = parsed.shortAnswer ?? '';
+                    paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
+                }
+            }
         } catch (e) {
-            const raw = gptResponse.choices[0].message.content;
-            console.error('[Questions API] Failed to parse model response:', raw?.substring(0, 300));
+            // Log everything so we can see what OpenRouter actually returned
+            const isAbort = e instanceof Error && e.name === 'AbortError';
+            console.error(
+                `[Questions API] Synthesis ${isAbort ? 'aborted' : 'failed'}:`,
+                e instanceof Error ? `${e.name}: ${e.message}` : String(e),
+            );
             paragraphs = ['Unable to generate answer at this time.'];
         }
 
@@ -291,7 +325,8 @@ Rules:
         const result = {
             slug,
             question,
-            ai_query,   // ← exposed for debug display on the question page
+            ai_query,            // raw HyDE passage
+            embedding_input: embeddingInput,  // ← question + ai_query combined (what was actually embedded)
             shortAnswer,
             answer: {
                 paragraphs,
