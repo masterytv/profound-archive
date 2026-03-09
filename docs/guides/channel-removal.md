@@ -21,7 +21,28 @@ WHERE "channelUsername" = '@ChannelName'
 GROUP BY "channelUsername", "channelName", "isNde";
 ```
 
-## Step 2: Mark Videos as `not_nde`
+Also grab the `channel_id` (YouTube's internal ID) — you'll need it in Step 2:
+
+```sql
+SELECT channel_id, name, custom_url, scanner_enabled 
+FROM channels 
+WHERE custom_url = '@ChannelName';
+```
+
+## Step 2: Disable the Scanner
+
+Turn the scanner off so **no new videos from this channel are ever ingested**.
+All scanner operations (`run_audit`, `discover_all`, `run_tick`) filter by `scanner_enabled = true`, so setting it to `false` is a complete gate.
+
+```sql
+UPDATE channels 
+SET scanner_enabled = false 
+WHERE channel_id = '<channel_id_from_step_1>';
+```
+
+> You can also do this via the UI at `/admin/scanner` — find the channel row and toggle it to **Off**.
+
+## Step 3: Mark Videos as `not_nde`
 
 ```sql
 UPDATE nde_vids 
@@ -31,25 +52,25 @@ WHERE "channelUsername" = '@ChannelName'
   AND "isNde" != 'not_nde';
 ```
 
-## Step 3: Delete Child Data Only (order matters)
+## Step 4: Delete Child Data Only (order matters)
 
 ```sql
--- 3a: Delete analysis rows (if any)
+-- 4a: Delete analysis rows (if any)
 DELETE FROM nde_analysis 
 WHERE video_id IN (SELECT "videoId" FROM nde_vids WHERE "channelUsername" = '@ChannelName');
 
--- 3b: Delete chatbot chunks
+-- 4b: Delete chatbot chunks
 DELETE FROM nde_chatbot_chunks 
 WHERE video_id IN (SELECT "videoId" FROM nde_vids WHERE "channelUsername" = '@ChannelName');
 
--- 3c: Delete embeddings
+-- 4c: Delete embeddings
 DELETE FROM nde_punctuated_embeddings 
 WHERE video_id IN (SELECT "videoId" FROM nde_vids WHERE "channelUsername" = '@ChannelName');
 ```
 
 **Do NOT delete from `nde_vids`.** Those rows stay permanently.
 
-## Step 4: Verify
+## Step 5: Verify
 
 ```sql
 -- Should show all videos still present but tagged not_nde
@@ -65,12 +86,16 @@ SELECT
     (SELECT "videoId" FROM nde_vids WHERE "channelUsername" = '@ChannelName')) as chunk_rows,
   (SELECT COUNT(*) FROM nde_punctuated_embeddings WHERE video_id IN 
     (SELECT "videoId" FROM nde_vids WHERE "channelUsername" = '@ChannelName')) as embedding_rows;
+
+-- Should show scanner_enabled = false
+SELECT channel_id, name, scanner_enabled FROM channels WHERE custom_url = '@ChannelName';
 ```
 
 ## Why This Works
 
 | Layer | Mechanism |
 |-------|-----------|
+| **Scanner** | `channels.scanner_enabled = false` — `run_audit`, `discover_all`, and `run_tick` all filter `.eq('scanner_enabled', true)`. No new videos queued. |
 | **Supabase RPCs** | `search_punctuated_embeddings` and `nde_chatbot_match` filter by `isNde = 'clear_nde'` |
 | **Homepage** | Veridical column uses `.eq("isNde", "clear_nde")`. Greyson/Transformation query `nde_analysis` (no rows = no display) |
 | **Explorer Pages** | Veridical uses `.eq("isNde", "clear_nde")`. Greyson queries `nde_analysis` directly |

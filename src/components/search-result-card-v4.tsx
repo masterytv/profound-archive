@@ -170,7 +170,7 @@ export function SearchResultCardV4({ video, searchTerm, user }: SearchResultCard
                     <div className="text-sm text-muted-foreground space-y-1">
                         <p className="font-medium text-foreground">{video.channelName}</p>
                         <p>{formatDate(video.date)}</p>
-                        <p>{Number(video.viewCount).toLocaleString()} views</p>
+                        <p>{isNaN(Number(video.viewCount)) ? video.viewCount : Number(video.viewCount).toLocaleString()} views</p>
                     </div>
                 </div>
 

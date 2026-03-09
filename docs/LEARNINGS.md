@@ -446,3 +446,48 @@ All errors are handled distinctly in `src/lib/youtube/subtitles.ts`. Search thes
 ```
 
 Note: `offset` and `duration` are in **milliseconds** — divide by 1000 for seconds.
+
+## 17. nde_questions Table — Source of Truth & Architecture (2026-03-09)
+
+### A. The Two Question Sources Problem
+
+The `/questions` page previously had **two independent question lists** that drifted out of sync:
+1. A hardcoded array of strings in `src/app/questions/page.tsx` (consumer-facing, emotionally resonant)
+2. The `nde_questions` database table (researcher-style interview questions — completely different content)
+
+The page used an inline `toSlug()` function to convert hardcoded strings into URL slugs — the DB table was never used for the index page, only for the semantic search RPC.
+
+### B. Resolution: DB as Single Source of Truth
+
+- Truncated `nde_questions` and reseeded with 81 consumer-facing questions + HyDE `ai_query` passages from `nde_questions_hyde.md`.
+- **LESSON:** When reseeding `nde_questions`, you MUST truncate `question_answers` first (foreign key):
+  ```sql
+  TRUNCATE TABLE public.question_answers, public.nde_questions RESTART IDENTITY CASCADE;
+  ```
+- The `/questions` page is now an async Server Component fetching from the DB — no `toSlug()` conversion, slugs come directly from `nde_questions.slug`.
+
+### C. HyDE Passages — Pre-Written, Not Generated
+
+`nde_questions.ai_query` stores a pre-written first-person "ideal answer" passage per question. Used by `nde_questions_match` RPC as the embedding query instead of calling GPT on every request.
+
+### D. nde_questions_match RPC — Key Facts
+
+- Queries `nde_punctuated_embeddings` (NOT `nde_chatbot_chunks`) — critical because only `nde_punctuated_embeddings` has `start_time`.
+- Returns: `chunk_id`, `video_id`, `content`, `start_time`, `similarity`, `title`, `thumbnail_url`, `view_count_formatted`, `channel_title`, `date`, `greyson_score`.
+- Changing the return type requires DROP + recreate — Postgres does not allow ALTER FUNCTION to change return types.
+
+### E. Questions Page Architecture (Final)
+
+```
+nde_questions table
+  └─ slug, category, category_label, consumer_question, ai_query, sort_order, is_active
+
+/questions (page.tsx) — Server Component, revalidate: 86400
+  └─ Fetches all active questions, groups by CATEGORY_ORDER
+  └─ Part navigation cards (3 clickable anchors: Part I / II / III)
+  └─ Left-justified category headers with coloured left-border accent
+
+/questions/[slug] (page.tsx) → /api/questions/[slug]
+  └─ Embeds ai_query → nde_questions_match RPC → top-15 semantic matches
+  └─ GPT-4o synthesises shortAnswer + 3 paragraphs, cached 24h
+```

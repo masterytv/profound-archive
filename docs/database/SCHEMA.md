@@ -61,6 +61,9 @@ The database is hosted on Supabase (PostgreSQL). It stores NDE (Near-Death Exper
 | total_view_count | bigint | YES | Total views across all videos |
 | published_at | timestamptz | YES | Channel creation date |
 | fetched_at | timestamptz | YES | When metadata was last fetched |
+| scanner_enabled | boolean | YES | Whether the scanner picks up new videos from this channel. All scanner operations filter by `scanner_enabled = true`. Set to `false` to permanently block future ingestion. |
+| last_scanned_at | timestamptz | YES | Timestamp of the most recent scanner audit for this channel |
+| uploads_playlist_id | text | YES | YouTube uploads playlist ID used by the scanner to discover new videos |
 
 **Relationships:**
 - `channel_id` matches `nde_vids.channelId`

@@ -256,14 +256,33 @@ function formatDate(dateString: string | null): string {
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
+async function fetchQuestionData(slug: string): Promise<QuestionAnswer | null> {
+    // Check dummy data first (instant, no network)
+    if (DUMMY_ANSWERS[slug]) return DUMMY_ANSWERS[slug];
+
+    // Fall back to live API
+    try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+            ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+        const res = await fetch(`${baseUrl}/api/questions/${encodeURIComponent(slug)}`, {
+            next: { revalidate: 86400 }, // cache for 24h
+        });
+        if (!res.ok) return null;
+        return (await res.json()) as QuestionAnswer;
+    } catch (err) {
+        console.error('[QuestionsPage] fetch error:', err);
+        return null;
+    }
+}
+
 export async function generateMetadata({
     params,
 }: {
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     const { slug } = await params;
-    const data = DUMMY_ANSWERS[slug];
-    const question = data?.question ?? "Question";
+    const data = await fetchQuestionData(slug);
+    const question = data?.question ?? slug.split('-').join(' ');
     return {
         title: `${question} | Project Profound`,
         description: `What do near-death experiences tell us about: ${question} — answered from 5,000+ real NDE accounts.`,
@@ -278,7 +297,7 @@ export default async function QuestionResultPage({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
-    const data = DUMMY_ANSWERS[slug];
+    const data = await fetchQuestionData(slug);
 
     if (!data) {
         return (
@@ -593,22 +612,31 @@ export default async function QuestionResultPage({
 
                                             {/* Views */}
                                             <td className="px-4 py-3 text-right text-muted-foreground hidden sm:table-cell whitespace-nowrap">
-                                                {formatViewCount(video.viewCount)}
+                                                {typeof video.viewCount === 'number'
+                                                    ? formatViewCount(video.viewCount)
+                                                    : (video.viewCount ?? '—')}
                                             </td>
 
-                                            {/* Relevance bar */}
+                                            {/* Relevance bar — API returns 0-1 float, dummy uses 0-100 */}
                                             <td className="px-4 py-3 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <div className="hidden sm:flex w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                                                        <div
-                                                            className="h-full rounded-full bg-emerald-500"
-                                                            style={{ width: `${video.relevance}%` }}
-                                                        />
-                                                    </div>
-                                                    <span className="text-xs font-mono text-muted-foreground w-8 text-right">
-                                                        {video.relevance}%
-                                                    </span>
-                                                </div>
+                                                {(() => {
+                                                    const pct = video.relevance <= 1
+                                                        ? Math.round(video.relevance * 100)
+                                                        : Math.round(video.relevance);
+                                                    return (
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <div className="hidden sm:flex w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                                                                <div
+                                                                    className="h-full rounded-full bg-emerald-500"
+                                                                    style={{ width: `${pct}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className="text-xs font-mono text-muted-foreground w-8 text-right">
+                                                                {pct}%
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })()}
                                             </td>
                                         </tr>
                                     ))}
