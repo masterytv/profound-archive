@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CrisisBanner } from "@/components/crisis-banner";
 import { isCrisisTopic } from "@/lib/questions/crisis-detection";
+import { createClient } from "@/lib/supabase/server";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -164,6 +165,20 @@ export default async function QuestionResultPage({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
+
+    // Check if the current user is an admin — gates the ai_query debug panel
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    let isAdmin = false;
+    if (user) {
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+        isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
+    }
+
     const data = await fetchQuestionData(slug);
 
     if (!data) {
@@ -232,15 +247,15 @@ export default async function QuestionResultPage({
                         {data.question}
                     </h1>
 
-                    {/* DEBUG: HyDE ai_query panel — shows the passage used for semantic search */}
-                    {data.ai_query && (
+                    {/* HyDE ai_query panel — admin only */}
+                    {isAdmin && data.ai_query && (
                         <details className="mb-5 group">
                             <summary className="cursor-pointer text-xs font-mono text-slate-400 hover:text-slate-600 transition-colors select-none list-none flex items-center gap-1.5">
                                 <span className="inline-block w-3 h-3 rotate-0 group-open:rotate-90 transition-transform">▶</span>
-                                <span>Search query used (ai_query)</span>
+                                <span>Search query used (ai_query) — <span className="text-amber-500 font-bold">Admin only</span></span>
                             </summary>
                             <div className="mt-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
-                                <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 mb-1">HyDE Passage (embedded for semantic search)</p>
+                                <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 mb-1">HyDE Passage (embedded for semantic search) — Admin only</p>
                                 <p className="text-sm text-amber-900 leading-relaxed italic">{data.ai_query}</p>
                             </div>
                         </details>
