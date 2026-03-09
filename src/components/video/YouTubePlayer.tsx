@@ -7,6 +7,7 @@ import { Play } from "lucide-react";
 interface YouTubePlayerProps {
     videoId: string;
     title: string;
+    startTime?: number; // seconds — passed as &start=N in the embed URL
 }
 
 /**
@@ -17,7 +18,7 @@ interface YouTubePlayerProps {
  * decoding. During extended browsing across multiple video pages, this causes
  * rendering corruption and browser tab crashes.
  */
-export function YouTubePlayer({ videoId, title }: YouTubePlayerProps) {
+export function YouTubePlayer({ videoId, title, startTime }: YouTubePlayerProps) {
     const [isPlaying, setIsPlaying] = useState(false);
 
     const handlePlay = useCallback(() => {
@@ -25,9 +26,10 @@ export function YouTubePlayer({ videoId, title }: YouTubePlayerProps) {
     }, []);
 
     if (isPlaying) {
+        const startParam = startTime && startTime > 0 ? `&start=${Math.floor(startTime)}` : "";
         return (
             <iframe
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0${startParam}`}
                 title={title || "Video"}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen

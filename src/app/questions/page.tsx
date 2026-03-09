@@ -2,7 +2,7 @@ import Link from "next/link";
 import {
     ArrowLeft, Heart, Sparkles, Baby, AlertTriangle, Radio,
     Waves, Eye, Flame, User, Church, Star, HelpCircle,
-    Users, Skull, Lightbulb, ArrowRight,
+    Users, Skull, Lightbulb, ArrowRight, ChevronRight,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { QuestionsSearchBar } from "@/components/questions-search-bar";
@@ -204,7 +204,7 @@ function PartDivider({ part }: { part: typeof PARTS[number] }) {
                 <p className={`text-xs font-bold uppercase tracking-widest ${part.color}`}>
                     Part {part.number}
                 </p>
-                <p className="text-base font-bold text-slate-900" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                <p className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
                     {part.title}
                 </p>
             </div>
@@ -298,29 +298,27 @@ export default async function QuestionsPage() {
             {/* ── Hero ─────────────────────────────────────────────────── */}
             <section
                 className="relative overflow-visible py-16 md:py-24"
-                style={{ background: "linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 40%, #EFF6FF 100%)" }}
+                style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 60%, #FFF1F2 100%)" }}
             >
                 <div
                     className="absolute inset-0 opacity-[0.03]"
                     style={{
-                        backgroundImage: "radial-gradient(circle, #059669 1px, transparent 1px)",
+                        backgroundImage: "radial-gradient(circle, #2563EB 1px, transparent 1px)",
                         backgroundSize: "32px 32px",
                     }}
                 />
-                <div className="relative container mx-auto px-4 max-w-4xl text-center">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 transition-colors mb-8"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Home
-                    </Link>
+                <div className="relative container mx-auto px-4 max-w-7xl text-center">
+                    <nav className="flex items-center justify-center gap-1.5 text-sm text-slate-400 mb-8">
+                        <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                        <span className="text-slate-700 font-medium">Questions</span>
+                    </nav>
                     <h1
-                        className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4 leading-[1.1]"
+                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 mb-4 leading-[1.05]"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         What&apos;s On Your{" "}
-                        <span className="text-emerald-600" style={{ fontStyle: "italic" }}>
+                        <span className="text-blue-600" style={{ fontStyle: "italic" }}>
                             Heart?
                         </span>
                     </h1>

@@ -147,7 +147,7 @@ export function QuestionsSearchBar() {
                         placeholder="Ask anything about NDEs…"
                         disabled={isLocked}
                         autoComplete="off"
-                        className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white shadow-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-base transition disabled:opacity-60"
+                        className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white shadow-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-base transition disabled:opacity-60"
                     />
                     {loading && (
                         <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 animate-spin" />
@@ -156,7 +156,7 @@ export function QuestionsSearchBar() {
                 <button
                     type="submit"
                     disabled={isLocked || !query.trim()}
-                    className="shrink-0 px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-300 text-white font-semibold text-sm transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+                    className="shrink-0 px-5 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold text-sm transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
                 >
                     {isLocked ? (
                         <><Loader2 className="w-4 h-4 animate-spin" /> Searching…</>
@@ -182,22 +182,22 @@ export function QuestionsSearchBar() {
                                     onClick={() => goToQuestion(r.slug)}
                                     disabled={navigating !== null}
                                     className={`w-full text-left flex items-center gap-3 px-4 py-3 transition-colors cursor-pointer ${
-                                        i === activeIdx ? "bg-emerald-50" : "hover:bg-slate-50"
+                                        i === activeIdx ? "bg-blue-50" : "hover:bg-slate-50"
                                     } disabled:cursor-default`}
                                 >
                                     {navigating === r.slug ? (
-                                        <Loader2 className="w-4 h-4 text-emerald-500 shrink-0 animate-spin" />
+                                        <Loader2 className="w-4 h-4 text-blue-500 shrink-0 animate-spin" />
                                     ) : (
-                                        <BookOpen className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                        <BookOpen className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                                     )}
                                     <div className="flex-1 min-w-0">
                                         <p className={`text-sm leading-snug ${
-                                            navigating === r.slug ? "text-emerald-700 font-medium" : "text-slate-800"
+                                            navigating === r.slug ? "text-blue-700 font-medium" : "text-slate-800"
                                         }`}>{r.consumer_question}</p>
                                         <p className="text-xs text-slate-400 mt-0.5">{r.category_label}</p>
                                     </div>
                                     {navigating === r.slug ? (
-                                        <span className="text-xs text-emerald-500 shrink-0">Loading…</span>
+                                        <span className="text-xs text-blue-500 shrink-0">Loading…</span>
                                     ) : (
                                         <ArrowRight className="w-3.5 h-3.5 text-slate-300 shrink-0 mt-0.5" />
                                     )}

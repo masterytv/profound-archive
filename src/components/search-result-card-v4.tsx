@@ -256,13 +256,15 @@ export function SearchResultCardV4({ video, searchTerm, user }: SearchResultCard
                         {video.transcripts.map((t, idx) => {
                             const hasTimestamp = typeof t.start_time === "number" && !isNaN(t.start_time);
                             const timestampStr = hasTimestamp ? formatTimestamp(t.start_time!) : null;
+                            // Link to internal /video page with ?t= so the player starts at the right moment.
+                            // Falls back to /video/[id] (no timestamp) if no start_time.
                             const linkUrl = hasTimestamp
-                                ? `${video.url}&t=${Math.floor(t.start_time!)}s`
-                                : video.url;
+                                ? `/video/${video.video_id}?t=${Math.floor(t.start_time!)}`
+                                : `/video/${video.video_id}`;
 
                             return (
                                 <div key={idx} className="group relative pl-4 border-l-2 border-primary/20 hover:border-primary transition-colors">
-                                    <Link href={linkUrl} target="_blank" className="block">
+                                    <Link href={linkUrl} className="block">
                                         <div className="text-sm text-foreground/80 leading-relaxed">
                                             &quot;{highlightTerm(t.content, searchTerm)}&quot;
                                         </div>

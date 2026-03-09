@@ -29,6 +29,7 @@ import { SimilarExperiences, type SimilarExperience } from "@/components/analysi
 
 interface VideoPageProps {
     params: Promise<{ id: string }>;
+    searchParams: Promise<{ t?: string }>;
 }
 
 // --- Helpers ---
@@ -125,8 +126,10 @@ function RvndeDetailsSection({ details }: { details: unknown }) {
 
 // --- Page Component ---
 
-export default async function VideoPageAlt1({ params }: VideoPageProps) {
+export default async function VideoPageAlt1({ params, searchParams }: VideoPageProps) {
     const { id } = await params;
+    const { t } = await searchParams;
+    const startTime = t ? parseInt(t, 10) : undefined;
     const supabase = await createClient();
 
     const { data: video, error } = await supabase
@@ -208,7 +211,7 @@ export default async function VideoPageAlt1({ params }: VideoPageProps) {
                     <div className="space-y-8">
                         {/* Video Player */}
                         <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg bg-black">
-                            <YouTubePlayer videoId={video.videoId} title={video.title || "Video"} />
+                            <YouTubePlayer videoId={video.videoId} title={video.title || "Video"} startTime={startTime} />
                         </div>
 
                         {/* Title + Metadata */}

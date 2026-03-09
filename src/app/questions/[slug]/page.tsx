@@ -5,13 +5,16 @@ import type { Metadata } from "next";
 import { SearchResultCardV4 } from "@/components/search-result-card-v4";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { CrisisBanner } from "@/components/crisis-banner";
+import { isCrisisTopic } from "@/lib/questions/crisis-detection";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface QuestionAnswer {
     slug: string;
     question: string;
-    shortAnswer: string; // NEW — one-sentence direct answer
+    ai_query?: string;  // HyDE passage used for semantic search — shown for debugging
+    shortAnswer: string;
     answer: {
         paragraphs: string[];
         citedVideoIds: string[];
@@ -45,193 +48,6 @@ interface MoreVideo {
     relevance: number;
 }
 
-// ─── Dummy Data ───────────────────────────────────────────────────────────────
-
-const DUMMY_ANSWERS: Record<string, QuestionAnswer> = {
-    "are-our-loved-ones-really-there-to-greet-us-when-we-die": {
-        slug: "are-our-loved-ones-really-there-to-greet-us-when-we-die",
-        question: "Are our loved ones really there to greet us when we die?",
-        shortAnswer:
-            "Yes. In many NDEs, loved ones were not only there to greet those who died — they radiated a love unlike anything experienced on Earth.",
-        answer: {
-            paragraphs: [
-                "Across thousands of near-death experience accounts in our archive, one of the most consistently reported and emotionally moving elements is the encounter with deceased loved ones at the threshold of death. Experiencers frequently describe being met by parents, siblings, spouses, and cherished friends — often appearing younger, radiant, and free from any suffering they experienced in life. In the account shared by Bill Letson, a firefighter who came close to death from a severe illness, he described being greeted by his mother who had passed years earlier, her face full of warmth and recognition. Mary Neal, who drowned in a kayaking accident in Chile, similarly recounted a crowd of joyful beings who felt intimately familiar, later identifying them as relatives she had never met in life yet recognized with complete certainty.",
-                "What strikes researchers and listeners alike is the specificity and consistency of these encounters. Unlike vague sensations of \"presence,\" NDE accounts typically describe concrete conversations, shared memories, and gestures of reassurance. Anita Moorjani, whose experience during end-stage lymphoma became widely known, described her father communicating to her that it was not yet her time — a message that came with unmistakable personal warmth, not as an impersonal directive. In account after account, the loved ones described do not appear confused or lost; they seem purposeful, at peace, and fully present to welcome the experiencer home. This pattern holds across cultures, ages, and backgrounds with a remarkable consistency that researchers like Dr. Bruce Greyson have noted is difficult to explain through purely psychological models.",
-                "Perhaps the most tender thread running through these accounts is the assurance they offer to the grieving: that the separation felt on this side is not mirrored on the other. Loved ones are often described as aware of those still living — watching, caring, and sometimes even communicating comfort in moments of crisis. Whether or not one holds a particular religious belief, these accounts invite a profound reconsidering of what death means and what might wait on the other side of it. For those carrying the weight of grief, the testimony gathered here offers not a guarantee, but a deeply human chorus of voices saying: you will not arrive alone.",
-            ],
-            citedVideoIds: ["letson_nde", "neal_nde", "moorjani_nde"],
-        },
-        referencedVideos: [
-            {
-                video_id: "dQw4w9WgXcQ",
-                url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                title: "Man Dies & Learns We Have It Completely Backwards! (Powerful NDE)",
-                thumbnailUrl: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-                date: "2023-04-13",
-                viewCount: "12819034",
-                channelName: "Shaman Oaks",
-                summary:
-                    "Bill Letson was a firefighter and engineer in Santa Barbara in 1994. He caught a severe flu from a patient he treated. He became dehydrated and was hospitalized. A nurse gave him pain and nausea medications which caused him to collapse into unconsciousness. He found himself floating above his body in the hospital room, could see and hear the medical staff trying to revive him. He then passed through the hospital walls and was surrounded by an overwhelming sense of peace and love.",
-                transcripts: [
-                    {
-                        content:
-                            "And then I saw my mother. She died when I was twelve, and there she was — young, so young, smiling. And she said, 'It's not your time, Billy. Go back. We'll be here.'",
-                        start_time: 553,
-                    },
-                    {
-                        content:
-                            "There was this enormous crowd of — I can only call them beings of light. They were so happy to see me. Some of them I recognized as family who had passed. There was this sense that the whole universe had been waiting just to welcome me.",
-                        start_time: 722,
-                    },
-                ],
-            },
-            {
-                video_id: "oHg5SJYRHA0",
-                url: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
-                title: "She Drowned & Met Beings of Pure Joy at the Gates of Heaven (Mary Neal NDE)",
-                thumbnailUrl: "https://i.ytimg.com/vi/oHg5SJYRHA0/hqdefault.jpg",
-                date: "2022-11-07",
-                viewCount: "5640211",
-                channelName: "NDE Compilations",
-                summary:
-                    "Dr. Mary Neal, an orthopaedic spine surgeon, drowned while kayaking on a river in Chile. She describes leaving her body and being escorted by loving spiritual beings who felt deeply familiar to her. She was given a choice of whether to return, and was told her son would die young and needed her presence on earth. Years later, her son Willie died in a car accident at age 19, fulfilling what she had been told.",
-                transcripts: [
-                    {
-                        content:
-                            "They were so joyful — joyful in a way that I had never experienced joy. And they were familiar to me, I knew them intimately, even the ones I had never met in my earthly life. My grandparents were there. My uncle who had died before I was born. They were there to escort me.",
-                        start_time: 441,
-                    },
-                    {
-                        content:
-                            "The love I felt from these beings was not vague or general. It was personal and specific. They knew every part of me — even the parts I had kept hidden. And they loved me anyway. There was no judgment, only absolute welcome.",
-                        start_time: 618,
-                    },
-                ],
-            },
-            {
-                video_id: "3tmd-ClpJxA",
-                url: "https://www.youtube.com/watch?v=3tmd-ClpJxA",
-                title: "Stage 4 Cancer patient dies, enters the light: 'I was love. I was everything.' (Anita Moorjani NDE)",
-                thumbnailUrl: "https://i.ytimg.com/vi/3tmd-ClpJxA/hqdefault.jpg",
-                date: "2021-06-02",
-                viewCount: "8322100",
-                channelName: "Touching The Afterlife",
-                summary:
-                    "Anita Moorjani slipped into a coma on February 2, 2006, with end-stage Hodgkin's lymphoma. Tumors the size of lemons had grown throughout her lymphatic system. During the coma she experienced an expanded state of consciousness where she was reunited with her father and her best friend Soni, both deceased. She describes having access to all knowledge and understanding the cause of her illness was rooted in fear. She recovered rapidly after returning, and her recovery was considered medically remarkable.",
-                transcripts: [
-                    {
-                        content:
-                            "My father was there. And he communicated to me — not in words, but in a knowing — that it wasn't my time. That I had come too far and was turning back too soon. He was so clear, so present. More present than he had ever been in my physical life.",
-                        start_time: 334,
-                    },
-                    {
-                        content:
-                            "And Soni was there too — my dearest friend who had died of cancer two years before me. And she was well. She was whole. And she said to me: go back, Anita. Go back and live your life fearlessly. That's all you need to do.",
-                        start_time: 512,
-                    },
-                ],
-            },
-        ],
-        moreVideos: [
-            {
-                video_id: "L_jWHffIx5E",
-                title: "Man Dies, Sees His Parents on the Other Side — and Why He Had to Come Back",
-                channelName: "Round Trip Death",
-                thumbnailUrl: "https://i.ytimg.com/vi/L_jWHffIx5E/hqdefault.jpg",
-                viewCount: 4130000,
-                date: "2023-01-15",
-                experienceType: "NDE",
-                tone: "Very Positive",
-                greysonScore: 28,
-                relevance: 94,
-            },
-            {
-                video_id: "9bZkp7q19f0",
-                title: "She Died During Surgery & Was Greeted by Every Pet She'd Ever Lost",
-                channelName: "Pegi Robinson – NDE TV",
-                thumbnailUrl: "https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg",
-                viewCount: 2880000,
-                date: "2022-08-22",
-                experienceType: "NDE",
-                tone: "Very Positive",
-                greysonScore: 24,
-                relevance: 91,
-            },
-            {
-                video_id: "e-7Nq5AePN8",
-                title: "Atheist Cardiologist Dies, Meets His Skeptical Father Beyond Death",
-                channelName: "IANDS",
-                thumbnailUrl: "https://i.ytimg.com/vi/e-7Nq5AePN8/hqdefault.jpg",
-                viewCount: 3670000,
-                date: "2022-03-11",
-                experienceType: "NDE",
-                tone: "Positive",
-                greysonScore: 30,
-                relevance: 89,
-            },
-            {
-                video_id: "ZZ5LpwO-An4",
-                title: "Woman Dies Twice — Each Time Met by the Same Grandmother She Never Knew",
-                channelName: "Tales Of Resilience",
-                thumbnailUrl: "https://i.ytimg.com/vi/ZZ5LpwO-An4/hqdefault.jpg",
-                viewCount: 1940000,
-                date: "2023-05-01",
-                experienceType: "NDE",
-                tone: "Very Positive",
-                greysonScore: 22,
-                relevance: 87,
-            },
-            {
-                video_id: "XGK84Poeynk",
-                title: "Hospice Nurse Witnesses 30 Years of Patients Meeting Deceased Relatives at the Moment of Death",
-                channelName: "Love Covered Life Podcast",
-                thumbnailUrl: "https://i.ytimg.com/vi/XGK84Poeynk/hqdefault.jpg",
-                viewCount: 890000,
-                date: "2023-09-14",
-                experienceType: "Other",
-                tone: "Positive",
-                greysonScore: null,
-                relevance: 85,
-            },
-            {
-                video_id: "8UVNT4wvIGY",
-                title: "He Was Dead for 45 Minutes — His Wife, Who Didn't Know He Died, Saw Him Standing at Her Bedside",
-                channelName: "NDE Radio with Lee Witting",
-                thumbnailUrl: "https://i.ytimg.com/vi/8UVNT4wvIGY/hqdefault.jpg",
-                viewCount: 2100000,
-                date: "2021-12-03",
-                experienceType: "NDE",
-                tone: "Positive",
-                greysonScore: 26,
-                relevance: 82,
-            },
-            {
-                video_id: "yPwlS2QGbXo",
-                title: "Suicide NDE: He Died, Met His Brother Who Begged Him To Return",
-                channelName: "The Other Side NDE",
-                thumbnailUrl: "https://i.ytimg.com/vi/yPwlS2QGbXo/hqdefault.jpg",
-                viewCount: 3440000,
-                date: "2022-06-19",
-                experienceType: "NDE",
-                tone: "Mixed",
-                greysonScore: 20,
-                relevance: 80,
-            },
-            {
-                video_id: "T-7kz0Y1LYg",
-                title: "Border Patrol Agent Dies: His Late Dad's Final Message Changed Everything",
-                channelName: "T&H - Afterlife",
-                thumbnailUrl: "https://i.ytimg.com/vi/T-7kz0Y1LYg/hqdefault.jpg",
-                viewCount: 1670000,
-                date: "2023-02-28",
-                experienceType: "NDE",
-                tone: "Very Positive",
-                greysonScore: 18,
-                relevance: 78,
-            },
-        ],
-    },
-};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -259,19 +75,14 @@ function formatDate(dateString: string | null): string {
 type QuestionResult = QuestionAnswer | { no_results: true; question: string; slug: string } | null;
 
 async function fetchQuestionData(slug: string): Promise<QuestionResult> {
-    // Check dummy data first (instant, no network)
-    if (DUMMY_ANSWERS[slug]) return DUMMY_ANSWERS[slug];
-
-    // Fall back to live API
     try {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
             ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         const res = await fetch(`${baseUrl}/api/questions/${encodeURIComponent(slug)}`, {
-            cache: 'no-store', // API is force-dynamic; do not cache the no_results state across threshold changes
+            cache: 'no-store',
         });
         if (!res.ok) return null;
         const json = await res.json();
-        // API returns { no_results: true } when similarity < 50%
         if (json.no_results) return json as { no_results: true; question: string; slug: string };
         return json as QuestionAnswer;
     } catch (err) {
@@ -410,13 +221,30 @@ export default async function QuestionResultPage({
 
                 <div className="relative container mx-auto px-4 max-w-3xl">
 
+                    {/* Crisis safety banner — shown for any question involving suicide, self-harm, etc. */}
+                    {isCrisisTopic(data.question) && <CrisisBanner />}
+
                     {/* 1. Title */}
                     <h1
-                        className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 leading-[1.2] mb-6"
+                        className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 leading-[1.2] mb-4"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         {data.question}
                     </h1>
+
+                    {/* DEBUG: HyDE ai_query panel — shows the passage used for semantic search */}
+                    {data.ai_query && (
+                        <details className="mb-5 group">
+                            <summary className="cursor-pointer text-xs font-mono text-slate-400 hover:text-slate-600 transition-colors select-none list-none flex items-center gap-1.5">
+                                <span className="inline-block w-3 h-3 rotate-0 group-open:rotate-90 transition-transform">▶</span>
+                                <span>Search query used (ai_query)</span>
+                            </summary>
+                            <div className="mt-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 mb-1">HyDE Passage (embedded for semantic search)</p>
+                                <p className="text-sm text-amber-900 leading-relaxed italic">{data.ai_query}</p>
+                            </div>
+                        </details>
+                    )}
 
                     {/* 2. Short Answer — direct, confident pull-quote */}
                     <p

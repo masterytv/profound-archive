@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-// Use service key — needed to read user_questions (RLS allows it, but anon key fine too)
+// Use service key — needed to read nde_questions and user_questions
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_KEY!
@@ -12,7 +12,7 @@ const supabase = createClient(
 
 const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-/** Format large viewcount numbers as readable strings like "1.2M" */
+/** Format large view counts as readable strings like "1.2M" */
 function formatViewCount(count: number | null | bigint): string {
     if (!count) return '0';
     const n = typeof count === 'bigint' ? Number(count) : count;
@@ -21,33 +21,83 @@ function formatViewCount(count: number | null | bigint): string {
     return `${n}`;
 }
 
-// ─── Shape returned by nde_questions_match RPC ────────────────────────────────
-interface MatchedMoment {
+// ─── Shape returned by search_punctuated_embeddings_filtered RPC ─────────────
+interface FilteredChunk {
     id: number;
     content: string;
-    similarity: number;
     start_time: number;
+    similarity: number;
     video_id: string;
-    video_url: string;
+    url: string;
     title: string | null;
-    thumbnail: string | null;
-    view_count: number | null;
-    channel: string | null;
-    nde_summary: string | null;
-    greyson: string | null;
+    thumbnailUrl: string | null;
     date: string | null;
+    viewCount: number | null;
+    channelName: string | null;
+    analysis_nde_summary: string | null;
 }
 
 /**
- * Similarity thresholds for the no-results guard:
- * - CURATED: lower bar (0.50) because ai_query is a hand-written NDE HyDE passage —
- *   we can trust it's NDE-relevant, so even a moderate match is real evidence.
- * - USER: higher bar (0.58) because ai_query is raw question text — off-topic queries
- *   (cooking, sports, etc.) need a steeper cutoff to fire the no-results page.
+ * Similarity thresholds:
+ * Both curated and user questions now use 0.50.
+ * - Curated: backed by a pre-written HyDE passage (LEARNINGS.md §17C).
+ * - User: backed by a GPT-4o-mini HyDE passage generated at submission time.
+ * Both are rich NDE passages in the same vector space as the corpus.
  */
 const MIN_SIMILARITY_CURATED = 0.50;
-const MIN_SIMILARITY_USER    = 0.58;
+const MIN_SIMILARITY_USER    = 0.50;
 
+// ─── Deduplication helpers ────────────────────────────────────────────────────
+
+interface VideoGroup {
+    video_id: string;
+    bestSimilarity: number;
+    meta: FilteredChunk;
+    chunks: FilteredChunk[];
+}
+
+/**
+ * Deduplicate chunk-level RPC results into unique videos.
+ *
+ * - Groups all chunks by video_id.
+ * - Caps transcript snippets per video at MAX_CHUNKS_PER_VIDEO to prevent
+ *   one very popular video from dominating the transcript section.
+ * - Sorts the deduplicated video list by best chunk similarity (DESC).
+ */
+const MAX_CHUNKS_PER_VIDEO = 3;
+
+function deduplicateByVideo(chunks: FilteredChunk[]): VideoGroup[] {
+    const map = new Map<string, VideoGroup>();
+
+    for (const chunk of chunks) {
+        const vid = chunk.video_id;
+        if (!vid) continue;
+
+        if (!map.has(vid)) {
+            map.set(vid, {
+                video_id: vid,
+                bestSimilarity: chunk.similarity,
+                meta: chunk,
+                chunks: [chunk],
+            });
+        } else {
+            const group = map.get(vid)!;
+            if (chunk.similarity > group.bestSimilarity) {
+                group.bestSimilarity = chunk.similarity;
+                group.meta = chunk;
+            }
+            if (group.chunks.length < MAX_CHUNKS_PER_VIDEO) {
+                group.chunks.push(chunk);
+            }
+        }
+    }
+
+    // RPC already returns chunks sorted by similarity DESC, but re-sort after
+    // grouping to ensure deduplicated video order reflects best chunk score.
+    return Array.from(map.values()).sort((a, b) => b.bestSimilarity - a.bestSimilarity);
+}
+
+// ─── GET handler ──────────────────────────────────────────────────────────────
 
 export async function GET(
     _req: NextRequest,
@@ -58,8 +108,7 @@ export async function GET(
     try {
         const openai = getOpenAI();
 
-        // ── Step 1: Look up the question + ai_query from either table ──────────
-        // Check nde_questions first (curated, pre-written ai_query)
+        // ── Step 1: Look up question + ai_query from either table ──────────────
         let question: string;
         let ai_query: string;
         let isCurated = false;
@@ -72,11 +121,11 @@ export async function GET(
             .maybeSingle();
 
         if (curated) {
-            question = curated.consumer_question;
-            ai_query = curated.ai_query;
+            question  = curated.consumer_question;
+            ai_query  = curated.ai_query;
             isCurated = true;
         } else {
-            // Fall back to user_questions
+            // Fall back to user_questions (custom questions submitted via the search bar)
             const { data: userQ } = await supabase
                 .from('user_questions')
                 .select('question, ai_query')
@@ -90,66 +139,63 @@ export async function GET(
             ai_query = userQ.ai_query;
         }
 
-        // ── Step 2: Embed the pre-written ai_query (no GPT HyDE call needed) ──
+        // ── Step 2: Embed the ai_query (HyDE passage for both curated and user) ─
         const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: ai_query,
         });
         const embedding = embeddingResponse.data[0].embedding;
 
-        // ── Step 3: Semantic search via nde_questions_match ───────────────────
-        const { data: matchedMoments, error: rpcError } = await supabase.rpc('nde_questions_match', {
-            query_embedding: embedding,
-            match_count: 20,
-        });
+        // ── Step 3: Semantic search via search_punctuated_embeddings_filtered ───
+        // This RPC applies the similarity threshold in SQL and has no hard chunk
+        // cap (unlike the old nde_questions_match which always returned exactly 20).
+        // We request up to 200 chunks, then deduplicate to unique videos in app code.
+        const similarityThreshold = isCurated ? MIN_SIMILARITY_CURATED : MIN_SIMILARITY_USER;
+
+        const { data: rawChunks, error: rpcError } = await supabase.rpc(
+            'search_punctuated_embeddings_filtered',
+            {
+                query_embedding:         embedding,
+                similarity_threshold:    similarityThreshold,
+                sort_column:             'similarity',
+                sort_direction:          'DESC',
+                page_limit:              200,
+                page_offset:             0,
+                filter_experience_type:  null,
+                filter_trigger_category: null,
+                filter_overall_tone:     null,
+                filter_intensity_min:    null,
+                filter_intensity_max:    null,
+                filter_greyson_min:      null,
+                filter_transformation_min: null,
+                filter_veridical_min:    null,
+            }
+        );
 
         if (rpcError) {
             console.error('[Questions API] RPC error:', rpcError);
-            return NextResponse.json({ error: 'Search failed', details: rpcError.message }, { status: 500 });
+            return NextResponse.json(
+                { error: 'Search failed', details: rpcError.message },
+                { status: 500 }
+            );
         }
 
-        const moments = (matchedMoments ?? []) as MatchedMoment[];
+        const chunks = (rawChunks ?? []) as FilteredChunk[];
 
-        // ── Step 4: No-results guard ──────────────────────────────────────────
-        // If there are no moments, or the best similarity is below threshold, bail out
-        const bestSimilarity = moments.length > 0 ? moments[0].similarity : 0;
-        const minSimilarity = isCurated ? MIN_SIMILARITY_CURATED : MIN_SIMILARITY_USER;
-        if (moments.length === 0 || bestSimilarity < minSimilarity) {
-            return NextResponse.json({
-                no_results: true,
-                question,
-                slug,
-                best_similarity: bestSimilarity,
-            });
+        // ── Step 4: No-results guard ───────────────────────────────────────────
+        if (chunks.length === 0) {
+            return NextResponse.json({ no_results: true, question, slug, best_similarity: 0 });
         }
 
-        // ── Step 5: Group moments by video, sort by similarity ────────────────
-        const videoMomentsMap: Record<string, MatchedMoment[]> = {};
-        for (const moment of moments) {
-            const vid = moment.video_id;
-            if (!vid) continue;
-            if (!videoMomentsMap[vid]) videoMomentsMap[vid] = [];
-            videoMomentsMap[vid].push(moment);
-        }
-        for (const vid of Object.keys(videoMomentsMap)) {
-            videoMomentsMap[vid].sort((a, b) => b.similarity - a.similarity);
-        }
+        // ── Step 5: Deduplicate chunks → unique videos (sorted by similarity) ──
+        const deduped = deduplicateByVideo(chunks);
 
-        const sortedVideoIds = Object.entries(videoMomentsMap)
-            .map(([vid, moms]) => ({
-                vid,
-                bestSimilarity: moms[0].similarity,
-                moments: moms,
-                meta: moms[0],
-            }))
-            .sort((a, b) => b.bestSimilarity - a.bestSimilarity);
-
-        const referencedVids = sortedVideoIds.slice(0, 4);
-        const moreVids = sortedVideoIds.slice(4);
+        const referencedVids = deduped.slice(0, 4);   // hero section: top 4
+        const moreVids       = deduped.slice(4, 20);  // table: next 16
 
         // ── Step 6: Synthesize answer via GPT-4o ──────────────────────────────
-        const contextForGPT = referencedVids.map(({ meta, moments }) => {
-            const topSnippets = moments.slice(0, 2).map(m => m.content).join('\n');
+        const contextForGPT = referencedVids.map(({ meta, chunks: vidChunks }) => {
+            const topSnippets = vidChunks.slice(0, 2).map(c => c.content).join('\n');
             return `VIDEO: ${meta.title ?? meta.video_id}\n${topSnippets}`;
         }).join('\n\n---\n\n');
 
@@ -177,9 +223,9 @@ Rules:
                 { role: 'system', content: systemPrompt },
                 {
                     role: 'user',
-                    content: `Question: ${question}\n\nNDE Accounts:\n\n${contextForGPT}`
-                }
-            ]
+                    content: `Question: ${question}\n\nNDE Accounts:\n\n${contextForGPT}`,
+                },
+            ],
         });
 
         let shortAnswer = '';
@@ -188,49 +234,50 @@ Rules:
         try {
             const parsed = JSON.parse(gptResponse.choices[0].message.content ?? '{}');
             shortAnswer = parsed.shortAnswer ?? '';
-            paragraphs = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
+            paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
         } catch {
             console.error('[Questions API] Failed to parse GPT response');
             paragraphs = ['Unable to generate answer at this time.'];
         }
 
-        // ── Step 7: Build the QuestionAnswer response shape ───────────────────
-        const referencedVideos = referencedVids.map(({ vid, meta, moments }) => ({
-            video_id: vid,
-            url: meta.video_url ?? `https://www.youtube.com/watch?v=${vid}`,
+        // ── Step 7: Build response shape (matches QuestionAnswer interface in page.tsx) ─
+        const referencedVideos = referencedVids.map(({ video_id, meta, chunks: vidChunks }) => ({
+            video_id,
+            url: meta.url ?? `https://www.youtube.com/watch?v=${video_id}`,
             title: meta.title ?? 'NDE Account',
-            thumbnailUrl: meta.thumbnail ?? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`,
+            thumbnailUrl: meta.thumbnailUrl ?? `https://i.ytimg.com/vi/${video_id}/hqdefault.jpg`,
             date: meta.date ?? null,
-            viewCount: formatViewCount(meta.view_count),
-            channelName: meta.channel ?? 'Unknown Channel',
-            summary: meta.nde_summary ?? moments[0]?.content ?? '',
-            transcripts: moments.slice(0, 3).map(m => ({
-                content: m.content,
-                start_time: m.start_time,
-                similarity: m.similarity,
+            viewCount: formatViewCount(meta.viewCount),
+            channelName: meta.channelName ?? 'Unknown Channel',
+            summary: meta.analysis_nde_summary ?? vidChunks[0]?.content ?? '',
+            transcripts: vidChunks.slice(0, 3).map(c => ({
+                content: c.content,
+                start_time: c.start_time,
+                similarity: c.similarity,
             })),
         }));
 
-        const moreVideos = moreVids.map(({ vid, meta, moments }) => ({
-            video_id: vid,
+        const moreVideos = moreVids.map(({ video_id, meta, chunks: vidChunks }) => ({
+            video_id,
             title: meta.title ?? 'NDE Account',
-            channelName: meta.channel ?? 'Unknown Channel',
-            thumbnailUrl: meta.thumbnail ?? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`,
-            viewCount: meta.view_count ?? 0,
+            channelName: meta.channelName ?? 'Unknown Channel',
+            thumbnailUrl: meta.thumbnailUrl ?? `https://i.ytimg.com/vi/${video_id}/hqdefault.jpg`,
+            viewCount: meta.viewCount ?? 0,
             date: meta.date ?? null,
             experienceType: 'NDE',
             tone: 'Positive',
-            greysonScore: meta.greyson ? parseFloat(meta.greyson) : null,
-            relevance: moments[0]?.similarity ?? 0,
+            greysonScore: null, // Not returned by search_punctuated_embeddings_filtered
+            relevance: vidChunks[0]?.similarity ?? 0,
         }));
 
         const result = {
             slug,
             question,
+            ai_query,   // ← exposed for debug display on the question page
             shortAnswer,
             answer: {
                 paragraphs,
-                citedVideoIds: referencedVids.map(v => v.vid),
+                citedVideoIds: referencedVids.map(v => v.video_id),
             },
             referencedVideos,
             moreVideos,

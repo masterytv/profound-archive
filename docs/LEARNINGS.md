@@ -488,6 +488,101 @@ nde_questions table
   └─ Left-justified category headers with coloured left-border accent
 
 /questions/[slug] (page.tsx) → /api/questions/[slug]
-  └─ Embeds ai_query → nde_questions_match RPC → top-15 semantic matches
+  └─ Embeds ai_query → search_punctuated_embeddings_filtered RPC (0.50 threshold)
   └─ GPT-4o synthesises shortAnswer + 3 paragraphs, cached 24h
+```
+
+---
+
+## 12. HyDE Generation — Prompt Design
+
+### A. Model & Parameters
+- Use **`gpt-4o`** (not `gpt-4o-mini`) for HyDE generation. Mini produces repetitive, templated output.
+- Temperature **0.85** — gives creative variance without hallucination.
+
+### B. Voice: Testimonial, Not Literary
+The most important lesson: the prompt must produce **spoken NDE testimony**, not creative fiction.
+
+**WRONG frame:** "Write as an NDE experiencer describing a scene"
+→ Produces: *"The shimmering expanse of color was interrupted by a familiar, yet complicated face..."*
+
+**RIGHT frame:** "Write 3-4 sentences that sound like they were ACTUALLY SPOKEN by a regular person in a casual YouTube interview or podcast"
+→ Produces: *"my dad was there. he wasn't the same person. i forgave him instantly."*
+
+Key constraints to include in the prompt:
+- Short sentences, 8-18 words each
+- No compound sentences, no em dashes
+- Ban list: "shimmering", "ethereal", "luminous", "expanse", "radiant", "enveloped", "profound"
+- Lowercase is acceptable
+- Include a BAD vs GOOD example directly in the prompt
+
+### C. Batch Regeneration via Edge Function
+To regenerate all 81 `ai_query` values without hitting the 150s Edge Function timeout:
+1. Deploy the function with `from_id` and `to_id` query params
+2. Pass OpenAI API key via `x-openai-key` request header (avoids Supabase Secrets setup)
+3. Run 3 sequential curl calls: IDs 1-27, 28-54, 55-81
+4. Add 1500ms delay between rows to avoid OpenAI rate limits
+
+### D. Dummy Data Anti-Pattern (DO NOT USE)
+Never keep a `DUMMY_ANSWERS` object in a Server Component page that short-circuits the API:
+```typescript
+// NEVER DO THIS — it shadows live data permanently for those slugs
+if (DUMMY_ANSWERS[slug]) return DUMMY_ANSWERS[slug];
+```
+This caused Rick Astley thumbnails to appear on a production question page for weeks.
+
+---
+
+## 13. Crisis Safety Banner
+
+Any page that could be visited by someone in distress needs a 988 Lifeline banner.
+
+### Pattern
+```tsx
+// src/lib/questions/crisis-detection.ts
+export function isCrisisTopic(text: string): boolean { ... }
+
+// In page.tsx
+{isCrisisTopic(data.question) && <CrisisBanner />}
+```
+
+### Detection Coverage
+- `suicid*`, `self-harm`, `self-injury`, `kill myself`, `kills their own life`
+- `end my life`, `take my life`, `overdos*`, `hurting myself`, `cutting myself`
+- Normalise slug hyphens to spaces before matching
+
+### Banner Content
+- Link to `https://988lifeline.org/`
+- Clickable `tel:988` for mobile tap-to-call
+- Rose/red colour palette (warm, not alarming red)
+- Text: "If you or someone you know is in crisis, please reach out."
+
+---
+
+## 14. Internal Video Routing with Timestamps
+
+When linking to specific moments in a video, use internal `/video/[id]?t=N` paths — not YouTube URLs.
+
+### Flow
+1. `SearchResultCardV4` builds `linkUrl = /video/${video_id}?t=${seconds}`
+2. `/video/[id]/page.tsx` reads `searchParams.t`, parses to int, passes as `startTime` to `<YouTubePlayer>`
+3. `YouTubePlayer` appends `&start=N` to the embed src when user clicks play
+
+```tsx
+// YouTubePlayer.tsx
+const startParam = startTime && startTime > 0 ? `&start=${Math.floor(startTime)}` : "";
+src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0${startParam}`}
+```
+
+### Note on `searchParams` in Next.js 14+ App Router
+`searchParams` must be typed as `Promise<{ t?: string }>` and awaited:
+```tsx
+interface VideoPageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ t?: string }>;
+}
+export default async function Page({ params, searchParams }: VideoPageProps) {
+  const { t } = await searchParams;
+  const startTime = t ? parseInt(t, 10) : undefined;
+}
 ```
