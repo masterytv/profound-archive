@@ -30,6 +30,17 @@ export function MainNav() {
           Search
         </Link>
         <Link
+          href="/questions"
+          className={cn(
+            "transition-colors hover:text-foreground/80",
+            pathname?.startsWith("/questions")
+              ? "text-foreground"
+              : "text-foreground/60"
+          )}
+        >
+          Questions
+        </Link>
+        <Link
           href="/about"
           className={cn(
             "transition-colors hover:text-foreground/80",
