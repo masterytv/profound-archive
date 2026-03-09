@@ -586,3 +586,60 @@ export default async function Page({ params, searchParams }: VideoPageProps) {
   const startTime = t ? parseInt(t, 10) : undefined;
 }
 ```
+
+---
+
+## 15. OpenRouter / Claude Integration
+
+### A. Why OpenRouter
+OpenRouter is a proxy that routes to any LLM provider (Anthropic, OpenAI, Google, etc.) via a single OpenAI-compatible API. Useful for switching models without SDK changes.
+
+### B. Client Setup
+The OpenAI SDK works with OpenRouter by changing `apiKey` and `baseURL`:
+```typescript
+const getOpenRouter = () => new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY!,
+    baseURL: 'https://openrouter.ai/api/v1',
+    defaultHeaders: {
+        'HTTP-Referer': 'https://projectprofound.org', // Required by OpenRouter
+        'X-Title': 'Project Profound',
+    },
+});
+```
+
+### C. Model Names on OpenRouter
+Use the provider-prefixed format:
+- `anthropic/claude-sonnet-4-5` — recommended (< $0.01/call for NDE synthesis)
+- `anthropic/claude-opus-4-5` — higher quality, ~5-10x more expensive
+- `openai/gpt-4o` — fallback if needed
+
+### D. `response_format` Is OpenAI-Only — DO NOT USE WITH CLAUDE
+**The most important gotcha:** `response_format: { type: 'json_object' }` is ignored by Claude via OpenRouter. Claude will return JSON but wrap it in markdown code fences:
+````
+```json
+{ "key": "value" }
+```
+````
+This silently breaks `JSON.parse()` and causes the fallback error message to render.
+
+**Fix — always strip fences before parsing when using Claude:**
+```typescript
+const rawContent = response.choices[0].message.content ?? '{}';
+const cleaned = rawContent
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/, '')
+    .trim();
+const parsed = JSON.parse(cleaned);
+```
+Enforce JSON compliance via the **system prompt** instead: `"Return ONLY a valid JSON object, no markdown wrapping."`
+
+### E. Secret Manager Setup
+Add to `.env.local` for local dev. For Firebase App Hosting:
+1. Create secret in Google Secret Manager: `OPENROUTER_API_KEY`
+2. Version will be `/versions/1` — use this in `apphosting.yaml` (never `latest`)
+3. Project-level IAM is inherited automatically — no per-secret grants needed if the service accounts already have project-level `Secret Manager Secret Accessor`
+4. Reference in `apphosting.yaml`:
+```yaml
+- variable: OPENROUTER_API_KEY
+  secret: projects/432036554831/secrets/OPENROUTER_API_KEY/versions/1
+```

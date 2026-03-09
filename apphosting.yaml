@@ -57,6 +57,9 @@ env:
   - variable: OPENAI_API_KEY
     secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/2
 
+  - variable: OPENROUTER_API_KEY
+    secret: projects/432036554831/secrets/OPENROUTER_API_KEY/versions/1
+
   # Secret for securing Cron/Automated jobs
   - variable: CRON_SECRET
     secret: projects/432036554831/secrets/CRON_SECRET/versions/3

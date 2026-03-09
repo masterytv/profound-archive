@@ -10,7 +10,16 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_KEY!
 );
 
-const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+// OpenRouter client — OpenAI SDK-compatible, just different baseURL + key.
+// Switch model here to change the synthesis model.
+const getOpenRouter = () => new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY!,
+    baseURL: 'https://openrouter.ai/api/v1',
+    defaultHeaders: {
+        'HTTP-Referer': 'https://projectprofound.org',
+        'X-Title': 'Project Profound',
+    },
+});
 
 /** Format large view counts as readable strings like "1.2M" */
 function formatViewCount(count: number | null | bigint): string {
@@ -106,7 +115,7 @@ export async function GET(
     const { slug } = await params;
 
     try {
-        const openai = getOpenAI();
+        const openai = getOpenRouter();
 
         // ── Step 1: Look up question + ai_query from either table ──────────────
         let question: string;
@@ -215,10 +224,11 @@ Rules:
   "paragraphs": ["paragraph 1 text", "paragraph 2 text", "paragraph 3 text"]
 }`;
 
-        const gptResponse = await openai.chat.completions.create({
-            model: 'gpt-4o',
+        const gptResponse = await getOpenRouter().chat.completions.create({
+            model: 'anthropic/claude-sonnet-4-5',
             temperature: 0.7,
-            response_format: { type: 'json_object' },
+            // NOTE: response_format is OpenAI-only — Claude ignores it.
+            // JSON compliance is enforced via the system prompt instead.
             messages: [
                 { role: 'system', content: systemPrompt },
                 {
@@ -232,11 +242,19 @@ Rules:
         let paragraphs: string[] = [];
 
         try {
-            const parsed = JSON.parse(gptResponse.choices[0].message.content ?? '{}');
+            // Claude often wraps JSON in markdown code fences (```json ... ```).
+            // Strip them before parsing so JSON.parse doesn't throw.
+            const rawContent = gptResponse.choices[0].message.content ?? '{}';
+            const cleaned = rawContent
+                .replace(/^```(?:json)?\s*/i, '')
+                .replace(/\s*```\s*$/, '')
+                .trim();
+            const parsed = JSON.parse(cleaned);
             shortAnswer = parsed.shortAnswer ?? '';
             paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
-        } catch {
-            console.error('[Questions API] Failed to parse GPT response');
+        } catch (e) {
+            const raw = gptResponse.choices[0].message.content;
+            console.error('[Questions API] Failed to parse model response:', raw?.substring(0, 300));
             paragraphs = ['Unable to generate answer at this time.'];
         }
 
