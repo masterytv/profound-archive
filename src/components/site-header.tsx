@@ -151,42 +151,16 @@ export default function SiteHeader() {
               {exploreOpen && (
                 <div className="absolute top-full left-0 mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
                   <Link
-                    href="/explore/veridical"
+                    href="/questions"
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
                     onClick={() => setExploreOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                      <TrendingUp className="w-4 h-4 text-emerald-600" />
+                    <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+                      <HelpCircle className="w-4 h-4 text-violet-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800">Veridical Perception</div>
-                      <div className="text-xs text-slate-400">Evidential out-of-body reports</div>
-                    </div>
-                  </Link>
-                  <Link
-                    href="/explore/greyson"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
-                    onClick={() => setExploreOpen(false)}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                      <Brain className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-slate-800">Greyson Scale</div>
-                      <div className="text-xs text-slate-400">NDE depth measurement</div>
-                    </div>
-                  </Link>
-                  <Link
-                    href="/explore/transformation"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
-                    onClick={() => setExploreOpen(false)}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-rose-600" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-slate-800">Transformation Index</div>
-                      <div className="text-xs text-slate-400">Life-changing impact scores</div>
+                      <div className="text-sm font-medium text-slate-800">Big Questions</div>
+                      <div className="text-xs text-slate-400">What NDEs reveal about life</div>
                     </div>
                   </Link>
                   <Link
@@ -202,17 +176,18 @@ export default function SiteHeader() {
                       <div className="text-xs text-slate-400">Browse by source channel</div>
                     </div>
                   </Link>
+                  <div className="my-1.5 border-t border-slate-100" />
                   <Link
-                    href="/questions"
+                    href="/explore"
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
                     onClick={() => setExploreOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
-                      <HelpCircle className="w-4 h-4 text-violet-600" />
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                      <Search className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800">Big Questions</div>
-                      <div className="text-xs text-slate-400">What NDEs reveal about life</div>
+                      <div className="text-sm font-medium text-slate-800">Research</div>
+                      <div className="text-xs text-slate-400">Veridical, Greyson &amp; Transformation</div>
                     </div>
                   </Link>
                 </div>
@@ -228,7 +203,7 @@ export default function SiteHeader() {
               Search
             </Link>
 
-            {/* Tools Dropdown */}
+            {/* Ask Dropdown (formerly Chat) */}
             <div className="relative" ref={toolsRef}>
               <button
                 onClick={() => {
@@ -238,11 +213,25 @@ export default function SiteHeader() {
                 }}
                 className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
               >
-                Chat
+                Ask
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
               </button>
               {toolsOpen && (
-                <div className="absolute top-full left-0 mt-1.5 w-56 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
+                <div className="absolute top-full left-0 mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
+                  <Link
+                    href="/questions"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    onClick={() => setToolsOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+                      <HelpCircle className="w-4 h-4 text-violet-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800">Big Questions</div>
+                      <div className="text-xs text-slate-400">81 questions answered from accounts</div>
+                    </div>
+                  </Link>
+                  <div className="my-1.5 border-t border-slate-100" />
                   <Link
                     href="/chat-compassionate"
                     className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
@@ -458,7 +447,7 @@ export default function SiteHeader() {
                       onClick={() => setMobileExploreOpen(!mobileExploreOpen)}
                       className="flex items-center justify-between w-full text-base font-semibold text-slate-900 mb-3"
                     >
-                      Explore by Score
+                      Explore
                       <ChevronDown
                         className={`w-4 h-4 transition-transform ${mobileExploreOpen ? "rotate-180" : ""}`}
                       />
@@ -466,28 +455,12 @@ export default function SiteHeader() {
                     {mobileExploreOpen && (
                       <div className="space-y-1 pl-1">
                         <Link
-                          href="/explore/veridical"
+                          href="/questions"
                           className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          <TrendingUp className="w-4 h-4 text-emerald-600" />
-                          Veridical Perception
-                        </Link>
-                        <Link
-                          href="/explore/greyson"
-                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Brain className="w-4 h-4 text-blue-600" />
-                          Greyson Scale
-                        </Link>
-                        <Link
-                          href="/explore/transformation"
-                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Sparkles className="w-4 h-4 text-rose-600" />
-                          Transformation Index
+                          <HelpCircle className="w-4 h-4 text-violet-600" />
+                          Big Questions
                         </Link>
                         <Link
                           href="/channels"
@@ -498,12 +471,12 @@ export default function SiteHeader() {
                           Channels
                         </Link>
                         <Link
-                          href="/questions"
+                          href="/explore"
                           className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          <HelpCircle className="w-4 h-4 text-violet-600" />
-                          Big Questions
+                          <TrendingUp className="w-4 h-4 text-slate-500" />
+                          Research
                         </Link>
                       </div>
                     )}
@@ -519,19 +492,27 @@ export default function SiteHeader() {
                     Search
                   </Link>
 
-                  {/* Chat Section */}
+                  {/* Ask Section (formerly Chat) */}
                   <div>
                     <button
                       onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
                       className="flex items-center justify-between w-full text-base font-semibold text-slate-900 mb-3"
                     >
-                      Chat
+                      Ask
                       <ChevronDown
                         className={`w-4 h-4 transition-transform ${mobileToolsOpen ? "rotate-180" : ""}`}
                       />
                     </button>
                     {mobileToolsOpen && (
                       <div className="space-y-1 pl-4">
+                        <Link
+                          href="/questions"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <HelpCircle className="w-4 h-4 text-violet-600" />
+                          Big Questions
+                        </Link>
                         <Link
                           href="/chat-compassionate"
                           className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
