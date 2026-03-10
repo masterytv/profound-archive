@@ -10,7 +10,9 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "index:typesense": "tsc --project scripts/tsconfig.json && node --require dotenv/config scripts/index-data.js"
+    "index:typesense": "tsc --project scripts/tsconfig.json && node --require dotenv/config scripts/index-data.js",
+    "warm": "ts-node --project scripts/tsconfig.json scripts/warm-questions.ts",
+    "warm:prod": "ts-node --project scripts/tsconfig.json scripts/warm-questions.ts --url=https://projectprofound.org"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.67.1",
