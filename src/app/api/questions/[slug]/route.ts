@@ -152,20 +152,25 @@ export async function GET(
 
         // ── Step 1b: Cache-read — skip Claude if we already have a synthesis ────
         // Only curated questions are cached (user questions are ephemeral).
-        let cachedSynthesis: { shortAnswer: string; paragraphs: string[] } | null = null;
+        let cachedSynthesis: {
+            shortAnswer:    string;
+            paragraphs:     string[];
+            citedVideoIds:  string[];  // order pins [1]-[4] citations
+        } | null = null;
 
         if (isCurated && questionId !== null) {
             const { data: cached } = await supabase
                 .from('question_synthesis')
-                .select('short_answer, paragraphs')
+                .select('short_answer, paragraphs, cited_video_ids')
                 .eq('question_id', questionId)
                 .maybeSingle();
 
             if (cached && Array.isArray(cached.paragraphs) && cached.paragraphs.length === 3) {
                 console.log(`[Questions API] Serving cached synthesis for question_id=${questionId}`);
                 cachedSynthesis = {
-                    shortAnswer: cached.short_answer,
-                    paragraphs:  cached.paragraphs,
+                    shortAnswer:   cached.short_answer,
+                    paragraphs:    cached.paragraphs,
+                    citedVideoIds: cached.cited_video_ids ?? [],
                 };
             }
         }
@@ -234,6 +239,19 @@ export async function GET(
             const topSnippets = vidChunks.slice(0, 2).map(c => c.content).join('\n');
             return `[${i + 1}] ${meta.title ?? meta.video_id}\n${topSnippets}`;
         }).join('\n\n---\n\n');
+
+        // ── When serving cached synthesis, reorder referencedVids to match the stored
+        // cited_video_ids so citations [1]-[4] always point to the same videos.
+        // Videos absent from the live search (e.g. deleted) are silently dropped.
+        if (cachedSynthesis && cachedSynthesis.citedVideoIds.length > 0) {
+            const liveMap = new Map(deduped.map(v => [v.video_id, v]));
+            const reordered = cachedSynthesis.citedVideoIds
+                .map(id => liveMap.get(id))
+                .filter((v): v is VideoGroup => v !== undefined);
+            // Replace the top 4 with pin-ordered videos (remaining moreVids unchanged)
+            referencedVids.length = 0;
+            referencedVids.push(...reordered);
+        }
 
         // Check if we have a cached synthesis from Step 1b
         // (local variable — no globalThis needed, same function scope)
@@ -337,10 +355,11 @@ Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
                         if (isCurated && questionId !== null &&
                             shortAnswer && paragraphs.length === 3) {
                             supabase.from('question_synthesis').upsert({
-                                question_id:  questionId,
-                                short_answer: shortAnswer,
-                                paragraphs:   paragraphs,
-                                answered_at:  new Date().toISOString(),
+                                question_id:      questionId,
+                                short_answer:     shortAnswer,
+                                paragraphs:       paragraphs,
+                                cited_video_ids:  referencedVids.map(v => v.video_id),
+                                answered_at:      new Date().toISOString(),
                             }, { onConflict: 'question_id' })
                             .then(({ error: writeErr }) => {
                                 if (writeErr) {
