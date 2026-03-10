@@ -4,10 +4,22 @@ import Image from "next/image";
 import { ArrowLeft, BookOpen, Video, List } from "lucide-react";
 import type { Metadata } from "next";
 import { SearchResultCardV4 } from "@/components/search-result-card-v4";
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 import { CrisisBanner } from "@/components/crisis-banner";
 import { isCrisisTopic } from "@/lib/questions/crisis-detection";
 import { createClient } from "@/lib/supabase/server";
+
+/**
+ * A cookie-free Supabase client safe for use in generateStaticParams and generateMetadata
+ * (called outside request scope where Next.js cookies() is unavailable).
+ */
+function getServiceClient() {
+    return createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY!,
+    );
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -112,7 +124,7 @@ export const revalidate = 86400;
 
 /** Pre-render all active curated questions at build time so crawlers never wait for Claude. */
 export async function generateStaticParams() {
-    const supabase = await createClient();
+    const supabase = getServiceClient();
     const { data } = await supabase
         .from('nde_questions')
         .select('slug')
@@ -157,7 +169,7 @@ export async function generateMetadata({
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     const { slug } = await params;
-    const supabase = await createClient();
+    const supabase = getServiceClient();
 
     const { data: q } = await supabase
         .from('nde_questions')
