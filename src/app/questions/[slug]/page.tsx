@@ -1,10 +1,10 @@
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, BookOpen, Video, List } from "lucide-react";
 import type { Metadata } from "next";
 import { SearchResultCardV4 } from "@/components/search-result-card-v4";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import { CrisisBanner } from "@/components/crisis-banner";
 import { isCrisisTopic } from "@/lib/questions/crisis-detection";
 import { createClient } from "@/lib/supabase/server";
@@ -44,14 +44,47 @@ interface MoreVideo {
     thumbnailUrl: string;
     viewCount: number;
     date: string | null;
-    experienceType: string;
-    tone: string;
-    greysonScore: number | null;
+    quote: string | null;      // top matching chunk text, DB-sourced
+    startTime: number | null;  // seconds — used for timestamped link
     relevance: number;
 }
 
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Replaces LLM-emitted citation markers [1]–[4] with superscript links
+ * pointing to /video/[videoId]. The mapping comes entirely from the DB-backed
+ * referencedVideos array — Claude never generates a URL or title.
+ */
+function renderWithCitations(
+    text: string,
+    videos: ReferencedVideo[]
+): React.ReactNode[] {
+    // Split on [1], [2], … markers
+    const parts = text.split(/(\[[1-9]\])/g);
+    return parts.map((part, i) => {
+        const match = part.match(/^\[(\d)\]$/);
+        if (match) {
+            const idx = parseInt(match[1], 10) - 1;
+            const video = videos[idx];
+            if (video) {
+                return (
+                    <a
+                        key={i}
+                        href={`/video/${video.video_id}`}
+                        title={video.title}
+                        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-bold no-underline hover:bg-emerald-200 transition-colors align-super mx-[1px]"
+                        aria-label={`Source ${idx + 1}: ${video.title}`}
+                    >
+                        {idx + 1}
+                    </a>
+                );
+            }
+        }
+        return part || null;
+    }).filter(Boolean);
+}
 
 function formatViewCount(n: number): string {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -106,9 +139,24 @@ export async function generateMetadata({
     const { slug } = await params;
     const data = await fetchQuestionData(slug);
     const question = data?.question ?? slug.split('-').join(' ');
+    // Fall back to a descriptive generic if shortAnswer isn't available yet
+    // (will be improved once answer persistence lands)
+    const shortAnswer = (data && !('no_results' in data) && data.shortAnswer)
+        ? data.shortAnswer
+        : `What do near-death experiences tell us about: ${question} — answered from 5,000+ real NDE accounts.`;
     return {
         title: `${question} | Project Profound`,
-        description: `What do near-death experiences tell us about: ${question} — answered from 5,000+ real NDE accounts.`,
+        description: shortAnswer,
+        openGraph: {
+            title: question,
+            description: shortAnswer,
+            url: `https://projectprofound.org/questions/${slug}`,
+            type: 'article',
+            siteName: 'Project Profound',
+            images: [{ url: 'https://projectprofound.org/og-default.png', width: 1200, height: 630 }],
+        },
+        twitter: { card: 'summary_large_image', title: question, description: shortAnswer },
+        alternates: { canonical: `https://projectprofound.org/questions/${slug}` },
     };
 }
 
@@ -203,8 +251,42 @@ export default async function QuestionResultPage({
         return <NoResultsPage question={data.question} />;
     }
 
+    // ── JSON-LD structured data ─────────────────────────────────────────────
+    const faqJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: [{
+            '@type': 'Question',
+            name: data.question,
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: data.shortAnswer,
+            },
+        }],
+    };
+
+    const breadcrumbJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://projectprofound.org' },
+            { '@type': 'ListItem', position: 2, name: 'Questions', item: 'https://projectprofound.org/questions' },
+            { '@type': 'ListItem', position: 3, name: data.question, item: `https://projectprofound.org/questions/${slug}` },
+        ],
+    };
+
     return (
         <div className="min-h-screen bg-background text-foreground">
+
+            {/* ── JSON-LD: FAQPage + BreadcrumbList ────────────────────── */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+            />
 
             {/* ── Breadcrumb ───────────────────────────────────────────── */}
             <div className="border-b border-border/60 bg-muted/30">
@@ -253,7 +335,25 @@ export default async function QuestionResultPage({
                         {data.question}
                     </h1>
 
-                    {/* HyDE ai_query panel — admin only */}
+                    {/* 2. Short Answer — immediately after h1 for QEO first-200-chars rule.
+                         Wrapped in a semantic answer-box so crawlers recognise it as the direct answer. */}
+                    <div
+                        className="mb-6 px-4 py-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60"
+                        role="note"
+                        aria-label="Direct answer"
+                    >
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-600 mb-1">
+                            What NDEs say
+                        </p>
+                        <p
+                            className="text-lg sm:text-xl font-medium text-emerald-900 leading-relaxed"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            {data.shortAnswer}
+                        </p>
+                    </div>
+
+                    {/* HyDE ai_query panel — admin only (after shortAnswer so it doesn't push answer down) */}
                     {isAdmin && (data.embedding_input || data.ai_query) && (
                         <details className="mb-5 group">
                             <summary className="cursor-pointer text-xs font-mono text-slate-400 hover:text-slate-600 transition-colors select-none list-none flex items-center gap-1.5">
@@ -266,14 +366,6 @@ export default async function QuestionResultPage({
                             </div>
                         </details>
                     )}
-
-                    {/* 2. Short Answer — direct, confident pull-quote */}
-                    <p
-                        className="text-lg sm:text-xl font-medium text-emerald-800 leading-relaxed mb-8"
-                        style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-                    >
-                        {data.shortAnswer}
-                    </p>
 
                     {/* 3. Small Thumbnail Strip — click to scroll to detail cards */}
                     <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
@@ -351,9 +443,11 @@ export default async function QuestionResultPage({
                             key={i}
                             className="text-slate-700 leading-[1.85] text-[1.05rem]"
                         >
-                            {para}
+                            {renderWithCitations(para, data.referencedVideos)}
                         </p>
                     ))}
+
+                    {/* Sources list removed — Videos Referenced section below is the canonical source list */}
 
                     {/* AI disclaimer */}
                     <div className="mt-8 flex items-start gap-2.5 bg-white/80 border border-slate-100 rounded-xl p-4 text-sm text-slate-400 shadow-sm">
@@ -406,7 +500,7 @@ export default async function QuestionResultPage({
 
                 {/* ════════ SECTION: More Relevant Videos ════════ */}
                 <section id="more-videos">
-                    <div className="flex items-center gap-3 mb-8">
+                    <div className="flex items-center gap-3 mb-6">
                         <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                             <List className="w-5 h-5 text-blue-600" />
                         </div>
@@ -423,137 +517,111 @@ export default async function QuestionResultPage({
                         </div>
                     </div>
 
-                    <Card className="overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-border/60 bg-muted/40">
-                                        <th className="text-left font-medium text-muted-foreground px-4 py-3 w-16 hidden sm:table-cell">
-                                            Video
-                                        </th>
-                                        <th className="text-left font-medium text-muted-foreground px-4 py-3">
-                                            Title
-                                        </th>
-                                        <th className="text-left font-medium text-muted-foreground px-4 py-3 hidden md:table-cell">
-                                            Channel
-                                        </th>
-                                        <th className="text-left font-medium text-muted-foreground px-4 py-3 hidden lg:table-cell">
-                                            Type
-                                        </th>
-                                        <th className="text-left font-medium text-muted-foreground px-4 py-3 hidden md:table-cell">
-                                            Tone
-                                        </th>
-                                        <th className="text-right font-medium text-muted-foreground px-4 py-3 hidden lg:table-cell">
-                                            Greyson
-                                        </th>
-                                        <th className="text-right font-medium text-muted-foreground px-4 py-3 hidden sm:table-cell">
-                                            Views
-                                        </th>
-                                        <th className="text-right font-medium text-muted-foreground px-4 py-3">
-                                            Relevance
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {data.moreVideos.map((video, i) => (
-                                        <tr
-                                            key={video.video_id}
-                                            className={`border-b border-border/40 hover:bg-muted/30 transition-colors ${
-                                                i % 2 === 0 ? "" : "bg-muted/10"
-                                            }`}
-                                        >
-                                            {/* Thumbnail */}
-                                            <td className="px-4 py-3 hidden sm:table-cell">
-                                                <Link href={`/video/${video.video_id}`}>
-                                                    <div className="relative w-14 aspect-video rounded overflow-hidden bg-muted shrink-0">
-                                                        <Image
-                                                            src={video.thumbnailUrl}
-                                                            alt={video.title}
-                                                            fill
-                                                            sizes="56px"
-                                                            className="object-cover"
-                                                        />
-                                                    </div>
-                                                </Link>
-                                            </td>
+                    {/* Card-per-row layout — responsive, no horizontal scroll */}
+                    <div className="divide-y divide-slate-100 rounded-xl border border-slate-100 bg-white overflow-hidden">
+                        {data.moreVideos.map((video) => {
+                            const pct = video.relevance <= 1
+                                ? Math.round(video.relevance * 100)
+                                : Math.round(video.relevance);
+                            // Timestamped YouTube-style URL on our video page
+                            const videoUrl = `/video/${video.video_id}`;
+                            const quotedUrl = video.startTime != null
+                                ? `${videoUrl}?t=${Math.floor(video.startTime)}`
+                                : videoUrl;
 
-                                            {/* Title */}
-                                            <td className="px-4 py-3 max-w-xs">
+                            return (
+                                <article
+                                    key={video.video_id}
+                                    className="flex gap-3 sm:gap-4 px-4 py-4 hover:bg-slate-50 transition-colors group"
+                                >
+                                    {/* Thumbnail — hidden on mobile */}
+                                    <Link
+                                        href={videoUrl}
+                                        className="hidden sm:block shrink-0 self-start"
+                                        tabIndex={-1}
+                                        aria-hidden="true"
+                                    >
+                                        <div className="relative w-24 lg:w-32 aspect-video rounded-lg overflow-hidden bg-slate-100">
+                                            <Image
+                                                src={video.thumbnailUrl}
+                                                alt={video.title}
+                                                fill
+                                                sizes="(min-width: 1024px) 128px, 96px"
+                                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                    </Link>
+
+                                    {/* Main content */}
+                                    <div className="flex-1 min-w-0">
+                                        {/* Title + meta row */}
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="min-w-0">
                                                 <Link
-                                                    href={`/video/${video.video_id}`}
-                                                    className="font-medium text-foreground hover:text-primary transition-colors line-clamp-2 leading-snug"
+                                                    href={videoUrl}
+                                                    className="font-semibold text-slate-900 hover:text-emerald-700 transition-colors text-sm sm:text-base leading-snug line-clamp-2"
                                                 >
                                                     {video.title}
                                                 </Link>
-                                                <p className="text-xs text-muted-foreground mt-0.5 md:hidden">
+                                                <p className="text-xs text-slate-500 mt-0.5">
                                                     {video.channelName}
-                                                    {video.date && ` · ${formatDate(video.date)}`}
+                                                    {video.date && (
+                                                        <span className="text-slate-400"> · {formatDate(video.date)}</span>
+                                                    )}
+                                                    {/* Views — shown on sm+ */}
+                                                    {video.viewCount > 0 && (
+                                                        <span className="hidden sm:inline text-slate-400">
+                                                            {' · '}{formatViewCount(video.viewCount)} views
+                                                        </span>
+                                                    )}
                                                 </p>
-                                            </td>
+                                            </div>
 
-                                            {/* Channel */}
-                                            <td className="px-4 py-3 text-muted-foreground hidden md:table-cell whitespace-nowrap">
-                                                {video.channelName}
-                                            </td>
+                                            {/* Relevance pill — always visible */}
+                                            <div className="shrink-0 flex flex-col items-end gap-1">
+                                                <span
+                                                    className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                                                    style={{
+                                                        background: `hsl(${pct * 1.2}, 60%, 94%)`,
+                                                        color: `hsl(${pct * 1.2}, 50%, 35%)`,
+                                                    }}
+                                                >
+                                                    {pct}% match
+                                                </span>
+                                                {/* Relevance bar — sm+ */}
+                                                <div className="hidden sm:flex w-16 h-1 rounded-full bg-slate-100 overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded-full bg-emerald-500"
+                                                        style={{ width: `${pct}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                            {/* Type */}
-                                            <td className="px-4 py-3 hidden lg:table-cell">
-                                                <Badge variant="outline" className="text-[10px] font-medium">
-                                                    {video.experienceType}
-                                                </Badge>
-                                            </td>
-
-                                            {/* Tone */}
-                                            <td className="px-4 py-3 hidden md:table-cell">
-                                                <TonePill tone={video.tone} />
-                                            </td>
-
-                                            {/* Greyson score */}
-                                            <td className="px-4 py-3 text-right hidden lg:table-cell">
-                                                {video.greysonScore != null ? (
-                                                    <span className="font-mono text-xs text-muted-foreground">
-                                                        {video.greysonScore}
-                                                        <span className="text-muted-foreground/50">/32</span>
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted-foreground/40 text-xs">—</span>
-                                                )}
-                                            </td>
-
-                                            {/* Views */}
-                                            <td className="px-4 py-3 text-right text-muted-foreground hidden sm:table-cell whitespace-nowrap">
-                                                {typeof video.viewCount === 'number'
-                                                    ? formatViewCount(video.viewCount)
-                                                    : (video.viewCount ?? '—')}
-                                            </td>
-
-                                            {/* Relevance bar — API returns 0-1 float, dummy uses 0-100 */}
-                                            <td className="px-4 py-3 text-right">
-                                                {(() => {
-                                                    const pct = video.relevance <= 1
-                                                        ? Math.round(video.relevance * 100)
-                                                        : Math.round(video.relevance);
-                                                    return (
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <div className="hidden sm:flex w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                                                                <div
-                                                                    className="h-full rounded-full bg-emerald-500"
-                                                                    style={{ width: `${pct}%` }}
-                                                                />
-                                                            </div>
-                                                            <span className="text-xs font-mono text-muted-foreground w-8 text-right">
-                                                                {pct}%
-                                                            </span>
-                                                        </div>
-                                                    );
-                                                })()}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </Card>
+                                        {/* Quote — the actual DB chunk, linked to timestamp */}
+                                        {video.quote && (
+                                            <Link
+                                                href={quotedUrl}
+                                                className="mt-2 block"
+                                                title={video.startTime != null
+                                                    ? `Jump to ${Math.floor(video.startTime / 60)}:${String(Math.floor(video.startTime % 60)).padStart(2,'0')}`
+                                                    : 'Watch video'}
+                                            >
+                                                <blockquote className="border-l-2 border-emerald-300 pl-3 text-xs sm:text-sm text-slate-600 italic leading-relaxed line-clamp-3 hover:border-emerald-500 hover:text-slate-800 transition-colors">
+                                                    &ldquo;{video.quote.trim()}&rdquo;
+                                                    {video.startTime != null && (
+                                                        <span className="not-italic text-[10px] text-emerald-600 ml-1.5 font-medium">
+                                                            {Math.floor(video.startTime / 60)}:{String(Math.floor(video.startTime % 60)).padStart(2,'0')}
+                                                        </span>
+                                                    )}
+                                                </blockquote>
+                                            </Link>
+                                        )}
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
 
                     {/* Link to full search */}
                     <div className="mt-6 text-center">

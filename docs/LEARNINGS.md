@@ -687,3 +687,38 @@ export function createClient() {
 }
 ```
 This only affects dev (`Strict Mode` is disabled in production builds).
+
+---
+
+## 18. Questions Page — Synthesis Prompt Design (Mar 2026)
+
+### A. Versioned Prompts — Always Save Before Switching
+Before changing the `systemPrompt` in `src/app/api/questions/[slug]/route.ts`, save the current version to `docs/prompts/`. Follow the naming pattern:
+- `questions-synthesis-v1-academic.md` — original evidence-based researcher voice
+- `questions-synthesis-v2-compassionate-friend.md` — active as of Mar 2026
+
+### B. Current Voice (v2) — Key Requirements
+- Style: Malcolm Gladwell as your best friend. Concrete, specific, vivid.
+- Reading level: 8th grade. No jargon.
+- 3 paragraphs, each 3-5 sentences.
+- **P1 structure (two-beat rule):** One framing sentence first (what NDErs say about this topic, or why the question matters) — then one specific vivid moment from the accounts. **Never start cold with "One man/woman...".**
+- **P2:** Find the consistent pattern across accounts.
+- **P3:** Speak directly to the person asking. Human, grounded, never preachy.
+
+### C. P1 Anti-Patterns — What Breaks It
+
+| Anti-pattern | Cause | Fix |
+|---|---|---|
+| Starts with `"You are asking if..."` | Instruction said "acknowledge what they're really asking" — Claude restates literally | Tell Claude NOT to paraphrase the question. Never say "you are asking" |
+| Starts cold with `"One man who..."` | Few-shot examples ended with a story opener that Claude pattern-matched on | Remove examples; use clear two-beat rule instead |
+| Skips framing sentence entirely | Examples compete with the instruction | Remove examples, make the rule explicit: "framing sentence first, story follows" |
+
+### D. Claude Timeout — Increase to 90s for Long Context
+Claude Sonnet on OpenRouter is ~2-3x slower than GPT-4o. With 4 referenced videos × 2 chunks each, the 55s AbortSignal fired intermittently. Set to `90_000` ms. If still hitting timeout, switch to `claude-haiku-3-5` which is faster for structured JSON tasks.
+
+### E. Citation System — Numbered Markers, Not Titles
+The LLM uses `[1]`, `[2]` markers, not video titles. The page's `renderWithCitations()` function maps numbers to real `/video/[id]` links. This prevents hallucinated titles/URLs entirely. The mapping comes from `referencedVideos` which is populated by pgvector search — the LLM cannot invent a citation outside that list.
+
+### F. More Relevant Videos — Card Layout (not table)
+The `moreVideos` section was redesigned from a table to a card-per-row layout in Mar 2026. Each card includes the top matching DB chunk as a `<blockquote>` with a timestamped link to `/video/[id]?t=[seconds]`. The DB chunk is guaranteed non-hallucinated — it comes from `nde_punctuated_embeddings` via pgvector search. See `src/app/questions/[slug]/page.tsx`.
+

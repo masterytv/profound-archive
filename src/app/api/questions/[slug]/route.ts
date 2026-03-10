@@ -204,25 +204,45 @@ export async function GET(
         const referencedVids = deduped.slice(0, 4);   // hero section: top 4
         const moreVids       = deduped.slice(4, 20);  // table: next 16
 
-        // ── Step 6: Synthesize answer via GPT-4o ──────────────────────────────
-        const contextForGPT = referencedVids.map(({ meta, chunks: vidChunks }) => {
+        // ── Step 6: Synthesize answer via Claude ──────────────────────────────
+        // Number the videos [1]-[N] so Claude cites by number only.
+        // The page renderer replaces [1] → real /video/[id] link from structured data.
+        // Claude never writes a URL or title — zero hallucination risk.
+        const contextForGPT = referencedVids.map(({ meta, chunks: vidChunks }, i) => {
             const topSnippets = vidChunks.slice(0, 2).map(c => c.content).join('\n');
-            return `VIDEO: ${meta.title ?? meta.video_id}\n${topSnippets}`;
+            return `[${i + 1}] ${meta.title ?? meta.video_id}\n${topSnippets}`;
         }).join('\n\n---\n\n');
 
-        const systemPrompt = `You are a compassionate and evidence-based NDE (near-death experience) researcher and writer.
-You have access to first-person NDE accounts from real people. Write a thoughtful, warm, and well-structured answer 
-to the following research question based ONLY on the provided NDE transcript excerpts.
+        const systemPrompt = `You are a compassionate friend who has spent years reading thousands of near-death experience accounts.
+Someone you truly care about just asked you a vulnerable question. You want to answer it honestly, warmly, and in a way they will actually feel.
 
-Rules:
-- Write exactly 3 paragraphs. Each paragraph should be 3–5 sentences, detailed and rich.
-- Ground your answer in the specific accounts provided. Reference experiencers by name when relevant and the accounts support it.
-- Do NOT use em dashes (—) or double dashes (--). Use commas, parentheses, or other punctuation instead.
-- Do NOT start with "Based on the accounts" or "The accounts show". Start with a direct, flowing statement.
-- Use warm, conversational academic tone without jargon.
-- Return ONLY a valid JSON object with this exact structure, no markdown wrapping:
+You have access to real first-person NDE accounts, numbered [1] through [${referencedVids.length}].
+Answer based ONLY on what those accounts say. Do not add spiritual commentary or theology of your own.
+
+Voice and style:
+- Write like Malcolm Gladwell if he were your best friend: concrete, specific, human, page-turning.
+- Use real moments and names from the accounts, not vague summaries.
+- Short sentences land hard. Use them. Then let a longer sentence open things up.
+- Aim for 8th-grade reading level. No academic jargon. Plain, direct, vivid English.
+- You are talking TO someone, not writing FOR publication.
+- Do NOT start with "Based on the accounts" or "The accounts show". Start in the middle of an idea.
+- Do NOT use em dashes (—) or double dashes (--). Use commas, parentheses, or colons instead.
+- Do not moralize or editorialize. Let the accounts speak for themselves.
+
+Paragraph structure:
+- Write exactly 3 paragraphs, each 3 to 5 sentences.
+- Paragraph 1: Start with one sentence of compassionate framing that acknowledges why this question matters (without restating the question or saying "you are asking"). This can be an observation about what NDErs report on this topic, or a gentle acknowledgment that many people carry this question. Then bring in one specific, vivid moment from the accounts that speaks to it. The framing sentence comes first, the story follows. Never start cold with a person's name or "One man/woman...".
+- Paragraph 2: Broaden to what is consistent across multiple accounts. Find the pattern.
+- Paragraph 3: End with what this means for the person asking. Human, grounded, never preachy.
+
+Citations:
+- When you draw on a specific account, insert its number marker immediately after the claim: [1], [2], etc.
+- Use only numbers [1] through [${referencedVids.length}]. Do not write out video titles.
+- Do not cite every sentence. Only cite when the detail genuinely comes from a specific account.
+
+Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
 {
-  "shortAnswer": "one compelling sentence direct answer, 20-30 words",
+  "shortAnswer": "One self-contained sentence that directly answers the question. 20-30 words. Start with the subject, not 'NDEs show' or 'According to'. Must make sense if read alone, out of context.",
   "paragraphs": ["paragraph 1 text", "paragraph 2 text", "paragraph 3 text"]
 }`;
 
@@ -251,7 +271,10 @@ Rules:
                         { role: 'assistant', content: '{' },
                     ],
                 },
-                { signal: AbortSignal.timeout(55_000) },
+                // Claude Sonnet on OpenRouter is ~2-3× slower than GPT-4o.
+                // Our context (4 videos × 2 chunks) is long; 55s timed out intermittently.
+                // 90s gives adequate headroom without hanging the route for too long.
+                { signal: AbortSignal.timeout(90_000) },
             );
 
 
@@ -277,9 +300,16 @@ Rules:
                     paragraphs = ['Unable to generate answer at this time.'];
                 } else {
                     const jsonStr = rawContent.slice(firstBrace, lastBrace + 1);
-                    const parsed  = JSON.parse(jsonStr);
-                    shortAnswer = parsed.shortAnswer ?? '';
-                    paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
+                    try {
+                        const parsed  = JSON.parse(jsonStr);
+                        shortAnswer = parsed.shortAnswer ?? '';
+                        paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
+                    } catch (parseErr) {
+                        // Separate parse failures from timeout failures so logs are actionable
+                        console.error('[Questions API] JSON.parse failed. jsonStr (500 chars):', jsonStr.substring(0, 500));
+                        console.error('[Questions API] Parse error:', parseErr instanceof Error ? parseErr.message : String(parseErr));
+                        paragraphs = ['Unable to generate answer at this time.'];
+                    }
                 }
             }
         } catch (e) {
@@ -316,9 +346,10 @@ Rules:
             thumbnailUrl: meta.thumbnailUrl ?? `https://i.ytimg.com/vi/${video_id}/hqdefault.jpg`,
             viewCount: meta.viewCount ?? 0,
             date: meta.date ?? null,
-            experienceType: 'NDE',
-            tone: 'Positive',
-            greysonScore: null, // Not returned by search_punctuated_embeddings_filtered
+            // Top matching chunk — DB-sourced, not LLM-generated.
+            // The page renders this as a blockquote with a timestamped link.
+            quote: vidChunks[0]?.content ?? null,
+            startTime: vidChunks[0]?.start_time ?? null,
             relevance: vidChunks[0]?.similarity ?? 0,
         }));
 
