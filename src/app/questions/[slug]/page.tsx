@@ -281,6 +281,32 @@ export default async function QuestionResultPage({
         isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
     }
 
+    const supabaseService = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY!
+    );
+
+    // Determine question type — used to show/hide the Hide button in RegenerateBar
+    let isUserQuestion = false;
+    let isActive = true;
+    const { data: curatedCheck } = await supabaseService
+        .from('nde_questions')
+        .select('id')
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .maybeSingle();
+    if (!curatedCheck) {
+        const { data: userCheck } = await supabaseService
+            .from('user_questions')
+            .select('is_active')
+            .eq('slug', slug)
+            .maybeSingle();
+        if (userCheck) {
+            isUserQuestion = true;
+            isActive = userCheck.is_active ?? true;
+        }
+    }
+
     const data = await fetchQuestionData(slug);
 
     if (!data) {
@@ -328,7 +354,12 @@ export default async function QuestionResultPage({
 
             {/* ── Admin: regeneration bar (admin-only) ─────────────────── */}
             {isAdmin && (
-                <RegenerateBar slug={slug} questionText={data.question} />
+                <RegenerateBar
+                    slug={slug}
+                    questionText={data.question}
+                    isUserQuestion={isUserQuestion}
+                    isActive={isActive}
+                />
             )}
 
             {/* ── JSON-LD: FAQPage + BreadcrumbList ────────────────────── */}

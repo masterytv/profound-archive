@@ -140,12 +140,16 @@ export async function GET(
             // Fall back to user_questions (custom questions submitted via the search bar)
             const { data: userQ } = await supabase
                 .from('user_questions')
-                .select('id, question, ai_query')
+                .select('id, question, ai_query, is_active')
                 .eq('slug', slug)
                 .maybeSingle();
 
             if (!userQ) {
                 return NextResponse.json({ error: 'Question not found' }, { status: 404 });
+            }
+            // Soft-deleted / hidden by admin
+            if (userQ.is_active === false) {
+                return NextResponse.json({ error: 'Question not available' }, { status: 404 });
             }
             question       = userQ.question;
             ai_query       = userQ.ai_query;

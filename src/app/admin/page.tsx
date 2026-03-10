@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { Users, ShieldAlert, Shield } from "lucide-react";
+import { Users, ShieldAlert, Shield, MessageSquareWarning } from "lucide-react";
+import Link from "next/link";
 
 export default async function AdminDashboard() {
     const cookieStore = await cookies();
@@ -87,6 +88,27 @@ export default async function AdminDashboard() {
                         <p className={`text-3xl font-bold ${stat.valueColor}`}>{stat.value}</p>
                     </div>
                 ))}
+            </div>
+
+            {/* Moderation shortcuts */}
+            <h2 className="text-lg font-semibold text-slate-700 mt-10 mb-4">Moderation</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Link
+                    href="/admin/questions"
+                    className="flex items-center gap-4 bg-white rounded-2xl border border-slate-200/60 p-5 hover:shadow-md hover:border-amber-200 transition-all group"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+                        <MessageSquareWarning className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                        <p className="font-semibold text-slate-800 group-hover:text-amber-800 transition-colors">
+                            User Questions
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                            Review, hide, or restore questions submitted by visitors
+                        </p>
+                    </div>
+                </Link>
             </div>
         </div>
     );
