@@ -753,5 +753,49 @@ Idempotent — skips already-cached rows. ~81 questions × ~14s average ≈ ~19 
 
 ### E. Firebase App Hosting + ISR
 `revalidate = 86400` works on Firebase App Hosting (Cloud Run + Firebase CDN). It is **not Vercel** — do not write "Vercel CDN" in docs. Stale-while-revalidate behaviour is equivalent.
+## 16. Navigation — Option A Restructure (Mar 2026)
 
+### A. Final Nav Shape
+```
+Logo | Questions | Channels | Research ▼ | 🔍 Search | Chat ▼ | About ▼ | Newsletter | Contribute | [Auth]
+```
+- **Questions** and **Channels** are direct top-level links (no dropdown) — they are the site's highest-traffic destinations and primary SEO anchor pages.
+- **Research ▼** dropdown → Veridical Perception, Greyson Scale, Transformation Index. These are the three scoring-based research lenses; they go together.
+- **Chat ▼** dropdown → Compassionate Chat, Research Chat. No other items.
+- The previous **Explore** and **Ask** dropdowns were removed. Both had "Big Questions" as a duplicate item across two menus, which confused the IA and split crawl priority.
+
+### B. Key Design Principle
+Navigate by *user intent*, not internal taxonomy. Users are either seeking answers (Questions → Chat) or researching (Research ▼). Do not put the same destination in two menus.
+
+### C. Mobile Nav
+Mirrors desktop exactly. Questions and Channels are direct links at top of sheet. Research is a collapsible accordion with the 3 research pages. Chat is a collapsible accordion with 2 chat modes.
+
+### D. RSC Icon Serialization — Always Pass Strings, Not Components
+When a Server Component passes props to a `"use client"` Client Component, **React only allows plain-JSON-serializable values**. Lucide icon components are functions/objects with methods — passing them crosses the RSC boundary and throws:
+```
+Error: Only plain objects can be passed to Client Components from Server Components.
+```
+**Pattern:** Pass an `iconName: string` from the server, resolve it to the component inside the client using a local `ICON_MAP`. Example:
+```ts
+// Server Component (page.tsx):
+<CategoryAccordion iconName="Heart" ... />
+
+// Client Component (category-accordion.tsx):
+const ICON_MAP = { Heart, Sparkles, Baby, ... };
+const Icon = ICON_MAP[iconName] ?? HelpCircle;
+```
+This pattern applies to **any** React component (Lucide, heroicons, etc.) passed as a prop across the server/client boundary.
+
+## 17. Questions Page — Accordion Category Sections (Mar 2026)
+
+### A. Architecture
+The questions page (`src/app/questions/page.tsx`) is a Server Component. The old `CategorySection` function was a static server component — converting it to an accordion required client-side `useState`, but Server Components can't use hooks.
+
+**Solution:** Extract a `"use client"` wrapper: `src/components/questions/category-accordion.tsx`. The server page passes plain-serializable props (strings, arrays of plain objects) and the client component owns all toggle state.
+
+### B. Default-Open Behaviour
+The first category in each Part (`reunion`, `dying-process`, `identity`) defaults to `open = true` so users see content immediately rather than a fully-collapsed wall. All other categories default to closed.
+
+### C. Info Density on Headers
+Each accordion header shows: icon · category title · subtitle · `"X questions"` count · chevron. This lets users understand the scope of a section before expanding it — they can scan all 12 categories at a glance.
 
