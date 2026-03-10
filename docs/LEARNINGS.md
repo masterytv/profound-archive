@@ -729,8 +729,9 @@ Synthesised Claude answers are stored in `question_synthesis` (not `question_ans
 `id, question_id (unique FK), short_answer, paragraphs (text[3]), cited_video_ids (text[]), answered_at`
 
 - Cache-read happens **before** every Claude call in `route.ts`. If a valid 3-paragraph row exists, Claude is skipped.
-- Cache-write happens after a successful synthesis. Only curated questions are cached; user questions are ephemeral.
+- Cache-write happens after a successful synthesis. **Both curated and user questions are now cached.**
 - **Admin regeneration:** Delete the row to force re-synthesis on next load. Use `POST /api/admin/questions/regenerate` with `{ slug }`.
+- **user_question_id column (Mar 2026):** `question_synthesis` has a nullable `user_question_id BIGINT FK → user_questions(id) ON DELETE CASCADE`. Exactly one of `question_id` OR `user_question_id` is non-null per row. The `question_id` column is now nullable to support user-only rows. Unique constraint and index on `user_question_id`.
 
 ### B. cited_video_ids — Citation Pinning
 `[1]`–`[4]` markers map positionally to `referencedVids`. If vector search ranking shifts or a video is deleted, citations could silently point to wrong sources.

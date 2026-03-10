@@ -122,6 +122,7 @@ export async function GET(
         let ai_query: string;
         let isCurated = false;
         let questionId: number | null = null;
+        let userQuestionId: number | null = null;
 
         const { data: curated } = await supabase
             .from('nde_questions')
@@ -139,19 +140,20 @@ export async function GET(
             // Fall back to user_questions (custom questions submitted via the search bar)
             const { data: userQ } = await supabase
                 .from('user_questions')
-                .select('question, ai_query')
+                .select('id, question, ai_query')
                 .eq('slug', slug)
                 .maybeSingle();
 
             if (!userQ) {
                 return NextResponse.json({ error: 'Question not found' }, { status: 404 });
             }
-            question = userQ.question;
-            ai_query = userQ.ai_query;
+            question       = userQ.question;
+            ai_query       = userQ.ai_query;
+            userQuestionId = userQ.id;
         }
 
         // ── Step 1b: Cache-read — skip Claude if we already have a synthesis ────
-        // Only curated questions are cached (user questions are ephemeral).
+        // Both curated AND user questions are now cached in question_synthesis.
         let cachedSynthesis: {
             shortAnswer:    string;
             paragraphs:     string[];
@@ -167,6 +169,21 @@ export async function GET(
 
             if (cached && Array.isArray(cached.paragraphs) && cached.paragraphs.length === 3) {
                 console.log(`[Questions API] Serving cached synthesis for question_id=${questionId}`);
+                cachedSynthesis = {
+                    shortAnswer:   cached.short_answer,
+                    paragraphs:    cached.paragraphs,
+                    citedVideoIds: cached.cited_video_ids ?? [],
+                };
+            }
+        } else if (userQuestionId !== null) {
+            const { data: cached } = await supabase
+                .from('question_synthesis')
+                .select('short_answer, paragraphs, cited_video_ids')
+                .eq('user_question_id', userQuestionId)
+                .maybeSingle();
+
+            if (cached && Array.isArray(cached.paragraphs) && cached.paragraphs.length === 3) {
+                console.log(`[Questions API] Serving cached synthesis for user_question_id=${userQuestionId}`);
                 cachedSynthesis = {
                     shortAnswer:   cached.short_answer,
                     paragraphs:    cached.paragraphs,
@@ -350,22 +367,41 @@ Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
                         paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
 
                         // ── Cache-write: persist to question_synthesis ─────────
-                        // Only after a fully valid 3-paragraph response, and only for
-                        // curated questions (user questions are ephemeral).
-                        if (isCurated && questionId !== null &&
-                            shortAnswer && paragraphs.length === 3) {
-                            supabase.from('question_synthesis').upsert({
-                                question_id:      questionId,
-                                short_answer:     shortAnswer,
-                                paragraphs:       paragraphs,
-                                cited_video_ids:  referencedVids.map(v => v.video_id),
-                                answered_at:      new Date().toISOString(),
-                            }, { onConflict: 'question_id' })
+                        // Applies to both curated AND user questions after a valid
+                        // 3-paragraph response. This makes user question pages
+                        // permanent — sharing the URL always returns the same answer.
+                        const hasCurated = isCurated && questionId !== null;
+                        const hasUser    = !isCurated && userQuestionId !== null;
+
+                        if ((hasCurated || hasUser) && shortAnswer && paragraphs.length === 3) {
+                            const upsertPayload = hasCurated
+                                ? {
+                                    question_id:      questionId,
+                                    user_question_id: null,
+                                    short_answer:     shortAnswer,
+                                    paragraphs:       paragraphs,
+                                    cited_video_ids:  referencedVids.map(v => v.video_id),
+                                    answered_at:      new Date().toISOString(),
+                                }
+                                : {
+                                    question_id:      null,
+                                    user_question_id: userQuestionId,
+                                    short_answer:     shortAnswer,
+                                    paragraphs:       paragraphs,
+                                    cited_video_ids:  referencedVids.map(v => v.video_id),
+                                    answered_at:      new Date().toISOString(),
+                                };
+
+                            const conflictCol = hasCurated ? 'question_id' : 'user_question_id';
+                            supabase.from('question_synthesis').upsert(upsertPayload, { onConflict: conflictCol })
                             .then(({ error: writeErr }) => {
                                 if (writeErr) {
                                     console.error('[Questions API] Cache-write failed:', writeErr.message);
                                 } else {
-                                    console.log(`[Questions API] Cached synthesis for question_id=${questionId}`);
+                                    const label = hasCurated
+                                        ? `question_id=${questionId}`
+                                        : `user_question_id=${userQuestionId} (slug=${slug})`;
+                                    console.log(`[Questions API] Cached synthesis for ${label}`);
                                 }
                             });
                         }
