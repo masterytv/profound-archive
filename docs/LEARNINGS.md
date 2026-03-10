@@ -722,3 +722,36 @@ The LLM uses `[1]`, `[2]` markers, not video titles. The page's `renderWithCitat
 ### F. More Relevant Videos — Card Layout (not table)
 The `moreVideos` section was redesigned from a table to a card-per-row layout in Mar 2026. Each card includes the top matching DB chunk as a `<blockquote>` with a timestamped link to `/video/[id]?t=[seconds]`. The DB chunk is guaranteed non-hallucinated — it comes from `nde_punctuated_embeddings` via pgvector search. See `src/app/questions/[slug]/page.tsx`.
 
+## 15. Questions Pages — SEO & Persistence Architecture (Mar 2026)
+
+### A. question_synthesis Table — Caching Layer
+Synthesised Claude answers are stored in `question_synthesis` (not `question_answers` which is for video clip matches). Schema:
+`id, question_id (unique FK), short_answer, paragraphs (text[3]), cited_video_ids (text[]), answered_at`
+
+- Cache-read happens **before** every Claude call in `route.ts`. If a valid 3-paragraph row exists, Claude is skipped.
+- Cache-write happens after a successful synthesis. Only curated questions are cached; user questions are ephemeral.
+- **Admin regeneration:** Delete the row to force re-synthesis on next load. Use `POST /api/admin/questions/regenerate` with `{ slug }`.
+
+### B. cited_video_ids — Citation Pinning
+`[1]`–`[4]` markers map positionally to `referencedVids`. If vector search ranking shifts or a video is deleted, citations could silently point to wrong sources.
+
+**Fix:** `cited_video_ids text[]` stores the exact video_id order at synthesis time. On cache-read, `route.ts` reorders `referencedVids` to match the stored order. Deleted videos are silently dropped.
+
+### C. generateStaticParams / generateMetadata — Use Service Client, Not Cookie Client
+`createClient()` from `src/lib/supabase/server.ts` calls `cookies()` internally. **This throws outside a request scope** — during `next build` pre-rendering.
+
+**Fix:** Use `getServiceClient()` (a plain `createSupabaseClient()` with service key) in `generateStaticParams` and `generateMetadata`. The main page component still uses `await createClient()` (auth-aware) since it runs inside a real request.
+
+### D. Warm-Up Script — Pre-Populate Before First Deploy
+`scripts/warm-questions.ts` pre-populates `question_synthesis` for all active questions. Run before deploying so the build pre-renders from DB (no live Claude calls at build time).
+```bash
+npm run warm          # against localhost:3000
+npm run warm:prod     # against projectprofound.org
+npm run warm -- --dry-run
+```
+Idempotent — skips already-cached rows. ~81 questions × ~14s average ≈ ~19 minutes.
+
+### E. Firebase App Hosting + ISR
+`revalidate = 86400` works on Firebase App Hosting (Cloud Run + Firebase CDN). It is **not Vercel** — do not write "Vercel CDN" in docs. Stale-while-revalidate behaviour is equivalent.
+
+

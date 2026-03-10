@@ -9,6 +9,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { CrisisBanner } from "@/components/crisis-banner";
 import { isCrisisTopic } from "@/lib/questions/crisis-detection";
 import { createClient } from "@/lib/supabase/server";
+import { RegenerateBar } from "@/components/questions/regenerate-bar";
 
 /**
  * A cookie-free Supabase client safe for use in generateStaticParams and generateMetadata
@@ -324,6 +325,11 @@ export default async function QuestionResultPage({
 
     return (
         <div className="min-h-screen bg-background text-foreground">
+
+            {/* ── Admin: regeneration bar (admin-only) ─────────────────── */}
+            {isAdmin && (
+                <RegenerateBar slug={slug} questionText={data.question} />
+            )}
 
             {/* ── JSON-LD: FAQPage + BreadcrumbList ────────────────────── */}
             <script
