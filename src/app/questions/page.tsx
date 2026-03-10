@@ -2,11 +2,12 @@ import Link from "next/link";
 import {
     ArrowLeft, Heart, Sparkles, Baby, AlertTriangle, Radio,
     Waves, Eye, Flame, User, Church, Star, HelpCircle,
-    Users, Skull, Lightbulb, ArrowRight, ChevronRight,
+    Users, Skull, Lightbulb, ChevronRight,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { QuestionsSearchBar } from "@/components/questions-search-bar";
 import { createClient } from "@/lib/supabase/server";
+import { CategoryAccordion } from "@/components/questions/category-accordion";
 
 export const metadata: Metadata = {
     title: "Questions — What NDEs Tell Us | Project Profound",
@@ -57,69 +58,69 @@ const PARTS = [
 // ─── Category config ──────────────────────────────────────────────────────────
 
 const CATEGORY_META: Record<string, {
-    icon: React.ElementType;
+    iconName: string;
     iconColor: string;
-    accentColor: string; // left-border colour class
+    accentColor: string;
     partId: string;
     subtitle: string;
 }> = {
     reunion: {
-        icon: Heart, iconColor: "text-rose-500", accentColor: "border-l-rose-400",
+        iconName: "Heart", iconColor: "text-rose-500", accentColor: "border-l-rose-400",
         partId: "part-1",
         subtitle: "Reunion, recognition, and the bonds that outlast death",
     },
     pets: {
-        icon: Sparkles, iconColor: "text-amber-500", accentColor: "border-l-amber-400",
+        iconName: "Sparkles", iconColor: "text-amber-500", accentColor: "border-l-amber-400",
         partId: "part-1",
         subtitle: "The companions we've lost and hope to find again",
     },
     children: {
-        icon: Baby, iconColor: "text-sky-500", accentColor: "border-l-sky-400",
+        iconName: "Baby", iconColor: "text-sky-500", accentColor: "border-l-sky-400",
         partId: "part-1",
         subtitle: "Where innocent souls go, and whether we will ever hold them again",
     },
     suicide: {
-        icon: AlertTriangle, iconColor: "text-orange-500", accentColor: "border-l-orange-400",
+        iconName: "AlertTriangle", iconColor: "text-orange-500", accentColor: "border-l-orange-400",
         partId: "part-1",
         subtitle: "Compassion, consequences, and what awaits those who died in crisis",
     },
     signs: {
-        icon: Radio, iconColor: "text-teal-500", accentColor: "border-l-teal-400",
+        iconName: "Radio", iconColor: "text-teal-500", accentColor: "border-l-teal-400",
         partId: "part-1",
         subtitle: "Communication across the veil — what's real and how to recognize it",
     },
     "dying-process": {
-        icon: Waves, iconColor: "text-blue-500", accentColor: "border-l-blue-400",
+        iconName: "Waves", iconColor: "text-blue-500", accentColor: "border-l-blue-400",
         partId: "part-2",
         subtitle: "The crossing itself — fear, peace, and the first moments after",
     },
     "life-review": {
-        icon: Eye, iconColor: "text-violet-500", accentColor: "border-l-violet-400",
+        iconName: "Eye", iconColor: "text-violet-500", accentColor: "border-l-violet-400",
         partId: "part-2",
         subtitle: "Facing everything you've ever done — judgment, shame, and mercy",
     },
     hell: {
-        icon: Flame, iconColor: "text-red-500", accentColor: "border-l-red-400",
+        iconName: "Flame", iconColor: "text-red-500", accentColor: "border-l-red-400",
         partId: "part-2",
         subtitle: "Dark NDEs, consequences for wrongdoing, and whether mercy has limits",
     },
     identity: {
-        icon: User, iconColor: "text-indigo-500", accentColor: "border-l-indigo-400",
+        iconName: "User", iconColor: "text-indigo-500", accentColor: "border-l-indigo-400",
         partId: "part-3",
         subtitle: "Identity, memory, and the continuity of who we are",
     },
     religion: {
-        icon: Church, iconColor: "text-yellow-600", accentColor: "border-l-yellow-400",
+        iconName: "Church", iconColor: "text-yellow-600", accentColor: "border-l-yellow-400",
         partId: "part-3",
         subtitle: "What NDEs reveal about faith, dogma, and the question of God",
     },
     "afterlife-description": {
-        icon: Star, iconColor: "text-purple-500", accentColor: "border-l-purple-400",
+        iconName: "Star", iconColor: "text-purple-500", accentColor: "border-l-purple-400",
         partId: "part-3",
         subtitle: "Time, sensation, beauty, and the nature of existence beyond death",
     },
     purpose: {
-        icon: HelpCircle, iconColor: "text-emerald-500", accentColor: "border-l-emerald-400",
+        iconName: "HelpCircle", iconColor: "text-emerald-500", accentColor: "border-l-emerald-400",
         partId: "part-3",
         subtitle: "The purpose of life, the choice to be born, and the view from the other side",
     },
@@ -147,25 +148,6 @@ interface NdeQuestion {
     category_label: string;
     consumer_question: string;
     sort_order: number;
-}
-
-// ─── Components ───────────────────────────────────────────────────────────────
-
-function QuestionCard({ question, index }: { question: NdeQuestion; index: number }) {
-    return (
-        <Link
-            href={`/questions/${question.slug}`}
-            className="group flex items-start gap-3 bg-white rounded-lg border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer"
-        >
-            <span className="text-xs font-mono text-slate-300 mt-0.5 shrink-0 w-5 text-right select-none">
-                {index}
-            </span>
-            <p className="text-sm text-slate-700 leading-relaxed group-hover:text-slate-900 transition-colors flex-1">
-                {question.consumer_question}
-            </p>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-400 transition-colors shrink-0 mt-0.5" />
-        </Link>
-    );
 }
 
 function PartNavCard({ part }: { part: typeof PARTS[number] }) {
@@ -213,49 +195,7 @@ function PartDivider({ part }: { part: typeof PARTS[number] }) {
     );
 }
 
-function CategorySection({
-    category,
-    label,
-    questions,
-    catIndex,
-}: {
-    category: string;
-    label: string;
-    questions: NdeQuestion[];
-    catIndex: number;
-}) {
-    const meta = CATEGORY_META[category];
-    if (!meta || questions.length === 0) return null;
-    const Icon = meta.icon;
 
-    return (
-        <section id={`cat-${category}`}>
-            {/* Left-justified category header */}
-            <div className={`flex items-start gap-4 mb-4 pl-4 border-l-4 ${meta.accentColor}`}>
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <Icon className={`w-4 h-4 ${meta.iconColor}`} />
-                        <h2
-                            className="text-lg font-bold text-slate-900"
-                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-                        >
-                            {label}
-                        </h2>
-                    </div>
-                    <p className="text-xs text-slate-500">{meta.subtitle}</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {questions.map((q, i) => (
-                    <QuestionCard key={q.id} question={q} index={i + 1} />
-                ))}
-            </div>
-        </section>
-    );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function QuestionsPage() {
     const supabase = await createClient();
@@ -359,13 +299,21 @@ export default async function QuestionsPage() {
                         const cat = section.category;
                         const qs = byCategory[cat];
                         const label = qs?.[0]?.category_label ?? cat;
+                        const meta = CATEGORY_META[cat];
+                        if (!meta) return null;
+                        // First category of each Part defaults open
+                        const isFirstInPart = Object.keys(PART_ANCHORS).includes(cat);
                         return (
-                            <CategorySection
+                            <CategoryAccordion
                                 key={cat}
                                 category={cat}
                                 label={label}
+                                subtitle={meta.subtitle}
+                                accentColor={meta.accentColor}
+                                iconColor={meta.iconColor}
+                                iconName={meta.iconName}
                                 questions={qs ?? []}
-                                catIndex={section.catIndex ?? 0}
+                                defaultOpen={isFirstInPart}
                             />
                         );
                     }
