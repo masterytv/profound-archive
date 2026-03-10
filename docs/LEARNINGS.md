@@ -800,3 +800,36 @@ The first category in each Part (`reunion`, `dying-process`, `identity`) default
 ### C. Info Density on Headers
 Each accordion header shows: icon · category title · subtitle · `"X questions"` count · chevron. This lets users understand the scope of a section before expanding it — they can scan all 12 categories at a glance.
 
+## 18. User Question Moderation (Mar 2026)
+
+### A. Table Separation
+- `nde_questions` — the 81 curated editorial questions. These are the only questions shown on `/questions`. User questions never appear there.
+- `user_questions` — visitor-submitted questions. They only live at `/questions/[slug]` if navigated to directly (or via shared URL).
+- `question_answers` — legacy table, never read by current code. Pre-dates pgvector approach. Can be ignored.
+- `question_synthesis` — Claude answer cache for **both** curated and user questions. Uses `question_id` (curated) or `user_question_id` (user) — exactly one is non-null per row.
+
+### B. Soft Delete with is_active
+`user_questions.is_active BOOLEAN DEFAULT true` — setting it to `false` hides the question without deleting it.
+- Route `/api/questions/[slug]` returns 404 if `is_active = false`.
+- Admin can restore by setting back to `true` via `POST /api/admin/questions/hide-user` with `{ slug, restore: true }`.
+- Hiding also deletes the `question_synthesis` cache row so a stale answer isn't served if restored.
+
+### C. Admin Moderation UI
+- `/admin/questions` — client-side list page with All/Active/Hidden filter tabs, inline Hide/Restore toggle, synthesis cache status, and external link to the question page.
+- `RegenerateBar` (on individual question pages) shows a **Hide question** button for user questions (not curated). One confirm click required. Curated questions only show "Regenerate answer".
+- Admin dashboard (`/admin`) has a Moderation section card linking there.
+
+### D. Supabase Nested Select with Multiple FKs — Use Explicit Join
+If a table has two FKs to different parent tables (e.g., `question_synthesis` has `question_id → nde_questions` AND `user_question_id → user_questions`), Supabase's nested select syntax `table_name(col, col)` is **ambiguous** — it may join on the wrong FK silently.
+
+**Fix:** Do two explicit queries and merge in JS:
+```ts
+const { data: questions } = await supabase.from('user_questions').select('id, ...');
+const ids = questions.map(q => q.id);
+const { data: syntheses } = await supabase
+  .from('question_synthesis')
+  .select('user_question_id, short_answer')
+  .in('user_question_id', ids);
+const synthMap = new Map(syntheses.map(s => [s.user_question_id, s]));
+const merged = questions.map(q => ({ ...q, synthesis: synthMap.get(q.id) ?? null }));
+```

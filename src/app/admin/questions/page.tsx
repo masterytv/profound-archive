@@ -10,7 +10,7 @@ interface UserQuestion {
     question: string;
     is_active: boolean;
     created_at: string;
-    question_synthesis: Array<{ id: number; short_answer: string; answered_at: string }> | null;
+    synthesis: { short_answer: string; answered_at: string } | null;
 }
 
 function formatDate(d: string) {
@@ -117,7 +117,7 @@ export default function AdminUserQuestionsPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {visible.map(q => {
-                                const synthesis = Array.isArray(q.question_synthesis) ? q.question_synthesis[0] : null;
+                                const synthesis = q.synthesis;
                                 return (
                                     <tr
                                         key={q.id}
