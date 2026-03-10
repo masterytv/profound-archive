@@ -121,18 +121,20 @@ export async function GET(
         let question: string;
         let ai_query: string;
         let isCurated = false;
+        let questionId: number | null = null;
 
         const { data: curated } = await supabase
             .from('nde_questions')
-            .select('consumer_question, ai_query')
+            .select('id, consumer_question, ai_query')
             .eq('slug', slug)
             .eq('is_active', true)
             .maybeSingle();
 
         if (curated) {
-            question  = curated.consumer_question;
-            ai_query  = curated.ai_query;
-            isCurated = true;
+            question   = curated.consumer_question;
+            ai_query   = curated.ai_query;
+            isCurated  = true;
+            questionId = curated.id;
         } else {
             // Fall back to user_questions (custom questions submitted via the search bar)
             const { data: userQ } = await supabase
@@ -146,6 +148,26 @@ export async function GET(
             }
             question = userQ.question;
             ai_query = userQ.ai_query;
+        }
+
+        // ── Step 1b: Cache-read — skip Claude if we already have a synthesis ────
+        // Only curated questions are cached (user questions are ephemeral).
+        let cachedSynthesis: { shortAnswer: string; paragraphs: string[] } | null = null;
+
+        if (isCurated && questionId !== null) {
+            const { data: cached } = await supabase
+                .from('question_synthesis')
+                .select('short_answer, paragraphs')
+                .eq('question_id', questionId)
+                .maybeSingle();
+
+            if (cached && Array.isArray(cached.paragraphs) && cached.paragraphs.length === 3) {
+                console.log(`[Questions API] Serving cached synthesis for question_id=${questionId}`);
+                cachedSynthesis = {
+                    shortAnswer: cached.short_answer,
+                    paragraphs:  cached.paragraphs,
+                };
+            }
         }
 
         // Option A: embed question + ai_query combined so literal keywords from the
@@ -204,7 +226,7 @@ export async function GET(
         const referencedVids = deduped.slice(0, 4);   // hero section: top 4
         const moreVids       = deduped.slice(4, 20);  // table: next 16
 
-        // ── Step 6: Synthesize answer via Claude ──────────────────────────────
+        // ── Step 6: Synthesize answer via Claude (or serve from cache) ──────────
         // Number the videos [1]-[N] so Claude cites by number only.
         // The page renderer replaces [1] → real /video/[id] link from structured data.
         // Claude never writes a URL or title — zero hallucination risk.
@@ -212,6 +234,9 @@ export async function GET(
             const topSnippets = vidChunks.slice(0, 2).map(c => c.content).join('\n');
             return `[${i + 1}] ${meta.title ?? meta.video_id}\n${topSnippets}`;
         }).join('\n\n---\n\n');
+
+        // Check if we have a cached synthesis from Step 1b
+        // (local variable — no globalThis needed, same function scope)
 
         const systemPrompt = `You are a compassionate friend who has spent years reading thousands of near-death experience accounts.
 Someone you truly care about just asked you a vulnerable question. You want to answer it honestly, warmly, and in a way they will actually feel.
@@ -246,10 +271,11 @@ Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
   "paragraphs": ["paragraph 1 text", "paragraph 2 text", "paragraph 3 text"]
 }`;
 
-        let shortAnswer = '';
-        let paragraphs: string[] = [];
+        let shortAnswer = cachedSynthesis?.shortAnswer ?? '';
+        let paragraphs: string[] = cachedSynthesis?.paragraphs ?? [];
 
-        try {
+        // Skip the Claude call entirely if we have a valid cached synthesis
+        if (!cachedSynthesis) try {
             // Pass an independent signal so the Claude call can't be killed by
             // the route handler's abort (triggered by Turbopack HMR in dev mode).
             const gptResponse = await getOpenRouter().chat.completions.create(
@@ -304,6 +330,26 @@ Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
                         const parsed  = JSON.parse(jsonStr);
                         shortAnswer = parsed.shortAnswer ?? '';
                         paragraphs  = Array.isArray(parsed.paragraphs) ? parsed.paragraphs : [];
+
+                        // ── Cache-write: persist to question_synthesis ─────────
+                        // Only after a fully valid 3-paragraph response, and only for
+                        // curated questions (user questions are ephemeral).
+                        if (isCurated && questionId !== null &&
+                            shortAnswer && paragraphs.length === 3) {
+                            supabase.from('question_synthesis').upsert({
+                                question_id:  questionId,
+                                short_answer: shortAnswer,
+                                paragraphs:   paragraphs,
+                                answered_at:  new Date().toISOString(),
+                            }, { onConflict: 'question_id' })
+                            .then(({ error: writeErr }) => {
+                                if (writeErr) {
+                                    console.error('[Questions API] Cache-write failed:', writeErr.message);
+                                } else {
+                                    console.log(`[Questions API] Cached synthesis for question_id=${questionId}`);
+                                }
+                            });
+                        }
                     } catch (parseErr) {
                         // Separate parse failures from timeout failures so logs are actionable
                         console.error('[Questions API] JSON.parse failed. jsonStr (500 chars):', jsonStr.substring(0, 500));

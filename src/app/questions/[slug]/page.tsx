@@ -105,6 +105,21 @@ function formatDate(dateString: string | null): string {
     }
 }
 
+// ─── ISR + Static Generation ────────────────────────────────────────────────
+
+// Re-render each question page at most once per 24 h (ISR).
+export const revalidate = 86400;
+
+/** Pre-render all active curated questions at build time so crawlers never wait for Claude. */
+export async function generateStaticParams() {
+    const supabase = await createClient();
+    const { data } = await supabase
+        .from('nde_questions')
+        .select('slug')
+        .eq('is_active', true);
+    return (data ?? []).map((q: { slug: string }) => ({ slug: q.slug }));
+}
+
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
 type QuestionResult = QuestionAnswer | { no_results: true; question: string; slug: string } | null;
@@ -131,31 +146,51 @@ async function fetchQuestionData(slug: string): Promise<QuestionResult> {
     }
 }
 
+/**
+ * Reads metadata directly from DB — never calls Claude.
+ * Uses question_synthesis.short_answer written by the API route after first load.
+ * Falls back to a generic description until the synthesis is first cached.
+ */
 export async function generateMetadata({
     params,
 }: {
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     const { slug } = await params;
-    const data = await fetchQuestionData(slug);
-    const question = data?.question ?? slug.split('-').join(' ');
-    // Fall back to a descriptive generic if shortAnswer isn't available yet
-    // (will be improved once answer persistence lands)
-    const shortAnswer = (data && !('no_results' in data) && data.shortAnswer)
-        ? data.shortAnswer
-        : `What do near-death experiences tell us about: ${question} — answered from 5,000+ real NDE accounts.`;
+    const supabase = await createClient();
+
+    const { data: q } = await supabase
+        .from('nde_questions')
+        .select('id, consumer_question')
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .maybeSingle();
+
+    const question = q?.consumer_question ?? slug.split('-').join(' ');
+
+    const { data: synthesis } = q
+        ? await supabase
+            .from('question_synthesis')
+            .select('short_answer')
+            .eq('question_id', q.id)
+            .maybeSingle()
+        : { data: null };
+
+    const description = synthesis?.short_answer
+        ?? `What do near-death experiences tell us about: ${question} — explored through 5,000+ real NDE accounts on Project Profound.`;
+
     return {
         title: `${question} | Project Profound`,
-        description: shortAnswer,
+        description,
         openGraph: {
             title: question,
-            description: shortAnswer,
+            description,
             url: `https://projectprofound.org/questions/${slug}`,
             type: 'article',
             siteName: 'Project Profound',
             images: [{ url: 'https://projectprofound.org/og-default.png', width: 1200, height: 630 }],
         },
-        twitter: { card: 'summary_large_image', title: question, description: shortAnswer },
+        twitter: { card: 'summary_large_image', title: question, description },
         alternates: { canonical: `https://projectprofound.org/questions/${slug}` },
     };
 }
