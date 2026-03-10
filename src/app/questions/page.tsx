@@ -269,6 +269,20 @@ export default async function QuestionsPage() {
                 </div>
             </section>
 
+            {/* ── "Most Asked Questions" intro ───────────────────────────── */}
+            <div className="container mx-auto px-4 max-w-5xl pt-14 pb-4">
+                <h2
+                    className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                >
+                    The Most Asked Questions
+                </h2>
+                <p className="text-slate-500 text-base leading-relaxed max-w-2xl">
+                    We&apos;ve found more than 1,000 NDE-related questions on Reddit, YouTube, Facebook,
+                    and other online communities. These are the top questions organized by category.
+                </p>
+            </div>
+
             {/* ── Part Navigation Cards ─────────────────────────────────── */}
             <div className="border-b border-slate-100 bg-slate-50/60">
                 <div className="container mx-auto px-4 max-w-5xl py-6">
