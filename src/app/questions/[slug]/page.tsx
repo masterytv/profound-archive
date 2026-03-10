@@ -498,7 +498,7 @@ export default async function QuestionResultPage({
                     </div>
                 </section>
 
-                {/* ════════ SECTION: More Relevant Videos ════════ */}
+                {/* ════════ SECTION: Other Relevant Videos ════════ */}
                 <section id="more-videos">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
@@ -509,7 +509,7 @@ export default async function QuestionResultPage({
                                 className="text-2xl font-bold text-slate-900"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
-                                More Relevant Videos
+                                Other Relevant Videos
                             </h2>
                             <p className="text-sm text-slate-500">
                                 Additional accounts from the archive related to this question
@@ -523,7 +523,6 @@ export default async function QuestionResultPage({
                             const pct = video.relevance <= 1
                                 ? Math.round(video.relevance * 100)
                                 : Math.round(video.relevance);
-                            // Timestamped YouTube-style URL on our video page
                             const videoUrl = `/video/${video.video_id}`;
                             const quotedUrl = video.startTime != null
                                 ? `${videoUrl}?t=${Math.floor(video.startTime)}`
@@ -534,19 +533,19 @@ export default async function QuestionResultPage({
                                     key={video.video_id}
                                     className="flex gap-3 sm:gap-4 px-4 py-4 hover:bg-slate-50 transition-colors group"
                                 >
-                                    {/* Thumbnail — hidden on mobile */}
+                                    {/* Thumbnail — visible on all sizes; smaller on mobile, 60% larger on sm/lg */}
                                     <Link
                                         href={videoUrl}
-                                        className="hidden sm:block shrink-0 self-start"
+                                        className="shrink-0 self-start"
                                         tabIndex={-1}
                                         aria-hidden="true"
                                     >
-                                        <div className="relative w-24 lg:w-32 aspect-video rounded-lg overflow-hidden bg-slate-100">
+                                        <div className="relative w-16 sm:w-40 lg:w-52 aspect-video rounded-lg overflow-hidden bg-slate-100">
                                             <Image
                                                 src={video.thumbnailUrl}
                                                 alt={video.title}
                                                 fill
-                                                sizes="(min-width: 1024px) 128px, 96px"
+                                                sizes="(min-width: 1024px) 208px, (min-width: 640px) 160px, 64px"
                                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
                                         </div>
@@ -554,33 +553,53 @@ export default async function QuestionResultPage({
 
                                     {/* Main content */}
                                     <div className="flex-1 min-w-0">
-                                        {/* Title + meta row */}
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div className="min-w-0">
-                                                <Link
-                                                    href={videoUrl}
-                                                    className="font-semibold text-slate-900 hover:text-emerald-700 transition-colors text-sm sm:text-base leading-snug line-clamp-2"
-                                                >
-                                                    {video.title}
-                                                </Link>
-                                                <p className="text-xs text-slate-500 mt-0.5">
-                                                    {video.channelName}
-                                                    {video.date && (
-                                                        <span className="text-slate-400"> · {formatDate(video.date)}</span>
-                                                    )}
-                                                    {/* Views — shown on sm+ */}
-                                                    {video.viewCount > 0 && (
-                                                        <span className="hidden sm:inline text-slate-400">
-                                                            {' · '}{formatViewCount(video.viewCount)} views
-                                                        </span>
-                                                    )}
-                                                </p>
+                                        {/* Title + meta row — full width */}
+                                        <Link
+                                            href={videoUrl}
+                                            className="font-semibold text-slate-900 hover:text-emerald-700 transition-colors text-sm sm:text-base leading-snug line-clamp-2"
+                                        >
+                                            {video.title}
+                                        </Link>
+                                        <p className="text-xs text-slate-500 mt-0.5">
+                                            {video.channelName}
+                                            {video.date && (
+                                                <span className="text-slate-400"> · {formatDate(video.date)}</span>
+                                            )}
+                                            {video.viewCount > 0 && (
+                                                <span className="hidden sm:inline text-slate-400">
+                                                    {' · '}{formatViewCount(video.viewCount)} views
+                                                </span>
+                                            )}
+                                        </p>
+
+                                        {/* Bottom row: 2/3 quote | 1/3 relevance */}
+                                        <div className="flex gap-3 mt-2 items-start">
+                                            {/* Quote — 3/4 width */}
+                                            <div className="flex-[3] min-w-0">
+                                                {video.quote && (
+                                                    <Link
+                                                        href={quotedUrl}
+                                                        className="block"
+                                                        title={video.startTime != null
+                                                            ? `Jump to ${Math.floor(video.startTime / 60)}:${String(Math.floor(video.startTime % 60)).padStart(2, '0')}`
+                                                            : 'Watch video'}
+                                                    >
+                                                        <blockquote className="border-l-2 border-emerald-300 pl-3 text-xs sm:text-sm text-slate-600 italic leading-relaxed line-clamp-3 hover:border-emerald-500 hover:text-slate-800 transition-colors">
+                                                            &ldquo;{video.quote.trim()}&rdquo;
+                                                            {video.startTime != null && (
+                                                                <span className="not-italic text-[10px] text-emerald-600 ml-1.5 font-medium">
+                                                                    {Math.floor(video.startTime / 60)}:{String(Math.floor(video.startTime % 60)).padStart(2, '0')}
+                                                                </span>
+                                                            )}
+                                                        </blockquote>
+                                                    </Link>
+                                                )}
                                             </div>
 
-                                            {/* Relevance pill — always visible */}
-                                            <div className="shrink-0 flex flex-col items-end gap-1">
+                                            {/* Relevance — 1/4 width */}
+                                            <div className="flex-1 flex items-center justify-center">
                                                 <span
-                                                    className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                                                    className="text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap"
                                                     style={{
                                                         background: `hsl(${pct * 1.2}, 60%, 94%)`,
                                                         color: `hsl(${pct * 1.2}, 50%, 35%)`,
@@ -588,35 +607,8 @@ export default async function QuestionResultPage({
                                                 >
                                                     {pct}% match
                                                 </span>
-                                                {/* Relevance bar — sm+ */}
-                                                <div className="hidden sm:flex w-16 h-1 rounded-full bg-slate-100 overflow-hidden">
-                                                    <div
-                                                        className="h-full rounded-full bg-emerald-500"
-                                                        style={{ width: `${pct}%` }}
-                                                    />
-                                                </div>
                                             </div>
                                         </div>
-
-                                        {/* Quote — the actual DB chunk, linked to timestamp */}
-                                        {video.quote && (
-                                            <Link
-                                                href={quotedUrl}
-                                                className="mt-2 block"
-                                                title={video.startTime != null
-                                                    ? `Jump to ${Math.floor(video.startTime / 60)}:${String(Math.floor(video.startTime % 60)).padStart(2,'0')}`
-                                                    : 'Watch video'}
-                                            >
-                                                <blockquote className="border-l-2 border-emerald-300 pl-3 text-xs sm:text-sm text-slate-600 italic leading-relaxed line-clamp-3 hover:border-emerald-500 hover:text-slate-800 transition-colors">
-                                                    &ldquo;{video.quote.trim()}&rdquo;
-                                                    {video.startTime != null && (
-                                                        <span className="not-italic text-[10px] text-emerald-600 ml-1.5 font-medium">
-                                                            {Math.floor(video.startTime / 60)}:{String(Math.floor(video.startTime % 60)).padStart(2,'0')}
-                                                        </span>
-                                                    )}
-                                                </blockquote>
-                                            </Link>
-                                        )}
                                     </div>
                                 </article>
                             );
