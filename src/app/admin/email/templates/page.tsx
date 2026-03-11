@@ -10,6 +10,7 @@ interface Template {
   subject: string;
   intro_text: string | null;
   cta_text: string;
+  cta_href: string | null;
   from_name: string;
 }
 
@@ -48,6 +49,7 @@ export default function EmailTemplatesPage() {
     subject: `A near-death story for you`,
     intro_text: "",
     cta_text: "Watch this story →",
+    cta_href: "",
     from_name: "Project Profound",
   };
 
@@ -208,7 +210,7 @@ export default function EmailTemplatesPage() {
                 </p>
               </div>
 
-              {/* CTA */}
+              {/* CTA text */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Button text
@@ -220,6 +222,24 @@ export default function EmailTemplatesPage() {
                   placeholder="Watch this story →"
                 />
               </div>
+
+              {/* CTA href — only shown for newsletter_welcome */}
+              {selected === "newsletter_welcome" && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Button link URL
+                  </label>
+                  <input
+                    value={current.cta_href ?? ""}
+                    onChange={e => update("cta_href", e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="https://projectprofound.org/quiz"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Where the button takes the reader. Defaults to the homepage.
+                  </p>
+                </div>
+              )}
 
               {/* Save */}
               <button

@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   const { error } = await admin
     .from("email_templates")
     .upsert(
-      { archetype, subject, intro_text, cta_text, from_name, updated_at: new Date().toISOString() },
+      { archetype, subject, intro_text, cta_text, cta_href: body.cta_href ?? null, from_name, updated_at: new Date().toISOString() },
       { onConflict: "archetype" }
     );
 

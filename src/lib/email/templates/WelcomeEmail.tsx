@@ -10,12 +10,14 @@ import * as React from "react";
 interface WelcomeEmailProps {
   introText?: string;
   ctaText?: string;
+  ctaHref?: string;
   unsubscribeUrl?: string;
 }
 
 export function WelcomeEmail({
   introText = "Welcome to Project Profound — a living archive of 5,000+ first-person near-death experiences. We'll send you occasional updates on research, new features, and insights from the archive.",
   ctaText = "Explore the Archive →",
+  ctaHref = "https://projectprofound.org",
   unsubscribeUrl = "https://projectprofound.org/unsubscribe",
 }: WelcomeEmailProps) {
   return (
@@ -44,7 +46,7 @@ export function WelcomeEmail({
 
           {/* CTA */}
           <Link
-            href="https://projectprofound.org"
+            href={ctaHref}
             style={{
               display: "inline-block", backgroundColor: "#1e3a5f", color: "#ffffff",
               fontSize: 14, fontWeight: 600, padding: "12px 24px", borderRadius: 8,

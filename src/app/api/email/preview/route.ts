@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   if (archetype === "newsletter_welcome") {
     const { data: tpl } = await supabase
       .from("email_templates")
-      .select("intro_text, cta_text")
+      .select("intro_text, cta_text, cta_href")
       .eq("archetype", "newsletter_welcome")
       .maybeSingle();
 
@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
       WelcomeEmail({
         introText:      tpl?.intro_text ?? undefined,
         ctaText:        tpl?.cta_text   ?? undefined,
+        ctaHref:        tpl?.cta_href   ?? undefined,
         unsubscribeUrl: "https://projectprofound.org/unsubscribe?token=preview",
       })
     );
