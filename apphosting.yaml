@@ -76,6 +76,9 @@ env:
   # Resend — transactional email provider for quiz subscriber CRM
   - variable: RESEND_API_KEY
     secret: projects/432036554831/secrets/RESEND_API_KEY/versions/1
+  # Verified sending domain (mail.projectprofound.org verified in Resend)
+  - variable: RESEND_FROM
+    value: stories@mail.projectprofound.org
 
   # Apify API token — kept for potential future use (currently unused)
   - variable: APIFY_API_TOKEN
