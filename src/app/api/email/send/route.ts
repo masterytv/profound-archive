@@ -100,17 +100,7 @@ export async function POST(req: NextRequest) {
   const archetypeData = ARCHETYPES[archetype];
   const unsubscribeBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL ? "https://projectprofound.org" : "http://localhost:3000"}`;
 
-  // Fetch unsubscribe token if this is a real lead
-  let unsubToken = "test";
-  if (leadId !== "00000000-0000-0000-0000-000000000000") {
-    const { data: lead } = await supabase
-      .from("quiz_leads")
-      .select("unsubscribe_token")
-      .eq("id", leadId)
-      .single();
-    unsubToken = lead?.unsubscribe_token ?? "test";
-  }
-  const unsubscribeUrl = `${unsubscribeBase}/unsubscribe?token=${unsubToken}`;
+  const unsubscribeUrl = `${unsubscribeBase}/unsubscribe?email=${encodeURIComponent(email)}`;
 
   // Render and send
   const html = await render(

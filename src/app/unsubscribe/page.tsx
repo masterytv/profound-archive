@@ -45,25 +45,32 @@ export default function UnsubscribePage() {
 
 function UnsubscribeContent() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token") ?? undefined;
-  const hasError = !!searchParams.get("error");
+  const emailParam  = searchParams.get("email") ?? undefined;
+  const tokenParam  = searchParams.get("token") ?? undefined;
 
-  const [subs, setSubs] = useState<Sub[]>([]);
-  const [email, setEmail] = useState<string | null>(null);
-  const [loading, setLoading] = useState(!!token);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  // Local active/freq state keyed by archetype
-  const [local, setLocal] = useState<Record<string, { active: boolean; frequency: string }>>({});
+  const [activeEmail, setActiveEmail] = useState<string | null>(emailParam ?? null);
+  const [inputEmail, setInputEmail]   = useState(""); // for the fallback form
+  const [subs, setSubs]   = useState<Sub[]>([]);
+  const [loading, setLoading]   = useState(!!(emailParam || tokenParam));
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [saving, setSaving]   = useState(false);
+  const [saved, setSaved]     = useState(false);
+  const [local, setLocal]     = useState<Record<string, { active: boolean; frequency: string }>>({});
 
+  // Load subscriptions when email or token is present
   useEffect(() => {
-    if (!token) return;
-    fetch(`/api/email/manage-subs?token=${encodeURIComponent(token)}`)
+    const param = emailParam
+      ? `email=${encodeURIComponent(emailParam)}`
+      : tokenParam
+      ? `token=${encodeURIComponent(tokenParam)}`
+      : null;
+    if (!param) return;
+
+    fetch(`/api/email/manage-subs?${param}`)
       .then(r => r.json())
       .then(d => {
-        if (d.error) { setNotFound(true); return; }
-        setEmail(d.email);
+        if (d.error) { setLookupError(d.error); return; }
+        setActiveEmail(d.email);
         setSubs(d.subs);
         const init: typeof local = {};
         d.subs.forEach((s: Sub) => {
@@ -71,12 +78,32 @@ function UnsubscribeContent() {
         });
         setLocal(init);
       })
-      .catch(() => setNotFound(true))
+      .catch(() => setLookupError("Could not load subscriptions."))
       .finally(() => setLoading(false));
-  }, [token]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Email lookup via the input form
+  async function handleEmailLookup(e: React.FormEvent) {
+    e.preventDefault();
+    if (!inputEmail) return;
+    setLoading(true);
+    setLookupError(null);
+    try {
+      const res = await fetch(`/api/email/manage-subs?email=${encodeURIComponent(inputEmail)}`);
+      const d = await res.json();
+      if (d.error || !res.ok) { setLookupError("No subscriptions found for that email."); return; }
+      setActiveEmail(d.email);
+      setSubs(d.subs);
+      const init: typeof local = {};
+      d.subs.forEach((s: Sub) => { init[s.archetype] = { active: s.is_active, frequency: s.frequency }; });
+      setLocal(init);
+    } catch { setLookupError("Could not load subscriptions."); }
+    finally { setLoading(false); }
+  }
 
   async function handleSave() {
-    if (!token) return;
+    if (!activeEmail) return;
     setSaving(true);
     const updates = Object.entries(local).map(([archetype, { active, frequency }]) => ({
       archetype, active, frequency,
@@ -84,7 +111,7 @@ function UnsubscribeContent() {
     await fetch("/api/email/manage-subs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, updates }),
+      body: JSON.stringify({ email: activeEmail, updates }),
     });
     setSaving(false);
     setSaved(true);
@@ -106,34 +133,7 @@ function UnsubscribeContent() {
     setSaved(false);
   }
 
-  // ── Error / loading states ─────────────────────────────────────────────────
-  if (hasError) {
-    return (
-      <Shell>
-        <div className="text-5xl">⚠</div>
-        <h1 className="heading">Link has expired.</h1>
-        <p className="sub">
-          Email us at{" "}
-          <a href="mailto:hello@projectprofound.org" className="text-blue-600 hover:underline">
-            hello@projectprofound.org
-          </a>{" "}
-          and we&apos;ll sort it out.
-        </p>
-      </Shell>
-    );
-  }
-
-  if (!token) {
-    return (
-      <Shell>
-        <div className="text-5xl">✦</div>
-        <h1 className="heading">Manage subscriptions</h1>
-        <p className="sub">Click the unsubscribe link in any email we&apos;ve sent you to manage your lists.</p>
-        <Link href="/" className="text-sm text-blue-600 hover:underline">← Back to Project Profound</Link>
-      </Shell>
-    );
-  }
-
+  // ── Error / loading states ──────────────────────────────────────────────────
   if (loading) {
     return (
       <Shell>
@@ -143,12 +143,26 @@ function UnsubscribeContent() {
     );
   }
 
-  if (notFound) {
+  // No email resolved yet — show email input form
+  if (!activeEmail) {
     return (
       <Shell>
-        <div className="text-5xl">⚠</div>
-        <h1 className="heading">Token not found.</h1>
-        <p className="sub">This link may have already been used or has expired.</p>
+        <div className="text-5xl">✦</div>
+        <h1 className="heading">Manage subscriptions</h1>
+        <p className="sub">Enter your email address to see and manage your lists.</p>
+        <form onSubmit={handleEmailLookup} className="w-full space-y-3 text-left">
+          <input
+            type="email" required value={inputEmail}
+            onChange={e => setInputEmail(e.target.value)}
+            placeholder="your@email.com"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          />
+          {lookupError && <p className="text-sm text-red-500">{lookupError}</p>}
+          <button type="submit" className="w-full rounded-xl bg-slate-900 text-white py-2.5 text-sm font-medium hover:opacity-90">
+            Find my subscriptions →
+          </button>
+        </form>
+        <Link href="/" className="text-xs text-slate-400 hover:text-slate-600">← Back to Project Profound</Link>
       </Shell>
     );
   }
@@ -166,7 +180,7 @@ function UnsubscribeContent() {
           >
             Your subscriptions
           </h1>
-          <p className="text-slate-500 text-sm">{email}</p>
+          <p className="text-slate-500 text-sm">{activeEmail}</p>
           <p className="text-slate-500 text-sm">
             Toggle any list below. Changes take effect immediately.
           </p>

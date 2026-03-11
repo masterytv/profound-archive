@@ -71,7 +71,7 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
     .eq("archetype", archetype)
     .maybeSingle();
 
-  const unsubscribeUrl = `https://projectprofound.org/unsubscribe?token=${lead.unsubscribe_token}`;
+  const unsubscribeUrl = `https://projectprofound.org/unsubscribe?email=${encodeURIComponent(lead.email)}`;
 
   const html = await render(
     VideoEmail({

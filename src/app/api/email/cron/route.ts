@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
         thumbnailUrl: string | null; viewCount: number | null;
       };
 
-      const unsubscribeUrl = `https://projectprofound.org/unsubscribe?token=${lead.unsubscribe_token}`;
+      const unsubscribeUrl = `https://projectprofound.org/unsubscribe?email=${encodeURIComponent(lead.email)}`;
 
       const html = await render(
         VideoEmail({
