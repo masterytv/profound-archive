@@ -15,6 +15,11 @@ interface Template {
 
 const ARCHETYPE_ENTRIES = Object.entries(ARCHETYPES) as [string, typeof ARCHETYPES[keyof typeof ARCHETYPES]][];
 
+// Extra templates not tied to an NDE archetype
+const EXTRA_TEMPLATES = [
+  { id: "newsletter_welcome", icon: "✉️", label: "Newsletter Welcome", note: "Sent immediately when someone subscribes to the Newsletter." },
+];
+
 export default function EmailTemplatesPage() {
   const supabase = createClient();
   const [selected, setSelected] = useState(ARCHETYPE_ENTRIES[0][0]);
@@ -117,6 +122,24 @@ export default function EmailTemplatesPage() {
             >
               <span className="text-base">{a.icon}</span>
               <span className="leading-tight">{a.label.replace("The ", "")}</span>
+            </button>
+          ))}
+
+          {/* Divider */}
+          <div className="border-t border-border my-2" />
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-2 pb-1">Welcome Emails</p>
+          {EXTRA_TEMPLATES.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => { setSelected(t.id); setSaved(false); setTestResult(null); }}
+              className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all ${
+                selected === t.id
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <span className="text-base">{t.icon}</span>
+              <span className="leading-tight">{t.label}</span>
             </button>
           ))}
         </div>

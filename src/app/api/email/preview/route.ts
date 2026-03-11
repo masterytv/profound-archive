@@ -1,9 +1,11 @@
 // GET /api/email/preview?archetype=griever
-// Returns the rendered HTML of the VideoEmail template for preview in an iframe.
+// Returns the rendered HTML of the email template for preview in an iframe.
+// Supports NDE archetype video emails and newsletter_welcome email.
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { VideoEmail } from "@/lib/email/templates/VideoEmail";
+import { WelcomeEmail } from "@/lib/email/templates/WelcomeEmail";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { render } from "@react-email/render";
 import type { ArchetypeId } from "@/lib/quiz/archetypes";
@@ -13,11 +15,31 @@ export async function GET(req: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
-  const archetype = (req.nextUrl.searchParams.get("archetype") ?? "griever") as ArchetypeId;
+  const archetype = req.nextUrl.searchParams.get("archetype") ?? "griever";
 
-  // Pick any video for this archetype (ignore dedup for preview)
+  // ── Newsletter welcome preview ───────────────────────────────────────────
+  if (archetype === "newsletter_welcome") {
+    const { data: tpl } = await supabase
+      .from("email_templates")
+      .select("intro_text, cta_text")
+      .eq("archetype", "newsletter_welcome")
+      .maybeSingle();
+
+    const html = await render(
+      WelcomeEmail({
+        introText:      tpl?.intro_text ?? undefined,
+        ctaText:        tpl?.cta_text   ?? undefined,
+        unsubscribeUrl: "https://projectprofound.org/unsubscribe?token=preview",
+      })
+    );
+    return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  }
+
+  // ── NDE archetype video email preview ────────────────────────────────────
+  const archetypeId = archetype as ArchetypeId;
+
   const { data: videoRows } = await supabase.rpc("pick_video_for_archetype", {
-    p_archetype: archetype,
+    p_archetype: archetypeId,
     p_lead_id:   "00000000-0000-0000-0000-000000000000",
   });
 
@@ -29,28 +51,24 @@ export async function GET(req: NextRequest) {
     viewCount:    125000,
   };
 
-  // Load custom template copy from DB
   const { data: tpl } = await supabase
     .from("email_templates")
     .select("*")
-    .eq("archetype", archetype)
-    .single();
+    .eq("archetype", archetypeId)
+    .maybeSingle();
 
-  const archetypeData = ARCHETYPES[archetype];
+  const archetypeData = ARCHETYPES[archetypeId];
   const html = await render(
     VideoEmail({
       archetypeLabel: archetypeData?.label ?? archetype,
       archetypeIcon:  archetypeData?.icon ?? "✦",
       videoId:        video.videoId,
-      videoTitle:     tpl?.intro_text
-        ? `${video.title}`
-        : video.title,
+      videoTitle:     video.title,
       channelName:    video.channelName,
       thumbnailUrl:   video.thumbnailUrl,
       viewCount:      video.viewCount,
       frequency:      "weekly",
       unsubscribeUrl: "https://projectprofound.org/unsubscribe?token=preview",
-      // pass template customizations if VideoEmail supports them
       introText:      tpl?.intro_text ?? undefined,
       ctaText:        tpl?.cta_text ?? "Watch this story →",
     })

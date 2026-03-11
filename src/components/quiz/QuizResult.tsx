@@ -200,9 +200,9 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
               <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <p className="text-[15px] font-medium text-foreground">You're in.</p>
+              <p className="text-[15px] font-medium text-foreground">You&apos;re in.</p>
               <p className="text-sm text-muted-foreground">
-                Your first story will arrive {freq === "daily" ? "tomorrow" : freq === "3day" ? "in 3 days" : freq === "weekly" ? "next week" : "next month"}.
+                Your first story is on its way — check your inbox.
               </p>
             </div>
           </div>
