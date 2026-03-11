@@ -227,15 +227,13 @@ export default function SiteHeader() {
               Search
             </Link>
 
-            {/* Quiz Link — admin only during soft launch */}
-            {(userRole === 'admin' || userRole === 'super_admin') && (
-              <Link
-                href="/quiz"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-700 dark:text-purple-300 bg-purple-50/70 dark:bg-purple-500/15 hover:bg-purple-100/80 dark:hover:bg-purple-500/25 transition-all"
-              >
-                ✦ What's Your NDE Type?
-              </Link>
-            )}
+            {/* Quiz Link — public */}
+            <Link
+              href="/quiz"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-700 dark:text-purple-300 bg-purple-50/70 dark:bg-purple-500/15 hover:bg-purple-100/80 dark:hover:bg-purple-500/25 transition-all"
+            >
+              ✦ What's Your NDE Type?
+            </Link>
 
             {/* Chat Dropdown */}
             <div className="relative" ref={toolsRef}>
@@ -532,17 +530,15 @@ export default function SiteHeader() {
                     Search
                   </Link>
 
-                  {/* Quiz — admin only during soft launch */}
-                  {(userRole === 'admin' || userRole === 'super_admin') && (
-                    <Link
-                      href="/quiz"
-                      className="flex items-center gap-3 text-base font-semibold text-purple-700 dark:text-purple-300"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <span className="text-base">✦</span>
-                      What's Your NDE Type?
-                    </Link>
-                  )}
+                  {/* Quiz — public */}
+                  <Link
+                    href="/quiz"
+                    className="flex items-center gap-3 text-base font-semibold text-purple-700 dark:text-purple-300"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="text-base">✦</span>
+                    What's Your NDE Type?
+                  </Link>
 
                   {/* Chat Section */}
                   <div>
