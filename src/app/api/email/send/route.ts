@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { resend } from "@/lib/email/resend";
 import { VideoEmail } from "@/lib/email/templates/VideoEmail";
+import { WelcomeEmail } from "@/lib/email/templates/WelcomeEmail";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { render } from "@react-email/render";
 import type { ArchetypeId } from "@/lib/quiz/archetypes";
@@ -74,7 +75,38 @@ export async function POST(req: NextRequest) {
     frequency = body.frequency ?? "weekly";
   }
 
-  // Pick a video
+  // ── Newsletter welcome — special path, no video pick ──────────────────────
+  if ((body.archetype ?? archetype) === "newsletter_welcome") {
+    const { data: tpl } = await supabase
+      .from("email_templates")
+      .select("subject, intro_text, cta_text")
+      .eq("archetype", "newsletter_welcome")
+      .maybeSingle();
+
+    const unsubscribeUrl = `https://projectprofound.org/unsubscribe?email=${encodeURIComponent(email)}`;
+    const html = await render(
+      WelcomeEmail({
+        introText:      tpl?.intro_text ?? undefined,
+        ctaText:        tpl?.cta_text   ?? undefined,
+        unsubscribeUrl,
+      })
+    );
+
+    const { error: sendError } = await resend.emails.send({
+      from:    EMAIL_FROM,
+      to:      [email],
+      subject: tpl?.subject ?? "Welcome to Project Profound",
+      html,
+    });
+
+    if (sendError) {
+      const msg = (sendError as { message?: string })?.message ?? JSON.stringify(sendError);
+      return NextResponse.json({ error: `Resend: ${msg}` }, { status: 500 });
+    }
+    return NextResponse.json({ success: true, type: "newsletter_welcome" });
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   const { data: videoRows, error: rpcError } = await supabase.rpc("pick_video_for_archetype", {
     p_archetype: archetype,
     p_lead_id:   leadId,

@@ -89,7 +89,7 @@ export default function EmailTemplatesPage() {
       });
       const data = await res.json();
       setTestResult(res.ok
-        ? { ok: true, msg: `Sent! Video: ${data.video}` }
+        ? { ok: true, msg: data.type === "newsletter_welcome" ? "Sent! Welcome email delivered." : `Sent! Video: ${data.video}` }
         : { ok: false, msg: data.error ?? "Send failed" });
     } catch (e) {
       setTestResult({ ok: false, msg: String(e) });
