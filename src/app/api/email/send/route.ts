@@ -6,11 +6,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { resend, EMAIL_FROM } from "@/lib/email/resend";
+import { resend } from "@/lib/email/resend";
 import { VideoEmail } from "@/lib/email/templates/VideoEmail";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { render } from "@react-email/render";
 import type { ArchetypeId } from "@/lib/quiz/archetypes";
+
+// Use verified domain in prod; Resend's test domain locally
+const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
 
 // Compute next_send_at from frequency
 function computeNextSend(frequency: string): Date {
@@ -77,9 +80,13 @@ export async function POST(req: NextRequest) {
     p_lead_id:   leadId,
   });
 
-  if (rpcError || !videoRows?.length) {
-    console.error("[email/send] No video found:", rpcError?.message);
-    return NextResponse.json({ error: "No matching video found" }, { status: 404 });
+  console.log("[email/send] RPC result:", { rows: videoRows?.length, rpcError: rpcError?.message, archetype });
+
+  if (rpcError) {
+    return NextResponse.json({ error: `RPC error: ${rpcError.message}` }, { status: 500 });
+  }
+  if (!videoRows?.length) {
+    return NextResponse.json({ error: `No matching video found for archetype: ${archetype}` }, { status: 404 });
   }
 
   const video = videoRows[0] as {
@@ -129,7 +136,9 @@ export async function POST(req: NextRequest) {
 
   if (sendError) {
     console.error("[email/send] Resend error:", sendError);
-    return NextResponse.json({ error: "Send failed", detail: sendError }, { status: 500 });
+    // Surface the exact Resend error message to the caller
+    const msg = (sendError as any)?.message ?? JSON.stringify(sendError);
+    return NextResponse.json({ error: `Resend: ${msg}` }, { status: 500 });
   }
 
   // Log send + update lead (only for real leads, not test)

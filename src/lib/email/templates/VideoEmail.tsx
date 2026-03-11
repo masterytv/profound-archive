@@ -27,6 +27,9 @@ export interface VideoEmailProps {
   viewCount:      number | null;
   frequency:      string;   // "weekly", "daily", etc.
   unsubscribeUrl: string;
+  // Optional overrides from email_templates DB
+  introText?: string;       // paragraph shown above video title
+  ctaText?:   string;       // button label, default "Watch this story →"
 }
 
 const BASE_URL = "https://projectprofound.org";
@@ -41,6 +44,8 @@ export function VideoEmail({
   viewCount,
   frequency,
   unsubscribeUrl,
+  introText,
+  ctaText = "Watch this story →",
 }: VideoEmailProps) {
   const videoUrl = `${BASE_URL}/video/${videoId}`;
   const formattedViews = viewCount
@@ -87,6 +92,13 @@ export function VideoEmail({
             <Text style={styles.meta}>{formattedViews} views</Text>
           )}
 
+          {/* Intro text (optional, from DB template) */}
+          {introText && (
+            <Text style={{ ...styles.channel, marginBottom: "16px", fontStyle: "italic", color: "#475569" }}>
+              {introText}
+            </Text>
+          )}
+
           {/* Thumbnail */}
           {thumbnailUrl && (
             <Section style={{ margin: "24px 0" }}>
@@ -104,7 +116,7 @@ export function VideoEmail({
           {/* CTA */}
           <Section style={{ textAlign: "center", margin: "24px 0" }}>
             <Button href={videoUrl} style={styles.button}>
-              Watch this story →
+              {ctaText}
             </Button>
           </Section>
 
