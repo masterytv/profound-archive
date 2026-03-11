@@ -33,11 +33,12 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createClient();
 
-  // Fetch all leads due for a send
+  // Fetch all leads due for a send (skip newsletter — broadcast-only list)
   const { data: leads, error } = await supabase
     .from("quiz_leads")
     .select("id, email, archetype, frequency, unsubscribe_token")
     .eq("is_active", true)
+    .neq("archetype", "newsletter")
     .or("next_send_at.is.null,next_send_at.lte." + new Date().toISOString())
     .limit(MAX_BATCH);
 

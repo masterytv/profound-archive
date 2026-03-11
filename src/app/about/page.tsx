@@ -24,29 +24,24 @@ export default function AboutPage() {
     setSubmitStatus("idle")
 
     try {
-      const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL
-
-      if (!webhookUrl || webhookUrl === 'YOUR_N8N_WEBHOOK_URL_HERE') {
-        console.error("[v0] Webhook URL not configured")
-        setSubmitStatus("error")
-        setIsSubmitting(false)
-        return
-      }
-
-      const response = await fetch(webhookUrl, {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          message: formData.message,
+        }),
       })
 
-      if (response.ok) {
+      if (res.ok) {
         setSubmitStatus("success")
         setFormData({ fullName: "", email: "", message: "" })
       } else {
         setSubmitStatus("error")
       }
     } catch (error) {
-      console.error("[v0] Form submission error:", error)
+      console.error("[contact] submission error:", error)
       setSubmitStatus("error")
     } finally {
       setIsSubmitting(false)

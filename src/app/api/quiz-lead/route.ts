@@ -13,10 +13,13 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const { error } = await supabase
       .from("quiz_leads")
-      .insert({ email, archetype, frequency });
+      .upsert(
+        { email, archetype, frequency, is_active: true },
+        { onConflict: "email,archetype", ignoreDuplicates: false }
+      );
 
     if (error) {
-      console.error("[quiz-lead] insert error:", error.message);
+      console.error("[quiz-lead] upsert error:", error.message);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 

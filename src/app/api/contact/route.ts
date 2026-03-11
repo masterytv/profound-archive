@@ -1,0 +1,47 @@
+// src/app/api/contact/route.ts
+// POST /api/contact  { name, email, message }
+// Forwards the message to tom@projectprofound.org via Resend.
+
+import { NextResponse } from "next/server";
+import { resend } from "@/lib/email/resend";
+
+const CONTACT_TO = "tom@projectprofound.org";
+const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
+
+export async function POST(req: Request) {
+  try {
+    const { name, email, message } = await req.json();
+
+    if (!name || !email || !message) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    const { error } = await resend.emails.send({
+      from:     EMAIL_FROM,
+      to:       [CONTACT_TO],
+      replyTo:  email,
+      subject:  `[Project Profound] Message from ${name}`,
+      html: `
+        <div style="font-family: Georgia, serif; max-width: 600px; color: #1E293B;">
+          <h2 style="font-size: 22px; margin-bottom: 4px;">New message from the website</h2>
+          <p style="color: #64748B; margin-top: 0; font-size: 14px;">via projectprofound.org/about#connect</p>
+          <hr style="border-color: #E2E8F0; margin: 20px 0;" />
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+          <hr style="border-color: #E2E8F0; margin: 20px 0;" />
+          <p style="white-space: pre-wrap; font-size: 15px; line-height: 1.7;">${message}</p>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error("[contact] Resend error:", error);
+      return NextResponse.json({ error: "Failed to send" }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("[contact] unexpected error:", err);
+    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+  }
+}

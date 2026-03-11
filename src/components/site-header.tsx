@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
+import { NewsletterModal } from "@/components/NewsletterModal"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ export default function SiteHeader() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileExploreOpen, setMobileExploreOpen] = useState(false)
+  const [newsletterOpen, setNewsletterOpen] = useState(false)
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false)
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
 
@@ -113,6 +115,7 @@ export default function SiteHeader() {
 
 
   return (
+    <>
     <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl text-foreground sticky top-0 z-50 border-b border-slate-200/60 dark:border-slate-700/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -328,14 +331,13 @@ export default function SiteHeader() {
             <ThemeToggle />
 
             {/* Newsletter */}
-            <a
-              data-formkit-toggle="893453eeff"
-              href="https://project-profound.kit.com/893453eeff"
+            <button
+              onClick={() => setNewsletterOpen(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 hover:bg-blue-50/60 dark:hover:bg-blue-500/20 transition-all"
             >
               <Mail className="w-3.5 h-3.5" />
               Newsletter
-            </a>
+            </button>
 
             {/* Contribute */}
             <a
@@ -628,14 +630,13 @@ export default function SiteHeader() {
                     </div>
 
                     {/* Newsletter */}
-                    <a
-                      data-formkit-toggle="893453eeff"
-                      href="https://project-profound.kit.com/893453eeff"
+                    <button
+                      onClick={() => { setNewsletterOpen(true); setMobileMenuOpen(false); }}
                       className="flex items-center gap-2.5 text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 font-medium"
                     >
                       <Mail className="w-4 h-4" />
                       Newsletter
-                    </a>
+                    </button>
 
                     {/* Contribute */}
                     <a
@@ -655,5 +656,7 @@ export default function SiteHeader() {
         </div>
       </div>
     </nav>
+    {newsletterOpen && <NewsletterModal onClose={() => setNewsletterOpen(false)} />}
+  </>
   )
 }
