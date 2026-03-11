@@ -1069,3 +1069,53 @@ Inline style gradients (e.g., `style={{ background: "linear-gradient(135deg, #F0
 <section className="bg-gradient-to-br from-emerald-50 via-slate-50 to-blue-50
                     dark:from-transparent dark:via-transparent dark:to-transparent dark:bg-card">
 ```
+
+## 20. Email Subscription System — Archetype Profile Reports (Mar 2026)
+
+### A. Architecture
+
+Subscribers receive a personalized **profile report** in their first email only. This is stored in `email_templates.profile_report` (nullable TEXT) and rendered by `VideoEmail.tsx` as a styled card above the video.
+
+**Flow:** `sendFirstStory.ts` → fetches `profile_report` from `email_templates` → passes to `VideoEmail` → profile card renders above video.
+
+**Key decision:** Profile only sent on the first email. Subsequent cron emails use `VideoEmail` without `profileReport` so they stay clean and video-focused.
+
+### B. email_templates Table — Full Column Reference
+
+| Column | Type | Purpose |
+|---|---|---|
+| `archetype` | TEXT (PK) | Archetype ID (`griever`, `seeker`, etc.) or `newsletter_welcome` |
+| `subject` | TEXT | Email subject line |
+| `intro_text` | TEXT | Italic paragraph above the video title |
+| `cta_text` | TEXT | Button label (default: "Watch this story →") |
+| `cta_href` | TEXT | Button URL (newsletter_welcome only) |
+| `from_name` | TEXT | Sender display name |
+| `profile_report` | TEXT | Long-form 2–4 paragraph profile for the archetype (first email only) |
+| `updated_at` | TIMESTAMPTZ | Last save timestamp |
+
+### C. Admin Pages for Email
+
+| Page | Path | Purpose |
+|---|---|---|
+| Email CRM | `/admin/email` | Subscriber list, stats, test sends |
+| Email Templates | `/admin/email/templates` | Edit subject/intro/CTA per archetype, live preview |
+| Archetype Profiles | `/admin/email/profiles` | Edit 2–4 paragraph profile per archetype, live preview |
+
+All admin email pages use `/api/email/template-save` (service role, upserts on `archetype` PK) to save. The preview route (`/api/email/preview?archetype=X`) renders live DB content into the email HTML and is `force-dynamic, no-store`.
+
+### D. VideoEmail Profile Card Styling
+
+The profile card uses inline styles (required for email client compatibility):
+- Background: `#F0EBE3` (warm tan, matches the brand)
+- Heading: `#1E293B`, 15px, uppercase, Georgia serif
+- Body: `#374151`, 15px, 1.7 line-height, Georgia serif
+- Paragraphs split by double-newline (`\n\n`) from the stored TEXT
+
+### E. template-save API — What It Accepts
+
+`POST /api/email/template-save` accepts any subset of template fields:
+```json
+{ "archetype": "griever", "profile_report": "..." }
+```
+Fields not present in the payload are preserved on upsert (Postgres UPSERT with `ON CONFLICT DO UPDATE` only sets what's provided).
+
