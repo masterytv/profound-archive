@@ -5,7 +5,8 @@
 // Loads all subscriptions for the email associated with the token,
 // lets the user toggle each list on/off, and saves changes.
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { Check, Loader2 } from "lucide-react";
@@ -33,13 +34,19 @@ const ARCHETYPE_META: Record<string, { label: string; icon: string; desc: string
   },
 };
 
-export default function UnsubscribePage({
-  searchParams,
-}: {
-  searchParams: { token?: string; error?: string };
-}) {
-  const token = searchParams.token;
-  const hasError = !!searchParams.error;
+// Suspense wrapper required by Next.js for useSearchParams
+export default function UnsubscribePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>}>
+      <UnsubscribeContent />
+    </Suspense>
+  );
+}
+
+function UnsubscribeContent() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? undefined;
+  const hasError = !!searchParams.get("error");
 
   const [subs, setSubs] = useState<Sub[]>([]);
   const [email, setEmail] = useState<string | null>(null);
