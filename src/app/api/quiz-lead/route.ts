@@ -1,6 +1,15 @@
 // src/app/api/quiz-lead/route.ts
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
+
+// Use service role to bypass RLS — this is a public subscription form
+// and must work regardless of whether the caller has an auth session.
+function adminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +19,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const supabase = adminClient();
     const { error } = await supabase
       .from("quiz_leads")
       .upsert(
