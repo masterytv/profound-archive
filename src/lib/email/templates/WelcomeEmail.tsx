@@ -3,7 +3,7 @@
 
 import {
   Body, Container, Head, Heading, Html,
-  Link, Preview, Section, Text, Hr,
+  Img, Link, Preview, Section, Text, Hr,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -27,9 +27,16 @@ export function WelcomeEmail({
       <Body style={{ backgroundColor: "#FDFAF6", fontFamily: "Georgia, serif", margin: 0 }}>
         <Container style={{ maxWidth: 560, margin: "0 auto", padding: "48px 24px" }}>
 
-          {/* Logo / wordmark */}
+          {/* Logo / Brand — matches VideoEmail header */}
           <Section style={{ marginBottom: 32 }}>
-            <Text style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#94a3b8", margin: 0 }}>
+            <Img
+              src="https://projectprofound.org/logo-transparent.png"
+              alt="Project Profound"
+              width={36}
+              height={36}
+              style={{ display: "inline-block", verticalAlign: "middle" }}
+            />
+            <Text style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 10, fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#94a3b8", margin: "0 0 0 10px" }}>
               Project Profound
             </Text>
           </Section>
