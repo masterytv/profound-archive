@@ -12,13 +12,6 @@ import { Loader2 } from "lucide-react";
 
 // ── Full list of available lists ─────────────────────────────────────────────
 const ALL_LISTS = [
-  ...Object.entries(ARCHETYPES).map(([id, a]) => ({
-    id,
-    icon: a.icon,
-    label: a.label,
-    desc: a.tagline,
-    type: "archetype" as const,
-  })),
   {
     id: "newsletter",
     icon: "✉️",
@@ -26,6 +19,13 @@ const ALL_LISTS = [
     desc: "Occasional updates on new research, features, and insights from the archive.",
     type: "newsletter" as const,
   },
+  ...Object.entries(ARCHETYPES).map(([id, a]) => ({
+    id,
+    icon: a.icon,
+    label: a.label,
+    desc: a.tagline,
+    type: "archetype" as const,
+  })),
 ];
 
 const FREQ_OPTIONS = [
@@ -143,6 +143,13 @@ function UnsubscribeContent() {
     setSaved(false);
   }
 
+  function unsubscribeAll() {
+    setLocal(prev =>
+      Object.fromEntries(Object.keys(prev).map(id => [id, { ...prev[id], active: false }]))
+    );
+    setSaved(false);
+  }
+
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
@@ -195,6 +202,44 @@ function UnsubscribeContent() {
           <p className="text-muted-foreground text-xs">
             Toggle any list. Turn on new ones to subscribe. {activeCount > 0 && `${activeCount} active.`}
           </p>
+        </div>
+
+        {/* General Newsletter — top */}
+        <div>
+          <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-3">General Newsletter</p>
+          {ALL_LISTS.filter(l => l.type === "newsletter").map(list => {
+            const state = local[list.id] ?? { active: false, frequency: "weekly" };
+            return (
+              <div
+                key={list.id}
+                className={`rounded-2xl border p-5 transition-all ${
+                  state.active
+                    ? "border-border bg-card"
+                    : "border-border/50 bg-muted/30 opacity-60"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{list.icon}</span>
+                    <div>
+                      <div className="font-semibold text-foreground text-[15px]">{list.label}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5 leading-snug">{list.desc}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => toggle(list.id)}
+                    className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
+                      state.active ? "bg-emerald-500" : "bg-muted-foreground/30"
+                    }`}
+                  >
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                      state.active ? "translate-x-5 left-1" : "left-1"
+                    }`} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* NDE-Type lists */}
@@ -257,52 +302,20 @@ function UnsubscribeContent() {
           </div>
         </div>
 
-        {/* Newsletter */}
-        <div>
-          <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-3">General Newsletter</p>
-          {ALL_LISTS.filter(l => l.type === "newsletter").map(list => {
-            const state = local[list.id] ?? { active: false, frequency: "weekly" };
-            return (
-              <div
-                key={list.id}
-                className={`rounded-2xl border p-5 transition-all ${
-                  state.active
-                    ? "border-border bg-card"
-                    : "border-border/50 bg-muted/30 opacity-60"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{list.icon}</span>
-                    <div>
-                      <div className="font-semibold text-foreground text-[15px]">{list.label}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5 leading-snug">{list.desc}</div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => toggle(list.id)}
-                    className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
-                      state.active ? "bg-emerald-500" : "bg-muted-foreground/30"
-                    }`}
-                  >
-                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                      state.active ? "translate-x-5 left-1" : "left-1"
-                    }`} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Save */}
-        <div className="sticky bottom-6">
+        {/* Save + Unsubscribe All */}
+        <div className="sticky bottom-6 space-y-2">
           <button
             onClick={handleSave}
             disabled={saving}
             className="w-full py-3.5 rounded-2xl bg-foreground text-background font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition-all"
           >
             {saving ? "Saving…" : saved ? "Saved ✓" : "Save preferences"}
+          </button>
+          <button
+            onClick={unsubscribeAll}
+            className="w-full py-2.5 rounded-2xl border border-destructive/40 text-destructive text-sm font-medium hover:bg-destructive/5 transition-all"
+          >
+            Unsubscribe from all
           </button>
         </div>
 
