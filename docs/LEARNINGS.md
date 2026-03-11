@@ -833,3 +833,46 @@ const { data: syntheses } = await supabase
 const synthMap = new Map(syntheses.map(s => [s.user_question_id, s]));
 const merged = questions.map(q => ({ ...q, synthesis: synthMap.get(q.id) ?? null }));
 ```
+
+---
+
+## 18. Video Page v2 Redesign — Patterns & Gotchas (2026-03-11)
+
+### A. Route Promotion
+- **Old design:** `src/app/video-2025/[id]` → `/video-2025/[id]`
+- **New design:** `src/app/video/[id]` → `/video/[id]`
+- All existing `/video/` hrefs site-wide automatically point to the new page after the directory rename. No mass link updates required.
+
+### B. `raw_timestamped_subtitles` Shape — Use Runtime Parser
+Supabase returns `raw_timestamped_subtitles` (JSONB) typed as `Json`. The data is stored as `{ data: TimestampedSegment[] }` but a bare TypeScript cast gives NO runtime guarantee.
+
+**Wrong pattern (breaks silently):**
+```ts
+const rawTs = video.raw_timestamped_subtitles as { data: TimestampedSegment[] } | null;
+const segments = rawTs?.data; // undefined if shape differs
+```
+
+**Correct pattern — use the safe parser in `video/[id]/page.tsx`:**
+```ts
+function getTimestampedSegments(raw: unknown): TimestampedSegment[] | null {
+    // handles { data: [] }, plain [], and double-encoded strings
+}
+const rawSegments = getTimestampedSegments(video.raw_timestamped_subtitles);
+```
+
+### C. Timestamp Links → Seek + Autoplay Pattern
+Transcript `[0:45]` links must **not** use `<Link href="?t=45">` (page reload resets play state).
+Use `seekYouTubePlayer(seconds)` from `YouTubePlayer.tsx` which dispatches a `"yt-seek"` `CustomEvent` on `window`. The player listens, seeks, and autoplays — no navigation.
+
+**Client wrapper:** `src/components/video/TimestampLink.tsx`  
+**Event dispatcher:** `seekYouTubePlayer()` exported from `YouTubePlayer.tsx`
+
+### D. Sticky Sidebar Independent Scroll — Avoid
+Tailwind classes `lg:sticky lg:top-14 lg:self-start lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto` on a sidebar container create two independent scroll contexts. Users experience content cutoff and disorientation. **Prefer normal document flow** (both columns scroll together) unless the sidebar content is independently navigable and short enough not to cause overflow.
+
+### E. New video Components (session output)
+| Component | Path | Purpose |
+|---|---|---|
+| `EvidenceStrengthCard` | `src/components/video/EvidenceStrengthCard.tsx` | Evidence/RVNDE score card matching Greyson/Transformation design |
+| `TimestampLink` | `src/components/video/TimestampLink.tsx` | Client button that fires `yt-seek` event |
+| `SocialShareButton` | `src/components/video/ShareButton.tsx` | Share sheet (copy URL, social links) |

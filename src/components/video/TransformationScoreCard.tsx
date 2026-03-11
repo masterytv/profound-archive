@@ -48,6 +48,7 @@ interface TransformationScoreCardProps {
     totalScore: number;
     classification: string;
     breakdown: TransformationBreakdown;
+    title?: string;
 }
 
 // --- Helpers ---
@@ -92,7 +93,7 @@ const getDomainBarWidth = (score: number): string => {
 
 // --- Component ---
 
-export function TransformationScoreCard({ totalScore, classification, breakdown }: TransformationScoreCardProps) {
+export function TransformationScoreCard({ totalScore, classification, breakdown, title }: TransformationScoreCardProps) {
     if (!breakdown || !breakdown.domain_analysis) return null;
 
     const { domain_analysis, qualitative_profile, quantitative_metrics } = breakdown;
@@ -104,7 +105,7 @@ export function TransformationScoreCard({ totalScore, classification, breakdown 
             <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-base">
                     <div className="flex items-center gap-2">
-                        NDE Transformation Index
+                        {title ?? "NDE Transformation Index"}
                         <Link href="/scale/transformation" target="_blank" className="text-muted-foreground hover:text-primary transition-colors">
                             <ExternalLink className="w-4 h-4" />
                         </Link>
@@ -116,9 +117,9 @@ export function TransformationScoreCard({ totalScore, classification, breakdown 
                 {/* Score Header */}
                 <div className="flex items-baseline gap-2">
                     <div className={`text-4xl font-bold ${getScoreColor(totalScore)}`}>
-                        {totalScore}
+                        {Math.round((totalScore / 50) * 100)}%
                     </div>
-                    <div className="text-lg text-muted-foreground font-normal">/ 50</div>
+                    <div className="text-sm text-muted-foreground font-normal">{totalScore}/50</div>
                     <Badge className={`${getScoreColor(totalScore)} bg-primary/10 hover:bg-primary/20 border-0 ml-auto text-[10px]`}>
                         {classification || "N/A"}
                     </Badge>

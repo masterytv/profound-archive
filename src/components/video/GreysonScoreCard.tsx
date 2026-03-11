@@ -49,6 +49,7 @@ interface GreysonScoreCardProps {
     totalScore: number;
     classification: string;
     breakdown: GreysonBreakdown;
+    title?: string;
 }
 
 // Helper to format key names (e.g., "time_distortion" -> "Time distortion")
@@ -120,7 +121,7 @@ const CategorySection = ({
     );
 };
 
-export function GreysonScoreCard({ totalScore, classification, breakdown }: GreysonScoreCardProps) {
+export function GreysonScoreCard({ totalScore, classification, breakdown, title }: GreysonScoreCardProps) {
     if (!breakdown) return null;
 
     return (
@@ -128,7 +129,7 @@ export function GreysonScoreCard({ totalScore, classification, breakdown }: Grey
             <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-base">
                     <div className="flex items-center gap-2">
-                        Greyson NDE Scale
+                        {title ?? "Greyson NDE Scale"}
                         <Link href="/scale/greyson" target="_blank" className="text-muted-foreground hover:text-primary transition-colors">
                             <ExternalLink className="w-4 h-4" />
                         </Link>
@@ -139,9 +140,9 @@ export function GreysonScoreCard({ totalScore, classification, breakdown }: Grey
             <CardContent className="flex-1 flex flex-col gap-4">
                 <div className="flex items-baseline gap-2">
                     <div className={`text-4xl font-bold ${getScoreColor(totalScore)}`}>
-                        {totalScore}
+                        {Math.round((totalScore / 32) * 100)}%
                     </div>
-                    <div className="text-lg text-muted-foreground font-normal">/ 32</div>
+                    <div className="text-sm text-muted-foreground font-normal">{totalScore}/32</div>
                     <Badge className={`${getScoreColor(totalScore)} bg-primary/10 hover:bg-primary/20 border-0 ml-auto`}>
                         {classification || "N/A"}
                     </Badge>

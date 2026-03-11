@@ -55,9 +55,6 @@ export function SimilarExperiences({ results }: SimilarExperiencesProps) {
                 >
                     Similar Experiences
                 </h2>
-                <span className="ml-auto text-[10px] font-medium bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
-                    AI-powered
-                </span>
             </div>
 
             {/* Content */}
