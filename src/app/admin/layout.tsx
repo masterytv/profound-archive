@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List, ListVideo } from "lucide-react";
+import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List, ListVideo, Mail } from "lucide-react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -112,6 +112,13 @@ export default async function AdminLayout({
                         >
                             <ListVideo className="w-4 h-4" />
                             Pending Queue
+                        </Link>
+                        <Link
+                            href="/admin/email"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <Mail className="w-4 h-4 text-purple-500" />
+                            Email CRM
                         </Link>
                         {profile?.role === "super_admin" && (
                             <Link

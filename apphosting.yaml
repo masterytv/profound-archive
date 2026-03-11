@@ -73,6 +73,10 @@ env:
   - variable: SUPADATA_API_KEY
     secret: projects/432036554831/secrets/SUPADATA_API_KEY/versions/1
 
+  # Resend — transactional email provider for quiz subscriber CRM
+  - variable: RESEND_API_KEY
+    secret: projects/432036554831/secrets/RESEND_API_KEY/versions/1
+
   # Apify API token — kept for potential future use (currently unused)
   - variable: APIFY_API_TOKEN
     secret: projects/432036554831/secrets/APIFY_API_TOKEN/versions/1

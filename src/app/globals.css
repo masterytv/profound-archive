@@ -123,3 +123,19 @@ body {
   background: hsl(225 25% 20%);
   border-radius: 4px;
 }
+
+/* ─── Quiz slide-in animation ───────────────────────────────────── */
+@keyframes quiz-slide {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-quiz-slide {
+  animation: quiz-slide 0.35s ease-out forwards;
+}

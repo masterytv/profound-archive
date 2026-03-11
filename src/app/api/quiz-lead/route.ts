@@ -1,0 +1,28 @@
+// src/app/api/quiz-lead/route.ts
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+
+export async function POST(req: Request) {
+  try {
+    const { email, archetype, frequency } = await req.json();
+
+    if (!email || !archetype || !frequency) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("quiz_leads")
+      .insert({ email, archetype, frequency });
+
+    if (error) {
+      console.error("[quiz-lead] insert error:", error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("[quiz-lead] unexpected error:", err);
+    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+  }
+}

@@ -136,23 +136,15 @@ export default function SiteHeader() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
-            {/* Questions — direct top-level link */}
+            {/* Big Questions — direct top-level link */}
             <Link
               href="/questions"
               className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
             >
-              Questions
+              Big Questions
             </Link>
 
-            {/* Channels — direct top-level link */}
-            <Link
-              href="/channels"
-              className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
-            >
-              Channels
-            </Link>
-
-            {/* Research Dropdown */}
+            {/* Browse Dropdown */}
             <div className="relative" ref={exploreRef}>
               <button
                 onClick={() => {
@@ -162,11 +154,24 @@ export default function SiteHeader() {
                 }}
                 className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
               >
-                Research
+                Browse
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${exploreOpen ? 'rotate-180' : ''}`} />
               </button>
               {exploreOpen && (
                 <div className="absolute top-full left-0 mt-1.5 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
+                  <Link
+                    href="/channels"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    onClick={() => setExploreOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/20 flex items-center justify-center">
+                      <Tv className="w-4 h-4 text-indigo-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">By Channel</div>
+                      <div className="text-xs text-slate-400">Browse by NDE video channel</div>
+                    </div>
+                  </Link>
                   <Link
                     href="/explore/veridical"
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
@@ -176,8 +181,8 @@ export default function SiteHeader() {
                       <TrendingUp className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Veridical Perception</div>
-                      <div className="text-xs text-slate-400">Evidential out-of-body reports</div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">By Evidence Strength</div>
+                      <div className="text-xs text-slate-400">Veridical out-of-body accounts</div>
                     </div>
                   </Link>
                   <Link
@@ -189,8 +194,8 @@ export default function SiteHeader() {
                       <Brain className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Greyson Scale</div>
-                      <div className="text-xs text-slate-400">NDE depth measurement</div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">By Experience Depth</div>
+                      <div className="text-xs text-slate-400">Greyson scale NDE depth</div>
                     </div>
                   </Link>
                   <Link
@@ -202,8 +207,8 @@ export default function SiteHeader() {
                       <Sparkles className="w-4 h-4 text-rose-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Transformation Index</div>
-                      <div className="text-xs text-slate-400">Life-changing impact scores</div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">By Life Impact</div>
+                      <div className="text-xs text-slate-400">Transformation index scores</div>
                     </div>
                   </Link>
                 </div>
@@ -218,6 +223,16 @@ export default function SiteHeader() {
               <Search className="w-3.5 h-3.5" />
               Search
             </Link>
+
+            {/* Quiz Link — admin only during soft launch */}
+            {(userRole === 'admin' || userRole === 'super_admin') && (
+              <Link
+                href="/quiz"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-700 dark:text-purple-300 bg-purple-50/70 dark:bg-purple-500/15 hover:bg-purple-100/80 dark:hover:bg-purple-500/25 transition-all"
+              >
+                ✦ What's Your NDE Type?
+              </Link>
+            )}
 
             {/* Chat Dropdown */}
             <div className="relative" ref={toolsRef}>
@@ -446,33 +461,23 @@ export default function SiteHeader() {
                     </div>
                   )}
 
-                  {/* Questions — direct link */}
+                  {/* Big Questions — direct link */}
                   <Link
                     href="/questions"
                     className="flex items-center gap-3 text-base font-semibold text-slate-900 dark:text-white"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <HelpCircle className="w-4 h-4 text-violet-600" />
-                    Questions
+                    Big Questions
                   </Link>
 
-                  {/* Channels — direct link */}
-                  <Link
-                    href="/channels"
-                    className="flex items-center gap-3 text-base font-semibold text-slate-900 dark:text-white"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Tv className="w-4 h-4 text-indigo-600" />
-                    Channels
-                  </Link>
-
-                  {/* Research Section */}
+                  {/* Browse Section */}
                   <div>
                     <button
                       onClick={() => setMobileExploreOpen(!mobileExploreOpen)}
                       className="flex items-center justify-between w-full text-base font-semibold text-slate-900 dark:text-white mb-3"
                     >
-                      Research
+                      Browse
                       <ChevronDown
                         className={`w-4 h-4 transition-transform ${mobileExploreOpen ? "rotate-180" : ""}`}
                       />
@@ -480,28 +485,36 @@ export default function SiteHeader() {
                     {mobileExploreOpen && (
                       <div className="space-y-1 pl-1">
                         <Link
+                          href="/channels"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Tv className="w-4 h-4 text-indigo-600" />
+                          By Channel
+                        </Link>
+                        <Link
                           href="/explore/veridical"
-                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <TrendingUp className="w-4 h-4 text-emerald-600" />
-                          Veridical Perception
+                          By Evidence Strength
                         </Link>
                         <Link
                           href="/explore/greyson"
-                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Brain className="w-4 h-4 text-blue-600" />
-                          Greyson Scale
+                          By Experience Depth
                         </Link>
                         <Link
                           href="/explore/transformation"
-                          className="flex items-center gap-3 py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Sparkles className="w-4 h-4 text-rose-600" />
-                          Transformation Index
+                          By Life Impact
                         </Link>
                       </div>
                     )}
@@ -510,12 +523,24 @@ export default function SiteHeader() {
                   {/* Search */}
                   <Link
                     href="/search3"
-                    className="flex items-center gap-3 text-base font-semibold text-slate-900"
+                    className="flex items-center gap-3 text-base font-semibold text-slate-900 dark:text-white"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Search className="w-4 h-4 text-slate-500" />
                     Search
                   </Link>
+
+                  {/* Quiz — admin only during soft launch */}
+                  {(userRole === 'admin' || userRole === 'super_admin') && (
+                    <Link
+                      href="/quiz"
+                      className="flex items-center gap-3 text-base font-semibold text-purple-700 dark:text-purple-300"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span className="text-base">✦</span>
+                      What's Your NDE Type?
+                    </Link>
+                  )}
 
                   {/* Chat Section */}
                   <div>

@@ -1,0 +1,25 @@
+name: Email CRM Cron
+
+on:
+  schedule:
+    # Runs every hour at minute 0
+    - cron: "0 * * * *"
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+jobs:
+  send-emails:
+    name: Dispatch Due Emails
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Trigger email cron endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            "https://projectprofound.org/api/email/cron")
+          echo "Response code: $response"
+          if [ "$response" != "200" ]; then
+            echo "::error::Email cron returned HTTP $response"
+            exit 1
+          fi
