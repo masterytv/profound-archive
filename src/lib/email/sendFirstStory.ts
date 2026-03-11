@@ -98,7 +98,7 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
   // Fetch customized template content from DB (if any)
   const { data: tmpl } = await supabase
     .from("email_templates")
-    .select("subject, intro_text, cta_text")
+    .select("subject, intro_text, cta_text, profile_report")
     .eq("archetype", archetype)
     .maybeSingle();
 
@@ -115,8 +115,9 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
       viewCount:      video.viewCount,
       frequency:      lead.frequency,
       unsubscribeUrl,
-      introText:      tmpl?.intro_text ?? undefined,
-      ctaText:        tmpl?.cta_text   ?? undefined,
+      introText:      tmpl?.intro_text     ?? undefined,
+      ctaText:        tmpl?.cta_text       ?? undefined,
+      profileReport:  (tmpl as { profile_report?: string | null } | null)?.profile_report ?? undefined,
     })
   );
 

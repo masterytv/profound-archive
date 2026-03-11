@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { type Archetype, type Frequency } from "@/lib/quiz/archetypes";
-import { ArrowRight, Check, AlertCircle } from "lucide-react";
+import { Check, AlertCircle } from "lucide-react";
 
 interface QuizResultProps {
   archetype: Archetype;
@@ -107,14 +107,7 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
           </div>
         )}
 
-        {/* CTA link */}
-        <Link
-          href={archetype.ctaHref}
-          className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-        >
-          {archetype.ctaLabel}
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+
       </div>
 
       {/* ─── "See all types" link ─── */}

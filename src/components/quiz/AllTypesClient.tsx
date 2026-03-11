@@ -105,12 +105,7 @@ function ArchetypeCard({ archetype }: { archetype: Archetype }) {
             </div>
           )}
 
-          <Link
-            href={archetype.ctaHref}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-          >
-            {archetype.ctaLabel}
-          </Link>
+
 
           {/* Subscribe form */}
           {!submitted ? (

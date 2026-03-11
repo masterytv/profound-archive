@@ -75,6 +75,7 @@ export async function GET(req: NextRequest) {
       unsubscribeUrl: "https://projectprofound.org/unsubscribe?token=preview",
       introText:      tpl?.intro_text ?? undefined,
       ctaText:        tpl?.cta_text ?? "Watch this story →",
+      profileReport:  tpl?.profile_report ?? undefined,
     })
   );
 

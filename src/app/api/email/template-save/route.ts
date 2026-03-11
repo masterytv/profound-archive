@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { archetype, subject, intro_text, cta_text, from_name } = body;
+  const { archetype, subject, intro_text, cta_text, from_name, profile_report } = body;
 
   if (!archetype) {
     return NextResponse.json({ error: "Missing archetype" }, { status: 400 });
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   const { error } = await admin
     .from("email_templates")
     .upsert(
-      { archetype, subject, intro_text, cta_text, cta_href: body.cta_href ?? null, from_name, updated_at: new Date().toISOString() },
+      { archetype, subject, intro_text, cta_text, cta_href: body.cta_href ?? null, from_name, profile_report: profile_report ?? null, updated_at: new Date().toISOString() },
       { onConflict: "archetype" }
     );
 

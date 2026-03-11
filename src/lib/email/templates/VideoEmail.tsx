@@ -28,8 +28,9 @@ export interface VideoEmailProps {
   frequency:      string;   // "weekly", "daily", etc.
   unsubscribeUrl: string;
   // Optional overrides from email_templates DB
-  introText?: string;       // paragraph shown above video title
-  ctaText?:   string;       // button label, default "Watch this story →"
+  introText?:     string;       // paragraph shown above video title
+  ctaText?:       string;       // button label, default "Watch this story →"
+  profileReport?: string;       // full-page profile report shown above video (first email only)
 }
 
 const BASE_URL = "https://projectprofound.org";
@@ -46,6 +47,7 @@ export function VideoEmail({
   unsubscribeUrl,
   introText,
   ctaText = "Watch this story →",
+  profileReport,
 }: VideoEmailProps) {
   const videoUrl = `${BASE_URL}/video/${videoId}`;
   const formattedViews = viewCount
@@ -78,10 +80,22 @@ export function VideoEmail({
             <Text style={styles.brandName}>Project Profound</Text>
           </Section>
 
+          {/* Profile Report — only in first email when set */}
+          {profileReport && (
+            <Section style={styles.profileCard}>
+              <Text style={styles.profileHeading}>
+                {archetypeIcon} Your {archetypeLabel} Profile
+              </Text>
+              {profileReport.split(/\n\n+/).filter(Boolean).map((para, i) => (
+                <Text key={i} style={styles.profilePara}>{para.trim()}</Text>
+              ))}
+            </Section>
+          )}
+
           {/* Archetype label */}
           <Section>
             <Text style={styles.archetypeLabel}>
-              {archetypeIcon} A story for {archetypeLabel}
+              {archetypeIcon} Your first story
             </Text>
           </Section>
 
@@ -210,6 +224,28 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     textDecoration: "none",
     display: "inline-block",
+  },
+  profileCard: {
+    backgroundColor: "#F0EBE3",
+    borderRadius: "12px",
+    padding: "24px",
+    marginBottom: "28px",
+  },
+  profileHeading: {
+    fontSize: "15px",
+    fontWeight: "700",
+    color: "#1E293B",
+    fontFamily: "Georgia, serif",
+    margin: "0 0 12px",
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.04em",
+  },
+  profilePara: {
+    fontSize: "15px",
+    color: "#374151",
+    fontFamily: "Georgia, 'Times New Roman', serif",
+    lineHeight: "1.7",
+    margin: "0 0 12px",
   },
   divider: {
     borderColor: "#E2E8F0",
