@@ -46,7 +46,7 @@ export function HeroSearchBar() {
                     }
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full pl-11 pr-28 h-14 text-lg rounded-full border-2 border-primary/20 focus:border-primary shadow-lg bg-white"
+                    className="w-full pl-11 pr-28 h-14 text-lg rounded-full border-2 border-primary/20 focus:border-primary shadow-lg bg-white dark:bg-slate-800 dark:border-slate-600/50 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
                 <Search className="w-5 h-5 absolute left-4 top-4.5 text-muted-foreground" />
                 <Button
@@ -63,7 +63,7 @@ export function HeroSearchBar() {
 
             {/* Search mode toggle */}
             <div className="flex justify-center">
-                <div className="inline-flex items-center bg-white/80 backdrop-blur-sm p-1 rounded-full border shadow-sm">
+                <div className="inline-flex items-center bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-1 rounded-full border dark:border-slate-700 shadow-sm">
                     <button
                         type="button"
                         onClick={() => setSearchType("keyword")}
@@ -79,7 +79,7 @@ export function HeroSearchBar() {
                         onClick={() => setSearchType("semantic")}
                         className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${searchType === "semantic"
                             ? "bg-blue-600 text-white shadow-sm"
-                            : "text-blue-700 hover:text-blue-900"
+                            : "text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                             }`}
                     >
                         <BrainCircuit className="w-3 h-3" />

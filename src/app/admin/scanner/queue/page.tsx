@@ -27,10 +27,10 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_CLASSES: Record<string, string> = {
-    failed: 'bg-red-50 text-red-700',
-    no_captions: 'bg-slate-100 text-slate-500',
-    not_profound: 'bg-amber-50 text-amber-600',
-    indexing: 'bg-orange-50 text-orange-600',
+    failed: 'bg-red-50 dark:bg-red-500/20 text-red-700 dark:text-red-400',
+    no_captions: 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400',
+    not_profound: 'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400',
+    indexing: 'bg-orange-50 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400',
 };
 
 export default function QueueInspectorPage() {
@@ -94,7 +94,7 @@ export default function QueueInspectorPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Pro, serif' }}>
+                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100" style={{ fontFamily: 'Crimson Pro, serif' }}>
                         Queue Inspector
                     </h1>
                     <p className="text-sm text-slate-500 mt-0.5">
@@ -103,7 +103,7 @@ export default function QueueInspectorPage() {
                 </div>
                 <button
                     onClick={fetchItems}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                 >
                     <RefreshCcw className="w-4 h-4" />
                     Refresh
@@ -111,14 +111,14 @@ export default function QueueInspectorPage() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-1 p-1 bg-slate-100 rounded-xl w-fit">
+            <div className="flex flex-wrap gap-1 p-1 bg-slate-100 dark:bg-white/10 rounded-xl w-fit">
                 {TAB_OPTIONS.map(tab => (
                     <button
                         key={tab.key}
                         onClick={() => setFilter(tab.key)}
                         className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${filter === tab.key
-                            ? 'bg-white text-slate-900 shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
+                            ? 'bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-sm'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                             }`}
                     >
                         {tab.label}
@@ -136,9 +136,9 @@ export default function QueueInspectorPage() {
                     <p className="text-sm mt-1">All videos are processing normally</p>
                 </div>
             ) : (
-                <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden">
+                <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden">
                     <table className="w-full text-sm">
-                        <thead className="bg-slate-50 border-b border-slate-200">
+                        <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
                             <tr>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Video</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Channel</th>
@@ -147,14 +147,14 @@ export default function QueueInspectorPage() {
                                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wide">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/10">
                             {filtered.map((item) => (
                                 <>
-                                    <tr key={item.videoId} className="hover:bg-slate-50/50 transition-colors">
+                                    <tr key={item.videoId} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
                                         {/* Video */}
                                         <td className="px-4 py-3 max-w-xs">
                                             <div className="space-y-0.5">
-                                                <p className="text-slate-800 text-xs font-medium truncate">
+                                                <p className="text-slate-800 dark:text-slate-200 text-xs font-medium truncate">
                                                     {item.title || <span className="text-slate-400 italic">Untitled</span>}
                                                 </p>
                                                 <a
@@ -177,7 +177,7 @@ export default function QueueInspectorPage() {
 
                                         {/* Status badge */}
                                         <td className="px-4 py-3">
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_CLASSES[item.intake_status] || 'bg-slate-100 text-slate-500'}`}>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_CLASSES[item.intake_status] || 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
                                                 {item.intake_status === 'failed' && <AlertTriangle className="w-3 h-3" />}
                                                 {item.intake_status === 'no_captions' && <SkipForward className="w-3 h-3" />}
                                                 {item.intake_status === 'indexing' && <Clock className="w-3 h-3" />}
@@ -201,7 +201,7 @@ export default function QueueInspectorPage() {
                                                 {item.intake_error && (
                                                     <button
                                                         onClick={() => setExpandedError(expandedError === item.videoId ? null : item.videoId)}
-                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
                                                         title="View error"
                                                     >
                                                         {expandedError === item.videoId
@@ -213,7 +213,7 @@ export default function QueueInspectorPage() {
                                                 <button
                                                     onClick={() => retryVideo(item.videoId)}
                                                     disabled={retrying === item.videoId}
-                                                    className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50"
+                                                    className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/30 transition-colors disabled:opacity-50"
                                                     title="Reset to pending for retry"
                                                 >
                                                     {retrying === item.videoId
@@ -228,7 +228,7 @@ export default function QueueInspectorPage() {
 
                                     {/* Expanded error row */}
                                     {expandedError === item.videoId && item.intake_error && (
-                                        <tr key={`${item.videoId}-error`} className="bg-red-50">
+                                        <tr key={`${item.videoId}-error`} className="bg-red-50 dark:bg-red-900/20">
                                             <td colSpan={5} className="px-4 py-3">
                                                 <p className="text-xs text-red-700 font-mono whitespace-pre-wrap break-all">
                                                     {item.intake_error}

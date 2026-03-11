@@ -147,7 +147,7 @@ export function QuestionsSearchBar() {
                         placeholder="Ask anything about NDEs…"
                         disabled={isLocked}
                         autoComplete="off"
-                        className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white shadow-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-base transition disabled:opacity-60"
+                        className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-white/5 shadow-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-700 focus:border-transparent text-base transition disabled:opacity-60"
                     />
                     {loading && (
                         <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 animate-spin" />
@@ -168,11 +168,11 @@ export function QuestionsSearchBar() {
 
             {/* ── Dropdown ─────────────────────────────────────────────────── */}
             {open && (results.length > 0 || showCustomOption) && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden z-[9999]">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-[9999]">
                     {/* Curated matches */}
                     {results.length > 0 && (
                         <div>
-                            <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-400">
+                            <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                                 Questions in our archive
                             </p>
                             {results.map((r, i) => (
@@ -182,7 +182,7 @@ export function QuestionsSearchBar() {
                                     onClick={() => goToQuestion(r.slug)}
                                     disabled={navigating !== null}
                                     className={`w-full text-left flex items-center gap-3 px-4 py-3 transition-colors cursor-pointer ${
-                                        i === activeIdx ? "bg-blue-50" : "hover:bg-slate-50"
+                                        i === activeIdx ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-slate-50 dark:hover:bg-white/5"
                                     } disabled:cursor-default`}
                                 >
                                     {navigating === r.slug ? (
@@ -192,9 +192,9 @@ export function QuestionsSearchBar() {
                                     )}
                                     <div className="flex-1 min-w-0">
                                         <p className={`text-sm leading-snug ${
-                                            navigating === r.slug ? "text-blue-700 font-medium" : "text-slate-800"
+                                            navigating === r.slug ? "text-blue-700 dark:text-blue-400 font-medium" : "text-slate-800 dark:text-slate-200"
                                         }`}>{r.consumer_question}</p>
-                                        <p className="text-xs text-slate-400 mt-0.5">{r.category_label}</p>
+                                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{r.category_label}</p>
                                     </div>
                                     {navigating === r.slug ? (
                                         <span className="text-xs text-blue-500 shrink-0">Loading…</span>
@@ -209,7 +209,7 @@ export function QuestionsSearchBar() {
                     {/* Divider + custom option */}
                     {showCustomOption && (
                         <>
-                            {results.length > 0 && <div className="border-t border-slate-100 mx-4" />}
+                            {results.length > 0 && <div className="border-t border-slate-100 dark:border-slate-700 mx-4" />}
                             <button
                                 type="button"
                                 onClick={() => submitCustom(query)}
@@ -217,10 +217,10 @@ export function QuestionsSearchBar() {
                             >
                                 <Search className="w-4 h-4 text-blue-400 shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm text-slate-700 group-hover:text-blue-700 transition-colors">
+                                    <p className="text-sm text-slate-700 dark:text-slate-300 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                                         Search NDEs for: <span className="font-semibold">&ldquo;{query.trim()}&rdquo;</span>
                                     </p>
-                                    <p className="text-xs text-slate-400 mt-0.5">
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                                         Ask your own question — we&apos;ll search 5,000+ accounts
                                     </p>
                                 </div>

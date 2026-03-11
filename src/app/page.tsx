@@ -155,15 +155,11 @@ export default async function HomeAlt1() {
     return (
         <div className="min-h-screen">
             {/* ─── Hero Section ─── */}
-            <section
-                className="relative overflow-hidden"
-                style={{
-                    background: "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 40%, #F1F5F9 100%)",
-                }}
-            >
+            <section className="relative overflow-hidden hero-gradient">
+
                 {/* Decorative grid dots */}
                 <div
-                    className="absolute inset-0 opacity-[0.03]"
+                    className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07]"
                     style={{
                         backgroundImage: "radial-gradient(circle, #2563EB 1px, transparent 1px)",
                         backgroundSize: "32px 32px",
@@ -174,7 +170,7 @@ export default async function HomeAlt1() {
 
                     {/* Main heading — serif with italic emphasis */}
                     <h1
-                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]"
+                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-6 leading-[1.1]"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         Archive of the{" "}
@@ -186,7 +182,7 @@ export default async function HomeAlt1() {
                         </span>
                     </h1>
 
-                    <p className="max-w-2xl mx-auto text-slate-600 text-lg md:text-xl mb-10 leading-relaxed">
+                    <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg md:text-xl mb-10 leading-relaxed">
                         Search 5,000+ first-person accounts of Near-Death Experiences.
                         Explore by scientific scales. Discover patterns across the veil.
                     </p>
@@ -198,17 +194,17 @@ export default async function HomeAlt1() {
 
                     {/* Stats ribbon */}
                     <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-sm">
-                        <div className="flex items-center gap-2 text-slate-500">
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                             <Search className="w-4 h-4 text-blue-500" />
-                            <span><strong className="text-slate-800 font-semibold">5,000+</strong> Accounts</span>
+                            <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">5,000+</strong> Accounts</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-500">
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                             <TrendingUp className="w-4 h-4 text-emerald-500" />
-                            <span><strong className="text-slate-800 font-semibold">3</strong> Research Scales</span>
+                            <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">3</strong> Research Scales</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-500">
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                             <Cpu className="w-4 h-4 text-violet-500" />
-                            <span><strong className="text-slate-800 font-semibold">AI-Powered</strong> Analysis</span>
+                            <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">AI-Powered</strong> Analysis</span>
                         </div>
                     </div>
                 </div>
@@ -219,17 +215,17 @@ export default async function HomeAlt1() {
                 <section className="container mx-auto px-4 pt-6 pb-4 max-w-7xl">
                     <div className="text-center mb-10">
                         <div className="flex items-center justify-center gap-2.5 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
-                                <Plus className="w-5 h-5 text-green-600" />
+                            <div className="w-10 h-10 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
+                                <Plus className="w-5 h-5 text-green-600 dark:text-green-400" />
                             </div>
                             <h2
-                                className="text-2xl md:text-3xl font-bold text-slate-900"
+                                className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
                                 Just Added
                             </h2>
                         </div>
-                        <p className="text-slate-500 max-w-xl mx-auto">
+                        <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
                             Recently imported experiences
                         </p>
                     </div>
@@ -239,9 +235,9 @@ export default async function HomeAlt1() {
                             <Link
                                 key={video.videoId}
                                 href={`/video/${video.videoId}`}
-                                className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden hover:shadow-lg transition-all duration-300"
+                                className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 overflow-hidden hover:shadow-lg dark:hover:shadow-slate-900/40 transition-all duration-300"
                             >
-                                <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                                <div className="relative aspect-video bg-slate-100 dark:bg-slate-700 overflow-hidden">
                                     {video.thumbnailUrl && (
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <img
@@ -255,11 +251,11 @@ export default async function HomeAlt1() {
                                     </span>
                                 </div>
                                 <div className="p-3">
-                                    <p className="text-sm font-medium text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                                    <p className="text-sm font-medium text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
                                         {video.title}
                                     </p>
                                     {video.channelName && (
-                                        <p className="text-[11px] text-slate-400 mt-1 truncate">{video.channelName}</p>
+                                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 truncate">{video.channelName}</p>
                                     )}
                                 </div>
                             </Link>
@@ -269,7 +265,7 @@ export default async function HomeAlt1() {
                     <div className="text-center mt-8">
                         <Link
                             href="/search3?q=*&sort=date:desc"
-                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-green-50 text-green-700 text-sm font-medium hover:bg-green-100 transition-colors"
+                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-medium hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
                         >
                             See All New Videos
                             <ArrowRight className="w-4 h-4" />
@@ -282,17 +278,17 @@ export default async function HomeAlt1() {
             <section className="container mx-auto px-4 pt-6 pb-12 max-w-7xl">
                 <div className="text-center mb-10">
                     <div className="flex items-center justify-center gap-2.5 mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                            <Tv className="w-5 h-5 text-indigo-600" />
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+                            <Tv className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                         </div>
                         <h2
-                            className="text-2xl md:text-3xl font-bold text-slate-900"
+                            className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             Explore by Channel
                         </h2>
                     </div>
-                    <p className="text-slate-500 max-w-xl mx-auto">
+                    <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
                         Discover NDE channels sharing first-person accounts.
                     </p>
                 </div>
@@ -306,7 +302,7 @@ export default async function HomeAlt1() {
                 <div className="text-center">
                     <Link
                         href="/channels"
-                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-medium hover:bg-indigo-100 transition-colors"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                     >
                         Browse All Channels
                         <ArrowRight className="w-4 h-4" />
@@ -318,26 +314,26 @@ export default async function HomeAlt1() {
             <section className="container mx-auto px-4 pt-6 pb-20 max-w-7xl">
                 <div className="text-center mb-12">
                     <h2
-                        className="text-2xl md:text-3xl font-bold text-slate-900 mb-3"
+                        className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         Explore by Score
                     </h2>
-                    <p className="text-slate-500 max-w-xl mx-auto">
+                    <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
                         Curated selections from our highest-scoring accounts, refreshed every 6 hours.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {/* Column 1: Veridical Perception */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg dark:hover:shadow-slate-900/40 transition-shadow duration-300">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                                <TrendingUp className="w-5 h-5 text-emerald-600" />
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                                <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Veridical Perception</h3>
-                                <p className="text-xs text-slate-500">Verified out-of-body evidence</p>
+                                <h3 className="font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Veridical Perception</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Verified out-of-body evidence</p>
                             </div>
                         </div>
                         <div className="space-y-3">
@@ -345,10 +341,10 @@ export default async function HomeAlt1() {
                                 <Link
                                     key={video.videoId}
                                     href={`/video/${video.videoId}`}
-                                    className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+                                    className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors group cursor-pointer"
                                 >
                                     {/* Mini thumbnail */}
-                                    <div className="w-20 h-12 rounded-lg overflow-hidden bg-slate-100 shrink-0 relative">
+                                    <div className="w-20 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0 relative">
                                         {video.thumbnailUrl && (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img
@@ -364,11 +360,11 @@ export default async function HomeAlt1() {
                                         )}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-sm font-medium text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
                                             {video.title}
                                         </p>
                                         {video.channelName && (
-                                            <p className="text-[11px] text-slate-400 mt-0.5 truncate">{video.channelName}</p>
+                                            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{video.channelName}</p>
                                         )}
                                     </div>
                                 </Link>
@@ -376,7 +372,7 @@ export default async function HomeAlt1() {
                         </div>
                         <Link
                             href="/explore/veridical"
-                            className="mt-5 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-50 text-emerald-700 text-sm font-medium hover:bg-emerald-100 transition-colors cursor-pointer"
+                            className="mt-5 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors cursor-pointer"
                         >
                             Explore All
                             <ArrowRight className="w-4 h-4" />
@@ -384,14 +380,14 @@ export default async function HomeAlt1() {
                     </div>
 
                     {/* Column 2: Transformation */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg dark:hover:shadow-slate-900/40 transition-shadow duration-300">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-rose-600" />
+                            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center">
+                                <Sparkles className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Transformation</h3>
-                                <p className="text-xs text-slate-500">Profound life changes</p>
+                                <h3 className="font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Transformation</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Profound life changes</p>
                             </div>
                         </div>
                         <div className="space-y-3">
@@ -399,9 +395,9 @@ export default async function HomeAlt1() {
                                 <Link
                                     key={video.videoId}
                                     href={`/video/${video.videoId}`}
-                                    className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+                                    className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors group cursor-pointer"
                                 >
-                                    <div className="w-20 h-12 rounded-lg overflow-hidden bg-slate-100 shrink-0 relative">
+                                    <div className="w-20 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0 relative">
                                         {video.thumbnailUrl && (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img
@@ -417,11 +413,11 @@ export default async function HomeAlt1() {
                                         )}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-sm font-medium text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
                                             {video.title}
                                         </p>
                                         {video.channelName && (
-                                            <p className="text-[11px] text-slate-400 mt-0.5 truncate">{video.channelName}</p>
+                                            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{video.channelName}</p>
                                         )}
                                     </div>
                                 </Link>
@@ -429,7 +425,7 @@ export default async function HomeAlt1() {
                         </div>
                         <Link
                             href="/explore/transformation"
-                            className="mt-5 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-rose-50 text-rose-700 text-sm font-medium hover:bg-rose-100 transition-colors cursor-pointer"
+                            className="mt-5 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 text-sm font-medium hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors cursor-pointer"
                         >
                             Explore All
                             <ArrowRight className="w-4 h-4" />
@@ -437,14 +433,14 @@ export default async function HomeAlt1() {
                     </div>
 
                     {/* Column 3: Greyson Scale */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg dark:hover:shadow-slate-900/40 transition-shadow duration-300">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                                <Brain className="w-5 h-5 text-blue-600" />
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                                <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Greyson Scale</h3>
-                                <p className="text-xs text-slate-500">Classic NDE depth measurement</p>
+                                <h3 className="font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Greyson Scale</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Classic NDE depth measurement</p>
                             </div>
                         </div>
                         <div className="space-y-3">
@@ -452,9 +448,9 @@ export default async function HomeAlt1() {
                                 <Link
                                     key={video.videoId}
                                     href={`/video/${video.videoId}`}
-                                    className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+                                    className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors group cursor-pointer"
                                 >
-                                    <div className="w-20 h-12 rounded-lg overflow-hidden bg-slate-100 shrink-0 relative">
+                                    <div className="w-20 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0 relative">
                                         {video.thumbnailUrl && (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img
@@ -470,11 +466,11 @@ export default async function HomeAlt1() {
                                         )}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-sm font-medium text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
                                             {video.title}
                                         </p>
                                         {video.channelName && (
-                                            <p className="text-[11px] text-slate-400 mt-0.5 truncate">{video.channelName}</p>
+                                            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{video.channelName}</p>
                                         )}
                                     </div>
                                 </Link>
@@ -482,7 +478,7 @@ export default async function HomeAlt1() {
                         </div>
                         <Link
                             href="/explore/greyson"
-                            className="mt-5 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors cursor-pointer"
+                            className="mt-5 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer"
                         >
                             Explore All
                             <ArrowRight className="w-4 h-4" />
@@ -495,12 +491,12 @@ export default async function HomeAlt1() {
             <section className="container mx-auto px-4 pt-6 pb-16 max-w-7xl">
                 <div className="text-center mb-10">
                     <h2
-                        className="text-2xl md:text-3xl font-bold text-slate-900 mb-3"
+                        className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         Explore the NDE Ecosystem
                     </h2>
-                    <p className="text-slate-500 max-w-xl mx-auto">
+                    <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
                         Discover the organizations and researchers advancing our understanding of near-death experiences.
                     </p>
                 </div>
@@ -511,21 +507,21 @@ export default async function HomeAlt1() {
                         href="https://noeticmap.com/research/literature"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg hover:border-violet-200 transition-all duration-300"
+                        className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg hover:border-violet-200 dark:hover:border-violet-700/60 transition-all duration-300"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center mb-4 group-hover:bg-violet-100 transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center mb-4 group-hover:bg-violet-100 dark:group-hover:bg-violet-900/50 transition-colors">
                             <span className="text-lg">📚</span>
                         </div>
                         <h3
-                            className="font-bold text-slate-900 mb-1 group-hover:text-violet-700 transition-colors"
+                            className="font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-violet-700 dark:group-hover:text-violet-400 transition-colors"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             Academic Literature
                         </h3>
-                        <p className="text-sm text-slate-500 mb-3">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                             Search 1,100+ AI-analyzed peer-reviewed papers on consciousness research, with 9,000+ extracted findings.
                         </p>
-                        <span className="text-xs font-medium text-violet-600 group-hover:text-violet-700 transition-colors">
+                        <span className="text-xs font-medium text-violet-600 dark:text-violet-400 group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
                             NoeticMap.com ↗
                         </span>
                     </a>
@@ -535,21 +531,21 @@ export default async function HomeAlt1() {
                         href="https://www.nderf.org"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg hover:border-amber-200 transition-all duration-300"
+                        className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg hover:border-amber-200 dark:hover:border-amber-700/60 transition-all duration-300"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-4 group-hover:bg-amber-100 transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center mb-4 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/50 transition-colors">
                             <span className="text-lg">🌍</span>
                         </div>
                         <h3
-                            className="font-bold text-slate-900 mb-1 group-hover:text-amber-700 transition-colors"
+                            className="font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             World&apos;s Largest NDE Archive
                         </h3>
-                        <p className="text-sm text-slate-500 mb-3">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                             5,300+ documented near-death experiences collected since 1998 by Dr. Jeffrey Long, available in 37 languages.
                         </p>
-                        <span className="text-xs font-medium text-amber-600 group-hover:text-amber-700 transition-colors">
+                        <span className="text-xs font-medium text-amber-600 dark:text-amber-400 group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
                             NDERF.org ↗
                         </span>
                     </a>
@@ -559,21 +555,21 @@ export default async function HomeAlt1() {
                         href="https://noeticmap.com/answers"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg hover:border-teal-200 transition-all duration-300"
+                        className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg hover:border-teal-200 dark:hover:border-teal-700/60 transition-all duration-300"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center mb-4 group-hover:bg-teal-100 transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-4 group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
                             <span className="text-lg">❓</span>
                         </div>
                         <h3
-                            className="font-bold text-slate-900 mb-1 group-hover:text-teal-700 transition-colors"
+                            className="font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             Your Questions, Answered
                         </h3>
-                        <p className="text-sm text-slate-500 mb-3">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                             30+ evidence-based answers to questions like &quot;Are NDEs real?&quot; and &quot;What happens when we die?&quot;
                         </p>
-                        <span className="text-xs font-medium text-teal-600 group-hover:text-teal-700 transition-colors">
+                        <span className="text-xs font-medium text-teal-600 dark:text-teal-400 group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
                             NoeticMap.com ↗
                         </span>
                     </a>
@@ -582,7 +578,7 @@ export default async function HomeAlt1() {
                 <div className="text-center">
                     <Link
                         href="/resources"
-                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                     >
                         View All Resources
                         <ArrowRight className="w-4 h-4" />
@@ -591,15 +587,15 @@ export default async function HomeAlt1() {
             </section>
 
             {/* ─── Bottom CTA ─── */}
-            <section className="py-16 text-center" style={{ background: "linear-gradient(to bottom, #F8FAFC, #EFF6FF)" }}>
+            <section className="cta-gradient py-16 text-center">
                 <h2
-                    className="text-2xl md:text-3xl font-bold text-slate-900 mb-4"
+                    className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4"
                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                 >
                     Ready to explore the{" "}
                     <span className="text-blue-600" style={{ fontStyle: "italic" }}>evidence</span>?
                 </h2>
-                <p className="text-slate-500 mb-8 max-w-md mx-auto">
+                <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">
                     Search across 5,000+ accounts using keywords or AI-powered concept matching.
                 </p>
                 <Link

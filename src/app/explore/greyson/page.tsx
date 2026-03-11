@@ -102,45 +102,42 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
     const metaMap = new Map((videoMeta || []).map((v) => [v.videoId, v]));
 
     return (
-        <div className="min-h-screen" style={{ background: "#F8FAFC" }}>
+        <div className="min-h-screen bg-background text-foreground">
             {/* ─── Header ─── */}
-            <div
-                className="border-b border-slate-200"
-                style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%)" }}
-            >
+            <div className="border-b border-slate-200 dark:border-slate-800 hero-gradient">
                 <div className="container mx-auto px-4 py-8 max-w-7xl">
                     {/* Breadcrumb */}
-                    <nav className="flex items-center gap-1.5 text-sm text-slate-400 mb-6">
-                        <Link href="/" className="hover:text-blue-600 transition-colors">
+                    <nav className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 mb-6">
+                        <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                             Home
                         </Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <Link href="/" className="hover:text-blue-600 transition-colors">
+                        <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                             Explore
                         </Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <span className="text-slate-700 font-medium">Greyson Scale</span>
+                        <span className="text-slate-700 dark:text-slate-300 font-medium">Greyson Scale</span>
                     </nav>
 
                     <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center shrink-0">
-                            <Brain className="w-6 h-6 text-blue-600" />
+                        <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                            <Brain className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
                             <h1
-                                className="text-3xl md:text-4xl font-bold text-slate-900 mb-2"
+                                className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 mb-2"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
                                 Greyson NDE Scale
                             </h1>
-                            <p className="text-slate-500 max-w-2xl leading-relaxed">
+                            <p className="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
                                 The gold standard for measuring NDE depth. Sort by total score or explore
                                 individual categories: cognitive, affective, paranormal, and transcendental
                                 elements.
                             </p>
                             <Link
                                 href="/scale/greyson"
-                                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 mt-3 font-medium"
+                                className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mt-3 font-medium"
                             >
                                 Learn about the Greyson Scale
                                 <ChevronRight className="w-3.5 h-3.5" />
@@ -153,7 +150,7 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
             {/* ─── Controls + Grid ─── */}
             <div className="container mx-auto px-4 py-8 max-w-7xl">
                 {/* Controls */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 mb-8">
+                <div className="bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-4 mb-8">
                     <Suspense fallback={null}>
                         <ExplorerControls
                             sortOptions={SORT_OPTIONS}
@@ -183,10 +180,10 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
                             <Link
                                 key={item.video_id}
                                 href={`/video/${item.video_id}`}
-                                className="group block bg-white rounded-2xl overflow-hidden border border-slate-200/60 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer"
+                                className="group block bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-300 cursor-pointer"
                             >
                                 {/* Thumbnail */}
-                                <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                                <div className="relative aspect-video bg-slate-100 dark:bg-slate-800 overflow-hidden">
                                     {meta.thumbnailUrl ? (
                                         <Image
                                             src={meta.thumbnailUrl.replace("maxresdefault", "hqdefault")}
@@ -215,7 +212,7 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
                                 {/* Content */}
                                 <div className="p-4 space-y-2.5">
                                     <h3
-                                        className="text-sm font-semibold leading-snug line-clamp-2 text-slate-800 group-hover:text-blue-600 transition-colors"
+                                        className="text-sm font-semibold leading-snug line-clamp-2 text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
                                         style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: "15px" }}
                                     >
                                         {meta.title || "Untitled"}
@@ -223,7 +220,7 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
 
                                     <div className="flex items-center justify-between gap-2">
                                         {meta.channelName && (
-                                            <p className="text-xs text-slate-400 truncate">
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
                                                 {meta.channelName}
                                             </p>
                                         )}
@@ -237,8 +234,8 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
                                     {/* Sub-score when sorting by category */}
                                     {sortLabel && subScore && (
                                         <div className="pt-1">
-                                            <span className="text-[11px] bg-slate-50 px-2 py-1 rounded-lg text-slate-500">
-                                                {sortLabel}: <strong className="text-slate-700">{subScore}</strong>
+                                            <span className="text-[11px] bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg text-slate-500 dark:text-slate-400">
+                                                {sortLabel}: <strong className="text-slate-700 dark:text-slate-300">{subScore}</strong>
                                             </span>
                                         </div>
                                     )}
@@ -256,7 +253,7 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
 
                 {/* Bottom pagination */}
                 {totalPages > 1 && (
-                    <div className="mt-10 bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4">
+                    <div className="mt-10 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-4">
                         <Suspense fallback={null}>
                             <ExplorerControls
                                 sortOptions={SORT_OPTIONS}

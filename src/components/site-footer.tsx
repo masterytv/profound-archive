@@ -2,18 +2,18 @@ import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-slate-200/60 bg-slate-50 mt-auto">
+    <footer className="border-t border-slate-200/60 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-900/80 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <h3
-              className="text-lg font-bold text-slate-900 mb-2"
+              className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2"
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
               Project Profound
             </h3>
-            <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs">
               Exploring Near-Death Experiences through research, data analysis, and compassionate AI.
             </p>
           </div>
@@ -24,16 +24,16 @@ export default function SiteFooter() {
               Quick Links
             </h4>
             <div className="space-y-2 text-sm">
-              <Link href="/search3" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/search3" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Search NDEs
               </Link>
-              <Link href="/explore/veridical" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/explore/veridical" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Veridical Perception
               </Link>
-              <Link href="/explore/greyson" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/explore/greyson" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Greyson Scale
               </Link>
-              <Link href="/explore/transformation" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/explore/transformation" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Transformation Index
               </Link>
               <a
@@ -77,7 +77,7 @@ export default function SiteFooter() {
               >
                 NDERF Archive ↗
               </a>
-              <Link href="/resources" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/resources" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 All Resources
               </Link>
             </div>
@@ -89,13 +89,13 @@ export default function SiteFooter() {
               Legal & Support
             </h4>
             <div className="space-y-2 text-sm">
-              <Link href="/privacy" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/privacy" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/terms" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/about#connect" className="block text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/about#connect" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Contact
               </Link>
               <a
@@ -111,7 +111,7 @@ export default function SiteFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-slate-200/60 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="mt-10 pt-6 border-t border-slate-200/60 dark:border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-slate-400">
             © {new Date().getFullYear()} Project Profound. Dive deep into the experience.
           </p>

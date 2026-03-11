@@ -108,23 +108,23 @@ export default async function ChannelsPage({
     const rankOffset = (page - 1) * ITEMS_PER_PAGE
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+        <div className="min-h-screen bg-background text-foreground">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
 
                 {/* Header */}
                 <div className="mb-8 sm:mb-10">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
-                            <Tv className="w-5 h-5 text-blue-600" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/30">
+                            <Tv className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <h1
-                            className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"
+                            className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-50 tracking-tight"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             NDE Channels
                         </h1>
                     </div>
-                    <p className="text-slate-500 text-sm sm:text-base max-w-2xl">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base max-w-2xl">
                         {channels.length} channels sharing near-death experience accounts,
                         ranked by experience analysis. Sort by intensity, emotional tone, Greyson score, and more.
                     </p>
@@ -159,8 +159,8 @@ export default async function ChannelsPage({
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <Film className="w-12 h-12 text-slate-300 mb-3" />
-                        <p className="text-slate-500 text-sm">
+                        <Film className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">
                             {query ? `No channels matching "${query}"` : 'No channels found.'}
                         </p>
                     </div>

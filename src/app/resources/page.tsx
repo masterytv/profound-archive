@@ -33,7 +33,7 @@ function ResourceCard({
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-lg transition-all duration-300"
+            className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-6 hover:shadow-lg transition-all duration-300"
         >
             <div className="flex items-start gap-4 mb-3">
                 <div
@@ -42,18 +42,18 @@ function ResourceCard({
                     <Icon className={`w-5 h-5 ${iconColor}`} />
                 </div>
                 <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {title}
                     </h3>
-                    <p className="text-xs text-slate-400">{org}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">{org}</p>
                 </div>
-                <ExternalLink className="w-4 h-4 text-slate-300 group-hover:text-blue-400 shrink-0 mt-1 transition-colors" />
+                <ExternalLink className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-blue-400 shrink-0 mt-1 transition-colors" />
             </div>
-            <p className="text-sm text-slate-500 leading-relaxed flex-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed flex-1">
                 {description}
             </p>
             {stat && (
-                <p className="text-xs font-medium text-blue-600 mt-3 pt-3 border-t border-slate-100">
+                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mt-3 pt-3 border-t border-slate-100 dark:border-white/10">
                     {stat}
                 </p>
             )}
@@ -74,16 +74,16 @@ function BookCard({
     description: string;
 }) {
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
-            <p className="text-xs text-slate-400 mb-1">{year}</p>
+        <div className="bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-6">
+            <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{year}</p>
             <h3
-                className="font-bold text-slate-900 mb-0.5"
+                className="font-bold text-slate-900 dark:text-slate-100 mb-0.5"
                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
                 <em>{title}</em>
             </h3>
-            <p className="text-sm text-blue-600 mb-2">{author}</p>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">{author}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                 {description}
             </p>
         </div>
@@ -110,10 +110,10 @@ function SectionHeader({
                 <Icon className={`w-5 h-5 ${iconColor}`} />
             </div>
             <div>
-                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
                     {title}
                 </h2>
-                <p className="text-sm text-slate-500">{subtitle}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
             </div>
         </div>
     );
@@ -123,14 +123,8 @@ export default function ResourcesPage() {
     return (
         <div className="min-h-screen bg-background text-foreground">
             {/* Hero */}
-            <section
-                className="relative overflow-hidden py-16 md:py-24"
-                style={{
-                    background:
-                        "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 40%, #F1F5F9 100%)",
-                }}
-            >
-                <div className="absolute inset-0 opacity-[0.03]"
+            <section className="relative overflow-hidden py-16 md:py-24 hero-gradient">
+                <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
                     style={{
                         backgroundImage: "radial-gradient(circle, #2563EB 1px, transparent 1px)",
                         backgroundSize: "32px 32px",
@@ -139,21 +133,21 @@ export default function ResourcesPage() {
                 <div className="relative container mx-auto px-4 max-w-4xl text-center">
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 transition-colors mb-8"
+                        className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-8"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Home
                     </Link>
                     <h1
-                        className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4 leading-[1.1]"
+                        className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-4 leading-[1.1]"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         The NDE Research{" "}
-                        <span className="text-blue-600" style={{ fontStyle: "italic" }}>
+                        <span className="text-blue-600 dark:text-blue-400" style={{ fontStyle: "italic" }}>
                             Ecosystem
                         </span>
                     </h1>
-                    <p className="max-w-2xl mx-auto text-slate-600 text-lg leading-relaxed">
+                    <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
                         Project Profound is one part of a global community studying near-death experiences.
                         Here are the organizations, databases, and tools advancing this research.
                     </p>
@@ -536,16 +530,16 @@ export default function ResourcesPage() {
                 {/* ═══════════════════════════════════════════════════════════ */}
                 {/* About These Organizations (expanded) */}
                 {/* ═══════════════════════════════════════════════════════════ */}
-                <section className="bg-slate-50 rounded-2xl p-8 border border-slate-200/60">
+                <section className="bg-slate-50 dark:bg-white/5 rounded-2xl p-8 border border-slate-200/60 dark:border-white/10">
                     <h2
-                        className="text-xl font-bold text-slate-900 mb-4"
+                        className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         About These Organizations
                     </h2>
-                    <div className="space-y-6 text-sm text-slate-600 leading-relaxed">
+                    <div className="space-y-6 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                         <div>
-                            <h3 className="font-semibold text-slate-800 mb-1">
+                            <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
                                 IANDS — International Association for Near-Death Studies
                             </h3>
                             <p>
@@ -558,7 +552,7 @@ export default function ResourcesPage() {
                             </p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-800 mb-1">
+                            <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
                                 NDERF — Near-Death Experience Research Foundation
                             </h3>
                             <p>
@@ -571,7 +565,7 @@ export default function ResourcesPage() {
                             </p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-800 mb-1">
+                            <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
                                 NoeticMap.com
                             </h3>
                             <p>
@@ -582,7 +576,7 @@ export default function ResourcesPage() {
                             </p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-800 mb-1">
+                            <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
                                 Shared Crossing Project
                             </h3>
                             <p>
@@ -601,7 +595,7 @@ export default function ResourcesPage() {
                 <div className="text-center pt-4 pb-8">
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 transition-colors"
+                        className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Home

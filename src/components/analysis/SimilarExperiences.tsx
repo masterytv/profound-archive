@@ -45,12 +45,12 @@ export function SimilarExperiences({ results }: SimilarExperiencesProps) {
     if (!results || results.length === 0) return null;
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-purple-500" />
                 <h2
-                    className="text-lg font-bold text-slate-900"
+                    className="text-lg font-bold text-slate-900 dark:text-slate-100"
                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                 >
                     Similar Experiences
@@ -64,10 +64,10 @@ export function SimilarExperiences({ results }: SimilarExperiencesProps) {
                         <Link
                             key={exp.video_id}
                             href={`/video/${exp.video_id}`}
-                            className="group block rounded-xl overflow-hidden border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all duration-200"
+                            className="group block rounded-xl overflow-hidden border border-slate-100 dark:border-white/10 hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
                         >
                             {/* Thumbnail */}
-                            <div className="relative aspect-video bg-slate-100">
+                            <div className="relative aspect-video bg-slate-100 dark:bg-slate-800">
                                 {exp.thumbnailUrl ? (
                                     <Image
                                         src={exp.thumbnailUrl.replace("maxresdefault", "hqdefault")}
@@ -90,7 +90,7 @@ export function SimilarExperiences({ results }: SimilarExperiencesProps) {
 
                             {/* Info */}
                             <div className="p-3">
-                                <p className="text-sm font-medium text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
+                                <p className="text-sm font-medium text-slate-800 dark:text-slate-200 line-clamp-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                     {exp.title || "Untitled"}
                                 </p>
 
@@ -105,7 +105,7 @@ export function SimilarExperiences({ results }: SimilarExperiencesProps) {
                                         </span>
                                     )}
                                     {exp.tone && (
-                                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 capitalize">
+                                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 capitalize">
                                             {exp.tone.replace("_", " ")}
                                         </span>
                                     )}

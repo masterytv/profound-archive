@@ -157,11 +157,11 @@ export default function IntakePage() {
             {/* Page Header */}
             <div>
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
                         <Upload className="w-5 h-5 text-blue-600" />
                     </div>
                     <h1
-                        className="text-2xl font-bold text-slate-900"
+                        className="text-2xl font-bold text-slate-900 dark:text-slate-100"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         Video Intake Pipeline
@@ -173,9 +173,9 @@ export default function IntakePage() {
             </div>
 
             {/* URL Form Card */}
-            <div className="bg-white rounded-2xl border border-slate-200/60 p-6 shadow-sm">
+            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-6 shadow-sm">
                 <form onSubmit={handleSubmit}>
-                    <label htmlFor="youtube-url" className="block text-sm font-medium text-slate-700 mb-2">
+                    <label htmlFor="youtube-url" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                         YouTube URL
                     </label>
                     <div className="flex gap-3">
@@ -185,7 +185,7 @@ export default function IntakePage() {
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
                             placeholder="https://www.youtube.com/watch?v=..."
-                            className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            className="flex-1 px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                             disabled={isLoading}
                         />
                         <button
@@ -296,8 +296,8 @@ export default function IntakePage() {
 
                     {/* Processing Steps Card */}
                     {result.steps.length > 0 && (
-                        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-                            <div className="px-5 py-3.5 border-b border-slate-100">
+                        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                            <div className="px-5 py-3.5 border-b border-slate-100 dark:border-white/10">
                                 <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                     Processing Steps
                                 </h3>
@@ -306,7 +306,7 @@ export default function IntakePage() {
                                 {result.steps.map((step, i) => (
                                     <div
                                         key={i}
-                                        className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-slate-50/50 transition-colors"
+                                        className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors"
                                     >
                                         <span className="shrink-0">
                                             <StepStatusIcon status={step.status} />
@@ -353,7 +353,7 @@ export default function IntakePage() {
                                     setUrl('');
                                     setResult(null);
                                 }}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-white text-slate-600 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/20 hover:border-slate-300 transition-all cursor-pointer"
                             >
                                 <RotateCcw className="w-3.5 h-3.5" />
                                 Process Another
@@ -365,11 +365,11 @@ export default function IntakePage() {
 
             {/* Loading State */}
             {isLoading && !result && (
-                <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-12 text-center">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-12 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
                         <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
                     </div>
-                    <p className="text-slate-700 font-medium">Processing video through the intake pipeline...</p>
+                    <p className="text-slate-700 dark:text-slate-200 font-medium">Processing video through the intake pipeline...</p>
                     <p className="text-slate-400 text-sm mt-1">This typically takes 30–60 seconds</p>
                 </div>
             )}

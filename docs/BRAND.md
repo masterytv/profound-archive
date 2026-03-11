@@ -263,3 +263,75 @@ Both pages share a common pattern:
 - **Quick actions**: White pills with `hover:bg-blue-50 hover:border-blue-200`
 - **Input**: `bg-slate-50 rounded-full` with blue focus ring
 
+---
+
+## 12. Theme System
+
+### Overview
+
+Project Profound supports three theme options via **next-themes** (`^0.4.6`):
+
+| Option | Class on `<html>` | Behaviour |
+|--------|--------------------|----------|
+| **Light** | *(none / default)* | Forces light palette regardless of OS |
+| **System (Device)** | Follows OS | Reads `prefers-color-scheme` — default on first visit |
+| **Dark** | `.dark` | Forces dark palette regardless of OS |
+
+The selected preference is persisted in `localStorage` under the key `theme`.
+
+### How It Works
+
+1. `src/components/theme-provider.tsx` — thin `"use client"` wrapper around `NextThemesProvider`.
+2. Wraps the entire app in `src/app/layout.tsx` with `attribute="class" defaultTheme="system" enableSystem`.
+3. `suppressHydrationWarning` is set on `<html>` — next-themes injects an inline script that applies the `.dark` class before React hydrates, causing an intentional (harmless) mismatch.
+4. `src/components/theme-toggle.tsx` — three-button pill (☀ Light / 💻 System / 🌙 Dark) rendered in both the desktop nav and mobile sheet footer.
+
+### Light Palette (CSS Variables — `:root`)
+
+| Token | HSL | Tailwind Equivalent | Usage |
+|-------|-----|---------------------|-------|
+| `--background` | `210 40% 98%` | `slate-50` `#F8FAFC` | Page background |
+| `--foreground` | `222 47% 11%` | `slate-900` `#0F172A` | Primary text |
+| `--card` | `0 0% 100%` | white | Card background |
+| `--primary` | `221 83% 53%` | `blue-600` `#2563EB` | Links, buttons, accents |
+| `--border` | `214 32% 91%` | `slate-200` | Dividers, card borders |
+| `--muted-foreground` | `215 20% 45%` | `slate-500` | Secondary text |
+
+### Dark Palette (CSS Variables — `.dark`)
+
+| Token | HSL | Usage |
+|-------|-----|-------|
+| `--background` | `222 47% 8%` | Near `slate-950` — page background |
+| `--foreground` | `210 40% 96%` | `slate-100` — primary text |
+| `--card` | `222 47% 12%` | `slate-900` equiv — card background |
+| `--primary` | `221 83% 53%` | `blue-600` — unchanged brand accent |
+| `--border` | `222 47% 22%` | Subtle dark border |
+| `--muted-foreground` | `215 20% 65%` | Medium-grey secondary text |
+
+### Coding Rules
+
+1. **Prefer CSS variables** (`bg-background`, `text-foreground`, `bg-card`, `border-border`) — they flip automatically with the theme.
+2. **Use `dark:` variants** only for hardcoded Tailwind values that don't have a CSS variable equivalent, e.g. `bg-white dark:bg-slate-800`.
+3. **Never use raw `bg-white` without `dark:bg-*`** in new components — always pair the light value with a dark override.
+4. **Score accent colours** (emerald, rose, blue badges) look good in both themes — no special handling needed.
+5. **Admin pages** use a light theme regardless — the admin layout explicitly sets a `bg-[#F8FAFC]` base and should not adopt dark backgrounds.
+
+### Logo in Dark Mode
+
+| Theme | Logo variant to use |
+|-------|---------------------|
+| Light | `public/logo-transparent.png` (36×36 in nav) |
+| Dark | `public/logo-transparent.png` also works on dark backgrounds |
+| Dark overlay | Use `public/logo-white.png` for opaque dark surfaces or hero images |
+
+The transparent PNG renders well on both the light `bg-white/80` and the dark `bg-slate-900/80` header — no conditional swap needed for the nav.
+
+### Files
+
+| Purpose | Path |
+|---------|------|
+| CSS variables (light + dark) | `src/app/globals.css` |
+| ThemeProvider wrapper | `src/components/theme-provider.tsx` |
+| ThemeToggle button | `src/components/theme-toggle.tsx` |
+| Site Header (where toggle lives) | `src/components/site-header.tsx` |
+

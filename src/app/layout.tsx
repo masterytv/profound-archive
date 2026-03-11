@@ -7,6 +7,7 @@ import Script from 'next/script';
 import AuthConfirmationToast from '@/components/auth-confirmation-toast';
 import ChatPopup from '@/components/chat-popup';
 import { Suspense } from 'react';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   title: 'Project Profound: Near Death Experiences and Consciousness',
@@ -22,7 +23,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    // suppressHydrationWarning is required by next-themes — it adds the theme
+    // class via an inline script before React hydrates, causing an intentional
+    // but harmless mismatch that we explicitly suppress here.
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -32,16 +36,24 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen bg-background">
-        <SiteHeader />
-        <main className="flex-grow">{children}</main>
-        <SiteFooter />
-        <ChatPopup />
-        <Suspense fallback={null}>
-          <AuthConfirmationToast />
-        </Suspense>
-        <Toaster />
-        <Script strategy="lazyOnload" data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SiteHeader />
+          <main className="flex-grow">{children}</main>
+          <SiteFooter />
+          <ChatPopup />
+          <Suspense fallback={null}>
+            <AuthConfirmationToast />
+          </Suspense>
+          <Toaster />
+          <Script strategy="lazyOnload" data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+

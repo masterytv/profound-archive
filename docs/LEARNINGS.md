@@ -876,3 +876,196 @@ Tailwind classes `lg:sticky lg:top-14 lg:self-start lg:max-h-[calc(100vh-4rem)] 
 | `EvidenceStrengthCard` | `src/components/video/EvidenceStrengthCard.tsx` | Evidence/RVNDE score card matching Greyson/Transformation design |
 | `TimestampLink` | `src/components/video/TimestampLink.tsx` | Client button that fires `yt-seek` event |
 | `SocialShareButton` | `src/components/video/ShareButton.tsx` | Share sheet (copy URL, social links) |
+
+---
+
+## 14. Theming Convention — Light & Dark Mode (CRITICAL — READ BEFORE BUILDING ANY PAGE)
+
+> **The app has a full CSS variable token system defined in `src/app/globals.css`. Using semantic tokens instead of raw Tailwind colors means a page automatically supports both light and dark modes with ZERO extra `dark:` classes needed.**
+
+### A. Why past pages needed individual dark-mode fixes
+
+Pages built with hardcoded Tailwind color names (`bg-white`, `bg-slate-50`, `text-slate-900`) ignore the theme system entirely. Each one had to be patched manually with `dark:` variants. This was fixed in the March 2026 dark-theme audit, but **do not repeat this pattern**.
+
+### B. The Token System (`globals.css`)
+
+CSS variables are defined under `:root` (light) and `.dark` (dark). Tailwind maps them via `tailwind.config.ts`. Both themes are maintained in one place.
+
+| Semantic Token | Light Value | Dark Value | Use for |
+|---|---|---|---|
+| `bg-background` | `slate-50 (#F8FAFC)` | deep indigo-navy `#0A0F1E` | Page backgrounds |
+| `bg-card` | `white` | lifted surface `#12182B` | Cards, panels, sidebars |
+| `text-foreground` | `slate-900` | warm near-white | Primary text |
+| `text-muted-foreground` | `slate-500ish` | `slate-400ish` | Secondary/caption text |
+| `bg-muted` | `slate-100` | dark muted surface | Inputs, code blocks, tags |
+| `border-border` | `slate-200ish` | dark border | All dividers and borders |
+| `bg-primary` | `blue-600 #2563EB` | same | CTAs, links, accent buttons |
+| `text-primary` | `blue-600` | same | Accent text, links |
+| `bg-secondary` | `slate-100` | dark secondary | Secondary buttons |
+| `bg-popover` | `white` | `card` value | Dropdowns, tooltips |
+| `bg-destructive` | `red-600` | `red-900/30` | Danger actions |
+
+### C. ⛔ FORBIDDEN PATTERNS (will break dark mode)
+
+Never use these hardcoded colors in new pages or components:
+
+```jsx
+// ❌ WRONG — breaks dark mode
+<div className="bg-white">
+<div className="bg-slate-50">
+<div className="bg-gray-50">
+<div className="bg-gray-100">
+<p className="text-slate-900">
+<p className="text-gray-700">
+<div className="border-slate-200">
+
+// Also forbidden — inline styles for backgrounds:
+<section style={{ backgroundColor: 'white' }}>
+```
+
+### D. ✅ CORRECT PATTERNS (use these always)
+
+```jsx
+// ✅ CORRECT — adapts to both themes automatically
+<div className="bg-background">          {/* page shell */}
+<div className="bg-card">               {/* cards, panels */}
+<div className="bg-muted">              {/* inputs, tags, tinted areas */}
+<p className="text-foreground">         {/* primary text */}
+<p className="text-muted-foreground">   {/* secondary text */}
+<div className="border-border">         {/* dividers */}
+<button className="bg-primary text-primary-foreground"> {/* CTA */}
+```
+
+### E. New Page Template (copy-paste starter)
+
+When creating a brand-new page, start with this shell — it handles both themes automatically:
+
+```tsx
+// src/app/your-page/page.tsx
+export default function YourPage() {
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+
+      {/* Hero / header area */}
+      <section className="bg-muted/50 border-b border-border py-12">
+        <div className="max-w-5xl mx-auto px-4">
+          <h1 className="text-4xl font-bold text-foreground">Title</h1>
+          <p className="text-muted-foreground mt-2">Subtitle</p>
+        </div>
+      </section>
+
+      {/* Main content */}
+      <div className="max-w-5xl mx-auto px-4 py-12 space-y-8">
+
+        {/* Card */}
+        <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-foreground mb-2">Card Title</h2>
+          <p className="text-muted-foreground">Card body text.</p>
+        </div>
+
+        {/* Form input */}
+        <input
+          className="w-full rounded-lg border border-border bg-muted px-4 py-3
+                     text-foreground placeholder:text-muted-foreground
+                     focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Enter something..."
+        />
+
+        {/* Primary button */}
+        <button className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg
+                           hover:opacity-90 transition-opacity font-medium">
+          Action
+        </button>
+
+        {/* Secondary / ghost button */}
+        <button className="border border-border bg-card text-foreground px-5 py-2.5
+                           rounded-lg hover:bg-muted transition-colors font-medium">
+          Secondary
+        </button>
+
+      </div>
+    </div>
+  )
+}
+```
+
+### F. When you MUST use `dark:` overrides
+
+Only use explicit `dark:` variants when:
+1. **Colored accent elements** — e.g., a green badge that needs a different shade in dark: `bg-emerald-50 dark:bg-emerald-500/20`
+2. **External/third-party components** that don't respect CSS variables
+3. **Inline styles** that cannot be switched to Tailwind tokens (use sparingly)
+4. **Subtle alpha overlays** — e.g., `dark:bg-white/5` for hierarchy within the dark card surface
+
+For these cases the **pattern is always semi-transparent alpha** in dark mode rather than a flat color:
+```jsx
+// Tinted card within a dark page:
+<div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
+
+// Colored badge (green example):
+<span className="bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+
+// Hover state on dark surface:
+<button className="hover:bg-slate-100 dark:hover:bg-white/10">
+```
+
+### G. Component authoring checklist
+
+Before committing any new component, verify:
+- [ ] No `bg-white`, `bg-slate-50`, `bg-gray-*` without a matching `dark:` variant
+- [ ] No `text-slate-900` / `text-gray-900` — use `text-foreground` or add `dark:text-slate-100`
+- [ ] No `border-slate-200` without `dark:border-white/10` or `dark:border-border`
+- [ ] Form inputs have `dark:bg-muted` or `dark:bg-white/5` + `dark:placeholder:text-muted-foreground`
+- [ ] Hover/active states work on both surfaces (use alpha-based dark hovers)
+
+### H. Where everything lives
+
+| File | Purpose |
+|---|---|
+| `src/app/globals.css` | **Single source of truth** — all CSS variables for both themes |
+| `tailwind.config.ts` | Maps CSS variables → Tailwind class names |
+| `src/components/ui/` | Shadcn components — already theme-aware |
+| `src/lib/utils.ts` | `cn()` helper for class merging |
+
+### I. ⛔ GOTCHA: Native `<select>` and `<input>` dropdowns ignore CSS background-color
+
+The browser renders the **option list** of a native `<select>` at the OS level — CSS `background-color` and `color` on the `<select>` itself do NOT reach the drop-down list. In dark mode the list always shows as bright white (macOS/Windows default).
+
+**Fix:** Add `dark:[color-scheme:dark]` to every native `<select>` (and `<input type="date">` etc.) so the browser renders the OS dropdown in dark mode:
+
+```jsx
+// ✅ Correct
+<select className="... dark:[color-scheme:dark]">
+  <option>...</option>
+</select>
+
+// ❌ Wrong — bg-color is applied to the widget border only, not the option list
+<select className="dark:bg-slate-800">
+  <option>...</option>
+</select>
+```
+
+### J. ⛔ GOTCHA: Shared/analysis components need `dark:` just like pages
+
+Components like `NderfAnalysisSection`, `ScoreBadges`, `ChannelAnalysisSummary`, `CategoryAccordion`, etc. are **not pages**, but they still need dark mode variants on every `bg-white`, `bg-*-50`, `text-slate-900` class — they don't inherit theming automatically.
+
+**Rule:** Any component in `src/components/` that uses hardcoded color classes **must** be audited for dark mode, especially:
+- `bg-white` → `dark:bg-white/5`
+- `bg-*-50` (pastel badge backgrounds) → `dark:bg-*-500/20`
+- `text-*-700` (dark text on pastel) → `dark:text-*-300`
+- `border-*-200` → `dark:border-*-500/30`
+
+### K. ⛔ GOTCHA: Inline `style={{ background: '...' }}` gradients are invisible to dark mode
+
+Inline style gradients (e.g., `style={{ background: "linear-gradient(135deg, #F0FDF4 ...)" }}`) are **not affected by the `.dark` class** — they always render regardless of theme state.
+
+**Fix:** Replace with Tailwind gradient utilities + dark mode overrides:
+
+```jsx
+// ❌ Wrong — always renders, ignores dark mode
+<section style={{ background: "linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 40%)" }}>
+
+// ✅ Correct — dark mode classes override the gradient
+<section className="bg-gradient-to-br from-emerald-50 via-slate-50 to-blue-50
+                    dark:from-transparent dark:via-transparent dark:to-transparent dark:bg-card">
+```

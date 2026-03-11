@@ -19,10 +19,10 @@ function getGreysonClassification(score: number): { label: string; filter: strin
 }
 
 function getGreysonColor(score: number) {
-    if (score >= 21) return { text: "text-blue-700", bg: "bg-blue-50", border: "border-blue-200", hover: "hover:bg-blue-100" };
-    if (score >= 13) return { text: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200", hover: "hover:bg-amber-100" };
-    if (score >= 7) return { text: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200", hover: "hover:bg-slate-100" };
-    return { text: "text-red-600", bg: "bg-red-50", border: "border-red-200", hover: "hover:bg-red-100" };
+    if (score >= 21) return { text: "text-blue-700", bg: "bg-blue-50", border: "border-blue-200", hover: "hover:bg-blue-100", dark: "dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30 dark:hover:bg-blue-500/30" };
+    if (score >= 13) return { text: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200", hover: "hover:bg-amber-100", dark: "dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30 dark:hover:bg-amber-500/30" };
+    if (score >= 7) return { text: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200", hover: "hover:bg-slate-100", dark: "dark:bg-white/10 dark:text-slate-300 dark:border-white/20 dark:hover:bg-white/15" };
+    return { text: "text-red-600", bg: "bg-red-50", border: "border-red-200", hover: "hover:bg-red-100", dark: "dark:bg-red-500/20 dark:text-red-300 dark:border-red-500/30 dark:hover:bg-red-500/30" };
 }
 
 // --- Transformation classification from score ---
@@ -35,18 +35,18 @@ function getTransformationClassification(score: number): { label: string; filter
 }
 
 function getTransformationColor(score: number) {
-    if (score >= 40) return { text: "text-rose-700", bg: "bg-rose-50", border: "border-rose-200", hover: "hover:bg-rose-100" };
-    if (score >= 30) return { text: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200", hover: "hover:bg-rose-100" };
-    if (score >= 20) return { text: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200", hover: "hover:bg-amber-100" };
-    return { text: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200", hover: "hover:bg-slate-100" };
+    if (score >= 40) return { text: "text-rose-700", bg: "bg-rose-50", border: "border-rose-200", hover: "hover:bg-rose-100", dark: "dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30 dark:hover:bg-rose-500/30" };
+    if (score >= 30) return { text: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200", hover: "hover:bg-rose-100", dark: "dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30 dark:hover:bg-rose-500/30" };
+    if (score >= 20) return { text: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200", hover: "hover:bg-amber-100", dark: "dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30 dark:hover:bg-amber-500/30" };
+    return { text: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200", hover: "hover:bg-slate-100", dark: "dark:bg-white/10 dark:text-slate-300 dark:border-white/20 dark:hover:bg-white/15" };
 }
 
 // --- Veridical Perception color by level ---
 function getVeridicalColor(level: string | null | undefined) {
-    if (level?.includes("Exceptional")) return { text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", hover: "hover:bg-emerald-100" };
-    if (level?.includes("High")) return { text: "text-blue-700", bg: "bg-blue-50", border: "border-blue-200", hover: "hover:bg-blue-100" };
-    if (level?.includes("Moderate")) return { text: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200", hover: "hover:bg-amber-100" };
-    return { text: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200", hover: "hover:bg-slate-100" };
+    if (level?.includes("Exceptional")) return { text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", hover: "hover:bg-emerald-100", dark: "dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 dark:hover:bg-emerald-500/30" };
+    if (level?.includes("High")) return { text: "text-blue-700", bg: "bg-blue-50", border: "border-blue-200", hover: "hover:bg-blue-100", dark: "dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30 dark:hover:bg-blue-500/30" };
+    if (level?.includes("Moderate")) return { text: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200", hover: "hover:bg-amber-100", dark: "dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30 dark:hover:bg-amber-500/30" };
+    return { text: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200", hover: "hover:bg-slate-100", dark: "dark:bg-white/10 dark:text-slate-300 dark:border-white/20 dark:hover:bg-white/15" };
 }
 
 function getVeridicalLabel(level: string | null | undefined): string {
@@ -104,7 +104,7 @@ export function ScoreBadges({
                                 <TooltipTrigger asChild>
                                     <Link
                                         href={`/explore/greyson?filter=${encodeURIComponent(classInfo.filter)}&dir=desc`}
-                                        className={cn(pillBase, color.text, color.bg, color.border, color.hover)}
+                                        className={cn(pillBase, color.text, color.bg, color.border, color.hover, color.dark)}
                                         aria-label={`Greyson Scale: ${greysonScore} out of 32 — ${displayLabel}. Click to find similar.`}
                                     >
                                         <Brain className={iconSize} />
@@ -132,7 +132,7 @@ export function ScoreBadges({
                                 <TooltipTrigger asChild>
                                     <Link
                                         href={`/explore/transformation?filter=${encodeURIComponent(classInfo.filter)}&dir=desc`}
-                                        className={cn(pillBase, color.text, color.bg, color.border, color.hover)}
+                                        className={cn(pillBase, color.text, color.bg, color.border, color.hover, color.dark)}
                                         aria-label={`Transformation Index: ${transformationScore} out of 50 — ${displayLabel}. Click to find similar.`}
                                     >
                                         <Sparkles className={iconSize} />
@@ -159,7 +159,7 @@ export function ScoreBadges({
                                 <TooltipTrigger asChild>
                                     <Link
                                         href={`/explore/veridical?dir=desc`}
-                                        className={cn(pillBase, color.text, color.bg, color.border, color.hover)}
+                                        className={cn(pillBase, color.text, color.bg, color.border, color.hover, color.dark)}
                                         aria-label={`Veridical Perception: ${veridicalScore} out of 28 — ${displayLabel}. Click to find similar.`}
                                     >
                                         <ClipboardCheck className={iconSize} />

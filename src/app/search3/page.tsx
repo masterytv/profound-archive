@@ -388,21 +388,18 @@ function SearchContent() {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: "#F8FAFC" }}>
+        <div className="min-h-screen bg-background text-foreground">
             {/* ─── Search Header ─── */}
-            <div
-                className="border-b border-slate-200"
-                style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%)" }}
-            >
+            <div className="border-b border-slate-200 dark:border-slate-800 hero-gradient">
                 <div className="container mx-auto px-4 py-10 max-w-5xl">
                     <h1
-                        className="text-3xl md:text-4xl font-bold text-slate-900 text-center mb-2"
+                        className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 text-center mb-2"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         Search Engine for the{" "}
-                        <span className="text-blue-600" style={{ fontStyle: "italic" }}>Soul</span>
+                        <span className="text-blue-600 dark:text-blue-400" style={{ fontStyle: "italic" }}>Soul</span>
                     </h1>
-                    <p className="text-slate-500 text-center mb-8">
+                    <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
                         Find specific moments in more than 5,000 NDE YouTube videos.
                     </p>
 
@@ -418,7 +415,7 @@ function SearchContent() {
                                     }
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-12 pr-32 h-14 text-lg rounded-2xl border-2 border-slate-200 focus:border-blue-400 shadow-sm bg-white"
+                                    className="w-full pl-12 pr-32 h-14 text-lg rounded-2xl border-2 border-slate-200 dark:border-slate-700 focus:border-blue-400 shadow-sm bg-white dark:bg-white/5 dark:text-slate-100 dark:placeholder:text-slate-500"
                                     style={{ fontSize: "16px" }}
                                 />
                                 <Search className="w-5 h-5 absolute left-4 top-4.5 text-slate-400" />
@@ -451,12 +448,12 @@ function SearchContent() {
                         {/* Mode + Sort Controls */}
                         <div className="flex flex-wrap items-center justify-between mt-4 gap-3">
                             {/* Search Type Pills */}
-                            <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                            <div className="flex items-center bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
                                 <button
                                     onClick={() => setSearchType('keyword')}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${searchType === 'keyword'
-                                        ? 'bg-slate-900 text-white shadow-sm'
-                                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                        ? 'bg-slate-900 dark:bg-white/[0.15] text-white shadow-sm'
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5'
                                         }`}
                                 >
                                     Keyword Match
@@ -465,7 +462,7 @@ function SearchContent() {
                                     onClick={() => setSearchType('semantic')}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${searchType === 'semantic'
                                         ? 'bg-blue-600 text-white shadow-sm'
-                                        : 'text-blue-600 hover:bg-blue-50'
+                                        : 'text-blue-400 hover:bg-blue-900/20'
                                         }`}
                                 >
                                     <BrainCircuit className="w-3.5 h-3.5" />
@@ -479,7 +476,7 @@ function SearchContent() {
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
-                                    className="text-sm text-slate-600 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                                    className="text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 dark:[color-scheme:dark]"
                                 >
                                     <option value="relevance">Relevance</option>
                                     <option value="viewCount">View Count</option>
@@ -489,7 +486,7 @@ function SearchContent() {
                                 </select>
                                 <button
                                     onClick={() => setDirection(d => d === "desc" ? "asc" : "desc")}
-                                    className="text-xs text-slate-500 bg-white border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors"
+                                    className="text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                                 >
                                     {direction === "desc" ? "↓ High" : "↑ Low"}
                                 </button>
@@ -498,10 +495,10 @@ function SearchContent() {
 
                         {/* Similarity slider for concept mode */}
                         {searchType === 'semantic' && (
-                            <div className="mt-4 bg-white rounded-xl border border-slate-200 p-4">
+                            <div className="mt-4 bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-medium text-slate-700">Similarity Threshold</span>
-                                    <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-lg">{similarity.toFixed(2)}</span>
+                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Similarity Threshold</span>
+                                    <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 px-2.5 py-1 rounded-lg">{similarity.toFixed(2)}</span>
                                 </div>
                                 <Slider
                                     defaultValue={[0.5]}
@@ -529,12 +526,12 @@ function SearchContent() {
                             <Collapsible
                                 open={isFiltersOpen}
                                 onOpenChange={setIsFiltersOpen}
-                                className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+                                className="bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
                             >
-                                <CollapsibleTrigger asChild className="lg:hidden w-full cursor-pointer hover:bg-slate-50 rounded-xl transition-colors">
+                                <CollapsibleTrigger asChild className="lg:hidden w-full cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors">
                                     <div className="flex items-center justify-between mb-0 pb-4">
-                                        <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                                            <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+                                        <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                            <SlidersHorizontal className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                                             Filters
                                         </h2>
                                         <div className="h-8 w-8 flex flex-col justify-center items-center text-slate-400">
@@ -549,8 +546,8 @@ function SearchContent() {
 
                                 {/* Desktop static header (hidden on mobile) */}
                                 <div className="hidden lg:flex items-center justify-between mb-4">
-                                    <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                                        <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+                                    <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                        <SlidersHorizontal className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                                         Filters
                                     </h2>
                                 </div>
@@ -563,7 +560,7 @@ function SearchContent() {
 
                                             return (
                                                 <AccordionItem value={facet.field_name} key={facet.field_name} className="border-b-0">
-                                                    <AccordionTrigger className="text-xs font-semibold uppercase tracking-wider text-slate-500 py-3 hover:no-underline">
+                                                    <AccordionTrigger className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-3 hover:no-underline">
                                                         {formatFacetTitle(facet.field_name)}
                                                     </AccordionTrigger>
                                                     <AccordionContent>
@@ -577,7 +574,7 @@ function SearchContent() {
                                                                     />
                                                                     <label
                                                                         htmlFor={`v4-${facet.field_name}-${item.value}`}
-                                                                        className="text-sm text-slate-600 leading-none cursor-pointer"
+                                                                        className="text-sm text-slate-600 dark:text-slate-300 leading-none cursor-pointer"
                                                                     >
                                                                         {formatFacetValue(facet.field_name, item.value)}{" "}
                                                                         <span className="text-slate-400">({item.count})</span>
@@ -606,8 +603,8 @@ function SearchContent() {
                                     </Accordion>
 
                                     {/* Numeric Score Filters */}
-                                    <div className="mt-6 pt-4 border-t border-slate-200">
-                                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Minimum Scores</h3>
+                                    <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Minimum Scores</h3>
 
                                         <div className="space-y-6">
                                             <div className="space-y-3">
@@ -684,7 +681,7 @@ function SearchContent() {
                         {isLoading ? (
                             <div className="space-y-4">
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                    <div key={i} className="bg-white rounded-2xl border border-slate-200/60 p-6">
+                                    <div key={i} className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-6">
                                         <div className="flex gap-4">
                                             <Skeleton className="w-48 h-28 rounded-xl shrink-0" />
                                             <div className="flex-1 space-y-3">
@@ -704,15 +701,15 @@ function SearchContent() {
                         ) : hasSearched ? (
                             <>
                                 <div className="mb-5 flex items-center justify-between">
-                                    <p className="text-sm text-slate-500">
-                                        <strong className="text-slate-800">{totalHits >= 2000 ? "2,000+" : totalHits.toLocaleString()}</strong> results found
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                        <strong className="text-slate-800 dark:text-slate-200">{totalHits >= 2000 ? "2,000+" : totalHits.toLocaleString()}</strong> results found
                                     </p>
                                 </div>
 
                                 {results.length === 0 ? (
                                     <div className="text-center py-20">
-                                        <h3 className="text-lg font-semibold text-slate-800 mb-2">No results found.</h3>
-                                        <p className="text-slate-500">Try a different search term or adjust your filters.</p>
+                                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">No results found.</h3>
+                                        <p className="text-slate-500 dark:text-slate-400">Try a different search term or adjust your filters.</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
@@ -746,16 +743,16 @@ function SearchContent() {
                         ) : (
                             /* Empty state before first search */
                             <div className="text-center py-20">
-                                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-blue-50 flex items-center justify-center">
+                                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
                                     <Search className="w-7 h-7 text-blue-400" />
                                 </div>
                                 <h3
-                                    className="text-xl font-bold text-slate-800 mb-2"
+                                    className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2"
                                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                                 >
                                     Start your search
                                 </h3>
-                                <p className="text-slate-400 max-w-md mx-auto">
+                                <p className="text-slate-400 dark:text-slate-500 max-w-md mx-auto">
                                     Enter a keyword or question above to find relevant NDE accounts across 5,000+ transcripts.
                                 </p>
                             </div>

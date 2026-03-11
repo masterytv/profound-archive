@@ -52,9 +52,9 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className="min-h-screen flex" style={{ background: "#F8FAFC" }}>
+        <div className="min-h-screen flex bg-background">
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-slate-200/60 hidden md:flex md:flex-col">
+            <aside className="w-64 bg-white dark:bg-white/5 border-r border-slate-200/60 dark:border-white/10 hidden md:flex md:flex-col">
                 <div className="p-5 flex-1 flex flex-col">
                     {/* Sidebar Header */}
                     <div className="flex items-center gap-3 mb-8 px-2">
@@ -62,7 +62,7 @@ export default async function AdminLayout({
                             <Shield className="w-4.5 h-4.5 text-blue-600" />
                         </div>
                         <span
-                            className="text-lg font-bold text-slate-900"
+                            className="text-lg font-bold text-slate-900 dark:text-white"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             Admin
@@ -73,42 +73,42 @@ export default async function AdminLayout({
                     <nav className="space-y-1 flex-1">
                         <Link
                             href="/admin"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             <LayoutDashboard className="w-4 h-4" />
                             Overview
                         </Link>
                         <Link
                             href="/admin/users"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             <Users className="w-4 h-4" />
                             Users
                         </Link>
                         <Link
                             href="/admin/intake"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             <Upload className="w-4 h-4" />
                             Video Intake
                         </Link>
                         <Link
                             href="/admin/scanner"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             <Radar className="w-4 h-4" />
                             Channel Scanner
                         </Link>
                         <Link
                             href="/admin/scanner/queue"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             <List className="w-4 h-4" />
                             Queue Inspector
                         </Link>
                         <Link
                             href="/admin/scanner/pending"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             <ListVideo className="w-4 h-4" />
                             Pending Queue
@@ -116,7 +116,7 @@ export default async function AdminLayout({
                         {profile?.role === "super_admin" && (
                             <Link
                                 href="/admin/chatbot"
-                                className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                                className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                             >
                                 <MessageSquare className="w-4 h-4 text-indigo-500" />
                                 Chatbot Editor
@@ -125,10 +125,10 @@ export default async function AdminLayout({
                     </nav>
 
                     {/* Exit Link */}
-                    <div className="border-t border-slate-200/60 pt-4">
+                    <div className="border-t border-slate-200/60 dark:border-white/10 pt-4">
                         <Link
                             href="/"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             <LogOut className="w-4 h-4" />
                             Exit Admin

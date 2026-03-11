@@ -87,7 +87,7 @@ function renderWithCitations(
                         key={i}
                         href={`/video/${video.video_id}`}
                         title={video.title}
-                        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-bold no-underline hover:bg-emerald-200 transition-colors align-super mx-[1px]"
+                        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold no-underline hover:bg-emerald-200 dark:hover:bg-emerald-500/40 transition-colors align-super mx-[1px]"
                         aria-label={`Source ${idx + 1}: ${video.title}`}
                     >
                         {idx + 1}
@@ -245,13 +245,13 @@ function NoResultsPage({ question }: { question: string }) {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Link
                         href="/questions"
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 dark:bg-white/10 px-5 py-2.5 text-sm font-medium text-white dark:text-slate-200 hover:bg-slate-700 dark:hover:bg-white/20 transition-colors"
                     >
                         Browse curated questions
                     </Link>
                     <Link
                         href="/search3"
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                     >
                         Search NDE accounts directly
                     </Link>
@@ -392,10 +392,7 @@ export default async function QuestionResultPage({
                 3. Small Thumbnail Strip
                 ═══════════════════════════════════════════════════════ */}
             <section
-                className="relative overflow-hidden pt-12 pb-10"
-                style={{
-                    background: "linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 40%, #EFF6FF 100%)",
-                }}
+                className="relative overflow-hidden pt-12 pb-10 bg-gradient-to-br from-emerald-50 via-slate-50 to-blue-50 dark:from-transparent dark:via-transparent dark:to-transparent dark:bg-card"
             >
                 {/* subtle dot grid */}
                 <div
@@ -413,7 +410,7 @@ export default async function QuestionResultPage({
 
                     {/* 1. Title */}
                     <h1
-                        className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 leading-[1.2] mb-4"
+                        className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-[1.2] mb-4"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                         {data.question}
@@ -422,7 +419,7 @@ export default async function QuestionResultPage({
                     {/* 2. Short Answer — immediately after h1 for QEO first-200-chars rule.
                          Wrapped in a semantic answer-box so crawlers recognise it as the direct answer. */}
                     <div
-                        className="mb-6 px-4 py-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60"
+                        className="mb-6 px-4 py-3.5 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/10"
                         role="note"
                         aria-label="Direct answer"
                     >
@@ -430,7 +427,7 @@ export default async function QuestionResultPage({
                             What NDEs say
                         </p>
                         <p
-                            className="text-lg sm:text-xl font-medium text-emerald-900 leading-relaxed"
+                            className="text-lg sm:text-xl font-medium text-emerald-900 dark:text-emerald-100 leading-relaxed"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             {data.shortAnswer}
@@ -507,10 +504,7 @@ export default async function QuestionResultPage({
                 LONG ANSWER — below the fold
                 ═══════════════════════════════════════════════════════ */}
             <section
-                className="relative overflow-hidden py-12"
-                style={{
-                    background: "linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)",
-                }}
+                className="relative overflow-hidden py-12 bg-gradient-to-b from-slate-50 to-white dark:from-transparent dark:to-transparent dark:bg-card"
             >
                 <div className="relative container mx-auto px-4 max-w-3xl space-y-6">
 
@@ -525,7 +519,7 @@ export default async function QuestionResultPage({
                     {data.answer.paragraphs.map((para, i) => (
                         <p
                             key={i}
-                            className="text-slate-700 leading-[1.85] text-[1.05rem]"
+                            className="text-slate-700 dark:text-slate-300 leading-[1.85] text-[1.05rem]"
                         >
                             {renderWithCitations(para, data.referencedVideos)}
                         </p>
@@ -534,7 +528,7 @@ export default async function QuestionResultPage({
                     {/* Sources list removed — Videos Referenced section below is the canonical source list */}
 
                     {/* AI disclaimer */}
-                    <div className="mt-8 flex items-start gap-2.5 bg-white/80 border border-slate-100 rounded-xl p-4 text-sm text-slate-400 shadow-sm">
+                    <div className="mt-8 flex items-start gap-2.5 bg-white/80 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl p-4 text-sm text-slate-400 dark:text-slate-500 shadow-sm dark:shadow-none">
                         <span className="shrink-0 mt-0.5 text-slate-300">✦</span>
                         <p className="leading-relaxed">
                             This synthesis was generated from real NDE accounts in our archive. It is
@@ -553,17 +547,17 @@ export default async function QuestionResultPage({
                 {/* ════════ SECTION: Videos Referenced ════════ */}
                 <section>
                     <div className="flex items-center gap-3 mb-8">
-                        <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
                             <Video className="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
                             <h2
-                                className="text-2xl font-bold text-slate-900"
+                                className="text-2xl font-bold text-slate-900 dark:text-slate-100"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
                                 Videos Referenced
                             </h2>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                                 The accounts cited above, with the relevant quotes
                             </p>
                         </div>
@@ -585,28 +579,36 @@ export default async function QuestionResultPage({
                 {/* ════════ SECTION: Other Relevant Videos ════════ */}
                 <section id="more-videos">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center shrink-0">
                             <List className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
                             <h2
-                                className="text-2xl font-bold text-slate-900"
+                                className="text-2xl font-bold text-slate-900 dark:text-slate-100"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
                                 Other Relevant Videos
                             </h2>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                                 Additional accounts from the archive related to this question
                             </p>
                         </div>
                     </div>
 
                     {/* Card-per-row layout — responsive, no horizontal scroll */}
-                    <div className="divide-y divide-slate-100 rounded-xl border border-slate-100 bg-white overflow-hidden">
+                    <div className="divide-y divide-slate-100 dark:divide-white/10 rounded-xl border border-slate-100 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden">
                         {data.moreVideos.map((video) => {
                             const pct = video.relevance <= 1
                                 ? Math.round(video.relevance * 100)
                                 : Math.round(video.relevance);
+                            // Threshold-based classes — works in both light and dark mode
+                            const matchClass = pct >= 85
+                                ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                                : pct >= 70
+                                ? 'bg-green-50 dark:bg-green-500/20 text-green-700 dark:text-green-300'
+                                : pct >= 55
+                                ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300'
+                                : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400';
                             const videoUrl = `/video/${video.video_id}`;
                             const quotedUrl = video.startTime != null
                                 ? `${videoUrl}?t=${Math.floor(video.startTime)}`
@@ -615,7 +617,7 @@ export default async function QuestionResultPage({
                             return (
                                 <article
                                     key={video.video_id}
-                                    className="flex gap-3 sm:gap-4 px-4 py-4 hover:bg-slate-50 transition-colors group"
+                                    className="flex gap-3 sm:gap-4 px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group"
                                 >
                                     {/* Thumbnail — visible on all sizes; smaller on mobile, 60% larger on sm/lg */}
                                     <Link
@@ -624,7 +626,7 @@ export default async function QuestionResultPage({
                                         tabIndex={-1}
                                         aria-hidden="true"
                                     >
-                                        <div className="relative w-16 sm:w-40 lg:w-52 aspect-video rounded-lg overflow-hidden bg-slate-100">
+                                        <div className="relative w-16 sm:w-40 lg:w-52 aspect-video rounded-lg overflow-hidden bg-slate-100 dark:bg-white/10">
                                             <Image
                                                 src={video.thumbnailUrl}
                                                 alt={video.title}
@@ -640,11 +642,11 @@ export default async function QuestionResultPage({
                                         {/* Title + meta row — full width */}
                                         <Link
                                             href={videoUrl}
-                                            className="font-semibold text-slate-900 hover:text-emerald-700 transition-colors text-sm sm:text-base leading-snug line-clamp-2"
+                                            className="font-semibold text-slate-900 dark:text-slate-100 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors text-sm sm:text-base leading-snug line-clamp-2"
                                         >
                                             {video.title}
                                         </Link>
-                                        <p className="text-xs text-slate-500 mt-0.5">
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                             {video.channelName}
                                             {video.date && (
                                                 <span className="text-slate-400"> · {formatDate(video.date)}</span>
@@ -668,7 +670,7 @@ export default async function QuestionResultPage({
                                                             ? `Jump to ${Math.floor(video.startTime / 60)}:${String(Math.floor(video.startTime % 60)).padStart(2, '0')}`
                                                             : 'Watch video'}
                                                     >
-                                                        <blockquote className="border-l-2 border-emerald-300 pl-3 text-xs sm:text-sm text-slate-600 italic leading-relaxed line-clamp-3 hover:border-emerald-500 hover:text-slate-800 transition-colors">
+                                                        <blockquote className="border-l-2 border-emerald-300 dark:border-emerald-500/50 pl-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 italic leading-relaxed line-clamp-3 hover:border-emerald-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
                                                             &ldquo;{video.quote.trim()}&rdquo;
                                                             {video.startTime != null && (
                                                                 <span className="not-italic text-[10px] text-emerald-600 ml-1.5 font-medium">
@@ -682,13 +684,7 @@ export default async function QuestionResultPage({
 
                                             {/* Relevance — 1/4 width */}
                                             <div className="flex-1 flex items-center justify-center">
-                                                <span
-                                                    className="text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap"
-                                                    style={{
-                                                        background: `hsl(${pct * 1.2}, 60%, 94%)`,
-                                                        color: `hsl(${pct * 1.2}, 50%, 35%)`,
-                                                    }}
-                                                >
+                                                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${matchClass}`}>
                                                     {pct}% match
                                                 </span>
                                             </div>
@@ -720,11 +716,11 @@ export default async function QuestionResultPage({
 
 function TonePill({ tone }: { tone: string }) {
     const map: Record<string, string> = {
-        "Very Positive": "bg-emerald-50 text-emerald-700 border-emerald-200",
-        "Positive": "bg-green-50 text-green-700 border-green-200",
-        "Mixed": "bg-yellow-50 text-yellow-700 border-yellow-200",
-        "Negative": "bg-orange-50 text-orange-700 border-orange-200",
-        "Very Negative": "bg-red-50 text-red-700 border-red-200",
+        "Very Positive": "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30",
+        "Positive": "bg-green-50 dark:bg-green-500/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-500/30",
+        "Mixed": "bg-yellow-50 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-500/30",
+        "Negative": "bg-orange-50 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-500/30",
+        "Very Negative": "bg-red-50 dark:bg-red-500/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/30",
     };
     const cls = map[tone] ?? "bg-muted text-muted-foreground border-border";
     return (

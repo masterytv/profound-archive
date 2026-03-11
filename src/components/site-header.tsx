@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
@@ -112,7 +113,7 @@ export default function SiteHeader() {
 
 
   return (
-    <nav className="bg-white/80 backdrop-blur-xl text-foreground sticky top-0 z-50 border-b border-slate-200/60">
+    <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl text-foreground sticky top-0 z-50 border-b border-slate-200/60 dark:border-slate-700/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* ─── Logo ─── */}
@@ -126,7 +127,7 @@ export default function SiteHeader() {
               priority
             />
             <span
-              className="text-xl font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors"
+              className="text-xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
               Project Profound
@@ -138,7 +139,7 @@ export default function SiteHeader() {
             {/* Questions — direct top-level link */}
             <Link
               href="/questions"
-              className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+              className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
             >
               Questions
             </Link>
@@ -146,7 +147,7 @@ export default function SiteHeader() {
             {/* Channels — direct top-level link */}
             <Link
               href="/channels"
-              className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+              className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
             >
               Channels
             </Link>
@@ -159,49 +160,49 @@ export default function SiteHeader() {
                   setToolsOpen(false)
                   setAboutOpen(false)
                 }}
-                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
               >
                 Research
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${exploreOpen ? 'rotate-180' : ''}`} />
               </button>
               {exploreOpen && (
-                <div className="absolute top-full left-0 mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
+                <div className="absolute top-full left-0 mt-1.5 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
                   <Link
                     href="/explore/veridical"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setExploreOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/20 flex items-center justify-center">
                       <TrendingUp className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800">Veridical Perception</div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Veridical Perception</div>
                       <div className="text-xs text-slate-400">Evidential out-of-body reports</div>
                     </div>
                   </Link>
                   <Link
                     href="/explore/greyson"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setExploreOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center">
                       <Brain className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800">Greyson Scale</div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Greyson Scale</div>
                       <div className="text-xs text-slate-400">NDE depth measurement</div>
                     </div>
                   </Link>
                   <Link
                     href="/explore/transformation"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setExploreOpen(false)}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-500/20 flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-rose-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-slate-800">Transformation Index</div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Transformation Index</div>
                       <div className="text-xs text-slate-400">Life-changing impact scores</div>
                     </div>
                   </Link>
@@ -212,7 +213,7 @@ export default function SiteHeader() {
             {/* Search Link */}
             <Link
               href="/search3"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
             >
               <Search className="w-3.5 h-3.5" />
               Search
@@ -226,23 +227,23 @@ export default function SiteHeader() {
                   setExploreOpen(false)
                   setAboutOpen(false)
                 }}
-                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
               >
                 Chat
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
               </button>
               {toolsOpen && (
-                <div className="absolute top-full left-0 mt-1.5 w-56 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
+                <div className="absolute top-full left-0 mt-1.5 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
                   <Link
                     href="/chat-compassionate"
-                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setToolsOpen(false)}
                   >
                     Compassionate Chat
                   </Link>
                   <Link
                     href="/chat-2"
-                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setToolsOpen(false)}
                   >
                     Research Chat
@@ -255,7 +256,7 @@ export default function SiteHeader() {
             <div className="relative flex items-center" ref={aboutRef}>
               <Link
                 href="/about"
-                className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all"
+                className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
               >
                 About
               </Link>
@@ -270,17 +271,17 @@ export default function SiteHeader() {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} />
               </button>
               {aboutOpen && (
-                <div className="absolute top-full left-0 mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-slate-200/60 py-2 z-50">
+                <div className="absolute top-full left-0 mt-1.5 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
                   <Link
                     href="/about#projects"
-                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     Projects
                   </Link>
                   <Link
                     href="/about#connect"
-                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     Connect
@@ -289,14 +290,14 @@ export default function SiteHeader() {
                     href="https://blog.projectprofound.org"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     Blog
                   </a>
                   <Link
                     href="/experiencers"
-                    className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     For Experiencers
@@ -306,13 +307,16 @@ export default function SiteHeader() {
             </div>
 
             {/* Divider */}
-            <div className="w-px h-5 bg-slate-200 mx-1" />
+            <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 mx-1" />
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Newsletter */}
             <a
               data-formkit-toggle="893453eeff"
               href="https://project-profound.kit.com/893453eeff"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50/60 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 hover:bg-blue-50/60 dark:hover:bg-blue-500/20 transition-all"
             >
               <Mail className="w-3.5 h-3.5" />
               Newsletter
@@ -323,7 +327,7 @@ export default function SiteHeader() {
               href="https://www.gofundme.com/f/project-profound"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-lg text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-all"
+              className="px-3 py-1.5 rounded-lg text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/30 transition-all"
             >
               Contribute
             </a>
@@ -400,7 +404,7 @@ export default function SiteHeader() {
                       className="w-8 h-8"
                     />
                     <span
-                      className="text-lg font-bold text-slate-900"
+                      className="text-lg font-bold text-slate-900 dark:text-white"
                       style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
                       Project Profound
@@ -422,7 +426,7 @@ export default function SiteHeader() {
                           <AvatarFallback><UserIcon className="h-5 w-5" /></AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <span className="font-semibold text-sm text-slate-900">{user.user_metadata?.full_name || user.email}</span>
+                          <span className="font-semibold text-sm text-slate-900 dark:text-white">{user.user_metadata?.full_name || user.email}</span>
                           <Link href="/dashboard" className="text-xs text-blue-600 hover:underline" onClick={() => setMobileMenuOpen(false)}>View Dashboard</Link>
                         </div>
                       </div>
@@ -445,7 +449,7 @@ export default function SiteHeader() {
                   {/* Questions — direct link */}
                   <Link
                     href="/questions"
-                    className="flex items-center gap-3 text-base font-semibold text-slate-900"
+                    className="flex items-center gap-3 text-base font-semibold text-slate-900 dark:text-white"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <HelpCircle className="w-4 h-4 text-violet-600" />
@@ -455,7 +459,7 @@ export default function SiteHeader() {
                   {/* Channels — direct link */}
                   <Link
                     href="/channels"
-                    className="flex items-center gap-3 text-base font-semibold text-slate-900"
+                    className="flex items-center gap-3 text-base font-semibold text-slate-900 dark:text-white"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Tv className="w-4 h-4 text-indigo-600" />
@@ -466,7 +470,7 @@ export default function SiteHeader() {
                   <div>
                     <button
                       onClick={() => setMobileExploreOpen(!mobileExploreOpen)}
-                      className="flex items-center justify-between w-full text-base font-semibold text-slate-900 mb-3"
+                      className="flex items-center justify-between w-full text-base font-semibold text-slate-900 dark:text-white mb-3"
                     >
                       Research
                       <ChevronDown
@@ -591,12 +595,18 @@ export default function SiteHeader() {
                   </div>
 
                   {/* Divider */}
-                  <div className="border-t border-slate-100 pt-4 space-y-3">
+                  <div className="border-t border-slate-100 dark:border-slate-700 pt-4 space-y-3">
+                    {/* Theme Toggle */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Theme</span>
+                      <ThemeToggle />
+                    </div>
+
                     {/* Newsletter */}
                     <a
                       data-formkit-toggle="893453eeff"
                       href="https://project-profound.kit.com/893453eeff"
-                      className="flex items-center gap-2.5 text-blue-600 hover:text-blue-700 font-medium"
+                      className="flex items-center gap-2.5 text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 font-medium"
                     >
                       <Mail className="w-4 h-4" />
                       Newsletter
@@ -607,7 +617,7 @@ export default function SiteHeader() {
                       href="https://www.gofundme.com/f/project-profound"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/30 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Contribute

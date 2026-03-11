@@ -45,7 +45,7 @@ function StackedBar({
     return (
         <div className="space-y-2">
             {/* Stacked bar */}
-            <div className="h-5 rounded-full overflow-hidden flex bg-slate-100">
+            <div className="h-5 rounded-full overflow-hidden flex bg-slate-100 dark:bg-white/10">
                 {data.map((d, i) => {
                     const pct = (d.value / total) * 100;
                     if (pct < 1) return null; // skip tiny slices
@@ -75,7 +75,7 @@ function StackedBar({
                             className="w-2 h-2 rounded-full shrink-0"
                             style={{ backgroundColor: d.color }}
                         />
-                        <span className="text-[10px] text-slate-600">
+                        <span className="text-[10px] text-slate-600 dark:text-slate-400">
                             {formatLabel(d.label)} ({d.value})
                         </span>
                     </div>
@@ -108,17 +108,17 @@ export function ChannelAnalysisSummary({ stats }: ChannelAnalysisSummaryProps) {
             }));
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm dark:shadow-none overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-blue-500" />
                 <h2
-                    className="text-lg font-bold text-slate-900"
+                    className="text-lg font-bold text-slate-900 dark:text-slate-100"
                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                 >
                     Experience Analysis Overview
                 </h2>
-                <span className="ml-auto text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                <span className="ml-auto text-[10px] font-medium bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">
                     {stats.total_analyzed} analyzed
                 </span>
             </div>
@@ -127,7 +127,7 @@ export function ChannelAnalysisSummary({ stats }: ChannelAnalysisSummaryProps) {
                 <div className="space-y-6">
                     {/* Experience Types */}
                     <div>
-                        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                             <Heart className="w-3.5 h-3.5" />
                             Experience Types
                         </h3>
@@ -136,7 +136,7 @@ export function ChannelAnalysisSummary({ stats }: ChannelAnalysisSummaryProps) {
 
                     {/* Tone Distribution */}
                     <div>
-                        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                             <Zap className="w-3.5 h-3.5" />
                             Emotional Tone
                         </h3>
@@ -145,7 +145,7 @@ export function ChannelAnalysisSummary({ stats }: ChannelAnalysisSummaryProps) {
 
                     {/* Trigger Distribution */}
                     <div>
-                        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                             <AlertTriangle className="w-3.5 h-3.5" />
                             Trigger Types
                         </h3>
@@ -155,16 +155,16 @@ export function ChannelAnalysisSummary({ stats }: ChannelAnalysisSummaryProps) {
 
                 {/* Average intensity bar */}
                 {stats.avg_intensity && (
-                    <div className="mt-6 pt-4 border-t border-slate-100">
+                    <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/10">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Avg. Intensity
                             </span>
-                            <span className="text-sm font-bold text-slate-900">
+                            <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                                 {stats.avg_intensity}/10
                             </span>
                         </div>
-                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
                             <div
                                 className="h-full rounded-full bg-gradient-to-r from-blue-400 to-violet-500 transition-all duration-700"
                                 style={{ width: `${(Number(stats.avg_intensity) / 10) * 100}%` }}

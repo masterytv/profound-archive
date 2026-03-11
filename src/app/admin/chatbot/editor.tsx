@@ -160,13 +160,13 @@ export default function ChatbotEditor() {
         <div className="p-6 max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Chatbot Prompt Editor</h1>
-                    <p className="text-sm text-gray-500">Manage the compassionate AI system instructions</p>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Chatbot Prompt Editor</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Manage the compassionate AI system instructions</p>
                 </div>
                 <div className="flex gap-3">
                     <button
                         onClick={() => setShowTestChat(!showTestChat)}
-                        className={`inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium transition-colors ${showTestChat ? 'bg-indigo-600 text-white border-transparent' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        className={`inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium transition-colors ${showTestChat ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-white/10 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/20'
                             }`}
                     >
                         <MessageSquare className="h-4 w-4 mr-2" />
@@ -202,25 +202,25 @@ export default function ChatbotEditor() {
             <div className={`grid gap-6 ${showTestChat ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
                 {/* Editor Section */}
                 <div className="space-y-6">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-                            <span className="text-sm font-semibold text-gray-700">Staging System Prompt</span>
+                    <div className="bg-white dark:bg-white/5 rounded-lg shadow-sm border border-slate-200 dark:border-white/10 overflow-hidden">
+                        <div className="px-4 py-3 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Staging System Prompt</span>
                             <span className="text-xs text-gray-400 italic">Editing here won't affect live users until published</span>
                         </div>
                         <textarea
                             value={stagingContent}
                             onChange={(e) => setStagingContent(e.target.value)}
-                            className="w-full h-[600px] p-4 text-sm font-mono focus:ring-0 focus:outline-none resize-none"
+                            className="w-full h-[600px] p-4 text-sm font-mono focus:ring-0 focus:outline-none resize-none bg-white dark:bg-transparent text-slate-900 dark:text-slate-100"
                             placeholder="Enter the system prompt instructions here..."
                         />
                     </div>
 
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 opacity-75">
+                    <div className="bg-slate-50 dark:bg-white/5 rounded-lg p-4 border border-slate-200 dark:border-white/10 opacity-75">
                         <div className="flex items-center gap-2 mb-2">
                             <Eye className="h-4 w-4 text-gray-600" />
-                            <span className="text-sm font-semibold text-gray-700">Current Live Prompt (Reference Only)</span>
+                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Current Live Prompt (Reference Only)</span>
                         </div>
-                        <div className="text-xs text-gray-600 font-mono whitespace-pre-wrap max-h-40 overflow-y-auto bg-white p-3 rounded border">
+                        <div className="text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-pre-wrap max-h-40 overflow-y-auto bg-white dark:bg-white/5 p-3 rounded border border-slate-200 dark:border-white/10">
                             {config?.live_prompt || "No live prompt configured yet."}
                         </div>
                     </div>
@@ -228,20 +228,20 @@ export default function ChatbotEditor() {
 
                 {/* Test Chat Section */}
                 {showTestChat && (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-[800px]">
+                    <div className="bg-white dark:bg-white/5 rounded-lg shadow-sm border border-slate-200 dark:border-white/10 flex flex-col h-[800px]">
                         <div className="px-4 py-3 bg-indigo-50 border-b border-indigo-100 flex items-center gap-2">
                             <MessageSquare className="h-4 w-4 text-indigo-600" />
                             <span className="text-sm font-semibold text-indigo-800">Prompt Test Simulator</span>
                             <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 uppercase tracking-wider font-bold">Staging Mode</span>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-white/5">
                             {chatHistory.length === 0 && (
                                 <div className="text-center py-8">
                                     <div className="inline-block p-3 bg-indigo-100 rounded-full mb-3">
                                         <MessageSquare className="h-6 w-6 text-indigo-600" />
                                     </div>
-                                    <p className="text-sm text-gray-500 max-w-xs mx-auto">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
                                         Test how the staging prompt handles different inputs before publishing live.
                                     </p>
                                 </div>
@@ -261,18 +261,18 @@ export default function ChatbotEditor() {
                             ))}
                             {isChatting && (
                                 <div className="flex justify-start">
-                                    <div className="bg-white border rounded-lg p-3 shadow-sm">
+                                    <div className="bg-white dark:bg-white/10 border rounded-lg p-3 shadow-sm">
                                         <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        <div className="p-4 border-t border-gray-100 italic text-[10px] text-gray-400">
+                        <div className="p-4 border-t border-slate-100 dark:border-white/10 italic text-[10px] text-slate-400">
                             Always **Save Staging** before testing to ensure the latest instructions are used.
                         </div>
 
-                        <div className="p-4 bg-gray-50 border-t border-gray-200">
+                        <div className="p-4 bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10">
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -280,7 +280,7 @@ export default function ChatbotEditor() {
                                     onChange={(e) => setChatInput(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleTestChat()}
                                     placeholder="Type a message to test..."
-                                    className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+                                    className="flex-1 rounded-md border border-slate-300 dark:border-white/10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white dark:bg-white/5 text-slate-900 dark:text-slate-100"
                                 />
                                 <button
                                     onClick={handleTestChat}

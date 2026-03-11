@@ -39,12 +39,12 @@ function QuestionCard({ question, index }: { question: NdeQuestion; index: numbe
     return (
         <Link
             href={`/questions/${question.slug}`}
-            className="group flex items-start gap-3 bg-white rounded-lg border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer"
+            className="group flex items-start gap-3 bg-white dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10 p-4 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-md dark:hover:bg-white/10 transition-all duration-200 cursor-pointer"
         >
             <span className="text-xs font-mono text-slate-300 mt-0.5 shrink-0 w-5 text-right select-none">
                 {index}
             </span>
-            <p className="text-sm text-slate-700 leading-relaxed group-hover:text-slate-900 transition-colors flex-1">
+            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex-1">
                 {question.consumer_question}
             </p>
             <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-400 transition-colors shrink-0 mt-0.5" />
@@ -79,13 +79,13 @@ export function CategoryAccordion({
                     <div className="flex items-center gap-2 mb-0.5">
                         <Icon className={`w-4 h-4 ${iconColor}`} />
                         <h2
-                            className="text-lg font-bold text-slate-900 group-hover:text-slate-700 transition-colors"
+                            className="text-lg font-bold text-slate-900 dark:text-slate-100 group-hover:text-slate-700 dark:group-hover:text-white transition-colors"
                             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                         >
                             {label}
                         </h2>
                     </div>
-                    <p className="text-xs text-slate-500">{subtitle}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 pr-1">

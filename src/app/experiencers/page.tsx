@@ -59,7 +59,7 @@ export default function AboutUsPage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gray-50 dark:bg-white/5 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-extrabold text-foreground mb-4">Have you had an experience that changed the way you see the world?</h1>
           <p className="text-xl text-muted-foreground">
@@ -78,7 +78,7 @@ export default function AboutUsPage() {
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             {/* Card 1: Community */}
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8">
               <h3 className="text-xl font-bold text-foreground mb-4">
                 We are building a community dedicated to:
               </h3>
@@ -90,7 +90,7 @@ export default function AboutUsPage() {
             </div>
 
             {/* Card 2: Experiences */}
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8">
               <h3 className="text-xl font-bold text-foreground mb-4">
                 We focus on the full spectrum of profound experiences, including:
               </h3>
@@ -114,19 +114,19 @@ export default function AboutUsPage() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* For Those Seeking Answers */}
-            <div className="bg-white rounded-lg shadow-md p-8 flex flex-col">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8 flex flex-col">
               <h3 className="text-xl font-bold text-foreground mb-2">For Those Seeking Answers in Other Stories:</h3>
               <p className="text-muted-foreground leading-relaxed mb-4">Find specific answers, patterns, and insights from thousands of people who have been there.</p>
               <p className="text-muted-foreground leading-relaxed">Our <Link href="/search3" className="text-primary hover:underline">Near Death Experience Database</Link> is a searchable library of more than 5,000 NDE video accounts from YouTube, paired with an <Link href="/chat-2" className="text-primary hover:underline">NDE Research Chatbot</Link> to help you query the data.</p>
             </div>
             {/* For Those Needing to Talk */}
-            <div className="bg-white rounded-lg shadow-md p-8 flex flex-col">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8 flex flex-col">
               <h3 className="text-xl font-bold text-foreground mb-2">For Those Needing to Talk:</h3>
               <p className="text-muted-foreground leading-relaxed mb-4">Have a compassionate, interactive conversation, any time of day or night.</p>
               <p className="text-muted-foreground leading-relaxed">Our <Link href="/chat-compassionate" className="text-primary hover:underline">NDE Compassionate Chatbot</Link> is a supportive, AI-driven companion grounded in 5,000 first-person accounts, offering a safe, non-judgmental space to explore your feelings.</p>
             </div>
             {/* For Those Who Want to Go Deeper */}
-            <div className="bg-white rounded-lg shadow-md p-8 flex flex-col">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8 flex flex-col">
               <h3 className="text-xl font-bold text-foreground mb-2">For Those Who Want to Go Deeper:</h3>
               <p className="text-muted-foreground leading-relaxed mb-4">Join a larger conversation on spirituality, consciousness, and the transcendent.</p>
               <p className="text-muted-foreground leading-relaxed">
@@ -140,7 +140,7 @@ export default function AboutUsPage() {
         <section>
           <h2 className="text-3xl font-extrabold text-foreground mb-6 text-center">What's Coming Next</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8">
               <p className="text-muted-foreground leading-relaxed mb-4">Our work is always expanding. We are currently building new tools to serve more communities:</p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
                 <li><span className="font-semibold">UAP Encounter Database:</span> We're developing a searchable database for people who have had encounters with UAP/UFO/NHI, allowing you to find patterns and connect with similar accounts.</li>
@@ -154,7 +154,7 @@ export default function AboutUsPage() {
         <section>
           <h2 className="text-3xl font-extrabold text-foreground mb-6 text-center">Our Approach: Compassion & Curiosity</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8">
               <p className="text-muted-foreground leading-relaxed">
                 Your experiences deserve to be taken seriously. Our methodology is built on a foundation of compassionate investigation, rigorous study, and empathic curiosity. We use ethically guided AI tools to analyze, interact with, and build connections for experiencers.
               </p>
@@ -171,20 +171,20 @@ export default function AboutUsPage() {
             </p>
           </div>
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8">
               {isClient && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label htmlFor="fullName" className="block text-lg font-medium text-foreground mb-2">Full Name</label>
-                    <input type="text" id="fullName" required value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                     <input type="text" id="fullName" required value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground dark:placeholder:text-slate-500" />
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-lg font-medium text-foreground mb-2">Email Address</label>
-                    <input type="email" id="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="john.doe@example.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                     <input type="email" id="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="john.doe@example.com" className="w-full px-4 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground dark:placeholder:text-slate-500" />
                   </div>
                   <div>
                     <label htmlFor="message" className="block text-lg font-medium text-foreground mb-2">Your Message</label>
-                    <textarea id="message" required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Type your message..." rows={6} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary" />
+                     <textarea id="message" required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Type your message..." rows={6} className="w-full px-4 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary text-foreground dark:placeholder:text-slate-500" />
                   </div>
                   <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-primary text-white font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50">
                     {isSubmitting ? "Sending..." : "Send Message"}

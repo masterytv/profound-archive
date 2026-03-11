@@ -160,7 +160,7 @@ export default function ChatPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      <div className="bg-white rounded-lg shadow-md p-8 min-h-[600px] flex flex-col">
+      <div className="bg-white dark:bg-white/5 dark:border dark:border-white/10 rounded-xl shadow-md p-8 min-h-[600px] flex flex-col">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
@@ -207,7 +207,7 @@ export default function ChatPage() {
               <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                    message.role === "user" ? "text-white" : "bg-gray-100 text-foreground"
+                    message.role === "user" ? "text-white" : "bg-slate-100 dark:bg-white/10 text-foreground"
                   }`}
                   style={message.role === "user" ? { backgroundColor: "#2563eb" } : {}}
                 >
@@ -217,7 +217,7 @@ export default function ChatPage() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-foreground rounded-lg px-4 py-3">
+                <div className="bg-slate-100 dark:bg-white/10 text-foreground rounded-lg px-4 py-3">
                   <Loader2 className="w-5 h-5 animate-spin" />
                 </div>
               </div>

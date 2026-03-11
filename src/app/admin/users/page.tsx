@@ -58,11 +58,11 @@ export default async function AdminUsersPage() {
     return (
         <div>
             <div className="flex items-center gap-3 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
                     <Users className="w-4.5 h-4.5 text-blue-600" />
                 </div>
                 <h1
-                    className="text-2xl font-bold text-slate-900"
+                    className="text-2xl font-bold text-slate-900 dark:text-slate-100"
                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                 >
                     Users
@@ -70,10 +70,10 @@ export default async function AdminUsersPage() {
                 <span className="text-xs text-slate-400 ml-auto">{usersWithEmails.length} users</span>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
+            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 overflow-hidden">
                 <table className="min-w-full divide-y divide-slate-200/60">
                     <thead>
-                        <tr className="bg-slate-50/80">
+                        <tr className="bg-slate-50/80 dark:bg-white/5">
                             <th
                                 scope="col"
                                 className="px-6 py-3 text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wider"
@@ -100,7 +100,7 @@ export default async function AdminUsersPage() {
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-white/10">
                         {usersWithEmails.map((user: any) => (
                             <UserRow key={user.id} profile={user} email={user.email} />
                         ))}

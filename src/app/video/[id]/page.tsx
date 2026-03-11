@@ -66,13 +66,13 @@ function getLevelColor(level: string | null): {
     dot: string;
 } {
     if (!level)
-        return { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200", dot: "bg-slate-400" };
+        return { bg: "bg-slate-50 dark:bg-slate-800/50", text: "text-slate-600 dark:text-slate-400", border: "border-slate-200 dark:border-slate-700", dot: "bg-slate-400" };
     const l = level.toLowerCase();
     if (l.includes("exceptional"))
-        return { bg: "bg-emerald-50", text: "text-emerald-800", border: "border-emerald-200", dot: "bg-emerald-500" };
+        return { bg: "bg-emerald-50 dark:bg-emerald-900/20", text: "text-emerald-800 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800", dot: "bg-emerald-500" };
     if (l.includes("high") || l.includes("strong"))
-        return { bg: "bg-amber-50", text: "text-amber-800", border: "border-amber-200", dot: "bg-amber-500" };
-    return { bg: "bg-blue-50", text: "text-blue-800", border: "border-blue-200", dot: "bg-blue-500" };
+        return { bg: "bg-amber-50 dark:bg-amber-900/20", text: "text-amber-800 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800", dot: "bg-amber-500" };
+    return { bg: "bg-blue-50 dark:bg-blue-900/20", text: "text-blue-800 dark:text-blue-300", border: "border-blue-200 dark:border-blue-800", dot: "bg-blue-500" };
 }
 
 /** Map the raw rvnde_level string to a short human-readable descriptor */
@@ -110,12 +110,12 @@ function RvndeDetailsSection({ details }: { details: unknown }) {
                 return (
                     <div
                         key={key}
-                        className="bg-slate-50 rounded-xl p-3 border border-slate-100"
+                        className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/10"
                     >
                         <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs font-semibold text-slate-700">{label}</span>
+                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</span>
                             {value.score !== undefined && (
-                                <span className="text-xs font-bold bg-white px-2 py-0.5 rounded-lg border border-slate-200 text-slate-800">
+                                <span className="text-xs font-bold bg-white dark:bg-white/10 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
                                     {value.score}/4
                                 </span>
                             )}
@@ -348,16 +348,16 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
     const transcriptBlocks = rawSegments ? groupSegmentsIntoBlocks(rawSegments) : null;
 
     return (
-        <div className="min-h-screen" style={{ background: "#FDFAF6" }}>
+        <div className="min-h-screen bg-background text-foreground">
             {/* ─── Breadcrumb bar ─── */}
-            <div className="border-b border-slate-200 bg-white/60 backdrop-blur-sm sticky top-0 z-10">
+            <div className="border-b border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm sticky top-0 z-10">
                 <div className="container mx-auto px-4 max-w-6xl">
-                    <nav className="flex items-center gap-1.5 text-sm text-slate-400 py-3">
-                        <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+                    <nav className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 py-3">
+                        <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <Link href="/search3" className="hover:text-blue-600 transition-colors">Search</Link>
+                        <Link href="/search3" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Search</Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <span className="text-slate-600 font-medium truncate max-w-[200px] sm:max-w-xs">
+                        <span className="text-slate-600 dark:text-slate-300 font-medium truncate max-w-[200px] sm:max-w-xs">
                             {video.title || "Video"}
                         </span>
                     </nav>
@@ -377,7 +377,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                         {/* ─── Title + Metadata (original layout) ─── */}
                         <div className="space-y-4">
                             <h1
-                                className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight"
+                                className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 leading-tight"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
                                 {video.title || "Untitled Video"}
@@ -388,7 +388,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                 {video.channelName && (
                                     <Link
                                         href={video.channelId ? `/channel/${video.channelId}` : (video.channelUrl || "#")}
-                                        className="flex items-center gap-1.5 font-medium text-slate-800 hover:text-blue-600 transition-colors"
+                                        className="flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                     >
                                         <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
                                             {video.channelName.charAt(0)}
@@ -399,19 +399,19 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                                 <span className="text-slate-300">·</span>
 
-                                <div className="flex items-center gap-1 text-slate-500">
+                                <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
                                     <Calendar className="w-3.5 h-3.5" />
                                     {formatDate(video.date)}
                                 </div>
 
-                                <div className="flex items-center gap-1 text-slate-500">
+                                <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
                                     <Eye className="w-3.5 h-3.5" />
                                     {formatViewCount(video.viewCount)} views
                                 </div>
 
                                 {video.experiencerFullName && (
-                                    <div className="flex items-center gap-1 text-slate-500">
-                                        <span>Experiencer: <strong className="text-slate-700">{video.experiencerFullName}</strong></span>
+                                    <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                                        <span>Experiencer: <strong className="text-slate-700 dark:text-slate-300">{video.experiencerFullName}</strong></span>
                                     </div>
                                 )}
                             </div>
@@ -429,9 +429,9 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                         {/* ─── Mobile-only: Research Scores ─── */}
                         {scoreCount > 0 && (
-                            <div className="lg:hidden bg-white rounded-2xl border border-slate-200/60 shadow-sm p-5">
+                            <div className="lg:hidden bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-5">
                                 <h3
-                                    className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4"
+                                    className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-4"
                                     style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: "0.05em" }}
                                 >
                                     What Researchers Found
@@ -440,12 +440,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     {hasVeridical && (
                                         <a href="#section-veridical-mobile" className={`rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-emerald-300 transition-all ${levelColor.bg} ${levelColor.border} border`}>
                                             <div className="flex items-center gap-1.5 mb-1">
-                                                <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-                                                <span className="text-[10px] font-semibold text-slate-700">Evidence</span>
+                                                <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Evidence</span>
                                             </div>
                                             {video.rvnde_total_score !== null ? (
                                                 <div className="flex items-baseline gap-0.5">
-                                                    <span className="text-xl font-bold text-slate-900">{Math.round((video.rvnde_total_score / 28) * 100)}%</span>
+                                                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{Math.round((video.rvnde_total_score / 28) * 100)}%</span>
                                                 </div>
                                             ) : (
                                                 <div className="text-[10px] text-slate-500 leading-tight">{getEvidenceDescriptor(video.rvnde_level)}</div>
@@ -453,24 +453,24 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                         </a>
                                     )}
                                     {hasGreyson && (
-                                        <a href="#section-greyson" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all bg-blue-50 border border-blue-200">
+                                        <a href="#section-greyson" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                                             <div className="flex items-center gap-1.5 mb-1">
-                                                <Brain className="w-3.5 h-3.5 text-blue-600" />
-                                                <span className="text-[10px] font-semibold text-slate-700">Depth</span>
+                                                <Brain className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Depth</span>
                                             </div>
                                             <div className="flex items-baseline gap-0.5">
-                                                <span className="text-xl font-bold text-slate-900">{Math.round(((analysis!.total_greyson_score ?? 0) / 32) * 100)}%</span>
+                                                <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{Math.round(((analysis!.total_greyson_score ?? 0) / 32) * 100)}%</span>
                                             </div>
                                         </a>
                                     )}
                                     {hasTransformation && (
-                                        <a href="#section-transformation" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 border border-rose-200">
+                                        <a href="#section-transformation" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
                                             <div className="flex items-center gap-1.5 mb-1">
-                                                <Sparkles className="w-3.5 h-3.5 text-rose-600" />
-                                                <span className="text-[10px] font-semibold text-slate-700">Impact</span>
+                                                <Sparkles className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Impact</span>
                                             </div>
                                             <div className="flex items-baseline gap-0.5">
-                                                <span className="text-xl font-bold text-slate-900">{Math.round(((analysis!.transformation_score ?? 0) / 50) * 100)}%</span>
+                                                <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{Math.round(((analysis!.transformation_score ?? 0) / 50) * 100)}%</span>
                                             </div>
                                         </a>
                                     )}
@@ -480,11 +480,11 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                         {/* ─── 1.1: The Story (renamed AI Summary) ─── */}
                         {video.analysis_nde_summary && (
-                            <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-                                <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+                            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                                <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
                                     <BookOpen className="w-4 h-4 text-blue-500" />
                                     <h2
-                                        className="text-lg font-bold text-slate-900"
+                                        className="text-lg font-bold text-slate-900 dark:text-slate-100"
                                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                                     >
                                         The Story
@@ -499,10 +499,10 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                                 key={tag.label}
                                                 className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                                                     tag.color === "emerald"
-                                                        ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                                                        ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800"
                                                         : tag.color === "rose"
-                                                        ? "bg-rose-50 text-rose-700 border border-rose-100"
-                                                        : "bg-slate-100 text-slate-600 border border-slate-200"
+                                                        ? "bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-800"
+                                                        : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10"
                                                 }`}
                                             >
                                                 {tag.label}
@@ -513,7 +513,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                                 {/* Story text */}
                                 <div className="px-6 py-5">
-                                    <p className="text-slate-700 leading-relaxed whitespace-pre-line text-[15px]">
+                                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line text-[15px]">
                                         {video.analysis_nde_summary}
                                     </p>
                                 </div>
@@ -521,9 +521,9 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                 {/* 1.10 — Pull quote (below the story) */}
                                 {pullQuote && (
                                     <div className="px-6 pb-5 pt-0">
-                                        <blockquote className="border-l-2 border-blue-200 pl-4">
+                                        <blockquote className="border-l-2 border-blue-200 dark:border-blue-700 pl-4">
                                             <p
-                                                className="text-slate-600 italic leading-relaxed"
+                                                className="text-slate-600 dark:text-slate-400 italic leading-relaxed"
                                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: "1.05rem" }}
                                             >
                                                 &ldquo;{pullQuote.quote}&rdquo;
@@ -539,8 +539,8 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                 )}
 
                                 {/* 1.1b — Subtle AI disclosure at bottom */}
-                                <div className="px-6 pb-4 border-t border-slate-50 pt-3">
-                                    <span className="text-[11px] text-slate-400">✦ AI Generated</span>
+                                <div className="px-6 pb-4 border-t border-slate-50 dark:border-white/5 pt-3">
+                                    <span className="text-[11px] text-slate-400 dark:text-slate-500">✦ AI Generated</span>
                                 </div>
                             </div>
                         )}
@@ -551,13 +551,13 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                         {/* ─── 1.6: Research Breakdown (moved NDERF + scores) ─── */}
                         {analysis && (
                             <Collapsible>
-                                <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+                                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
                                     <CollapsibleTrigger asChild>
-                                        <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer">
+                                        <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer">
                                             <div className="flex items-center gap-2">
-                                                <Beaker className="w-4 h-4 text-slate-500" />
+                                                <Beaker className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                                                 <h2
-                                                    className="text-lg font-bold text-slate-900"
+                                                    className="text-lg font-bold text-slate-900 dark:text-slate-100"
                                                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                                                 >
                                                     Research Breakdown
@@ -625,13 +625,13 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                         {/* ─── 1.11: Timestamped Transcript ─── */}
                         {(transcriptBlocks || video.subtitles_punctuated) && (
                             <Collapsible>
-                                <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+                                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
                                     <CollapsibleTrigger asChild>
-                                        <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer">
+                                        <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer">
                                             <div className="flex items-center gap-2">
-                                                <BookOpen className="w-4 h-4 text-slate-500" />
+                                                <BookOpen className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                                                 <h2
-                                                    className="text-lg font-bold text-slate-900"
+                                                    className="text-lg font-bold text-slate-900 dark:text-slate-100"
                                                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                                                 >
                                                     Full Transcript
@@ -644,21 +644,21 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                         <div className="px-6 pb-6">
                                             {transcriptBlocks ? (
                                                 // 1.11 — Timestamped blocks
-                                                <div className="bg-slate-50 rounded-xl p-5 max-h-[500px] overflow-y-auto border border-slate-100 space-y-4">
+                                                <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-5 max-h-[500px] overflow-y-auto border border-slate-100 dark:border-white/10 space-y-4">
                                                     {transcriptBlocks.map((block, i) => (
                                                         <div key={i} className="flex gap-3">
                                                             <TimestampLink
                                                                 seconds={block.startSeconds}
                                                                 label={`[${formatTimestamp(block.startSeconds)}]`}
                                                             />
-                                                            <p className="text-sm text-slate-700 leading-relaxed">{block.text}</p>
+                                                            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{block.text}</p>
                                                         </div>
                                                     ))}
                                                 </div>
                                             ) : (
                                                 // Fallback: plain subtitles_punctuated
-                                                <div className="bg-slate-50 rounded-xl p-5 max-h-[500px] overflow-y-auto border border-slate-100">
-                                                    <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                                                <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-5 max-h-[500px] overflow-y-auto border border-slate-100 dark:border-white/10">
+                                                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
                                                         {video.subtitles_punctuated}
                                                     </p>
                                                 </div>
@@ -670,14 +670,14 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                         )}
 
                         {/* ─── 1.9: Grief / comfort footer ─── */}
-                        <div className="bg-blue-50/40 border border-blue-100 rounded-2xl px-6 py-6 space-y-3">
+                        <div className="bg-blue-50/40 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-2xl px-6 py-6 space-y-3">
                             <div className="flex items-center gap-2">
                                 <Heart className="w-4 h-4 text-blue-400" />
-                                <p className="text-sm font-semibold text-slate-800">
+                                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                                     Are you here because someone you love has died?
                                 </p>
                             </div>
-                            <p className="text-sm text-slate-600 leading-relaxed">
+                            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                                 These accounts were gathered because death may not be the end.
                                 Thousands of people have experienced something beyond — and come back to tell us about it.
                             </p>
@@ -695,16 +695,16 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                     {/* ─── Right Sidebar (desktop only) ─── */}
                     <div className="hidden lg:block space-y-6 lg:pr-1">
                         {/* 1.7/1.8 — Renamed Score Summary Card */}
-                        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-5">
+                        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-5">
                             <h3
-                                className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4"
+                                className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-4"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif", letterSpacing: "0.05em" }}
                             >
                                 What Researchers Found
                             </h3>
 
                             {scoreCount === 0 ? (
-                                <p className="text-sm text-slate-400 leading-relaxed">
+                                <p className="text-sm text-slate-400 dark:text-slate-500 leading-relaxed">
                                     This video has not yet been analyzed by our research scales.
                                 </p>
                             ) : (
@@ -713,16 +713,16 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     {hasVeridical && (
                                         <a href="#section-veridical" className={`rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-emerald-300 transition-all ${levelColor.bg} ${levelColor.border} border`}>
                                             <div className="flex items-center gap-2 mb-1">
-                                                <TrendingUp className="w-4 h-4 text-emerald-600" />
-                                                <span className="text-xs font-semibold text-slate-700">Evidence Strength</span>
+                                                <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Evidence Strength</span>
                                             </div>
                                             <div className="flex items-baseline gap-1.5">
                                                 {video.rvnde_total_score !== null ? (
-                                                    <span className="text-2xl font-bold text-slate-900">{Math.round((video.rvnde_total_score / 28) * 100)}%</span>
+                                                    <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{Math.round((video.rvnde_total_score / 28) * 100)}%</span>
                                                 ) : (
-                                                    <span className="text-2xl font-bold text-slate-900">—</span>
+                                                    <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">—</span>
                                                 )}
-                                                <span className={`ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full ${levelColor.text} bg-white/70`}>
+                                                <span className={`ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full ${levelColor.text} bg-white/70 dark:bg-black/20`}>
                                                     {getEvidenceDescriptor(video.rvnde_level)}
                                                 </span>
                                             </div>
@@ -732,15 +732,15 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                                     {/* Experience Depth (was Greyson) */}
                                     {hasGreyson && (
-                                        <a href="#section-greyson-desktop" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all bg-blue-50 border border-blue-200">
+                                        <a href="#section-greyson-desktop" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <Brain className="w-4 h-4 text-blue-600" />
-                                                <span className="text-xs font-semibold text-slate-700">Experience Depth</span>
+                                                <Brain className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Experience Depth</span>
                                             </div>
                                             <div className="flex items-baseline gap-1.5">
-                                                <span className="text-2xl font-bold text-slate-900">{Math.round(((analysis.total_greyson_score ?? 0) / 32) * 100)}%</span>
+                                                <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{Math.round(((analysis.total_greyson_score ?? 0) / 32) * 100)}%</span>
                                                 {analysis.scale_agreement && (
-                                                    <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full text-blue-700 bg-white/70">
+                                                    <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full text-blue-700 dark:text-blue-300 bg-white/70 dark:bg-black/20">
                                                         {analysis.scale_agreement}
                                                     </span>
                                                 )}
@@ -751,15 +751,15 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                                     {/* Life Impact (was Transformation) */}
                                     {hasTransformation && (
-                                        <a href="#section-transformation-desktop" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 border border-rose-200">
+                                        <a href="#section-transformation-desktop" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <Sparkles className="w-4 h-4 text-rose-600" />
-                                                <span className="text-xs font-semibold text-slate-700">Life Impact</span>
+                                                <Sparkles className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                                                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Life Impact</span>
                                             </div>
                                             <div className="flex items-baseline gap-1.5">
-                                                <span className="text-2xl font-bold text-slate-900">{Math.round(((analysis.transformation_score ?? 0) / 50) * 100)}%</span>
+                                                <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{Math.round(((analysis.transformation_score ?? 0) / 50) * 100)}%</span>
                                                 {analysis.transformation_classification && (
-                                                    <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full text-rose-700 bg-white/70">
+                                                    <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full text-rose-700 dark:text-rose-300 bg-white/70 dark:bg-black/20">
                                                         {analysis.transformation_classification}
                                                     </span>
                                                 )}
@@ -771,16 +771,16 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                             )}
 
                             {/* Quick links */}
-                            <div className="mt-5 pt-4 border-t border-slate-100 space-y-2">
-                                <Link href="/scale/cvnde" className="flex items-center justify-between text-xs text-slate-500 hover:text-blue-600 transition-colors py-1">
+                            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-white/10 space-y-2">
+                                <Link href="/scale/cvnde" className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-1">
                                     <span>About Evidence Strength</span>
                                     <ChevronRight className="w-3.5 h-3.5" />
                                 </Link>
-                                <Link href="/scale/greyson" className="flex items-center justify-between text-xs text-slate-500 hover:text-blue-600 transition-colors py-1">
+                                <Link href="/scale/greyson" className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-1">
                                     <span>About Experience Depth</span>
                                     <ChevronRight className="w-3.5 h-3.5" />
                                 </Link>
-                                <Link href="/scale/transformation" className="flex items-center justify-between text-xs text-slate-500 hover:text-blue-600 transition-colors py-1">
+                                <Link href="/scale/transformation" className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-1">
                                     <span>About Life Impact</span>
                                     <ChevronRight className="w-3.5 h-3.5" />
                                 </Link>

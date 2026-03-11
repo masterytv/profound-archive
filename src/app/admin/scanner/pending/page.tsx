@@ -80,11 +80,11 @@ export default function PendingQueuePage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-violet-50 rounded-xl">
+                    <div className="p-2.5 bg-violet-50 dark:bg-violet-900/30 rounded-xl">
                         <ListVideo className="w-5 h-5 text-violet-600" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Pro, serif' }}>
+                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100" style={{ fontFamily: 'Crimson Pro, serif' }}>
                             Pending Queue
                         </h1>
                         <p className="text-sm text-slate-500 mt-0.5">
@@ -98,8 +98,8 @@ export default function PendingQueuePage() {
                     <button
                         onClick={toggleShortsFilter}
                         className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl border transition-colors ${shortsOnly
-                                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                                ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                                : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
                             }`}
                         title="Show only videos ≤ 3 minutes (potential Shorts)"
                     >
@@ -109,7 +109,7 @@ export default function PendingQueuePage() {
 
                     <button
                         onClick={() => fetchPage(page, shortsOnly)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                     >
                         <RefreshCcw className="w-4 h-4" />
                         Refresh
@@ -132,7 +132,7 @@ export default function PendingQueuePage() {
             )}
 
             {/* Table */}
-            <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden">
+            <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
                         <Loader2 className="w-6 h-6 animate-spin text-violet-600" />
@@ -149,7 +149,7 @@ export default function PendingQueuePage() {
                     </div>
                 ) : (
                     <table className="w-full text-sm">
-                        <thead className="bg-slate-50 border-b border-slate-200">
+                        <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
                             <tr>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Video</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Channel</th>
@@ -161,18 +161,18 @@ export default function PendingQueuePage() {
                                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wide">Queued</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/10">
                             {items.map((item) => {
                                 const { label: durationLabel, isShort } = formatDuration(item.duration_seconds);
                                 return (
                                     <tr
                                         key={item.id}
-                                        className={`transition-colors ${isShort ? 'bg-amber-50/60 hover:bg-amber-50' : 'hover:bg-slate-50/50'}`}
+                                        className={`transition-colors ${isShort ? 'bg-amber-50/60 dark:bg-amber-900/20 hover:bg-amber-50 dark:hover:bg-amber-900/30' : 'hover:bg-slate-50/50 dark:hover:bg-white/5'}`}
                                     >
                                         {/* Video */}
                                         <td className="px-4 py-3 max-w-xs">
                                             <div className="space-y-0.5">
-                                                <p className="text-slate-800 text-xs font-medium truncate max-w-[320px]">
+                                                <p className="text-slate-800 dark:text-slate-200 text-xs font-medium truncate max-w-[320px]">
                                                     {item.title || <span className="text-slate-400 italic">Title pending</span>}
                                                 </p>
                                                 <a
@@ -199,8 +199,8 @@ export default function PendingQueuePage() {
                                                 <span className="text-xs text-slate-400">—</span>
                                             ) : (
                                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-mono font-medium ${isShort
-                                                        ? 'bg-amber-100 text-amber-700 border border-amber-200'
-                                                        : 'bg-slate-100 text-slate-600'
+                                                        ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30'
+                                                        : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400'
                                                     }`}>
                                                     {isShort && <AlertTriangle className="w-3 h-3" />}
                                                     {durationLabel}
@@ -234,7 +234,7 @@ export default function PendingQueuePage() {
                         <button
                             onClick={() => goTo(page - 1)}
                             disabled={page === 1 || loading}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             <ChevronLeft className="w-4 h-4" />
                             Prev
@@ -249,7 +249,7 @@ export default function PendingQueuePage() {
                                     onClick={() => goTo(p)}
                                     className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === page
                                             ? 'bg-violet-600 text-white'
-                                            : 'hover:bg-slate-100 text-slate-600'
+                                            : 'hover:bg-white/10 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300'
                                         }`}
                                 >
                                     {p}
@@ -260,7 +260,7 @@ export default function PendingQueuePage() {
                         <button
                             onClick={() => goTo(page + 1)}
                             disabled={page === pagination.total_pages || loading}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             Next
                             <ChevronRight className="w-4 h-4" />

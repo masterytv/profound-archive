@@ -141,10 +141,10 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
     })
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
 
             {/* Channel Header */}
-            <div className="border-b border-slate-200/60 bg-white/80 backdrop-blur-sm">
+            <div className="border-b border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
                     {/* Breadcrumb */}
                     <nav className="flex items-center gap-1.5 text-sm text-slate-400 mb-5">
@@ -152,7 +152,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                         <ChevronRight className="w-3.5 h-3.5" />
                         <Link href="/channels" className="hover:text-blue-600 transition-colors">Channels</Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <span className="text-slate-700 font-medium">{channelMeta.channelName}</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-medium">{channelMeta.channelName}</span>
                     </nav>
 
                     <div className="flex flex-col sm:flex-row items-start gap-5">
@@ -173,7 +173,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
 
                         <div className="flex-1">
                             <h1
-                                className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-2"
+                                className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mb-2"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
                                 {channelMeta.channelName}
@@ -183,16 +183,16 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 mb-3">
                                 <span className="flex items-center gap-1.5">
                                     <Film className="w-4 h-4" />
-                                    <strong className="text-slate-700">{totalResults}</strong> videos
+                                    <strong className="text-slate-700 dark:text-slate-200">{totalResults}</strong> videos
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                     <Eye className="w-4 h-4" />
-                                    <strong className="text-slate-700">{formatNumber(totalViews)}</strong> total views
+                                    <strong className="text-slate-700 dark:text-slate-200">{formatNumber(totalViews)}</strong> total views
                                 </span>
                                 {subscriberCount > 0 && (
                                     <span className="flex items-center gap-1.5">
                                         <Users className="w-4 h-4" />
-                                        <strong className="text-slate-700">{formatNumber(subscriberCount)}</strong> subscribers
+                                        <strong className="text-slate-700 dark:text-slate-200">{formatNumber(subscriberCount)}</strong> subscribers
                                     </span>
                                 )}
                             </div>
@@ -227,7 +227,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
             {/* Controls + Grid */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Search + Controls */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 mb-8">
+                <div className="bg-white dark:bg-white/5 rounded-2xl shadow-sm dark:shadow-none border border-slate-200/60 dark:border-white/10 p-4 mb-8">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         {/* Inline search */}
                         <div className="relative flex-1 w-full sm:max-w-xs">
@@ -235,7 +235,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                                 type="text"
                                 placeholder="Search videos in this channel..."
                                 defaultValue={query}
-                                className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 py-2 pl-3 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all"
                             />
                         </div>
                         <Suspense fallback={null}>
@@ -258,7 +258,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                             <Link
                                 key={video.videoId}
                                 href={`/video/${video.videoId}`}
-                                className="group block bg-white rounded-2xl overflow-hidden border border-slate-200/60 hover:shadow-xl hover:border-blue-200 transition-all duration-300"
+                                className="group block bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 hover:shadow-xl dark:hover:shadow-none hover:border-blue-200 dark:hover:border-blue-500/50 transition-all duration-300"
                             >
                                 {/* Thumbnail */}
                                 <div className="relative aspect-video overflow-hidden bg-slate-100">
@@ -279,7 +279,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
 
                                 {/* Info */}
                                 <div className="p-4">
-                                    <h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
                                         {video.title || 'Untitled Video'}
                                     </h3>
                                     <div className="flex items-center gap-3 text-xs text-slate-400">
@@ -312,7 +312,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                 {/* Bottom pagination */}
                 {totalPages > 1 && (
                     <div className="mt-8">
-                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4">
+                        <div className="bg-white dark:bg-white/5 rounded-2xl shadow-sm dark:shadow-none border border-slate-200/60 dark:border-white/10 p-4">
                             <Suspense fallback={null}>
                                 <ExplorerControls
                                     sortOptions={SORT_OPTIONS}

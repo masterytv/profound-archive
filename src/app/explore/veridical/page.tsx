@@ -86,39 +86,36 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
     }
 
     return (
-        <div className="min-h-screen" style={{ background: "#F8FAFC" }}>
+        <div className="min-h-screen bg-background text-foreground">
             {/* ─── Header ─── */}
-            <div
-                className="border-b border-slate-200"
-                style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%)" }}
-            >
+            <div className="border-b border-slate-200 dark:border-slate-800 hero-gradient">
                 <div className="container mx-auto px-4 py-8 max-w-7xl">
                     {/* Breadcrumb */}
-                    <nav className="flex items-center gap-1.5 text-sm text-slate-400 mb-6">
-                        <Link href="/" className="hover:text-blue-600 transition-colors">
+                    <nav className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 mb-6">
+                        <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                             Home
                         </Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <Link href="/" className="hover:text-blue-600 transition-colors">
+                        <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                             Explore
                         </Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <span className="text-slate-700 font-medium">Veridical Perception</span>
+                        <span className="text-slate-700 dark:text-slate-300 font-medium">Veridical Perception</span>
                     </nav>
 
                     <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0">
-                            <TrendingUp className="w-6 h-6 text-emerald-600" />
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                            <TrendingUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
                             <h1
-                                className="text-3xl md:text-4xl font-bold text-slate-900 mb-2"
+                                className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 mb-2"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
                                 Veridical Perception{" "}
-                                <span className="text-slate-400 text-2xl md:text-3xl font-normal">(cvNDE)</span>
+                                <span className="text-slate-400 dark:text-slate-500 text-2xl md:text-3xl font-normal">(cvNDE)</span>
                             </h1>
-                            <p className="text-slate-500 max-w-2xl leading-relaxed">
+                            <p className="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
                                 Accounts with verified, evidential out-of-body perceptions. Sort by
                                 total score or drill into individual criteria like medical severity,
                                 verification strength, and specificity.
@@ -138,7 +135,7 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
             {/* ─── Controls + Grid ─── */}
             <div className="container mx-auto px-4 py-8 max-w-7xl">
                 {/* Controls */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 mb-8">
+                <div className="bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-4 mb-8">
                     <Suspense fallback={null}>
                         <ExplorerControls
                             sortOptions={SORT_OPTIONS}
@@ -167,10 +164,10 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
                             <Link
                                 key={video.videoId}
                                 href={`/video/${video.videoId}`}
-                                className="group block bg-white rounded-2xl overflow-hidden border border-slate-200/60 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer"
+                                className="group block bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-300 cursor-pointer"
                             >
                                 {/* Thumbnail */}
-                                <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                                <div className="relative aspect-video bg-slate-100 dark:bg-slate-800 overflow-hidden">
                                     {video.thumbnailUrl ? (
                                         <Image
                                             src={video.thumbnailUrl.replace("maxresdefault", "hqdefault")}
@@ -199,7 +196,7 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
                                 {/* Content */}
                                 <div className="p-4 space-y-2.5">
                                     <h3
-                                        className="text-sm font-semibold leading-snug line-clamp-2 text-slate-800 group-hover:text-blue-600 transition-colors"
+                                        className="text-sm font-semibold leading-snug line-clamp-2 text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
                                         style={{ fontFamily: "'Crimson Pro', Georgia, serif", fontSize: "15px" }}
                                     >
                                         {video.title || "Untitled"}
@@ -207,7 +204,7 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
 
                                     <div className="flex items-center justify-between gap-2">
                                         {video.channelName && (
-                                            <p className="text-xs text-slate-400 truncate">
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
                                                 {video.channelName}
                                             </p>
                                         )}
@@ -221,7 +218,7 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
                                     {/* Sub-score if sorting by criteria */}
                                     {sortLabel && subScore && (
                                         <div className="pt-1">
-                                            <span className="text-[11px] bg-slate-50 px-2 py-1 rounded-lg text-slate-500">
+                                            <span className="text-[11px] bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg text-slate-500 dark:text-slate-400">
                                                 {sortLabel}: <strong className="text-slate-700">{subScore}</strong>
                                             </span>
                                         </div>
@@ -240,7 +237,7 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
 
                 {/* Bottom pagination */}
                 {totalPages > 1 && (
-                    <div className="mt-10 bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4">
+                    <div className="mt-10 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-4">
                         <Suspense fallback={null}>
                             <ExplorerControls
                                 sortOptions={SORT_OPTIONS}

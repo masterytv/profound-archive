@@ -92,17 +92,17 @@ export function ChannelListRow({
     return (
         <Link
             href={`/channel/${channel.channel_id}`}
-            className="group flex items-center gap-4 sm:gap-5 bg-white border border-slate-200/60 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 hover:shadow-lg hover:border-blue-200/70 transition-all duration-200"
+            className="group flex items-center gap-4 sm:gap-5 bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 hover:shadow-lg hover:border-blue-200/70 dark:hover:border-blue-700 transition-all duration-200"
         >
             {/* Rank number */}
-            <span className="hidden sm:block text-sm font-bold text-slate-300 w-6 text-right shrink-0 tabular-nums">
+            <span className="hidden sm:block text-sm font-bold text-slate-300 dark:text-slate-600 w-6 text-right shrink-0 tabular-nums">
                 {rank}
             </span>
 
             {/* Avatar */}
             <div className="shrink-0">
                 {channel.avatar_url ? (
-                    <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden ring-2 ring-slate-100 group-hover:ring-blue-100 transition-all duration-200 shadow-sm">
+                    <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden ring-2 ring-slate-100 dark:ring-slate-700 group-hover:ring-blue-100 dark:group-hover:ring-blue-800 transition-all duration-200 shadow-sm">
                         <Image
                             src={channel.avatar_url}
                             alt={channel.channel_name}
@@ -120,10 +120,10 @@ export function ChannelListRow({
 
             {/* Name + basic stats */}
             <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors truncate leading-tight mb-0.5">
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate leading-tight mb-0.5">
                     {channel.channel_name}
                 </p>
-                <div className="flex items-center gap-3 text-xs text-slate-400">
+                <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
                     <span className="flex items-center gap-1">
                         <Film className="w-3 h-3" />
                         {channel.video_count}
@@ -144,12 +144,12 @@ export function ChannelListRow({
                 {hasAnalysis && (
                     <div className="sm:hidden flex items-center gap-2 mt-1.5 flex-wrap">
                         {channel.avg_intensity != null && (
-                            <span className="text-[10px] bg-violet-50 text-violet-600 font-medium px-1.5 py-0.5 rounded-md">
+                            <span className="text-[10px] bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-medium px-1.5 py-0.5 rounded-md">
                                 ⚡ {channel.avg_intensity}/10
                             </span>
                         )}
                         {channel.pct_positive_tone != null && (
-                            <span className="text-[10px] bg-blue-50 text-blue-600 font-medium px-1.5 py-0.5 rounded-md">
+                            <span className="text-[10px] bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium px-1.5 py-0.5 rounded-md">
                                 +{channel.pct_positive_tone}% pos
                             </span>
                         )}
@@ -159,7 +159,7 @@ export function ChannelListRow({
                             const total = Object.values(expTypes).reduce((s, v) => s + v, 0)
                             const pct = Math.round((topType[1] / total) * 100)
                             return (
-                                <span className="text-[10px] bg-slate-100 text-slate-500 font-medium px-1.5 py-0.5 rounded-md">
+                                <span className="text-[10px] bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 font-medium px-1.5 py-0.5 rounded-md">
                                     {topType[0].toUpperCase()} {pct}%
                                 </span>
                             )
@@ -174,13 +174,13 @@ export function ChannelListRow({
                     {/* Intensity bar */}
                     {channel.avg_intensity != null && (
                         <div className="flex items-center gap-2">
-                            <span className="text-[9px] text-slate-400 uppercase tracking-wider w-12 shrink-0">
+                            <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider w-12 shrink-0">
                                 Intensity
                             </span>
                             <div className="flex-1">
                                 <MiniIntensityBar value={channel.avg_intensity} />
                             </div>
-                            <span className="text-[10px] font-semibold text-slate-600 w-6 text-right tabular-nums shrink-0">
+                            <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 w-6 text-right tabular-nums shrink-0">
                                 {channel.avg_intensity}
                             </span>
                         </div>
@@ -189,7 +189,7 @@ export function ChannelListRow({
                     {/* Experience types bar */}
                     {Object.keys(expTypes).length > 0 && (
                         <div className="flex items-center gap-2">
-                            <span className="text-[9px] text-slate-400 uppercase tracking-wider w-12 shrink-0">
+                            <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider w-12 shrink-0">
                                 Types
                             </span>
                             <div className="flex-1">
@@ -201,7 +201,7 @@ export function ChannelListRow({
                     {/* Tone bar */}
                     {Object.keys(toneDistrib).length > 0 && (
                         <div className="flex items-center gap-2">
-                            <span className="text-[9px] text-slate-400 uppercase tracking-wider w-12 shrink-0">
+                            <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider w-12 shrink-0">
                                 Tone
                             </span>
                             <div className="flex-1">
@@ -213,7 +213,7 @@ export function ChannelListRow({
             )}
 
             {/* Desktop: Score badges */}
-            <div className="hidden lg:flex items-center gap-3 shrink-0 pl-2 border-l border-slate-100">
+            <div className="hidden lg:flex items-center gap-3 shrink-0 pl-2 border-l border-slate-100 dark:border-white/10">
                 <ScoreBadge
                     label="Greyson"
                     value={channel.avg_greyson_score}
@@ -235,15 +235,15 @@ export function ChannelListRow({
             <div className="flex items-center gap-2 shrink-0 ml-auto pl-2">
                 {sortHighlight && (
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-bold text-slate-800 tabular-nums">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 tabular-nums">
                             {sortHighlight.value}
                         </p>
-                        <p className="text-[9px] text-slate-400 uppercase tracking-wider">
+                        <p className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                             {sortHighlight.label}
                         </p>
                     </div>
                 )}
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
             </div>
         </Link>
     )

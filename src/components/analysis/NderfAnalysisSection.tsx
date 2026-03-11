@@ -42,12 +42,12 @@ function CollapsibleSection({
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="border border-slate-100 rounded-xl overflow-hidden">
+        <div className="border border-slate-100 dark:border-white/10 rounded-xl overflow-hidden">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between p-3 hover:bg-slate-50/50 transition-colors cursor-pointer"
+                className="w-full flex items-center justify-between p-3 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors cursor-pointer"
             >
-                <h4 className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <h4 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                     {title}
                 </h4>
                 {isOpen ? (
@@ -81,8 +81,8 @@ function ContentSafetyWarning({
         <div className={cn(
             "flex items-start gap-3 p-3 rounded-lg border",
             isSevere
-                ? "bg-red-50 border-red-200 text-red-800"
-                : "bg-amber-50 border-amber-200 text-amber-800"
+                ? "bg-red-50 dark:bg-red-500/20 border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-300"
+                : "bg-amber-50 dark:bg-amber-500/20 border-amber-200 dark:border-amber-500/30 text-amber-800 dark:text-amber-300"
         )}>
             <ShieldAlert className={cn(
                 "w-4 h-4 shrink-0 mt-0.5",
@@ -122,11 +122,11 @@ export function NderfAnalysisSection({ data, className }: NderfAnalysisSectionPr
     if (!hasElements && !hasJourney && !hasPhenomenology && !hasEntities && !hasBadges) return null;
 
     return (
-        <div className={cn("bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden", className)}>
+        <div className={cn("bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none overflow-hidden", className)}>
             {/* Header */}
             <div className="flex items-center gap-2 px-4 pt-4 pb-2">
                 <Sparkles className="w-4 h-4 text-blue-500" />
-                <h3 className="text-sm font-semibold text-slate-800">
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                     Experience Analysis
                 </h3>
                 <span className="text-[10px] text-slate-400 ml-auto">NDERF Framework</span>
@@ -148,7 +148,7 @@ export function NderfAnalysisSection({ data, className }: NderfAnalysisSectionPr
 
                 {/* AI Summary */}
                 {data.nde_summary && (
-                    <p className="text-sm text-slate-600 leading-relaxed">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                         {data.nde_summary}
                     </p>
                 )}
@@ -156,7 +156,7 @@ export function NderfAnalysisSection({ data, className }: NderfAnalysisSectionPr
                 {/* Journey Timeline — always visible */}
                 {hasJourney && (
                     <div>
-                        <h4 className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                        <h4 className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                             Journey Flow
                         </h4>
                         <JourneyFlowTimeline journeyFlow={data.journey_flow} />

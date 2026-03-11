@@ -151,11 +151,11 @@ export default function ScannerAdminPage() {
         <div className="space-y-8">
             {/* Header */}
             <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-50 rounded-xl">
+                <div className="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                     <Radar className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Pro, serif' }}>
+                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100" style={{ fontFamily: 'Crimson Pro, serif' }}>
                         Channel Scanner
                     </h1>
                     <p className="text-sm text-slate-500">
@@ -194,8 +194,8 @@ export default function ScannerAdminPage() {
             </div>
 
             {/* Actions */}
-            <div className="rounded-2xl border border-slate-200/60 bg-white p-6">
-                <h2 className="text-lg font-semibold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-white/5 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4" style={{ fontFamily: 'Crimson Pro, serif' }}>
                     Scanner Controls
                 </h2>
                 <div className="flex flex-wrap gap-3">
@@ -228,7 +228,7 @@ export default function ScannerAdminPage() {
                     <button
                         onClick={runTick}
                         disabled={actionLoading === 'tick'}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/10 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/20 transition-colors disabled:opacity-50"
                     >
                         {actionLoading === 'tick' ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -239,7 +239,7 @@ export default function ScannerAdminPage() {
                     </button>
                     <button
                         onClick={fetchData}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/10 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/20 transition-colors"
                     >
                         <RotateCcw className="w-4 h-4" />
                         Refresh
@@ -248,7 +248,7 @@ export default function ScannerAdminPage() {
 
                 {/* Audit Result */}
                 {auditResult && (
-                    <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                    <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10">
                         {auditResult.error ? (
                             <p className="text-red-600 text-sm">{auditResult.error}</p>
                         ) : (
@@ -295,7 +295,7 @@ export default function ScannerAdminPage() {
 
                 {/* Tick Result */}
                 {tickResult && (
-                    <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                    <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10">
                         {tickResult.error ? (
                             <p className="text-red-600 text-sm">{tickResult.error}</p>
                         ) : (
@@ -320,25 +320,25 @@ export default function ScannerAdminPage() {
             </div>
 
             {/* Channel Table */}
-            <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden">
-                <div className="p-6 border-b border-slate-200/60">
-                    <h2 className="text-lg font-semibold text-slate-900" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden">
+                <div className="p-6 border-b border-slate-200/60 dark:border-white/10">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100" style={{ fontFamily: 'Crimson Pro, serif' }}>
                         Channels ({channels.length})
                     </h2>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="text-left text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200/60">
+                            <tr className="text-left text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200/60 dark:border-white/10">
                                 <th className="px-6 py-3">Channel</th>
                                 <th className="px-4 py-3">Scanner</th>
                                 <th className="px-4 py-3 text-right">Subscribers</th>
                                 <th className="px-4 py-3 text-right">Last Scanned</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/10">
                             {channels.map((channel) => (
-                                <tr key={channel.channel_id} className="hover:bg-slate-50/50 transition-colors">
+                                <tr key={channel.channel_id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
                                     <td className="px-6 py-3">
                                         <div className="flex items-center gap-3">
                                             {channel.avatar_url ? (
@@ -352,7 +352,7 @@ export default function ScannerAdminPage() {
                                                     <Radar className="w-4 h-4 text-slate-400" />
                                                 </div>
                                             )}
-                                            <span className="text-sm font-medium text-slate-900">{channel.name}</span>
+                                            <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{channel.name}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
@@ -400,12 +400,12 @@ function StatCard({ label, value, total, icon, subtitle, className }: {
     className?: string;
 }) {
     return (
-        <div className={`rounded-2xl border border-slate-200/60 bg-white p-4 hover:shadow-lg transition-all ${className || ''}`}>
+        <div className={`rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-white/5 p-4 hover:shadow-lg transition-all ${className || ''}`}>
             <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 bg-slate-50 rounded-lg">{icon}</div>
+                <div className="p-1.5 bg-slate-50 dark:bg-white/10 rounded-lg">{icon}</div>
                 <span className="text-xs text-slate-500">{label}</span>
             </div>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                 {value}
                 {total !== undefined && (
                     <span className="text-sm font-normal text-slate-400"> / {total}</span>
