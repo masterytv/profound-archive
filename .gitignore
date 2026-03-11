@@ -51,3 +51,6 @@ firebase-debug.log
 firestore-debug.log
 mcp-config.json
 .next.old.*
+
+# vscode — contains local OAuth credentials, never commit
+.vscode/settings.json
