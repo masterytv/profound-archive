@@ -121,6 +121,9 @@ export default async function TransformationExplorerPage({ searchParams }: PageP
                             <Sparkles className="w-6 h-6 text-rose-600 dark:text-rose-400" />
                         </div>
                         <div>
+                            <p className="text-sm font-semibold uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-1">
+                                Life Impact
+                            </p>
                             <h1
                                 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 mb-2"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}

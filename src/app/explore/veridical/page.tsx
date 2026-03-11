@@ -108,6 +108,9 @@ export default async function VeridicalExplorerAlt1Page({ searchParams }: PagePr
                             <TrendingUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
+                            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">
+                                Evidence Strength
+                            </p>
                             <h1
                                 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 mb-2"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}

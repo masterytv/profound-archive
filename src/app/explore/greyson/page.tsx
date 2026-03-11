@@ -124,6 +124,9 @@ export default async function GreysonExplorerPage({ searchParams }: PageProps) {
                             <Brain className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
+                            <p className="text-sm font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1">
+                                Experience Depth
+                            </p>
                             <h1
                                 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 mb-2"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
