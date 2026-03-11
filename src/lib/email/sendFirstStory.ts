@@ -64,6 +64,37 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
     thumbnailUrl: string | null; viewCount: number | null;
   };
 
+  // ── Email-wide duplicate guard ────────────────────────────────────────────
+  // The RPC deduplicates against this specific lead_id's email_sends, but if
+  // the same email has multiple subscriptions (e.g. Seeker + Curious), they
+  // could all pick the same video concurrently. Check across ALL lists.
+  const { data: siblingLeads } = await supabase
+    .from("quiz_leads")
+    .select("id")
+    .eq("email", lead.email);
+
+  if (siblingLeads?.length) {
+    const allLeadIds = siblingLeads.map(r => r.id);
+    const { data: alreadySentRows } = await supabase
+      .from("email_sends")
+      .select("video_id")
+      .in("lead_id", allLeadIds);
+
+    const alreadySent = new Set((alreadySentRows ?? []).map(r => r.video_id));
+
+    if (alreadySent.has(video.videoId)) {
+      console.warn(
+        `[sendFirstStory] Skipping duplicate video ${video.videoId} for ${lead.email} (${archetype}) — already sent via another list`
+      );
+      // Update next_send_at so the cron will retry later with a different video
+      await supabase
+        .from("quiz_leads")
+        .update({ next_send_at: computeNextSend(lead.frequency).toISOString() })
+        .eq("id", lead.id);
+      return { ok: false, error: "Duplicate video — will retry next cycle" };
+    }
+  }
+
   // Fetch customized template content from DB (if any)
   const { data: tmpl } = await supabase
     .from("email_templates")

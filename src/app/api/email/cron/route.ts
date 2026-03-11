@@ -51,7 +51,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ sent: 0, message: "No leads due" });
   }
 
-  const results = { sent: 0, failed: 0, errors: [] as string[] };
+  const results = { sent: 0, failed: 0, skipped: 0, errors: [] as string[] };
+
+  // Track videos picked this run, keyed by email — prevents same-run dupes
+  // when multiple subscriptions for the same email are processed together
+  const pickedThisRun = new Map<string, Set<string>>();
 
   for (const lead of leads) {
     try {
@@ -74,6 +78,37 @@ export async function GET(req: NextRequest) {
         videoId: string; title: string; channelName: string;
         thumbnailUrl: string | null; viewCount: number | null;
       };
+
+      // ── Email-wide duplicate guard ──────────────────────────────────────────
+      // 1) Check current-run picks for this email (race condition within batch)
+      const runPicked = pickedThisRun.get(lead.email) ?? new Set<string>();
+      if (runPicked.has(video.videoId)) {
+        console.warn(`[cron] Skipping in-run duplicate ${video.videoId} for ${lead.email} (${archetype})`);
+        results.skipped++;
+        await supabase.from("quiz_leads")
+          .update({ next_send_at: computeNextSend(lead.frequency) })
+          .eq("id", lead.id);
+        continue;
+      }
+
+      // 2) Check historical sends for this email across all its leads
+      const { data: siblingLeads } = await supabase
+        .from("quiz_leads").select("id").eq("email", lead.email);
+      if (siblingLeads?.length) {
+        const { data: sentRows } = await supabase
+          .from("email_sends").select("video_id")
+          .in("lead_id", siblingLeads.map(r => r.id));
+        const historicallySent = new Set((sentRows ?? []).map(r => r.video_id));
+        if (historicallySent.has(video.videoId)) {
+          console.warn(`[cron] Skipping historical duplicate ${video.videoId} for ${lead.email} (${archetype})`);
+          results.skipped++;
+          await supabase.from("quiz_leads")
+            .update({ next_send_at: computeNextSend(lead.frequency) })
+            .eq("id", lead.id);
+          continue;
+        }
+      }
+      // ───────────────────────────────────────────────────────────────────────
 
       const unsubscribeUrl = `https://projectprofound.org/unsubscribe?email=${encodeURIComponent(lead.email)}`;
 
@@ -99,6 +134,10 @@ export async function GET(req: NextRequest) {
       });
 
       if (sendError) throw new Error(sendError.message);
+
+      // Record this pick in the in-run dedup map
+      runPicked.add(video.videoId);
+      pickedThisRun.set(lead.email, runPicked);
 
       // Log + update
       await supabase.from("email_sends").insert({
