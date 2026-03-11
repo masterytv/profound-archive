@@ -1,6 +1,9 @@
 // GET /api/email/preview?archetype=griever
 // Returns the rendered HTML of the email template for preview in an iframe.
 // Supports NDE archetype video emails and newsletter_welcome email.
+// force-dynamic: always re-fetch from DB so edits reflect immediately.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -32,7 +35,7 @@ export async function GET(req: NextRequest) {
         unsubscribeUrl: "https://projectprofound.org/unsubscribe?token=preview",
       })
     );
-    return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+    return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
   }
 
   // ── NDE archetype video email preview ────────────────────────────────────
@@ -75,6 +78,6 @@ export async function GET(req: NextRequest) {
   );
 
   return new NextResponse(html, {
-    headers: { "Content-Type": "text/html; charset=utf-8" },
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
   });
 }

@@ -56,15 +56,25 @@ export default function EmailTemplatesPage() {
     setSaved(false);
   }
 
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   async function handleSave() {
     setSaving(true);
     setSaved(false);
-    await supabase
-      .from("email_templates")
-      .upsert({ ...current, archetype: selected, updated_at: new Date().toISOString() });
+    setSaveError(null);
+    const res = await fetch("/api/email/template-save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...current, archetype: selected }),
+    });
+    const json = await res.json();
     setSaving(false);
-    setSaved(true);
-    setPreviewKey(k => k + 1); // refresh preview
+    if (!res.ok) {
+      setSaveError(json.error ?? "Save failed");
+    } else {
+      setSaved(true);
+      setPreviewKey(k => k + 1); // refresh preview after confirmed save
+    }
   }
 
   async function handleTestSend() {
@@ -220,6 +230,9 @@ export default function EmailTemplatesPage() {
                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
               </button>
+              {saveError && (
+                <p className="text-xs text-destructive">{saveError}</p>
+              )}
             </div>
 
             {/* Test send */}
