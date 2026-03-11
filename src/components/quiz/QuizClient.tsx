@@ -45,6 +45,14 @@ export function QuizClient() {
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         {step < QUESTIONS.length && result === null ? (
           <>
+            {/* Quiz title */}
+            <p
+              className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3"
+              style={{ letterSpacing: "0.15em" }}
+            >
+              NDE-Type Quiz
+            </p>
+
             {/* Step indicator */}
             <p className="text-xs font-medium text-muted-foreground mb-8 tracking-widest uppercase">
               {step + 1} / {QUESTIONS.length}
