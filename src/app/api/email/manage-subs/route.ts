@@ -62,16 +62,24 @@ export async function POST(req: NextRequest) {
   // Apply each update using service role (bypasses RLS)
   const results = await Promise.all(
     updates.map(async ({ archetype, active, frequency }) => {
-      const patch: Record<string, unknown> = { is_active: active };
-      if (frequency) patch.frequency = frequency;
-
-      const { error } = await supabase
-        .from("quiz_leads")
-        .update(patch)
-        .eq("email", email)
-        .eq("archetype", archetype);
-
-      return { archetype, ok: !error };
+      if (active) {
+        // Upsert — create subscription if new, update if existing
+        const { error } = await supabase
+          .from("quiz_leads")
+          .upsert(
+            { email, archetype, is_active: true, frequency: frequency ?? "weekly" },
+            { onConflict: "email,archetype", ignoreDuplicates: false }
+          );
+        return { archetype, ok: !error };
+      } else {
+        // Deactivate — only update rows that exist
+        const { error } = await supabase
+          .from("quiz_leads")
+          .update({ is_active: false })
+          .eq("email", email)
+          .eq("archetype", archetype);
+        return { archetype, ok: !error };
+      }
     })
   );
 
