@@ -143,9 +143,12 @@ function UnsubscribeContent() {
     setSaved(false);
   }
 
-  function unsubscribeAll() {
+  // Master toggle — all on if every list is active, else turn all on; if all on, turn all off
+  const allActive = ALL_LISTS.every(l => local[l.id]?.active);
+  function toggleAll() {
+    const next = !allActive;
     setLocal(prev =>
-      Object.fromEntries(Object.keys(prev).map(id => [id, { ...prev[id], active: false }]))
+      Object.fromEntries(Object.keys(prev).map(id => [id, { ...prev[id], active: next }]))
     );
     setSaved(false);
   }
@@ -202,6 +205,34 @@ function UnsubscribeContent() {
           <p className="text-muted-foreground text-xs">
             Toggle any list. Turn on new ones to subscribe. {activeCount > 0 && `${activeCount} active.`}
           </p>
+        </div>
+
+        {/* Master toggle — Subscribe to / Unsubscribe from all */}
+        <div
+          className={`rounded-2xl border p-5 transition-all ${
+            allActive ? "border-border bg-card" : "border-border/50 bg-muted/30"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="font-semibold text-foreground">
+                {allActive ? "Subscribed to all" : "Subscribe / Unsubscribe from all"}
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {allActive ? "Toggle off to unsubscribe from every list." : "Toggle on to subscribe to every list at once."}
+              </div>
+            </div>
+            <button
+              onClick={toggleAll}
+              className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
+                allActive ? "bg-emerald-500" : "bg-muted-foreground/30"
+              }`}
+            >
+              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                allActive ? "translate-x-5 left-1" : "left-1"
+              }`} />
+            </button>
+          </div>
         </div>
 
         {/* General Newsletter — top */}
@@ -302,20 +333,14 @@ function UnsubscribeContent() {
           </div>
         </div>
 
-        {/* Save + Unsubscribe All */}
-        <div className="sticky bottom-6 space-y-2">
+        {/* Save */}
+        <div className="sticky bottom-6">
           <button
             onClick={handleSave}
             disabled={saving}
             className="w-full py-3.5 rounded-2xl bg-foreground text-background font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition-all"
           >
             {saving ? "Saving…" : saved ? "Saved ✓" : "Save preferences"}
-          </button>
-          <button
-            onClick={unsubscribeAll}
-            className="w-full py-2.5 rounded-2xl border border-destructive/40 text-destructive text-sm font-medium hover:bg-destructive/5 transition-all"
-          >
-            Unsubscribe from all
           </button>
         </div>
 
