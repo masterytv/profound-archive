@@ -77,6 +77,7 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - **Discover All Channels** (`discover_all` admin API action + "Queue All Channels" admin button) — bulk-queues 50 videos per channel across all 47 enabled channels in one shot. Safe to re-run (idempotent via `ignoreDuplicates`).
 - **Hourly cron** (`.github/workflows/scanner-cron.yml`) — increased from every 2h to every 1h (~72 videos/day throughput).
 - **CES Feedback widget** (`src/components/ces-feedback-widget.tsx`) — persistent left-edge tab (desktop) / auto-open after 2 min (mobile). 7-point scale + optional reason. Score saved to DB immediately on click. 30-day suppression via localStorage. Test mode: `?ces_test=1`. Admin analytics at `/admin/ces`. Table: `ces_feedback`. See `docs/LEARNINGS.md §18`.
+- **Nav simplification** — Removed "Chat" dropdown from site-wide nav (`site-header.tsx`). New order: Big Questions → Browse → NDE Compass → About → Search. Chat pages still accessible via the floating ChatPopup widget on all pages.
 
 ### In Progress
 - Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
