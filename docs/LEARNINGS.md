@@ -1119,3 +1119,28 @@ The profile card uses inline styles (required for email client compatibility):
 ```
 Fields not present in the payload are preserved on upsert (Postgres UPSERT with `ON CONFLICT DO UPDATE` only sets what's provided).
 
+---
+
+## 18. CES Feedback Widget
+
+### Architecture
+- **Widget:** `src/components/ces-feedback-widget.tsx` — `"use client"` component, registered in `src/app/layout.tsx` wrapped in `<Suspense>` (required because it uses `useSearchParams`).
+- **API:** `POST /api/ces-feedback` (insert score immediately on click) + `PATCH /api/ces-feedback` (add reason on submit). Both use service client — anon RLS was blocking inserts in this project's PostgREST configuration even with correct `WITH CHECK (true)` policies. Using service client on server-side API routes is safe.
+- **Admin page:** `/admin/ces` reads from `ces_dashboard` and `ces_path_breakdown` views using service client.
+
+### Key Design Decisions
+- **Score is saved immediately** on button click (before the follow-up question). A PATCH then adds the `reason` and sets `phase='complete'`. This ensures partial responses (score only) are never lost.
+- **Suppression is tracked in React state**, not checked inline in event handlers. This prevents the "ghost tab" bug where the tab renders but swallows clicks silently because `isSuppressed()` returned true.
+- **Desktop:** Persistent left-edge tab (always visible → click to open). Tab is hidden when suppressed. `showTab = !isMobile && (isTestMode || !suppressed)`.
+- **Mobile:** Auto-appears as bottom sheet after 2 minutes. Uses `mobileTimerRef` cleanup in `useEffect`.
+- **`z-[9998]`:** One below the ChatPopup (`z-[9999]`) so they never collide.
+
+### Test Mode
+- **`?ces_test=1`** in the URL, or `NEXT_PUBLIC_CES_TEST=true` in `.env.local`, bypasses all localStorage suppression and forces the widget visible immediately.
+- Widget never appears on `/admin/*` even in test mode.
+- Data IS saved to the real DB in test mode. Clear test rows with: `TRUNCATE TABLE public.ces_feedback;`
+
+### Resetting Data
+```sql
+TRUNCATE TABLE public.ces_feedback;
+```

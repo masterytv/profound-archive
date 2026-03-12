@@ -76,6 +76,7 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - **Round-robin queue processing** (`src/lib/scanner/tick.ts`) — tick now picks a random channel per iteration (sampling 500 pending rows, deduplicating channel_ids, tracking `touchedChannelIds` per tick) instead of globally oldest-first. Prevents one channel from monopolizing the queue.
 - **Discover All Channels** (`discover_all` admin API action + "Queue All Channels" admin button) — bulk-queues 50 videos per channel across all 47 enabled channels in one shot. Safe to re-run (idempotent via `ignoreDuplicates`).
 - **Hourly cron** (`.github/workflows/scanner-cron.yml`) — increased from every 2h to every 1h (~72 videos/day throughput).
+- **CES Feedback widget** (`src/components/ces-feedback-widget.tsx`) — persistent left-edge tab (desktop) / auto-open after 2 min (mobile). 7-point scale + optional reason. Score saved to DB immediately on click. 30-day suppression via localStorage. Test mode: `?ces_test=1`. Admin analytics at `/admin/ces`. Table: `ces_feedback`. See `docs/LEARNINGS.md §18`.
 
 ### In Progress
 - Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
@@ -105,3 +106,6 @@ See [Environment Variables Doc](./docs/ENVIRONMENT.md).
 | Pipeline Modules | `src/lib/pipeline/` (scraper, classifier, embeddings, etc.) |
 | Admin Intake Page | `src/app/admin/intake/page.tsx` |
 | Intake API Route | `src/app/api/intake/route.ts` |
+| CES Feedback Widget | `src/components/ces-feedback-widget.tsx` |
+| CES Feedback API | `src/app/api/ces-feedback/route.ts` |
+| CES Admin Dashboard | `src/app/admin/ces/page.tsx` |

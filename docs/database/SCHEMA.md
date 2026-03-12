@@ -221,6 +221,37 @@ Used by `/channels` list page (11 sort options) and homepage. Migration: `202603
 
 ---
 
+### `ces_feedback`
+**Purpose:** Stores Customer Effort Score (CES) responses from the site-wide feedback widget. Supports partial saves — score is recorded immediately on selection; the follow-up reason is patched in on submit.
+
+| Column | Type | Nullable | Description |
+|---|---|---|---|
+| id | uuid | NO | Primary Key |
+| created_at | timestamptz | NO | Row creation time |
+| updated_at | timestamptz | NO | Auto-updated on PATCH |
+| score | smallint | NO | 1–7 (1 = Very Difficult, 7 = Very Easy) |
+| reason | text | YES | Optional follow-up text (≤ 500 chars) |
+| path | text | YES | URL path at time of submission |
+| user_id | uuid | YES | FK → `auth.users(id)`, nullable for anon |
+| session_id | text | NO | Client-generated UUID for POST→PATCH linking |
+| phase | text | NO | `'score_only'` or `'complete'` |
+
+**RLS:** anon + authenticated can INSERT and UPDATE. Service role reads all for admin analytics.
+
+**API:** `POST /api/ces-feedback` (insert score) + `PATCH /api/ces-feedback` (add reason).
+
+**Widget:** `src/components/ces-feedback-widget.tsx` — persistent left-edge tab (desktop), auto-open after 2 min (mobile). 30-day submit suppression, 7-day dismiss suppression via localStorage.
+
+**Test mode:** Append `?ces_test=1` to any URL to bypass suppression and force the widget open.
+
+**Views:**
+- `ces_dashboard` — aggregate stats (avg score, total, distribution 1–7)
+- `ces_path_breakdown` — per-path avg score, sorted by lowest (highest friction) first
+
+**Admin page:** `/admin/ces` (linked from admin sidebar)
+
+---
+
 ### `precog_trials`
 **Purpose:** Unknown / Experimental table for precognition trials?
 
