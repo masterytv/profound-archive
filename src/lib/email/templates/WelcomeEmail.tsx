@@ -46,10 +46,12 @@ export function WelcomeEmail({
             Welcome.
           </Heading>
 
-          {/* Intro */}
-          <Text style={{ fontSize: 16, lineHeight: 1.75, color: "#475569", margin: "0 0 28px" }}>
-            {introText}
-          </Text>
+          {/* Intro — split on blank lines so each paragraph is its own block */}
+          {introText.split(/\n\n+/).filter(Boolean).map((para, i) => (
+            <Text key={i} style={{ fontSize: 16, lineHeight: 1.75, color: "#475569", margin: "0 0 16px" }}>
+              {para.trim()}
+            </Text>
+          ))}
 
           {/* CTA */}
           <Link

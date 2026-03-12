@@ -18,8 +18,8 @@ import {
 } from "@react-email/components";
 
 export interface VideoEmailProps {
-  archetypeLabel: string;   // "The Griever", "The Skeptic / Researcher", etc.
-  archetypeIcon:  string;   // emoji icon
+  archetypeLabel:            string;   // "The Healing Path", "The Evidence Trail", etc. (destination label)
+  archetypeIcon:             string;   // emoji icon
   videoId:        string;
   videoTitle:     string;
   channelName:    string;
@@ -64,7 +64,7 @@ export function VideoEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>A near-death story for {archetypeLabel} — {videoTitle}</Preview>
+      <Preview>An NDE story for {archetypeLabel} — {videoTitle}</Preview>
       <Body style={styles.body}>
         <Container style={styles.container}>
 
@@ -95,7 +95,7 @@ export function VideoEmail({
           {/* Archetype label */}
           <Section>
             <Text style={styles.archetypeLabel}>
-              {archetypeIcon} Your first story
+              {archetypeIcon} The NDE Story Selected For You
             </Text>
           </Section>
 

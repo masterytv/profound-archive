@@ -9,6 +9,7 @@ import { VideoEmail } from "@/lib/email/templates/VideoEmail";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { render } from "@react-email/render";
 import type { ArchetypeId } from "@/lib/quiz/archetypes";
+import { resolveArchetypeId } from "@/lib/quiz/archetypes";
 
 const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
 
@@ -45,7 +46,8 @@ interface LeadInfo {
  */
 export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; error?: string }> {
   const supabase = adminClient();
-  const archetype = lead.archetype as ArchetypeId;
+  // resolveArchetypeId maps legacy reexp/crisis IDs to the nearest active archetype
+  const archetype = resolveArchetypeId(lead.archetype) as ArchetypeId;
   const archetypeData = ARCHETYPES[archetype];
 
   // Pick a video for this archetype
@@ -106,7 +108,7 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
 
   const html = await render(
     VideoEmail({
-      archetypeLabel: archetypeData?.label ?? archetype,
+      archetypeLabel: archetypeData?.destinationLabel ?? archetypeData?.label ?? archetype,
       archetypeIcon:  archetypeData?.icon  ?? "✦",
       videoId:        video.videoId,
       videoTitle:     video.title,
@@ -121,7 +123,7 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
     })
   );
 
-  const subject = tmpl?.subject ?? `Your first NDE story for ${archetypeData?.label ?? archetype}`;
+  const subject = tmpl?.subject ?? `Your first NDE story — ${archetypeData?.destinationLabel ?? archetypeData?.label ?? archetype}`;
 
   const { data: sendData, error: sendError } = await resend.emails.send({
     from:    EMAIL_FROM,

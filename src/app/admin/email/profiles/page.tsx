@@ -21,47 +21,36 @@ const ARCHETYPE_ENTRIES = Object.entries(ARCHETYPES) as [
 
 // Seed text derived from fullDescription — a sensible starting point
 const SEED_PROFILES: Record<string, string> = {
-  griever: `You carry a grief that most people around you don't fully understand. You've found your way here because somewhere beneath the loss, there's a question you can't stop asking — and that question deserves a real answer.
+  griever: `You may have come looking for something the world rarely offers: honest, documented accounts that the person you lost didn't simply stop. You're not grasping at comfort. You're seeking something real. We'll email you NDE videos where people reconnect with the ones they love.
 
-These accounts were gathered for exactly you. Not because they'll replace what's gone, but because they offer something rare: testimony, from thousands of ordinary people, that love doesn't end at the boundary others call death.
+These accounts were gathered for exactly you. Not because they'll replace what's gone, but because they offer something rare: testimony, from thousands of ordinary people, that love continues past the boundary others call death.
 
-Each story you receive has been selected from thousands of first-person accounts. They were chosen for emotional authenticity, the reality of the connection described, and what they say about what waits on the other side of loss.`,
+Each story you receive has been selected for emotional authenticity — accounts where the connection described feels unmistakably real, and where what the experiencer saw on the other side speaks directly to what you're carrying.`,
 
-  seeker: `You have a framework for meaning — built from years of reading, practice, or simply paying deep attention. You're not here because you doubt. You're here because these accounts confirm something you've long suspected: that consciousness is larger than the brain.
+  seeker: `You likely approach NDEs not as proof you need, but as spiritual data from a territory you already partially know. You're building a coherent picture of consciousness and the afterlife. Each account adds another coordinate to a map you'll spend your life drawing.
 
-The archive scores each account on three validated research scales. You can read them for their emotional depth or for their evidential weight — both are real.
+The archive confirms something you've long suspected: that consciousness is larger than the brain, and that the accounts of those who've touched the edge of death are among the most trustworthy data we have.
 
-Each story you receive has been selected for its depth and transformative content: accounts where the experiencer came back genuinely changed, and where what they describe maps to the territory you already partially know.`,
+Each story you receive has been selected for depth and transformative content — accounts where the experiencer came back genuinely changed and describes that change in language that maps to the territory you already know.`,
 
-  experiencer: `You carry knowledge that's hard to share. The experience itself was real — the question has always been whether anyone else would understand it. Coming here is an act of courage.
+  experiencer: `You likely had an experience and you want to connect in some way to others who have also. You may have wondered if you were alone in it. You weren't. These 5,000+ accounts are a mirror for what you saw, felt, or know deeply to be true.
 
 Every account in this archive is, in some sense, a message from someone who went where you went and came back changed. You are not alone, and you are not unusual. You are part of a documented phenomenon that spans every culture, every era, and every kind of person.
 
-Each story we send you has been selected for its specific phenomenological detail — accounts where the experiencer describes elements that mirror what many others have seen, heard, and felt in that territory.`,
+We'll send you videos from first-person experiencers that you can relate to — accounts where the phenomenological detail mirrors what many others have seen, heard, and felt in that territory.`,
 
-  skeptic: `You apply the same critical lens to NDEs that you apply to everything else — and that's exactly right. The archive scores each account on three validated research scales: the Greyson Scale, the NDE Veridical Perception protocol, and the Transformation Scale.
+  skeptic: `You may be drawn to NDEs because the data is genuinely anomalous. People perceive events they couldn't have seen, but were later verified to be true. Academics call this Veridical Perception. Blind patients describing surgical instruments. Children describing relatives they never met.
 
-The data is there. The anomalies are real. Blind patients describing surgical instruments. Children describing relatives they never met. Veridical perceptions confirmed after the fact. The standard explanations don't hold.
+The standard explanations don't hold — and you're fascinated by exploring these kinds of NDEs. The archive scores each account on three validated research scales: the Greyson Scale, the NDE Veridical Perception protocol, and the Transformation Scale.
 
-Each account you receive has been selected for evidential strength — the highest-scoring cases for verifiable detail and research-grade documentation.`,
+We'll send you videos with high levels of veridical perception — the evidence that there is something beyond the physical world. The data is there. The anomalies are real.`,
 
-  curious: `Curiosity is an underrated reason to be here. You're open, you're looking, and you're not yet sure what you'll find. That's actually a good starting point — it means you'll let the accounts speak before you've decided what they mean.
+  curious: `You probably didn't arrive with a specific wound or mission. Something caught your attention and refused to let go. That instinct was correct. The archive runs very deep: 5,000+ first-person accounts, each scored and analyzed, each a different doorway into the same territory.
 
-The archive runs very deep: 5,000+ first-person accounts, each scored and analyzed, each a different doorway into the same territory.
+Curiosity is an underrated reason to be here. You're open, you're looking, and you're not yet sure what you'll find. That's actually a good starting point — it means you'll let the accounts speak before you've decided what they mean.
 
-Each story you receive has been chosen for immediate impact — accounts that are clear, credible, and hard to dismiss. Start with one that surprises you.`,
+We'll show you NDE videos that pique your curiosity and sense of exploration. Start with one that surprises you.`,
 
-  reexp: `You've seen hundreds of these accounts. Maybe thousands. And you still come back. There's something in the territory that keeps drawing you — not just the stories themselves, but what they point toward.
-
-You're fluent in a language most people don't speak. You notice the details others miss. The specific texture of the light. The way time collapses. The knowledge that arrives without words.
-
-This archive was built, in part, for you. Each account you receive is one of the most detailed and immersive on record — the long ones, the ones where someone tries to describe the indescribable and spends an hour trying.`,
-
-  crisis: `You came here in the dark. That took courage — or maybe just desperation, which is another kind of courage. Either way, you're here, and that matters.
-
-What these accounts almost universally describe is this: at the boundary, there is no judgment. There is only love, and often the sense of being sent back — because something isn't finished yet. You are not finished yet.
-
-Each account we send you carries a specific message: people who stood at the edge and came back to say that what's there is not what you fear. They came back for love. That's for you too. If you're in crisis right now, please call or text 988 (Suicide & Crisis Lifeline) anytime.`,
 };
 
 export default function EmailProfilesPage() {
@@ -142,10 +131,10 @@ export default function EmailProfilesPage() {
             className="text-2xl font-bold text-foreground"
             style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
           >
-            Archetype Profile Reports
+            Compass Destination Profiles
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Write the 2–4 paragraph profile for each archetype. Appears in each
+            Write the 2–4 paragraph profile for each destination. Appears in each
             subscriber&apos;s <strong>first email</strong>, above the video.
           </p>
         </div>
@@ -171,7 +160,7 @@ export default function EmailProfilesPage() {
                 }`}
               >
                 <span className="text-base">{a.icon}</span>
-                <span className="flex-1 leading-tight">{a.label.replace("The ", "")}</span>
+                <span className="flex-1 leading-tight">{a.destinationLabel}</span>
                 {hasContent && (
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Has saved profile" />
                 )}
@@ -190,7 +179,7 @@ export default function EmailProfilesPage() {
                 <span className="text-lg">{archData?.icon}</span>
                 <div>
                   <div className="font-semibold text-foreground text-sm">
-                    {archData?.label}
+                    {archData?.destinationLabel}
                   </div>
                   <div className="text-[11px] text-muted-foreground italic">
                     {archData?.tagline}

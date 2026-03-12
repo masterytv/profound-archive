@@ -4,25 +4,19 @@ import { type Question, type AnswerOption } from "@/lib/quiz/archetypes";
 
 interface QuizQuestionProps {
   question: Question;
-  questionText: { before: string; emphasis: string; after: string };
   onAnswer: (option: AnswerOption) => void;
 }
 
-export function QuizQuestion({ question, questionText, onAnswer }: QuizQuestionProps) {
+// No emphasis words — questions are now plain conversational text.
+export function QuizQuestion({ question, onAnswer }: QuizQuestionProps) {
   return (
-    <div
-      className="w-full max-w-2xl animate-quiz-slide"
-    >
+    <div className="w-full max-w-2xl animate-quiz-slide">
       {/* Question headline */}
       <h2
         className="text-3xl sm:text-4xl md:text-5xl font-normal text-foreground mb-10 leading-tight text-center"
         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
       >
-        {questionText.before}
-        <em className="not-italic font-semibold text-primary">
-          {questionText.emphasis}
-        </em>
-        {questionText.after}
+        {question.prompt}
       </h2>
 
       {/* Answer options */}

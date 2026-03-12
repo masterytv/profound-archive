@@ -126,12 +126,7 @@ export default async function AdminLayout({
                         >
                             Email Templates
                         </Link>
-                        <Link
-                            href="/admin/email/profiles"
-                            className="flex items-center gap-3 pl-9 pr-3 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
-                        >
-                            Archetype Profiles
-                        </Link>
+
                         {profile?.role === "super_admin" && (
                             <Link
                                 href="/admin/chatbot"

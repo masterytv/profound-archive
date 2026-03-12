@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: "/quiz", destination: "/compass", permanent: true },
+      { source: "/quiz/types", destination: "/compass/types", permanent: true },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

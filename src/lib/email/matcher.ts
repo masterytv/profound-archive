@@ -53,15 +53,6 @@ const ARCHETYPE_FILTERS: Record<ArchetypeId, ArchetypeFilter> = {
     toneIn: ["very_positive", "positive"],
     minIntensity: 7,
   },
-  reexp: {
-    minGreyson: 25,
-    minTransformation: 30,
-  },
-  crisis: {
-    toneIn: ["very_positive", "positive"],
-    toneNotIn: ["very_negative"],
-    triggerNotIn: [],
-  },
 };
 
 // Primary ORDER BY per archetype (secondary is always v.viewCount DESC)
@@ -71,8 +62,6 @@ const ARCHETYPE_ORDER: Record<ArchetypeId, string> = {
   experiencer:  "a.total_greyson_score DESC, v.\"viewCount\" DESC",
   skeptic:      "v.rvnde_total_score DESC, v.\"viewCount\" DESC",
   curious:      "v.\"viewCount\" DESC, a.intensity_rating DESC",
-  reexp:        "a.total_greyson_score DESC, a.transformation_score DESC, v.\"viewCount\" DESC",
-  crisis:       "a.transformation_score DESC, v.\"viewCount\" DESC",
 };
 
 export async function pickVideoForArchetype(

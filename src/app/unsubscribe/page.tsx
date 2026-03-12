@@ -22,7 +22,7 @@ const ALL_LISTS = [
   ...Object.entries(ARCHETYPES).map(([id, a]) => ({
     id,
     icon: a.icon,
-    label: a.label,
+    label: a.destinationLabel,
     desc: a.tagline,
     type: "archetype" as const,
   })),
@@ -275,7 +275,7 @@ function UnsubscribeContent() {
 
         {/* NDE-Type lists */}
         <div>
-          <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-3">NDE Story Lists</p>
+          <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-3">NDE Compass Lists</p>
           <div className="space-y-3">
             {ALL_LISTS.filter(l => l.type === "archetype").map(list => {
               const state = local[list.id] ?? { active: false, frequency: "weekly" };
@@ -346,7 +346,7 @@ function UnsubscribeContent() {
 
         <p className="text-center text-xs text-muted-foreground pb-4">
           Want to try a different NDE story type?{" "}
-          <Link href="/quiz/types" className="text-primary hover:underline">Browse all types →</Link>
+          <Link href="/compass/types" className="text-primary hover:underline">Browse all types →</Link>
         </p>
       </div>
     </div>

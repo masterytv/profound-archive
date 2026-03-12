@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { type Archetype, type Frequency } from "@/lib/quiz/archetypes";
-import { Check, ChevronDown, AlertCircle } from "lucide-react";
+import { ARCHETYPES, type Archetype, type ArchetypeId, type Frequency } from "@/lib/quiz/archetypes";
+import { Check, ChevronDown } from "lucide-react";
 
 const FREQUENCIES: { id: Frequency; label: string }[] = [
   { id: "daily",   label: "Daily" },
@@ -13,29 +13,29 @@ const FREQUENCIES: { id: Frequency; label: string }[] = [
 ];
 
 const accentMap: Record<string, string> = {
-  blue:   "border-blue-200 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-950/30",
-  purple: "border-purple-200 dark:border-purple-800 bg-purple-50/40 dark:bg-purple-950/30",
-  amber:  "border-amber-200 dark:border-amber-800 bg-amber-50/40 dark:bg-amber-950/30",
-  emerald:"border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/30",
-  sky:    "border-sky-200 dark:border-sky-800 bg-sky-50/40 dark:bg-sky-950/30",
-  rose:   "border-rose-200 dark:border-rose-800 bg-rose-50/40 dark:bg-rose-950/30",
+  blue:    "border-blue-200 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-950/30",
+  purple:  "border-purple-200 dark:border-purple-800 bg-purple-50/40 dark:bg-purple-950/30",
+  amber:   "border-amber-200 dark:border-amber-800 bg-amber-50/40 dark:bg-amber-950/30",
+  emerald: "border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/30",
+  sky:     "border-sky-200 dark:border-sky-800 bg-sky-50/40 dark:bg-sky-950/30",
+  rose:    "border-rose-200 dark:border-rose-800 bg-rose-50/40 dark:bg-rose-950/30",
 };
 const labelMap: Record<string, string> = {
-  blue:   "text-blue-700 dark:text-blue-300",
-  purple: "text-purple-700 dark:text-purple-300",
-  amber:  "text-amber-700 dark:text-amber-300",
-  emerald:"text-emerald-700 dark:text-emerald-300",
-  sky:    "text-sky-700 dark:text-sky-300",
-  rose:   "text-rose-700 dark:text-rose-300",
+  blue:    "text-blue-700 dark:text-blue-300",
+  purple:  "text-purple-700 dark:text-purple-300",
+  amber:   "text-amber-700 dark:text-amber-300",
+  emerald: "text-emerald-700 dark:text-emerald-300",
+  sky:     "text-sky-700 dark:text-sky-300",
+  rose:    "text-rose-700 dark:text-rose-300",
 };
 
 function ArchetypeCard({ archetype }: { archetype: Archetype }) {
-  const [open, setOpen]         = useState(false);
-  const [email, setEmail]       = useState("");
-  const [freq, setFreq]         = useState<Frequency>("weekly");
-  const [submitted, setSubmit]  = useState(false);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [open, setOpen]       = useState(false);
+  const [email, setEmail]     = useState("");
+  const [freq, setFreq]       = useState<Frequency>("weekly");
+  const [submitted, setSubmit]= useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState<string | null>(null);
 
   const accent = accentMap[archetype.color] ?? accentMap.blue;
   const label  = labelMap[archetype.color]  ?? labelMap.blue;
@@ -70,7 +70,7 @@ function ArchetypeCard({ archetype }: { archetype: Archetype }) {
               className={`text-xl font-bold ${label}`}
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
-              {archetype.label}
+              {archetype.destinationLabel}
             </h2>
             <p className="text-sm text-muted-foreground italic mt-0.5">
               &ldquo;{archetype.tagline}&rdquo;
@@ -92,26 +92,14 @@ function ArchetypeCard({ archetype }: { archetype: Archetype }) {
       {open && (
         <div className="mt-5 space-y-5">
           <p className="text-[15px] text-foreground leading-relaxed">
-            {archetype.fullDescription}
+            {archetype.description}
           </p>
-
-          {/* Crisis note */}
-          {archetype.crisisNote && (
-            <div className="flex gap-2.5 rounded-xl bg-amber-100/70 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 px-4 py-3">
-              <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-800 dark:text-amber-300 leading-snug">
-                {archetype.crisisNote}
-              </p>
-            </div>
-          )}
-
-
 
           {/* Subscribe form */}
           {!submitted ? (
             <form onSubmit={handleSubmit} className="pt-1 space-y-3 border-t border-black/5 dark:border-white/10">
               <p className="text-sm font-medium text-foreground pt-2">
-                Subscribe as {archetype.label}
+                Subscribe to {archetype.destinationLabel}
               </p>
               <div className="flex gap-2 flex-wrap">
                 {FREQUENCIES.map((f) => (
@@ -157,7 +145,12 @@ function ArchetypeCard({ archetype }: { archetype: Archetype }) {
           ) : (
             <div className="flex items-center gap-2.5 pt-2 border-t border-black/5 dark:border-white/10">
               <Check className="w-4 h-4 text-emerald-600" />
-              <p className="text-sm text-muted-foreground">You're subscribed as {archetype.label}.</p>
+              <div>
+                <p className="text-sm text-muted-foreground">You&apos;re subscribed to {archetype.destinationLabel}.</p>
+                <a href="/unsubscribe" className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors">
+                  Unsubscribe any time.
+                </a>
+              </div>
             </div>
           )}
         </div>
@@ -166,19 +159,35 @@ function ArchetypeCard({ archetype }: { archetype: Archetype }) {
   );
 }
 
-export function AllTypesClient({ archetypes }: { archetypes: Archetype[] }) {
+// The 5 active compass destinations in priority display order
+const COMPASS_ARCHETYPES: ArchetypeId[] = ["griever", "seeker", "experiencer", "skeptic", "curious"];
+
+export function AllTypesClient() {
   return (
     <div className="space-y-4">
-      {archetypes.map((a) => (
-        <ArchetypeCard key={a.id} archetype={a} />
+      <p className="text-center text-sm text-muted-foreground mb-8">
+        Not sure which fits? Read through the five destinations and choose yours.
+      </p>
+
+      {COMPASS_ARCHETYPES.map((id) => (
+        <ArchetypeCard key={id} archetype={ARCHETYPES[id]} />
       ))}
 
-      <div className="pt-4 text-center">
+      {/* 988 anchor */}
+      <p className="text-xs text-muted-foreground text-center leading-relaxed pt-2">
+        If you&apos;re in a dark place right now, you&apos;re still welcome here.{" "}
+        <a href="tel:988" className="underline underline-offset-2 hover:text-foreground transition-colors">
+          988 Suicide &amp; Crisis Lifeline — call or text 988
+        </a>{" "}
+        is available anytime.
+      </p>
+
+      <div className="pt-2 text-center">
         <Link
-          href="/quiz"
+          href="/compass"
           className="text-sm text-primary hover:underline font-medium"
         >
-          Take the quiz to find your type →
+          Take the NDE Compass →
         </Link>
       </div>
     </div>

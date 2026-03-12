@@ -3,21 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import { type Archetype, type Frequency } from "@/lib/quiz/archetypes";
-import { Check, AlertCircle } from "lucide-react";
+import { Check } from "lucide-react";
 
 interface QuizResultProps {
   archetype: Archetype;
+  writeIn?: string;   // Optional write-in from Q5
   onRestart: () => void;
 }
 
 const FREQUENCIES: { id: Frequency; label: string; sub: string }[] = [
-  { id: "daily",   label: "Daily",           sub: "For the deeply immersed" },
-  { id: "3day",    label: "Every 3 days",    sub: "A steady rhythm" },
-  { id: "weekly",  label: "Weekly",          sub: "Thoughtful pace" },
-  { id: "monthly", label: "Monthly",         sub: "Occasional wonder" },
+  { id: "daily",   label: "Daily",         sub: "For the deeply immersed" },
+  { id: "3day",    label: "Every 3 days",  sub: "A steady rhythm" },
+  { id: "weekly",  label: "Weekly",        sub: "Thoughtful pace" },
+  { id: "monthly", label: "Monthly",       sub: "Occasional wonder" },
 ];
 
-export function QuizResult({ archetype, onRestart }: QuizResultProps) {
+export function QuizResult({ archetype, writeIn, onRestart }: QuizResultProps) {
   const [email, setEmail]         = useState("");
   const [freq, setFreq]           = useState<Frequency>("weekly");
   const [submitted, setSubmitted] = useState(false);
@@ -33,7 +34,12 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
       const res = await fetch("/api/quiz-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, archetype: archetype.id, frequency: freq }),
+        body: JSON.stringify({
+          email,
+          archetype: archetype.id,
+          frequency: freq,
+          ...(writeIn ? { write_in: writeIn } : {}),
+        }),
       });
       if (!res.ok) throw new Error("Something went wrong");
       setSubmitted(true);
@@ -45,20 +51,20 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
   }
 
   const accentMap: Record<string, string> = {
-    blue:   "border-blue-200 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/40",
-    purple: "border-purple-200 dark:border-purple-800 bg-purple-50/60 dark:bg-purple-950/40",
-    amber:  "border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/40",
-    emerald:"border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40",
-    sky:    "border-sky-200 dark:border-sky-800 bg-sky-50/60 dark:bg-sky-950/40",
-    rose:   "border-rose-200 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-950/40",
+    blue:    "border-blue-200 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/40",
+    purple:  "border-purple-200 dark:border-purple-800 bg-purple-50/60 dark:bg-purple-950/40",
+    amber:   "border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/40",
+    emerald: "border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40",
+    sky:     "border-sky-200 dark:border-sky-800 bg-sky-50/60 dark:bg-sky-950/40",
+    rose:    "border-rose-200 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-950/40",
   };
   const badgeMap: Record<string, string> = {
-    blue:   "text-blue-700 dark:text-blue-300",
-    purple: "text-purple-700 dark:text-purple-300",
-    amber:  "text-amber-700 dark:text-amber-300",
-    emerald:"text-emerald-700 dark:text-emerald-300",
-    sky:    "text-sky-700 dark:text-sky-300",
-    rose:   "text-rose-700 dark:text-rose-300",
+    blue:    "text-blue-700 dark:text-blue-300",
+    purple:  "text-purple-700 dark:text-purple-300",
+    amber:   "text-amber-700 dark:text-amber-300",
+    emerald: "text-emerald-700 dark:text-emerald-300",
+    sky:     "text-sky-700 dark:text-sky-300",
+    rose:    "text-rose-700 dark:text-rose-300",
   };
   const accent = accentMap[archetype.color] ?? accentMap.blue;
   const badge  = badgeMap[archetype.color]  ?? badgeMap.blue;
@@ -66,20 +72,20 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
   return (
     <div className="w-full max-w-2xl animate-quiz-slide space-y-6">
 
-      {/* ─── Archetype reveal card ─── */}
+      {/* ─── Destination reveal card ─── */}
       <div className={`rounded-2xl border px-7 py-8 ${accent}`}>
-        {/* Icon + archetype label */}
+        {/* Icon + destination label */}
         <div className="flex items-center gap-3 mb-5">
           <span className="text-4xl">{archetype.icon}</span>
           <div>
             <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-0.5">
-              You are
+              Your compass points to
             </p>
             <h2
               className={`text-2xl font-bold ${badge}`}
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
-              {archetype.label}
+              {archetype.destinationLabel}
             </h2>
           </div>
         </div>
@@ -96,27 +102,15 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
         <p className="text-[15px] text-muted-foreground leading-relaxed">
           {archetype.description}
         </p>
-
-        {/* Crisis note */}
-        {archetype.crisisNote && (
-          <div className="mt-5 flex gap-2.5 rounded-xl bg-amber-100/70 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 px-4 py-3">
-            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-800 dark:text-amber-300 leading-snug">
-              {archetype.crisisNote}
-            </p>
-          </div>
-        )}
-
-
       </div>
 
-      {/* ─── "See all types" link ─── */}
+      {/* ─── "Does this feel right?" self-selection ─── */}
       <div className="text-center">
         <Link
-          href="/quiz/types"
+          href="/compass/types"
           className="text-sm text-muted-foreground hover:text-primary transition-colors underline underline-offset-2"
         >
-          See all 7 NDE types →
+          This doesn&apos;t quite fit? See all five starting points →
         </Link>
       </div>
 
@@ -126,11 +120,13 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
           className="text-xl font-semibold text-foreground mb-1"
           style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
         >
-          Get your full profile
+          Get emailed videos customized for you
         </h3>
         <p className="text-sm text-muted-foreground mb-5">
-          A deeper look at {archetype.label} — plus one NDE video matched to you,
-          delivered at a pace you choose. No noise. No newsletter. One story.
+          We&apos;ll send you a deeper look at the{" "}
+          <span className="text-foreground font-medium">{archetype.destinationLabel}</span>{" "}
+          path and we&apos;ll send you related NDE videos at a pace you choose. You choose how
+          often. You can change or leave anytime.
         </p>
 
         {!submitted ? (
@@ -195,12 +191,27 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
             <div>
               <p className="text-[15px] font-medium text-foreground">You&apos;re in.</p>
               <p className="text-sm text-muted-foreground">
-                Your first story is on its way — check your inbox.
+                Your first story is on its way — check your inbox.{" "}
+                <a href="/unsubscribe" className="underline underline-offset-2 hover:text-foreground transition-colors">
+                  Unsubscribe any time.
+                </a>
               </p>
             </div>
           </div>
         )}
       </div>
+
+      {/* ─── 988 anchor ─── */}
+      <p className="text-xs text-muted-foreground text-center leading-relaxed">
+        If you&apos;re in a dark place right now, you&apos;re still welcome here.{" "}
+        <a
+          href="tel:988"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          988 Suicide &amp; Crisis Lifeline — call or text 988
+        </a>{" "}
+        is available anytime.
+      </p>
 
       {/* ─── Restart ─── */}
       <div className="text-center pb-8">
@@ -208,7 +219,7 @@ export function QuizResult({ archetype, onRestart }: QuizResultProps) {
           onClick={onRestart}
           className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
-          ↩ Retake the quiz
+          ↩ Retake the compass
         </button>
       </div>
     </div>

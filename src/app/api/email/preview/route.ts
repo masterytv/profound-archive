@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
   const archetypeData = ARCHETYPES[archetypeId];
   const html = await render(
     VideoEmail({
-      archetypeLabel: archetypeData?.label ?? archetype,
+      archetypeLabel: archetypeData?.destinationLabel ?? archetypeData?.label ?? archetype,
       archetypeIcon:  archetypeData?.icon ?? "✦",
       videoId:        video.videoId,
       videoTitle:     video.title,

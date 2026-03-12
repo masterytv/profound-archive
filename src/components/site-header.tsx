@@ -135,6 +135,9 @@ export default function SiteHeader() {
             >
               Project Profound
             </span>
+            <span className="self-start mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
+              BETA
+            </span>
           </Link>
 
           {/* Desktop Nav */}
@@ -229,10 +232,10 @@ export default function SiteHeader() {
 
             {/* Quiz Link — public */}
             <Link
-              href="/quiz"
+              href="/compass"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-700 dark:text-purple-300 bg-purple-50/70 dark:bg-purple-500/15 hover:bg-purple-100/80 dark:hover:bg-purple-500/25 transition-all"
             >
-              ✦ What's Your NDE Type?
+              ✦ NDE Compass
             </Link>
 
             {/* Chat Dropdown */}
@@ -424,6 +427,9 @@ export default function SiteHeader() {
                     >
                       Project Profound
                     </span>
+                    <span className="self-start mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
+                      BETA
+                    </span>
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
                     <X className="h-5 w-5" />
@@ -532,12 +538,12 @@ export default function SiteHeader() {
 
                   {/* Quiz — public */}
                   <Link
-                    href="/quiz"
+                    href="/compass"
                     className="flex items-center gap-3 text-base font-semibold text-purple-700 dark:text-purple-300"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <span className="text-base">✦</span>
-                    What's Your NDE Type?
+                    NDE Compass
                   </Link>
 
                   {/* Chat Section */}
