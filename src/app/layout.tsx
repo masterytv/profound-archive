@@ -55,6 +55,18 @@ export default function RootLayout({
             <AuthConfirmationToast />
           </Suspense>
           <Toaster />
+          {/* ── Google Analytics 4 ──────────────────────────────────────── */}
+          {/* afterInteractive: loads after hydration — never blocks page render */}
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-FLY0JWVM4X"
+            strategy="afterInteractive"
+          />
+          <Script id="ga4-init" strategy="afterInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FLY0JWVM4X', { send_page_view: true });
+          `}</Script>
           <Script strategy="lazyOnload" data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
         </ThemeProvider>
       </body>
