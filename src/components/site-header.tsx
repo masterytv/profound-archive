@@ -233,7 +233,6 @@ export default function SiteHeader() {
                 onClick={() => {
                   setAboutOpen(!aboutOpen)
                   setExploreOpen(false)
-                  setToolsOpen(false)
                 }}
                 className="p-1 rounded text-slate-400 hover:text-slate-600 transition-colors -ml-1"
               >
@@ -255,15 +254,13 @@ export default function SiteHeader() {
                   >
                     Connect
                   </Link>
-                  <a
-                    href="https://blog.projectprofound.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href="/blog"
                     className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setAboutOpen(false)}
                   >
                     Blog
-                  </a>
+                  </Link>
                   <Link
                     href="/experiencers"
                     className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
@@ -523,13 +520,13 @@ export default function SiteHeader() {
                         >
                           Connect
                         </Link>
-                        <a
-                          href="https://blog.projectprofound.org"
+                        <Link
+                          href="/blog"
                           className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Blog
-                        </a>
+                        </Link>
                         <Link
                           href="/experiencers"
                           className="block py-2.5 text-slate-600 hover:text-slate-900 transition-colors"

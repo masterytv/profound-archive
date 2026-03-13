@@ -1,0 +1,324 @@
+import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import type { Metadata } from "next";
+import { ArrowLeft, Clock, Calendar, Tag, ExternalLink } from "lucide-react";
+
+export const revalidate = 86400; // ISR: revalidate once per day
+
+type Ref = {
+    title: string;
+    url: string;
+    type: "academic" | "book" | "scripture" | "site";
+};
+
+type BlogPost = {
+    id: number;
+    slug: string;
+    title: string;
+    subtitle: string | null;
+    category: string;
+    author_name: string;
+    author_bio: string | null;
+    lead_paragraph: string | null;
+    body_mdx: string | null;
+    word_count: number | null;
+    read_time_mins: number | null;
+    tags: string[] | null;
+    refs: Ref[] | null;
+    seo_title: string | null;
+    seo_description: string | null;
+    published_at: string;
+    updated_at: string;
+    related_question_slugs: string[] | null;
+    related_video_ids: string[] | null;
+};
+
+async function getPost(slug: string): Promise<BlogPost | null> {
+    const supabase = await createClient();
+    const { data } = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("slug", slug)
+        .eq("status", "published")
+        .single();
+    return data ?? null;
+}
+
+export async function generateStaticParams() {
+    const supabase = await createClient();
+    const { data } = await supabase
+        .from("blog_posts")
+        .select("slug")
+        .eq("status", "published");
+    return (data ?? []).map((p) => ({ slug: p.slug }));
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+    const { slug } = await params;
+    const post = await getPost(slug);
+    if (!post) return { title: "Article Not Found | Project Profound" };
+
+    const title = post.seo_title ?? `${post.title} | Project Profound`;
+    const description = post.seo_description ?? post.lead_paragraph ?? "";
+
+    return {
+        title,
+        description,
+        authors: [{ name: post.author_name }],
+        openGraph: {
+            title,
+            description,
+            type: "article",
+            publishedTime: post.published_at,
+            modifiedTime: post.updated_at,
+            authors: [post.author_name],
+        },
+        // Structured data is injected below via JSON-LD script tag
+    };
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+    "cluster":       "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
+    "big-question":  "bg-violet-50 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
+    "story":         "bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
+    "experiencer":   "bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
+    "researcher":    "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
+};
+
+const REF_TYPE_LABEL: Record<string, string> = {
+    academic: "Academic",
+    book: "Book",
+    scripture: "Text",
+    site: "Web",
+};
+
+export default async function BlogPostPage({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}) {
+    const { slug } = await params;
+    const post = await getPost(slug);
+    if (!post) notFound();
+
+    const date = new Date(post.published_at).toLocaleDateString("en-US", {
+        year: "numeric", month: "long", day: "numeric",
+    });
+
+    // Article JSON-LD for SEO + LLM citation
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.title,
+        "description": post.seo_description ?? post.lead_paragraph ?? "",
+        "author": {
+            "@type": "Person",
+            "name": post.author_name,
+            "affiliation": { "@type": "Organization", "name": "Project Profound" },
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Project Profound",
+            "url": "https://projectprofound.org",
+        },
+        "datePublished": post.published_at,
+        "dateModified": post.updated_at,
+        "url": `https://projectprofound.org/blog/${post.slug}`,
+        "mainEntityOfPage": `https://projectprofound.org/blog/${post.slug}`,
+    };
+
+    return (
+        <>
+            {/* JSON-LD */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+
+            <div className="min-h-screen bg-background text-foreground">
+                {/* Header strip */}
+                <div className="border-b border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+                    <div className="container mx-auto px-4 max-w-4xl py-4 flex items-center gap-4">
+                        <Link
+                            href="/blog"
+                            className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5" />
+                            Blog
+                        </Link>
+                        <span className="text-slate-300 dark:text-slate-600">/</span>
+                        <span
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[post.category] ?? "bg-slate-50 text-slate-700"}`}
+                        >
+                            {post.category.replace("-", " ")}
+                        </span>
+                    </div>
+                </div>
+
+                <article className="container mx-auto px-4 max-w-3xl py-10 md:py-16">
+                    {/* Title block */}
+                    <header className="mb-8">
+                        <h1
+                            className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-3 leading-[1.1]"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            {post.title}
+                        </h1>
+                        {post.subtitle && (
+                            <p className="text-xl text-slate-600 dark:text-slate-400 mb-5 leading-relaxed">
+                                {post.subtitle}
+                            </p>
+                        )}
+
+                        {/* Meta row */}
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400 border-t border-b border-slate-100 dark:border-white/10 py-4 my-4">
+                            <span className="font-medium text-slate-700 dark:text-slate-200">{post.author_name}</span>
+                            <span className="text-slate-300 dark:text-slate-600">·</span>
+                            <span className="flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5" />
+                                {date}
+                            </span>
+                            {post.read_time_mins && (
+                                <>
+                                    <span className="text-slate-300 dark:text-slate-600">·</span>
+                                    <span className="flex items-center gap-1.5">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        {post.read_time_mins} min read
+                                    </span>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Lead paragraph — QEO: first paragraph answers the core question */}
+                        {post.lead_paragraph && (
+                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed font-medium border-l-4 border-blue-500/40 pl-5 bg-blue-50/30 dark:bg-blue-500/10 py-3 rounded-r-lg">
+                                {post.lead_paragraph}
+                            </p>
+                        )}
+                    </header>
+
+                    {/* Body */}
+                    {post.body_mdx && (
+                        <div
+                            className="prose prose-slate dark:prose-invert prose-lg max-w-none
+                                prose-headings:font-bold prose-headings:tracking-tight
+                                prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+                                prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                                prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300
+                                prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                                prose-blockquote:border-blue-500/40 prose-blockquote:bg-blue-50/30 dark:prose-blockquote:bg-blue-500/10
+                                prose-strong:text-slate-900 dark:prose-strong:text-slate-100"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                            dangerouslySetInnerHTML={{ __html: post.body_mdx }}
+                        />
+                    )}
+
+                    {/* Tags */}
+                    {post.tags && post.tags.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 mt-10 pt-6 border-t border-slate-100 dark:border-white/10">
+                            <Tag className="w-3.5 h-3.5 text-slate-400" />
+                            {post.tags.map((tag) => (
+                                <span
+                                    key={tag}
+                                    className="text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* References */}
+                    {post.refs && post.refs.length > 0 && (
+                        <section className="mt-10 pt-6 border-t border-slate-200 dark:border-white/10">
+                            <h2
+                                className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4"
+                                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                            >
+                                References
+                            </h2>
+                            <ol className="space-y-2">
+                                {post.refs.map((ref, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                        <span className="text-xs font-bold text-slate-400 mt-0.5 w-5 shrink-0">{i + 1}.</span>
+                                        <div className="flex-1 min-w-0">
+                                            <span className="text-xs font-semibold text-slate-400 mr-2">
+                                                [{REF_TYPE_LABEL[ref.type] ?? ref.type}]
+                                            </span>
+                                            {ref.url ? (
+                                                <a
+                                                    href={ref.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 dark:text-blue-400 hover:underline break-words inline-flex items-center gap-1"
+                                                >
+                                                    {ref.title}
+                                                    <ExternalLink className="w-3 h-3 shrink-0" />
+                                                </a>
+                                            ) : (
+                                                <span>{ref.title}</span>
+                                            )}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ol>
+                        </section>
+                    )}
+
+                    {/* Author bio */}
+                    {post.author_bio && (
+                        <section className="mt-10 pt-6 border-t border-slate-200 dark:border-white/10">
+                            <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-5 border border-slate-200/60 dark:border-white/10">
+                                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
+                                    About the Author
+                                </p>
+                                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                                    {post.author_name}
+                                </p>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    {post.author_bio}
+                                </p>
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Related questions */}
+                    {post.related_question_slugs && post.related_question_slugs.length > 0 && (
+                        <section className="mt-10">
+                            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">
+                                Explore Related Questions
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {post.related_question_slugs.map((slug) => (
+                                    <Link
+                                        key={slug}
+                                        href={`/questions/${slug}`}
+                                        className="text-sm px-3 py-1.5 rounded-lg bg-violet-50 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-500/30 transition-colors"
+                                    >
+                                        {slug.replace(/-/g, " ")}
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Back link */}
+                    <div className="mt-12 pt-6 border-t border-slate-100 dark:border-white/10">
+                        <Link
+                            href="/blog"
+                            className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            Back to all articles
+                        </Link>
+                    </div>
+                </article>
+            </div>
+        </>
+    );
+}
