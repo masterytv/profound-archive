@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { Users, ShieldAlert, Shield, MessageSquareWarning } from "lucide-react";
+import { Users, ShieldAlert, Shield, MessageSquareWarning, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
@@ -106,6 +106,22 @@ export default async function AdminDashboard() {
                         </p>
                         <p className="text-xs text-slate-500 mt-0.5">
                             Review, hide, or restore questions submitted by visitors
+                        </p>
+                    </div>
+                </Link>
+                <Link
+                    href="/admin/analytics"
+                    className="flex items-center gap-4 bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-5 hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800 transition-all group"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                        <TrendingUp className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                        <p className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                            Analytics
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                            GA4 traffic, top pages, and channel breakdown
                         </p>
                     </div>
                 </Link>

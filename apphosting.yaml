@@ -83,4 +83,17 @@ env:
   # Apify API token — kept for potential future use (currently unused)
   - variable: APIFY_API_TOKEN
     secret: projects/432036554831/secrets/APIFY_API_TOKEN/versions/1
+
+  # Google Analytics Data API — for /admin/analytics dashboard
+  # GA_PROPERTY_ID is non-sensitive (numeric GA4 property ID)
+  - variable: GA_PROPERTY_ID
+    value: "505681821"
+  # Create these secrets in Google Secret Manager before deploying:
+  #   gcloud secrets create GA_CLIENT_EMAIL --data-file=- <<< "project-profound-analytics@studio-9638832619-7f197.iam.gserviceaccount.com"
+  #   gcloud secrets create GA_PRIVATE_KEY --data-file=/path/to/private-key.txt
+  - variable: GA_CLIENT_EMAIL
+    secret: projects/432036554831/secrets/GA_CLIENT_EMAIL/versions/1
+  - variable: GA_PRIVATE_KEY
+    secret: projects/432036554831/secrets/GA_PRIVATE_KEY/versions/1
 # Trigger new build after granting secret access
+

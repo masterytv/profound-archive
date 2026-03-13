@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -46,7 +47,11 @@ async function getPost(slug: string): Promise<BlogPost | null> {
 }
 
 export async function generateStaticParams() {
-    const supabase = await createClient();
+    // Use service client — createClient() calls cookies() which throws outside request scope during build
+    const supabase = createServiceClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY!
+    );
     const { data } = await supabase
         .from("blog_posts")
         .select("slug")
@@ -65,6 +70,7 @@ export async function generateMetadata({
 
     const title = post.seo_title ?? `${post.title} | Project Profound`;
     const description = post.seo_description ?? post.lead_paragraph ?? "";
+    const ogImageUrl = `https://projectprofound.org/api/og/${post.slug}`;
 
     return {
         title,
@@ -77,6 +83,13 @@ export async function generateMetadata({
             publishedTime: post.published_at,
             modifiedTime: post.updated_at,
             authors: [post.author_name],
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: post.title }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: [ogImageUrl],
         },
         // Structured data is injected below via JSON-LD script tag
     };
