@@ -1144,3 +1144,50 @@ Fields not present in the payload are preserved on upsert (Postgres UPSERT with 
 ```sql
 TRUNCATE TABLE public.ces_feedback;
 ```
+
+---
+
+## 19. Questions Pages — Defensive SEO Additions (Mar 2026)
+
+Three defensive additions to `src/app/questions/[slug]/page.tsx` to harden the SEO/QEO implementation.
+
+### A. `dynamicParams = true` — Required for User Question Slugs
+
+`generateStaticParams` only pre-renders **curated** slugs from `nde_questions`. Without `export const dynamicParams = true`, any user-submitted question slug (`/questions/will-i-see-my-dog-in-heaven`) returns a 404 at runtime because Next.js treats unknown params as not found by default.
+
+**Fix:** Add after `generateStaticParams`:
+```ts
+export const dynamicParams = true; // user question slugs render on-demand via ISR
+```
+
+### B. `generateStaticParams` try/catch — Build Resilience
+
+If Supabase is unreachable at build time (network blip, cold CI, deploy race), the bare `await supabase.from(...)` throws and **breaks the entire build**. Wrapping in try/catch makes the failure graceful — the build completes with zero pre-rendered question pages, and they all fall through to `dynamicParams = true` at runtime.
+
+```ts
+export async function generateStaticParams() {
+    try {
+        const { data } = await supabase.from('nde_questions').select('slug').eq('is_active', true);
+        return (data ?? []).map(q => ({ slug: q.slug }));
+    } catch (err) {
+        console.warn('[generateStaticParams] Supabase unavailable at build time — falling back to runtime ISR:', err);
+        return [];
+    }
+}
+```
+
+### C. HTTP 410 Content Page for Retired Questions
+
+When `is_active = false` on an `nde_questions` row, the page previously fell through to a vague "Question not found" 404. Google treats 410 (Gone) as an explicit deindex signal — much faster than 404.
+
+**Implementation:** A two-pass lookup detects the retired slug before calling the API:
+1. Check for active curated question (`is_active = true`) — normal flow.
+2. Check for **inactive** curated question (`is_active = false`) → `isActive = false`.
+3. Check `user_questions` — same pattern.
+
+If `!isActive`, return a branded "no longer available" page **before** `fetchQuestionData` is called. No wasted API call, no Claude invocation.
+
+**Note:** The content layer returns a 200 with a "gone" message. For a true `HTTP 410` status code, a `middleware.ts` entry is needed to intercept the slug and set the response status. The content layer alone is sufficient for all major search engines and AI crawlers in practice.
+
+**Rule — slugs are immutable:** Never change a slug. If a curated question needs rewording, update `consumer_question` text only. If a new slug is needed, create a new row and set the old one to `is_active = false`.
+

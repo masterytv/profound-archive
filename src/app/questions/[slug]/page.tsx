@@ -123,15 +123,27 @@ function formatDate(dateString: string | null): string {
 // Re-render each question page at most once per 24 h (ISR).
 export const revalidate = 86400;
 
-/** Pre-render all active curated questions at build time so crawlers never wait for Claude. */
+/**
+ * Pre-render all active curated questions at build time so crawlers never wait for Claude.
+ * try/catch: if Supabase is unreachable at build time, return [] so the build completes
+ * and all slugs fall through to dynamicParams = true (runtime ISR).
+ */
 export async function generateStaticParams() {
-    const supabase = getServiceClient();
-    const { data } = await supabase
-        .from('nde_questions')
-        .select('slug')
-        .eq('is_active', true);
-    return (data ?? []).map((q: { slug: string }) => ({ slug: q.slug }));
+    try {
+        const supabase = getServiceClient();
+        const { data } = await supabase
+            .from('nde_questions')
+            .select('slug')
+            .eq('is_active', true);
+        return (data ?? []).map((q: { slug: string }) => ({ slug: q.slug }));
+    } catch (err) {
+        console.warn('[generateStaticParams] Supabase unavailable at build time — falling back to runtime ISR:', err);
+        return [];
+    }
 }
+
+// Allow user question slugs (not in generateStaticParams) to render on-demand at runtime.
+export const dynamicParams = true;
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
@@ -286,25 +298,70 @@ export default async function QuestionResultPage({
         process.env.SUPABASE_SERVICE_KEY!
     );
 
-    // Determine question type — used to show/hide the Hide button in RegenerateBar
+    // Determine question type and active status.
+    // Two-pass: first check for an ACTIVE curated question.
+    // If not found, check if the slug exists as a RETIRED curated question (is_active=false → 410),
+    // then fall through to user_questions.
     let isUserQuestion = false;
     let isActive = true;
-    const { data: curatedCheck } = await supabaseService
+
+    const { data: curatedActive } = await supabaseService
         .from('nde_questions')
         .select('id')
         .eq('slug', slug)
         .eq('is_active', true)
         .maybeSingle();
-    if (!curatedCheck) {
-        const { data: userCheck } = await supabaseService
-            .from('user_questions')
-            .select('is_active')
+
+    if (!curatedActive) {
+        // Detect retired curated question (slug exists but is_active=false)
+        const { data: curatedRetired } = await supabaseService
+            .from('nde_questions')
+            .select('id')
+            .eq('slug', slug)
+            .eq('is_active', false)
+            .maybeSingle();
+
+        if (curatedRetired) {
+            isActive = false; // will trigger the 410 content page below
+        } else {
+            const { data: userCheck } = await supabaseService
+                .from('user_questions')
+                .select('is_active')
+                .eq('slug', slug)
+                .maybeSingle();
+            if (userCheck) {
+                isUserQuestion = true;
+                isActive = userCheck.is_active ?? true;
+            }
+        }
+    }
+
+    // ── HTTP 410 Gone for deactivated questions ────────────────────────────────
+    // 410 tells Google to deindex the page immediately (vs 404 which takes months).
+    // We check is_active=false here: curatedCheck is null when is_active=false on nde_questions.
+    // For user questions, isActive is read from the row above.
+    // Strategy: detect the slug exists but is inactive, then return a minimal 410 page.
+    // Note: true HTTP 410 status in Next.js App Router requires middleware — this handles
+    // the content layer. Add /middleware.ts mapping to set the 410 header if needed.
+    if (!isActive) {
+        const { data: inactiveQ } = await supabaseService
+            .from('nde_questions')
+            .select('consumer_question')
             .eq('slug', slug)
             .maybeSingle();
-        if (userCheck) {
-            isUserQuestion = true;
-            isActive = userCheck.is_active ?? true;
-        }
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
+                <p className="text-muted-foreground text-lg font-medium">
+                    {inactiveQ?.consumer_question ?? 'This question'} is no longer available.
+                </p>
+                <p className="text-sm text-muted-foreground max-w-md">
+                    It may have been merged into another question or retired from the archive.
+                </p>
+                <Link href="/questions" className="text-primary hover:underline text-sm">
+                    ← Browse all questions
+                </Link>
+            </div>
+        );
     }
 
     const data = await fetchQuestionData(slug);
