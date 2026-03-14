@@ -98,8 +98,8 @@ env:
 
   # Perplexity AI — research step for blog article pipeline
   - variable: PERPLEXITY_API_KEY
-    secret: projects/432036554831/secrets/PERPLEXITY_API_KEY/versions/latest
+    secret: projects/432036554831/secrets/PERPLEXITY_API_KEY/versions/1
 
   # fal.ai — hero image generation for blog articles
   - variable: FAL_API_KEY
-    secret: projects/432036554831/secrets/FAL_API_KEY/versions/latest
+    secret: projects/432036554831/secrets/FAL_API_KEY/versions/1
