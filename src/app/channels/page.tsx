@@ -21,9 +21,9 @@ const SORT_OPTIONS = [
     { value: 'avg_intensity', label: 'Avg. Intensity' },
     { value: 'pct_positive_tone', label: 'Most Positive' },
     { value: 'pct_negative_tone', label: 'Most Distressing' },
-    { value: 'avg_greyson_score', label: 'Avg. Greyson Score' },
-    { value: 'avg_transformation_score', label: 'Avg. Transformation' },
-    { value: 'avg_veridical_score', label: 'Avg. Veridical Score' },
+    { value: 'avg_greyson_score', label: 'Avg. Depth' },
+    { value: 'avg_transformation_score', label: 'Avg. Life Impact' },
+    { value: 'avg_veridical_score', label: 'Avg. Evidence' },
     { value: 'total_analyzed', label: 'Most Analyzed' },
 ]
 
@@ -126,7 +126,7 @@ export default async function ChannelsPage({
                     </div>
                     <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base max-w-2xl">
                         {channels.length} channels sharing near-death experience accounts,
-                        ranked by experience analysis. Sort by intensity, emotional tone, Greyson score, and more.
+                        ranked by experience analysis. Sort by intensity, emotional tone, depth, life impact, and more.
                     </p>
                 </div>
 

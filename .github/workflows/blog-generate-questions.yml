@@ -1,9 +1,9 @@
-name: Blog — Generate Big Questions (1/day)
+name: Blog — Weekly Article (Sunday noon ET)
 
 on:
-  # schedule:                            # ← UNCOMMENT after voice calibration approved
-  #   - cron: '0 9 * * *'               # 9 AM UTC daily = 1 article/day
-  workflow_dispatch:                      # manual trigger only until calibration approved
+  schedule:
+    - cron: '0 16 * * 0'               # Sunday 16:00 UTC = noon ET (EDT)
+  workflow_dispatch:                    # manual trigger for testing
     inputs:
       count:
         description: 'Number of articles to generate (max 3)'
@@ -12,7 +12,7 @@ on:
 
 jobs:
   generate:
-    name: Generate blog articles
+    name: Generate & publish blog article
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -41,7 +41,3 @@ jobs:
 # BLOG_CRON_SECRET     — random secret string (generate with: openssl rand -hex 32)
 # NEXT_PUBLIC_APP_URL  — https://projectprofound.org (no trailing slash)
 # ─────────────────────────────────────────────────────────────────────────────
-# To enable the cron schedule after voice calibration:
-#   1. Uncomment the `schedule:` block above
-#   2. Commit and push to main
-#   3. GitHub will pick up the schedule on next push

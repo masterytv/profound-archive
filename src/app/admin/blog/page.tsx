@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
+import Link from "next/link";
 import type { Metadata } from "next";
-import { FileText, CheckCircle2, Clock3, Eye, EyeOff } from "lucide-react";
+import { FileText, CheckCircle2, Clock3, Settings2, Eye, EyeOff, Pencil } from "lucide-react";
 import { BlogGeneratePanel } from "@/components/admin/blog-generate-panel";
 
 export const dynamic = "force-dynamic";
@@ -38,16 +40,25 @@ type BlogRow = {
 };
 
 export default async function AdminBlogPage() {
+    // Session client — used only for auth check
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null; // middleware handles redirect, this is a fallback
 
-    const { data: posts, error } = await supabase
+    // Service client — bypasses RLS so admin can see ALL posts (drafts + published)
+    const adminClient = createServiceClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: posts, error } = await adminClient
         .from("blog_posts")
         .select("id, slug, title, category, author_name, status, word_count, published_at, updated_at")
         .order("updated_at", { ascending: false })
         .limit(200);
 
     // Fetch questions for the generate dropdown (ordered by sort_order)
-    const { data: rawQuestions } = await supabase
+    const { data: rawQuestions } = await adminClient
         .from("nde_questions")
         .select("slug, consumer_question")
         .eq("is_active", true)
@@ -81,6 +92,7 @@ export default async function AdminBlogPage() {
                         {published} published · {drafts} drafts
                     </p>
                 </div>
+
             </div>
 
             {/* Stats row */}
@@ -182,6 +194,13 @@ export default async function AdminBlogPage() {
                                                         View
                                                     </a>
                                                 )}
+                                                <Link
+                                                    href={`/admin/blog/${post.id}/edit`}
+                                                    className="inline-flex items-center gap-1 text-xs text-slate-600 hover:text-blue-600 font-medium whitespace-nowrap"
+                                                >
+                                                    <Pencil className="w-3 h-3" />
+                                                    Edit
+                                                </Link>
                                                 <PublishToggleButton
                                                     id={post.id}
                                                     currentStatus={post.status}

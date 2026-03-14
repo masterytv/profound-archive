@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { ChannelAnalysisSummary, type ChannelNderfStats } from '@/components/analysis/ChannelAnalysisSummary'
+import { ChannelAnalysisSummary, type ChannelNderfStats, type ChannelScoreSummary } from '@/components/analysis/ChannelAnalysisSummary'
 
 const PAGE_SIZE = 12
 
@@ -140,6 +140,42 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
         target_channel_id: channelId,
     })
 
+    // Fetch channel-level Greyson/Transformation/Veridical averages for the score summary
+    const { data: greysonAvg } = await supabase
+        .from('nde_analysis')
+        .select('total_greyson_score')
+        .not('total_greyson_score', 'is', null)
+        .in('video_id', (
+            await supabase.from('nde_vids').select('videoId').eq('channelId', channelId).eq('isNde', 'clear_nde')
+        ).data?.map(v => v.videoId) || [])
+
+    const { data: transformAvg } = await supabase
+        .from('nde_analysis')
+        .select('transformation_score')
+        .not('transformation_score', 'is', null)
+        .in('video_id', (
+            await supabase.from('nde_vids').select('videoId').eq('channelId', channelId).eq('isNde', 'clear_nde')
+        ).data?.map(v => v.videoId) || [])
+
+    const { data: veridicalAvg } = await supabase
+        .from('nde_vids')
+        .select('rvnde_total_score')
+        .eq('channelId', channelId)
+        .eq('isNde', 'clear_nde')
+        .not('rvnde_total_score', 'is', null)
+
+    const channelScores: ChannelScoreSummary = {
+        avg_greyson_score: greysonAvg && greysonAvg.length > 0
+            ? Math.round((greysonAvg.reduce((s, r) => s + (r.total_greyson_score ?? 0), 0) / greysonAvg.length) * 10) / 10
+            : null,
+        avg_transformation_score: transformAvg && transformAvg.length > 0
+            ? Math.round((transformAvg.reduce((s, r) => s + (r.transformation_score ?? 0), 0) / transformAvg.length) * 10) / 10
+            : null,
+        avg_veridical_score: veridicalAvg && veridicalAvg.length > 0
+            ? Math.round((veridicalAvg.reduce((s, r) => s + (r.rvnde_total_score ?? 0), 0) / veridicalAvg.length) * 10) / 10
+            : null,
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
 
@@ -221,7 +257,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
 
             {/* ─── Channel NDERF Analysis Summary ─── */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-                <ChannelAnalysisSummary stats={nderfStats as ChannelNderfStats | null} />
+                <ChannelAnalysisSummary stats={nderfStats as ChannelNderfStats | null} scores={channelScores} />
             </div>
 
             {/* Controls + Grid */}

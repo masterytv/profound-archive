@@ -2,8 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowLeft, Clock, Calendar, Tag, ExternalLink } from "lucide-react";
+import { markdownToHtml } from "@/lib/markdown";
 
 export const revalidate = 86400; // ISR: revalidate once per day
 
@@ -19,6 +21,7 @@ type BlogPost = {
     title: string;
     subtitle: string | null;
     category: string;
+    status: string;
     author_name: string;
     author_bio: string | null;
     lead_paragraph: string | null;
@@ -33,17 +36,36 @@ type BlogPost = {
     updated_at: string;
     related_question_slugs: string[] | null;
     related_video_ids: string[] | null;
+    hero_image_url: string | null;
 };
 
 async function getPost(slug: string): Promise<BlogPost | null> {
-    const supabase = await createClient();
-    const { data } = await supabase
+    // Service client to read all statuses
+    const serviceClient = createServiceClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY!
+    );
+    const { data } = await serviceClient
         .from("blog_posts")
         .select("*")
         .eq("slug", slug)
-        .eq("status", "published")
         .single();
-    return data ?? null;
+
+    if (!data) return null;
+
+    // Published posts are visible to everyone
+    if (data.status === "published") return data;
+
+    // Draft posts require a logged-in user (admin preview)
+    try {
+        const sessionClient = await createClient();
+        const { data: { user } } = await sessionClient.auth.getUser();
+        if (user) return data; // Logged in → can preview drafts
+    } catch {
+        // Auth check failed — treat as anonymous
+    }
+
+    return null; // Anonymous user → draft is hidden
 }
 
 export async function generateStaticParams() {
@@ -153,6 +175,17 @@ export default async function BlogPostPage({
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
 
+            {/* Draft banner — only shown when not published */}
+            {post.status !== "published" && (
+                <div className="bg-amber-400 text-amber-950 px-4 py-2.5 text-sm font-semibold text-center flex items-center justify-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 bg-amber-950/10 px-3 py-1 rounded-full">
+                        <span className="w-2 h-2 rounded-full bg-amber-700 animate-pulse" />
+                        DRAFT PREVIEW — Not published
+                    </span>
+                    <a href="/admin/blog" className="underline hover:no-underline text-amber-900 ml-2">Publish in admin →</a>
+                </div>
+            )}
+
             <div className="min-h-screen bg-background text-foreground">
                 {/* Header strip */}
                 <div className="border-b border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
@@ -215,21 +248,43 @@ export default async function BlogPostPage({
                         )}
                     </header>
 
-                    {/* Body */}
-                    {post.body_mdx && (
-                        <div
-                            className="prose prose-slate dark:prose-invert prose-lg max-w-none
-                                prose-headings:font-bold prose-headings:tracking-tight
-                                prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-                                prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                                prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300
-                                prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-                                prose-blockquote:border-blue-500/40 prose-blockquote:bg-blue-50/30 dark:prose-blockquote:bg-blue-500/10
-                                prose-strong:text-slate-900 dark:prose-strong:text-slate-100"
-                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-                            dangerouslySetInnerHTML={{ __html: post.body_mdx }}
-                        />
+                    {/* Hero image */}
+                    {post.hero_image_url && (
+                        <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-10 shadow-lg">
+                            <Image
+                                src={post.hero_image_url}
+                                alt={post.title}
+                                fill
+                                priority
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, 768px"
+                            />
+                        </div>
                     )}
+
+                    {/* Body */}
+                    {post.body_mdx && (() => {
+                        // Strip leading H1 (title is already rendered in <h1> above)
+                        // Also strip repeated title lines that LLMs sometimes echo
+                        let cleaned = post.body_mdx
+                            .replace(/^#\s+.+\n*/m, '')  // Remove first # heading
+                            .replace(new RegExp(`^${post.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n*`, 'm'), '') // Remove echoed title text
+                            .trimStart();
+                        return (
+                            <div
+                                className="prose prose-slate dark:prose-invert prose-lg max-w-none
+                                    prose-headings:font-bold prose-headings:tracking-tight
+                                    prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+                                    prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                                    prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300
+                                    prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                                    prose-blockquote:border-blue-500/40 prose-blockquote:bg-blue-50/30 dark:prose-blockquote:bg-blue-500/10
+                                    prose-strong:text-slate-900 dark:prose-strong:text-slate-100"
+                                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                                dangerouslySetInnerHTML={{ __html: markdownToHtml(cleaned) }}
+                            />
+                        );
+                    })()}
 
                     {/* Tags */}
                     {post.tags && post.tags.length > 0 && (

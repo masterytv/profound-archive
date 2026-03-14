@@ -31,13 +31,13 @@ const RESEARCH_DOMAINS = [
     'pubmed.ncbi.nlm.nih.gov',
     'iands.org',
     'nderf.org',
+    'near-death.com',
+    'med.virginia.edu',
     'frontiersin.org',
-    'sciencedirect.com',
-    'apa.org',
-    'nytimes.com',
-    'scientificamerican.com',
-    'theatlantic.com',
     'psychologytoday.com',
+    'scientificamerican.com',
+    'brucegreyson.com',
+    'magiscenter.com',
 ];
 
 // ─── Client ───────────────────────────────────────────────────────────────────
@@ -54,7 +54,7 @@ function getPerplexityClient() {
  * Research a question using Perplexity Sonar Pro.
  * Returns a structured brief with key findings and citations.
  */
-export async function researchQuestion(question: string): Promise<ResearchResult> {
+export async function researchQuestion(question: string, consumerQuestion?: string): Promise<ResearchResult> {
     const apiKey = getPerplexityClient();
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -68,11 +68,11 @@ export async function researchQuestion(question: string): Promise<ResearchResult
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a research assistant producing structured research briefs for science journalists. Be precise, cite sources inline, and prioritize peer-reviewed evidence.',
+                    content: 'You are a compassionate research assistant for a blog about near-death experiences. You gather information from scientific research, popular websites and blogs, books about NDEs, and other high-authority sources. Be precise about sources and citations.',
                 },
                 {
                     role: 'user',
-                    content: buildResearchPrompt(question),
+                    content: buildResearchPrompt(question, consumerQuestion),
                 },
             ],
             search_domain_filter: RESEARCH_DOMAINS,

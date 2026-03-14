@@ -54,15 +54,15 @@ export function ChannelListRow({
                     : null
             case 'avg_greyson_score':
                 return channel.avg_greyson_score != null
-                    ? { value: `${channel.avg_greyson_score}`, label: 'greyson' }
+                    ? { value: `${Math.round((channel.avg_greyson_score / 32) * 100)}%`, label: 'depth' }
                     : null
             case 'avg_transformation_score':
                 return channel.avg_transformation_score != null
-                    ? { value: `${channel.avg_transformation_score}`, label: 'transform' }
+                    ? { value: `${Math.round((channel.avg_transformation_score / 50) * 100)}%`, label: 'life impact' }
                     : null
             case 'avg_veridical_score':
                 return channel.avg_veridical_score != null
-                    ? { value: `${channel.avg_veridical_score}`, label: 'veridical' }
+                    ? { value: `${Math.round((channel.avg_veridical_score / 28) * 100)}%`, label: 'evidence' }
                     : null
             case 'pct_positive_tone':
                 return channel.pct_positive_tone != null
@@ -215,18 +215,21 @@ export function ChannelListRow({
             {/* Desktop: Score badges */}
             <div className="hidden lg:flex items-center gap-3 shrink-0 pl-2 border-l border-slate-100 dark:border-white/10">
                 <ScoreBadge
-                    label="Greyson"
-                    value={channel.avg_greyson_score}
+                    label="Depth"
+                    value={channel.avg_greyson_score != null ? Math.round((channel.avg_greyson_score / 32) * 100) : null}
+                    unit="%"
                     color="text-violet-600"
                 />
                 <ScoreBadge
-                    label="Transform"
-                    value={channel.avg_transformation_score}
+                    label="Life Impact"
+                    value={channel.avg_transformation_score != null ? Math.round((channel.avg_transformation_score / 50) * 100) : null}
+                    unit="%"
                     color="text-blue-600"
                 />
                 <ScoreBadge
-                    label="Veridical"
-                    value={channel.avg_veridical_score}
+                    label="Evidence"
+                    value={channel.avg_veridical_score != null ? Math.round((channel.avg_veridical_score / 28) * 100) : null}
+                    unit="%"
                     color="text-emerald-600"
                 />
             </div>

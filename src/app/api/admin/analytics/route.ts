@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server';
-import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { createClient } from '@/lib/supabase/server';
 
-// ── GA4 client (server-side only) ────────────────────────────────────────────
-// Private key is stored with literal \n in env — replace before use.
-const analyticsClient = new BetaAnalyticsDataClient({
-    credentials: {
-        client_email: process.env.GA_CLIENT_EMAIL,
-        private_key:  process.env.GA_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    },
-});
+/**
+ * GA4 Analytics API — zero-dependency version.
+ *
+ * Replaces @google-analytics/data SDK (not installed) with direct
+ * GA4 Data API v1 REST calls authenticated via a short-lived JWT.
+ * Same response shape as before — all callers unaffected.
+ */
 
 const PROPERTY_ID = process.env.GA_PROPERTY_ID!;
+const GA_API_BASE = `https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY_ID}`;
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 async function isAdmin(): Promise<boolean> {
@@ -33,20 +32,94 @@ async function isAdmin(): Promise<boolean> {
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface AnalyticsData {
     totals: {
-        sessions:       number;
-        pageViews:      number;
-        activeUsers:    number;
-        newUsers:       number;
-        returningUsers: number;
+        sessions:             number;
+        pageViews:            number;
+        activeUsers:          number;
+        newUsers:             number;
+        returningUsers:       number;
         avgEngagementSeconds: number;
     };
-    dailyUsers:     { date: string; users: number }[];
-    topPages:       { page: string; views: number }[];
-    channelGroups:  { channel: string; sessions: number }[];
-    aiReferrals:    { source: string; sessions: number }[];
+    dailyUsers:    { date: string; users: number }[];
+    topPages:      { page: string; views: number }[];
+    channelGroups: { channel: string; sessions: number }[];
+    aiReferrals:   { source: string; sessions: number }[];
 }
 
-// ── Helper: parse GA4 row value ───────────────────────────────────────────────
+// ── JWT helpers (Service Account auth without any SDK) ────────────────────────
+
+function base64url(input: ArrayBuffer): string {
+    return Buffer.from(input).toString('base64')
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function getAccessToken(): Promise<string> {
+    const email      = process.env.GA_CLIENT_EMAIL!;
+    const rawKey     = process.env.GA_PRIVATE_KEY?.replace(/\\n/g, '\n') ?? '';
+    const scope      = 'https://www.googleapis.com/auth/analytics.readonly';
+    const now        = Math.floor(Date.now() / 1000);
+
+    // Build JWT header + claim
+    const header  = base64url(Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })));
+    const payload = base64url(Buffer.from(JSON.stringify({
+        iss: email, scope, aud: 'https://oauth2.googleapis.com/token',
+        exp: now + 3600, iat: now,
+    })));
+    const message = `${header}.${payload}`;
+
+    // Import the RSA private key
+    const pemBody = rawKey
+        .replace('-----BEGIN PRIVATE KEY-----', '')
+        .replace('-----END PRIVATE KEY-----', '')
+        .replace(/\s+/g, '');
+    const keyBytes  = Buffer.from(pemBody, 'base64');
+    const cryptoKey = await crypto.subtle.importKey(
+        'pkcs8', keyBytes,
+        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+        false, ['sign']
+    );
+
+    // Sign
+    const sig = await crypto.subtle.sign(
+        'RSASSA-PKCS1-v1_5',
+        cryptoKey,
+        Buffer.from(message)
+    );
+    const jwt = `${message}.${base64url(sig)}`;
+
+    // Exchange JWT for access token
+    const res = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            assertion:  jwt,
+        }),
+    });
+    if (!res.ok) throw new Error(`OAuth token error ${res.status}: ${await res.text()}`);
+    const { access_token } = await res.json() as { access_token: string };
+    return access_token;
+}
+
+// ── GA4 REST helper ───────────────────────────────────────────────────────────
+
+async function runReport(token: string, body: object): Promise<{ rows?: GARow[] }> {
+    const res = await fetch(`${GA_API_BASE}:runReport`, {
+        method:  'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type':  'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`GA4 API error ${res.status}: ${await res.text()}`);
+    return res.json() as Promise<{ rows?: GARow[] }>;
+}
+
+interface GARow {
+    dimensionValues?: { value?: string }[];
+    metricValues?:    { value?: string }[];
+}
+
 function metric(value: string | null | undefined): number {
     return parseFloat(value ?? '0') || 0;
 }
@@ -58,15 +131,15 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const days = Math.min(parseInt(searchParams.get('days') ?? '30'), 365);
+    const days      = Math.min(parseInt(searchParams.get('days') ?? '30'), 365);
     const dateRange = { startDate: `${days}daysAgo`, endDate: 'today' };
 
     try {
-        // Run all GA4 queries in parallel
+        const token = await getAccessToken();
+
         const [totalsRes, dailyRes, pagesRes, channelsRes] = await Promise.all([
             // 1. Summary totals
-            analyticsClient.runReport({
-                property: `properties/${PROPERTY_ID}`,
+            runReport(token, {
                 dateRanges: [dateRange],
                 metrics: [
                     { name: 'sessions' },
@@ -77,9 +150,8 @@ export async function GET(request: Request) {
                 ],
             }),
 
-            // 2. Daily active users (for line chart)
-            analyticsClient.runReport({
-                property: `properties/${PROPERTY_ID}`,
+            // 2. Daily active users
+            runReport(token, {
                 dateRanges: [dateRange],
                 dimensions: [{ name: 'date' }],
                 metrics:    [{ name: 'activeUsers' }],
@@ -87,8 +159,7 @@ export async function GET(request: Request) {
             }),
 
             // 3. Top pages by views
-            analyticsClient.runReport({
-                property: `properties/${PROPERTY_ID}`,
+            runReport(token, {
                 dateRanges: [dateRange],
                 dimensions: [{ name: 'pagePath' }],
                 metrics:    [{ name: 'screenPageViews' }],
@@ -96,9 +167,8 @@ export async function GET(request: Request) {
                 limit: 10,
             }),
 
-            // 4. Sessions by default channel group (organic, direct, referral, etc.)
-            analyticsClient.runReport({
-                property: `properties/${PROPERTY_ID}`,
+            // 4. Sessions by channel group
+            runReport(token, {
                 dateRanges: [dateRange],
                 dimensions: [{ name: 'sessionDefaultChannelGroup' }],
                 metrics:    [{ name: 'sessions' }],
@@ -106,28 +176,24 @@ export async function GET(request: Request) {
             }),
         ]);
 
-        const totalsRow  = totalsRes[0].rows?.[0]?.metricValues ?? [];
+        const totalsRow      = totalsRes.rows?.[0]?.metricValues ?? [];
         const sessions       = metric(totalsRow[0]?.value);
         const pageViews      = metric(totalsRow[1]?.value);
         const activeUsers    = metric(totalsRow[2]?.value);
         const newUsers       = metric(totalsRow[3]?.value);
         const avgEngagement  = metric(totalsRow[4]?.value);
 
-        // Daily users — sort ascending by date string (YYYYMMDD → readable)
-        const dailyUsers = (dailyRes[0].rows ?? []).map((row: { dimensionValues?: { value?: string }[]; metricValues?: { value?: string }[] }) => ({
+        const dailyUsers = (dailyRes.rows ?? []).map((row) => ({
             date:  formatDate(row.dimensionValues?.[0]?.value ?? ''),
             users: metric(row.metricValues?.[0]?.value),
         }));
 
-        // Top pages — strip query strings
-        const topPages = (pagesRes[0].rows ?? []).map((row: { dimensionValues?: { value?: string }[]; metricValues?: { value?: string }[] }) => ({
+        const topPages = (pagesRes.rows ?? []).map((row) => ({
             page:  row.dimensionValues?.[0]?.value ?? '/',
             views: metric(row.metricValues?.[0]?.value),
         }));
 
-        // Channel groups — separate AI referrals (perplexity, openai, claude)
-        const allChannels   = (channelsRes[0].rows ?? []);
-        const channelGroups = allChannels.map((row: { dimensionValues?: { value?: string }[]; metricValues?: { value?: string }[] }) => ({
+        const channelGroups = (channelsRes.rows ?? []).map((row) => ({
             channel:  row.dimensionValues?.[0]?.value ?? 'Other',
             sessions: metric(row.metricValues?.[0]?.value),
         }));
@@ -138,17 +204,17 @@ export async function GET(request: Request) {
                 pageViews,
                 activeUsers,
                 newUsers,
-                returningUsers: Math.max(0, activeUsers - newUsers),
+                returningUsers:       Math.max(0, activeUsers - newUsers),
                 avgEngagementSeconds: Math.round(avgEngagement),
             },
             dailyUsers,
             topPages,
             channelGroups,
-            aiReferrals: [], // populated by client from channel data (referral sources)
+            aiReferrals: [],
         };
 
         return NextResponse.json(data, {
-            headers: { 'Cache-Control': 'private, max-age=300' }, // 5 min cache
+            headers: { 'Cache-Control': 'private, max-age=300' },
         });
 
     } catch (err) {

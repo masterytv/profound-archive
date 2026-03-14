@@ -18,12 +18,16 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { researchQuestion, type ResearchResult } from './blog-research';
+import { generateHeroImage } from './blog-image';
 import {
     buildDraftSystemPrompt,
     buildDraftUserPrompt,
     buildVoicePassSystemPrompt,
     SEO_REFRESH_PROMPT,
 } from './blog-prompts';
+
+
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,6 +44,7 @@ export type BlogArticleStatus =
     | 'assembling'
     | 'researching'
     | 'drafting'
+    | 'imaging'
     | 'polishing'
     | 'publishing'
     | 'complete'
@@ -112,7 +117,8 @@ interface ArticleContext {
     hydePassage: string;
     questionSlug: string;
     videoCount: number;
-    topChunks: string[];
+    topChunks: Array<{ content: string; videoId: string; title: string; channelName: string; startTime?: number }>;
+    videoReferences: Array<{ videoId: string; title: string; url: string; experiencerName?: string; channelName?: string }>;
     authorName: string;
 }
 
@@ -132,7 +138,8 @@ async function assembleContext(questionSlug: string): Promise<ArticleContext> {
 
     // Fetch top-similarity NDE transcript chunks for this question's HyDE passage
     // Uses the existing search RPC — if unavailable, fall back to empty array
-    let topChunks: string[] = [];
+    let topChunks: ArticleContext['topChunks'] = [];
+    let videoReferences: ArticleContext['videoReferences'] = [];
     try {
         // Get embedding for the HyDE passage first
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -144,17 +151,41 @@ async function assembleContext(questionSlug: string): Promise<ArticleContext> {
 
         const { data: chunks } = await supabase.rpc('search_punctuated_embeddings_filtered', {
             query_embedding: embedding,
-            match_threshold: 0.5,
-            match_count: 8,
-            nde_types_filter: [],
-            greyson_min: 0,
-            transformation_min: 0,
-            veridical_min: 0,
+            similarity_threshold: 0.5,
+            page_limit: 8,
+            page_offset: 0,
+            sort_column: 'similarity',
+            sort_direction: 'DESC',
+            filter_greyson_min: 0,
+            filter_transformation_min: 0,
+            filter_veridical_min: 0,
         });
 
-        topChunks = ((chunks ?? []) as Array<{ content: string }>)
-            .map((c) => c.content)
-            .slice(0, 5);
+        const rawChunks = (chunks ?? []) as Array<{ content: string; video_id: string; title: string; url: string; channelName: string; start_time: number | null }>;
+
+        // Extract text chunks WITH video metadata so the AI can link each quote to its source
+        topChunks = rawChunks.slice(0, 5).map((c) => ({
+            content: c.content,
+            videoId: c.video_id,
+            title: c.title ?? '',
+            channelName: c.channelName ?? '',
+            startTime: c.start_time ?? undefined,
+        }));
+
+        // Deduplicate video references (pick top 3 distinct videos)
+        const seenVideoIds = new Set<string>();
+        for (const chunk of rawChunks) {
+            if (chunk.video_id && !seenVideoIds.has(chunk.video_id)) {
+                seenVideoIds.add(chunk.video_id);
+                videoReferences.push({
+                    videoId: chunk.video_id,
+                    title: chunk.title ?? '',
+                    url: chunk.url ?? '',
+                    channelName: chunk.channelName ?? '',
+                });
+                if (videoReferences.length >= 3) break;
+            }
+        }
     } catch {
         // Non-fatal — pipeline continues without experiencer quotes
         console.warn('[blog-article] Could not fetch NDE chunks — continuing without quotes');
@@ -173,6 +204,7 @@ async function assembleContext(questionSlug: string): Promise<ArticleContext> {
         questionSlug: q.slug,
         videoCount: count ?? 5000,
         topChunks,
+        videoReferences,
         authorName: 'Tom Wood', // default — can be made configurable later
     };
 }
@@ -195,7 +227,8 @@ interface ArticleDraft {
 
 async function draftArticle(
     context: ArticleContext,
-    research: ResearchResult
+    research: ResearchResult,
+
 ): Promise<ArticleDraft> {
     const openRouter = getOpenRouter();
 
@@ -207,7 +240,7 @@ async function draftArticle(
     ].join('');
 
     const response = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-opus-4-5',
+        model: 'anthropic/claude-sonnet-4-5',
         messages: [
             { role: 'system', content: buildDraftSystemPrompt() },
             {
@@ -219,22 +252,25 @@ async function draftArticle(
                     research: researchText,
                     topChunks: context.topChunks,
                     authorName: context.authorName,
+                    videoReferences: context.videoReferences,
                 }),
             },
-            // Assistant prefill forces JSON output (LEARNINGS §15D)
+            // Assistant prefill forces JSON output (Claude-specific)
             { role: 'assistant', content: '{' },
         ],
-        max_tokens: 6000,
+        max_tokens: 16000,
         temperature: 0.7,
     });
 
-    const raw = '{' + (response.choices[0]?.message?.content ?? '{}');
+    const rawContent = '{' + (response.choices[0]?.message?.content ?? '{}');
+    // Strip markdown code fences if model wraps JSON in ```json ... ```
+    const cleaned = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 
     let draft: ArticleDraft;
     try {
-        draft = JSON.parse(raw);
+        draft = JSON.parse(cleaned);
     } catch {
-        throw new Error(`Claude returned invalid JSON: ${raw.slice(0, 200)}`);
+        throw new Error(`Claude returned invalid JSON: ${cleaned.slice(0, 200)}`);
     }
 
     // Validate required fields
@@ -302,16 +338,11 @@ async function voicePass(draft: ArticleDraft): Promise<ArticleDraft> {
 async function publishDraft(
     draft: ArticleDraft,
     context: ArticleContext,
-    research: ResearchResult
+    research: ResearchResult,
+    heroImageUrl?: string,
+    heroImagePrompt?: string,
 ): Promise<{ id: number; slug: string }> {
     const supabase = getSupabaseAdmin();
-
-    // Build references JSON from Perplexity citations
-    const references = research.citations.map((c) => ({
-        text: c.title,
-        url: c.url,
-        snippet: c.snippet,
-    }));
 
     const { data, error } = await supabase
         .from('blog_posts')
@@ -321,7 +352,8 @@ async function publishDraft(
             subtitle: draft.subtitle,
             category: 'big-question',
             author_name: context.authorName,
-            status: 'draft', // always draft — human publishes via admin UI
+            status: 'published',
+            published_at: new Date().toISOString(),  // prevent Unix epoch 1969 default
             lead_paragraph: draft.lead_paragraph,
             body_mdx: draft.body_mdx,
             read_time_mins: draft.read_time_mins,
@@ -330,7 +362,8 @@ async function publishDraft(
             seo_title: draft.seo_title,
             seo_description: draft.seo_description,
             source_question_slug: context.questionSlug,
-            // references stored as JSON in the body or a separate column if added later
+            hero_image_url: heroImageUrl ?? null,
+            hero_image_prompt: heroImagePrompt ?? null,
         })
         .select('id, slug')
         .single();
@@ -358,8 +391,9 @@ export async function generateBlogArticle(
         makeStep('Context assembly'),
         makeStep('Perplexity research'),
         makeStep('Claude draft'),
+        makeStep('Hero image'),
         makeStep('Voice calibration pass'),
-        makeStep('Save as draft'),
+        makeStep('Publish'),
     ];
     const result: BlogArticleResult = { status: 'assembling', questionSlug, steps };
 
@@ -385,6 +419,10 @@ export async function generateBlogArticle(
     let context: ArticleContext;
     let research: ResearchResult;
     let draft: ArticleDraft;
+    let heroImageUrl: string | undefined;
+    let heroImagePrompt: string | undefined;
+
+
 
     // ── Step 1 ────────────────────────────────────────────────────────────────
     const s1 = steps[0];
@@ -404,7 +442,7 @@ export async function generateBlogArticle(
     const t2 = Date.now();
     result.status = 'researching';
     try {
-        research = await researchQuestion(context.question);
+        research = await researchQuestion(context.question, context.consumerQuestion);
         finishStep(s2, 'success', `${research.citations.length} citations · ${research.keyFindings.length} key findings`, t2, onStep);
     } catch (err) {
         finishStep(s2, 'failed', String(err), t2, onStep);
@@ -417,33 +455,47 @@ export async function generateBlogArticle(
     const t3 = Date.now();
     result.status = 'drafting';
     try {
-        draft = await draftArticle(context, research);
+        draft = await draftArticle(context!, research!);
         finishStep(s3, 'success', `${draft.word_count} words · slug: ${draft.slug}`, t3, onStep);
     } catch (err) {
         finishStep(s3, 'failed', String(err), t3, onStep);
         return { ...result, status: 'failed', error: String(err) };
     }
 
+    // ── Step 3b: Hero image (non-fatal) ───────────────────────────────────────
+    const s3b = steps[3];
+    startStep(s3b, onStep);
+    const t3b = Date.now();
+    result.status = 'imaging';
+    try {
+        const img = await generateHeroImage(draft!.title, draft!.slug, 'big-question', draft!.tags ?? []);
+        heroImageUrl = img.url;
+        heroImagePrompt = img.prompt;
+        finishStep(s3b, 'success', `Generated · ${img.width}x${img.height}`, t3b, onStep);
+    } catch (err) {
+        // Non-fatal — article publishes without image if generation fails
+        finishStep(s3b, 'failed', `Image skipped: ${String(err)}`, t3b, onStep);
+    }
+
     // ── Step 4 ────────────────────────────────────────────────────────────────
-    const s4 = steps[3];
+    const s4 = steps[4];
     startStep(s4, onStep);
     const t4 = Date.now();
     result.status = 'polishing';
     try {
-        draft = await voicePass(draft);
+        draft = await voicePass(draft!);
         finishStep(s4, 'success', `Revised to ${draft.word_count} words`, t4, onStep);
     } catch (err) {
-        // Voice pass failure is non-fatal — use the raw draft
         finishStep(s4, 'failed', `Voice pass failed (using raw draft): ${String(err)}`, t4, onStep);
     }
 
     // ── Step 5 ────────────────────────────────────────────────────────────────
-    const s5 = steps[4];
+    const s5 = steps[5];
     startStep(s5, onStep);
     const t5 = Date.now();
     result.status = 'publishing';
     try {
-        const { id, slug } = await publishDraft(draft!, context!, research!);
+        const { id, slug } = await publishDraft(draft!, context!, research!, heroImageUrl, heroImagePrompt);
         finishStep(s5, 'success', `Saved as draft. ID: ${id}`, t5, onStep);
         return {
             ...result,
