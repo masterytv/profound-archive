@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isAdminUser } from '@/lib/auth/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +15,14 @@ const supabase = createClient(
  * Uses explicit join on user_question_id (not nested select) because question_synthesis
  * has two FKs (question_id + user_question_id) and Supabase auto-join is ambiguous.
  */
-export async function GET(_req: NextRequest) {
-    // Fetch all user questions
+export async function GET() {
+    // Security: require authenticated admin session
+    if (!(await isAdminUser())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Fetch ALL user questions (active + hidden) for admin review
+    // includes basic stats: is_active, vote counts, created date
     const { data: questions, error } = await supabase
         .from('user_questions')
         .select('id, slug, question, is_active, created_at')

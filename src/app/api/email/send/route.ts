@@ -36,7 +36,17 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createClient();
   const { data: { session } } = await supabase.auth.getSession();
-  const isAdmin = session?.user != null; // Further role check below for non-cron
+
+  // Security: verify caller is an admin, not just any logged-in user
+  let isAdmin = false;
+  if (session?.user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+    isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  }
 
   if (!isCron && !isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

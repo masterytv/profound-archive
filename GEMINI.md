@@ -51,6 +51,17 @@ All detailed documentation lives in the `/docs` folder. Start here:
 6. **Documentation Maintenance:** You represent the "Documentation Architect". After any significant code, schema, or API change, you MUST update the corresponding file in `/docs`. Do not wait for the user to ask.
 7. **Continuous Learning:** Always check `docs/LEARNINGS.md` before generating code to see if there are specific patterns or "gotchas" you need to be aware of.
 
+## Security Rules (Non-Negotiable)
+> These rules were established after a full security audit on 2026-03-14. They exist to prevent recurring vulnerabilities in AI-generated code.
+
+1. **Every `/api/admin/*` route MUST have auth.** Use the shared `isAdminUser()` from `src/lib/auth/admin-guard.ts`. No exceptions — even if middleware protects the admin *pages*, API routes are independently callable.
+2. **Never bypass auth for debugging.** No `IS_DEBUG_MODE` or similar env-var backdoors in production routes. If you need a debug path, gate it behind `CRON_SECRET` or admin session.
+3. **Sanitize all user input before HTML rendering.** Use `escapeHtml()` for any user-provided strings interpolated into HTML (emails, templates, SSR). See `src/app/api/contact/route.ts` for the pattern.
+4. **Security headers are mandatory.** They are configured in `next.config.ts` via `headers()`. Do not remove them.
+5. **Rate limiting awareness:** Critical routes (`/api/chat-compassionate`, `/api/questions/custom`, `/api/contact`) consume expensive resources (OpenAI credits, email sends). Note rate limiting needs when creating new public API routes.
+6. **Service role key usage:** Only use `SUPABASE_SERVICE_KEY` or `SUPABASE_SERVICE_ROLE_KEY` in routes that verify the caller is either a cron job (via `CRON_SECRET`) or an authenticated admin. Never use service keys in public-facing routes without auth.
+7. **RLS policies:** New tables MUST have explicit RLS policies. Never use `USING (true)` for INSERT/UPDATE/DELETE on user-facing tables without a clear justification.
+
 ## Current Development Status
 ### Completed
 - Core NDE search and display (Search3/Native).
@@ -78,6 +89,7 @@ All detailed documentation lives in the `/docs` folder. Start here:
 - **Hourly cron** (`.github/workflows/scanner-cron.yml`) — increased from every 2h to every 1h (~72 videos/day throughput).
 - **CES Feedback widget** (`src/components/ces-feedback-widget.tsx`) — persistent left-edge tab (desktop) / auto-open after 2 min (mobile). 7-point scale + optional reason. Score saved to DB immediately on click. 30-day suppression via localStorage. Test mode: `?ces_test=1`. Admin analytics at `/admin/ces`. Table: `ces_feedback`. See `docs/LEARNINGS.md §18`.
 - **Nav simplification** — Removed "Chat" dropdown from site-wide nav (`site-header.tsx`). New order: Big Questions → Browse → NDE Compass → About → Search. Chat pages still accessible via the floating ChatPopup widget on all pages.
+- **Security audit + hardening** (2026-03-14) — Full codebase security audit. Added auth guards to 3 admin API routes, locked `manage-subs` behind token/admin, removed debug auth bypass, added 5 security headers to `next.config.ts`, XSS-sanitized contact form, fixed weak email/send auth. Created shared `isAdminUser()` at `src/lib/auth/admin-guard.ts`.
 
 ### In Progress
 - Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
@@ -110,3 +122,4 @@ See [Environment Variables Doc](./docs/ENVIRONMENT.md).
 | CES Feedback Widget | `src/components/ces-feedback-widget.tsx` |
 | CES Feedback API | `src/app/api/ces-feedback/route.ts` |
 | CES Admin Dashboard | `src/app/admin/ces/page.tsx` |
+| Admin Auth Guard | `src/lib/auth/admin-guard.ts` |

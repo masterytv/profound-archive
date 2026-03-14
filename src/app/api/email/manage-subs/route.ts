@@ -1,11 +1,6 @@
-// src/app/api/email/manage-subs/route.ts
-// GET  /api/email/manage-subs?email=xxx@example.com  → returns all subscriptions for that email
-// POST /api/email/manage-subs  → { email, updates: [{ archetype, active, frequency? }] }
-// Uses service role to bypass RLS — no user auth required.
-// Email is the primary key; token is only used as a resolver (legacy email links).
-
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isAdminUser } from "@/lib/auth/admin-guard";
 
 function adminClient() {
   return createClient(
@@ -18,6 +13,12 @@ export async function GET(req: NextRequest) {
   const supabase = adminClient();
   let email = req.nextUrl.searchParams.get("email");
   const token = req.nextUrl.searchParams.get("token");
+
+  // Security: require either a valid unsubscribe token OR an authenticated admin session.
+  // Bare email lookups without auth are blocked to prevent subscription data leaks.
+  if (!token && !(await isAdminUser())) {
+    return NextResponse.json({ error: "Unauthorized — token or admin session required" }, { status: 401 });
+  }
 
   // If token provided instead of email, resolve it to an email first (legacy links)
   if (!email && token) {
@@ -35,6 +36,20 @@ export async function GET(req: NextRequest) {
 
   if (!email) {
     return NextResponse.json({ error: "email or token required" }, { status: 400 });
+  }
+
+  // If a token was provided, verify it actually belongs to this email (prevent token+email mismatch)
+  if (token) {
+    const { data: verify } = await supabase
+      .from("quiz_leads")
+      .select("email")
+      .eq("unsubscribe_token", token)
+      .eq("email", email)
+      .maybeSingle();
+
+    if (!verify) {
+      return NextResponse.json({ error: "Token does not match email" }, { status: 403 });
+    }
   }
 
   // Get ALL subscriptions for this email

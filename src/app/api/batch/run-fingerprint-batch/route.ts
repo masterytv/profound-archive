@@ -13,12 +13,11 @@ const supabase = createClient(
  * Protected by CRON_SECRET.
  */
 export async function POST(req: Request) {
-    // Auth check
+    // Auth check — CRON_SECRET only (no debug bypass)
     const { searchParams } = new URL(req.url);
     const secret = searchParams.get("secret") || req.headers.get("x-cron-secret");
-    const isDebug = process.env.IS_DEBUG_MODE === "true";
 
-    if (!isDebug && secret !== process.env.CRON_SECRET) {
+    if (secret !== process.env.CRON_SECRET) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { discoverNewVideos, getExistingVideoIds } from '@/lib/scanner/discover';
 import { runScannerTick } from '@/lib/scanner/tick';
+import { isAdminUser } from '@/lib/auth/admin-guard';
 
 /**
  * Admin Scanner API
@@ -18,6 +19,11 @@ function getAdminSupabase() {
 }
 
 export async function GET(req: NextRequest) {
+    // Security: require authenticated admin session
+    if (!(await isAdminUser())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const supabase = getAdminSupabase();
     const { searchParams } = new URL(req.url);
 
@@ -109,6 +115,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+    // Security: require either authenticated admin session OR valid CRON_SECRET
+    const cronSecret = req.headers.get('x-cron-secret');
+    const isCron = cronSecret === process.env.CRON_SECRET;
+    if (!isCron && !(await isAdminUser())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const supabase = getAdminSupabase();
     const body = await req.json();
 

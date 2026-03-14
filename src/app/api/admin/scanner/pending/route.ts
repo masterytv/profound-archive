@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isAdminUser } from '@/lib/auth/admin-guard';
 
 /**
  * GET /api/admin/scanner/pending?page=1&per_page=50&channel_id=...&max_duration=180
@@ -23,6 +24,11 @@ function getAdminSupabase() {
 }
 
 export async function GET(req: NextRequest) {
+    // Security: require authenticated admin session
+    if (!(await isAdminUser())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const supabase = getAdminSupabase();
     const { searchParams } = new URL(req.url);
 

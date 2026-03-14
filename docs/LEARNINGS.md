@@ -1191,3 +1191,25 @@ If `!isActive`, return a branded "no longer available" page **before** `fetchQue
 
 **Rule — slugs are immutable:** Never change a slug. If a curated question needs rewording, update `consumer_question` text only. If a new slug is needed, create a new row and set the old one to `is_active = false`.
 
+## 21. Security Audit — 2026-03-14
+
+A full codebase security audit was performed covering 40+ API routes, middleware, config files, and Supabase RLS policies. Key findings and fixes:
+
+### Critical Fixes Applied
+1. **Admin API routes had zero auth:** `/api/admin/scanner`, `/api/admin/user-questions`, `/api/admin/scanner/pending` were callable by anyone. Fixed: all now use `isAdminUser()` from `src/lib/auth/admin-guard.ts`.
+2. **`/api/email/manage-subs` was open:** Anyone who knew an email could read/modify subscriptions. Fixed: now requires `unsubscribe_token` or admin session.
+3. **Debug mode bypass:** `IS_DEBUG_MODE=true` in `/api/batch/run-fingerprint-batch` skipped auth. Fixed: removed entirely.
+
+### High-Priority Fixes Applied
+4. **Zero security headers:** Added 5 headers (`X-Frame-Options`, `X-Content-Type-Options`, `HSTS`, `Referrer-Policy`, `Permissions-Policy`) to `next.config.ts`.
+5. **XSS in contact form:** User input was interpolated raw into HTML email. Fixed: HTML entity escaping applied.
+6. **Weak email/send auth:** Any authenticated user (not just admins) could trigger email sends. Fixed: proper admin role check added.
+
+### Shared Admin Guard
+**Always import `isAdminUser()` from `src/lib/auth/admin-guard.ts`** for any new `/api/admin/*` route. Do not duplicate the cookie + role check logic. The function:
+- Reads auth cookies via `@supabase/ssr`
+- Checks `profiles.role` for `admin` or `super_admin`
+- Returns `false` on any error (fail-closed)
+
+### New Rule: Security Headers
+Security headers are configured in `next.config.ts` → `headers()`. Never remove them. If you need to customize CSP for a specific page, add a more specific `source` pattern instead.
