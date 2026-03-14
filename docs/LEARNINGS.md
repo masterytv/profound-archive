@@ -1260,3 +1260,43 @@ export async function generateStaticParams() {
 
 **Rule:** Never use `createClient()` from `@/lib/supabase/server` inside `generateStaticParams`, `generateMetadata`, or any `force-static` page component. Use a direct `@supabase/supabase-js` client instead. If the table has public SELECT RLS, use the anon key. If it requires elevated access, use `SUPABASE_SERVICE_KEY`.
 
+## 23. Custom Markdown Renderer — Link/Italic Processing Order — 2026-03-14
+
+**The Problem:** The custom markdown-to-HTML renderer in `src/lib/markdown.ts` processed italic (`_text_`) **before** links (`[text](url)`). This caused underscores inside video URLs like `/video/cA_xqhwR_NU` to be converted to `<em>` tags, breaking the link.
+
+**The Fix:** Two changes:
+1. **Process links FIRST** — `[text](url)` → `<a>` tags are created before italic regex runs, so underscores inside `href` attributes are safe.
+2. **Tighten underscore-italic regex** — Changed `/_(.+?)_/g` to `/(?<![\/\w])_([^_]+)_(?![\/\w])/g` which requires underscores to be at word boundaries, not inside URLs or identifiers.
+
+**Rule:** In any custom markdown parser, always process links before inline formatting (bold/italic). URLs contain characters (`_`, `*`) that conflict with markdown emphasis syntax.
+
+## 24. Blog Post Draft Visibility — 2026-03-14
+
+**The Problem:** The blog post page (`blog/[slug]/page.tsx`) used a service client with no status filter, so draft posts were publicly accessible to anyone with the URL, including search engine crawlers.
+
+**The Fix:** Added status-based access control in `getPost()`:
+- `status === 'published'` → visible to everyone
+- `status === 'draft'` → check for authenticated session. If logged in, show (admin preview). If anonymous, return `null` (triggers 404).
+
+**Rule:** Always filter by `status = 'published'` for public-facing content pages. Use session checks for draft previews, never expose drafts via service client without auth.
+
+## 25. `apphosting.yaml` — Adding New Secrets Checklist — 2026-03-14
+
+**The Problem:** Adding a secret to Google Cloud Secrets Manager alone does NOT make it available to the Firebase App Hosting app. The secret must also be referenced in `apphosting.yaml`.
+
+**Full checklist for adding a new secret:**
+1. Create the secret in **Google Cloud Secrets Manager**
+2. Add a version with the actual value
+3. Add a reference in **`apphosting.yaml`** under `env:`:
+   ```yaml
+   - variable: MY_NEW_SECRET
+     secret: projects/432036554831/secrets/MY_NEW_SECRET/versions/1
+   ```
+4. **CRITICAL: Use `/versions/1`** (or specific version number), NOT `/versions/latest`. Firebase App Hosting cannot resolve `latest` — it will fail at build time with "Misconfigured secret" error. The only exceptions are `TYPESENSE_API_KEY` and `YOUTUBE_API_KEY` which were pinned to `latest` before this limitation was discovered; they work because Firebase auto-pins them during build.
+5. Commit and push to trigger a new build
+6. Permissions are auto-inherited at the project level — no manual grant needed
+
+**Secrets NOT in apphosting.yaml won't exist as `process.env.*` at runtime**, even if they're in Secrets Manager.
+
+**Rule:** When adding any new secret, always update `apphosting.yaml`. Pin to a specific version number (`/versions/1`). If you rotate a secret, create a new version in Secrets Manager AND update the version number in `apphosting.yaml`.
+
