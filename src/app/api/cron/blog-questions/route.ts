@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     for (const slug of todo) {
         try {
             const result = await generateBlogArticle(slug);
-            results.push({ slug, status: result.status, articleSlug: result.articleSlug });
+            results.push({ slug, status: result.status, articleSlug: result.articleSlug, error: result.error });
         } catch (err) {
             results.push({ slug, status: 'failed', error: String(err) });
         }
