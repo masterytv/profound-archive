@@ -95,5 +95,11 @@ env:
     secret: projects/432036554831/secrets/GA_CLIENT_EMAIL/versions/1
   - variable: GA_PRIVATE_KEY
     secret: projects/432036554831/secrets/GA_PRIVATE_KEY/versions/1
-# Trigger new build after granting secret access
 
+  # Perplexity AI — research step for blog article pipeline
+  - variable: PERPLEXITY_API_KEY
+    secret: projects/432036554831/secrets/PERPLEXITY_API_KEY/versions/latest
+
+  # fal.ai — hero image generation for blog articles
+  - variable: FAL_API_KEY
+    secret: projects/432036554831/secrets/FAL_API_KEY/versions/latest
