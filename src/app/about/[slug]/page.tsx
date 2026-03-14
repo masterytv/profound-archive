@@ -1,11 +1,20 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
 import type { Metadata } from "next";
 import { ArrowRight, BookOpen, User } from "lucide-react";
 import { notFound } from "next/navigation";
 
 // Static pages — no DB needed for the author data itself.
 export const dynamic = "force-static";
+
+// Why: This page is force-static, so cookies() is unavailable.
+// Use a direct anon client (blog_posts has public SELECT RLS).
+function buildClient() {
+    return createAnonClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
+}
 
 type AuthorData = {
     name: string;
@@ -69,7 +78,7 @@ export default async function AuthorPage({
     if (!author) notFound();
 
     // Fetch published articles by this author
-    const supabase = await createClient();
+    const supabase = buildClient();
     const { data: articles } = await supabase
         .from("blog_posts")
         .select("id, slug, title, category, lead_paragraph, published_at, read_time_mins")

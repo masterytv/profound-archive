@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -30,8 +31,17 @@ type VideoRow = {
     view_count: number | null;
 };
 
+// Why: Both getProfile and generateStaticParams run at build time (SSG),
+// where cookies() is unavailable. Use a direct anon client instead.
+function buildClient() {
+    return createAnonClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
+}
+
 async function getProfile(slug: string): Promise<ExperiencerProfile | null> {
-    const supabase = await createClient();
+    const supabase = buildClient();
     const { data } = await supabase
         .from("experiencer_profiles")
         .select("*")
@@ -42,7 +52,7 @@ async function getProfile(slug: string): Promise<ExperiencerProfile | null> {
 }
 
 export async function generateStaticParams() {
-    const supabase = await createClient();
+    const supabase = buildClient();
     const { data } = await supabase
         .from("experiencer_profiles")
         .select("slug")
