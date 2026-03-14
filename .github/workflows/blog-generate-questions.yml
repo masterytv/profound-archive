@@ -22,7 +22,7 @@ jobs:
           COUNT="${{ github.event.inputs.count || '1' }}"
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -X POST \
-            -H "Authorization: Bearer ${{ secrets.BLOG_CRON_SECRET }}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/blog-questions?count=$COUNT")
 
@@ -38,6 +38,6 @@ jobs:
           fi
 
 # ── Required GitHub Secrets ──────────────────────────────────────────────────
-# BLOG_CRON_SECRET     — random secret string (generate with: openssl rand -hex 32)
+# CRON_SECRET          — same secret used by scanner/tick and other cron routes
 # NEXT_PUBLIC_APP_URL  — https://projectprofound.org (no trailing slash)
 # ─────────────────────────────────────────────────────────────────────────────

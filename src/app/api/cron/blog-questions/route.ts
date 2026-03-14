@@ -17,12 +17,12 @@ export const maxDuration = 300;
  * Override: ?count=2 (max 3 to stay within SEO limits).
  */
 export async function POST(req: Request) {
-    // Auth: verify cron secret
+    // Auth: verify cron secret (reuses the same CRON_SECRET as scanner/tick)
     const authHeader = req.headers.get('authorization') ?? '';
-    const cronSecret = process.env.BLOG_CRON_SECRET;
+    const cronSecret = process.env.CRON_SECRET;
 
     if (!cronSecret) {
-        return NextResponse.json({ error: 'BLOG_CRON_SECRET not configured' }, { status: 500 });
+        return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
     }
 
     if (authHeader !== `Bearer ${cronSecret}`) {
