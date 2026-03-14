@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createBrowserClient } from "@supabase/supabase-js";
 import type { Metadata } from "next";
-import { BookOpen, Clock, ArrowRight, Layers, ArrowLeft } from "lucide-react";
+import { Clock, ArrowRight, Layers, ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 
 export const revalidate = 86400;
@@ -22,8 +23,13 @@ const CATEGORY_LABELS: Record<string, string> = {
     "researcher":    "Researcher",
 };
 
+// Why: generateStaticParams runs at build time — no request scope, so cookies() is unavailable.
+// Use a direct Supabase client with anon key (blog_posts has public SELECT RLS).
 export async function generateStaticParams() {
-    const supabase = await createClient();
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
     const { data } = await supabase
         .from("blog_posts")
         .select("series")
