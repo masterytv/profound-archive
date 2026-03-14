@@ -1213,3 +1213,50 @@ A full codebase security audit was performed covering 40+ API routes, middleware
 
 ### New Rule: Security Headers
 Security headers are configured in `next.config.ts` → `headers()`. Never remove them. If you need to customize CSP for a specific page, add a more specific `source` pattern instead.
+
+### RLS Policy Tightening (Migration: `tighten_rls_policies`)
+Dropped 6 overly permissive policies:
+- `ces_feedback`: DROP UPDATE for anon (INSERT kept — widget needs it).
+- `clips`: DROP UPDATE for public (read-only now).
+- `quiz_leads`: DROP UPDATE for anon + authenticated (INSERT + SELECT kept).
+- `scan_queue` / `scan_runs`: Changed from ALL for `public` → ALL for `service_role` only.
+- `blog_settings` and `user_questions` left unchanged (already correct).
+
+**Rule:** When creating RLS policies for internal/infrastructure tables (scan_queue, scan_runs, blog_settings), always scope to `service_role` — never `public`.
+
+### Cloudflare Rate Limiting
+- Free plan: 1 rule, 10-second window only.
+- Current rule: 3 requests per 10 seconds on `/api/chat-compassionate`, `/api/contact`, `/api/questions/custom` (combined via OR). Action: Block for 10s.
+
+## 22. `generateStaticParams` Cannot Use `cookies()` — 2026-03-14
+
+**The Problem:** `createClient()` from `@/lib/supabase/server` calls `cookies()` internally. When used inside `generateStaticParams`, `generateMetadata`, or any function that runs at **build time** (SSG/ISR), Next.js throws:
+
+```
+Error: `cookies` was called outside a request scope
+```
+
+**The Fix:** Use a direct `@supabase/supabase-js` client with the public anon key instead:
+
+```ts
+import { createClient as createAnonClient } from "@supabase/supabase-js";
+
+function buildClient() {
+    return createAnonClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
+}
+
+export async function generateStaticParams() {
+    const supabase = buildClient(); // No cookies needed
+    // ...
+}
+```
+
+**Pages fixed:** `blog/series/[series]`, `experiencer/[slug]`, `about/[slug]`.
+
+**Pages already safe:** `blog/[slug]` (uses `createServiceClient`), `blog/category/[category]` (hardcoded array), `questions/[slug]` (already uses non-cookie client).
+
+**Rule:** Never use `createClient()` from `@/lib/supabase/server` inside `generateStaticParams`, `generateMetadata`, or any `force-static` page component. Use a direct `@supabase/supabase-js` client instead. If the table has public SELECT RLS, use the anon key. If it requires elevated access, use `SUPABASE_SERVICE_KEY`.
+
