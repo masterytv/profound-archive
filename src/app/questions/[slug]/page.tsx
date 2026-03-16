@@ -147,7 +147,7 @@ export const dynamicParams = true;
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
-type QuestionResult = QuestionAnswer | { no_results: true; question: string; slug: string } | null;
+type QuestionResult = QuestionAnswer | { no_results: true; question: string; slug: string } | { rate_limited: true; slug: string } | null;
 
 async function fetchQuestionData(slug: string): Promise<QuestionResult> {
     try {
@@ -158,9 +158,11 @@ async function fetchQuestionData(slug: string): Promise<QuestionResult> {
             // AbortSignal.timeout prevents a stuck Claude call from hanging indefinitely.
             // Why: Turbopack dev HMR can abort the SSR request mid-Claude-call, causing "Unable
             // to generate answer" — the explicit signal breaks that inheritance chain.
+            // 90s timeout: auto-generated questions need HyDE (3s) + embedding (1s) + Claude (15-30s)
             next: { revalidate: 0 },
-            signal: AbortSignal.timeout(60_000),
+            signal: AbortSignal.timeout(90_000),
         });
+        if (res.status === 429) return { rate_limited: true, slug };
         if (!res.ok) return null;
         const json = await res.json();
         if (json.no_results) return json as { no_results: true; question: string; slug: string };
@@ -377,9 +379,42 @@ export default async function QuestionResultPage({
         );
     }
 
+    // Rate-limited state — too many auto-generated questions recently
+    if ('rate_limited' in data) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
+                <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto">
+                    <BookOpen className="w-8 h-8 text-amber-500" />
+                </div>
+                <p className="text-muted-foreground text-lg">We&apos;re generating a lot of answers right now.</p>
+                <p className="text-sm text-muted-foreground max-w-md">
+                    Please try again in a few minutes. Each answer involves searching 5,000+ NDE accounts
+                    and synthesizing the results, which takes time and resources.
+                </p>
+                <Link href="/questions" className="text-primary hover:underline text-sm">
+                    ← Browse answered questions
+                </Link>
+            </div>
+        );
+    }
+
     // No-results state — insufficient NDE evidence
     if ('no_results' in data) {
         return <NoResultsPage question={data.question} />;
+    }
+
+    // Cross-link: check if a blog post exists for this question
+    let relatedBlogPost: { slug: string; title: string } | null = null;
+    try {
+        const { data: blogMatch } = await supabaseService
+            .from('blog_posts')
+            .select('slug, title')
+            .eq('source_question_slug', slug)
+            .eq('status', 'published')
+            .maybeSingle();
+        relatedBlogPost = blogMatch;
+    } catch {
+        // Non-fatal: skip cross-link if query fails
     }
 
     // ── JSON-LD structured data ─────────────────────────────────────────────
@@ -593,6 +628,24 @@ export default async function QuestionResultPage({
                             reported experiences, not verified facts.
                         </p>
                     </div>
+
+                    {/* Cross-link: deep-dive blog post */}
+                    {relatedBlogPost && (
+                        <Link
+                            href={`/blog/${relatedBlogPost.slug}`}
+                            className="flex items-center gap-3 mt-4 p-4 bg-blue-50/50 dark:bg-blue-500/10 border border-blue-200/50 dark:border-blue-500/20 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/15 transition-colors group"
+                        >
+                            <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                            <div>
+                                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 group-hover:underline">
+                                    Read the in-depth article
+                                </p>
+                                <p className="text-xs text-blue-500 dark:text-blue-400 mt-0.5">
+                                    {relatedBlogPost.title}
+                                </p>
+                            </div>
+                        </Link>
+                    )}
                 </div>
             </section>
 

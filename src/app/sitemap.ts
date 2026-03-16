@@ -37,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: p.updated_at ?? p.published_at ?? new Date().toISOString(),
         changeFrequency: 'monthly' as const,
         // Cluster (pillar) pages get highest priority, others slightly lower
-        priority: p.category === 'cluster' ? 0.9 : 0.75,
+        priority: p.category === 'guide' ? 0.9 : 0.75,
     }));
 
     // Published experiencer profiles

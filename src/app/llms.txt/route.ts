@@ -30,7 +30,7 @@ export async function GET() {
 ## Blog — Research Articles
 
 - [Blog Home](${BASE}/blog): All research articles
-- [Topic Deep Dives](${BASE}/blog?category=cluster): Comprehensive pillar articles on core NDE topics
+- [Guides](${BASE}/blog?category=guide): Comprehensive pillar articles on core NDE topics
 - [Big Question Articles](${BASE}/blog?category=big-question): Long-form answers to fundamental NDE questions
 - [NDE Stories](${BASE}/blog?category=story): Narrative accounts of significant NDE experiences
 - [Experiencer Profiles](${BASE}/experiencer): Scored, searchable profiles of public NDE experiencers

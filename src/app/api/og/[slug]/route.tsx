@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export const runtime = "edge";
 
 const CATEGORY_LABELS: Record<string, string> = {
-    "cluster":       "Deep Dive",
+    "guide":         "Guide",
     "big-question":  "Big Question",
     "story":         "Story",
     "experiencer":   "Experiencer",

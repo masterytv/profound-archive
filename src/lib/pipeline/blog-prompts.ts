@@ -294,3 +294,163 @@ export const SEO_REFRESH_PROMPT = `Given the revised article body below, regener
 2. seo_description (150 chars max, answer + "| Project Profound")
 
 Return JSON only: { "lead_paragraph": "...", "seo_description": "..." }`;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GUIDE (PILLAR PAGE) PROMPTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── Guide Research Prompt ────────────────────────────────────────────────────
+
+export function buildGuideResearchPrompt(title: string, targetQuery: string): string {
+    return `You're helping write a COMPREHENSIVE PILLAR GUIDE for Project Profound, a platform exploring near-death experiences through 5,000+ first-person accounts. This is NOT a single-question blog post — it's a definitive, authoritative guide meant to be the best page on the internet for this topic.
+
+GUIDE TITLE: "${title}"
+PRIMARY SEARCH QUERY: "${targetQuery}"
+
+Research this topic COMPREHENSIVELY. Cover ALL major subtopics, not just the most obvious angle. Think of every H2 section this guide needs. For each subtopic, gather:
+
+1. SCIENTIFIC DATA — specific studies, sample sizes, percentages, researchers
+2. HISTORICAL CONTEXT — when this was first studied, how understanding evolved
+3. COMPETING THEORIES — materialist explanations and why they fall short for the strongest cases
+4. CROSS-CULTURAL DATA — how this manifests across cultures, religions, age groups
+5. RECENT DEVELOPMENTS — anything from the last 3 years
+
+BOOKS & SOURCES TO DRAW FROM (pick the most relevant to this specific topic):
+${BOOK_LIST}
+
+WEBSITES TO SEARCH:
+Academic: IANDS.org, NDERF.org, UVA Division of Perceptual Studies, Bigelow Institute, PubMed.
+Popular: Psychology Today, Scientific American, The Atlantic, near-death.com, PMHAtwater.com.
+Podcasts/Media: "We Don't Die Radio", "Next Level Soul", "New Thinking Allowed".
+
+Return a structured research brief with:
+- SUBTOPICS: 6-8 recommended H2 sections for this guide, with 2-3 bullet points of key content for each
+- KEY STATISTICS: 10-15 citable statistics with exact sources
+- RESEARCHER QUOTES: 5-8 quotes from researchers about their findings (NOT retold NDE stories)
+- COUNTERARGUMENTS: The 3 strongest skeptical arguments and their specific weaknesses
+- FAQ CANDIDATES: 8-10 common questions people ask about this topic (for the FAQ section)
+- RECOMMENDED CITATIONS: 8-12 citations with author, title, year, and FULL URL
+
+IMPORTANT: This guide needs BREADTH. Cover the topic from every angle — scientific, experiential, cultural, psychological, practical. Don't go deep on one subtopic at the expense of others.`;
+}
+
+const BOOK_LIST = `Landmark: "Life After Life" (Moody), "Recollections of Death" (Sabom), "Heading Toward Omega" (Ring), "Lessons from the Light" (Ring), "Handbook of NDEs" (Holden/Greyson/James).
+Personal: "Proof of Heaven" (Alexander), "Dying to Be Me" (Moorjani), "Embraced by the Light" (Eadie), "Saved by the Light" (Brinkley), "To Heaven and Back" (Neal), "My Descent into Death" (Storm).
+Scientific: "After" (Greyson), "Consciousness Beyond Life" (van Lommel), "Erasing Death" (Parnia), "Truth in the Light" (Fenwick), "Evidence of the Afterlife" (Long), "The Self Does Not Die" (Rivas).
+Philosophical: "Journey of Souls" (Newton), "Imagine Heaven" (Burke), "Big Book of NDEs" (Atwater), "Stop Worrying! There Probably IS an Afterlife" (Taylor).`;
+
+// ─── Guide Draft System Prompt ────────────────────────────────────────────────
+
+export function buildGuideDraftSystemPrompt(): string {
+    return `You are a senior science journalist writing a COMPREHENSIVE PILLAR GUIDE for Project Profound, a near-death experience research platform.
+
+${GLADWELL_VOICE_RULES}
+
+GUIDE-SPECIFIC STRUCTURE RULES:
+- H1 = the exact guide title (copied from input). Do not rephrase.
+- First paragraph = direct, compelling overview of the topic. Set the stakes. No preamble.
+- 6-8 H2 sections covering the topic from EVERY major angle (scientific, experiential, cultural, practical)
+- Each H2 section: 400-600 words. Use H3 subsections where natural.
+- ONE dedicated "What the Skeptics Say" or counterarguments section (H2). Give the strongest objection genuine engagement.
+- FAQ section at the end: 5-8 Q&A pairs as H3 headings with 2-4 sentence answers each. These should be the most commonly searched questions related to this topic.
+- Target: 3,000-5,000 words total.
+- INTERNAL LINKS: When you mention topics covered by other pages on the site, link to them:
+  - Related questions → /questions/[slug]
+  - Other guides → /blog/[slug]
+  Use the provided slugs. Don't fabricate URLs.
+
+CONTENT RULES:
+- You have access to: (a) research citations from Perplexity, (b) real quotes from NDE experiencers on Project Profound, (c) the question metadata, (d) related question slugs for internal linking.
+- USE EXPERIENCER QUOTES VERBATIM as provided. Do not clean, paraphrase, or shorten them.
+- Category tag for this article: guide
+- Author: use the provided author name.
+
+CRITICAL — NO HALLUCINATED NDE ACCOUNTS:
+- NEVER retell famous NDE stories from training data. The ONLY NDE stories you may include are the verbatim experiencer quotes provided to you.
+- You may cite researchers and their FINDINGS/STATISTICS. Do NOT retell what specific experiencers said unless that quote was provided.
+
+OUTPUT FORMAT (JSON only, no markdown wrapper):
+{
+  "title": "exact H1 guide title",
+  "slug": "nde-topic-guide (4-7 words)",
+  "subtitle": "one-sentence editorial angle",
+  "lead_paragraph": "first paragraph — 3-5 sentences, compelling topic overview",
+  "body_mdx": "full article in MDX (use ## for H2, ### for H3, > for block quotes, **bold**, [text](url) for inline refs)",
+  "read_time_mins": <integer>,
+  "word_count": <integer>,
+  "tags": ["tag1", "tag2", "tag3", "tag4"],
+  "seo_title": "SEO title (60 chars max)",
+  "seo_description": "meta description (150 chars max)",
+  "references": [{"text": "Author, Year. Title. Publication.", "url": "https://..."}],
+  "faq_data": [{"question": "What is...?", "answer": "2-4 sentence answer"}]
+}`;
+}
+
+// ─── Guide Draft User Prompt ──────────────────────────────────────────────────
+
+export function buildGuideDraftUserPrompt(params: {
+    pillarTitle: string;
+    targetQuery: string;
+    research: string;
+    topChunks: Array<{ content: string; videoId: string; title: string; channelName: string; startTime?: number }>;
+    authorName: string;
+    relatedQuestionSlugs: Array<{ slug: string; question: string }>;
+    existingGuideSlugs: Array<{ slug: string; title: string }>;
+    videoReferences?: Array<{ videoId: string; title: string; url: string; channelName?: string }>;
+}): string {
+    const chunks = params.topChunks
+        .slice(0, 6)
+        .map((c, i) => {
+            const timeParam = c.startTime ? `?t=${Math.floor(c.startTime)}` : '';
+            const sourceLink = `/video/${c.videoId}${timeParam}`;
+            const fromLabel = c.title ? ` — from "${c.title}"${c.channelName ? ` on ${c.channelName}` : ''}` : '';
+            return `[Experiencer ${i + 1}${fromLabel}]: "${c.content}"\n  Source link: ${sourceLink}`;
+        })
+        .join('\n\n');
+
+    const relatedQuestionsSection = params.relatedQuestionSlugs.length > 0
+        ? `\nRELATED QUESTION PAGES — link to 3-5 of these naturally throughout the guide:
+${params.relatedQuestionSlugs.map((q) => `- "${q.question}" → /questions/${q.slug}`).join('\n')}`
+        : '';
+
+    const existingGuidesSection = params.existingGuideSlugs.length > 0
+        ? `\nOTHER GUIDE PAGES — link to 1-3 of these where relevant:
+${params.existingGuideSlugs.map((g) => `- "${g.title}" → /blog/${g.slug}`).join('\n')}`
+        : '';
+
+    const videoSection = params.videoReferences && params.videoReferences.length > 0
+        ? `\nPROJECT PROFOUND NDE ACCOUNTS — reference 2-4 of these with links:
+${params.videoReferences.map((v, i) => `[Account ${i + 1}]: "${v.title}" ${v.channelName ? `(from ${v.channelName})` : ''}\n  Link: /video/${v.videoId}`).join('\n')}`
+        : '';
+
+    return `Write a COMPREHENSIVE PILLAR GUIDE for Project Profound.
+
+GUIDE TITLE (use as H1): ${params.pillarTitle}
+PRIMARY SEARCH QUERY: ${params.targetQuery}
+AUTHOR: ${params.authorName}
+
+RESEARCH FROM PERPLEXITY:
+${params.research}
+
+REAL NDE EXPERIENCER QUOTES — use 3-4 of these VERBATIM:
+${chunks}
+${videoSection}
+${relatedQuestionsSection}
+${existingGuidesSection}
+
+STRUCTURAL REQUIREMENTS:
+- This is a PILLAR GUIDE, not a blog post. It must be comprehensive (3,000-5,000 words).
+- 6-8 H2 sections covering different angles of the topic.
+- End with a FAQ section (5-8 Q&A pairs as ### headings).
+- Include internal links to related /questions/ pages and other /blog/ guides.
+- Every claim needs a source. Weave citations into prose naturally.
+
+VOICE REMINDERS:
+- Use contractions. Get heated about weak arguments. Show genuine reactions.
+- No em dashes. No banned words. No formulaic structures.
+- Include one genuine digression. Break the essay arc.
+- End bluntly — no inspirational wrap-ups.
+- Do NOT start body_mdx with # H1 heading. Start directly with prose.
+
+Write the full guide now. Return valid JSON only.`;
+}

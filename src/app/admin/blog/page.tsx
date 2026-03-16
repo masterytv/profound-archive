@@ -3,7 +3,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { FileText, CheckCircle2, Clock3, Settings2, Eye, EyeOff, Pencil } from "lucide-react";
-import { BlogGeneratePanel } from "@/components/admin/blog-generate-panel";
+import { BlogGeneratePanel, GuideGeneratePanel } from "@/components/admin/blog-generate-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-    "cluster":       "Deep Dive",
+    "guide":         "Guide",
     "big-question":  "Big Question",
     "story":         "Story",
     "experiencer":   "Experiencer",
@@ -20,7 +20,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-    "cluster":       "bg-blue-50 text-blue-600 border-blue-200",
+    "guide":         "bg-blue-50 text-blue-600 border-blue-200",
     "big-question":  "bg-violet-50 text-violet-600 border-violet-200",
     "story":         "bg-amber-50 text-amber-600 border-amber-200",
     "experiencer":   "bg-rose-50 text-rose-600 border-rose-200",
@@ -115,6 +115,9 @@ export default async function AdminBlogPage() {
             {questions && questions.length > 0 && (
                 <BlogGeneratePanel questions={questions} />
             )}
+
+            {/* Guide (pillar page) generation panel */}
+            <GuideGeneratePanel />
 
             {/* Error state */}
             {error && (

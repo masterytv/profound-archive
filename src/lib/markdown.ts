@@ -85,9 +85,16 @@ export function markdownToHtml(md: string): string {
     html = html.replace(/`([^`]+)`/g, '<code class="bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-slate-800 dark:text-slate-200">$1</code>');
 
     // Links [text](url) — MUST come before bold/italic to protect underscores in URLs
+    // Internal links (starting with /) stay in same tab; external links open in new tab
     html = html.replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>'
+        (_match, text, url) => {
+            const isInternal = url.startsWith('/');
+            if (isInternal) {
+                return `<a href="${url}" class="text-blue-600 dark:text-blue-400 hover:underline">${text}</a>`;
+            }
+            return `<a href="${url}" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        }
     );
 
     // Bold + italic combined ***

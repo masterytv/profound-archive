@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
+import { generateHyde, slugToQuestion } from '@/lib/questions/question-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +56,44 @@ interface FilteredChunk {
  */
 const MIN_SIMILARITY_CURATED = 0.50;
 const MIN_SIMILARITY_USER    = 0.50;
+
+// ─── Auto-generation rate limiter ─────────────────────────────────────────────
+// Tracks auto-generated questions in a rolling 1-hour window.
+// When the limit is hit, returns 429 and logs a warning for admins.
+const AUTO_GEN_LIMIT = 10; // max per hour
+const autoGenTimestamps: number[] = [];
+
+/** Check and record an auto-generation event. Returns true if allowed. */
+function checkAutoGenRateLimit(): boolean {
+    const now = Date.now();
+    const oneHourAgo = now - 3600_000;
+    // Prune expired entries
+    while (autoGenTimestamps.length > 0 && autoGenTimestamps[0] < oneHourAgo) {
+        autoGenTimestamps.shift();
+    }
+    if (autoGenTimestamps.length >= AUTO_GEN_LIMIT) {
+        return false;
+    }
+    autoGenTimestamps.push(now);
+    return true;
+}
+
+/** Log rate limit event so admins are notified (Vercel logs + DB row for admin dashboard) */
+async function notifyAdminsRateLimit(slug: string) {
+    console.warn(`[Questions API] ⚠️ AUTO-GEN RATE LIMIT HIT — slug="${slug}", ${autoGenTimestamps.length} auto-gens in the last hour`);
+    try {
+        await supabase.from('rate_limit_events').insert({
+            endpoint: '/api/questions/[slug]',
+            slug,
+            event_type: 'auto_gen_question',
+            count_in_window: autoGenTimestamps.length,
+            window_hours: 1,
+        });
+    } catch (err) {
+        // Non-fatal — table may not exist yet, log to console instead
+        console.error('[Questions API] Failed to log rate limit event to DB:', err);
+    }
+}
 
 // ─── Deduplication helpers ────────────────────────────────────────────────────
 
@@ -144,16 +183,69 @@ export async function GET(
                 .eq('slug', slug)
                 .maybeSingle();
 
-            if (!userQ) {
-                return NextResponse.json({ error: 'Question not found' }, { status: 404 });
+            if (userQ) {
+                // Soft-deleted / hidden by admin
+                if (userQ.is_active === false) {
+                    return NextResponse.json({ error: 'Question not available' }, { status: 404 });
+                }
+                question       = userQ.question;
+                ai_query       = userQ.ai_query;
+                userQuestionId = userQ.id;
+            } else {
+                // ── Auto-generate: slug not found anywhere → create it ────────────
+                // Convert slug to question text, generate HyDE, persist to user_questions.
+                // This makes internal links from blog posts "self-healing" — any
+                // /questions/some-slug URL will auto-generate an answer on first visit.
+
+                // Rate limit check — prevent abuse
+                if (!checkAutoGenRateLimit()) {
+                    await notifyAdminsRateLimit(slug);
+                    return NextResponse.json(
+                        { error: 'Too many questions generated recently. Please try again later.' },
+                        { status: 429 }
+                    );
+                }
+
+                const questionText = slugToQuestion(slug);
+                console.log(`[Questions API] Auto-generating question from slug: "${slug}" → "${questionText}"`);
+
+                const generatedHyde = await generateHyde(questionText);
+
+                const { data: inserted, error: insertErr } = await supabase
+                    .from('user_questions')
+                    .insert({ slug, question: questionText, ai_query: generatedHyde })
+                    .select('id, question, ai_query')
+                    .single();
+
+                if (insertErr) {
+                    // Race condition: another request inserted the same slug simultaneously
+                    if (insertErr.code === '23505') {
+                        const { data: retry } = await supabase
+                            .from('user_questions')
+                            .select('id, question, ai_query, is_active')
+                            .eq('slug', slug)
+                            .maybeSingle();
+                        if (retry) {
+                            if (retry.is_active === false) {
+                                return NextResponse.json({ error: 'Question not available' }, { status: 404 });
+                            }
+                            question       = retry.question;
+                            ai_query       = retry.ai_query;
+                            userQuestionId = retry.id;
+                        } else {
+                            return NextResponse.json({ error: 'Question creation failed' }, { status: 500 });
+                        }
+                    } else {
+                        console.error('[Questions API] Auto-gen insert failed:', insertErr.message);
+                        return NextResponse.json({ error: 'Failed to create question' }, { status: 500 });
+                    }
+                } else {
+                    question       = inserted.question;
+                    ai_query       = inserted.ai_query;
+                    userQuestionId = inserted.id;
+                    console.log(`[Questions API] Auto-generated question id=${inserted.id} for slug="${slug}"`);
+                }
             }
-            // Soft-deleted / hidden by admin
-            if (userQ.is_active === false) {
-                return NextResponse.json({ error: 'Question not available' }, { status: 404 });
-            }
-            question       = userQ.question;
-            ai_query       = userQ.ai_query;
-            userQuestionId = userQ.id;
         }
 
         // ── Step 1b: Cache-read — skip Claude if we already have a synthesis ────

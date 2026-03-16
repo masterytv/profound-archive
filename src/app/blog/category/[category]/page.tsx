@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 export const revalidate = 86400;
 
 const CATEGORY_LABELS: Record<string, string> = {
-    "cluster":       "Deep Dives",
+    "guide":         "Guides",
     "big-question":  "Big Questions",
     "story":         "Stories",
     "experiencer":   "Experiencers",
@@ -15,7 +15,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-    "cluster":       "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
+    "guide":         "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
     "big-question":  "bg-violet-50 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
     "story":         "bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
     "experiencer":   "bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
@@ -23,14 +23,14 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
-    "cluster":       "Comprehensive guides that anchor our content on each major NDE topic.",
+    "guide":         "Comprehensive guides that anchor our content on each major NDE topic.",
     "big-question":  "Long-form answers to the questions people ask most about near-death experiences.",
     "story":         "First-person NDE accounts retold with journalistic precision.",
     "experiencer":   "Scored, sourced profiles of the most documented NDE experiencers.",
     "researcher":    "In-depth profiles of the scientists who study near-death experiences.",
 };
 
-const VALID_CATEGORIES = ["cluster", "big-question", "story", "experiencer", "researcher"];
+const VALID_CATEGORIES = ["guide", "big-question", "story", "experiencer", "researcher"];
 
 export async function generateStaticParams() {
     return VALID_CATEGORIES.map((category) => ({ category }));

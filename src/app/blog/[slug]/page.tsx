@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { ArrowLeft, Clock, Calendar, Tag, ExternalLink } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Tag, ExternalLink, BookOpen } from "lucide-react";
 import { markdownToHtml } from "@/lib/markdown";
 
 export const revalidate = 86400; // ISR: revalidate once per day
@@ -37,6 +37,8 @@ type BlogPost = {
     related_question_slugs: string[] | null;
     related_video_ids: string[] | null;
     hero_image_url: string | null;
+    source_question_slug: string | null;
+    faq_data: Array<{ question: string; answer: string }> | null;
 };
 
 async function getPost(slug: string): Promise<BlogPost | null> {
@@ -118,7 +120,7 @@ export async function generateMetadata({
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-    "cluster":       "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
+    "guide":         "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
     "big-question":  "bg-violet-50 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
     "story":         "bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
     "experiencer":   "bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
@@ -174,6 +176,27 @@ export default async function BlogPostPage({
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
+
+            {/* FAQPage JSON-LD for guide posts with FAQ data */}
+            {post.faq_data && post.faq_data.length > 0 && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": post.faq_data.map((faq) => ({
+                                "@type": "Question",
+                                "name": faq.question,
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": faq.answer,
+                                },
+                            })),
+                        }),
+                    }}
+                />
+            )}
 
             {/* Draft banner — only shown when not published */}
             {post.status !== "published" && (
@@ -245,6 +268,17 @@ export default async function BlogPostPage({
                             <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed font-medium border-l-4 border-blue-500/40 pl-5 bg-blue-50/30 dark:bg-blue-500/10 py-3 rounded-r-lg">
                                 {post.lead_paragraph}
                             </p>
+                        )}
+
+                        {/* Cross-link: link to shorter question summary */}
+                        {post.source_question_slug && (
+                            <Link
+                                href={`/questions/${post.source_question_slug}`}
+                                className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mt-2"
+                            >
+                                <BookOpen className="w-3.5 h-3.5" />
+                                See a short answer and related videos →
+                            </Link>
                         )}
                     </header>
 

@@ -1300,3 +1300,39 @@ export async function generateStaticParams() {
 
 **Rule:** When adding any new secret, always update `apphosting.yaml`. Pin to a specific version number (`/versions/1`). If you rotate a secret, create a new version in Secrets Manager AND update the version number in `apphosting.yaml`.
 
+## 26. Question Auto-Generation for Missing Slugs — 2026-03-15
+
+**The Problem:** When the guide pipeline generates articles with internal links to `/questions/[slug]`, the target question might not exist in the database. Visiting the URL returned "Question not found" — a bad user experience.
+
+**The Fix:** The `[slug]/route.ts` API now auto-generates answers for unknown question slugs:
+1. Converts slug to question text (`what-do-children-experience-during-ndes` → `what do children experience during ndes`)
+2. Generates a HyDE passage via OpenAI
+3. Synthesizes an answer via the existing pipeline (same as manual questions)
+4. Persists the question in `user_questions` and `question_synthesis` so it's permanent
+
+**Rate Limiting:** 10 auto-generated questions per hour. Rate limit events logged to `rate_limit_events` table for admin visibility. The page shows a polite "check back later" message on 429.
+
+**Key Files:**
+- `src/app/api/questions/[slug]/route.ts` — auto-generation logic + rate limiter
+- `src/app/questions/[slug]/page.tsx` — 90s fetch timeout + rate limit UI
+- `src/lib/questions/question-utils.ts` — shared `generateHyde`, `toSlug`, `slugToQuestion`
+
+**Rule:** When creating internal `/questions/` links in articles, the auto-generation system will handle creating the answers. But the fetch timeout is 90s — generation takes ~60s, so the first visit may feel slow.
+
+## 27. Blog Pipeline Link Validation — 2026-03-15
+
+**The Problem:** LLMs (Claude, Perplexity) generate URLs from training data. These URLs may have been valid when training data was crawled but are now broken (e.g., NDERF.org redesigned their site, Amazon delisted books with old ASINs). Worse, some sites return HTTP 200 with an error page instead of a proper 404 ("soft-404s").
+
+**Three categories of broken links:**
+1. **Standard 404s** — NDERF.org old URLs (`/Features/*.htm`)
+2. **Soft-404s** — Amazon returns 200 with "Sorry, we couldn't find that page" for invalid ASINs
+3. **Bot-blocked 403/405/406** — PMC, PubMed, and academic journals block automated requests but the URLs are valid
+
+**The Fix (Pipeline Stage 4.5):**
+1. **Trusted domain whitelist** — Academic sites (PMC, PubMed, DOI, Frontiers, etc.) are auto-skipped since they block bots but are always valid
+2. **Soft-404 body inspection** — For Amazon/NDERF, the checker does a GET request and scans the HTML body for known error indicators
+3. **Perplexity replacement search** — Broken links are sent to Perplexity with detailed context (book title, author, link text) to find working replacements
+4. **Replacement verification** — Every replacement URL suggested by Perplexity is re-checked before being applied (Perplexity can also hallucinate broken ASINs)
+5. **Unfixable link stripping** — If no valid replacement is found, the `[text](broken-url)` is converted to plain `text` — no dead links in the final article
+
+**Rule:** When adding new external link sources to articles, add their domain to either `TRUSTED_DOMAINS` (if they block bots) or `SOFT_404_PATTERNS` (if they return 200 for error pages) in the pipeline's Stage 4.5.

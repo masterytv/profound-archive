@@ -17,11 +17,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
-import { researchQuestion, type ResearchResult } from './blog-research';
+import { researchQuestion, researchGuideTopic, type ResearchResult } from './blog-research';
 import { generateHeroImage } from './blog-image';
 import {
     buildDraftSystemPrompt,
     buildDraftUserPrompt,
+    buildGuideDraftSystemPrompt,
+    buildGuideDraftUserPrompt,
     buildVoicePassSystemPrompt,
     SEO_REFRESH_PROMPT,
 } from './blog-prompts';
@@ -205,7 +207,7 @@ async function assembleContext(questionSlug: string): Promise<ArticleContext> {
         videoCount: count ?? 5000,
         topChunks,
         videoReferences,
-        authorName: 'Tom Wood', // default — can be made configurable later
+        authorName: await getNextAuthor(),
     };
 }
 
@@ -502,6 +504,375 @@ export async function generateBlogArticle(
             status: 'complete',
             articleId: id,
             articleSlug: slug,
+            wordCount: draft!.word_count,
+        };
+    } catch (err) {
+        finishStep(s5, 'failed', String(err), t5, onStep);
+        return { ...result, status: 'failed', error: String(err) };
+    }
+}
+
+// ─── Author Rotation ──────────────────────────────────────────────────────────
+
+const AUTHOR_ROTATION = ['Tom Wood', 'Dr. Micul Love', 'Pamela Harris'];
+
+async function getNextAuthor(): Promise<string> {
+    try {
+        const supabase = getSupabaseAdmin();
+        const { data } = await supabase
+            .from('blog_posts')
+            .select('author_name')
+            .order('id', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (!data?.author_name) return AUTHOR_ROTATION[0];
+        const lastIdx = AUTHOR_ROTATION.indexOf(data.author_name);
+        return AUTHOR_ROTATION[(lastIdx + 1) % AUTHOR_ROTATION.length];
+    } catch {
+        return AUTHOR_ROTATION[0];
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GUIDE (PILLAR PAGE) ORCHESTRATOR
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface GuideContext {
+    pillarTitle: string;
+    targetQuery: string;
+    authorName: string;
+    videoCount: number;
+    topChunks: ArticleContext['topChunks'];
+    videoReferences: ArticleContext['videoReferences'];
+    relatedQuestionSlugs: Array<{ slug: string; question: string }>;
+    existingGuideSlugs: Array<{ slug: string; title: string }>;
+}
+
+async function assembleGuideContext(
+    pillarTitle: string,
+    targetQuery: string,
+    authorName: string,
+): Promise<GuideContext> {
+    const supabase = getSupabaseAdmin();
+
+    // Fetch top NDE transcript chunks using a broader query
+    let topChunks: GuideContext['topChunks'] = [];
+    let videoReferences: GuideContext['videoReferences'] = [];
+    try {
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+        const embRes = await openai.embeddings.create({
+            model: 'text-embedding-3-small',
+            input: targetQuery,
+        });
+        const embedding = embRes.data[0].embedding;
+
+        const { data: chunks } = await supabase.rpc('search_punctuated_embeddings_filtered', {
+            query_embedding: embedding,
+            similarity_threshold: 0.45, // slightly lower threshold for broader coverage
+            page_limit: 12,
+            page_offset: 0,
+            sort_column: 'similarity',
+            sort_direction: 'DESC',
+            filter_greyson_min: 0,
+            filter_transformation_min: 0,
+            filter_veridical_min: 0,
+        });
+
+        const rawChunks = (chunks ?? []) as Array<{ content: string; video_id: string; title: string; url: string; channelName: string; start_time: number | null }>;
+
+        topChunks = rawChunks.slice(0, 6).map((c) => ({
+            content: c.content,
+            videoId: c.video_id,
+            title: c.title ?? '',
+            channelName: c.channelName ?? '',
+            startTime: c.start_time ?? undefined,
+        }));
+
+        const seenVideoIds = new Set<string>();
+        for (const chunk of rawChunks) {
+            if (chunk.video_id && !seenVideoIds.has(chunk.video_id)) {
+                seenVideoIds.add(chunk.video_id);
+                videoReferences.push({
+                    videoId: chunk.video_id,
+                    title: chunk.title ?? '',
+                    url: chunk.url ?? '',
+                    channelName: chunk.channelName ?? '',
+                });
+                if (videoReferences.length >= 4) break;
+            }
+        }
+    } catch {
+        console.warn('[guide-article] Could not fetch NDE chunks — continuing without quotes');
+    }
+
+    // Find related question slugs for internal cross-linking
+    let relatedQuestionSlugs: GuideContext['relatedQuestionSlugs'] = [];
+    try {
+        // Simple keyword match: search for questions that contain key words from the title
+        const keywords = pillarTitle.toLowerCase()
+            .replace(/[^a-z\s]/g, '')
+            .split(/\s+/)
+            .filter((w) => w.length > 3 && !['what', 'when', 'where', 'that', 'were', 'have', 'been', 'does', 'near', 'death', 'experience', 'experiences'].includes(w));
+
+        if (keywords.length > 0) {
+            // Use ilike with OR for each keyword
+            const { data: questions } = await supabase
+                .from('nde_questions')
+                .select('slug, consumer_question')
+                .eq('is_active', true)
+                .or(keywords.slice(0, 3).map((k) => `consumer_question.ilike.%${k}%`).join(','))
+                .limit(8);
+
+            relatedQuestionSlugs = (questions ?? []).map((q) => ({
+                slug: q.slug,
+                question: q.consumer_question,
+            }));
+        }
+    } catch {
+        console.warn('[guide-article] Could not fetch related questions');
+    }
+
+    // Find existing guide slugs for inter-pillar linking
+    let existingGuideSlugs: GuideContext['existingGuideSlugs'] = [];
+    try {
+        const { data: guides } = await supabase
+            .from('blog_posts')
+            .select('slug, title')
+            .eq('category', 'guide')
+            .eq('status', 'published');
+
+        existingGuideSlugs = (guides ?? []).map((g) => ({
+            slug: g.slug,
+            title: g.title,
+        }));
+    } catch {
+        // Non-fatal
+    }
+
+    const { count } = await supabase
+        .from('nde_vids')
+        .select('id', { count: 'exact', head: true })
+        .eq('intake_status', 'complete');
+
+    return {
+        pillarTitle,
+        targetQuery,
+        authorName,
+        videoCount: count ?? 5000,
+        topChunks,
+        videoReferences,
+        relatedQuestionSlugs,
+        existingGuideSlugs,
+    };
+}
+
+async function draftGuide(
+    context: GuideContext,
+    research: ResearchResult,
+): Promise<ArticleDraft & { faq_data?: Array<{ question: string; answer: string }> }> {
+    const openRouter = getOpenRouter();
+
+    const researchText = [
+        research.rawText,
+        research.citations.length > 0
+            ? '\n\nSOURCES:\n' + research.citations.map((c, i) => `[${i + 1}] ${c.title} — ${c.url}`).join('\n')
+            : '',
+    ].join('');
+
+    const response = await openRouter.chat.completions.create({
+        model: 'anthropic/claude-sonnet-4-5',
+        messages: [
+            { role: 'system', content: buildGuideDraftSystemPrompt() },
+            {
+                role: 'user',
+                content: buildGuideDraftUserPrompt({
+                    pillarTitle: context.pillarTitle,
+                    targetQuery: context.targetQuery,
+                    research: researchText,
+                    topChunks: context.topChunks,
+                    authorName: context.authorName,
+                    relatedQuestionSlugs: context.relatedQuestionSlugs,
+                    existingGuideSlugs: context.existingGuideSlugs,
+                    videoReferences: context.videoReferences,
+                }),
+            },
+            { role: 'assistant', content: '{' },
+        ],
+        max_tokens: 24000, // guides are longer than big-question articles
+        temperature: 0.7,
+    });
+
+    const rawContent = '{' + (response.choices[0]?.message?.content ?? '{}');
+    const cleaned = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    let draft: ArticleDraft & { faq_data?: Array<{ question: string; answer: string }> };
+    try {
+        draft = JSON.parse(cleaned);
+    } catch {
+        throw new Error(`Claude returned invalid JSON for guide: ${cleaned.slice(0, 200)}`);
+    }
+
+    if (!draft.title || !draft.slug || !draft.body_mdx) {
+        throw new Error('Guide draft missing required fields (title, slug, body_mdx)');
+    }
+
+    return draft;
+}
+
+/**
+ * Generate a comprehensive guide (pillar page) article.
+ *
+ * @param pillarTitle - The H1 title for the guide
+ * @param targetQuery - The primary search query this guide targets
+ * @param authorName  - Author to attribute the guide to
+ * @param onStep      - optional real-time progress callback
+ */
+export async function generateGuideArticle(
+    pillarTitle: string,
+    targetQuery: string,
+    authorName: string,
+    onStep?: (step: ArticleStep) => void
+): Promise<BlogArticleResult> {
+    const steps: ArticleStep[] = [
+        makeStep('Context assembly'),
+        makeStep('Perplexity research'),
+        makeStep('Claude guide draft'),
+        makeStep('Hero image'),
+        makeStep('Voice calibration pass'),
+        makeStep('Publish'),
+    ];
+    const result: BlogArticleResult = { status: 'assembling', questionSlug: pillarTitle, steps };
+
+    const supabase = getSupabaseAdmin();
+
+    // ── Idempotency: check if a guide with this title already exists ──────────
+    const tentativeSlug = pillarTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const { data: existing } = await supabase
+        .from('blog_posts')
+        .select('id, slug')
+        .eq('category', 'guide')
+        .ilike('title', pillarTitle)
+        .maybeSingle();
+
+    if (existing) {
+        return {
+            ...result,
+            status: 'already_exists',
+            articleId: existing.id,
+            articleSlug: existing.slug,
+            steps: steps.map((s) => ({ ...s, status: 'skipped', message: 'Already generated' })),
+        };
+    }
+
+    let context: GuideContext;
+    let research: ResearchResult;
+    let draft: ArticleDraft & { faq_data?: Array<{ question: string; answer: string }> };
+    let heroImageUrl: string | undefined;
+    let heroImagePrompt: string | undefined;
+
+    // ── Step 1: Context Assembly ──────────────────────────────────────────────
+    const s1 = steps[0];
+    startStep(s1, onStep);
+    const t1 = Date.now();
+    try {
+        context = await assembleGuideContext(pillarTitle, targetQuery, authorName);
+        finishStep(s1, 'success', `${context.topChunks.length} NDE quotes · ${context.relatedQuestionSlugs.length} related questions`, t1, onStep);
+    } catch (err) {
+        finishStep(s1, 'failed', String(err), t1, onStep);
+        return { ...result, status: 'failed', error: String(err) };
+    }
+
+    // ── Step 2: Research ──────────────────────────────────────────────────────
+    const s2 = steps[1];
+    startStep(s2, onStep);
+    const t2 = Date.now();
+    result.status = 'researching';
+    try {
+        research = await researchGuideTopic(pillarTitle, targetQuery);
+        finishStep(s2, 'success', `${research.citations.length} citations · ${research.keyFindings.length} key findings`, t2, onStep);
+    } catch (err) {
+        finishStep(s2, 'failed', String(err), t2, onStep);
+        return { ...result, status: 'failed', error: String(err) };
+    }
+
+    // ── Step 3: Guide Draft ───────────────────────────────────────────────────
+    const s3 = steps[2];
+    startStep(s3, onStep);
+    const t3 = Date.now();
+    result.status = 'drafting';
+    try {
+        draft = await draftGuide(context!, research!);
+        finishStep(s3, 'success', `${draft.word_count} words · slug: ${draft.slug}`, t3, onStep);
+    } catch (err) {
+        finishStep(s3, 'failed', String(err), t3, onStep);
+        return { ...result, status: 'failed', error: String(err) };
+    }
+
+    // ── Step 3b: Hero image (non-fatal) ──────────────────────────────────────
+    const s3b = steps[3];
+    startStep(s3b, onStep);
+    const t3b = Date.now();
+    result.status = 'imaging';
+    try {
+        const img = await generateHeroImage(draft!.title, draft!.slug, 'guide', draft!.tags ?? []);
+        heroImageUrl = img.url;
+        heroImagePrompt = img.prompt;
+        finishStep(s3b, 'success', `Generated · ${img.width}x${img.height}`, t3b, onStep);
+    } catch (err) {
+        finishStep(s3b, 'failed', `Image skipped: ${String(err)}`, t3b, onStep);
+    }
+
+    // ── Step 4: Voice Pass ────────────────────────────────────────────────────
+    const s4 = steps[4];
+    startStep(s4, onStep);
+    const t4 = Date.now();
+    result.status = 'polishing';
+    try {
+        draft = { ...await voicePass(draft!), faq_data: draft!.faq_data };
+        finishStep(s4, 'success', `Revised to ${draft.word_count} words`, t4, onStep);
+    } catch (err) {
+        finishStep(s4, 'failed', `Voice pass failed (using raw draft): ${String(err)}`, t4, onStep);
+    }
+
+    // ── Step 5: Publish as draft ──────────────────────────────────────────────
+    const s5 = steps[5];
+    startStep(s5, onStep);
+    const t5 = Date.now();
+    result.status = 'publishing';
+    try {
+        const { data, error } = await supabase
+            .from('blog_posts')
+            .insert({
+                slug: draft!.slug,
+                title: draft!.title,
+                subtitle: draft!.subtitle,
+                category: 'guide',
+                author_name: authorName,
+                status: 'draft', // guides always start as drafts for human review
+                lead_paragraph: draft!.lead_paragraph,
+                body_mdx: draft!.body_mdx,
+                read_time_mins: draft!.read_time_mins,
+                word_count: draft!.word_count,
+                tags: draft!.tags,
+                seo_title: draft!.seo_title,
+                seo_description: draft!.seo_description,
+                faq_data: draft!.faq_data ?? null,
+                hero_image_url: heroImageUrl ?? null,
+                hero_image_prompt: heroImagePrompt ?? null,
+            })
+            .select('id, slug')
+            .single();
+
+        if (error) throw new Error(`Failed to insert guide: ${error.message}`);
+        if (!data) throw new Error('Insert returned no data');
+
+        finishStep(s5, 'success', `Saved as draft. ID: ${data.id}`, t5, onStep);
+        return {
+            ...result,
+            status: 'complete',
+            articleId: data.id,
+            articleSlug: data.slug,
             wordCount: draft!.word_count,
         };
     } catch (err) {

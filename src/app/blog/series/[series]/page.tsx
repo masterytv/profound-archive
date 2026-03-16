@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 export const revalidate = 86400;
 
 const CATEGORY_COLORS: Record<string, string> = {
-    "cluster":       "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
+    "guide":         "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
     "big-question":  "bg-violet-50 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
     "story":         "bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
     "experiencer":   "bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
@@ -16,7 +16,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-    "cluster":       "Deep Dive",
+    "guide":         "Guide",
     "big-question":  "Big Question",
     "story":         "Story",
     "experiencer":   "Experiencer",

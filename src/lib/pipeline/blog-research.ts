@@ -117,3 +117,73 @@ export async function researchQuestion(question: string, consumerQuestion?: stri
         rawText,
     };
 }
+
+// ─── Guide Variant (broader coverage for pillar pages) ────────────────────────
+
+import { buildGuideResearchPrompt } from './blog-prompts';
+
+/**
+ * Research a topic comprehensively for a pillar guide page.
+ * Uses a broader prompt and higher max_tokens than single-question research.
+ */
+export async function researchGuideTopic(title: string, targetQuery: string): Promise<ResearchResult> {
+    const apiKey = getPerplexityClient();
+
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            model: 'sonar-pro',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are a comprehensive research assistant for a pillar guide about near-death experiences. This guide must be the most authoritative page on the internet for this topic. Gather data from scientific research, books, popular sources, and cultural perspectives. Be precise about sources and citations.',
+                },
+                {
+                    role: 'user',
+                    content: buildGuideResearchPrompt(title, targetQuery),
+                },
+            ],
+            search_domain_filter: RESEARCH_DOMAINS,
+            return_citations: true,
+            search_recency_filter: 'month',
+            temperature: 0.2,
+            max_tokens: 3000, // higher than big-question (2048) for comprehensive coverage
+        }),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Perplexity API error ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json() as {
+        choices: Array<{ message: { content: string } }>;
+        citations?: Array<{ url: string; title?: string; snippet?: string }>;
+    };
+
+    const rawText = data.choices[0]?.message?.content ?? '';
+
+    const citations: ResearchCitation[] = (data.citations ?? []).map((c) => ({
+        url: c.url ?? '',
+        title: c.title ?? c.url ?? '',
+        snippet: c.snippet ?? '',
+    }));
+
+    const keyFindings = rawText
+        .split('\n')
+        .filter((line) => line.trim().startsWith('-') || line.trim().startsWith('•'))
+        .map((line) => line.replace(/^[-•]\s*/, '').trim())
+        .filter(Boolean)
+        .slice(0, 15); // more findings for guides
+
+    return {
+        summary: rawText,
+        keyFindings,
+        citations,
+        rawText,
+    };
+}
