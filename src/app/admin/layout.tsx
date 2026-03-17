@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List, ListVideo, Mail, BarChart3, TrendingUp } from "lucide-react";
+import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List, ListVideo, Mail, BarChart3, TrendingUp, FileText, UserCheck } from "lucide-react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -70,7 +70,8 @@ export default async function AdminLayout({
                     </div>
 
                     {/* Nav Items */}
-                    <nav className="space-y-1 flex-1">
+                    <nav className="flex-1 space-y-0.5">
+                        {/* Overview — always first, ungrouped */}
                         <Link
                             href="/admin"
                             className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
@@ -78,13 +79,39 @@ export default async function AdminLayout({
                             <LayoutDashboard className="w-4 h-4" />
                             Overview
                         </Link>
+
+                        {/* ── CONTENT ── */}
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 px-3 pt-5 pb-1.5">
+                            Content
+                        </p>
                         <Link
-                            href="/admin/users"
+                            href="/admin/blog"
                             className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
-                            <Users className="w-4 h-4" />
-                            Users
+                            <FileText className="w-4 h-4 text-orange-500" />
+                            Blog
                         </Link>
+                        <Link
+                            href="/experiencer"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <UserCheck className="w-4 h-4 text-violet-500" />
+                            Experiencers
+                        </Link>
+                        {profile?.role === "super_admin" && (
+                            <Link
+                                href="/admin/chatbot"
+                                className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                            >
+                                <MessageSquare className="w-4 h-4 text-indigo-500" />
+                                Chatbot Editor
+                            </Link>
+                        )}
+
+                        {/* ── VIDEO PIPELINE ── */}
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 px-3 pt-5 pb-1.5">
+                            Video Pipeline
+                        </p>
                         <Link
                             href="/admin/intake"
                             className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
@@ -101,17 +128,27 @@ export default async function AdminLayout({
                         </Link>
                         <Link
                             href="/admin/scanner/queue"
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                            className="flex items-center gap-3 pl-9 pr-3 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
-                            <List className="w-4 h-4" />
                             Queue Inspector
                         </Link>
                         <Link
                             href="/admin/scanner/pending"
+                            className="flex items-center gap-3 pl-9 pr-3 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            Pending Queue
+                        </Link>
+
+                        {/* ── ENGAGEMENT ── */}
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 px-3 pt-5 pb-1.5">
+                            Engagement
+                        </p>
+                        <Link
+                            href="/admin/users"
                             className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
-                            <ListVideo className="w-4 h-4" />
-                            Pending Queue
+                            <Users className="w-4 h-4" />
+                            Users
                         </Link>
                         <Link
                             href="/admin/email"
@@ -126,7 +163,6 @@ export default async function AdminLayout({
                         >
                             Email Templates
                         </Link>
-
                         <Link
                             href="/admin/ces"
                             className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
@@ -135,6 +171,10 @@ export default async function AdminLayout({
                             CES Feedback
                         </Link>
 
+                        {/* ── INSIGHTS ── */}
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 px-3 pt-5 pb-1.5">
+                            Insights
+                        </p>
                         <Link
                             href="/admin/analytics"
                             className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
@@ -142,16 +182,6 @@ export default async function AdminLayout({
                             <TrendingUp className="w-4 h-4 text-emerald-500" />
                             Analytics
                         </Link>
-
-                        {profile?.role === "super_admin" && (
-                            <Link
-                                href="/admin/chatbot"
-                                className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
-                            >
-                                <MessageSquare className="w-4 h-4 text-indigo-500" />
-                                Chatbot Editor
-                            </Link>
-                        )}
                     </nav>
 
                     {/* Exit Link */}

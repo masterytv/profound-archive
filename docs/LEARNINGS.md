@@ -1319,20 +1319,38 @@ export async function generateStaticParams() {
 
 **Rule:** When creating internal `/questions/` links in articles, the auto-generation system will handle creating the answers. But the fetch timeout is 90s — generation takes ~60s, so the first visit may feel slow.
 
-## 27. Blog Pipeline Link Validation — 2026-03-15
+## 27. Blog Pipeline Link Validation (v2) — 2026-03-17
 
-**The Problem:** LLMs (Claude, Perplexity) generate URLs from training data. These URLs may have been valid when training data was crawled but are now broken (e.g., NDERF.org redesigned their site, Amazon delisted books with old ASINs). Worse, some sites return HTTP 200 with an error page instead of a proper 404 ("soft-404s").
+**The Problem:** LLMs generate URLs from training data that may be broken, soft-404s, or entirely wrong citations (hallucinated PMIDs pointing to unrelated papers).
 
-**Three categories of broken links:**
-1. **Standard 404s** — NDERF.org old URLs (`/Features/*.htm`)
-2. **Soft-404s** — Amazon returns 200 with "Sorry, we couldn't find that page" for invalid ASINs
-3. **Bot-blocked 403/405/406** — PMC, PubMed, and academic journals block automated requests but the URLs are valid
+**Four categories of link failures:**
+1. **Standard 404s** — NDERF.org old URLs, delisted pages
+2. **Soft-404s** — Amazon returns 200 with "Sorry" page for invalid ASINs
+3. **Bot-blocked 403/405/406** — Academic journals block bots but URLs are valid
+4. **Hallucinated citations** — URL works but points to wrong paper (e.g., PMID for staph paper linked to NDE claim)
 
-**The Fix (Pipeline Stage 4.5):**
-1. **Trusted domain whitelist** — Academic sites (PMC, PubMed, DOI, Frontiers, etc.) are auto-skipped since they block bots but are always valid
-2. **Soft-404 body inspection** — For Amazon/NDERF, the checker does a GET request and scans the HTML body for known error indicators
-3. **Perplexity replacement search** — Broken links are sent to Perplexity with detailed context (book title, author, link text) to find working replacements
-4. **Replacement verification** — Every replacement URL suggested by Perplexity is re-checked before being applied (Perplexity can also hallucinate broken ASINs)
-5. **Unfixable link stripping** — If no valid replacement is found, the `[text](broken-url)` is converted to plain `text` — no dead links in the final article
+**The Fix (Pipeline Stage 4.5 — 3-Part Validation):**
 
-**Rule:** When adding new external link sources to articles, add their domain to either `TRUSTED_DOMAINS` (if they block bots) or `SOFT_404_PATTERNS` (if they return 200 for error pages) in the pipeline's Stage 4.5.
+**Step 1: Health Check** — Trusted domain whitelist (academic sites skip), soft-404 body inspection (Amazon/NDERF), HEAD → fallback GET.
+
+**Step 2: Relevance Check** — PubMed/PMC links verified via NCBI E-utilities API (free, no key). Other links get HTML `<title>` extracted. GPT-4o-mini scores relevance of page content vs. claim text. Irrelevant links flow to Step 3.
+
+**Step 3: Fix/Strip** — Perplexity searches for correct resource (distinguishes BROKEN vs IRRELEVANT). Replacements re-verified. Unfixable links stripped to plain text.
+
+**Rule:** Add new domains to `TRUSTED_DOMAINS` (bot-blocking) or `SOFT_404_PATTERNS` (fake 200s) as needed.
+
+## 28. Blog Pipeline Book Link Strategy — 2026-03-17
+
+**The Problem:** Amazon ASINs rot. LLMs hallucinate ASINs. Perplexity also suggests broken ASINs from stale training data.
+
+**The Fix:** Books are NEVER hyperlinked. Mentioned by title/author in prose. Full citation in refs with `url: null`, `type: "book"`. Amazon Associates links can be added later via batch script.
+
+**Rules:** Draft prompt has `⛔ BOOKS: Do NOT hyperlink`. Correction prompt has `⛔ Do NOT add links to books or Amazon`. Refs format allows `null` URLs for books.
+
+## 29. Blog Pipeline Content Moderation — 2026-03-17
+
+**The Problem:** Claude 3.5 Haiku via OpenRouter routes through Amazon Bedrock, which flags NDE content as "violence/graphic."
+
+**The Fix:** Switched claim extraction to `openai/gpt-4o-mini` (no Bedrock filter). Requires code fence stripping for JSON output (wraps in `` ```json...``` ``).
+
+**Rule:** Avoid `anthropic/claude-3.5-haiku` via OpenRouter for NDE content. Use `openai/gpt-4o-mini` instead.

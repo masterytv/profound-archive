@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { ArrowLeft, Clock, Calendar, Tag, ExternalLink, BookOpen } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Tag, ExternalLink, BookOpen, Pencil } from "lucide-react";
 import { markdownToHtml } from "@/lib/markdown";
 
 export const revalidate = 86400; // ISR: revalidate once per day
@@ -143,6 +143,23 @@ export default async function BlogPostPage({
     const post = await getPost(slug);
     if (!post) notFound();
 
+    // Check if the current user is an admin (for edit button)
+    let isAdmin = false;
+    try {
+        const sessionClient = await createClient();
+        const { data: { user } } = await sessionClient.auth.getUser();
+        if (user) {
+            const { data: profile } = await sessionClient
+                .from("profiles")
+                .select("role")
+                .eq("id", user.id)
+                .single();
+            isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
+        }
+    } catch {
+        // Not logged in — no edit button
+    }
+
     const date = new Date(post.published_at).toLocaleDateString("en-US", {
         year: "numeric", month: "long", day: "numeric",
     });
@@ -226,6 +243,15 @@ export default async function BlogPostPage({
                         >
                             {post.category.replace("-", " ")}
                         </span>
+                        {isAdmin && (
+                            <Link
+                                href={`/admin/blog/${post.id}/edit`}
+                                className="ml-auto flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/30 border border-blue-200/60 dark:border-blue-500/30 transition-colors"
+                            >
+                                <Pencil className="w-3 h-3" />
+                                Edit
+                            </Link>
+                        )}
                     </div>
                 </div>
 
