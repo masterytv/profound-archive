@@ -52,7 +52,7 @@ Voice Characteristics: The writing should feel like a conversation with a wise, 
 - STATISTICS: Round uncertain numbers. Write "roughly 340" not "344" unless you are certain of the exact published figure.
 - NO PERSONAL CLAIMS: Do not claim to have personally interviewed anyone or visited labs unless the brief says you did.
 - VIDEO REFERENCES: Each experiencer quote has a Source link to its Project Profound video page. Use that link when referencing the quote. Format naturally: [one account on Project Profound](/video/VIDEO_ID?t=123) or [this experiencer describes](/video/VIDEO_ID?t=123). Do not list video references separately — weave them into the prose near each quote.
-- OUTBOUND LINKS: When you mention a book, link the book title to its Amazon page using the format https://www.amazon.com/s?k=BOOK+TITLE+AUTHOR (e.g., [The Self Does Not Die](https://www.amazon.com/s?k=The+Self+Does+Not+Die+Titus+Rivas)). When you mention a published study, link to its PubMed or journal URL if one was provided in the research brief. When you mention organizations like IANDS or NDERF, link to their homepage. These outbound links build authority and help readers verify claims.
+- OUTBOUND LINKS: When you mention a published study, link to its PubMed or journal URL if one was provided in the research brief. When you mention organizations like IANDS or NDERF, link to their homepage. These outbound links build authority and help readers verify claims. ⛔ BOOKS: Do NOT hyperlink book titles to Amazon or any retailer. Reference books by title and author in plain text only (e.g., "Raymond Moody's 1975 book Life After Life"). Books should appear in the references array with url: null and type: "book".
 </handling_evidence>
 
 <structure>
@@ -175,7 +175,7 @@ OUTPUT FORMAT (JSON only, no markdown wrapper):
   "tags": ["tag1", "tag2", "tag3"],
   "seo_title": "SEO-optimized title (60 chars max, different from H1 if needed)",
   "seo_description": "meta description (150 chars max, answer + brand)",
-  "references": [{"text": "Author, Year. Title. Publication.", "url": "https://..."}]
+  "references": [{"title": "Author, Year. Title. Publication.", "url": "https://... or null for books", "type": "academic|book|site"}]
 }`;
 }
 
@@ -187,6 +187,7 @@ export function buildDraftUserPrompt(params: {
     topChunks: Array<{ content: string; videoId: string; title: string; channelName: string; startTime?: number }>;
     authorName: string;
     videoReferences?: Array<{ videoId: string; title: string; url: string; experiencerName?: string; channelName?: string }>;
+    relatedQuestionSlugs?: Array<{ slug: string; question: string }>;
 }): string {
     const chunks = params.topChunks
         .slice(0, 5)
@@ -232,6 +233,11 @@ IMPORTANT REMINDERS:
 - Do NOT end paragraphs with short dramatic mic-drop sentences. Integrate conclusions into flowing prose.
 - Do NOT use "Not A, but B" structural pivots. Transition softly as a train of thought.
 - If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
+- Do NOT link book titles to Amazon. Mention books by title and author in prose only.
+${params.relatedQuestionSlugs && params.relatedQuestionSlugs.length > 0 ? `
+INTERNAL LINKS (include 3-5 of these as natural cross-references):
+${params.relatedQuestionSlugs.map(q => `- [${q.question}](/questions/${q.slug})`).join('\n')}
+Weave these internal links naturally into the article. Each should appear as a cross-reference, e.g., "For more on this, see [question text](/questions/slug)."` : ''}
 
 Write the full article now. Return valid JSON only.`;
 }
@@ -381,7 +387,7 @@ OUTPUT FORMAT (JSON only, no markdown wrapper):
   "tags": ["tag1", "tag2", "tag3", "tag4"],
   "seo_title": "SEO title (60 chars max)",
   "seo_description": "meta description (150 chars max)",
-  "references": [{"text": "Author, Year. Title. Publication.", "url": "https://..."}],
+  "references": [{"title": "Author, Year. Title. Publication.", "url": "https://... or null for books", "type": "academic|book|site"}],
   "faq_data": [{"question": "What is...?", "answer": "2-4 sentence answer"}]
 }`;
 }

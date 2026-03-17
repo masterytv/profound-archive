@@ -1354,3 +1354,28 @@ export async function generateStaticParams() {
 **The Fix:** Switched claim extraction to `openai/gpt-4o-mini` (no Bedrock filter). Requires code fence stripping for JSON output (wraps in `` ```json...``` ``).
 
 **Rule:** Avoid `anthropic/claude-3.5-haiku` via OpenRouter for NDE content. Use `openai/gpt-4o-mini` instead.
+
+## 30. 81 Questions Pipeline Verification Upgrade — 2026-03-17
+
+**The Problem:** The "big-question" blog pipeline (81 questions) had no fact-checking, no link validation, no book link safety, and no internal cross-linking. Articles published with potentially hallucinated citations, broken links, and Amazon book links that rot.
+
+**The Fix:** Ported the pillar pipeline's 3-stage verification into `src/lib/pipeline/blog-verify.ts`:
+1. **Fact-check:** GPT-4o-mini extracts claims → Perplexity verifies → Claude corrects (surgical, voice-preserving)
+2. **Link validation:** Health check (trusted domains, soft-404) → Relevance check (NCBI API + GPT-4o-mini) → Fix/strip (Perplexity replacement search)
+3. Non-fatal: articles publish even if verification fails
+
+**Prompt changes in `blog-prompts.ts`:**
+- Book linking: Amazon links → `⛔ Do NOT hyperlink books`
+- References format: `{text, url}` → `{title, url|null, type: academic|book|site}`
+- SEO model: Haiku → GPT-4o-mini (content moderation safety)
+- Added `/questions/` cross-linking via keyword-matched `relatedQuestionSlugs`
+
+**Rule:** Any new article pipeline must include the `verifyArticle()` step from `blog-verify.ts`. Env vars required: `OPENROUTER_API_KEY`, `PERPLEXITY_KEY`.
+
+## 31. Blog Pipeline Refs Storage Bug — 2026-03-17
+
+**The Bug:** `publishDraft()` in `blog-article.ts` generated references via Claude but never inserted `refs` into the `blog_posts` DB row. Both big-question and guide pipelines had this bug.
+
+**The Fix:** Added `refs: draft.references ?? null` to both `.insert()` calls.
+
+**Rule:** Always verify that pipeline output fields actually reach the DB. Check the `publishDraft` / insert call.

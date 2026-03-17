@@ -19,6 +19,7 @@ import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { researchQuestion, researchGuideTopic, type ResearchResult } from './blog-research';
 import { generateHeroImage } from './blog-image';
+import { verifyArticle, type ArticleReference } from './blog-verify';
 import {
     buildDraftSystemPrompt,
     buildDraftUserPrompt,
@@ -121,6 +122,7 @@ interface ArticleContext {
     videoCount: number;
     topChunks: Array<{ content: string; videoId: string; title: string; channelName: string; startTime?: number }>;
     videoReferences: Array<{ videoId: string; title: string; url: string; experiencerName?: string; channelName?: string }>;
+    relatedQuestionSlugs: Array<{ slug: string; question: string }>;
     authorName: string;
 }
 
@@ -199,6 +201,32 @@ async function assembleContext(questionSlug: string): Promise<ArticleContext> {
         .select('id', { count: 'exact', head: true })
         .eq('intake_status', 'complete');
 
+    // Find related question slugs for internal cross-linking
+    let relatedQuestionSlugs: ArticleContext['relatedQuestionSlugs'] = [];
+    try {
+        const keywords = q.consumer_question.toLowerCase()
+            .replace(/[^a-z\s]/g, '')
+            .split(/\s+/)
+            .filter((w: string) => w.length > 3 && !['what', 'when', 'where', 'that', 'were', 'have', 'been', 'does', 'near', 'death', 'experience', 'experiences'].includes(w));
+
+        if (keywords.length > 0) {
+            const { data: questions } = await supabase
+                .from('nde_questions')
+                .select('slug, consumer_question')
+                .eq('is_active', true)
+                .neq('slug', questionSlug) // exclude self
+                .or(keywords.slice(0, 3).map((k: string) => `consumer_question.ilike.%${k}%`).join(','))
+                .limit(5);
+
+            relatedQuestionSlugs = (questions ?? []).map((rq) => ({
+                slug: rq.slug,
+                question: rq.consumer_question,
+            }));
+        }
+    } catch {
+        console.warn('[blog-article] Could not fetch related questions');
+    }
+
     return {
         question: q.consumer_question,
         consumerQuestion: q.consumer_question,
@@ -207,6 +235,7 @@ async function assembleContext(questionSlug: string): Promise<ArticleContext> {
         videoCount: count ?? 5000,
         topChunks,
         videoReferences,
+        relatedQuestionSlugs,
         authorName: await getNextAuthor(),
     };
 }
@@ -224,7 +253,7 @@ interface ArticleDraft {
     tags: string[];
     seo_title: string;
     seo_description: string;
-    references: Array<{ text: string; url: string }>;
+    references: ArticleReference[];
 }
 
 async function draftArticle(
@@ -255,6 +284,7 @@ async function draftArticle(
                     topChunks: context.topChunks,
                     authorName: context.authorName,
                     videoReferences: context.videoReferences,
+                    relatedQuestionSlugs: context.relatedQuestionSlugs,
                 }),
             },
             // Assistant prefill forces JSON output (Claude-specific)
@@ -364,6 +394,7 @@ async function publishDraft(
             seo_title: draft.seo_title,
             seo_description: draft.seo_description,
             source_question_slug: context.questionSlug,
+            refs: draft.references ?? null,
             hero_image_url: heroImageUrl ?? null,
             hero_image_prompt: heroImagePrompt ?? null,
         })
@@ -395,6 +426,7 @@ export async function generateBlogArticle(
         makeStep('Claude draft'),
         makeStep('Hero image'),
         makeStep('Voice calibration pass'),
+        makeStep('Verify facts & links'),
         makeStep('Publish'),
     ];
     const result: BlogArticleResult = { status: 'assembling', questionSlug, steps };
@@ -491,8 +523,26 @@ export async function generateBlogArticle(
         finishStep(s4, 'failed', `Voice pass failed (using raw draft): ${String(err)}`, t4, onStep);
     }
 
+    // ── Step 4b: Verify facts & links (non-fatal) ─────────────────────────────
+    const s4b = steps[5];
+    startStep(s4b, onStep);
+    const t4b = Date.now();
+    try {
+        const verified = await verifyArticle(draft!.body_mdx, draft!.references);
+        draft = {
+            ...draft!,
+            body_mdx: verified.body_mdx,
+            references: verified.references,
+        };
+        const { stats } = verified;
+        finishStep(s4b, 'success', `✓${stats.claims_correct} ✗${stats.claims_incorrect} claims · ${stats.links_ok}/${stats.links_checked} links OK`, t4b, onStep);
+    } catch (err) {
+        // Non-fatal: publish with unverified draft
+        finishStep(s4b, 'failed', `Verification skipped: ${String(err)}`, t4b, onStep);
+    }
+
     // ── Step 5 ────────────────────────────────────────────────────────────────
-    const s5 = steps[5];
+    const s5 = steps[6];
     startStep(s5, onStep);
     const t5 = Date.now();
     result.status = 'publishing';
@@ -858,6 +908,7 @@ export async function generateGuideArticle(
                 seo_title: draft!.seo_title,
                 seo_description: draft!.seo_description,
                 faq_data: draft!.faq_data ?? null,
+                refs: draft!.references ?? null,
                 hero_image_url: heroImageUrl ?? null,
                 hero_image_prompt: heroImagePrompt ?? null,
             })
