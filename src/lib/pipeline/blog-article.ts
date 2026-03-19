@@ -395,6 +395,7 @@ async function publishDraft(
             seo_description: draft.seo_description,
             source_question_slug: context.questionSlug,
             refs: draft.references ?? null,
+            research_raw: research.rawText ?? null,
             hero_image_url: heroImageUrl ?? null,
             hero_image_prompt: heroImagePrompt ?? null,
         })

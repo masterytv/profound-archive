@@ -1414,3 +1414,20 @@ export async function generateStaticParams() {
 
 **Rule:** Supabase PKCE does NOT forward query params from the verify URL to the callback. Use session metadata (e.g., `recovery_sent_at`) to detect auth event types server-side.
 
+## 34. Blog Pipeline — PubMed Link Verification — 2026-03-19
+
+**The Bug:** Blog articles contained wrong PubMed links (e.g., PMID 11705526 "Role of hormones in puberty" used for Van Lommel's cardiac arrest study). The verify step fetched the real page title via NCBI E-utilities but GPT-4o-mini failed the relevance judgment. Then the fix step asked Perplexity for a replacement, which returned the same wrong PMID, and it passed health check (PubMed always returns 200).
+
+**Root Cause:** Two bugs: (1) GPT-4o-mini too weak for relevance checks, (2) replacement URL verification only checked HTTP status, not content relevance.
+
+**The Fix:**
+1. `blog-verify.ts`: Added deterministic `hasTitleKeywordOverlap()` check for PubMed links — extracts keywords from claim text and page title, flags zero overlap as mismatch without relying on LLM.
+2. Upgraded LLM relevance checker from `gpt-4o-mini` → `gpt-4o`.
+3. Replacement URL validation now rejects same-URL replacements and runs keyword overlap check on PubMed replacement URLs.
+4. `blog-article.ts`: Now saves `research_raw` to DB for debugging link origin issues.
+
+**Rule:** For PubMed/academic links, always verify content relevance deterministically (keyword overlap) before falling back to LLM judgment. Never trust HTTP status alone — academic sites always return 200 for valid IDs regardless of content relevance. Never accept a replacement URL that is the same as the broken one.
+
+## 35. Blog Pipeline — Daily Cron Schedule — 2026-03-19
+
+The blog `blog-generate-questions.yml` cron was changed from weekly (Sunday noon ET) to **daily at noon ET** (`0 16 * * *` UTC). Generates 1 Big Question article per day. Idempotency is handled in `/api/cron/blog-questions` by checking `blog_posts.source_question_slug`. Pillar GUIDE articles are generated manually via admin UI.

@@ -72,6 +72,44 @@ const TRUSTED_DOMAINS = [
     'journals.sagepub.com',
 ];
 
+// Words too common to be useful for keyword overlap matching
+const STOP_WORDS = new Set([
+    'a', 'an', 'the', 'of', 'in', 'to', 'and', 'is', 'for', 'on', 'with',
+    'by', 'at', 'from', 'or', 'as', 'are', 'was', 'were', 'be', 'been',
+    'its', 'it', 'this', 'that', 'these', 'their', 'not', 'but', 'has',
+    'had', 'have', 'do', 'does', 'did', 'will', 'would', 'could', 'should',
+    'may', 'might', 'can', 'shall', 'no', 'so', 'if', 'than', 'into',
+    'role', 'study', 'research', 'review', 'analysis', 'article', 'paper',
+]);
+
+/**
+ * Deterministic keyword overlap check for PubMed/academic links.
+ * Extracts significant keywords from both the claim/anchor text and the page title,
+ * then checks if there is ANY meaningful overlap. Zero overlap = guaranteed mismatch.
+ *
+ * Why: GPT-4o-mini failed to catch "Role of hormones in puberty" being used for
+ * "Van Lommel cardiac arrest Lancet study." A simple keyword check catches this trivially.
+ */
+function hasTitleKeywordOverlap(claimText: string, pageTitle: string): { overlaps: boolean; claimKeywords: string[]; titleKeywords: string[] } {
+    const extractKeywords = (text: string): string[] =>
+        text.toLowerCase()
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .split(/\s+/)
+            .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+
+    const claimKeywords = extractKeywords(claimText);
+    const titleKeywords = extractKeywords(pageTitle);
+
+    if (claimKeywords.length === 0 || titleKeywords.length === 0) {
+        // Can't determine overlap with no keywords — assume OK
+        return { overlaps: true, claimKeywords, titleKeywords };
+    }
+
+    const titleSet = new Set(titleKeywords);
+    const overlapping = claimKeywords.filter(k => titleSet.has(k));
+    return { overlaps: overlapping.length > 0, claimKeywords, titleKeywords };
+}
+
 // Sites that return 200 with error pages instead of proper 404s
 const SOFT_404_PATTERNS = [
     { domain: 'amazon.com', bodyIndicators: ["Sorry, we couldn't find that page", "we couldn\u2019t find that page", 'id="noResultsTitle"'] },
@@ -308,7 +346,10 @@ async function getPageMetadata(link: LinkInfo): Promise<LinkInfo & { pageTitle?:
                 const data = await res.json();
                 const paper = data.result?.[pmid];
                 if (paper) {
-                    return { ...link, pageTitle: paper.title || '', pageSource: paper.source || '', pageAuthors: (paper.authors || []).map((a: { name: string }) => a.name).join(', ') };
+                    const title = paper.title || '';
+                    const authors = (paper.authors || []).map((a: { name: string }) => a.name).join(', ');
+                    console.log(`    [links] PubMed ${pmid}: "${title.substring(0, 80)}" by ${authors.substring(0, 60)}`);
+                    return { ...link, pageTitle: title, pageSource: paper.source || '', pageAuthors: authors };
                 }
             }
         }
@@ -408,15 +449,43 @@ async function validateLinks(
 
         const linksWithMeta = metadataResults.filter(l => l.pageTitle);
 
-        if (linksWithMeta.length > 0) {
+        // ── Deterministic PubMed/PMC title mismatch check ──
+        // Catches obvious mismatches (e.g., "puberty study" for "cardiac arrest NDE")
+        // without relying on an LLM. Zero keyword overlap = auto-flag.
+        for (const link of linksWithMeta) {
+            const isPubMed = link.url.includes('pubmed.ncbi.nlm.nih.gov') || link.url.includes('pmc.ncbi.nlm.nih.gov');
+            if (!isPubMed || !link.pageTitle) continue;
+
+            const { overlaps, claimKeywords, titleKeywords } = hasTitleKeywordOverlap(link.text, link.pageTitle);
+            if (!overlaps) {
+                const resultIdx = results.findIndex(r => r.url === link.url);
+                if (resultIdx >= 0) {
+                    results[resultIdx].ok = false;
+                    results[resultIdx].error = `PubMed title mismatch: claim=[${claimKeywords.join(',')}] vs page=[${titleKeywords.join(',')}]`;
+                }
+                console.log(`    [links] ✗ PUBMED MISMATCH: "${link.text}" → page title: "${link.pageTitle}"`);
+                console.log(`             claim keywords: [${claimKeywords.join(', ')}]`);
+                console.log(`             title keywords: [${titleKeywords.join(', ')}]`);
+            }
+        }
+
+        // ── LLM relevance check for remaining links (GPT-4o for better accuracy) ──
+        const linksForLlmCheck = linksWithMeta.filter(l => {
+            const resultEntry = results.find(r => r.url === l.url);
+            // Skip links already flagged by deterministic check
+            return resultEntry?.ok !== false;
+        });
+
+        if (linksForLlmCheck.length > 0) {
             try {
                 const relResponse = await openRouter.chat.completions.create({
-                    model: 'openai/gpt-4o-mini',
+                    // GPT-4o (not mini) — mini failed to catch "puberty" vs "cardiac arrest"
+                    model: 'openai/gpt-4o',
                     messages: [
-                        { role: 'system', content: 'You are a citation accuracy checker. Return JSON only.' },
+                        { role: 'system', content: 'You are a citation accuracy checker. For each link, determine if the page content is actually about the topic claimed in the anchor text. Be STRICT: if the page title is about a completely different subject than what the link text claims, mark it irrelevant. Return JSON only.' },
                         {
                             role: 'user',
-                            content: `Check if each link's page content matches the claim it's attached to.\n\nLINKS:\n${linksWithMeta.map((l, i) => `[${i + 1}] CLAIM: "${l.text}"\n    URL: ${l.url}\n    PAGE TITLE: "${l.pageTitle}"\n    ${l.pageAuthors ? `AUTHORS: ${l.pageAuthors}` : ''}\n    ${l.pageSource ? `JOURNAL: ${l.pageSource}` : ''}\n    ${l.pageDescription ? `DESCRIPTION: ${l.pageDescription}` : ''}`).join('\n\n')}\n\nReturn JSON: [{"index": N, "verdict": "relevant|irrelevant|uncertain", "reason": "..."}]`,
+                            content: `Check if each link's page content matches the claim it's attached to.\n\nLINKS:\n${linksForLlmCheck.map((l, i) => `[${i + 1}] CLAIM: "${l.text}"\n    URL: ${l.url}\n    PAGE TITLE: "${l.pageTitle}"\n    ${l.pageAuthors ? `AUTHORS: ${l.pageAuthors}` : ''}\n    ${l.pageSource ? `JOURNAL: ${l.pageSource}` : ''}\n    ${l.pageDescription ? `DESCRIPTION: ${l.pageDescription}` : ''}`).join('\n\n')}\n\nReturn JSON: [{"index": N, "verdict": "relevant|irrelevant|uncertain", "reason": "..."}]`,
                         },
                     ],
                     temperature: 0,
@@ -428,7 +497,7 @@ async function validateLinks(
                 if (relMatch) {
                     const verdicts = JSON.parse(relMatch[0]) as Array<{ index: number; verdict: string; reason: string }>;
                     for (const v of verdicts) {
-                        const link = linksWithMeta[v.index - 1];
+                        const link = linksForLlmCheck[v.index - 1];
                         if (!link || v.verdict !== 'irrelevant') continue;
                         const resultIdx = results.findIndex(r => r.url === link.url);
                         if (resultIdx >= 0) {
@@ -479,19 +548,48 @@ async function validateLinks(
                     const fixes = JSON.parse(fixMatch[0]) as Array<{ broken_url: string; replacement_url: string | null }>;
 
                     for (const fix of fixes) {
+                        // Find the original bad link to get its claim text
+                        const badLink = bad.find(b => b.url === fix.broken_url);
+
                         if (fix.replacement_url) {
-                            // Verify replacement works
-                            const verifyResult = await checkLink({ url: fix.replacement_url, text: '', source: 'body' });
-                            if (verifyResult.ok) {
-                                fixedArticle = fixedArticle.replaceAll(fix.broken_url, fix.replacement_url);
-                                fixedRefs = fixedRefs.map(r => r.url === fix.broken_url ? { ...r, url: fix.replacement_url } : r);
-                                linksFixed++;
-                            } else {
-                                // Replacement also broken — strip
+                            // Reject if replacement is the same as the broken URL
+                            if (fix.replacement_url === fix.broken_url) {
+                                console.log(`    [links] ↻ Replacement same as broken, stripping: ${fix.broken_url}`);
                                 fixedArticle = stripLink(fixedArticle, fix.broken_url);
                                 fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
                                 linksStripped++;
+                                continue;
                             }
+
+                            // Verify replacement: HTTP health check
+                            const verifyResult = await checkLink({ url: fix.replacement_url, text: '', source: 'body' });
+                            if (!verifyResult.ok) {
+                                fixedArticle = stripLink(fixedArticle, fix.broken_url);
+                                fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
+                                linksStripped++;
+                                continue;
+                            }
+
+                            // For PubMed replacements: also verify content relevance via title keyword overlap
+                            const isPubMedReplacement = fix.replacement_url.includes('pubmed.ncbi.nlm.nih.gov') || fix.replacement_url.includes('pmc.ncbi.nlm.nih.gov');
+                            if (isPubMedReplacement && badLink?.text) {
+                                const metaResult = await getPageMetadata({ url: fix.replacement_url, text: badLink.text, source: 'body' });
+                                if (metaResult.pageTitle) {
+                                    const { overlaps } = hasTitleKeywordOverlap(badLink.text, metaResult.pageTitle);
+                                    if (!overlaps) {
+                                        console.log(`    [links] ✗ Replacement also mismatched: "${badLink.text}" → "${metaResult.pageTitle}"`);
+                                        fixedArticle = stripLink(fixedArticle, fix.broken_url);
+                                        fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
+                                        linksStripped++;
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            // Replacement passed all checks — apply it
+                            fixedArticle = fixedArticle.replaceAll(fix.broken_url, fix.replacement_url);
+                            fixedRefs = fixedRefs.map(r => r.url === fix.broken_url ? { ...r, url: fix.replacement_url } : r);
+                            linksFixed++;
                         } else {
                             // No replacement — strip
                             fixedArticle = stripLink(fixedArticle, fix.broken_url);
