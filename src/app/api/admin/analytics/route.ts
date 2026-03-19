@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { isAdminUser } from '@/lib/auth/admin-guard';
 
 /**
  * GA4 Analytics API — zero-dependency version.
@@ -11,23 +11,6 @@ import { createClient } from '@/lib/supabase/server';
 
 const PROPERTY_ID = process.env.GA_PROPERTY_ID!;
 const GA_API_BASE = `https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY_ID}`;
-
-// ── Auth guard ────────────────────────────────────────────────────────────────
-async function isAdmin(): Promise<boolean> {
-    try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return false;
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-        return profile?.role === 'admin' || profile?.role === 'super_admin';
-    } catch {
-        return false;
-    }
-}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface AnalyticsData {
@@ -126,7 +109,7 @@ function metric(value: string | null | undefined): number {
 
 // ── GET /api/admin/analytics?days=30 ─────────────────────────────────────────
 export async function GET(request: Request) {
-    if (!await isAdmin()) {
+    if (!await isAdminUser()) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -220,7 +203,7 @@ export async function GET(request: Request) {
     } catch (err) {
         console.error('[Analytics API] GA4 query failed:', err);
         return NextResponse.json(
-            { error: 'Failed to fetch analytics', details: String(err) },
+            { error: 'Failed to fetch analytics' },
             { status: 500 }
         );
     }

@@ -35,15 +35,15 @@ export async function POST(req: NextRequest) {
   const isCron = cronSecret === process.env.CRON_SECRET;
 
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
   // Security: verify caller is an admin, not just any logged-in user
   let isAdmin = false;
-  if (session?.user) {
+  if (user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
     isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
   }

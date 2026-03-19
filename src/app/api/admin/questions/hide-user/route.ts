@@ -1,38 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { isAdminUser } from '@/lib/auth/admin-guard';
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_KEY!
 );
-
-async function isAdminUser(): Promise<boolean> {
-    try {
-        const cookieStore = await cookies();
-        const clientSupabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    getAll() { return cookieStore.getAll(); },
-                    setAll() { },
-                },
-            }
-        );
-        const { data: { user } } = await clientSupabase.auth.getUser();
-        if (!user) return false;
-        const { data: profile } = await clientSupabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-        return profile?.role === 'admin' || profile?.role === 'super_admin';
-    } catch {
-        return false;
-    }
-}
 
 /**
  * POST /api/admin/questions/hide-user
@@ -78,7 +51,8 @@ export async function POST(req: NextRequest) {
         .eq('slug', slug);
 
     if (updateErr) {
-        return NextResponse.json({ error: updateErr.message }, { status: 500 });
+        console.error('[hide-user] Update error:', updateErr.message);
+        return NextResponse.json({ error: 'Failed to update question' }, { status: 500 });
     }
 
     // If hiding: also delete the cached synthesis so it won't be served

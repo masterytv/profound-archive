@@ -21,10 +21,16 @@ export function markdownToHtml(md: string): string {
 
     let html = md
         // Normalize Windows line endings
-        .replace(/\r\n/g, '\n')
-        // Escape raw HTML angle brackets that aren't intentional tags
-        // (preserves legitimate links)
-        ;
+        .replace(/\r\n/g, '\n');
+
+    // ── Security: Escape raw HTML tags to prevent XSS ─────────────────────────
+    // Strip script/style tags and their content entirely
+    html = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+    html = html.replace(/<style[\s\S]*?<\/style>/gi, '');
+    // Strip dangerous self-closing or unclosed tags (iframe, object, embed, form, input)
+    html = html.replace(/<\/?(script|iframe|object|embed|form|input|textarea|button|select|applet|meta|link|base)\b[^>]*\/?>/gi, '');
+    // Strip event handler attributes from any remaining HTML (onerror, onclick, onload, etc.)
+    html = html.replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '');
 
     // ── Block-level elements (process before inline) ──────────────────────────
 

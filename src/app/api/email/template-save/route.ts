@@ -3,8 +3,8 @@
 // Requires an authenticated admin session.
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { isAdminUser } from '@/lib/auth/admin-guard';
 
 function adminClient() {
   return createAdminClient(
@@ -14,11 +14,9 @@ function adminClient() {
 }
 
 export async function POST(req: NextRequest) {
-  // Auth guard — must be a logged-in user (admin page is already protected)
-  const supabase = await createServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Auth guard — admin or super_admin only
+  if (!(await isAdminUser())) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const body = await req.json();

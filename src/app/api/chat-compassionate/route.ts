@@ -13,13 +13,13 @@ const getOpenAIClient = () => {
     return new OpenAI({ apiKey });
 };
 
-// Initialize Supabase client
+// Initialize Supabase client — lazy to avoid build-time errors (LEARNINGS §4A)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const getServiceClient = () => createClient(supabaseUrl, process.env.SUPABASE_SERVICE_KEY!);
 
 export async function POST(req: NextRequest) {
     try {
+        const supabase = getServiceClient();
         const { sessionId, chatInput, test } = await req.json();
 
         if (!sessionId || !chatInput) {

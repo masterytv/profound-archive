@@ -7,6 +7,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isAdminUser } from '@/lib/auth/admin-guard';
 import { VideoEmail } from "@/lib/email/templates/VideoEmail";
 import { WelcomeEmail } from "@/lib/email/templates/WelcomeEmail";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
@@ -14,9 +15,10 @@ import { render } from "@react-email/render";
 import type { ArchetypeId } from "@/lib/quiz/archetypes";
 
 export async function GET(req: NextRequest) {
+  // Auth guard — admin or super_admin only
+  if (!(await isAdminUser())) return new NextResponse('Forbidden', { status: 403 });
+
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   const archetype = req.nextUrl.searchParams.get("archetype") ?? "griever";
 

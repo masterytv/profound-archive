@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('[CES API] INSERT error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to save feedback' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, id: data.id, session_id: data.session_id })
@@ -82,7 +82,7 @@ export async function PATCH(req: NextRequest) {
 
     if (error) {
       console.error('[CES API] PATCH error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to update feedback' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

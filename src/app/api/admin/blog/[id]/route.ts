@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { isAdminUser } from '@/lib/auth/admin-guard';
 
 // Service client that bypasses RLS — same pattern as admin/blog/page.tsx
 function getAdminClient() {
@@ -10,14 +10,12 @@ function getAdminClient() {
     );
 }
 
-// Auth check helper — verifies the caller is logged in
-async function requireAuth(): Promise<{ user: { id: string } } | NextResponse> {
-    const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// Auth check helper — verifies the caller is an admin or super_admin
+async function requireAdmin(): Promise<NextResponse | null> {
+    if (!(await isAdminUser())) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    return { user };
+    return null;
 }
 
 // PATCH /api/admin/blog/[id] — toggle publish status
@@ -32,8 +30,8 @@ export async function PATCH(
         return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const authResult = await requireAuth();
-    if (authResult instanceof NextResponse) return authResult;
+    const authResult = await requireAdmin();
+    if (authResult) return authResult;
 
     // Parse status from JSON or form body
     let status: string | undefined;
@@ -113,8 +111,8 @@ export async function GET(
         return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const authResult = await requireAuth();
-    if (authResult instanceof NextResponse) return authResult;
+    const authResult = await requireAdmin();
+    if (authResult) return authResult;
 
     const adminClient = getAdminClient();
     const { data, error } = await adminClient
@@ -141,8 +139,8 @@ export async function PUT(
         return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const authResult = await requireAuth();
-    if (authResult instanceof NextResponse) return authResult;
+    const authResult = await requireAdmin();
+    if (authResult) return authResult;
 
     const body = await req.json();
 

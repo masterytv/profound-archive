@@ -1379,3 +1379,38 @@ export async function generateStaticParams() {
 **The Fix:** Added `refs: draft.references ?? null` to both `.insert()` calls.
 
 **Rule:** Always verify that pipeline output fields actually reach the DB. Check the `publishDraft` / insert call.
+
+## 32. Security Audit & Hardening — 2026-03-19
+
+**The Audit:** Full codebase security review found 4 critical, 3 high, and 5 medium findings.
+
+**Critical Fixes:**
+- **Admin route access control:** `admin/blog/[id]`, `admin/blog/generate`, `email/template-save`, `email/preview` had no admin role check — any authenticated user could call them. Fixed by adding shared `isAdminUser()` guard from `src/lib/auth/admin-guard.ts`.
+- **`getSession()` → `getUser()`:** Server-side auth must use `getUser()` (contacts Supabase to verify JWT), not `getSession()` (reads local, potentially stale JWT). Fixed in `email/send`.
+- **XSS in `markdownToHtml`:** Blog post content rendered raw HTML from user-generated markdown. Fixed with sanitization in `src/lib/markdown.ts` — strips `<script>`, `<iframe>`, `<object>`, `<embed>`, event handlers (`on*=`).
+
+**Other Fixes:**
+- CSP header added to `next.config.ts`.
+- Duplicate local admin guards replaced with shared import in `admin/questions/hide-user` and `admin/analytics`.
+- Error messages genericized (no `error.message` to client) in `ces-feedback`, `hide-user`, `analytics`.
+- Module-level Supabase service client in `chat-compassionate` moved to lazy getter.
+
+**Rules:**
+1. **Every `/api/admin/*` route MUST use `isAdminUser()`** from `src/lib/auth/admin-guard.ts`. No local implementations.
+2. **Never use `getSession()` on the server.** Always `getUser()`.
+3. **Never return `error.message` to the client.** Log it server-side, return a generic message.
+4. **Any new admin route** must import the shared guard. Do not write a local check.
+
+## 33. Auth UX — Password Recovery Flow — 2026-03-19
+
+**The Bug:** Clicking a password reset email link auto-logged the user in without showing a password update form. The `auth/callback/route.ts` always redirected to `/` regardless of auth event type.
+
+**Root Cause:** Supabase PKCE flow does NOT forward `type=recovery` to the redirect URL — only sends `code=...`. The callback had no way to distinguish recovery from login.
+
+**The Fix:**
+1. `auth/callback/route.ts` now detects recovery via two methods: (a) `type=recovery` query param, (b) checking `user.recovery_sent_at` is within the last 10 minutes.
+2. Created `/update-password/page.tsx` — password + confirm form with validation.
+3. Rewrote `/login/page.tsx` with dynamic titles per view and duplicate signup warning banner.
+
+**Rule:** Supabase PKCE does NOT forward query params from the verify URL to the callback. Use session metadata (e.g., `recovery_sent_at`) to detect auth event types server-side.
+
