@@ -106,8 +106,7 @@ const CATEGORIES = [
     { value: "guide",         label: "Guides" },
     { value: "big-question", label: "Big Questions" },
     { value: "story",        label: "Stories" },
-    { value: "experiencer",  label: "Experiencers" },
-    { value: "researcher",   label: "Researchers" },
+    { value: "experiencer",  label: "Experiencers", href: "/experiencer" },
 ];
 
 export default async function BlogIndexPage({
@@ -179,7 +178,7 @@ export default async function BlogIndexPage({
                                 return (
                                     <Link
                                         key={cat.value}
-                                        href={cat.value === "all" ? "/blog" : `/blog?category=${cat.value}`}
+                                        href={'href' in cat && cat.href ? cat.href : cat.value === "all" ? "/blog" : `/blog?category=${cat.value}`}
                                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                                             isActive
                                                 ? "bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300"

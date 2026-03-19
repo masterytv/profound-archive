@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { FileText, CheckCircle2, Clock3, Settings2, Eye, EyeOff, Pencil } from "lucide-react";
+import { FileText, CheckCircle2, Clock3, Settings2, Eye, EyeOff, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
 import { BlogGeneratePanel, GuideGeneratePanel, StoryGeneratePanel } from "@/components/admin/blog-generate-panel";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,16 @@ type BlogRow = {
     updated_at: string;
 };
 
-export default async function AdminBlogPage() {
+const PAGE_SIZE = 10;
+
+export default async function AdminBlogPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string }>;
+}) {
+    const { page: pageParam } = await searchParams;
+    const currentPage = Math.max(1, parseInt(pageParam || "1", 10) || 1);
+
     // Session client — used only for auth check
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -51,11 +60,26 @@ export default async function AdminBlogPage() {
         process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Get total count
+    const { count: totalCount } = await adminClient
+        .from("blog_posts")
+        .select("id", { count: "exact", head: true });
+
+    const totalPages = Math.ceil((totalCount ?? 0) / PAGE_SIZE);
+    const rangeStart = (currentPage - 1) * PAGE_SIZE;
+    const rangeEnd = rangeStart + PAGE_SIZE - 1;
+
+    // Fetch all posts for stats, paginated posts for table
+    const { data: allPosts } = await adminClient
+        .from("blog_posts")
+        .select("status, word_count")
+        .limit(500);
+
     const { data: posts, error } = await adminClient
         .from("blog_posts")
         .select("id, slug, title, category, author_name, status, word_count, published_at, updated_at")
         .order("updated_at", { ascending: false })
-        .limit(200);
+        .range(rangeStart, rangeEnd);
 
     // Fetch questions for the generate dropdown (ordered by sort_order)
     const { data: rawQuestions } = await adminClient
@@ -71,8 +95,8 @@ export default async function AdminBlogPage() {
         question: q.consumer_question,
     }));
 
-    const published = (posts ?? []).filter((p) => p.status === "published").length;
-    const drafts = (posts ?? []).filter((p) => p.status === "draft").length;
+    const published = (allPosts ?? []).filter((p) => p.status === "published").length;
+    const drafts = (allPosts ?? []).filter((p) => p.status === "draft").length;
 
     return (
         <div className="space-y-6">
@@ -98,10 +122,10 @@ export default async function AdminBlogPage() {
             {/* Stats row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                    { label: "Total", value: (posts ?? []).length, icon: FileText, color: "text-slate-600 bg-slate-50 border-slate-200" },
+                    { label: "Total", value: totalCount ?? 0, icon: FileText, color: "text-slate-600 bg-slate-50 border-slate-200" },
                     { label: "Published", value: published, icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
                     { label: "Drafts", value: drafts, icon: Clock3, color: "text-amber-600 bg-amber-50 border-amber-200" },
-                    { label: "Words written", value: (posts ?? []).reduce((s, p) => s + (p.word_count ?? 0), 0).toLocaleString(), icon: FileText, color: "text-blue-600 bg-blue-50 border-blue-200" },
+                    { label: "Words written", value: (allPosts ?? []).reduce((s, p) => s + (p.word_count ?? 0), 0).toLocaleString(), icon: FileText, color: "text-blue-600 bg-blue-50 border-blue-200" },
                 ].map((stat) => (
                     <div key={stat.label} className={`rounded-xl border p-4 ${stat.color.split(" ").slice(1).join(" ")}`}>
                         <stat.icon className={`w-4 h-4 mb-1 ${stat.color.split(" ")[0]}`} />
@@ -227,6 +251,41 @@ export default async function AdminBlogPage() {
                         </div>
                     )}
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+                        <span className="text-xs text-slate-400">
+                            Page {currentPage} of {totalPages} · {totalCount} posts
+                        </span>
+                        <div className="flex items-center gap-2">
+                            {currentPage > 1 ? (
+                                <Link
+                                    href={`/admin/blog?page=${currentPage - 1}`}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                                >
+                                    <ChevronLeft className="w-3.5 h-3.5" /> Previous
+                                </Link>
+                            ) : (
+                                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 cursor-not-allowed">
+                                    <ChevronLeft className="w-3.5 h-3.5" /> Previous
+                                </span>
+                            )}
+                            {currentPage < totalPages ? (
+                                <Link
+                                    href={`/admin/blog?page=${currentPage + 1}`}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                                >
+                                    Next <ChevronRight className="w-3.5 h-3.5" />
+                                </Link>
+                            ) : (
+                                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 cursor-not-allowed">
+                                    Next <ChevronRight className="w-3.5 h-3.5" />
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
