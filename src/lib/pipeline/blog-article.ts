@@ -17,7 +17,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
-import { researchQuestion, researchGuideTopic, type ResearchResult } from './blog-research';
+import { researchQuestion, researchGuideTopic, filterOverusedCitations, getCitationUsageCounts, type ResearchResult } from './blog-research';
+import { searchNoeticMap } from './blog-research-noeticmap';
 import { generateHeroImage } from './blog-image';
 import { verifyArticle, type ArticleReference } from './blog-verify';
 import {
@@ -259,7 +260,8 @@ interface ArticleDraft {
 async function draftArticle(
     context: ArticleContext,
     research: ResearchResult,
-
+    noeticMapSummary?: string,
+    overusedWarning?: string,
 ): Promise<ArticleDraft> {
     const openRouter = getOpenRouter();
 
@@ -268,6 +270,8 @@ async function draftArticle(
         research.citations.length > 0
             ? '\n\nSOURCES:\n' + research.citations.map((c, i) => `[${i + 1}] ${c.title} — ${c.url}`).join('\n')
             : '',
+        noeticMapSummary ?? '',
+        overusedWarning ?? '',
     ].join('');
 
     const response = await openRouter.chat.completions.create({
@@ -497,7 +501,7 @@ export async function generateBlogArticle(
 ): Promise<BlogArticleResult> {
     const steps: ArticleStep[] = [
         makeStep('Context assembly'),
-        makeStep('Perplexity research'),
+        makeStep('Research (Perplexity + NoeticMap)'),
         makeStep('Claude draft'),
         makeStep('Hero image'),
         makeStep('Voice calibration pass'),
@@ -545,14 +549,50 @@ export async function generateBlogArticle(
         return { ...result, status: 'failed', error: String(err) };
     }
 
-    // ── Step 2 ────────────────────────────────────────────────────────────────
+    // ── Step 2: Research (Perplexity + NoeticMap + citation filtering) ─────────
     const s2 = steps[1];
     startStep(s2, onStep);
     const t2 = Date.now();
     result.status = 'researching';
+    let noeticMapSummary = '';
+    let overusedWarning = '';
     try {
-        research = await researchQuestion(context.question, context.consumerQuestion);
-        finishStep(s2, 'success', `${research.citations.length} citations · ${research.keyFindings.length} key findings`, t2, onStep);
+        // Run Perplexity + NoeticMap + citation counting in parallel
+        const [perplexityResult, citationCounts, noeticResult] = await Promise.all([
+            researchQuestion(context.question, context.consumerQuestion),
+            getCitationUsageCounts(),
+            searchNoeticMap(context.question, 10).catch(() => ({ citations: [], rawSummary: '' })),
+        ]);
+
+        research = perplexityResult;
+        noeticMapSummary = noeticResult.rawSummary;
+
+        // Filter overused citations (≥3 uses across all articles)
+        const originalCount = research.citations.length;
+        research = {
+            ...research,
+            citations: filterOverusedCitations(
+                [...research.citations, ...noeticResult.citations],
+                citationCounts,
+                3,  // max uses per URL
+                5,  // min citations to keep
+            ),
+        };
+
+        // Build overused-source warning for the draft prompt
+        const overusedUrls = [...citationCounts.entries()]
+            .filter(([, count]) => count >= 2)
+            .map(([url]) => url);
+        if (overusedUrls.length > 0) {
+            overusedWarning = `\n\nPREVIOUSLY USED SOURCES (cited in ${overusedUrls.length} earlier articles — prefer NEW sources above):\n` +
+                overusedUrls.slice(0, 15).map(u => `- ${u}`).join('\n') +
+                '\nUse these only if essential to the argument. Prefer the less-cited and NoeticMap sources.';
+        }
+
+        const nm = noeticResult.citations.length;
+        finishStep(s2, 'success',
+            `${originalCount} Perplexity + ${nm} NoeticMap citations · ${research.citations.length} after filtering · ${research.keyFindings.length} key findings`,
+            t2, onStep);
     } catch (err) {
         finishStep(s2, 'failed', String(err), t2, onStep);
         return { ...result, status: 'failed', error: String(err) };
@@ -564,7 +604,7 @@ export async function generateBlogArticle(
     const t3 = Date.now();
     result.status = 'drafting';
     try {
-        draft = await draftArticle(context!, research!);
+        draft = await draftArticle(context!, research!, noeticMapSummary, overusedWarning);
         finishStep(s3, 'success', `${draft.word_count} words · slug: ${draft.slug}`, t3, onStep);
     } catch (err) {
         finishStep(s3, 'failed', String(err), t3, onStep);
@@ -863,7 +903,7 @@ export async function generateGuideArticle(
 ): Promise<BlogArticleResult> {
     const steps: ArticleStep[] = [
         makeStep('Context assembly'),
-        makeStep('Perplexity research'),
+        makeStep('Research (Perplexity + NoeticMap)'),
         makeStep('Claude guide draft'),
         makeStep('Hero image'),
         makeStep('Voice calibration pass'),
@@ -911,14 +951,39 @@ export async function generateGuideArticle(
         return { ...result, status: 'failed', error: String(err) };
     }
 
-    // ── Step 2: Research ──────────────────────────────────────────────────────
+    // ── Step 2: Research (Perplexity + NoeticMap + citation filtering) ──────────
     const s2 = steps[1];
     startStep(s2, onStep);
     const t2 = Date.now();
     result.status = 'researching';
     try {
-        research = await researchGuideTopic(pillarTitle, targetQuery);
-        finishStep(s2, 'success', `${research.citations.length} citations · ${research.keyFindings.length} key findings`, t2, onStep);
+        const [perplexityResult, citationCounts, noeticResult] = await Promise.all([
+            researchGuideTopic(pillarTitle, targetQuery),
+            getCitationUsageCounts(),
+            searchNoeticMap(targetQuery, 10).catch(() => ({ citations: [], rawSummary: '' })),
+        ]);
+
+        research = perplexityResult;
+
+        // Merge NoeticMap summary into the rawText for the draft prompt
+        if (noeticResult.rawSummary) {
+            research = { ...research, rawText: research.rawText + noeticResult.rawSummary };
+        }
+
+        // Filter overused citations
+        const originalCount = research.citations.length;
+        research = {
+            ...research,
+            citations: filterOverusedCitations(
+                [...research.citations, ...noeticResult.citations],
+                citationCounts, 3, 5,
+            ),
+        };
+
+        const nm = noeticResult.citations.length;
+        finishStep(s2, 'success',
+            `${originalCount} Perplexity + ${nm} NoeticMap citations · ${research.citations.length} after filtering · ${research.keyFindings.length} key findings`,
+            t2, onStep);
     } catch (err) {
         finishStep(s2, 'failed', String(err), t2, onStep);
         return { ...result, status: 'failed', error: String(err) };

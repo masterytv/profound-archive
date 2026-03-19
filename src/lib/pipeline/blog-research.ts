@@ -2,10 +2,17 @@
  * Blog Pipeline — Perplexity Research Module
  *
  * Calls Perplexity Sonar Pro to fetch authoritative sources on a question.
- * Uses a focused domain filter to ensure academic + high-authority results.
+ * Includes citation usage tracking to prevent the same studies from
+ * appearing in every article.
+ *
+ * Changes (2026-03-19):
+ * - Temperature 0.2 → 0.4 for more variety
+ * - Domain list expanded from 10 → 15, randomly rotating 8 per call
+ * - Added getOverusedCitationUrls() for filtering before draft step
  */
 
 import { buildResearchPrompt } from './blog-prompts';
+import { createClient } from '@supabase/supabase-js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,23 +29,46 @@ export interface ResearchResult {
     rawText: string; // full Perplexity response for the draft prompt
 }
 
-// ─── Domain Filter ────────────────────────────────────────────────────────────
-// High-authority academic, journal, news, and NDE-specific sources.
-// Perplexity search_domain_filter accepts up to 10 domains — we pass the top ones
-// and let the general query catch the rest.
+// ─── Domain Filter (expanded + rotated) ───────────────────────────────────────
+// 15 high-authority domains. Each call picks 8 randomly to stay within
+// Perplexity's limit while ensuring different domains surface different articles.
 
-const RESEARCH_DOMAINS = [
+const ALL_RESEARCH_DOMAINS = [
+    // Academic / journal
     'pubmed.ncbi.nlm.nih.gov',
+    'pmc.ncbi.nlm.nih.gov',
+    'frontiersin.org',
+    'journals.sagepub.com',
+    'thelancet.com',
+    // NDE-specific research
     'iands.org',
     'nderf.org',
     'near-death.com',
     'med.virginia.edu',
-    'frontiersin.org',
+    'brucegreyson.com',
+    // Broader consciousness / afterlife
+    'bigelowinstitute.org',
+    'magiscenter.com',
+    'noeticmap.com',
+    // Popular science / psychology
     'psychologytoday.com',
     'scientificamerican.com',
-    'brucegreyson.com',
-    'magiscenter.com',
 ];
+
+const DOMAINS_PER_CALL = 8;
+
+/**
+ * Fisher-Yates shuffle + slice to pick N random domains per call.
+ * Ensures different Perplexity calls search different domain subsets.
+ */
+function pickRandomDomains(count: number): string[] {
+    const shuffled = [...ALL_RESEARCH_DOMAINS];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, count);
+}
 
 // ─── Client ───────────────────────────────────────────────────────────────────
 
@@ -46,6 +76,90 @@ function getPerplexityClient() {
     const apiKey = process.env.PERPLEXITY_API_KEY;
     if (!apiKey) throw new Error('Missing PERPLEXITY_API_KEY environment variable');
     return apiKey;
+}
+
+// ─── Citation Usage Tracking ──────────────────────────────────────────────────
+
+/**
+ * Query all published blog_posts.refs to find URLs that have been cited
+ * across existing articles. Returns a Map of url → usage count.
+ *
+ * This is used to filter out overused citations before passing research
+ * to the Claude draft step — deterministic, not prompt-dependent.
+ */
+export async function getCitationUsageCounts(): Promise<Map<string, number>> {
+    const counts = new Map<string, number>();
+    try {
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!url || !key) return counts;
+
+        const supabase = createClient(url, key);
+        const { data } = await supabase
+            .from('blog_posts')
+            .select('refs')
+            .not('refs', 'is', null);
+
+        for (const row of data ?? []) {
+            const refs = row.refs as Array<{ url?: string | null }> | null;
+            if (!Array.isArray(refs)) continue;
+            for (const ref of refs) {
+                if (ref.url) {
+                    counts.set(ref.url, (counts.get(ref.url) ?? 0) + 1);
+                }
+            }
+        }
+
+        console.log(`[research] Citation usage: ${counts.size} unique URLs across ${(data ?? []).length} articles`);
+    } catch (err) {
+        console.warn(`[research] Failed to fetch citation usage (non-fatal): ${err}`);
+    }
+    return counts;
+}
+
+/**
+ * Filter a list of citations to remove any that have been used ≥ maxUses times.
+ * Guarantees at least minKeep citations remain (keeps least-used if filtering
+ * would drop below the minimum).
+ */
+export function filterOverusedCitations(
+    citations: ResearchCitation[],
+    usageCounts: Map<string, number>,
+    maxUses = 3,
+    minKeep = 5,
+): ResearchCitation[] {
+    // Sort by usage count (ascending) so least-used come first
+    const sorted = [...citations].sort((a, b) => {
+        const countA = usageCounts.get(a.url) ?? 0;
+        const countB = usageCounts.get(b.url) ?? 0;
+        return countA - countB;
+    });
+
+    const filtered = sorted.filter((c) => (usageCounts.get(c.url) ?? 0) < maxUses);
+
+    // If filtering dropped below minimum, keep least-used ones regardless
+    if (filtered.length < minKeep) {
+        return sorted.slice(0, Math.max(minKeep, filtered.length));
+    }
+
+    const removed = citations.length - filtered.length;
+    if (removed > 0) {
+        console.log(`[research] Filtered out ${removed} overused citation(s) (used ≥${maxUses} times)`);
+    }
+    return filtered;
+}
+
+/**
+ * Get the set of overused citation URLs (≥3 uses) for exclusion in
+ * downstream modules like NoeticMap search.
+ */
+export async function getOverusedUrls(maxUses = 3): Promise<Set<string>> {
+    const counts = await getCitationUsageCounts();
+    const overused = new Set<string>();
+    for (const [url, count] of counts) {
+        if (count >= maxUses) overused.add(url);
+    }
+    return overused;
 }
 
 // ─── Main Function ────────────────────────────────────────────────────────────
@@ -56,6 +170,9 @@ function getPerplexityClient() {
  */
 export async function researchQuestion(question: string, consumerQuestion?: string): Promise<ResearchResult> {
     const apiKey = getPerplexityClient();
+    const domains = pickRandomDomains(DOMAINS_PER_CALL);
+
+    console.log(`[research] Perplexity search using ${domains.length} domains: ${domains.join(', ')}`);
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
@@ -75,10 +192,10 @@ export async function researchQuestion(question: string, consumerQuestion?: stri
                     content: buildResearchPrompt(question, consumerQuestion),
                 },
             ],
-            search_domain_filter: RESEARCH_DOMAINS,
+            search_domain_filter: domains,
             return_citations: true,
             search_recency_filter: 'month', // prefer recent but not limited to
-            temperature: 0.2, // low temp for factual research
+            temperature: 0.4, // increased from 0.2 for more variety
             max_tokens: 2048,
         }),
     });
@@ -128,6 +245,7 @@ import { buildGuideResearchPrompt } from './blog-prompts';
  */
 export async function researchGuideTopic(title: string, targetQuery: string): Promise<ResearchResult> {
     const apiKey = getPerplexityClient();
+    const domains = pickRandomDomains(DOMAINS_PER_CALL);
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
@@ -147,11 +265,11 @@ export async function researchGuideTopic(title: string, targetQuery: string): Pr
                     content: buildGuideResearchPrompt(title, targetQuery),
                 },
             ],
-            search_domain_filter: RESEARCH_DOMAINS,
+            search_domain_filter: domains,
             return_citations: true,
             search_recency_filter: 'month',
-            temperature: 0.2,
-            max_tokens: 3000, // higher than big-question (2048) for comprehensive coverage
+            temperature: 0.4, // increased from 0.2
+            max_tokens: 3000,
         }),
     });
 
