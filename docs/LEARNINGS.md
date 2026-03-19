@@ -1431,3 +1431,39 @@ export async function generateStaticParams() {
 ## 35. Blog Pipeline — Daily Cron Schedule — 2026-03-19
 
 The blog `blog-generate-questions.yml` cron was changed from weekly (Sunday noon ET) to **daily at noon ET** (`0 16 * * *` UTC). Generates 1 Big Question article per day. Idempotency is handled in `/api/cron/blog-questions` by checking `blog_posts.source_question_slug`. Pillar GUIDE articles are generated manually via admin UI.
+
+## 36. Supabase Auth — Session Cookie Persistence — 2026-03-19
+
+Users were logged out on every page refresh. Root cause was three interacting issues:
+
+1. **`server.ts` used deprecated cookie API:** Individual `get`/`set`/`remove` methods → must use `getAll`/`setAll` for `@supabase/ssr` v0.7.0+.
+2. **`middleware.ts` dropped cookies on redirects:** Admin route redirects (`NextResponse.redirect()`) did not copy session cookies from `supabaseResponse`. Token refreshes were silently lost.
+3. **`actions.ts` imported deprecated `@supabase/auth-helpers-nextjs`:** Mixed cookie handling conflicted with `@supabase/ssr`.
+
+**Rule:** Always use the `getAll`/`setAll` cookie pattern (not individual methods). When creating redirect responses in middleware, always copy cookies: `supabaseResponse.cookies.getAll().forEach(c => redirect.cookies.set(c.name, c.value))`. Never mix `@supabase/auth-helpers-nextjs` with `@supabase/ssr`. The helpers package is deprecated — use `createClient` from `@/lib/supabase/server` in all server actions.
+
+## 37. Cloudflare 524 Timeout on Long-Running Cron Routes — 2026-03-19
+
+`projectprofound.org` is behind Cloudflare, which has a **100-second proxy timeout**. If the origin server doesn't respond within ~100s, Cloudflare returns **HTTP 524** ("A Timeout Occurred"). The blog generation pipelines take 2-5 minutes (Claude draft + Perplexity research + fal.ai images), so they always exceeded this limit.
+
+**Fix:** Use Next.js `after()` in cron routes to return HTTP 200 immediately, then run the pipeline in the background:
+
+```typescript
+import { after } from 'next/server';
+
+export async function POST(req: Request) {
+    // Auth check...
+    after(async () => {
+        // Long-running pipeline work here — runs AFTER response is sent
+        const result = await generateBlogArticle(slug);
+        console.log(`[cron] Done: ${result.status}`);
+    });
+    return NextResponse.json({ acknowledged: true });
+}
+```
+
+**Rule:** Any API route that takes >30 seconds must use `after()` or streaming. Never block the response for long-running work. Firebase App Hosting's `timeoutSeconds: 300` keeps the serverless function alive, but Cloudflare kills the HTTP connection at 100s. The `after()` callback runs within the server's timeout, not Cloudflare's.
+
+Affected routes: `/api/cron/blog-questions`, `/api/cron/blog-stories`.
+
+

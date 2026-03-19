@@ -1,0 +1,718 @@
+/**
+ * Blog Story Pipeline — Orchestrator
+ *
+ * Generates long-form narrative articles retelling named experiencers' NDEs
+ * using only our internal video transcripts. Designed as a pure function
+ * callable from cron, admin UI, or CLI.
+ *
+ * 6 steps:
+ * 1. Select     — pick next experiencer by total views
+ * 2. Context    — assemble their video transcripts + metadata
+ * 3. Draft      — Claude writes the narrative (JSON output)
+ * 4. Voice pass — strip AI tics, enforce style
+ * 5. Images     — thumbnail + 2 fal.ai paintings
+ * 6. Publish    — insert blog_posts row
+ */
+
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
+import {
+    STORY_DRAFT_SYSTEM_PROMPT,
+    STORY_VOICE_PASS_SYSTEM,
+    buildStoryDraftUserPrompt,
+    buildDeathSceneImagePrompt,
+    buildAfterlifeEncounterImagePrompt,
+} from './blog-story-prompts';
+import { SEO_REFRESH_PROMPT } from './blog-prompts';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface StoryArticleResult {
+    status: 'complete' | 'already_exists' | 'no_experiencers' | 'failed';
+    experiencerSlug?: string;
+    experiencerName?: string;
+    articleSlug?: string;
+    articleId?: number;
+    error?: string;
+}
+
+interface StoryDraft {
+    title: string;
+    slug: string;
+    subtitle: string;
+    lead_paragraph: string;
+    body_mdx: string;
+    read_time_mins: number;
+    word_count: number;
+    tags: string[];
+    seo_title: string;
+    seo_description: string;
+    related_video_ids: string[];
+    image_prompts: {
+        death_scene: string;
+        afterlife_encounter: string;
+    };
+}
+
+// ─── Clients ──────────────────────────────────────────────────────────────────
+
+function getSupabaseAdmin() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) throw new Error('Missing Supabase environment variables');
+    return createClient(url, key);
+}
+
+function getOpenRouter() {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable');
+    return new OpenAI({
+        apiKey,
+        baseURL: 'https://openrouter.ai/api/v1',
+        defaultHeaders: {
+            'HTTP-Referer': 'https://projectprofound.org',
+            'X-Title': 'Project Profound Story Pipeline',
+        },
+    });
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Convert raw timestamped subtitle segments to a readable format with timestamps.
+ * Input: JSON with {data: [{start, end, text}]} or [{text, start, duration}]
+ * Output: "[0:00] text\n[0:05] text\n..."
+ */
+function formatTimestampedTranscript(rawJson: unknown): string {
+    try {
+        let segments: Array<{ text: string; start: number }>;
+
+        if (Array.isArray(rawJson)) {
+            // Format: [{text, start, duration}]
+            segments = rawJson;
+        } else if (rawJson && typeof rawJson === 'object' && 'data' in rawJson) {
+            // Format: {data: [{start, end, text}]}
+            segments = (rawJson as { data: Array<{ text: string; start: number }> }).data;
+        } else {
+            return '';
+        }
+
+        return segments
+            .filter(s => s.text && s.text !== '[Music]' && s.text.trim().length > 0)
+            .map(s => {
+                const mins = Math.floor(s.start / 60);
+                const secs = Math.floor(s.start % 60);
+                const ts = `${mins}:${String(secs).padStart(2, '0')}`;
+                // Clean HTML entities
+                const text = s.text
+                    .replace(/&#39;/g, "'")
+                    .replace(/&quot;/g, '"')
+                    .replace(/&amp;/g, '&')
+                    .replace(/\\n/g, ' ')
+                    .trim();
+                return `[${ts}] ${text}`;
+            })
+            .join('\n');
+    } catch {
+        return '';
+    }
+}
+
+/**
+ * Generate experiencer slug from full name: "Betty Guadagno" → "betty-guadagno"
+ */
+function nameToSlug(name: string): string {
+    return name.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-');
+}
+
+// ─── fal.ai Image Generation ─────────────────────────────────────────────────
+
+interface FalResponse {
+    images?: Array<{ url: string; width: number; height: number }>;
+}
+
+async function generateImageWithFal(prompt: string): Promise<{ url: string; width: number; height: number }> {
+    const apiKey = process.env.FAL_API_KEY;
+    if (!apiKey) throw new Error('Missing FAL_API_KEY');
+
+    const submitRes = await fetch('https://queue.fal.run/fal-ai/flux/dev', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Key ${apiKey}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            prompt,
+            image_size: 'landscape_16_9',
+            num_inference_steps: 28,
+            guidance_scale: 3.5,
+            num_images: 1,
+            enable_safety_checker: true,
+        }),
+    });
+
+    if (!submitRes.ok) throw new Error(`fal.ai submit error ${submitRes.status}`);
+
+    const { request_id, status_url } = await submitRes.json() as { request_id: string; status_url: string };
+
+    // Poll for completion (max 3 minutes)
+    for (let i = 0; i < 36; i++) {
+        await new Promise(r => setTimeout(r, 5000));
+        const pollRes = await fetch(status_url ?? `https://queue.fal.run/fal-ai/flux/dev/requests/${request_id}`, {
+            headers: { 'Authorization': `Key ${apiKey}` },
+        });
+        if (!pollRes.ok) continue;
+        const pollData = await pollRes.json() as { status: string; response_url?: string };
+        if (pollData.status === 'COMPLETED' && pollData.response_url) {
+            const resultRes = await fetch(pollData.response_url, {
+                headers: { 'Authorization': `Key ${apiKey}` },
+            });
+            const result = await resultRes.json() as FalResponse;
+            const img = result.images?.[0];
+            if (!img) throw new Error('fal.ai returned no images');
+            return img;
+        }
+        if (pollData.status === 'FAILED') throw new Error('fal.ai generation failed');
+    }
+    throw new Error('fal.ai timed out');
+}
+
+async function uploadToStorage(imageUrl: string, fileName: string): Promise<string> {
+    const supabase = getSupabaseAdmin();
+    const imageRes = await fetch(imageUrl);
+    if (!imageRes.ok) throw new Error(`Failed to fetch image: ${imageRes.status}`);
+    const imageBuffer = await imageRes.arrayBuffer();
+
+    const contentType = imageUrl.includes('.webp') ? 'image/webp'
+        : imageUrl.includes('.png') ? 'image/png'
+        : 'image/jpeg';
+
+    const { error } = await supabase.storage
+        .from('media')
+        .upload(fileName, imageBuffer, { contentType, upsert: true });
+
+    if (error) throw new Error(`Storage upload failed: ${error.message}`);
+    const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(fileName);
+    return publicUrl;
+}
+
+// ─── Stage 1: Experiencer Selection ───────────────────────────────────────────
+
+interface ExperiencerCandidate {
+    experiencerFullName: string;
+    totalViews: number;
+    videoCount: number;
+    slug: string;
+}
+
+async function selectNextExperiencer(specificSlug?: string): Promise<ExperiencerCandidate | null> {
+    const supabase = getSupabaseAdmin();
+
+    // Get already-generated experiencer slugs
+    const { data: existing } = await supabase
+        .from('blog_posts')
+        .select('source_experiencer_slug')
+        .not('source_experiencer_slug', 'is', null);
+
+    const alreadyDone = new Set((existing ?? []).map(r => r.source_experiencer_slug));
+
+    if (specificSlug && !alreadyDone.has(specificSlug)) {
+        // Specific experiencer requested
+        const { data: videos } = await supabase
+            .from('nde_vids')
+            .select('"experiencerFullName", "viewCount"')
+            .eq('intake_status', 'complete')
+            .not('experiencerFullName', 'is', null);
+
+        // Match by slug
+        const matching = (videos ?? []).filter(v => {
+            const vSlug = nameToSlug(v.experiencerFullName);
+            return vSlug === specificSlug;
+        });
+
+        if (matching.length === 0) return null;
+
+        return {
+            experiencerFullName: matching[0].experiencerFullName,
+            totalViews: matching.reduce((sum, v) => sum + (v.viewCount ?? 0), 0),
+            videoCount: matching.length,
+            slug: specificSlug,
+        };
+    }
+
+    // Auto-select: find top experiencer by total views who hasn't been done
+    const { data: candidates } = await supabase.rpc('get_top_experiencers_for_stories');
+
+    // If RPC doesn't exist, fall back to raw query
+    if (!candidates || candidates.length === 0) {
+        const { data: allVids } = await supabase
+            .from('nde_vids')
+            .select('"experiencerFullName", "viewCount"')
+            .eq('intake_status', 'complete')
+            .not('experiencerFullName', 'is', null)
+            .not('experiencerFullName', 'eq', '');
+
+        // Aggregate by experiencer name
+        const byName = new Map<string, { totalViews: number; count: number }>();
+        for (const v of (allVids ?? [])) {
+            const name = v.experiencerFullName;
+            const entry = byName.get(name) ?? { totalViews: 0, count: 0 };
+            entry.totalViews += v.viewCount ?? 0;
+            entry.count++;
+            byName.set(name, entry);
+        }
+
+        // Sort by total views, filter out already done
+        const sorted = [...byName.entries()]
+            .map(([name, data]) => ({
+                experiencerFullName: name,
+                totalViews: data.totalViews,
+                videoCount: data.count,
+                slug: nameToSlug(name),
+            }))
+            .filter(c => !alreadyDone.has(c.slug))
+            .sort((a, b) => b.totalViews - a.totalViews);
+
+        return sorted[0] ?? null;
+    }
+
+    // Use RPC results
+    const candidate = candidates.find((c: { slug: string }) => !alreadyDone.has(c.slug));
+    return candidate ?? null;
+}
+
+// ─── Stage 2: Context Assembly ────────────────────────────────────────────────
+
+interface StoryContext {
+    experiencer: {
+        fullName: string;
+        slug: string;
+        experienceType: string | null;
+        triggerCategory: string | null;
+        coreThemes: string[] | null;
+        highlightQuote: string | null;
+        hasProfile: boolean;
+    };
+    primaryVideos: Array<{
+        videoId: string;
+        title: string;
+        viewCount: number;
+        channelName: string;
+        thumbnailUrl: string | null;
+        transcript: string;
+        timestampedSegments: string;
+        analysisSummary: string | null;
+    }>;
+    otherVideos: Array<{
+        videoId: string;
+        title: string;
+        viewCount: number;
+        channelName: string;
+    }>;
+    heroThumbnailUrl: string | null;
+}
+
+async function assembleStoryContext(candidate: ExperiencerCandidate): Promise<StoryContext> {
+    const supabase = getSupabaseAdmin();
+
+    // Fetch all videos for this experiencer
+    // Use raw_timestamped_subtitles_cleaned first, fall back to raw_timestamped_subtitles
+    const { data: videos } = await supabase
+        .from('nde_vids')
+        .select('"videoId", title, "viewCount", "channelName", "thumbnailUrl", subtitles_punctuated, "raw_timestamped_subtitles_cleaned", raw_timestamped_subtitles, analysis_nde_summary')
+        .eq('experiencerFullName', candidate.experiencerFullName)
+        .eq('intake_status', 'complete')
+        .order('viewCount', { ascending: false });
+
+    const allVideos = (videos ?? []) as Array<{
+        videoId: string;
+        title: string;
+        viewCount: number;
+        channelName: string;
+        thumbnailUrl: string | null;
+        subtitles_punctuated: string | null;
+        raw_timestamped_subtitles_cleaned: unknown | null;
+        raw_timestamped_subtitles: unknown | null;
+        analysis_nde_summary: string | null;
+    }>;
+
+    // Primary videos: top 2 by views (with full transcripts for context)
+    const primaryVideos = allVideos.slice(0, 2).map(v => ({
+        videoId: v.videoId,
+        title: v.title,
+        viewCount: v.viewCount ?? 0,
+        channelName: v.channelName ?? '',
+        thumbnailUrl: v.thumbnailUrl,
+        transcript: v.subtitles_punctuated ?? '',
+        // Use cleaned timestamps if available, fall back to raw
+        timestampedSegments: formatTimestampedTranscript(
+            v.raw_timestamped_subtitles_cleaned ?? v.raw_timestamped_subtitles
+        ),
+        analysisSummary: v.analysis_nde_summary,
+    }));
+
+    // Other videos: metadata only (for linking)
+    const otherVideos = allVideos.slice(2).map(v => ({
+        videoId: v.videoId,
+        title: v.title,
+        viewCount: v.viewCount ?? 0,
+        channelName: v.channelName ?? '',
+    }));
+
+    // Check for experiencer profile
+    const { data: profile } = await supabase
+        .from('experiencer_profiles')
+        .select('slug, experience_type, trigger_category, core_themes, highlight_quote')
+        .eq('slug', candidate.slug)
+        .single();
+
+    const heroThumbnailUrl = allVideos[0]?.thumbnailUrl ?? null;
+
+    return {
+        experiencer: {
+            fullName: candidate.experiencerFullName,
+            slug: candidate.slug,
+            experienceType: profile?.experience_type ?? null,
+            triggerCategory: profile?.trigger_category ?? null,
+            coreThemes: profile?.core_themes ?? null,
+            highlightQuote: profile?.highlight_quote ?? null,
+            hasProfile: !!profile,
+        },
+        primaryVideos,
+        otherVideos,
+        heroThumbnailUrl,
+    };
+}
+
+// ─── Stage 3: Claude Draft ────────────────────────────────────────────────────
+
+async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
+    const openRouter = getOpenRouter();
+
+    const userPrompt = buildStoryDraftUserPrompt({
+        experiencer: context.experiencer,
+        primaryVideos: context.primaryVideos,
+        otherVideos: context.otherVideos,
+    });
+
+    console.log(`    [story] Sending draft request to Claude (${userPrompt.length} chars)...`);
+
+    const response = await openRouter.chat.completions.create({
+        model: 'anthropic/claude-sonnet-4-5',
+        messages: [
+            { role: 'system', content: STORY_DRAFT_SYSTEM_PROMPT },
+            { role: 'user', content: userPrompt },
+            { role: 'assistant', content: '{' },
+        ],
+        max_tokens: 8000,
+        temperature: 0.7,
+    });
+
+    let jsonStr = '{' + (response.choices[0]?.message?.content ?? '{}');
+    // Strip markdown code fence if present
+    jsonStr = jsonStr.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+
+    const draft = JSON.parse(jsonStr) as StoryDraft;
+
+    if (!draft.body_mdx || draft.body_mdx.length < 500) {
+        throw new Error('Draft body too short or missing');
+    }
+
+    return draft;
+}
+
+// ─── Stage 4: Voice Pass ──────────────────────────────────────────────────────
+
+async function applyVoicePass(draft: StoryDraft): Promise<StoryDraft> {
+    const openRouter = getOpenRouter();
+
+    const voiceResponse = await openRouter.chat.completions.create({
+        model: 'anthropic/claude-sonnet-4-5',
+        messages: [
+            { role: 'system', content: STORY_VOICE_PASS_SYSTEM },
+            { role: 'user', content: `Apply the voice pass to this story article. Return ONLY the corrected body_mdx text (no JSON wrapper, no markdown fence).\n\nCurrent body_mdx:\n\n${draft.body_mdx}` },
+        ],
+        max_tokens: 6000,
+        temperature: 0.3,
+    });
+
+    const revisedBody = voiceResponse.choices[0]?.message?.content ?? draft.body_mdx;
+
+    // Refresh SEO fields
+    const seoResponse = await openRouter.chat.completions.create({
+        model: 'openai/gpt-4o-mini',
+        messages: [
+            { role: 'user', content: `${SEO_REFRESH_PROMPT}\n\nTITLE: ${draft.title}\n\nARTICLE BODY:\n${revisedBody.slice(0, 3000)}` },
+            { role: 'assistant', content: '{' },
+        ],
+        max_tokens: 400,
+        temperature: 0.2,
+    });
+
+    let seoFields = { lead_paragraph: draft.lead_paragraph, seo_description: draft.seo_description };
+    try {
+        seoFields = JSON.parse('{' + (seoResponse.choices[0]?.message?.content ?? '{}'));
+    } catch { /* keep original */ }
+
+    const wordCount = revisedBody.split(/\s+/).filter(Boolean).length;
+    const readTimeMins = Math.max(1, Math.round(wordCount / 238));
+
+    return {
+        ...draft,
+        body_mdx: revisedBody,
+        lead_paragraph: seoFields.lead_paragraph ?? draft.lead_paragraph,
+        seo_description: seoFields.seo_description ?? draft.seo_description,
+        word_count: wordCount,
+        read_time_mins: readTimeMins,
+    };
+}
+
+// ─── Stage 5: Images ──────────────────────────────────────────────────────────
+
+interface StoryImages {
+    heroUrl: string;
+    deathSceneUrl: string | null;
+    deathScenePrompt: string | null;
+    afterlifeUrl: string | null;
+    afterlifePrompt: string | null;
+}
+
+async function generateStoryImages(
+    draft: StoryDraft,
+    context: StoryContext,
+): Promise<StoryImages> {
+    const slug = draft.slug;
+
+    // Image 1: YouTube thumbnail as hero
+    let heroUrl = '';
+    if (context.heroThumbnailUrl) {
+        try {
+            // Use maxresdefault if available, otherwise the provided URL
+            const videoId = context.primaryVideos[0]?.videoId;
+            const thumbnailUrl = videoId
+                ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+                : context.heroThumbnailUrl;
+
+            heroUrl = await uploadToStorage(thumbnailUrl, `blog/${slug}-hero.jpg`);
+            console.log(`    [story] Hero thumbnail uploaded: ${heroUrl}`);
+        } catch (err) {
+            console.warn(`    [story] Failed to upload thumbnail, using direct URL: ${err}`);
+            heroUrl = context.heroThumbnailUrl;
+        }
+    }
+
+    // Image 2: Death scene (fal.ai)
+    let deathSceneUrl: string | null = null;
+    let deathScenePrompt: string | null = null;
+    if (draft.image_prompts?.death_scene) {
+        try {
+            deathScenePrompt = buildDeathSceneImagePrompt(draft.image_prompts.death_scene);
+            const generated = await generateImageWithFal(deathScenePrompt);
+            deathSceneUrl = await uploadToStorage(generated.url, `blog/${slug}-death-scene.webp`);
+            console.log(`    [story] Death scene image uploaded: ${deathSceneUrl}`);
+        } catch (err) {
+            console.warn(`    [story] Death scene image failed: ${err}`);
+        }
+    }
+
+    // Image 3: Afterlife encounter (fal.ai)
+    let afterlifeUrl: string | null = null;
+    let afterlifePrompt: string | null = null;
+    if (draft.image_prompts?.afterlife_encounter) {
+        try {
+            afterlifePrompt = buildAfterlifeEncounterImagePrompt(draft.image_prompts.afterlife_encounter);
+            const generated = await generateImageWithFal(afterlifePrompt);
+            afterlifeUrl = await uploadToStorage(generated.url, `blog/${slug}-afterlife.webp`);
+            console.log(`    [story] Afterlife image uploaded: ${afterlifeUrl}`);
+        } catch (err) {
+            console.warn(`    [story] Afterlife image failed: ${err}`);
+        }
+    }
+
+    return { heroUrl, deathSceneUrl, deathScenePrompt, afterlifeUrl, afterlifePrompt };
+}
+
+// ─── Stage 6: Publish ─────────────────────────────────────────────────────────
+
+async function publishStory(
+    draft: StoryDraft,
+    experiencerSlug: string,
+    images: StoryImages,
+): Promise<{ id: number; slug: string }> {
+    const supabase = getSupabaseAdmin();
+
+    // Inject inline images into body_mdx as raw HTML (passes through markdownToHtml untouched)
+    // Uses <figure><img> — same approach as the hero image, not markdown syntax.
+    let body = draft.body_mdx;
+    if (images.deathSceneUrl || images.afterlifeUrl) {
+        const buildImageHtml = (url: string, caption: string) =>
+            `<figure class="my-8"><img src="${url}" alt="${caption}" class="rounded-xl w-full shadow-md" loading="lazy" /><figcaption class="text-center text-sm text-slate-500 dark:text-slate-400 mt-3 italic">${caption}</figcaption></figure>`;
+
+        // Find the first ## heading after the opening prose and inject the death scene image
+        if (images.deathSceneUrl) {
+            const firstHeadingIdx = body.indexOf('\n##');
+            if (firstHeadingIdx > 0) {
+                const caption = draft.image_prompts?.death_scene || 'The moment everything changed';
+                body = body.slice(0, firstHeadingIdx) +
+                    '\n\n' + buildImageHtml(images.deathSceneUrl, caption) + '\n' +
+                    body.slice(firstHeadingIdx);
+            }
+        }
+
+        // Inject afterlife image near the middle of the article
+        if (images.afterlifeUrl) {
+            const headings = [...body.matchAll(/\n##\s/g)];
+            const midHeadingIdx = headings.length >= 3
+                ? headings[Math.floor(headings.length / 2)]?.index
+                : null;
+            if (midHeadingIdx) {
+                const caption = draft.image_prompts?.afterlife_encounter || 'What awaited on the other side';
+                body = body.slice(0, midHeadingIdx) +
+                    '\n\n' + buildImageHtml(images.afterlifeUrl, caption) + '\n' +
+                    body.slice(midHeadingIdx);
+            }
+        }
+    }
+
+    const { data, error } = await supabase
+        .from('blog_posts')
+        .insert({
+            slug: draft.slug,
+            title: draft.title,
+            subtitle: draft.subtitle,
+            category: 'story',
+            author_name: 'Thomas Wood',
+            status: 'published',
+            published_at: new Date().toISOString(),
+            lead_paragraph: draft.lead_paragraph,
+            body_mdx: body,
+            read_time_mins: draft.read_time_mins,
+            word_count: draft.word_count,
+            tags: draft.tags,
+            seo_title: draft.seo_title,
+            seo_description: draft.seo_description,
+            source_experiencer_slug: experiencerSlug,
+            related_video_ids: draft.related_video_ids,
+            hero_image_url: images.heroUrl || null,
+            hero_image_prompt: images.deathScenePrompt || null,
+            refs: null, // Stories don't have external references
+        })
+        .select('id, slug')
+        .single();
+
+    if (error) throw new Error(`Failed to insert blog_posts: ${error.message}`);
+    if (!data) throw new Error('Insert returned no data');
+    return { id: data.id, slug: data.slug };
+}
+
+// ─── Main Orchestrator ────────────────────────────────────────────────────────
+
+/** Step progress callback — compatible with ArticleStep from blog-article.ts */
+export interface StoryStep {
+    name: string;
+    status: 'pending' | 'running' | 'success' | 'failed' | 'skipped';
+    message?: string;
+    duration_ms?: number;
+}
+
+/**
+ * Generate a story article for a named NDE experiencer.
+ *
+ * @param experiencerSlug - optional slug (e.g. "betty-guadagno") to target specific experiencer.
+ *                          If omitted, auto-selects the highest-view-count experiencer not yet done.
+ * @param onStep - optional callback for real-time progress updates (SSE support)
+ */
+export async function generateStoryArticle(
+    experiencerSlug?: string,
+    onStep?: (step: StoryStep) => void,
+): Promise<StoryArticleResult> {
+    const emit = (name: string, status: StoryStep['status'], message?: string, duration_ms?: number) => {
+        console.log(`[story] ${name}: ${status}${message ? ' — ' + message : ''}`);
+        onStep?.({ name, status, message, duration_ms });
+    };
+
+    try {
+        // ── Stage 1: Select experiencer ──
+        let t0 = Date.now();
+        emit('Select experiencer', 'running');
+        const candidate = await selectNextExperiencer(experiencerSlug);
+
+        if (!candidate) {
+            emit('Select experiencer', 'failed', 'No eligible experiencers remaining');
+            return { status: 'no_experiencers' };
+        }
+
+        emit('Select experiencer', 'success',
+            `${candidate.experiencerFullName} (${candidate.totalViews.toLocaleString()} views, ${candidate.videoCount} videos)`,
+            Date.now() - t0);
+
+        // Check if already exists
+        const supabase = getSupabaseAdmin();
+        const { data: existing } = await supabase
+            .from('blog_posts')
+            .select('id')
+            .eq('source_experiencer_slug', candidate.slug)
+            .single();
+
+        if (existing) {
+            emit('Select experiencer', 'skipped', `Story already exists for ${candidate.experiencerFullName}`);
+            return { status: 'already_exists', experiencerSlug: candidate.slug, experiencerName: candidate.experiencerFullName };
+        }
+
+        // ── Stage 2: Context assembly ──
+        t0 = Date.now();
+        emit('Assemble context', 'running', 'Fetching transcripts and metadata...');
+        const context = await assembleStoryContext(candidate);
+        emit('Assemble context', 'success',
+            `${context.primaryVideos.length} primary + ${context.otherVideos.length} secondary videos`,
+            Date.now() - t0);
+
+        // ── Stage 3: Claude draft ──
+        t0 = Date.now();
+        emit('Generate draft', 'running', 'Claude is writing the narrative...');
+        const rawDraft = await generateStoryDraft(context);
+        emit('Generate draft', 'success',
+            `"${rawDraft.title}" (${rawDraft.word_count} words)`,
+            Date.now() - t0);
+
+        // ── Stage 4: Voice pass ──
+        t0 = Date.now();
+        emit('Voice pass', 'running', 'Removing AI tics, enforcing house style...');
+        const polishedDraft = await applyVoicePass(rawDraft);
+        emit('Voice pass', 'success',
+            `${polishedDraft.word_count} words after polish`,
+            Date.now() - t0);
+
+        // ── Stage 5: Images ──
+        t0 = Date.now();
+        emit('Generate images', 'running', 'Creating hero + 2 oil paintings via fal.ai...');
+        const images = await generateStoryImages(polishedDraft, context);
+        emit('Generate images', 'success',
+            `Hero: ${images.heroUrl ? '✓' : '✗'}, Death scene: ${images.deathSceneUrl ? '✓' : '✗'}, Afterlife: ${images.afterlifeUrl ? '✓' : '✗'}`,
+            Date.now() - t0);
+
+        // ── Stage 6: Publish ──
+        t0 = Date.now();
+        emit('Publish', 'running', 'Inserting into blog_posts...');
+        const result = await publishStory(polishedDraft, candidate.slug, images);
+        emit('Publish', 'success',
+            `/blog/${result.slug} (id=${result.id})`,
+            Date.now() - t0);
+
+        return {
+            status: 'complete',
+            experiencerSlug: candidate.slug,
+            experiencerName: candidate.experiencerFullName,
+            articleSlug: result.slug,
+            articleId: result.id,
+        };
+    } catch (err) {
+        console.error(`[story] Pipeline failed: ${err}`);
+        emit('Pipeline error', 'failed', String(err));
+        return {
+            status: 'failed',
+            experiencerSlug: experiencerSlug,
+            error: String(err),
+        };
+    }
+}

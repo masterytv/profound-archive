@@ -1,23 +1,28 @@
+/**
+ * Cron endpoint: generate one Big Question blog article per invocation.
+ * Triggered daily by GitHub Actions at noon ET.
+ *
+ * Auth: requires CRON_SECRET header.
+ *
+ * Query params:
+ *   count — number of articles (default 1, max 3)
+ *
+ * ARCHITECTURE NOTE:
+ * The pipeline takes 2-5 minutes (Claude draft + Perplexity research + fal.ai images).
+ * Cloudflare's proxy timeout is ~100s, which causes a 524 if we wait synchronously.
+ * We use Next.js `after()` to return HTTP 200 immediately and run the pipeline
+ * in the background. Results are logged server-side and written to the database.
+ */
+
 import { NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { generateBlogArticle } from '@/lib/pipeline/blog-article';
 import { createClient } from '@supabase/supabase-js';
 
-export const maxDuration = 300;
+export const maxDuration = 300; // 5 min timeout for serverless
 
-/**
- * POST /api/cron/blog-questions
- *
- * Called by GitHub Actions "blog-generate-questions.yml" workflow.
- * Protected by BLOG_CRON_SECRET bearer token.
- *
- * Picks the next N unpublished nde_questions (ordered by view_count DESC)
- * that don't already have a corresponding blog_posts row, and generates articles.
- *
- * Default batch size: 1 article per run (1/day cron = 1/day throughput).
- * Override: ?count=2 (max 3 to stay within SEO limits).
- */
 export async function POST(req: Request) {
-    // Auth: verify cron secret (reuses the same CRON_SECRET as scanner/tick)
+    // Auth: verify cron secret
     const authHeader = req.headers.get('authorization') ?? '';
     const cronSecret = process.env.CRON_SECRET;
 
@@ -29,53 +34,60 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Batch size (max 3 — SEO rate limit)
+    // Parse params before responding
     const url = new URL(req.url);
     const count = Math.min(parseInt(url.searchParams.get('count') ?? '1', 10), 3);
 
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    // Kick off pipeline AFTER response is sent (avoids Cloudflare 524 timeout)
+    after(async () => {
+        console.log(`[cron/blog-questions] Starting generation of ${count} article(s)...`);
 
-    // Find questions that don't have a blog article yet
-    const { data: generated } = await supabase
-        .from('blog_posts')
-        .select('source_question_slug')
-        .not('source_question_slug', 'is', null);
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
 
-    const generatedSlugs = new Set((generated ?? []).map((r) => r.source_question_slug));
+        // Find questions that don't have a blog article yet
+        const { data: generated } = await supabase
+            .from('blog_posts')
+            .select('source_question_slug')
+            .not('source_question_slug', 'is', null);
 
-    const { data: questions } = await supabase
-        .from('nde_questions')
-        .select('slug')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true, nullsFirst: false })
-        .limit(count + generatedSlugs.size + 10); // over-fetch to account for already-done ones
+        const generatedSlugs = new Set((generated ?? []).map((r) => r.source_question_slug));
 
-    const todo = (questions ?? [])
-        .map((q) => q.slug)
-        .filter((s) => !generatedSlugs.has(s))
-        .slice(0, count);
+        const { data: questions } = await supabase
+            .from('nde_questions')
+            .select('slug')
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true, nullsFirst: false })
+            .limit(count + generatedSlugs.size + 10);
 
-    if (todo.length === 0) {
-        return NextResponse.json({ message: 'All questions already generated', processed: 0 });
-    }
+        const todo = (questions ?? [])
+            .map((q) => q.slug)
+            .filter((s) => !generatedSlugs.has(s))
+            .slice(0, count);
 
-    // Process sequentially — respect Perplexity rate limits
-    const results = [];
-    for (const slug of todo) {
-        try {
-            const result = await generateBlogArticle(slug);
-            results.push({ slug, status: result.status, articleSlug: result.articleSlug, error: result.error });
-        } catch (err) {
-            results.push({ slug, status: 'failed', error: String(err) });
+        if (todo.length === 0) {
+            console.log('[cron/blog-questions] All questions already generated — nothing to do');
+            return;
         }
-    }
 
+        // Process sequentially — respect API rate limits
+        for (const slug of todo) {
+            try {
+                const result = await generateBlogArticle(slug);
+                console.log(`[cron/blog-questions] ${slug}: ${result.status}${result.articleSlug ? ` → /blog/${result.articleSlug}` : ''}${result.error ? ` — ${result.error}` : ''}`);
+            } catch (err) {
+                console.error(`[cron/blog-questions] ${slug}: FAILED — ${err}`);
+            }
+        }
+
+        console.log(`[cron/blog-questions] Done. Processed ${todo.length} question(s).`);
+    });
+
+    // Respond immediately — pipeline runs in background via after()
     return NextResponse.json({
-        processed: results.length,
-        results,
-        remaining: (questions?.length ?? 0) - generatedSlugs.size - results.length,
+        acknowledged: true,
+        message: `Queued ${count} article(s) for generation. Check server logs for results.`,
     });
 }

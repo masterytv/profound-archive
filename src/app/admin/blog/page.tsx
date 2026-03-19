@@ -3,7 +3,7 @@ import { createClient as createServiceClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { FileText, CheckCircle2, Clock3, Settings2, Eye, EyeOff, Pencil } from "lucide-react";
-import { BlogGeneratePanel, GuideGeneratePanel } from "@/components/admin/blog-generate-panel";
+import { BlogGeneratePanel, GuideGeneratePanel, StoryGeneratePanel } from "@/components/admin/blog-generate-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -118,6 +118,9 @@ export default async function AdminBlogPage() {
 
             {/* Guide (pillar page) generation panel */}
             <GuideGeneratePanel />
+
+            {/* Story (experiencer narrative) generation panel */}
+            <StoryGeneratePanel />
 
             {/* Error state */}
             {error && (

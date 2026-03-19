@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Sparkles, CheckCircle2, XCircle, Clock3, Loader2, ChevronDown, BookOpen } from "lucide-react";
+import { Sparkles, CheckCircle2, XCircle, Clock3, Loader2, ChevronDown, BookOpen, User } from "lucide-react";
 
 type StepStatus = "pending" | "running" | "success" | "failed" | "skipped";
 
@@ -389,3 +389,105 @@ export function GuideGeneratePanel() {
         </div>
     );
 }
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Story (Experiencer Narrative) Generation Panel
+// ═════════════════════════════════════════════════════════════════════════════
+
+export function StoryGeneratePanel() {
+    const [open, setOpen] = useState(false);
+    const [slug, setSlug] = useState("");
+    const [steps, setSteps] = useState<PipelineStep[]>([]);
+    const [result, setResult] = useState<GenerateResult | null>(null);
+    const [running, setRunning] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const abortRef = useRef<AbortController | null>(null);
+
+    function reset() { setSteps([]); setResult(null); setError(null); }
+
+    async function handleGenerate() {
+        reset();
+        setRunning(true);
+        abortRef.current = new AbortController();
+
+        try {
+            await runSSEGeneration(
+                {
+                    type: "story",
+                    ...(slug.trim() ? { experiencerSlug: slug.trim() } : {}),
+                },
+                abortRef.current.signal,
+                {
+                    onStep: (step) => setSteps((prev) => {
+                        const idx = prev.findIndex((s) => s.name === step.name);
+                        if (idx === -1) return [...prev, step];
+                        const next = [...prev]; next[idx] = step; return next;
+                    }),
+                    onResult: setResult,
+                    onError: setError,
+                }
+            );
+        } catch (err: unknown) {
+            if (err instanceof Error && err.name !== "AbortError") setError(String(err));
+        } finally {
+            setRunning(false);
+        }
+    }
+
+    return (
+        <div className="rounded-2xl border border-amber-200/60 bg-amber-50/40 dark:bg-amber-500/5 dark:border-amber-500/20 overflow-hidden">
+            <button
+                onClick={() => setOpen((o) => !o)}
+                className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-amber-50/60 dark:hover:bg-amber-500/10 transition-colors"
+            >
+                <div className="w-8 h-8 rounded-xl bg-amber-600 flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1">
+                    <p className="text-sm font-bold text-amber-700 dark:text-amber-300">Generate Experiencer Story</p>
+                    <p className="text-xs text-amber-500 dark:text-amber-400">Long-form narrative from transcripts · 6 stages: Select → Context → Draft → Voice → Images → Publish</p>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-amber-400 transition-transform ${open ? "rotate-180" : ""}`} />
+            </button>
+
+            {open && (
+                <div className="px-5 pb-5 border-t border-amber-200/40 dark:border-amber-500/20 pt-4">
+                    {/* Experiencer slug input */}
+                    <div className="mb-3">
+                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">
+                            Experiencer slug (optional)
+                        </label>
+                        <input
+                            type="text"
+                            value={slug}
+                            onChange={(e) => { setSlug(e.target.value); reset(); }}
+                            disabled={running}
+                            placeholder="e.g. betty-guadagno — leave empty for auto-select (highest views)"
+                            className="w-full text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50"
+                        />
+                        <p className="text-xs text-slate-400 mt-1">
+                            {slug.trim()
+                                ? <span className="font-mono">/experiencer/{slug.trim()}</span>
+                                : "Auto-selects the highest-view experiencer not yet covered"
+                            }
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={handleGenerate}
+                        disabled={running}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                        {running
+                            ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating Story...</>
+                            : <><User className="w-3.5 h-3.5" /> Generate Story</>
+                        }
+                    </button>
+
+                    <PipelineProgress steps={steps} result={result} error={error} />
+                </div>
+            )}
+        </div>
+    );
+}
+

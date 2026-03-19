@@ -1,0 +1,53 @@
+name: Blog — Daily Experiencer Story (2pm ET)
+
+on:
+  schedule:
+    - cron: '0 18 * * *'                 # Daily 18:00 UTC = 2pm ET (EDT)
+  workflow_dispatch:                    # manual trigger for testing
+    inputs:
+      count:
+        description: 'Number of stories to generate (max 3)'
+        required: false
+        default: '1'
+      slug:
+        description: 'Specific experiencer slug (optional, e.g. "betty-guadagno")'
+        required: false
+        default: ''
+
+jobs:
+  generate:
+    name: Generate & publish experiencer story
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Trigger story generation
+        run: |
+          COUNT="${{ github.event.inputs.count || '1' }}"
+          SLUG_PARAM=""
+          if [ -n "${{ inputs.slug }}" ]; then
+            SLUG_PARAM="&slug=${{ inputs.slug }}"
+          fi
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 300 \
+            "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/blog-stories?count=$COUNT${SLUG_PARAM}")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Story generation failed with status $HTTP_CODE"
+            exit 1
+          fi
+
+# ── Required GitHub Secrets ──────────────────────────────────────────────────
+# CRON_SECRET          — same secret used by scanner/tick and other cron routes
+# NEXT_PUBLIC_APP_URL  — https://projectprofound.org (no trailing slash)
+# ─────────────────────────────────────────────────────────────────────────────

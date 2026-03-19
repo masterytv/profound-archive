@@ -90,6 +90,17 @@ export function markdownToHtml(md: string): string {
     // Inline code (before bold/italic to avoid conflicts)
     html = html.replace(/`([^`]+)`/g, '<code class="bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-slate-800 dark:text-slate-200">$1</code>');
 
+    // Images ![alt](url) — MUST come before links to avoid matching as broken link with stray `!`
+    html = html.replace(
+        /!\[([^\]]*)\]\(([^)]+)\)/g,
+        (_match, alt, url) => {
+            const caption = alt && alt.trim()
+                ? `<figcaption class="text-center text-sm text-slate-500 dark:text-slate-400 mt-3 italic">${alt}</figcaption>`
+                : '';
+            return `<figure class="my-8"><img src="${url}" alt="${alt || ''}" class="rounded-xl w-full shadow-md" loading="lazy" />${caption}</figure>`;
+        }
+    );
+
     // Links [text](url) — MUST come before bold/italic to protect underscores in URLs
     // Internal links (starting with /) stay in same tab; external links open in new tab
     html = html.replace(
