@@ -164,17 +164,18 @@ CRITICAL — NO HALLUCINATED NDE ACCOUNTS:
 - If the article needs more human stories beyond what was provided, reference the Project Profound video accounts with links. Do not make up stories to fill the gap.
 
 OUTPUT FORMAT (JSON only, no markdown wrapper):
+REMINDER: NO em dashes (—) in ANY field. Use commas, periods, colons, or parentheses instead. This applies to title, subtitle, lead_paragraph, seo_title, seo_description, and body_mdx.
 {
   "title": "exact H1 question text",
   "slug": "nde-topic-angle (4-7 words, NOT matching the /questions/ slug)",
-  "subtitle": "one-sentence editorial angle (shown under title on blog)",
-  "lead_paragraph": "first paragraph — 3-5 sentences, direct answer + hook, no preamble",
-  "body_mdx": "full article in MDX (use ## for H2, ### for H3, > for block quotes, **bold**, [text](url) for inline refs — NEVER bracketed citations)",
+  "subtitle": "one-sentence editorial angle, no em dashes (shown under title on blog)",
+  "lead_paragraph": "first paragraph: 3-5 sentences, direct answer + hook, no preamble, no em dashes",
+  "body_mdx": "full article in MDX (use ## for H2, ### for H3, > for block quotes, **bold**, [text](url) for inline refs. NEVER bracketed citations. NEVER em dashes.)",
   "read_time_mins": <integer>,
   "word_count": <integer>,
   "tags": ["tag1", "tag2", "tag3"],
   "seo_title": "SEO-optimized title (60 chars max, different from H1 if needed)",
-  "seo_description": "meta description (150 chars max, answer + brand)",
+  "seo_description": "meta description (150 chars max, answer + brand, no em dashes)",
   "references": [{"title": "Author, Year. Title. Publication.", "url": "https://... or null for books", "type": "academic|book|site"}]
 }`;
 }
@@ -303,10 +304,13 @@ Return the FULL revised MDX body only. Do not wrap in a JSON block. Do not inclu
 // ─── Step 5: SEO field regeneration (on voice-pass output) ───────────────────
 
 export const SEO_REFRESH_PROMPT = `Given the revised article body below, regenerate:
-1. lead_paragraph (3-5 sentences, direct answer to the question, from the first section of the article — no preamble, no "Quick Answer" framing)
-2. seo_description (150 chars max, answer + "| Project Profound")
+1. lead_paragraph (3-5 sentences, direct answer to the question, from the first section of the article. No preamble, no "Quick Answer" framing. NO em dashes.)
+2. seo_description (150 chars max, answer + "| Project Profound". NO em dashes.)
+3. subtitle (one-sentence editorial angle for display under the title. NO em dashes. Use commas or colons instead.)
 
-Return JSON only: { "lead_paragraph": "...", "seo_description": "..." }`;
+CRITICAL: Do NOT use em dashes (—) in any field. Use commas, periods, or colons instead.
+
+Return JSON only: { "lead_paragraph": "...", "seo_description": "...", "subtitle": "..." }`;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GUIDE (PILLAR PAGE) PROMPTS
