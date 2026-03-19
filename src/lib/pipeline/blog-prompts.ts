@@ -217,6 +217,15 @@ REAL NDE EXPERIENCER QUOTES — use 2-3 of these VERBATIM (do not paraphrase, cl
 ${chunks}
 ${videoSection}
 
+LINKING RULES (critical):
+- The SOURCES list above contains verified, working URLs from Perplexity. Use THESE URLs for inline links.
+- When citing a study, researcher, or organization mentioned in the sources, link to the SOURCE URL provided — e.g., [Lancet study on cardiac arrest survivors](https://pubmed.ncbi.nlm.nih.gov/XXXXX/).
+- ⛔ Do NOT fabricate or guess URLs. If a fact isn't in the SOURCES list, mention it without a link.
+- ⛔ Do NOT link book titles to Amazon. Mention books by title and author in prose only.
+- If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
+- Every article should have at least 5-8 inline links to research sources from the SOURCES list above.
+- In the "references" array, use the actual URLs from SOURCES. Set url to null for books.
+
 IMPORTANT REMINDERS:
 - Use the experiencer quotes EXACTLY as provided. Do not invent demographic details not given.
 - Do NOT claim to have personally interviewed researchers.
@@ -232,8 +241,6 @@ IMPORTANT REMINDERS:
 - Do NOT start body_mdx with # H1 heading. Start directly with prose.
 - Do NOT end paragraphs with short dramatic mic-drop sentences. Integrate conclusions into flowing prose.
 - Do NOT use "Not A, but B" structural pivots. Transition softly as a train of thought.
-- If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
-- Do NOT link book titles to Amazon. Mention books by title and author in prose only.
 ${params.relatedQuestionSlugs && params.relatedQuestionSlugs.length > 0 ? `
 INTERNAL LINKS (include 3-5 of these as natural cross-references):
 ${params.relatedQuestionSlugs.map(q => `- [${q.question}](/questions/${q.slug})`).join('\n')}

@@ -91,8 +91,8 @@ async function extractAndVerifyClaims(
     stats: VerifyResult['stats'];
 }> {
     const openRouter = getOpenRouter();
-    const perplexityKey = process.env.PERPLEXITY_KEY;
-    if (!perplexityKey) throw new Error('Missing PERPLEXITY_KEY');
+    const perplexityKey = process.env.PERPLEXITY_API_KEY;
+    if (!perplexityKey) throw new Error('Missing PERPLEXITY_API_KEY');
 
     // ── Step 1a: Extract claims with GPT-4o-mini ──
     console.log('    [verify] Extracting factual claims...');
@@ -357,7 +357,7 @@ async function validateLinks(
     refs: ArticleReference[],
 ): Promise<{ body_mdx: string; references: ArticleReference[]; linksChecked: number; linksOk: number; linksFixed: number; linksStripped: number }> {
     const openRouter = getOpenRouter();
-    const perplexityKey = process.env.PERPLEXITY_KEY;
+    const perplexityKey = process.env.PERPLEXITY_API_KEY;
 
     // Extract all external URLs
     const bodyLinks = [...(article.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g))].map(m => ({
