@@ -365,6 +365,80 @@ async function voicePass(draft: ArticleDraft): Promise<ArticleDraft> {
     };
 }
 
+// ─── Link Sanitizer (deterministic post-processing) ──────────────────────────
+
+/**
+ * Deterministic regex-based cleanup of malformed markdown links.
+ * Catches patterns that LLMs consistently produce despite prompt instructions:
+ *
+ * 1. URL fragments leaked into anchor text:
+ *    e.g., "The Lancet07100-8/fulltext)" → plain "The Lancet" (link stripped)
+ *
+ * 2. Malformed markdown where the URL contains unbalanced parentheses:
+ *    e.g., [study](https://...PIIS0140-6736(01)07100-8/fulltext)
+ *    The (01) closes the markdown link prematurely.
+ *
+ * 3. Bare URL fragments floating in prose (no markdown brackets at all).
+ *
+ * This runs AFTER voice pass and verify — it's the last line of defense.
+ */
+export function sanitizeMarkdownLinks(mdx: string): string {
+    let result = mdx;
+
+    // Pass 1: Fix markdown links where URL has unbalanced parens
+    // [text](url-with-(parens)-inside) → the inner ) breaks markdown.
+    // Strategy: find all [text]( patterns and match the URL greedily,
+    // balancing parentheses.
+    result = result.replace(
+        /\[([^\]]+)\]\(([^)]*\([^)]*\)[^)]*(?:\([^)]*\)[^)]*)*)\)/g,
+        (_match, text: string, url: string) => {
+            // If the URL looks valid after reassembly, keep it; else strip
+            const fullUrl = url.trim();
+            if (fullUrl.startsWith('http') || fullUrl.startsWith('/')) {
+                return `[${text}](${fullUrl})`;
+            }
+            return text;
+        }
+    );
+
+    // Pass 2: Detect URL fragments leaked into anchor text.
+    // Pattern: text immediately followed by a URL-path fragment like
+    // "07100-8/fulltext)" or "articles/PMC123456)"
+    // These appear when markdown [text](url) was mangled by the LLM.
+    result = result.replace(
+        /([A-Za-z\s]{3,})((?:\/[\w.-]+){1,}\))/g,
+        (_match, text: string, fragment: string) => {
+            // Only strip if it looks like a leaked path fragment
+            if (fragment.includes('/') && fragment.endsWith(')')) {
+                console.log(`[sanitize-links] Stripped leaked URL fragment: "${fragment}" from "${text.trim()}"`);
+                return text.trimEnd();
+            }
+            return _match;
+        }
+    );
+
+    // Pass 3: Remove any remaining markdown links with clearly broken URLs
+    // (URLs not starting with http, /, or #)
+    result = result.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        (_match, text: string, url: string) => {
+            const trimmedUrl = url.trim();
+            if (
+                trimmedUrl.startsWith('http') ||
+                trimmedUrl.startsWith('/') ||
+                trimmedUrl.startsWith('#') ||
+                trimmedUrl.startsWith('mailto:')
+            ) {
+                return _match; // valid link, keep it
+            }
+            console.log(`[sanitize-links] Stripped broken link: [${text}](${trimmedUrl})`);
+            return text; // strip to plain text
+        }
+    );
+
+    return result;
+}
+
 // ─── Step 5: Publish ──────────────────────────────────────────────────────────
 
 async function publishDraft(
@@ -548,6 +622,8 @@ export async function generateBlogArticle(
     const t5 = Date.now();
     result.status = 'publishing';
     try {
+        // Final deterministic link cleanup before publishing
+        draft = { ...draft!, body_mdx: sanitizeMarkdownLinks(draft!.body_mdx) };
         const { id, slug } = await publishDraft(draft!, context!, research!, heroImageUrl, heroImagePrompt);
         finishStep(s5, 'success', `Saved as draft. ID: ${id}`, t5, onStep);
         return {
@@ -922,7 +998,7 @@ export async function generateGuideArticle(
                 author_name: authorName,
                 status: 'draft', // guides always start as drafts for human review
                 lead_paragraph: draft!.lead_paragraph,
-                body_mdx: draft!.body_mdx,
+                body_mdx: sanitizeMarkdownLinks(draft!.body_mdx),
                 read_time_mins: draft!.read_time_mins,
                 word_count: draft!.word_count,
                 tags: draft!.tags,

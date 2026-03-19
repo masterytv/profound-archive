@@ -23,6 +23,7 @@ import {
     buildDeathSceneImagePrompt,
     buildAfterlifeEncounterImagePrompt,
 } from './blog-story-prompts';
+import { sanitizeMarkdownLinks } from './blog-article';
 import { SEO_REFRESH_PROMPT } from './blog-prompts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -585,7 +586,7 @@ async function publishStory(
             status: 'published',
             published_at: new Date().toISOString(),
             lead_paragraph: draft.lead_paragraph,
-            body_mdx: body,
+            body_mdx: sanitizeMarkdownLinks(body),
             read_time_mins: draft.read_time_mins,
             word_count: draft.word_count,
             tags: draft.tags,
