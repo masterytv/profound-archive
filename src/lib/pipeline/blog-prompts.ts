@@ -201,7 +201,7 @@ export function buildDraftUserPrompt(params: {
         .join("\n\n");
 
     const videoSection = params.videoReferences && params.videoReferences.length > 0
-        ? `\nPROJECT PROFOUND NDE ACCOUNTS — reference 1-3 of these in the article with links to our site:\n${params.videoReferences.map((v, i) => `[Account ${i + 1}]: "${v.title}" ${v.channelName ? `(from ${v.channelName})` : ''}\n  Link: /video/${v.videoId}`).join('\n')}\n\nWhen referencing these accounts, link to them using Markdown: [experiencer's description](/video/VIDEO_ID). Mention them naturally in the text as "one account on Project Profound" or similar, don't list them.`
+        ? `\nPROJECT PROFOUND NDE ACCOUNTS (MANDATORY — you MUST reference at least 3 of these with links to our site):\n${params.videoReferences.map((v, i) => `[Account ${i + 1}]: "${v.title}" ${v.experiencerName ? `(${v.experiencerName})` : ''} ${v.channelName ? `on ${v.channelName}` : ''}\n  Link: /video/${v.videoId}`).join('\n')}\n\nThese are REAL accounts on our platform. You MUST include inline links to at least 3 of them, woven naturally into the article. Format: [experiencer's description](/video/VIDEO_ID) or [one account on Project Profound](/video/VIDEO_ID). Do NOT list them in a separate section. Integrate them into the body as supporting evidence for your argument.`
         : '';
 
     return `Write a long-form blog article answering this question for Project Profound.
@@ -225,6 +225,7 @@ LINKING RULES (critical):
 - ⛔ Do NOT link book titles to Amazon. Mention books by title and author in prose only.
 - If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
 - Every article should have at least 5-8 inline links to research sources from the SOURCES list above.
+- ⚠️ MANDATORY: Every article MUST include at least 3 inline links to Project Profound video accounts (the /video/ links provided above). Weave these into the prose naturally as supporting evidence. If no video accounts were provided, reference 2-3 with [an experiencer on Project Profound](/video/VIDEO_ID).
 - In the "references" array, use the actual URLs from SOURCES. Set url to null for books.
 
 IMPORTANT REMINDERS:
@@ -437,8 +438,7 @@ ${params.existingGuideSlugs.map((g) => `- "${g.title}" → /blog/${g.slug}`).joi
         : '';
 
     const videoSection = params.videoReferences && params.videoReferences.length > 0
-        ? `\nPROJECT PROFOUND NDE ACCOUNTS — reference 2-4 of these with links:
-${params.videoReferences.map((v, i) => `[Account ${i + 1}]: "${v.title}" ${v.channelName ? `(from ${v.channelName})` : ''}\n  Link: /video/${v.videoId}`).join('\n')}`
+        ? `\nPROJECT PROFOUND NDE ACCOUNTS (MANDATORY — you MUST reference at least 3 of these with links):\n${params.videoReferences.map((v, i) => `[Account ${i + 1}]: "${v.title}" ${v.channelName ? `(from ${v.channelName})` : ''}\n  Link: /video/${v.videoId}`).join('\n')}\n\nYou MUST include inline links to at least 3 of these. Format: [experiencer's description](/video/VIDEO_ID). Integrate them into the body as supporting evidence.`
         : '';
 
     return `Write a COMPREHENSIVE PILLAR GUIDE for Project Profound.

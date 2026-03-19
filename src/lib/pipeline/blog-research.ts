@@ -207,17 +207,37 @@ export async function researchQuestion(question: string, consumerQuestion?: stri
 
     const data = await response.json() as {
         choices: Array<{ message: { content: string } }>;
-        citations?: Array<{ url: string; title?: string; snippet?: string }>;
+        citations?: Array<string | { url: string; title?: string; snippet?: string }>;
     };
 
     const rawText = data.choices[0]?.message?.content ?? '';
 
     // Parse citations from Perplexity's structured response
-    const citations: ResearchCitation[] = (data.citations ?? []).map((c) => ({
-        url: c.url ?? '',
-        title: c.title ?? c.url ?? '',
-        snippet: c.snippet ?? '',
-    }));
+    // Perplexity sometimes returns citations as plain URL strings, sometimes as objects
+    let citations: ResearchCitation[] = (data.citations ?? []).map((c) => {
+        if (typeof c === 'string') {
+            return { url: c, title: c, snippet: '' };
+        }
+        return {
+            url: c.url ?? '',
+            title: c.title ?? c.url ?? '',
+            snippet: c.snippet ?? '',
+        };
+    }).filter(c => c.url.length > 0);
+
+    // Fallback: if no structured citations, extract URLs from the raw text
+    if (citations.length === 0) {
+        const urlRegex = /https?:\/\/[^\s\])"']+/g;
+        const foundUrls = [...new Set(rawText.match(urlRegex) ?? [])];
+        citations = foundUrls.map((url) => ({
+            url,
+            title: url,
+            snippet: '',
+        }));
+        if (citations.length > 0) {
+            console.log(`[research] Extracted ${citations.length} URLs from raw text (no structured citations)`);
+        }
+    }
 
     // Extract key findings as bullet lines from the raw text
     const keyFindings = rawText
@@ -280,16 +300,36 @@ export async function researchGuideTopic(title: string, targetQuery: string): Pr
 
     const data = await response.json() as {
         choices: Array<{ message: { content: string } }>;
-        citations?: Array<{ url: string; title?: string; snippet?: string }>;
+        citations?: Array<string | { url: string; title?: string; snippet?: string }>;
     };
 
     const rawText = data.choices[0]?.message?.content ?? '';
 
-    const citations: ResearchCitation[] = (data.citations ?? []).map((c) => ({
-        url: c.url ?? '',
-        title: c.title ?? c.url ?? '',
-        snippet: c.snippet ?? '',
-    }));
+    // Same flexible parsing as researchQuestion — handles both string and object arrays
+    let citations: ResearchCitation[] = (data.citations ?? []).map((c) => {
+        if (typeof c === 'string') {
+            return { url: c, title: c, snippet: '' };
+        }
+        return {
+            url: c.url ?? '',
+            title: c.title ?? c.url ?? '',
+            snippet: c.snippet ?? '',
+        };
+    }).filter(c => c.url.length > 0);
+
+    // Fallback: extract URLs from raw text if no structured citations
+    if (citations.length === 0) {
+        const urlRegex = /https?:\/\/[^\s\])"']+/g;
+        const foundUrls = [...new Set(rawText.match(urlRegex) ?? [])];
+        citations = foundUrls.map((url) => ({
+            url,
+            title: url,
+            snippet: '',
+        }));
+        if (citations.length > 0) {
+            console.log(`[research-guide] Extracted ${citations.length} URLs from raw text (no structured citations)`);
+        }
+    }
 
     const keyFindings = rawText
         .split('\n')
