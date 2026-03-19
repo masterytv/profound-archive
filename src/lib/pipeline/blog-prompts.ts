@@ -387,17 +387,18 @@ CRITICAL — NO HALLUCINATED NDE ACCOUNTS:
 - You may cite researchers and their FINDINGS/STATISTICS. Do NOT retell what specific experiencers said unless that quote was provided.
 
 OUTPUT FORMAT (JSON only, no markdown wrapper):
+REMINDER: NO em dashes (—) in ANY field. Use commas, periods, colons, or parentheses instead.
 {
   "title": "exact H1 guide title",
   "slug": "nde-topic-guide (4-7 words)",
-  "subtitle": "one-sentence editorial angle",
-  "lead_paragraph": "first paragraph — 3-5 sentences, compelling topic overview",
-  "body_mdx": "full article in MDX (use ## for H2, ### for H3, > for block quotes, **bold**, [text](url) for inline refs)",
+  "subtitle": "one-sentence editorial angle, no em dashes",
+  "lead_paragraph": "first paragraph: 3-5 sentences, compelling topic overview, no em dashes",
+  "body_mdx": "full article in MDX (use ## for H2, ### for H3, > for block quotes, **bold**, [text](url) for inline refs. NEVER em dashes.)",
   "read_time_mins": <integer>,
   "word_count": <integer>,
   "tags": ["tag1", "tag2", "tag3", "tag4"],
   "seo_title": "SEO title (60 chars max)",
-  "seo_description": "meta description (150 chars max)",
+  "seo_description": "meta description (150 chars max, no em dashes)",
   "references": [{"title": "Author, Year. Title. Publication.", "url": "https://... or null for books", "type": "academic|book|site"}],
   "faq_data": [{"question": "What is...?", "answer": "2-4 sentence answer"}]
 }`;
@@ -455,6 +456,15 @@ ${videoSection}
 ${relatedQuestionsSection}
 ${existingGuidesSection}
 
+LINKING RULES (critical):
+- The SOURCES list above contains verified, working URLs from Perplexity. Use THESE URLs for inline links.
+- When citing a study, researcher, or organization mentioned in the sources, link to the SOURCE URL provided.
+- ⛔ Do NOT fabricate or guess URLs. If a fact isn't in the SOURCES list, mention it without a link.
+- ⛔ Do NOT link book titles to Amazon. Mention books by title and author in prose only.
+- If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
+- Every guide should have at least 8-12 inline links to research sources from the SOURCES list above.
+- In the "references" array, use the actual URLs from SOURCES. Set url to null for books.
+
 STRUCTURAL REQUIREMENTS:
 - This is a PILLAR GUIDE, not a blog post. It must be comprehensive (3,000-5,000 words).
 - 6-8 H2 sections covering different angles of the topic.
@@ -464,9 +474,9 @@ STRUCTURAL REQUIREMENTS:
 
 VOICE REMINDERS:
 - Use contractions. Get heated about weak arguments. Show genuine reactions.
-- No em dashes. No banned words. No formulaic structures.
+- No em dashes (—) anywhere. No banned words. No formulaic structures.
 - Include one genuine digression. Break the essay arc.
-- End bluntly — no inspirational wrap-ups.
+- End bluntly, no inspirational wrap-ups.
 - Do NOT start body_mdx with # H1 heading. Start directly with prose.
 
 Write the full guide now. Return valid JSON only.`;

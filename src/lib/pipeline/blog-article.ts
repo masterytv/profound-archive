@@ -335,7 +335,7 @@ async function voicePass(draft: ArticleDraft): Promise<ArticleDraft> {
 
     // Re-generate lead_paragraph and seo_description from revised body
     const seoResponse = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-haiku-4-5',
+        model: 'openai/gpt-4o-mini',
         messages: [
             { role: 'user', content: `${SEO_REFRESH_PROMPT}\n\nQUESTION: ${draft.title}\n\nARTICLE BODY:\n${revisedBody.slice(0, 3000)}` },
             { role: 'assistant', content: '{' },
@@ -790,6 +790,7 @@ export async function generateGuideArticle(
         makeStep('Claude guide draft'),
         makeStep('Hero image'),
         makeStep('Voice calibration pass'),
+        makeStep('Verify facts & links'),
         makeStep('Publish'),
     ];
     const result: BlogArticleResult = { status: 'assembling', questionSlug: pillarTitle, steps };
@@ -885,8 +886,27 @@ export async function generateGuideArticle(
         finishStep(s4, 'failed', `Voice pass failed (using raw draft): ${String(err)}`, t4, onStep);
     }
 
+    // ── Step 4b: Verify facts & links (non-fatal) ─────────────────────────────
+    const s4b = steps[5];
+    startStep(s4b, onStep);
+    const t4b = Date.now();
+    try {
+        const verified = await verifyArticle(draft!.body_mdx, draft!.references);
+        draft = {
+            ...draft!,
+            body_mdx: verified.body_mdx,
+            references: verified.references,
+            faq_data: draft!.faq_data,
+        };
+        const { stats } = verified;
+        finishStep(s4b, 'success', `✓${stats.claims_correct} ✗${stats.claims_incorrect} claims · ${stats.links_ok}/${stats.links_checked} links OK`, t4b, onStep);
+    } catch (err) {
+        // Non-fatal: publish with unverified draft
+        finishStep(s4b, 'failed', `Verification skipped: ${String(err)}`, t4b, onStep);
+    }
+
     // ── Step 5: Publish as draft ──────────────────────────────────────────────
-    const s5 = steps[5];
+    const s5 = steps[6];
     startStep(s5, onStep);
     const t5 = Date.now();
     result.status = 'publishing';
