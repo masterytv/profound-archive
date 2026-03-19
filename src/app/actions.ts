@@ -1,14 +1,13 @@
 'use server';
 
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { compassionateChatbotAnswers, CompassionateChatbotOutput } from '@/ai/flows/compassionate-chatbot-answers';
 import { z } from 'zod';
 
 // Action to add a video to a user's default "Favorites" collection
 export async function addVideoToFavorites(videoId: string, videoTitle: string) {
-  const supabase = createServerActionClient({ cookies });
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

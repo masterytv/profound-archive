@@ -54,6 +54,71 @@ interface HighlightElement {
   confidence: number;
   video_id: string;
   element_label: string;
+  timestamp_seconds?: number;
+}
+
+// ─── Timestamp Matching ─────────────────────────────────────────────────────
+
+interface TimestampedSegment {
+  start: number;
+  end: number;
+  text: string;
+}
+
+/**
+ * Search timestamped subtitle segments for the best match to a quote string.
+ * Returns the start time in seconds, or undefined if no convincing match.
+ */
+function findQuoteTimestamp(
+  segments: TimestampedSegment[] | null,
+  quote: string,
+): number | undefined {
+  if (!segments || segments.length === 0 || !quote) return undefined;
+
+  // Normalize: lowercase, collapse whitespace
+  const normQuote = quote.toLowerCase().replace(/\s+/g, ' ').trim();
+  // Extract a ~6-word search phrase from the start of the quote
+  const words = normQuote.split(' ');
+  const searchPhrase = words.slice(0, Math.min(6, words.length)).join(' ');
+
+  for (const seg of segments) {
+    if (!seg.text) continue;
+    const normSeg = seg.text.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (normSeg.includes(searchPhrase)) {
+      return Math.floor(seg.start);
+    }
+  }
+
+  // Fallback: try a smaller 4-word prefix
+  if (words.length >= 4) {
+    const fallback = words.slice(0, 4).join(' ');
+    for (const seg of segments) {
+      if (!seg.text) continue;
+      const normSeg = seg.text.toLowerCase().replace(/\s+/g, ' ').trim();
+      if (normSeg.includes(fallback)) {
+        return Math.floor(seg.start);
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Parse raw_timestamped_subtitles into a segment array.
+ * Handles shapes: { data: [...] } | [...] | JSON string
+ */
+function parseTimestampedSubtitles(raw: unknown): TimestampedSegment[] | null {
+  if (!raw) return null;
+  let parsed = raw;
+  if (typeof raw === 'string') {
+    try { parsed = JSON.parse(raw); } catch { return null; }
+  }
+  if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed) && Array.isArray((parsed as any).data)) {
+    return (parsed as { data: TimestampedSegment[] }).data;
+  }
+  if (Array.isArray(parsed)) return parsed as TimestampedSegment[];
+  return null;
 }
 
 export interface ProfileGenerationResult {
@@ -166,27 +231,52 @@ export async function generateExperiencerProfile(
   // 2. Fetch all linked videos with their analysis
   const { data: videos, error: videosError } = await supabase
     .from('nde_vids')
-    .select('videoId, title, channelId, channel_title, date, thumbnail_url, experiencerFullName')
+    .select('videoId, title, channelId, channel_title:channelName, date, thumbnail_url:thumbnailUrl, experiencerFullName, raw_timestamped_subtitles, viewCount')
     .in('videoId', videoIds);
 
   if (videosError || !videos || videos.length === 0) {
     return { slug: profile.slug, full_name: profile.full_name, status: 'no_videos', video_count: 0, message: `Video fetch error: ${videosError?.message}` };
   }
 
-  // 3. Fetch analysis for all videos
+  // 3. Fetch analysis for all videos (including score fields for avg computation)
   const { data: analyses } = await supabase
     .from('nde_analysis')
-    .select('video_id, core_elements, entities, journey_sequence, experience_type, trigger_category, overall_tone, intensity_rating')
+    .select('video_id, core_elements, entities, journey_sequence, experience_type, trigger_category, overall_tone, intensity_rating, total_greyson_score, transformation_score')
     .in('video_id', videoIds);
+
+  // 3b. Compute average scores for the listing page
+  const greysonScores = (analyses || []).map((a: any) => a.total_greyson_score).filter((v: any): v is number => v != null);
+  const transformScores = (analyses || []).map((a: any) => a.transformation_score).filter((v: any): v is number => v != null);
+  const avgGreyson = greysonScores.length ? greysonScores.reduce((a: number, b: number) => a + b, 0) / greysonScores.length : null;
+  const avgTransformation = transformScores.length ? transformScores.reduce((a: number, b: number) => a + b, 0) / transformScores.length : null;
+
+  // Veridical from nde_vids
+  const { data: vidScores } = await supabase
+    .from('nde_vids')
+    .select('rvnde_total_score')
+    .in('videoId', videoIds)
+    .not('rvnde_total_score', 'is', null);
+  const veridicalScores = (vidScores || []).map((v: any) => v.rvnde_total_score).filter((v: any): v is number => v != null);
+  const avgVeridical = veridicalScores.length ? veridicalScores.reduce((a: number, b: number) => a + b, 0) / veridicalScores.length : null;
+
+  // Compute total views across all linked videos
+  const totalViews = videos.reduce((sum, v: any) => sum + (parseInt(v.viewCount, 10) || 0), 0);
 
   const analysisMap = new Map((analyses || []).map(a => [a.video_id, a]));
 
   // 4. Extract highlight elements (best quotes across all videos)
+  // Pre-parse timestamped subtitles per video for quote timestamp lookup
+  const subtitleMap = new Map<string, TimestampedSegment[] | null>();
+  for (const video of videos) {
+    subtitleMap.set(video.videoId, parseTimestampedSubtitles((video as any).raw_timestamped_subtitles));
+  }
+
   const allElements: HighlightElement[] = [];
   for (const video of videos) {
     const analysis = analysisMap.get(video.videoId);
     if (!analysis?.core_elements) continue;
 
+    const segments = subtitleMap.get(video.videoId) || null;
     const elements = analysis.core_elements as CoreElement[];
     for (const el of elements) {
       if (el.present && el.quote && el.quote.trim().length > 10 && el.confidence >= 50) {
@@ -196,6 +286,7 @@ export async function generateExperiencerProfile(
           confidence: el.confidence,
           video_id: video.videoId,
           element_label: ELEMENT_LABELS[el.name] || el.name,
+          timestamp_seconds: findQuoteTimestamp(segments, el.quote),
         });
       }
     }
@@ -341,6 +432,10 @@ export async function generateExperiencerProfile(
     experience_type: experienceType,
     trigger_category: triggerCategory,
     contribution_label: contributionLabel,
+    avg_greyson_score: avgGreyson,
+    avg_transformation_score: avgTransformation,
+    avg_veridical_score: avgVeridical,
+    total_views: totalViews,
     updated_at: new Date().toISOString(),
   };
 

@@ -2,13 +2,13 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, LogIn, LogOut, Shield, Search, Tv, HelpCircle } from "lucide-react"
+import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv, HelpCircle, BookOpen } from "lucide-react"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { NewsletterModal } from "@/components/NewsletterModal"
 import {
   DropdownMenu,
@@ -37,6 +37,12 @@ export default function SiteHeader() {
   // fight over the same navigator.lock in dev Strict Mode, producing AbortErrors.
   const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
+  const pathname = usePathname();
+  // Defer returnTo URL to after mount to avoid hydration mismatch
+  // (server doesn't know the pathname during static rendering)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const loginHref = mounted ? `/login?returnTo=${encodeURIComponent(pathname)}` : "/login";
 
   useEffect(() => {
     // Fetch initial session and role
@@ -143,7 +149,7 @@ export default function SiteHeader() {
               Big Questions
             </Link>
 
-            {/* Browse Dropdown */}
+            {/* Explore Dropdown */}
             <div className="relative" ref={exploreRef}>
               <button
                 onClick={() => {
@@ -152,11 +158,37 @@ export default function SiteHeader() {
                 }}
                 className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all"
               >
-                Browse
+                Explore
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${exploreOpen ? 'rotate-180' : ''}`} />
               </button>
               {exploreOpen && (
                 <div className="absolute top-full left-0 mt-1.5 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
+                  <Link
+                    href="/experiencer"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    onClick={() => setExploreOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-500/20 flex items-center justify-center">
+                      <Users className="w-4 h-4 text-violet-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">By Experiencer</div>
+                      <div className="text-xs text-slate-400">Scored experiencer profiles</div>
+                    </div>
+                  </Link>
+                  <Link
+                    href="/blog"
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    onClick={() => setExploreOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center">
+                      <BookOpen className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-slate-800 dark:text-slate-100">By Article</div>
+                      <div className="text-xs text-slate-400">In-depth NDE articles & stories</div>
+                    </div>
+                  </Link>
                   <Link
                     href="/channels"
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
@@ -352,7 +384,7 @@ export default function SiteHeader() {
                 </DropdownMenu>
               ) : (
                 <Button asChild size="sm" className="rounded-lg bg-slate-900 hover:bg-slate-800 text-white">
-                  <Link href="/login">Login</Link>
+                  <Link href={loginHref}>Login</Link>
                 </Button>
               )}
             </div>
@@ -415,7 +447,7 @@ export default function SiteHeader() {
                   ) : (
                     <div className="pb-4 border-b border-slate-100">
                       <Button asChild className="w-full rounded-lg bg-slate-900 hover:bg-slate-800">
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href={loginHref} onClick={() => setMobileMenuOpen(false)}>
                           <LogIn className="w-4 h-4 mr-2" />
                           Login / Sign Up
                         </Link>
@@ -433,19 +465,35 @@ export default function SiteHeader() {
                     Big Questions
                   </Link>
 
-                  {/* Browse Section */}
+                  {/* Explore Section */}
                   <div>
                     <button
                       onClick={() => setMobileExploreOpen(!mobileExploreOpen)}
                       className="flex items-center justify-between w-full text-base font-semibold text-slate-900 dark:text-white mb-3"
                     >
-                      Browse
+                      Explore
                       <ChevronDown
                         className={`w-4 h-4 transition-transform ${mobileExploreOpen ? "rotate-180" : ""}`}
                       />
                     </button>
                     {mobileExploreOpen && (
                       <div className="space-y-1 pl-1">
+                        <Link
+                          href="/experiencer"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Users className="w-4 h-4 text-violet-600" />
+                          By Experiencer
+                        </Link>
+                        <Link
+                          href="/blog"
+                          className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <BookOpen className="w-4 h-4 text-amber-600" />
+                          By Article
+                        </Link>
                         <Link
                           href="/channels"
                           className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"

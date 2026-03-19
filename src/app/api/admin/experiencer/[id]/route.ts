@@ -3,7 +3,13 @@
  * 
  * Admin-only route to update experiencer profile fields.
  * Supports updating: photo_url, bio, social_links, offerings,
- * contribution_label, and any other admin-editable field.
+ * contribution_label, published_at, and any other admin-editable field.
+ * 
+ * To hide/unpublish a profile: PUT { "published_at": null }
+ * To re-publish: PUT { "published_at": "<iso-date>" }
+ * 
+ * DELETE /api/admin/experiencer/[id]
+ * Permanently removes an experiencer profile.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -28,6 +34,7 @@ const EDITABLE_FIELDS = [
   'summary',
   'thank_you_note',
   'full_name',
+  'published_at',
 ];
 
 export async function PUT(
@@ -78,3 +85,37 @@ export async function PUT(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const isAdmin = await isAdminUser();
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id } = await params;
+    const profileId = parseInt(id, 10);
+    if (isNaN(profileId)) {
+      return NextResponse.json({ error: 'Invalid profile ID' }, { status: 400 });
+    }
+
+    const supabase = getServiceClient();
+    const { error } = await supabase
+      .from('experiencer_profiles')
+      .delete()
+      .eq('id', profileId);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, deleted: profileId });
+  } catch (error: any) {
+    console.error('[ExperiencerDelete] Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+

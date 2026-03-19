@@ -3,13 +3,12 @@
 /**
  * ExperienceFingerprint — A radial visualization of the 15 NDE elements.
  * Each element is a "petal" that glows when present in the experiencer's account.
- * Clicking a lit element reveals the verbatim quote from their transcript.
- * 
- * Philosophy: This is a portrait, not a grade. Every fingerprint is unique.
+ * Clicking a lit element reveals the verbatim quote with video link.
  */
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Play } from 'lucide-react';
+import Link from 'next/link';
 
 export interface FingerprintElement {
   name: string;
@@ -17,6 +16,9 @@ export interface FingerprintElement {
   quote: string;
   confidence: number;
   video_id: string;
+  channel_name?: string;
+  channel_id?: string;
+  timestamp_seconds?: number;
 }
 
 interface Props {
@@ -24,7 +26,6 @@ interface Props {
   experiencerName: string;
 }
 
-// All 15 standard NDE elements in display order
 const ALL_ELEMENTS = [
   { name: 'feelings_of_peace', label: 'Peace', icon: '☮', color: '#60A5FA' },
   { name: 'out_of_body', label: 'Out of Body', icon: '🕊', color: '#818CF8' },
@@ -70,8 +71,8 @@ export default function ExperienceFingerprint({ elements, experiencerName }: Pro
         {ALL_ELEMENTS.map((el, index) => {
           const element = elementMap.get(el.name);
           const isPresent = !!element;
-          const angle = (index / totalElements) * 360 - 90; // Start from top
-          const radius = 42; // % from center
+          const angle = (index / totalElements) * 360 - 90;
+          const radius = 42;
           const x = 50 + radius * Math.cos((angle * Math.PI) / 180);
           const y = 50 + radius * Math.sin((angle * Math.PI) / 180);
 
@@ -102,7 +103,7 @@ export default function ExperienceFingerprint({ elements, experiencerName }: Pro
           );
         })}
 
-        {/* Connecting lines from center to present elements */}
+        {/* Connecting lines */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
           {ALL_ELEMENTS.map((el, index) => {
             const isPresent = elementMap.has(el.name);
@@ -112,16 +113,8 @@ export default function ExperienceFingerprint({ elements, experiencerName }: Pro
             const x = 50 + radius * Math.cos((angle * Math.PI) / 180);
             const y = 50 + radius * Math.sin((angle * Math.PI) / 180);
             return (
-              <line
-                key={el.name}
-                x1="50"
-                y1="50"
-                x2={x}
-                y2={y}
-                stroke={el.color}
-                strokeWidth="0.5"
-                opacity="0.3"
-              />
+              <line key={el.name} x1="50" y1="50" x2={x} y2={y}
+                stroke={el.color} strokeWidth="0.5" opacity="0.3" />
             );
           })}
         </svg>
@@ -135,9 +128,7 @@ export default function ExperienceFingerprint({ elements, experiencerName }: Pro
             <span
               key={el.name}
               className={`text-[10px] font-medium px-2 py-0.5 rounded-full transition-opacity ${
-                isPresent
-                  ? 'opacity-100'
-                  : 'opacity-20'
+                isPresent ? 'opacity-100' : 'opacity-20'
               }`}
               style={{
                 backgroundColor: isPresent ? el.color + '20' : 'transparent',
@@ -152,7 +143,7 @@ export default function ExperienceFingerprint({ elements, experiencerName }: Pro
         })}
       </div>
 
-      {/* Quote overlay */}
+      {/* Quote overlay with video link and channel attribution */}
       {activeElement && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
           onClick={() => setActiveElement(null)}
@@ -176,9 +167,37 @@ export default function ExperienceFingerprint({ elements, experiencerName }: Pro
             <blockquote className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-4 border-blue-500/40 pl-4">
               &ldquo;{activeElement.quote}&rdquo;
             </blockquote>
-            <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
-              — {experiencerName}, in their own words
-            </p>
+            <div className="mt-4 flex items-center justify-between">
+              <p className="text-xs text-slate-400 dark:text-slate-500">
+                {activeElement.channel_name ? (
+                  <>
+                    — From{' '}
+                    {activeElement.channel_id ? (
+                      <Link
+                        href={`/channel/${activeElement.channel_id}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {activeElement.channel_name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{activeElement.channel_name}</span>
+                    )}
+                  </>
+                ) : (
+                  `— ${experiencerName}`
+                )}
+              </p>
+              <Link
+                href={activeElement.timestamp_seconds != null
+                  ? `/video/${activeElement.video_id}?t=${activeElement.timestamp_seconds}`
+                  : `/video/${activeElement.video_id}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-500/30 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Play className="w-3 h-3" /> Watch Video
+              </Link>
+            </div>
           </div>
         </div>
       )}

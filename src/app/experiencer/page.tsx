@@ -1,14 +1,15 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
-import { ArrowRight, Users, Star } from "lucide-react";
+import { ArrowRight, Users, Brain, Sparkles, TrendingUp, ArrowDownWideNarrow, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
     title: "NDE Experiencers — Scored Profiles | Project Profound",
     description:
-        "Discover the most documented near-death experiencers, each profiled with Greyson, Transformation, and Veridical scores from our database of 5,000+ accounts.",
+        "Discover the most documented near-death experiencers, each profiled with Experience Depth, Life Impact, and Evidence Strength scores from our database of 5,000+ accounts.",
     openGraph: {
         title: "NDE Experiencer Profiles | Project Profound",
         description: "The world's first scored, searchable index of NDE experiencers.",
@@ -16,31 +17,36 @@ export const metadata: Metadata = {
     },
 };
 
+const PAGE_SIZE = 50;
+
 type ExperiencerProfile = {
     id: number;
     slug: string;
     full_name: string;
     summary: string | null;
+    photo_url: string | null;
     avg_greyson_score: number | null;
     avg_transformation_score: number | null;
     avg_veridical_score: number | null;
     video_ids: string[] | null;
+    total_views: number | null;
 };
 
 const SORT_OPTIONS = [
-    { value: "greyson",        label: "Greyson Score" },
-    { value: "transformation", label: "Transformation" },
-    { value: "veridical",      label: "Veridical" },
+    { value: "views",          label: "Total Views" },
+    { value: "greyson",        label: "Experience Depth" },
+    { value: "transformation", label: "Life Impact" },
+    { value: "veridical",      label: "Evidence Strength" },
     { value: "name",           label: "Name" },
 ] as const;
 
 type SortOption = typeof SORT_OPTIONS[number]["value"];
 
-function ScoreBadge({ label, value, color }: { label: string; value: number | null; color: string }) {
+function ScoreBadge({ label, value, color, icon }: { label: string; value: number | null; color: string; icon?: React.ReactNode }) {
     if (value === null || value === undefined) return null;
     return (
         <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${color}`}>
-            {label} {value.toFixed(1)}
+            {icon}{label} {value.toFixed(1)}
         </span>
     );
 }
@@ -50,87 +56,141 @@ function ExperiencerCard({ profile }: { profile: ExperiencerProfile }) {
     return (
         <Link
             href={`/experiencer/${profile.slug}`}
-            className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-5 hover:shadow-lg hover:border-blue-300/60 dark:hover:border-blue-500/30 transition-all duration-300"
+            className="group flex bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 overflow-hidden hover:shadow-lg hover:border-blue-300/60 dark:hover:border-blue-500/30 transition-all duration-300"
         >
-            {/* Avatar placeholder */}
-            <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-violet-100 dark:from-blue-500/30 dark:to-violet-500/30 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-blue-600 dark:text-blue-300">
-                        {profile.full_name.charAt(0)}
-                    </span>
-                </div>
-                <div className="min-w-0">
-                    <h2
-                        className="text-base font-bold text-slate-900 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate"
-                        style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-                    >
-                        {profile.full_name}
-                    </h2>
-                    {videoCount > 0 && (
-                        <p className="text-xs text-slate-400 dark:text-slate-500">
-                            {videoCount} {videoCount === 1 ? "account" : "accounts"}
-                        </p>
-                    )}
-                </div>
+            {/* Photo — 1/3 width */}
+            <div className="relative w-1/3 min-h-[140px] bg-gradient-to-br from-blue-100 to-violet-100 dark:from-blue-500/20 dark:to-violet-500/20 flex-shrink-0">
+                {profile.photo_url ? (
+                    <Image
+                        src={profile.photo_url}
+                        alt={profile.full_name}
+                        fill
+                        sizes="(max-width: 640px) 33vw, 150px"
+                        className="object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-3xl font-bold text-blue-400/60 dark:text-blue-300/40">
+                            {profile.full_name.charAt(0)}
+                        </span>
+                    </div>
+                )}
             </div>
 
-            {/* Summary */}
-            {profile.summary && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 mb-3 flex-1">
-                    {profile.summary}
+            {/* Content — 2/3 width */}
+            <div className="flex flex-col flex-1 p-4 min-w-0">
+                <h2
+                    className="text-base font-bold text-slate-900 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate mb-0.5"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                >
+                    {profile.full_name}
+                </h2>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
+                    {videoCount > 0 && <>{videoCount} {videoCount === 1 ? "account" : "accounts"}</>}
+                    {videoCount > 0 && profile.total_views ? " · " : ""}
+                    {profile.total_views ? <><Eye className="w-3 h-3 inline mb-0.5" /> {formatViews(profile.total_views)}</> : null}
                 </p>
-            )}
 
-            {/* Score badges */}
-            <div className="flex flex-wrap gap-1.5 mt-auto pt-3 border-t border-slate-100 dark:border-white/10">
-                <ScoreBadge
-                    label="Greyson"
-                    value={profile.avg_greyson_score}
-                    color="bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
-                />
-                <ScoreBadge
-                    label="Transform"
-                    value={profile.avg_transformation_score}
-                    color="bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
-                />
-                <ScoreBadge
-                    label="Veridical"
-                    value={profile.avg_veridical_score}
-                    color="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
-                />
-                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all ml-auto self-center" />
+                {/* Score percentages with icons */}
+                <div className="flex items-center gap-3 mt-auto">
+                    {profile.avg_greyson_score !== null && (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                            <Brain className="w-3.5 h-3.5" />
+                            {Math.round((profile.avg_greyson_score / 32) * 100)}%
+                        </span>
+                    )}
+                    {profile.avg_transformation_score !== null && (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 dark:text-rose-400">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            {Math.round((profile.avg_transformation_score / 50) * 100)}%
+                        </span>
+                    )}
+                    {profile.avg_veridical_score !== null && (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                            <TrendingUp className="w-3.5 h-3.5" />
+                            {Math.round((profile.avg_veridical_score / 28) * 100)}%
+                        </span>
+                    )}
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all ml-auto self-center" />
+                </div>
             </div>
         </Link>
     );
 }
 
+function formatViews(n: number): string {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M views`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K views`;
+    return `${n} views`;
+}
+
 export default async function ExperiencerDirectoryPage({
     searchParams,
 }: {
-    searchParams: Promise<{ sort?: string }>;
+    searchParams: Promise<{ sort?: string; order?: string; page?: string }>;
 }) {
-    const { sort } = await searchParams;
+    const { sort, order, page: pageParam } = await searchParams;
     const validSort = (SORT_OPTIONS.map((o) => o.value) as string[]).includes(sort ?? "")
         ? (sort as SortOption)
-        : "greyson";
+        : "views";
+
+    // Default direction: desc for scores/views, asc for name
+    const defaultAsc = validSort === "name";
+    const ascending = order === "asc" ? true : order === "desc" ? false : defaultAsc;
+
+    // Pagination
+    const currentPage = Math.max(1, parseInt(pageParam || "1", 10) || 1);
+    const rangeStart = (currentPage - 1) * PAGE_SIZE;
+    const rangeEnd = rangeStart + PAGE_SIZE - 1;
 
     const supabase = await createClient();
 
-    // Build sort order
+    // Build sort order — for name sort, we extract last name client-side
+    const sortByName = validSort === "name";
     const sortColumn =
+        validSort === "views"          ? "total_views" :
         validSort === "greyson"        ? "avg_greyson_score" :
         validSort === "transformation" ? "avg_transformation_score" :
         validSort === "veridical"      ? "avg_veridical_score" :
-        "full_name";
+        "full_name"; // fallback for DB query, overridden by client sort
 
-    const ascending = validSort === "name";
-
-    const { data: profiles } = await supabase
+    // Get total count for pagination
+    const { count: totalCount } = await supabase
         .from("experiencer_profiles")
-        .select("id, slug, full_name, summary, avg_greyson_score, avg_transformation_score, avg_veridical_score, video_ids")
-        .not("published_at", "is", null)
-        .order(sortColumn, { ascending, nullsFirst: false })
-        .limit(200);
+        .select("id", { count: "exact", head: true })
+        .not("published_at", "is", null);
+
+    const totalPages = Math.ceil((totalCount ?? 0) / PAGE_SIZE);
+
+    let profiles: ExperiencerProfile[] | null;
+
+    if (sortByName) {
+        // Fetch ALL profiles then sort by last name and paginate client-side
+        const { data: allProfiles } = await supabase
+            .from("experiencer_profiles")
+            .select("id, slug, full_name, summary, photo_url, avg_greyson_score, avg_transformation_score, avg_veridical_score, video_ids, total_views")
+            .not("published_at", "is", null);
+
+        const getLastName = (name: string) => {
+            const parts = name.trim().split(/\s+/);
+            return (parts[parts.length - 1] || name).toLowerCase();
+        };
+
+        const sorted = (allProfiles ?? []).sort((a, b) => {
+            const cmp = getLastName(a.full_name).localeCompare(getLastName(b.full_name));
+            return ascending ? cmp : -cmp;
+        });
+
+        profiles = sorted.slice(rangeStart, rangeEnd + 1) as ExperiencerProfile[];
+    } else {
+        const { data } = await supabase
+            .from("experiencer_profiles")
+            .select("id, slug, full_name, summary, photo_url, avg_greyson_score, avg_transformation_score, avg_veridical_score, video_ids, total_views")
+            .not("published_at", "is", null)
+            .order(sortColumn, { ascending, nullsFirst: false })
+            .range(rangeStart, rangeEnd);
+        profiles = data as ExperiencerProfile[] | null;
+    }
 
     // Structured data for the directory page
     const jsonLd = {
@@ -177,7 +237,7 @@ export default async function ExperiencerDirectoryPage({
                         </h1>
                         <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
                             Scored profiles of the most documented near-death experiencers in our database —
-                            each with their Greyson, Transformation, and Veridical scores.
+                            each with their Experience Depth, Life Impact, and Evidence Strength scores.
                         </p>
                     </div>
                 </section>
@@ -188,33 +248,87 @@ export default async function ExperiencerDirectoryPage({
                         <span className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mr-1">
                             Sort by
                         </span>
-                        {SORT_OPTIONS.map((opt) => (
-                            <Link
-                                key={opt.value}
-                                href={`/experiencer?sort=${opt.value}`}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                                    validSort === opt.value
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/15"
-                                }`}
-                            >
-                                {opt.value !== "name" && <Star className="w-3 h-3" />}
-                                {opt.label}
-                            </Link>
-                        ))}
-                        {profiles && (
-                            <span className="ml-auto text-sm text-slate-400 dark:text-slate-500">
-                                {profiles.length} profiles
-                            </span>
-                        )}
+                        {SORT_OPTIONS.map((opt) => {
+                            const isActive = validSort === opt.value;
+                            const iconMap: Record<string, React.ReactNode> = {
+                                views: <Eye className="w-3.5 h-3.5" />,
+                                greyson: <Brain className="w-3.5 h-3.5" />,
+                                transformation: <Sparkles className="w-3.5 h-3.5" />,
+                                veridical: <TrendingUp className="w-3.5 h-3.5" />,
+                            };
+                            return (
+                                <Link
+                                    key={opt.value}
+                                    href={`/experiencer?sort=${opt.value}&order=${opt.value === "name" ? "asc" : "desc"}`}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                                        isActive
+                                            ? "bg-blue-600 text-white"
+                                            : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/15"
+                                    }`}
+                                >
+                                    {iconMap[opt.value]}
+                                    {opt.label}
+                                </Link>
+                            );
+                        })}
+                        {/* Direction toggle */}
+                        <Link
+                            href={`/experiencer?sort=${validSort}&order=${ascending ? "desc" : "asc"}`}
+                            className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 ml-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 transition-colors cursor-pointer"
+                        >
+                            <ArrowDownWideNarrow className={`w-3.5 h-3.5 transition-transform ${ascending ? "rotate-180" : ""}`} />
+                            {validSort === "name"
+                                ? (ascending ? "A → Z" : "Z → A")
+                                : (ascending ? "Low → High" : "High → Low")
+                            }
+                        </Link>
+                        <span className="ml-auto text-sm text-slate-400 dark:text-slate-500">
+                            {totalCount ?? 0} profiles
+                            {totalPages > 1 && ` · Page ${currentPage} of ${totalPages}`}
+                        </span>
                     </div>
 
                     {/* Grid */}
                     {profiles && profiles.length > 0 ? (
+                        <div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {profiles.map((p) => (
                                 <ExperiencerCard key={p.id} profile={p as ExperiencerProfile} />
                             ))}
+                        </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-3 mt-10">
+                                {currentPage > 1 ? (
+                                    <Link
+                                        href={`/experiencer?sort=${validSort}&order=${ascending ? "asc" : "desc"}&page=${currentPage - 1}`}
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white dark:bg-white/10 border border-slate-200/60 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-blue-300 dark:hover:border-blue-500/30 hover:text-blue-600 transition-all"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" /> Previous
+                                    </Link>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 dark:text-slate-600 cursor-not-allowed">
+                                        <ChevronLeft className="w-4 h-4" /> Previous
+                                    </span>
+                                )}
+                                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                                    {currentPage} / {totalPages}
+                                </span>
+                                {currentPage < totalPages ? (
+                                    <Link
+                                        href={`/experiencer?sort=${validSort}&order=${ascending ? "asc" : "desc"}&page=${currentPage + 1}`}
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white dark:bg-white/10 border border-slate-200/60 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-blue-300 dark:hover:border-blue-500/30 hover:text-blue-600 transition-all"
+                                    >
+                                        Next <ChevronRight className="w-4 h-4" />
+                                    </Link>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 dark:text-slate-600 cursor-not-allowed">
+                                        Next <ChevronRight className="w-4 h-4" />
+                                    </span>
+                                )}
+                            </div>
+                        )}
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-24 text-center">

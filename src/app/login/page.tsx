@@ -14,17 +14,21 @@ function LoginContent() {
   const [view, setView] = useState<"sign_in" | "sign_up" | "forgotten_password">("sign_in");
   const [signupError, setSignupError] = useState<string | null>(null);
 
+  // Read returnTo from query params so we redirect back after login
+  const returnTo = searchParams.get("returnTo") || "/";
+
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string) => {
       if (event === "SIGNED_IN") {
-        router.push("/");
+        router.push(returnTo);
+        router.refresh();
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, router]);
+  }, [supabase, router, returnTo]);
 
   // Check for error params (e.g. from auth callback)
   useEffect(() => {
@@ -45,7 +49,7 @@ function LoginContent() {
     url = url.includes('http') ? url : `https://${url}`;
     // Make sure to include a trailing `/`.
     url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
-    return `${url}auth/callback`;
+    return `${url}auth/callback?next=${encodeURIComponent(returnTo)}`;
   };
 
   return (
