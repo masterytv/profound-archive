@@ -317,6 +317,18 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
         .eq("video_id", id)
         .single();
 
+    // Look up experiencer profile slug for linking
+    let experiencerSlug: string | null = null;
+    if (video.experiencerFullName) {
+        const { data: profileData } = await supabase
+            .from('experiencer_profiles')
+            .select('slug')
+            .ilike('full_name', video.experiencerFullName.trim())
+            .limit(1)
+            .single();
+        experiencerSlug = profileData?.slug ?? null;
+    }
+
     const { data: similarData } = await supabase.rpc("find_similar_experiences", {
         target_video_id: id,
         match_count: 6,
@@ -411,7 +423,15 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                                 {video.experiencerFullName && (
                                     <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
-                                        <span>Experiencer: <strong className="text-slate-700 dark:text-slate-300">{video.experiencerFullName}</strong></span>
+                                        <span>Experiencer:{' '}
+                                            {experiencerSlug ? (
+                                                <Link href={`/experiencer/${experiencerSlug}`} className="font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                                                    {video.experiencerFullName}
+                                                </Link>
+                                            ) : (
+                                                <strong className="text-slate-700 dark:text-slate-300">{video.experiencerFullName}</strong>
+                                            )}
+                                        </span>
                                     </div>
                                 )}
                             </div>

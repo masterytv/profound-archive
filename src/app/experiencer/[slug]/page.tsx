@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, Play, ExternalLink, Share2, Heart, Sparkles, Brain, TrendingUp } from "lucide-react";
+import { ArrowLeft, Play, ExternalLink, Heart, Sparkles, Brain, TrendingUp } from "lucide-react";
+import { SocialShareButton } from "@/components/video/ShareButton";
 import Image from "next/image";
 import ExperienceFingerprint from "@/components/experiencer/experience-fingerprint";
 
@@ -153,19 +154,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
     );
 }
 
-// ─── Share Button ───────────────────────────────────────────────────────────
 
-function ShareButton({ name, slug }: { name: string; slug: string }) {
-    const url = `https://projectprofound.org/experiencer/${slug}`;
-    const text = `Read about ${name}'s near-death experience on Project Profound`;
-    return (
-        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 text-sm transition-all">
-            <Share2 className="w-3.5 h-3.5" /> Share
-        </a>
-    );
-}
 
 // ─── Page ───────────────────────────────────────────────────────────────────
 
@@ -268,7 +257,11 @@ export default async function ExperiencerProfilePage({
                         <Link href="/experiencer" className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm">
                             <ArrowLeft className="w-3.5 h-3.5" /> All Experiencers
                         </Link>
-                        <ShareButton name={profile.full_name} slug={profile.slug} />
+                        <SocialShareButton
+                            url={`https://projectprofound.org/experiencer/${profile.slug}`}
+                            title={`${profile.full_name}'s Near-Death Experience — Project Profound`}
+                            description={`Explore ${profile.full_name}'s NDE profile on Project Profound.`}
+                        />
                     </div>
                 </div>
 
@@ -676,7 +669,11 @@ export default async function ExperiencerProfilePage({
                                 Know {profile.full_name}? Share their profile with them.
                             </p>
                             <div className="flex justify-center">
-                                <ShareButton name={profile.full_name} slug={profile.slug} />
+                                <SocialShareButton
+                                    url={`https://projectprofound.org/experiencer/${profile.slug}`}
+                                    title={`${profile.full_name}'s Near-Death Experience — Project Profound`}
+                                    description={`Explore ${profile.full_name}'s NDE profile on Project Profound.`}
+                                />
                             </div>
                         </div>
                         <p className="text-[11px] text-slate-400 dark:text-slate-600 text-center leading-relaxed max-w-md mx-auto">
