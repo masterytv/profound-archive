@@ -11,7 +11,7 @@
 - **Admin Security:** ALL `/api/admin/*` routes MUST import and use `isAdminUser()` from `src/lib/auth/admin-guard.ts`.
 - **Auth Tokens:** Always use `getUser()` on the server, NEVER `getSession()`. Use `getAll`/`setAll` for cookie management, never individual get/set methods.
 - **Static Page Build:** `generateStaticParams` and `generateMetadata` MUST use the anon/service client. Never use `createClient()` from `@/lib/supabase/server` as `cookies()` throws outside request scopes.
-- **Cloudflare Timeouts:** Any API route taking >30s (like AI pipelines) MUST use Next.js `after()` to process work in the background. Cloudflare drops connections at 100s.
+- **No `after()` on Cloud Run:** Firebase App Hosting (Cloud Run) throttles CPU after the response is sent. Never use `after()` for critical work in cron/pipeline routes — it will be silently killed. Run pipelines synchronously with `maxDuration = 300` and `--max-time 300` on the curl.
 
 ## 3. Styling & Theming (CRITICAL)
 - **Token System:** Use `globals.css` semantic tokens (`bg-background`, `bg-card`, `text-foreground`). 
