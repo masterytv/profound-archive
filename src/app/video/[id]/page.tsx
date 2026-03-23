@@ -159,7 +159,7 @@ function extractPullQuote(
 
     // Filter usable segments (no music tags, at least 8 words)
     const usable = rawTimestamped.data.filter(
-        (seg) => !seg.text.startsWith("[") && seg.text.split(/\s+/).length >= 8
+        (seg) => seg.text && !seg.text.startsWith("[") && seg.text.split(/\s+/).length >= 8
     );
     if (usable.length === 0) return null;
 
@@ -238,7 +238,7 @@ function groupSegmentsIntoBlocks(
     let blockStartSeconds = 0;
 
     for (const seg of segments) {
-        if (seg.text.startsWith("[")) continue; // skip [Music] etc.
+        if (!seg.text || seg.text.startsWith("[")) continue; // skip [Music] etc.
         const blockNum = Math.floor(seg.start / blockDurationSeconds);
         if (blockNum !== blockStart && currentBlock.length > 0) {
             blocks.push({
