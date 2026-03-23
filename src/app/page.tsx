@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu, Tv, Plus } from "lucide-react";
+import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu, Tv, Plus, Users } from "lucide-react";
 import Image from "next/image";
 import {
     CuratedVideoColumn,
@@ -7,6 +7,7 @@ import {
 } from "@/components/home/CuratedVideoColumn";
 import { HeroSearchBar } from "@/components/home/HeroSearchBar";
 import { ChannelCard } from "@/components/channels/ChannelCard";
+import { ExperiencerCard, type ExperiencerProfile } from "@/components/experiencer/ExperiencerCard";
 import Link from "next/link";
 
 // --- ISR: revalidate every 3 hours (10800 seconds) ---
@@ -135,6 +136,18 @@ export default async function HomeAlt1() {
         sample_thumbnail: string | null;
     }>;
     const featuredChannels = seededShuffle(channelPool, seed + 10).slice(0, 4);
+
+    // Fetch experiencers for "Explore by Experiencer" section — top 50 by views
+    const { data: experiencerPool } = await supabase
+        .from('experiencer_profiles')
+        .select('id, slug, full_name, summary, photo_url, avg_greyson_score, avg_transformation_score, avg_veridical_score, video_ids, total_views')
+        .not('total_views', 'is', null)
+        .order('total_views', { ascending: false })
+        .limit(50);
+    const featuredExperiencers = seededShuffle(
+        (experiencerPool || []) as ExperiencerProfile[],
+        seed + 20
+    ).slice(0, 4);
 
     // Fetch "Just Added" — latest 5 clear_nde videos by created_at
     const { data: justAddedVideos } = await supabase
@@ -305,6 +318,42 @@ export default async function HomeAlt1() {
                         className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                     >
                         Browse All Channels
+                        <ArrowRight className="w-4 h-4" />
+                    </Link>
+                </div>
+            </section>
+
+            {/* ─── Explore by Experiencer ─── */}
+            <section className="container mx-auto px-4 pt-6 pb-12 max-w-7xl">
+                <div className="text-center mb-10">
+                    <div className="flex items-center justify-center gap-2.5 mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center">
+                            <Users className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                        </div>
+                        <h2
+                            className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            Explore by Experiencer
+                        </h2>
+                    </div>
+                    <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+                        Meet the people behind the accounts, each profiled with research-backed scores.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                    {featuredExperiencers.map((profile) => (
+                        <ExperiencerCard key={profile.id} profile={profile} />
+                    ))}
+                </div>
+
+                <div className="text-center">
+                    <Link
+                        href="/experiencer"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 text-sm font-medium hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
+                    >
+                        Browse All Experiencers
                         <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
