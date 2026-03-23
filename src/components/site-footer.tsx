@@ -41,14 +41,9 @@ export default function SiteFooter() {
               <Link href="/explore/transformation" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Transformation Index
               </Link>
-              <a
-                href="https://blog.projectprofound.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-slate-600 hover:text-blue-600 transition-colors"
-              >
+              <Link href="/blog" className="block text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors">
                 Blog
-              </a>
+              </Link>
             </div>
           </div>
 

@@ -287,15 +287,13 @@ export default function AboutPage() {
             <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto mb-6">
               Explore our latest articles, insights, and stories about near-death experiences and consciousness research.
             </p>
-            <a
-              href="https://blog.projectprofound.org/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/blog"
               className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-blue-600 text-white font-medium rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-colors"
             >
               Visit the Blog
-              <ExternalLink className="w-4 h-4" />
-            </a>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
         </section>
       </div>
