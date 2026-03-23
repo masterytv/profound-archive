@@ -70,6 +70,7 @@ function getOpenRouter() {
     return new OpenAI({
         apiKey,
         baseURL: 'https://openrouter.ai/api/v1',
+        timeout: 4 * 60 * 1000, // 4-minute timeout — drafts can take 2-3 minutes
         defaultHeaders: {
             'HTTP-Referer': 'https://projectprofound.org',
             'X-Title': 'Project Profound Story Pipeline',
@@ -215,72 +216,56 @@ async function selectNextExperiencer(specificSlug?: string): Promise<Experiencer
         .select('source_experiencer_slug')
         .not('source_experiencer_slug', 'is', null);
 
-    const alreadyDone = new Set((existing ?? []).map(r => r.source_experiencer_slug));
+    const alreadyDone = (existing ?? []).map(r => r.source_experiencer_slug).filter(Boolean) as string[];
 
-    if (specificSlug && !alreadyDone.has(specificSlug)) {
-        // Specific experiencer requested
-        const { data: videos } = await supabase
-            .from('nde_vids')
-            .select('"experiencerFullName", "viewCount"')
-            .eq('intake_status', 'complete')
-            .not('experiencerFullName', 'is', null);
-
-        // Match by slug
-        const matching = (videos ?? []).filter(v => {
-            const vSlug = nameToSlug(v.experiencerFullName);
-            return vSlug === specificSlug;
+    if (specificSlug && !alreadyDone.includes(specificSlug)) {
+        // Specific experiencer requested — use RPC with just that slug excluded
+        const { data: candidates } = await supabase.rpc('get_top_experiencers_for_stories', {
+            already_done_slugs: alreadyDone,
+            result_limit: 200,
         });
 
-        if (matching.length === 0) return null;
+        const match = (candidates ?? []).find(
+            (c: { slug: string }) => c.slug === specificSlug
+        );
+
+        if (!match) {
+            console.warn(`[story] ${specificSlug} not found or has no complete videos`);
+            return null;
+        }
 
         return {
-            experiencerFullName: matching[0].experiencerFullName,
-            totalViews: matching.reduce((sum, v) => sum + (v.viewCount ?? 0), 0),
-            videoCount: matching.length,
-            slug: specificSlug,
+            experiencerFullName: match.experiencer_full_name,
+            totalViews: Number(match.total_views),
+            videoCount: Number(match.video_count),
+            slug: match.slug,
         };
     }
 
-    // Auto-select: find top experiencer by total views who hasn't been done
-    const { data: candidates } = await supabase.rpc('get_top_experiencers_for_stories');
+    // Auto-select: server-side aggregation across ALL 9,700+ videos
+    const { data: candidates, error } = await supabase.rpc('get_top_experiencers_for_stories', {
+        already_done_slugs: alreadyDone,
+        result_limit: 10,
+    });
 
-    // If RPC doesn't exist, fall back to raw query
-    if (!candidates || candidates.length === 0) {
-        const { data: allVids } = await supabase
-            .from('nde_vids')
-            .select('"experiencerFullName", "viewCount"')
-            .eq('intake_status', 'complete')
-            .not('experiencerFullName', 'is', null)
-            .not('experiencerFullName', 'eq', '');
-
-        // Aggregate by experiencer name
-        const byName = new Map<string, { totalViews: number; count: number }>();
-        for (const v of (allVids ?? [])) {
-            const name = v.experiencerFullName;
-            const entry = byName.get(name) ?? { totalViews: 0, count: 0 };
-            entry.totalViews += v.viewCount ?? 0;
-            entry.count++;
-            byName.set(name, entry);
-        }
-
-        // Sort by total views, filter out already done
-        const sorted = [...byName.entries()]
-            .map(([name, data]) => ({
-                experiencerFullName: name,
-                totalViews: data.totalViews,
-                videoCount: data.count,
-                slug: nameToSlug(name),
-            }))
-            .filter(c => !alreadyDone.has(c.slug))
-            .sort((a, b) => b.totalViews - a.totalViews);
-
-        return sorted[0] ?? null;
+    if (error) {
+        console.error(`[story] RPC error: ${error.message}`);
+        return null;
     }
 
-    // Use RPC results
-    const candidate = candidates.find((c: { slug: string }) => !alreadyDone.has(c.slug));
-    return candidate ?? null;
+    const top = (candidates ?? [])[0];
+    if (!top) return null;
+
+    console.log(`[story] Top 5 candidates: ${(candidates ?? []).slice(0, 5).map((c: { experiencer_full_name: string; total_views: number }) => `${c.experiencer_full_name} (${Number(c.total_views).toLocaleString()})`).join(', ')}`);
+
+    return {
+        experiencerFullName: top.experiencer_full_name,
+        totalViews: Number(top.total_views),
+        videoCount: Number(top.video_count),
+        slug: top.slug,
+    };
 }
+
 
 // ─── Stage 2: Context Assembly ────────────────────────────────────────────────
 
@@ -337,23 +322,42 @@ async function assembleStoryContext(candidate: ExperiencerCandidate): Promise<St
         analysis_nde_summary: string | null;
     }>;
 
-    // Primary videos: top 2 by views (with full transcripts for context)
-    const primaryVideos = allVideos.slice(0, 2).map(v => ({
-        videoId: v.videoId,
-        title: v.title,
-        viewCount: v.viewCount ?? 0,
-        channelName: v.channelName ?? '',
-        thumbnailUrl: v.thumbnailUrl,
-        transcript: v.subtitles_punctuated ?? '',
-        // Use cleaned timestamps if available, fall back to raw
-        timestampedSegments: formatTimestampedTranscript(
-            v.raw_timestamped_subtitles_cleaned ?? v.raw_timestamped_subtitles
-        ),
-        analysisSummary: v.analysis_nde_summary,
-    }));
+    // Transcript caps — prevents prompt from exceeding model context / causing network timeouts
+    // We send 1 primary video with full transcript (better to get 100% of one video
+    // than 50% of two). Generous caps since it's only one video.
+    const MAX_PUNCTUATED_CHARS = 60_000;
+    const MAX_TIMESTAMPED_CHARS = 80_000;
 
-    // Other videos: metadata only (for linking)
-    const otherVideos = allVideos.slice(2).map(v => ({
+    // Primary video: top 1 by views (with full transcript for context)
+    const primaryVideos = allVideos.slice(0, 1).map(v => {
+        let transcript = v.subtitles_punctuated ?? '';
+        let timestampedSegments = formatTimestampedTranscript(
+            v.raw_timestamped_subtitles_cleaned ?? v.raw_timestamped_subtitles
+        );
+
+        if (transcript.length > MAX_PUNCTUATED_CHARS) {
+            console.warn(`    [story] Truncating punctuated transcript for ${v.videoId}: ${transcript.length} → ${MAX_PUNCTUATED_CHARS} chars`);
+            transcript = transcript.slice(0, MAX_PUNCTUATED_CHARS) + '\n\n[...transcript truncated for length]';
+        }
+        if (timestampedSegments.length > MAX_TIMESTAMPED_CHARS) {
+            console.warn(`    [story] Truncating timestamped transcript for ${v.videoId}: ${timestampedSegments.length} → ${MAX_TIMESTAMPED_CHARS} chars`);
+            timestampedSegments = timestampedSegments.slice(0, MAX_TIMESTAMPED_CHARS) + '\n\n[...transcript truncated for length]';
+        }
+
+        return {
+            videoId: v.videoId,
+            title: v.title,
+            viewCount: v.viewCount ?? 0,
+            channelName: v.channelName ?? '',
+            thumbnailUrl: v.thumbnailUrl,
+            transcript,
+            timestampedSegments,
+            analysisSummary: v.analysis_nde_summary,
+        };
+    });
+
+    // Other videos: metadata only (for linking) — includes 2nd video onward
+    const otherVideos = allVideos.slice(1).map(v => ({
         videoId: v.videoId,
         title: v.title,
         viewCount: v.viewCount ?? 0,

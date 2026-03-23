@@ -1,125 +1,56 @@
-# GEMINI.md — AI Context File
+# GEMINI.md — AI Context & Routing File
 
-> **🚨 CRITICAL PRE-FLIGHT CHECK:** Before you execute ANY instructions, run ANY commands, or write ANY code in this project, you MUST use the `view_file` tool to read `docs/LEARNINGS.md`. This file contains project-specific gotchas (like Firebase secret pinning limits) that will break the app if ignored. Do not skip this step.
+> **🚨 CRITICAL PRE-FLIGHT CHECK:** Before you execute ANY instructions or write ANY code, you MUST use the `view_file` tool to read `docs/LEARNINGS.md`. This contains active, immutable architectural rules. 
+> **DO NOT** read `docs/LEARNINGS_ARCHIVE.md` unless the user explicitly instructs you to research a historical bug.
 
-> This file provides Gemini with the context it needs to assist with development on this project. Always read this file and the linked documentation before generating code.
-
-## Project Overview
-Project Profound is a Next.js application designed to explore Near-Death Experiences (NDEs) through analysis, semantic search, and compassionate AI interaction. It serves as a repository of 5000+ first-person accounts.
-
-## Tech Stack
+## 1. Project Overview & Tech Stack
+Project Profound is a Next.js application designed to explore Near-Death Experiences (NDEs) through analysis, semantic search, and compassionate AI interaction.
 - **Frontend:** Next.js 14+ (App Router), Tailwind CSS, Shadcn UI.
 - **Backend/API:** Next.js API Routes (`src/app/api/*`), Supabase (PostgreSQL, Auth, Vector).
-- **Database:** Supabase - see [Database Schema](./docs/database/SCHEMA.md).
-- **Auth:** Supabase Auth (via `@supabase/ssr`).
+- **Database:** Supabase - see `docs/database/SCHEMA.md`.
 - **Styling:** Tailwind CSS + CSS Variables (`globals.css`).
-- **AI Dev Environment:** Google Antigravity.
 
-## Architecture Summary
-The app uses a hybrid architecture:
+## 2. Architecture Summary
 1. **Client:** Next.js for UI.
 2. **Server:** Supabase for persistent data and Auth.
-3. **Logic:** Next.js API routes for lightweight logic; n8n (being migrated) for heavy workflows.
-See [Architecture Doc](./docs/ARCHITECTURE.md) for full details.
+3. **Logic:** Next.js API routes for lightweight logic; native pipeline for scraping/analysis.
+See `docs/ARCHITECTURE.md` for full details.
 
-## Documentation Index
-All detailed documentation lives in the `/docs` folder. Start here:
-- 📋 [Documentation Index](./docs/INDEX.md)
-- 🧠 [AI Learnings & Known Issues](./docs/LEARNINGS.md) (Read this to avoid common mistakes!)
-
-## Key Conventions & Patterns
-### File Organization
+## 3. Key Conventions & File Organization
 - `src/app`: Page routes and API routes.
 - `src/components`: UI components.
 - `src/lib`: Utilities, database clients, and service wrappers.
-
-### Code Patterns
 - **Supabase Client:** Use `createClient` from `src/lib/supabase/client.ts` (browser) or `src/lib/supabase/server.ts` (server).
-- **Environment Variables:** Access via `process.env`. See `docs/ENVIRONMENT.md`.
 - **Styling:** Use `cn()` for class merging.
 
-### Error Handling
-- Use `try/catch` blocks in API routes.
-- Return structured JSON errors: `{ error: string, details?: any }`.
+## 4. Documentation Index (Your Knowledge Base)
+Do not guess how this app works. Read these files when touching related systems:
+- 📋 `docs/INDEX.md` (Start here for general routing)
+- 🧠 `docs/LEARNINGS.md` (Active constraints - READ BEFORE CODING)
+- 🗄️ `docs/LEARNINGS_ARCHIVE.md` (Historical bugs/pipelines - DO NOT READ by default)
+- 🔐 `docs/ENVIRONMENT.md` (Env var definitions)
+- 🎨 `docs/BRAND.md` (Design guidelines)
 
-## Important Rules for AI Code Generation
-1. **Always use the existing patterns** found in the codebase.
+## 5. Important Rules for AI Code Generation
+1. **Use Existing Patterns:** Look at sibling files before generating new code.
 2. **Respect RLS:** Never use `service_role` key in client-side code.
 3. **Database Changes:** Always ask to create a migration file in `supabase/migrations/`.
-4. **New API Integrations:** Follow [New API Integration Guide](./docs/guides/NEW_API_INTEGRATION.md).
-5. **Types:** Use `src/lib/supabase/database.types.ts` for DB types.
-6. **Documentation Maintenance:** You represent the "Documentation Architect". After any significant code, schema, or API change, you MUST update the corresponding file in `/docs`. Do not wait for the user to ask.
-7. **Continuous Learning:** Always check `docs/LEARNINGS.md` before generating code to see if there are specific patterns or "gotchas" you need to be aware of.
+4. **Documentation Architect:** After any significant code, schema, or API change, you MUST update the corresponding file in `/docs`. Do not wait for the user to ask.
+5. **Strict Security:** Adhere to the security and auth routing rules defined in `docs/LEARNINGS.md`.
+6. **LEARNINGS.md Hygiene (MANDATORY):** `docs/LEARNINGS.md` is read every session — it must stay lean.
+   - **Cap: 30 active rules max.** Count only bullet points that state a constraint, not headers or whitespace.
+   - **What belongs:** Project-wide constraints that will break production if a future session forgets them (e.g., auth patterns, CSS token rules, API timeouts, deployment gotchas).
+   - **What does NOT belong:** One-off bug fixes, single-route implementation details, library API notes, or anything that only matters for one file.
+   - **Prune-on-write:** Before adding a new rule, review the existing list. Move any resolved, outdated, or narrowly-scoped rules to `docs/LEARNINGS_ARCHIVE.md` with a date stamp.
+   - **If you exceed 30 rules after your edit, you MUST archive the least-critical entries before finishing.**
 
-## Security Rules (Non-Negotiable)
-> These rules were established after a full security audit on 2026-03-14. They exist to prevent recurring vulnerabilities in AI-generated code.
+## 6. Current Development Focus
+- **Active Task:** Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
+- *(For a history of completed features, see `docs/LEARNINGS_ARCHIVE.md`)*
 
-1. **Every `/api/admin/*` route MUST have auth.** Use the shared `isAdminUser()` from `src/lib/auth/admin-guard.ts`. No exceptions — even if middleware protects the admin *pages*, API routes are independently callable.
-2. **Never bypass auth for debugging.** No `IS_DEBUG_MODE` or similar env-var backdoors in production routes. If you need a debug path, gate it behind `CRON_SECRET` or admin session.
-3. **Sanitize all user input before HTML rendering.** Use `escapeHtml()` for any user-provided strings interpolated into HTML (emails, templates, SSR). See `src/app/api/contact/route.ts` for the pattern.
-4. **Security headers are mandatory.** They are configured in `next.config.ts` via `headers()`. Do not remove them.
-5. **Rate limiting awareness:** Critical routes (`/api/chat-compassionate`, `/api/questions/custom`, `/api/contact`) consume expensive resources (OpenAI credits, email sends). Note rate limiting needs when creating new public API routes.
-6. **Service role key usage:** Only use `SUPABASE_SERVICE_KEY` or `SUPABASE_SERVICE_ROLE_KEY` in routes that verify the caller is either a cron job (via `CRON_SECRET`) or an authenticated admin. Never use service keys in public-facing routes without auth.
-7. **RLS policies:** New tables MUST have explicit RLS policies. Never use `USING (true)` for INSERT/UPDATE/DELETE on user-facing tables without a clear justification.
-
-## Current Development Status
-### Completed
-- Core NDE search and display (Search3/Native).
-- Compassionate Chat (Hybrid native/Supabase).
-- User Auth & Profiles.
-- Homepage curated video grid (ISR 6h rotation) with 3 score columns.
-- Explorer pages: `/explore/transformation`, `/explore/veridical`, `/explore/greyson`.
-- Scale info pages: `/scale/greyson`, `/scale/cvnde`, `/scale/transformation`.
-- Site-wide Chat Popup widget (`ChatPopup`) — floating "Chat with NDEs" on all pages.
-- Channel pages: `/channels` redesigned as ranked **list view** with analysis sorting (Intensity, Greyson, Transformation, Veridical, Tone). Each row shows mini stacked bars (Types/Tone) + intensity bar + score badges. 11 sort options. Mobile: pill badges. `/channel/[channelId]` detail pages unchanged.
-- YouTube channel metadata enrichment via `scripts/enrich-channels.ts` → `channels` table.
-- NDERF analysis visualization: video-level analysis (phenomenology, entities, journey flow, core elements), channel-level aggregate stats, similar experiences (pgvector).
-- Experience fingerprint generation + pgvector similarity search (`find_similar_experiences` RPC).
-- Resources page: `/resources` — NDE research ecosystem directory with 7 sections (orgs, academic, research, accounts, intro, books, support).
-- Alt1 design system redesign: profile, dashboard, admin pages, chat popup (light theme), and new logo.
-- Merged Home/Search experiences: Hero section now features a comprehensive search bar gateway.
-- Advanced Search Filters (`/search3`): Integrated Greyson, Transformation, and Veridical sliding score filters across Keyword and Concept (formerly Semantic) search modes correctly updating URL params, Typesense Schema, and pgvector RPCs (resolved candidate function overloading conflicts).
-- **Native video intake pipeline** (`src/lib/pipeline/`) — replaces n8n: scrape → classify → 7-pass analysis → embeddings → Typesense index → fingerprint.
-- Admin intake page (`/admin/intake`) — branded UI for single-video processing with real-time step progress.
-- **Queue Inspector** (`/admin/scanner/queue`) — persistent view of failed/skipped/stuck videos from `nde_vids.intake_status`, with per-item retry and bulk reset. Separate from transient `scan_queue`.
-- **Scanner stats fixed** — Total Failed/Accepted on scanner dashboard now reads from `nde_vids` (live) not `scan_runs` aggregate (never-decreases on retry).
-- **Apify async polling** (`src/lib/youtube/subtitles.ts`) — replaced fragile `waitForFinish=120` long-poll with start→poll→fetch pattern using `AbortController` per call. Fixes false `no_captions` on Firebase serverless.
-- **Round-robin queue processing** (`src/lib/scanner/tick.ts`) — tick now picks a random channel per iteration (sampling 500 pending rows, deduplicating channel_ids, tracking `touchedChannelIds` per tick) instead of globally oldest-first. Prevents one channel from monopolizing the queue.
-- **Discover All Channels** (`discover_all` admin API action + "Queue All Channels" admin button) — bulk-queues 50 videos per channel across all 47 enabled channels in one shot. Safe to re-run (idempotent via `ignoreDuplicates`).
-- **Hourly cron** (`.github/workflows/scanner-cron.yml`) — increased from every 2h to every 1h (~72 videos/day throughput).
-- **CES Feedback widget** (`src/components/ces-feedback-widget.tsx`) — persistent left-edge tab (desktop) / auto-open after 2 min (mobile). 7-point scale + optional reason. Score saved to DB immediately on click. 30-day suppression via localStorage. Test mode: `?ces_test=1`. Admin analytics at `/admin/ces`. Table: `ces_feedback`. See `docs/LEARNINGS.md §18`.
-- **Nav simplification** — Removed "Chat" dropdown from site-wide nav (`site-header.tsx`). New order: Big Questions → Browse → NDE Compass → About → Search. Chat pages still accessible via the floating ChatPopup widget on all pages.
-- **Security audit + hardening** (2026-03-14) — Full codebase security audit. Added auth guards to 3 admin API routes, locked `manage-subs` behind token/admin, removed debug auth bypass, added 5 security headers to `next.config.ts`, XSS-sanitized contact form, fixed weak email/send auth. Created shared `isAdminUser()` at `src/lib/auth/admin-guard.ts`.
-
-### In Progress
-- Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
-
-## Environment Variables
-See [Environment Variables Doc](./docs/ENVIRONMENT.md).
-
-## Quick Reference: Key File Paths
-| Purpose | Path |
-|---|---|
-| Supabase Client Init | `src/lib/supabase/client.ts` |
-| Database Types | `src/lib/supabase/database.types.ts` |
-| Chat Logic | `src/app/api/chat-compassionate/route.ts` |
-| Chat Popup Widget | `src/components/chat-popup.tsx` |
-| Search Logic | `src/app/api/search/route.ts` |
-| UI Components | `src/components/` |
-| Channel Components | `src/components/channels/` |
-| Channel Directory | `src/app/channels/page.tsx` |
-| Channel Detail | `src/app/channel/[channelId]/page.tsx` |
-| Channel Enrichment | `scripts/enrich-channels.ts` |
-| Analysis Components | `src/components/analysis/` |
-| Batch API Routes | `src/app/api/batch/` |
-| Resources Page | `src/app/resources/page.tsx` |
-| Brand Guidelines | `docs/BRAND.md` |
-| Logo (transparent) | `public/logo-transparent.png` |
-| Intake Pipeline | `src/lib/pipeline/intake.ts` |
-| Pipeline Modules | `src/lib/pipeline/` (scraper, classifier, embeddings, etc.) |
-| Admin Intake Page | `src/app/admin/intake/page.tsx` |
-| Intake API Route | `src/app/api/intake/route.ts` |
-| CES Feedback Widget | `src/components/ces-feedback-widget.tsx` |
-| CES Feedback API | `src/app/api/ces-feedback/route.ts` |
-| CES Admin Dashboard | `src/app/admin/ces/page.tsx` |
-| Admin Auth Guard | `src/lib/auth/admin-guard.ts` |
+## 7. Skills Archive
+- **Active skills (~65):** `~/.gemini/antigravity/skills/` — curated for Project Profound's stack.
+- **Archived skills (~1,199):** `~/.gemini/antigravity/skills-archive/` — available on demand.
+- If a task requires a skill not in the active set, check the archive before building from scratch.
+- To restore: `mv ~/.gemini/antigravity/skills-archive/<skill-name> ~/.gemini/antigravity/skills/`
+- See `skills_keep_list.md` in the brain artifacts for the full rationale.
