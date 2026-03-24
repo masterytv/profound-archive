@@ -9,13 +9,12 @@
  *
  * ARCHITECTURE NOTE:
  * The pipeline takes 2-5 minutes (Claude draft + Perplexity research + fal.ai images).
- * Cloudflare's proxy timeout is ~100s, which causes a 524 if we wait synchronously.
- * We use Next.js `after()` to return HTTP 200 immediately and run the pipeline
- * in the background. Results are logged server-side and written to the database.
+ * Runs synchronously — Firebase App Hosting (Cloud Run) throttles CPU after
+ * the response is sent, so after() callbacks are silently killed.
+ * The GitHub Actions curl has --max-time 300 which matches our maxDuration.
  */
 
 import { NextResponse } from 'next/server';
-import { after } from 'next/server';
 import { generateBlogArticle } from '@/lib/pipeline/blog-article';
 import { createClient } from '@supabase/supabase-js';
 
@@ -34,60 +33,59 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Parse params before responding
+    // Parse params
     const url = new URL(req.url);
     const count = Math.min(parseInt(url.searchParams.get('count') ?? '1', 10), 3);
 
-    // Kick off pipeline AFTER response is sent (avoids Cloudflare 524 timeout)
-    after(async () => {
-        console.log(`[cron/blog-questions] Starting generation of ${count} article(s)...`);
+    console.log(`[cron/blog-questions] Starting generation of ${count} article(s)...`);
 
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-        // Find questions that don't have a blog article yet
-        const { data: generated } = await supabase
-            .from('blog_posts')
-            .select('source_question_slug')
-            .not('source_question_slug', 'is', null);
+    // Find questions that don't have a blog article yet
+    const { data: generated } = await supabase
+        .from('blog_posts')
+        .select('source_question_slug')
+        .not('source_question_slug', 'is', null);
 
-        const generatedSlugs = new Set((generated ?? []).map((r) => r.source_question_slug));
+    const generatedSlugs = new Set((generated ?? []).map((r) => r.source_question_slug));
 
-        const { data: questions } = await supabase
-            .from('nde_questions')
-            .select('slug')
-            .eq('is_active', true)
-            .order('sort_order', { ascending: true, nullsFirst: false })
-            .limit(count + generatedSlugs.size + 10);
+    const { data: questions } = await supabase
+        .from('nde_questions')
+        .select('slug')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true, nullsFirst: false })
+        .limit(count + generatedSlugs.size + 10);
 
-        const todo = (questions ?? [])
-            .map((q) => q.slug)
-            .filter((s) => !generatedSlugs.has(s))
-            .slice(0, count);
+    const todo = (questions ?? [])
+        .map((q) => q.slug)
+        .filter((s) => !generatedSlugs.has(s))
+        .slice(0, count);
 
-        if (todo.length === 0) {
-            console.log('[cron/blog-questions] All questions already generated — nothing to do');
-            return;
+    if (todo.length === 0) {
+        console.log('[cron/blog-questions] All questions already generated — nothing to do');
+        return NextResponse.json({ results: [], message: 'All questions already generated' });
+    }
+
+    // Process sequentially — respect API rate limits
+    const results = [];
+    for (const slug of todo) {
+        try {
+            const result = await generateBlogArticle(slug);
+            results.push({ slug, ...result });
+            console.log(`[cron/blog-questions] ${slug}: ${result.status}${result.articleSlug ? ` → /blog/${result.articleSlug}` : ''}${result.error ? ` — ${result.error}` : ''}`);
+        } catch (err) {
+            results.push({ slug, status: 'failed', error: String(err) });
+            console.error(`[cron/blog-questions] ${slug}: FAILED — ${err}`);
         }
+    }
 
-        // Process sequentially — respect API rate limits
-        for (const slug of todo) {
-            try {
-                const result = await generateBlogArticle(slug);
-                console.log(`[cron/blog-questions] ${slug}: ${result.status}${result.articleSlug ? ` → /blog/${result.articleSlug}` : ''}${result.error ? ` — ${result.error}` : ''}`);
-            } catch (err) {
-                console.error(`[cron/blog-questions] ${slug}: FAILED — ${err}`);
-            }
-        }
+    console.log(`[cron/blog-questions] Done. Processed ${todo.length} question(s).`);
 
-        console.log(`[cron/blog-questions] Done. Processed ${todo.length} question(s).`);
-    });
+    const anyFailed = results.some(r => r.status === 'failed');
+    const statusCode = anyFailed ? 500 : 200;
 
-    // Respond immediately — pipeline runs in background via after()
-    return NextResponse.json({
-        acknowledged: true,
-        message: `Queued ${count} article(s) for generation. Check server logs for results.`,
-    });
+    return NextResponse.json({ results }, { status: statusCode });
 }

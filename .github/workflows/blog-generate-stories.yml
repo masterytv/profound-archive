@@ -44,10 +44,14 @@ jobs:
 
           if [ "$HTTP_CODE" != "200" ]; then
             echo "::error::Story generation failed with status $HTTP_CODE"
+            echo "::error::Response: $BODY"
             exit 1
           fi
+
+          echo "✅ Story generation completed successfully"
 
 # ── Required GitHub Secrets ──────────────────────────────────────────────────
 # CRON_SECRET          — same secret used by scanner/tick and other cron routes
 # NEXT_PUBLIC_APP_URL  — https://projectprofound.org (no trailing slash)
 # ─────────────────────────────────────────────────────────────────────────────
+

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Brain, Sparkles, TrendingUp, Tv, HelpCircle, Search } from "lucide-react";
+import { Brain, Sparkles, TrendingUp, Tv, HelpCircle, Search, Video } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "Explore NDEs | Project Profound",
@@ -31,6 +31,18 @@ const researchSections = [
         title: "NDE Channels",
         description: "47 curated YouTube channels ranked by experience depth, transformation impact, and veridical evidence. Browse by source.",
         cta: "Browse channels →",
+    },
+    {
+        href: "/video-explore",
+        icon: Video,
+        color: "blue",
+        bg: "bg-blue-50",
+        iconColor: "text-blue-600",
+        border: "border-blue-100",
+        badge: "New",
+        title: "Explore Videos",
+        description: "Browse 5,000+ NDE videos by research scores, core elements, and experience type. Filter by what happened, sort by impact.",
+        cta: "Explore videos →",
     },
 ] as const;
 

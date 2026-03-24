@@ -155,3 +155,542 @@ body {
 .animate-ces-slide-up {
   animation: ces-slide-up 0.3s ease-out forwards;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * NDE Experience Engine Styles
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Shell & Layout ────────────────────────────────────────────────── */
+.experience-main {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #050514;
+  z-index: 50;
+}
+
+.experience-shell {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.experience-phases {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.experience-phase-wrapper {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
+  will-change: opacity;
+}
+
+.experience-phase-active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+}
+
+.experience-phase-inactive {
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1;
+}
+
+.experience-phase {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─── Background, Overlay, Foreground Layers ────────────────────────── */
+.experience-bg {
+  position: absolute;
+  inset: -20px; /* overflow for parallax */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.experience-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.experience-fg-layer {
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.experience-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Narrative Text Overlay ────────────────────────────────────────── */
+.experience-narrative {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  padding: 0 1.5rem;
+  pointer-events: none;
+}
+
+.experience-narrative--bottom-center {
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 600px;
+  text-align: center;
+}
+
+.experience-narrative--center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 600px;
+  text-align: center;
+}
+
+.experience-narrative--top-left {
+  top: 4rem;
+  left: 1rem;
+  max-width: 420px;
+  text-align: left;
+}
+
+.experience-narrative-glass {
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  background: rgba(10, 10, 30, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.experience-narrative-text {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1rem;
+  line-height: 1.7;
+  font-style: italic;
+  margin: 0;
+}
+
+.experience-narrative-attribution {
+  display: block;
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  font-style: normal;
+}
+
+/* ─── Memory Cards Grid ─────────────────────────────────────────────── */
+.memory-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 5rem 1.5rem 8rem;
+  align-content: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .memory-grid {
+    grid-template-columns: 1fr;
+    padding: 4rem 1rem 7rem;
+  }
+}
+
+.memory-card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(10, 10, 40, 0.5);
+  border: 1px solid rgba(200, 180, 100, 0.15);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  box-shadow:
+    0 0 20px rgba(200, 180, 100, 0.05),
+    inset 0 0 20px rgba(200, 180, 100, 0.03);
+}
+
+.memory-card-text {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+}
+
+.memory-card-subtext {
+  color: rgba(200, 180, 100, 0.6);
+  font-size: 0.7rem;
+  margin: 0.5rem 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── HUD (Heads-Up Display) ────────────────────────────────────────── */
+.experience-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.experience-hud > * {
+  pointer-events: auto;
+}
+
+/* ─── Navigation Buttons ────────────────────────────────────────────── */
+.experience-nav {
+  position: fixed;
+  z-index: 21;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.experience-nav:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.experience-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.experience-nav--prev {
+  bottom: auto;
+  top: 1rem;
+  right: 1rem;
+}
+
+.experience-nav--next {
+  bottom: 5rem;
+  right: 1rem;
+}
+
+/* ─── Progress Indicator ────────────────────────────────────────────── */
+.experience-progress {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.experience-progress-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.experience-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  padding: 0;
+  cursor: default;
+  transition: all 0.3s ease;
+}
+
+.experience-progress-dot--visited {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.experience-progress-dot--active {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.experience-progress-label {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ─── Audio Toggle ──────────────────────────────────────────────────── */
+.experience-audio-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 21;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.experience-audio-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.experience-audio-toggle--on {
+  color: rgba(100, 180, 255, 0.9);
+  border-color: rgba(100, 180, 255, 0.3);
+}
+
+/* ─── Content Warning Gate ──────────────────────────────────────────── */
+.experience-gate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0a0f1e 0%, #050514 100%);
+  z-index: 50;
+}
+
+.experience-gate-content {
+  max-width: 440px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.experience-gate-header {
+  margin-bottom: 2rem;
+}
+
+.experience-gate-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.experience-gate-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.experience-gate-name {
+  color: rgba(100, 180, 255, 0.9);
+  font-weight: 500;
+}
+
+.experience-gate-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(255, 200, 50, 0.08);
+  border: 1px solid rgba(255, 200, 50, 0.15);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 200, 50, 0.8);
+  font-size: 0.8rem;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.experience-gate-warning svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.experience-gate-warning p {
+  margin: 0;
+}
+
+.experience-gate-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.experience-gate-dot {
+  opacity: 0.3;
+}
+
+.experience-gate-begin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2.5rem;
+  background: linear-gradient(135deg, rgba(100, 130, 255, 0.9), rgba(80, 100, 200, 0.9));
+  border: 1px solid rgba(120, 150, 255, 0.3);
+  border-radius: 9999px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(80, 100, 220, 0.3);
+}
+
+.experience-gate-begin:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(80, 100, 220, 0.45);
+}
+
+.experience-gate-lifeline {
+  margin-top: 2rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.experience-gate-link {
+  color: rgba(100, 180, 255, 0.7);
+  text-decoration: underline;
+}
+
+/* ─── End Card ──────────────────────────────────────────────────────── */
+.experience-endcard {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0a0f1e 0%, #050514 100%);
+  z-index: 50;
+}
+
+.experience-endcard-content {
+  max-width: 440px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.experience-endcard-header {
+  margin-bottom: 2rem;
+}
+
+.experience-endcard-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(100, 180, 255, 0.6);
+  margin: 0 0 0.5rem;
+}
+
+.experience-endcard-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+}
+
+.experience-endcard-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  background: linear-gradient(135deg, rgba(100, 130, 255, 0.9), rgba(80, 100, 200, 0.9));
+  border-radius: 9999px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(80, 100, 220, 0.3);
+}
+
+.experience-endcard-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(80, 100, 220, 0.45);
+}
+
+.experience-endcard-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.experience-endcard-link {
+  color: rgba(100, 180, 255, 0.7);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.experience-endcard-link:hover {
+  color: rgba(100, 180, 255, 1);
+}
+
+.experience-endcard-disclaimer {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.experience-endcard-disclaimer p {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+
+.experience-endcard-lifeline a {
+  color: rgba(100, 180, 255, 0.5);
+  text-decoration: underline;
+}
+
+/* ─── Reduced motion: instant cuts ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .experience-phase-wrapper,
+  .experience-fg-layer,
+  .experience-nav,
+  .experience-progress-dot,
+  .memory-card {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "frame-src https://www.youtube.com",
               "connect-src 'self' https://vnycavclrndjwmpaugju.supabase.co wss://vnycavclrndjwmpaugju.supabase.co https://api.openai.com https://www.google-analytics.com https://region1.google-analytics.com",
-              "media-src 'self'",
+              "media-src 'self' https://vnycavclrndjwmpaugju.supabase.co data:",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

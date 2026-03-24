@@ -22,8 +22,15 @@
 - **Images:** Every thumbnail MUST use Next.js `<Image>` (never `<img>`), request `hqdefault` (not `maxresdefault`), and include accurate `sizes`. Limit grid pages to ≤12 items.
 - **Video:** YouTube videos MUST use the click-to-play `<YouTubePlayer>`. Never use raw `<iframe>` with `autoplay=1` (causes massive GPU leaks).
 - **Routing:** Internal video links to specific times must use `<TimestampLink>` to trigger `seekYouTubePlayer()` custom events. Do not use `<Link href="?t=45">`.
+- **No Vision on Generated Assets:** NEVER use `view_file`, `browser_tool`, or any vision capability to inspect AI-generated images or full-page renders containing uncompressed images — the base64 payload will exceed the API limit and crash the session. Verify generated assets only via file-system commands (`ls -la`, `stat`, `file`).
 
 ## 5. AI & Infrastructure
 - **Claude JSON Forcing:** To get reliable JSON from Claude, you MUST use Assistant Prefill: `{ role: 'assistant', content: '{' }`. System prompts are not enough.
 - **Secrets:** `apphosting.yaml` secrets MUST be pinned to a specific version (e.g., `/versions/1`). Firebase App Hosting will fail builds if set to `/versions/latest`.
 - **Formatting:** No Em Dashes (—) in AI outputs. Use parentheses or commas.
+
+## 6. Zod & Validation
+- **Zod Strips Unknown Properties:** When adding new fields to TypeScript config interfaces (e.g., `secondary_audio_cue`, `loop`), you MUST also add them to the corresponding Zod schema. Zod's `.parse()` / `.safeParse()` silently drops any properties not defined in the schema. This will cause runtime data loss with zero compile errors.
+
+## 7. React Lifecycle
+- **Unstable useEffect Deps:** NEVER put a custom hook's return object in a `useEffect` dependency array (e.g., `useEffect(() => cleanup(), [audio])`). The hook returns a new object reference each render, causing cleanup to fire on EVERY re-render — killing audio, timers, etc. Use `useRef` + empty deps `[]` for unmount-only cleanup.

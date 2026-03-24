@@ -10,13 +10,12 @@
  *
  * ARCHITECTURE NOTE:
  * The pipeline takes 2-5 minutes (Claude draft + voice pass + fal.ai images).
- * Cloudflare's proxy timeout is ~100s, which causes a 524 if we wait synchronously.
- * We use Next.js `after()` to return HTTP 200 immediately and run the pipeline
- * in the background. Results are logged server-side and written to the database.
+ * Runs synchronously — Firebase App Hosting (Cloud Run) throttles CPU after
+ * the response is sent, so after() callbacks are silently killed.
+ * The GitHub Actions curl has --max-time 300 which matches our maxDuration.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { after } from 'next/server';
 import { generateStoryArticle } from '@/lib/pipeline/blog-story';
 
 export const maxDuration = 300; // 5 min timeout for serverless
@@ -33,29 +32,27 @@ export async function GET(request: NextRequest) {
     const count = Math.min(parseInt(searchParams.get('count') ?? '1', 10), 3);
     const specificSlug = searchParams.get('slug') ?? undefined;
 
-    // Kick off pipeline AFTER response is sent (avoids Cloudflare 524 timeout)
-    after(async () => {
-        console.log(`[cron/blog-stories] Starting generation of ${count} story(ies)${specificSlug ? ` for ${specificSlug}` : ''}...`);
+    console.log(`[cron/blog-stories] Starting generation of ${count} story(ies)${specificSlug ? ` for ${specificSlug}` : ''}...`);
 
-        for (let i = 0; i < count; i++) {
-            console.log(`[cron/blog-stories] Generating story ${i + 1}/${count}...`);
-            const result = await generateStoryArticle(specificSlug);
+    const results = [];
+    for (let i = 0; i < count; i++) {
+        console.log(`[cron/blog-stories] Generating story ${i + 1}/${count}...`);
+        const result = await generateStoryArticle(specificSlug);
+        results.push(result);
 
-            console.log(`[cron/blog-stories] Story ${i + 1}: ${result.status}${result.articleSlug ? ` → /blog/${result.articleSlug}` : ''}${result.error ? ` — ${result.error}` : ''}`);
+        console.log(`[cron/blog-stories] Story ${i + 1}: ${result.status}${result.articleSlug ? ` → /blog/${result.articleSlug}` : ''}${result.error ? ` — ${result.error}` : ''}`);
 
-            // Stop if we ran out of experiencers
-            if (result.status === 'no_experiencers') {
-                console.log('[cron/blog-stories] No more eligible experiencers — stopping');
-                break;
-            }
+        // Stop if we ran out of experiencers
+        if (result.status === 'no_experiencers') {
+            console.log('[cron/blog-stories] No more eligible experiencers — stopping');
+            break;
         }
+    }
 
-        console.log(`[cron/blog-stories] Done.`);
-    });
+    console.log(`[cron/blog-stories] Done.`);
 
-    // Respond immediately — pipeline runs in background via after()
-    return NextResponse.json({
-        acknowledged: true,
-        message: `Queued ${count} story(ies) for generation${specificSlug ? ` (targeting ${specificSlug})` : ''}. Check server logs for results.`,
-    });
+    const anyFailed = results.some(r => r.status === 'failed');
+    const statusCode = anyFailed ? 500 : 200;
+
+    return NextResponse.json({ results }, { status: statusCode });
 }
