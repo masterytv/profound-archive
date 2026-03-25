@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { FileText, CheckCircle2, Clock3, Settings2, Eye, EyeOff, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileText, CheckCircle2, Clock3, Settings2, Eye, EyeOff, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { DeletePostButton } from "@/components/admin/delete-post-button";
 import { BlogGeneratePanel, GuideGeneratePanel, StoryGeneratePanel } from "@/components/admin/blog-generate-panel";
 
 export const dynamic = "force-dynamic";
@@ -234,6 +235,10 @@ export default async function AdminBlogPage({
                                                 <PublishToggleButton
                                                     id={post.id}
                                                     currentStatus={post.status}
+                                                />
+                                                <DeletePostButton
+                                                    id={post.id}
+                                                    title={post.title}
                                                 />
                                             </div>
                                         </td>

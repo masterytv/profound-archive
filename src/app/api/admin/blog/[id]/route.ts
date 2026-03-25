@@ -173,3 +173,57 @@ export async function PUT(
 
     return NextResponse.json({ success: true, post: data });
 }
+
+// DELETE /api/admin/blog/[id] — permanently remove a post so it can be re-generated
+export async function DELETE(
+    _req: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id } = await params;
+    const postId = parseInt(id, 10);
+    if (isNaN(postId)) {
+        return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+    }
+
+    const authResult = await requireAdmin();
+    if (authResult) return authResult;
+
+    const adminClient = getAdminClient();
+
+    // Fetch the post first so we can return info about what was deleted
+    const { data: existing, error: fetchError } = await adminClient
+        .from("blog_posts")
+        .select("id, slug, title, category")
+        .eq("id", postId)
+        .single();
+
+    if (fetchError || !existing) {
+        return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    // Delete related images first (if the table exists)
+    await adminClient
+        .from("blog_post_images")
+        .delete()
+        .eq("blog_post_id", postId);
+
+    // Hard delete the post — this lets the pipeline re-process the question/topic
+    const { error: deleteError } = await adminClient
+        .from("blog_posts")
+        .delete()
+        .eq("id", postId);
+
+    if (deleteError) {
+        return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({
+        success: true,
+        deleted: {
+            id: existing.id,
+            slug: existing.slug,
+            title: existing.title,
+            category: existing.category,
+        },
+    });
+}
