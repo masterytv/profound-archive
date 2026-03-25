@@ -71,8 +71,21 @@ export default function EmailTemplatesPage() {
   const [previewKey, setPreviewKey] = useState(0);
 
   const loadTemplates = useCallback(async () => {
-    const { data } = await supabase.from("email_templates").select("*");
-    if (!data) return;
+    const { data, error } = await supabase.from("email_templates").select("*");
+    if (error) {
+      console.error("[email-templates] fetch error:", error.message, error);
+      return;
+    }
+    if (!data || data.length === 0) {
+      console.warn("[email-templates] fetch returned empty — will retry");
+      return;
+    }
+    // Validate first row has expected fields to guard against partial responses
+    const sample = data[0];
+    if (!sample.archetype || !('subject' in sample)) {
+      console.warn("[email-templates] unexpected data shape:", Object.keys(sample));
+      return;
+    }
     const map: Record<string, Template> = {};
     data.forEach((t: Template) => { map[t.archetype] = t; });
     setTemplates(map);
@@ -80,6 +93,14 @@ export default function EmailTemplatesPage() {
   }, [supabase]);
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
+
+  // Retry once if first load returned empty (e.g., auth token not ready)
+  useEffect(() => {
+    if (!loaded) {
+      const timer = setTimeout(() => { loadTemplates(); }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [loaded, loadTemplates]);
 
   const current: Template = templates[selected] ?? {
     archetype: selected,
