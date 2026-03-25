@@ -4,6 +4,7 @@ import { useState } from "react";
 import { QUESTIONS, ARCHETYPES, computeArchetype, type AnswerOption, type ArchetypeId } from "@/lib/quiz/archetypes";
 import { QuizQuestion } from "./QuizQuestion";
 import { QuizResult } from "./QuizResult";
+import MicroFeedback from "@/components/micro-feedback";
 
 const CRISIS_ANCHOR = (
   <p className="text-xs text-muted-foreground text-center mt-8 leading-relaxed">
@@ -172,11 +173,20 @@ export function QuizClient() {
 
         {/* ── Result ── */}
         {isResultStep && (
-          <QuizResult
-            archetype={ARCHETYPES[result]}
-            writeIn={writeIn || undefined}
-            onRestart={handleRestart}
-          />
+          <>
+            <QuizResult
+              archetype={ARCHETYPES[result]}
+              writeIn={writeIn || undefined}
+              onRestart={handleRestart}
+            />
+            <div className="mt-8 w-full max-w-2xl">
+              <MicroFeedback
+                feature="nde_compass"
+                contextId={result}
+                prompt="Was the NDE Compass useful?"
+              />
+            </div>
+          </>
         )}
       </div>
     </div>

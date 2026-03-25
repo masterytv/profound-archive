@@ -7,6 +7,7 @@ import { ArrowLeft, Play, ExternalLink, Heart, Sparkles, Brain, TrendingUp } fro
 import { SocialShareButton } from "@/components/video/ShareButton";
 import Image from "next/image";
 import ExperienceFingerprint from "@/components/experiencer/experience-fingerprint";
+import MicroFeedback from "@/components/micro-feedback";
 
 export const revalidate = 86400;
 
@@ -679,6 +680,13 @@ export default async function ExperiencerProfilePage({
                         <p className="text-[11px] text-slate-400 dark:text-slate-600 text-center leading-relaxed max-w-md mx-auto">
                             This page was composed from {profile.full_name}&apos;s own words in recorded interviews. Quotes are verbatim from video transcripts.
                         </p>
+                        <div className="mt-8 flex justify-center">
+                            <MicroFeedback
+                                feature="experiencer_profile"
+                                contextId={slug}
+                                prompt="Was this profile helpful?"
+                            />
+                        </div>
                         <div className="mt-6 text-center">
                             <Link href="/experiencer"
                                 className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">

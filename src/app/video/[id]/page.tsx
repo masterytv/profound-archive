@@ -29,6 +29,7 @@ import { NderfAnalysisSection } from "@/components/analysis/NderfAnalysisSection
 import { SimilarExperiences, type SimilarExperience } from "@/components/analysis/SimilarExperiences";
 import { SocialShareButton } from "@/components/video/ShareButton";
 import { TimestampLink } from "@/components/video/TimestampLink";
+import MicroFeedback from "@/components/micro-feedback";
 
 interface VideoPageProps {
     params: Promise<{ id: string }>;
@@ -619,6 +620,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     details={video.rvnde_details}
                                     title="Evidence Strength"
                                 />
+                                <MicroFeedback
+                                    feature="evidence_strength"
+                                    contextId={video.videoId}
+                                    prompt="Was this Evidence Strength score useful?"
+                                    compact
+                                />
                             </div>
                         )}
                         {hasGreyson && (
@@ -629,6 +636,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     breakdown={analysis!.greyson_breakdown as GreysonBreakdown}
                                     title="Experience Depth"
                                 />
+                                <MicroFeedback
+                                    feature="greyson_score"
+                                    contextId={video.videoId}
+                                    prompt="Was this Experience Depth score useful?"
+                                    compact
+                                />
                             </div>
                         )}
                         {hasTransformation && (
@@ -638,6 +651,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     classification={analysis!.transformation_classification}
                                     breakdown={analysis!.transformation_breakdown as any}
                                     title="Life Impact"
+                                />
+                                <MicroFeedback
+                                    feature="transformation_score"
+                                    contextId={video.videoId}
+                                    prompt="Was this Life Impact score useful?"
+                                    compact
                                 />
                             </div>
                         )}
@@ -710,6 +729,13 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                 </Link>
                             </div>
                         </div>
+
+                        {/* ─── Micro feedback ─── */}
+                        <MicroFeedback
+                            feature="video_analysis"
+                            contextId={video.videoId}
+                            prompt="Was this analysis helpful?"
+                        />
                     </div>
 
                     {/* ─── Right Sidebar (desktop only) ─── */}
@@ -818,6 +844,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     details={video.rvnde_details}
                                     title="Evidence Strength"
                                 />
+                                <MicroFeedback
+                                    feature="evidence_strength"
+                                    contextId={video.videoId}
+                                    prompt="Was this Evidence Strength score useful?"
+                                    compact
+                                />
                             </div>
                         )}
 
@@ -830,6 +862,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     breakdown={analysis.greyson_breakdown as GreysonBreakdown}
                                     title="Experience Depth"
                                 />
+                                <MicroFeedback
+                                    feature="greyson_score"
+                                    contextId={video.videoId}
+                                    prompt="Was this Experience Depth score useful?"
+                                    compact
+                                />
                             </div>
                         )}
 
@@ -841,6 +879,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     classification={analysis.transformation_classification}
                                     breakdown={analysis.transformation_breakdown as any}
                                     title="Life Impact"
+                                />
+                                <MicroFeedback
+                                    feature="transformation_score"
+                                    contextId={video.videoId}
+                                    prompt="Was this Life Impact score useful?"
+                                    compact
                                 />
                             </div>
                         )}

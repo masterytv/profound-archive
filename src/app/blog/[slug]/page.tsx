@@ -6,6 +6,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowLeft, Clock, Calendar, Tag, ExternalLink, BookOpen, Pencil } from "lucide-react";
 import { markdownToHtml } from "@/lib/markdown";
+import MicroFeedback from "@/components/micro-feedback";
 
 export const revalidate = 86400; // ISR: revalidate once per day
 
@@ -434,6 +435,15 @@ export default async function BlogPostPage({
                             </div>
                         </section>
                     )}
+
+                    {/* Micro feedback */}
+                    <div className="mt-10">
+                        <MicroFeedback
+                            feature="blog_article"
+                            contextId={slug}
+                            prompt="Was this article helpful?"
+                        />
+                    </div>
 
                     {/* Back link */}
                     <div className="mt-12 pt-6 border-t border-slate-100 dark:border-white/10">

@@ -15,6 +15,7 @@ import type { User } from "@supabase/supabase-js";
 import { Slider } from "@/components/ui/slider";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import Link from "next/link";
+import MicroFeedback from "@/components/micro-feedback";
 
 // Shape of a single document returned from our API
 interface HitDocument {
@@ -739,6 +740,15 @@ function SearchContent() {
                                         )}
                                     </div>
                                 )}
+
+                                {/* Micro feedback */}
+                                <div className="mt-8">
+                                    <MicroFeedback
+                                        feature="search_results"
+                                        contextId={searchTerm.trim()}
+                                        prompt="Did you find what you were looking for?"
+                                    />
+                                </div>
                             </>
                         ) : (
                             /* Empty state before first search */

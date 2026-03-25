@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import MicroFeedback from "@/components/micro-feedback";
 import { ArrowLeft, BookOpen, Video, List } from "lucide-react";
 import type { Metadata } from "next";
 import { SearchResultCardV4 } from "@/components/search-result-card-v4";
@@ -816,6 +817,15 @@ export default async function QuestionResultPage({
                         </Link>
                     </div>
                 </section>
+
+                {/* Micro feedback */}
+                <div className="mt-12">
+                    <MicroFeedback
+                        feature="question_answer"
+                        contextId={slug}
+                        prompt="Was this answer helpful?"
+                    />
+                </div>
 
             </div>
         </div>
