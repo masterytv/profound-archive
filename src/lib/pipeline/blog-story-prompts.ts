@@ -36,7 +36,7 @@ ACCURACY IS SACRED. This is a REAL PERSON's story. You are their voice and advoc
 
 5. QUOTES: Extract direct quotes from the transcript and use them VERBATIM. Include hesitations, restarts, and imperfect grammar. These are real words from a real person. Every quote MUST be linked to the video timestamp where it appears.
 
-6. QUOTE LINKS: Every direct quote must be followed by or wrapped in a Markdown link to the video timestamp: [Betty describes](/video/VIDEO_ID?t=SECONDS). Use the video metadata provided to construct these links. Calculate the timestamp in seconds from the "start" field in the transcript data.
+6. QUOTE LINKS: Every direct quote in the BODY must be followed by or wrapped in a Markdown link to the video timestamp: [Betty describes](/video/VIDEO_ID?t=SECONDS). Use the video metadata provided to construct these links. Calculate the timestamp in seconds from the "start" field in the transcript data. EXCEPTION: The lead_paragraph (opening hook) must be PLAIN PROSE with NO markdown links, no URLs, and no [text](link) syntax.
 
 7. DO NOT EMBELLISH the afterlife descriptions. If the experiencer said "I saw a bright light," do not write "she was engulfed in a luminous, all-encompassing radiance." Stay close to their words.
 
@@ -77,6 +77,7 @@ Use ## for section headings. Make them SPECIFIC to this person's story, not gene
 6. Link to the experiencer's profile page where it exists: [Name](/experiencer/SLUG).
 7. NEVER use these words: delve, tapestry, testament, beacon, cornerstone, multifaceted, intricate, nuanced, robust, leverage, utilize, facilitate, foster, holistic, overarching, pivotal, crucial, vital, realm, navigate, embark, journey (metaphorical), shed light.
 8. Also NEVER use these AI bridge phrases: "Here's what makes this...", "What strikes me most...", "I find myself returning to...", "This is where it gets interesting...", "Consider what this means...", "Let that sink in.", "And that changes everything."
+9. LINKS MUST BE PURE MARKDOWN ONLY. Use [text](url) syntax. NEVER output HTML anchor tags (<a href="..." class="...">), NEVER include class=, style=, or any HTML attributes inside markdown link URLs. A correct link: [Bill describes](/video/ID?t=33). An incorrect link: <a href="/video/ID?t=33" class="text-blue-600">Bill describes</a>.
 </style_rules>
 
 <image_extraction>
@@ -95,7 +96,7 @@ REMINDER: NO em dashes (—) in ANY field. Use commas, periods, colons, or paren
   "title": "Compelling, SEO-friendly title featuring the experiencer's name (60 chars max)",
   "slug": "experiencer-firstname-lastname-nde-story",
   "subtitle": "one-sentence editorial angle, no em dashes",
-  "lead_paragraph": "first 3-5 sentences, compelling hook, no preamble, no em dashes",
+  "lead_paragraph": "first 3-5 sentences, compelling hook, no preamble, no em dashes, NO markdown links or [text](url) syntax — plain prose only",
   "body_mdx": "full article in MDX. Start with prose, not an H1. Use ## for sections. Link all quotes to /video/VIDEO_ID?t=SECONDS. Minimum 2000 words.",
   "read_time_mins": <integer>,
   "word_count": <integer>,

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 const PAGE_SIZE = 50;
-const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
 
 import { ExperiencerCard, formatViews, type ExperiencerProfile } from "@/components/experiencer/ExperiencerCard";
 
@@ -237,31 +237,6 @@ export default async function ExperiencerDirectoryPage({
                                 {effectiveTotalCount.toLocaleString()} profiles
                             </span>
                         </div>
-
-                        {/* A-Z strip */}
-                        <div className="flex flex-wrap items-center gap-1">
-                            <Link
-                                href={buildUrl({ sort: validSort, order: ascending ? 'asc' : 'desc' }, { letter: null, q: null, page: null })}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${!activeLetter && !activeSearch
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/15'
-                                    }`}
-                            >
-                                All
-                            </Link>
-                            {ALPHABET.map(char => (
-                                <Link
-                                    key={char}
-                                    href={buildUrl({ sort: validSort, order: ascending ? 'asc' : 'desc' }, { letter: char, q: null, page: null })}
-                                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-all ${activeLetter === char
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/15'
-                                        }`}
-                                >
-                                    {char}
-                                </Link>
-                            ))}
-                        </div>
                     </div>
 
                     {/* Sort controls */}
@@ -337,12 +312,7 @@ export default async function ExperiencerDirectoryPage({
                                     <Link href={buildUrl({ sort: validSort, order: ascending ? 'asc' : 'desc' }, { q: null, page: null })} className="hover:text-blue-900 dark:hover:text-blue-100">✕</Link>
                                 </span>
                             )}
-                            {activeLetter && (
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 text-xs font-medium">
-                                    Last name: {activeLetter}
-                                    <Link href={buildUrl({ sort: validSort, order: ascending ? 'asc' : 'desc' }, { letter: null, page: null })} className="hover:text-blue-900 dark:hover:text-blue-100">✕</Link>
-                                </span>
-                            )}
+
                         </div>
                     )}
 

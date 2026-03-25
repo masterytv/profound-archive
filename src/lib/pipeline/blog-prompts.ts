@@ -72,6 +72,7 @@ Voice Characteristics: The writing should feel like a conversation with a wise, 
 - Never end a paragraph with a short punchy mic-drop sentence. Integrate conclusions into flowing prose.
 - Do NOT use "Not A, but B" pivots ("The strongest objection isn't X; it's Y"). Transition softly as a train of thought.
 - No forced conversational markers: "Picture this:", "Let's be honest...", "Counterintuitive, right?", "Here's where..."
+- LINKS MUST BE PURE MARKDOWN ONLY. Use [text](url) syntax. NEVER output HTML anchor tags (<a href="..." class="...">), NEVER include class=, style=, or any HTML attributes inside markdown link URLs.
 </style_and_syntax>
 
 <banned_words>
@@ -169,7 +170,7 @@ REMINDER: NO em dashes (—) in ANY field. Use commas, periods, colons, or paren
   "title": "exact H1 question text",
   "slug": "nde-topic-angle (4-7 words, NOT matching the /questions/ slug)",
   "subtitle": "one-sentence editorial angle, no em dashes (shown under title on blog)",
-  "lead_paragraph": "first paragraph: 3-5 sentences, direct answer + hook, no preamble, no em dashes",
+  "lead_paragraph": "first paragraph: 3-5 sentences, direct answer + hook, no preamble, no em dashes, NO markdown links or [text](url) syntax — plain prose only",
   "body_mdx": "full article in MDX (use ## for H2, ### for H3, > for block quotes, **bold**, [text](url) for inline refs. NEVER bracketed citations. NEVER em dashes.)",
   "read_time_mins": <integer>,
   "word_count": <integer>,
@@ -223,6 +224,7 @@ LINKING RULES (critical):
 - When citing a study, researcher, or organization mentioned in the sources, link to the SOURCE URL provided — e.g., [Lancet study on cardiac arrest survivors](https://pubmed.ncbi.nlm.nih.gov/XXXXX/).
 - ⛔ Do NOT fabricate or guess URLs. If a fact isn't in the SOURCES list, mention it without a link.
 - ⛔ Do NOT link book titles to Amazon. Mention books by title and author in prose only.
+- ⛔ NEVER link to youtube.com or youtu.be. ALL video references MUST use internal paths: [description](/video/VIDEO_ID). Our site hosts these videos at /video/VIDEO_ID — never link to external YouTube pages.
 - If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
 - Every article should have at least 5-8 inline links to research sources from the SOURCES list above.
 - ⚠️ MANDATORY: Every article MUST include at least 3 inline links to Project Profound video accounts (the /video/ links provided above). Weave these into the prose naturally as supporting evidence. If no video accounts were provided, reference 2-3 with [an experiencer on Project Profound](/video/VIDEO_ID).
@@ -305,7 +307,7 @@ Return the FULL revised MDX body only. Do not wrap in a JSON block. Do not inclu
 // ─── Step 5: SEO field regeneration (on voice-pass output) ───────────────────
 
 export const SEO_REFRESH_PROMPT = `Given the revised article body below, regenerate:
-1. lead_paragraph (3-5 sentences, direct answer to the question, from the first section of the article. No preamble, no "Quick Answer" framing. NO em dashes.)
+1. lead_paragraph (3-5 sentences, direct answer to the question, from the first section of the article. No preamble, no "Quick Answer" framing. NO em dashes. NO markdown links or [text](url) syntax — plain prose only.)
 2. seo_description (150 chars max, answer + "| Project Profound". NO em dashes.)
 3. subtitle (one-sentence editorial angle for display under the title. NO em dashes. Use commas or colons instead.)
 
@@ -393,7 +395,7 @@ REMINDER: NO em dashes (—) in ANY field. Use commas, periods, colons, or paren
   "title": "exact H1 guide title",
   "slug": "nde-topic-guide (4-7 words)",
   "subtitle": "one-sentence editorial angle, no em dashes",
-  "lead_paragraph": "first paragraph: 3-5 sentences, compelling topic overview, no em dashes",
+  "lead_paragraph": "first paragraph: 3-5 sentences, compelling topic overview, no em dashes, NO markdown links or [text](url) syntax — plain prose only",
   "body_mdx": "full article in MDX (use ## for H2, ### for H3, > for block quotes, **bold**, [text](url) for inline refs. NEVER em dashes.)",
   "read_time_mins": <integer>,
   "word_count": <integer>,
@@ -461,15 +463,21 @@ LINKING RULES (critical):
 - When citing a study, researcher, or organization mentioned in the sources, link to the SOURCE URL provided.
 - ⛔ Do NOT fabricate or guess URLs. If a fact isn't in the SOURCES list, mention it without a link.
 - ⛔ Do NOT link book titles to Amazon. Mention books by title and author in prose only.
+- ⛔ NEVER link to youtube.com or youtu.be. ALL video references MUST use internal paths: [description](/video/VIDEO_ID). Our site hosts these videos at /video/VIDEO_ID — never link to external YouTube pages.
 - If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
 - Every guide should have at least 8-12 inline links to research sources from the SOURCES list above.
 - In the "references" array, use the actual URLs from SOURCES. Set url to null for books.
+
+INTERNAL CROSS-LINKING (MANDATORY):
+- You MUST include at least 3 internal links to related /questions/ pages from the list provided above.
+- You MUST include at least 1 internal link to another /blog/ guide from the list provided above.
+- Weave these naturally: "For more on children's NDEs, see [question text](/questions/slug)." or "Our guide on [topic](/blog/slug) covers this in depth."
+- These internal links are critical for SEO and user engagement. Do NOT skip them.
 
 STRUCTURAL REQUIREMENTS:
 - This is a PILLAR GUIDE, not a blog post. It must be comprehensive (3,000-5,000 words).
 - 6-8 H2 sections covering different angles of the topic.
 - End with a FAQ section (5-8 Q&A pairs as ### headings).
-- Include internal links to related /questions/ pages and other /blog/ guides.
 - Every claim needs a source. Weave citations into prose naturally.
 
 VOICE REMINDERS:

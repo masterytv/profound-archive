@@ -389,6 +389,29 @@ async function voicePass(draft: ArticleDraft): Promise<ArticleDraft> {
 export function sanitizeMarkdownLinks(mdx: string): string {
     let result = mdx;
 
+    // Pass 0: Strip HTML attributes leaked into markdown link URLs.
+    // LLMs sometimes produce hybrid markdown/HTML like:
+    //   [quote text](/video/ID?t=33" class="text-blue-600 dark:text-blue-400 hover:underline">Anchor Text
+    // This regex matches [text](url" followed by HTML attributes and strips them,
+    // keeping only [text](clean-url). The leaked ">Anchor Text" tail is also removed.
+    result = result.replace(
+        /\[([^\]]+)\]\(([^")\s]+)"[^)]*\)(?:>([^,.\n]*?)(?=[,.\s]|$))?/g,
+        (_match, linkText: string, cleanUrl: string, _leakedTail: string) => {
+            console.log(`[sanitize-links] Stripped HTML attributes from link URL: "${cleanUrl}"`);
+            return `[${linkText}](${cleanUrl.trim()})`;
+        }
+    );
+
+    // Pass 0b: Strip any remaining HTML anchor tags leaked into markdown.
+    // Catches raw <a href="..." class="...">text</a> that should be markdown links.
+    result = result.replace(
+        /<a\s+href="([^"]*)"[^>]*>([^<]*)<\/a>/g,
+        (_match, url: string, text: string) => {
+            console.log(`[sanitize-links] Converted HTML <a> to markdown: [${text}](${url})`);
+            return `[${text}](${url.trim()})`;
+        }
+    );
+
     // Pass 1: Fix markdown links where URL has unbalanced parens
     // [text](url-with-(parens)-inside) → the inner ) breaks markdown.
     // Strategy: find all [text]( patterns and match the URL greedily,
@@ -440,6 +463,30 @@ export function sanitizeMarkdownLinks(mdx: string): string {
         }
     );
 
+    // Pass 4: Convert YouTube watch URLs to internal /video/ paths.
+    // LLMs sometimes link to youtube.com/watch?v=ID instead of /video/ID.
+    result = result.replace(
+        /\[([^\]]+)\]\(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})[^)]*\)/g,
+        (_match, text: string, videoId: string) => {
+            console.log(`[sanitize-links] Converted YouTube URL to internal: /video/${videoId}`);
+            return `[${text}](/video/${videoId})`;
+        }
+    );
+
+    return result;
+}
+
+/**
+ * Strip ALL markdown links from a plain-text field (lead_paragraph, subtitle, seo_description).
+ * Keeps the display text, removes the link syntax entirely.
+ */
+export function stripMarkdownLinks(text: string): string {
+    // Remove [text](url) → text
+    let result = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+    // Remove any <a> tags → text
+    result = result.replace(/<a\s+[^>]*>([^<]*)<\/a>/g, '$1');
+    // Remove any leftover HTML attribute fragments (class="..." patterns in prose)
+    result = result.replace(/"\s*class="[^"]*"\s*>/g, '');
     return result;
 }
 
@@ -464,7 +511,7 @@ async function publishDraft(
             author_name: context.authorName,
             status: 'published',
             published_at: new Date().toISOString(),  // prevent Unix epoch 1969 default
-            lead_paragraph: draft.lead_paragraph,
+            lead_paragraph: stripMarkdownLinks(draft.lead_paragraph),
             body_mdx: draft.body_mdx,
             read_time_mins: draft.read_time_mins,
             word_count: draft.word_count,
