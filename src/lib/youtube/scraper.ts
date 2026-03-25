@@ -40,6 +40,7 @@ export interface ChannelMetadata {
     total_view_count: number | null;
     published_at: string | null;
     fetched_at: string;
+    uploads_playlist_id: string | null;
 }
 
 // ─── URL Parsing ─────────────────────────────────────────────────────────────
@@ -139,15 +140,108 @@ export async function fetchVideoMetadata(videoId: string): Promise<VideoMetadata
 // ─── Channel Metadata ────────────────────────────────────────────────────────
 
 /**
+ * Resolve a YouTube channel URL, @handle, or custom URL to a channel_id.
+ * Supports:
+ *   - Direct channel ID: UCxxxxxx
+ *   - @handle: @NearDeathExperience
+ *   - Channel URL: youtube.com/channel/UCxxxxxx
+ *   - Custom URL: youtube.com/c/ChannelName or youtube.com/@Handle
+ *
+ * @returns The resolved channel_id, or null if not found
+ */
+export async function resolveChannelId(input: string): Promise<string | null> {
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    if (!apiKey) throw new Error('Missing YOUTUBE_API_KEY environment variable');
+
+    const trimmed = input.trim();
+
+    // Pattern 1: Direct channel ID (starts with UC and is ~24 chars)
+    if (/^UC[a-zA-Z0-9_-]{22}$/.test(trimmed)) {
+        return trimmed;
+    }
+
+    // Pattern 2: youtube.com/channel/UCxxxxx URL
+    const channelUrlMatch = trimmed.match(/youtube\.com\/channel\/(UC[a-zA-Z0-9_-]{22})/);
+    if (channelUrlMatch) {
+        return channelUrlMatch[1];
+    }
+
+    // Pattern 3: @handle (bare or in a URL)
+    let handle: string | null = null;
+    const handleFromUrl = trimmed.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/);
+    if (handleFromUrl) {
+        handle = handleFromUrl[1];
+    } else if (trimmed.startsWith('@')) {
+        handle = trimmed.slice(1);
+    }
+
+    if (handle) {
+        // Use forHandle param (YouTube Data API v3)
+        const url = new URL('https://www.googleapis.com/youtube/v3/channels');
+        url.searchParams.set('part', 'id');
+        url.searchParams.set('forHandle', handle);
+        url.searchParams.set('key', apiKey);
+
+        const response = await fetch(url.toString());
+        if (response.ok) {
+            const data = await response.json();
+            if (data.items?.length > 0) {
+                return data.items[0].id;
+            }
+        }
+        return null;
+    }
+
+    // Pattern 4: youtube.com/c/CustomName (legacy custom URL)
+    const customUrlMatch = trimmed.match(/youtube\.com\/c\/([a-zA-Z0-9_.-]+)/);
+    if (customUrlMatch) {
+        // Search by custom URL — use search API as fallback
+        const url = new URL('https://www.googleapis.com/youtube/v3/search');
+        url.searchParams.set('part', 'snippet');
+        url.searchParams.set('q', customUrlMatch[1]);
+        url.searchParams.set('type', 'channel');
+        url.searchParams.set('maxResults', '1');
+        url.searchParams.set('key', apiKey);
+
+        const response = await fetch(url.toString());
+        if (response.ok) {
+            const data = await response.json();
+            if (data.items?.length > 0) {
+                return data.items[0].snippet?.channelId || data.items[0].id?.channelId || null;
+            }
+        }
+        return null;
+    }
+
+    // Pattern 5: Bare string — could be a handle without @, try forHandle
+    if (/^[a-zA-Z0-9_.-]+$/.test(trimmed) && trimmed.length > 3) {
+        const url = new URL('https://www.googleapis.com/youtube/v3/channels');
+        url.searchParams.set('part', 'id');
+        url.searchParams.set('forHandle', trimmed);
+        url.searchParams.set('key', apiKey);
+
+        const response = await fetch(url.toString());
+        if (response.ok) {
+            const data = await response.json();
+            if (data.items?.length > 0) {
+                return data.items[0].id;
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
  * Fetch channel metadata from YouTube Data API v3.
- * Mirrors the pattern from scripts/enrich-channels.ts.
+ * Includes contentDetails for uploads_playlist_id (required for scanner).
  */
 export async function fetchChannelMetadata(channelId: string): Promise<ChannelMetadata | null> {
     const apiKey = process.env.YOUTUBE_API_KEY;
     if (!apiKey) throw new Error('Missing YOUTUBE_API_KEY environment variable');
 
     const url = new URL('https://www.googleapis.com/youtube/v3/channels');
-    url.searchParams.set('part', 'snippet,brandingSettings,statistics');
+    url.searchParams.set('part', 'snippet,brandingSettings,statistics,contentDetails');
     url.searchParams.set('id', channelId);
     url.searchParams.set('key', apiKey);
 
@@ -167,6 +261,7 @@ export async function fetchChannelMetadata(channelId: string): Promise<ChannelMe
     const thumbnails = snippet.thumbnails || {};
     const branding = ch.brandingSettings || {};
     const stats = ch.statistics || {};
+    const contentDetails = ch.contentDetails || {};
 
     const avatar = thumbnails.high?.url || thumbnails.medium?.url || thumbnails.default?.url || null;
 
@@ -183,5 +278,6 @@ export async function fetchChannelMetadata(channelId: string): Promise<ChannelMe
         total_view_count: stats.viewCount ? parseInt(stats.viewCount, 10) : null,
         published_at: snippet.publishedAt || null,
         fetched_at: new Date().toISOString(),
+        uploads_playlist_id: contentDetails.relatedPlaylists?.uploads || null,
     };
 }

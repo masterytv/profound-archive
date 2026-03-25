@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { discoverNewVideos, getExistingVideoIds } from '@/lib/scanner/discover';
 import { runScannerTick } from '@/lib/scanner/tick';
 import { isAdminUser } from '@/lib/auth/admin-guard';
+import { resolveChannelId, fetchChannelMetadata } from '@/lib/youtube/scraper';
 
 /**
  * Admin Scanner API
@@ -345,6 +346,80 @@ export async function POST(req: NextRequest) {
 
             if (error) return NextResponse.json({ error: error.message }, { status: 500 });
             return NextResponse.json({ success: true });
+        }
+
+        case 'add_channel': {
+            // Add a new channel by YouTube URL, @handle, or channel ID
+            const { input, enableScanner } = body;
+            if (!input || typeof input !== 'string') {
+                return NextResponse.json({ error: 'Missing or invalid channel input' }, { status: 400 });
+            }
+
+            try {
+                // Step 1: Resolve input → channel_id
+                const channelId = await resolveChannelId(input);
+                if (!channelId) {
+                    return NextResponse.json({
+                        error: `Could not resolve "${input}" to a YouTube channel. Try a @handle, channel URL, or channel ID.`,
+                    }, { status: 404 });
+                }
+
+                // Step 2: Check if channel already exists
+                const { data: existing } = await supabase
+                    .from('channels')
+                    .select('channel_id, name')
+                    .eq('channel_id', channelId)
+                    .single();
+
+                if (existing) {
+                    return NextResponse.json({
+                        error: `Channel "${existing.name}" is already in the system.`,
+                        existing: true,
+                        channel: existing,
+                    }, { status: 409 });
+                }
+
+                // Step 3: Fetch full metadata from YouTube
+                const metadata = await fetchChannelMetadata(channelId);
+                if (!metadata) {
+                    return NextResponse.json({
+                        error: `Channel ID ${channelId} resolved but metadata fetch failed.`,
+                    }, { status: 500 });
+                }
+
+                // Step 4: Insert into channels table
+                const channelRow = {
+                    channel_id: metadata.channel_id,
+                    name: metadata.name,
+                    description: metadata.description,
+                    avatar_url: metadata.avatar_url,
+                    banner_url: metadata.banner_url,
+                    custom_url: metadata.custom_url,
+                    country: metadata.country,
+                    subscriber_count: metadata.subscriber_count,
+                    total_video_count: metadata.total_video_count,
+                    total_view_count: metadata.total_view_count,
+                    published_at: metadata.published_at,
+                    fetched_at: metadata.fetched_at,
+                    uploads_playlist_id: metadata.uploads_playlist_id,
+                    scanner_enabled: enableScanner ?? true,
+                };
+
+                const { error: insertError } = await supabase
+                    .from('channels')
+                    .insert(channelRow);
+
+                if (insertError) {
+                    return NextResponse.json({ error: insertError.message }, { status: 500 });
+                }
+
+                return NextResponse.json({
+                    success: true,
+                    channel: channelRow,
+                });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
         }
 
         default:

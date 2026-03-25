@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
     Radar, Play, RotateCcw, CheckCircle2, XCircle, Clock,
     ToggleLeft, ToggleRight, Loader2, AlertTriangle, Search,
-    TrendingUp, TrendingDown, BarChart3
+    TrendingUp, TrendingDown, BarChart3, Plus
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -48,6 +48,8 @@ export default function ScannerAdminPage() {
     const [auditResult, setAuditResult] = useState<any>(null);
     const [tickResult, setTickResult] = useState<any>(null);
     const [discoverAllResult, setDiscoverAllResult] = useState<any>(null);
+    const [addChannelInput, setAddChannelInput] = useState('');
+    const [addChannelResult, setAddChannelResult] = useState<{ success?: boolean; error?: string; channel?: any } | null>(null);
 
     const fetchData = useCallback(async () => {
         try {
@@ -138,6 +140,31 @@ export default function ScannerAdminPage() {
     };
 
     const enabledCount = channels.filter(c => c.scanner_enabled).length;
+
+    const addChannel = async () => {
+        if (!addChannelInput.trim()) return;
+        setActionLoading('add_channel');
+        setAddChannelResult(null);
+        try {
+            const res = await fetch('/api/admin/scanner', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'add_channel', input: addChannelInput.trim(), enableScanner: true }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setAddChannelResult({ error: data.error || 'Failed to add channel' });
+            } else {
+                setAddChannelResult({ success: true, channel: data.channel });
+                setAddChannelInput('');
+                fetchData(); // Refresh channel list
+            }
+        } catch (err: any) {
+            setAddChannelResult({ error: err.message });
+        } finally {
+            setActionLoading(null);
+        }
+    };
 
     if (loading) {
         return (
@@ -385,6 +412,68 @@ export default function ScannerAdminPage() {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Add Channel Form */}
+                <div className="p-6 border-t border-slate-200/60 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
+                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                        <Plus className="w-4 h-4" />
+                        Add New Channel
+                    </h3>
+                    <div className="flex gap-3">
+                        <input
+                            type="text"
+                            value={addChannelInput}
+                            onChange={(e) => setAddChannelInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && addChannel()}
+                            placeholder="Paste a YouTube channel URL, @handle, or channel ID"
+                            disabled={actionLoading === 'add_channel'}
+                            className="flex-1 px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent disabled:opacity-50 transition-all"
+                        />
+                        <button
+                            onClick={addChannel}
+                            disabled={!addChannelInput.trim() || actionLoading === 'add_channel'}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {actionLoading === 'add_channel' ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Plus className="w-4 h-4" />
+                            )}
+                            {actionLoading === 'add_channel' ? 'Resolving...' : 'Add Channel'}
+                        </button>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-2">
+                        Examples: <code className="text-slate-500">@NearDeathExp</code>, <code className="text-slate-500">https://youtube.com/@ChannelName</code>, <code className="text-slate-500">UC...</code>
+                    </p>
+
+                    {/* Add Channel Result */}
+                    {addChannelResult && (
+                        <div className={`mt-3 p-3 rounded-xl text-sm border ${
+                            addChannelResult.success
+                                ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/30 text-emerald-700 dark:text-emerald-400'
+                                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-400'
+                        }`}>
+                            {addChannelResult.success ? (
+                                <div className="flex items-center gap-2">
+                                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                                    <span>
+                                        Added <strong>{addChannelResult.channel?.name}</strong> with scanner enabled.
+                                        {addChannelResult.channel?.subscriber_count && (
+                                            <span className="text-emerald-600 dark:text-emerald-500 ml-1">
+                                                ({(addChannelResult.channel.subscriber_count / 1000).toFixed(1)}K subscribers)
+                                            </span>
+                                        )}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <XCircle className="w-4 h-4 flex-shrink-0" />
+                                    <span>{addChannelResult.error}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
