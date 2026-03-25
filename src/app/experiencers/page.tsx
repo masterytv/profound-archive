@@ -113,6 +113,12 @@ export default function AboutUsPage() {
             We build tools and create conversations to help you explore consciousness, expanded awareness, and anomalous events.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* For Those Seeking Other Experiencers */}
+            <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8 flex flex-col">
+              <h3 className="text-xl font-bold text-foreground mb-2">For Those Seeking Other Experiencers:</h3>
+              <p className="text-muted-foreground leading-relaxed mb-4">Connect with people who have had similar experiences and see how yours compares.</p>
+              <p className="text-muted-foreground leading-relaxed">Our <Link href="/experiencer" className="text-primary hover:underline">Experiencer Profiles</Link> page features scored profiles of NDErs, with research-backed depth, evidence, and transformation scores so you can find kindred journeys.</p>
+            </div>
             {/* For Those Seeking Answers */}
             <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8 flex flex-col">
               <h3 className="text-xl font-bold text-foreground mb-2">For Those Seeking Answers in Other Stories:</h3>

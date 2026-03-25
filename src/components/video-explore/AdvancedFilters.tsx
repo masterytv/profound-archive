@@ -15,6 +15,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { SmartTagFilter } from "./SmartTagFilter";
 
 // Category filter definitions
 const EXPERIENCE_TYPES = [
@@ -122,10 +123,14 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
     updateParams({ [paramName]: value > 0 ? String(value) : "" });
   };
 
+  // Also check smart tags for "has active filters"
+  const activeTags = (searchParams.get("tags") || "").split(",").filter(Boolean);
+
   const hasActiveFilters =
     activeTypes.length > 0 ||
     activeTones.length > 0 ||
     activeElements.length > 0 ||
+    activeTags.length > 0 ||
     minGreyson > 0 ||
     minTransformation > 0 ||
     minVeridical > 0 ||
@@ -133,6 +138,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
 
   const clearAll = () => {
     updateParams({
+      tags: "",
       type: "",
       tone: "",
       elements: "",
@@ -185,6 +191,11 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
       </div>
 
       <CollapsibleContent className="space-y-6 pt-2">
+        {/* Quick Filters (Smart Tags) */}
+        <div>
+          <SmartTagFilter />
+        </div>
+
         {/* Experience Type */}
         <FilterSection title="Experience Type">
           {EXPERIENCE_TYPES.map((opt) => (

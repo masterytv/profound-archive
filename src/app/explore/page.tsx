@@ -44,6 +44,18 @@ const researchSections = [
         description: "Browse 5,000+ NDE videos by research scores, core elements, and experience type. Filter by what happened, sort by impact.",
         cta: "Explore videos →",
     },
+    {
+        href: "/search3",
+        icon: Search,
+        color: "slate",
+        bg: "bg-slate-100",
+        iconColor: "text-slate-600",
+        border: "border-slate-200",
+        badge: null,
+        title: "Search Transcripts",
+        description: "Search across every word of 5,000+ NDE accounts using keyword or AI-powered semantic matching. Find exactly what you're looking for.",
+        cta: "Search transcripts →",
+    },
 ] as const;
 
 const exploreSections = [
@@ -163,26 +175,7 @@ export default function ExplorePage() {
                     </div>
                 </section>
 
-                {/* ── Search ────────────────────────────────────────────────── */}
-                <section className="pb-4">
-                    <Link
-                        href="/search3"
-                        className="group flex items-center gap-5 p-6 bg-white rounded-2xl border border-slate-100 hover:shadow-md transition-all hover:-translate-y-0.5"
-                    >
-                        <div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                            <Search className="w-5 h-5 text-slate-600" />
-                        </div>
-                        <div className="flex-1">
-                            <h3 className="text-base font-semibold text-slate-900 mb-0.5">Search</h3>
-                            <p className="text-sm text-slate-500">
-                                Keyword or semantic search across all 5,000+ accounts. Filter by score, channel, or topic.
-                            </p>
-                        </div>
-                        <span className="text-sm font-medium text-slate-500 group-hover:text-slate-900 transition-colors shrink-0">
-                            Search accounts →
-                        </span>
-                    </Link>
-                </section>
+
 
             </div>
         </div>

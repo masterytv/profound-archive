@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
-import { ChevronRight, Video } from "lucide-react";
+import { ChevronRight, Video, Search } from "lucide-react";
 import Link from "next/link";
-import { SmartTagFilter } from "@/components/video-explore/SmartTagFilter";
 import { VideoCardExpandable } from "@/components/video-explore/VideoCardExpandable";
 import { VideoGridControls } from "@/components/video-explore/VideoGridControls";
 import { AdvancedFilters } from "@/components/video-explore/AdvancedFilters";
@@ -61,7 +60,7 @@ function getSmartTagConditions(tags: string[]): {
 
 export default async function VideoExplorePage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const sort = (params.sort as string) || "viewCount";
+  const sort = (params.sort as string) || "date";
   const direction = ((params.dir as string) || "desc") as "asc" | "desc";
   const page = Math.max(1, parseInt((params.page as string) || "1", 10));
   const query = (params.q as string) || "";
@@ -173,23 +172,24 @@ export default async function VideoExplorePage({ searchParams }: PageProps) {
               >
                 Explore NDE Videos
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
+              <p className="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed mb-4">
                 Browse by research scores, filter by what happened during the
                 experience, or search by name. Every video is analyzed for
                 evidence strength, experience depth, and life impact.
               </p>
+              <Link
+                href="/search3"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-colors"
+              >
+                <Search className="w-4 h-4" />
+                Search Inside Transcripts
+              </Link>
             </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Smart Tag Filter — always visible */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-4 mb-8">
-          <Suspense fallback={null}>
-            <SmartTagFilter />
-          </Suspense>
-        </div>
 
 
         {/* Browse All Grid */}

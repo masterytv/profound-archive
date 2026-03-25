@@ -277,7 +277,7 @@ export default async function HomeAlt1() {
 
                     <div className="text-center mt-8">
                         <Link
-                            href="/search3?q=*&sort=date:desc"
+                            href="/video-explore"
                             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-medium hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
                         >
                             See All New Videos
