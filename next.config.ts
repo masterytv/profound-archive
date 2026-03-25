@@ -4,19 +4,18 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Global security headers — exclude email preview (needs iframe embedding)
-        source: '/((?!api/email/preview).*)',
+        source: '/(.*)',
         headers: [
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.youtube.com https://www.googletagmanager.com https://www.google-analytics.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.youtube.com https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://*.kit.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://yt3.googleusercontent.com https://vnycavclrndjwmpaugju.supabase.co https://images.unsplash.com https://placehold.co https://picsum.photos",
               "font-src 'self' https://fonts.gstatic.com",
-              "frame-src https://www.youtube.com",
-              "connect-src 'self' https://vnycavclrndjwmpaugju.supabase.co wss://vnycavclrndjwmpaugju.supabase.co https://api.openai.com https://www.google-analytics.com https://region1.google-analytics.com",
+              "frame-src 'self' https://www.youtube.com",
+              "connect-src 'self' https://vnycavclrndjwmpaugju.supabase.co wss://vnycavclrndjwmpaugju.supabase.co https://api.openai.com https://www.google-analytics.com https://region1.google-analytics.com https://cloudflareinsights.com",
               "media-src 'self' https://vnycavclrndjwmpaugju.supabase.co data:",
               "object-src 'none'",
               "base-uri 'self'",
