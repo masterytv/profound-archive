@@ -75,30 +75,53 @@ export function EmailCrmClient() {
 
   const PAGE_SIZE = 25;
 
+  // Use direct REST fetch to avoid GoTrue _acquireLock AbortErrors
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      // Load stats via RPC
-      const { data: statsData } = await supabase.rpc("get_email_crm_stats");
-      setStats(statsData);
+      // Load stats via RPC (SECURITY DEFINER)
+      const statsRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_email_crm_stats`, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: "{}",
+        cache: "no-store",
+      });
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setStats(statsData);
+      }
 
       // Load leads with filters
-      let q = supabase
-        .from("quiz_leads")
-        .select("*")
-        .order(sortBy, { ascending: sortDir === "asc" })
-        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      const params = new URLSearchParams({
+        select: "*",
+        order: `${sortBy}.${sortDir}`,
+        offset: String(page * PAGE_SIZE),
+        limit: String(PAGE_SIZE),
+      });
+      if (filterArchetype !== "all") params.set("archetype", `eq.${filterArchetype}`);
+      if (filterActive === "active") params.set("is_active", "eq.true");
+      if (filterActive === "unsub") params.set("is_active", "eq.false");
 
-      if (filterArchetype !== "all") q = q.eq("archetype", filterArchetype);
-      if (filterActive === "active") q = q.eq("is_active", true);
-      if (filterActive === "unsub")  q = q.eq("is_active", false);
-
-      const { data } = await q;
-      setLeads(data ?? []);
+      const leadsRes = await fetch(`${SUPABASE_URL}/rest/v1/quiz_leads?${params}`, {
+        headers,
+        cache: "no-store",
+      });
+      if (leadsRes.ok) {
+        const data: Lead[] = await leadsRes.json();
+        setLeads(data ?? []);
+      } else {
+        setLeads([]);
+      }
+    } catch (err) {
+      console.error("[email-crm] fetch error:", err);
     } finally {
       setLoading(false);
     }
-  }, [supabase, sortBy, sortDir, page, filterArchetype, filterActive]);
+  }, [sortBy, sortDir, page, filterArchetype, filterActive]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
