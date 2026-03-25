@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        // Global security headers — exclude email preview (needs iframe embedding)
+        source: '/((?!api/email/preview).*)',
         headers: [
           {
             key: 'Content-Security-Policy',

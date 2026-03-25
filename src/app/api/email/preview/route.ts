@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
         unsubscribeUrl: "https://projectprofound.org/unsubscribe?token=preview",
       })
     );
-    return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+    return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "Content-Security-Policy": "frame-ancestors 'self'", "X-Frame-Options": "SAMEORIGIN" } });
   }
 
   // ── NDE archetype video email preview ────────────────────────────────────
@@ -82,6 +82,6 @@ export async function GET(req: NextRequest) {
   );
 
   return new NextResponse(html, {
-    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "Content-Security-Policy": "frame-ancestors 'self'", "X-Frame-Options": "SAMEORIGIN" },
   });
 }
