@@ -73,34 +73,53 @@ export default function EmailTemplatesPage() {
   const loadTemplates = useCallback(async () => {
     const { data, error } = await supabase.from("email_templates").select("*");
     if (error) {
+      // AbortError means auth is still initializing — caller should retry
+      if (error.message?.includes("AbortError") || error.message?.includes("aborted")) {
+        console.warn("[email-templates] fetch aborted (auth initializing) — will retry");
+        return false;
+      }
       console.error("[email-templates] fetch error:", error.message, error);
-      return;
+      return false;
     }
     if (!data || data.length === 0) {
       console.warn("[email-templates] fetch returned empty — will retry");
-      return;
-    }
-    // Validate first row has expected fields to guard against partial responses
-    const sample = data[0];
-    if (!sample.archetype || !('subject' in sample)) {
-      console.warn("[email-templates] unexpected data shape:", Object.keys(sample));
-      return;
+      return false;
     }
     const map: Record<string, Template> = {};
     data.forEach((t: Template) => { map[t.archetype] = t; });
     setTemplates(map);
     setLoaded(true);
+    return true;
   }, [supabase]);
 
-  useEffect(() => { loadTemplates(); }, [loadTemplates]);
-
-  // Retry once if first load returned empty (e.g., auth token not ready)
+  // Wait for Supabase auth to finish initializing, then fetch.
+  // The GoTrue client's _acquireLock aborts in-flight requests during init,
+  // so we listen for the auth state change event which fires after init completes.
   useEffect(() => {
-    if (!loaded) {
-      const timer = setTimeout(() => { loadTemplates(); }, 2000);
-      return () => clearTimeout(timer);
+    let cancelled = false;
+
+    async function fetchWithRetry(attempt = 0) {
+      if (cancelled) return;
+      const ok = await loadTemplates();
+      if (!ok && !cancelled && attempt < 4) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 8000);
+        setTimeout(() => fetchWithRetry(attempt + 1), delay);
+      }
     }
-  }, [loaded, loadTemplates]);
+
+    // Try immediately (works if auth is already initialized on revisit)
+    fetchWithRetry();
+
+    // Also listen for auth state changes — fires INITIAL_SESSION after init
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      if (!cancelled) fetchWithRetry();
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [supabase, loadTemplates]);
 
   const current: Template = templates[selected] ?? {
     archetype: selected,
