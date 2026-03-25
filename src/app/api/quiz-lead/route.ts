@@ -145,7 +145,7 @@ async function sendWelcomeEmail(lead: { email: string; unsubscribe_token: string
 
   const { data: tmpl } = await supabase
     .from("email_templates")
-    .select("subject, intro_text, cta_text")
+    .select("subject, intro_text, cta_text, cta_href")
     .eq("archetype", "newsletter_welcome")
     .maybeSingle();
 
@@ -155,6 +155,7 @@ async function sendWelcomeEmail(lead: { email: string; unsubscribe_token: string
     WelcomeEmail({
       introText:      tmpl?.intro_text ?? undefined,
       ctaText:        tmpl?.cta_text   ?? undefined,
+      ctaHref:        tmpl?.cta_href   ?? undefined,
       unsubscribeUrl,
     })
   );
