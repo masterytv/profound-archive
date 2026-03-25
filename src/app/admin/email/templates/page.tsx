@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { Save, Send, RefreshCw, Eye, FileText } from "lucide-react";
@@ -56,9 +56,12 @@ const EXTRA_TEMPLATES = [
 ];
 
 export default function EmailTemplatesPage() {
-  const supabase = createClient();
+  // Memoize supabase client to prevent re-creation on every render
+  // (which would invalidate useCallback/useEffect dependencies and cause data races)
+  const supabase = useMemo(() => createClient(), []);
   const [selected, setSelected] = useState(ARCHETYPE_ENTRIES[0][0]);
   const [templates, setTemplates] = useState<Record<string, Template>>({});
+  const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -73,6 +76,7 @@ export default function EmailTemplatesPage() {
     const map: Record<string, Template> = {};
     data.forEach((t: Template) => { map[t.archetype] = t; });
     setTemplates(map);
+    setLoaded(true);
   }, [supabase]);
 
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
@@ -93,6 +97,10 @@ export default function EmailTemplatesPage() {
   }
 
   async function handleSave() {
+    if (!loaded) {
+      setSaveError("Still loading — please wait.");
+      return;
+    }
     setSaving(true);
     setSaved(false);
     setSaveError(null);
@@ -322,11 +330,11 @@ export default function EmailTemplatesPage() {
               {/* Save */}
               <button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || !loaded}
                 className="w-full px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
+                {!loaded ? "Loading…" : saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
               </button>
               {saveError && (
                 <p className="text-xs text-destructive">{saveError}</p>
