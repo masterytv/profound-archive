@@ -87,6 +87,21 @@ function getOpenRouter() {
     });
 }
 
+// ─── Timeout Wrapper ──────────────────────────────────────────────────────────
+
+/**
+ * Race a promise against a timeout. Prevents OpenRouter/Claude calls from
+ * hanging indefinitely. Throws 'Timed out after <n>s' on timeout.
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return Promise.race([
+        promise,
+        new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timed out after ${Math.round(ms / 1000)}s`)), ms)
+        ),
+    ]);
+}
+
 // ─── Step Helpers ─────────────────────────────────────────────────────────────
 
 function makeStep(name: string): ArticleStep {
@@ -1146,7 +1161,7 @@ export async function generateGuideArticle(
     const t4 = Date.now();
     result.status = 'polishing';
     try {
-        draft = { ...await voicePass(draft!), faq_data: draft!.faq_data };
+        draft = { ...await withTimeout(voicePass(draft!), 180_000), faq_data: draft!.faq_data };
         finishStep(s4, 'success', `Revised to ${draft.word_count} words`, t4, onStep);
     } catch (err) {
         finishStep(s4, 'failed', `Voice pass failed (using raw draft): ${String(err)}`, t4, onStep);
@@ -1157,7 +1172,7 @@ export async function generateGuideArticle(
     startStep(s4b, onStep);
     const t4b = Date.now();
     try {
-        const verified = await verifyArticle(draft!.body_mdx, draft!.references);
+        const verified = await withTimeout(verifyArticle(draft!.body_mdx, draft!.references), 180_000);
         draft = {
             ...draft!,
             body_mdx: verified.body_mdx,
