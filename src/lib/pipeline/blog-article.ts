@@ -389,6 +389,41 @@ async function voicePass(draft: ArticleDraft): Promise<ArticleDraft> {
 export function sanitizeMarkdownLinks(mdx: string): string {
     let result = mdx;
 
+    // ═══ PRE-PASS A: Fix unclosed internal links (the most destructive pattern) ═══
+    // Claude produces: [text](/video rest of sentence with quotes and paragraphs...
+    // The ( never closes, so standard [text](url) regex never matches.
+    // This swallows entire paragraphs into a single broken link.
+    // Strategy: detect [text](/known-route followed by space, comma, period, colon,
+    // or end-of-string — meaning no actual ID/slug was provided.
+    result = result.replace(
+        /\[([^\]]+)\]\(\/(video|questions|experiencer)(?=[\s,.:;'"]|$)/g,
+        (_match, text: string, _route: string) => {
+            console.log(`[sanitize-links] Stripped unclosed stub link: [${text}](/${_route}...)`);
+            return text;
+        }
+    );
+
+    // ═══ PRE-PASS B: Fix unclosed external links (URL contains space) ═══
+    // Claude produces: [text](https://domain.com rest of sentence...
+    // The URL has a space, so the ( never properly closes.
+    // We capture the URL (up to first space) and the trailing text separately.
+    result = result.replace(
+        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\s([^)]*?)(?:\)|$)/g,
+        (_match, text: string, url: string, trailingText: string) => {
+            // If the URL itself looks complete (has a path), rescue as proper link + trailing text
+            try {
+                const parsed = new URL(url);
+                if (parsed.pathname !== '/' && parsed.pathname !== '') {
+                    console.log(`[sanitize-links] Rescued truncated link, kept URL: [${text}](${url})`);
+                    return `[${text}](${url})${trailingText ? ' ' + trailingText.trim() : ''}`;
+                }
+            } catch { /* fall through to strip */ }
+            // Domain-only or malformed — strip link, keep all text
+            console.log(`[sanitize-links] Stripped unclosed external link: [${text}](${url}...)`);
+            return `${text} ${trailingText}`.trim();
+        }
+    );
+
     // Pass 0: Strip HTML attributes leaked into markdown link URLs.
     // LLMs sometimes produce hybrid markdown/HTML like:
     //   [quote text](/video/ID?t=33" class="text-blue-600 dark:text-blue-400 hover:underline">Anchor Text
