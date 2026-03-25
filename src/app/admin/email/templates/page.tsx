@@ -70,56 +70,37 @@ export default function EmailTemplatesPage() {
   const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [previewKey, setPreviewKey] = useState(0);
 
+  // Use direct REST fetch instead of Supabase client to avoid GoTrue auth
+  // _acquireLock AbortErrors during initialization (especially in incognito).
+  // email_templates has public read RLS so the anon key is sufficient.
   const loadTemplates = useCallback(async () => {
-    const { data, error } = await supabase.from("email_templates").select("*");
-    if (error) {
-      // AbortError means auth is still initializing — caller should retry
-      if (error.message?.includes("AbortError") || error.message?.includes("aborted")) {
-        console.warn("[email-templates] fetch aborted (auth initializing) — will retry");
-        return false;
+    try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!url || !key) {
+        console.error("[email-templates] missing Supabase env vars");
+        return;
       }
-      console.error("[email-templates] fetch error:", error.message, error);
-      return false;
-    }
-    if (!data || data.length === 0) {
-      console.warn("[email-templates] fetch returned empty — will retry");
-      return false;
-    }
-    const map: Record<string, Template> = {};
-    data.forEach((t: Template) => { map[t.archetype] = t; });
-    setTemplates(map);
-    setLoaded(true);
-    return true;
-  }, [supabase]);
-
-  // Wait for Supabase auth to finish initializing, then fetch.
-  // The GoTrue client's _acquireLock aborts in-flight requests during init,
-  // so we listen for the auth state change event which fires after init completes.
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchWithRetry(attempt = 0) {
-      if (cancelled) return;
-      const ok = await loadTemplates();
-      if (!ok && !cancelled && attempt < 4) {
-        const delay = Math.min(1000 * Math.pow(2, attempt), 8000);
-        setTimeout(() => fetchWithRetry(attempt + 1), delay);
+      const res = await fetch(`${url}/rest/v1/email_templates?select=*`, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        console.error("[email-templates] fetch failed:", res.status);
+        return;
       }
+      const data: Template[] = await res.json();
+      if (!data || data.length === 0) return;
+      const map: Record<string, Template> = {};
+      data.forEach((t) => { map[t.archetype] = t; });
+      setTemplates(map);
+      setLoaded(true);
+    } catch (err) {
+      console.error("[email-templates] fetch exception:", err);
     }
+  }, []);
 
-    // Try immediately (works if auth is already initialized on revisit)
-    fetchWithRetry();
-
-    // Also listen for auth state changes — fires INITIAL_SESSION after init
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      if (!cancelled) fetchWithRetry();
-    });
-
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
-  }, [supabase, loadTemplates]);
+  useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
   const current: Template = templates[selected] ?? {
     archetype: selected,
