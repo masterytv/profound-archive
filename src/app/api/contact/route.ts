@@ -3,10 +3,9 @@
 // Forwards the message to tom@projectprofound.org via Resend.
 
 import { NextResponse } from "next/server";
-import { resend } from "@/lib/email/resend";
+import { resend, EMAIL_FROM } from "@/lib/email/resend";
 
 const CONTACT_TO = "tom@projectprofound.org";
-const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
 
 export async function POST(req: Request) {
   try {

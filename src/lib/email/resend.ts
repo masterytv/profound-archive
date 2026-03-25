@@ -10,5 +10,5 @@ if (!process.env.RESEND_API_KEY) {
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const EMAIL_FROM = "stories@projectprofound.org";
+export const EMAIL_FROM = process.env.RESEND_FROM ?? "Project Profound <stories@mail.projectprofound.org>";
 export const EMAIL_REPLY_TO = "hello@projectprofound.org";
