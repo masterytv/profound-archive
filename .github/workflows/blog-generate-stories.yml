@@ -29,29 +29,47 @@ jobs:
             SLUG_PARAM="&slug=${{ inputs.slug }}"
           fi
 
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
-            -X GET \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            --max-time 300 \
-            "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/blog-stories?count=$COUNT${SLUG_PARAM}")
+          MAX_ATTEMPTS=3
+          ATTEMPT=1
 
-          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | head -n -1)
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -X GET \
+              --max-time 300 \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              -H "Content-Type: application/json" \
+              "https://${{ secrets.APP_DIRECT_URL }}/api/cron/blog-stories?count=$COUNT${SLUG_PARAM}")
+
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            BODY=$(echo "$RESPONSE" | head -n -1)
+
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Success on attempt $ATTEMPT"
+              break
+            fi
+
+            echo "⚠️ Attempt $ATTEMPT failed with status $HTTP_CODE"
+            echo "Response: $BODY"
+            if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
+              echo "Retrying in 10 seconds..."
+              sleep 10
+            fi
+            ATTEMPT=$((ATTEMPT + 1))
+          done
 
           echo "HTTP status: $HTTP_CODE"
           echo "Response: $BODY"
 
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "::error::Story generation failed with status $HTTP_CODE"
-            echo "::error::Response: $BODY"
+            echo "::error::Story generation failed with status $HTTP_CODE after $MAX_ATTEMPTS attempts"
             exit 1
           fi
 
           echo "✅ Story generation completed successfully"
 
 # ── Required GitHub Secrets ──────────────────────────────────────────────────
-# CRON_SECRET          — same secret used by scanner/tick and other cron routes
-# NEXT_PUBLIC_APP_URL  — https://projectprofound.org (no trailing slash)
+# CRON_SECRET      — same secret used by scanner/tick and other cron routes
+# APP_DIRECT_URL   — Firebase App Hosting direct URL (bypasses Cloudflare)
 # ─────────────────────────────────────────────────────────────────────────────
 
