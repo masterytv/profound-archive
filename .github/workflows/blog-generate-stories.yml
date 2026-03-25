@@ -18,7 +18,7 @@ jobs:
   generate:
     name: Generate & publish experiencer story
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
 
     steps:
       - name: Trigger story generation
@@ -36,7 +36,7 @@ jobs:
             echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
             RESPONSE=$(curl -s -w "\n%{http_code}" \
               -X GET \
-              --max-time 300 \
+              --max-time 600 \
               -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
               -H "Content-Type: application/json" \
               "https://${{ secrets.APP_DIRECT_URL }}/api/cron/blog-stories?count=$COUNT${SLUG_PARAM}")

@@ -18,7 +18,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateStoryArticle } from '@/lib/pipeline/blog-story';
 
-export const maxDuration = 300; // 5 min timeout for serverless
+export const maxDuration = 600; // 10 min — pipeline: draft + voice + parallel fal.ai images
 
 export async function GET(request: NextRequest) {
     // Auth check

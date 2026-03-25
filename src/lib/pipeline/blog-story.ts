@@ -531,31 +531,44 @@ async function generateStoryImages(
         }
     }
 
-    // Image 2: Death scene (fal.ai)
+    // Images 2 & 3: Generate fal.ai paintings in PARALLEL (saves ~60s vs sequential)
     let deathSceneUrl: string | null = null;
     let deathScenePrompt: string | null = null;
-    if (draft.image_prompts?.death_scene) {
-        try {
-            deathScenePrompt = buildDeathSceneImagePrompt(draft.image_prompts.death_scene);
-            const generated = await generateImageWithFal(deathScenePrompt);
-            deathSceneUrl = await uploadToStorage(generated.url, `blog/${slug}-death-scene.webp`);
-            console.log(`    [story] Death scene image uploaded: ${deathSceneUrl}`);
-        } catch (err) {
-            console.warn(`    [story] Death scene image failed: ${err}`);
-        }
-    }
-
-    // Image 3: Afterlife encounter (fal.ai)
     let afterlifeUrl: string | null = null;
     let afterlifePrompt: string | null = null;
+
+    const imageJobs: Array<Promise<{ type: string; url: string; prompt: string }>> = [];
+
+    if (draft.image_prompts?.death_scene) {
+        deathScenePrompt = buildDeathSceneImagePrompt(draft.image_prompts.death_scene);
+        imageJobs.push(
+            generateImageWithFal(deathScenePrompt)
+                .then(img => uploadToStorage(img.url, `blog/${slug}-death-scene.webp`))
+                .then(url => ({ type: 'death_scene', url, prompt: deathScenePrompt! }))
+        );
+    }
+
     if (draft.image_prompts?.afterlife_encounter) {
-        try {
-            afterlifePrompt = buildAfterlifeEncounterImagePrompt(draft.image_prompts.afterlife_encounter);
-            const generated = await generateImageWithFal(afterlifePrompt);
-            afterlifeUrl = await uploadToStorage(generated.url, `blog/${slug}-afterlife.webp`);
-            console.log(`    [story] Afterlife image uploaded: ${afterlifeUrl}`);
-        } catch (err) {
-            console.warn(`    [story] Afterlife image failed: ${err}`);
+        afterlifePrompt = buildAfterlifeEncounterImagePrompt(draft.image_prompts.afterlife_encounter);
+        imageJobs.push(
+            generateImageWithFal(afterlifePrompt)
+                .then(img => uploadToStorage(img.url, `blog/${slug}-afterlife.webp`))
+                .then(url => ({ type: 'afterlife', url, prompt: afterlifePrompt! }))
+        );
+    }
+
+    const imageResults = await Promise.allSettled(imageJobs);
+    for (const result of imageResults) {
+        if (result.status === 'fulfilled') {
+            if (result.value.type === 'death_scene') {
+                deathSceneUrl = result.value.url;
+                console.log(`    [story] Death scene image uploaded: ${deathSceneUrl}`);
+            } else {
+                afterlifeUrl = result.value.url;
+                console.log(`    [story] Afterlife image uploaded: ${afterlifeUrl}`);
+            }
+        } else {
+            console.warn(`    [story] Image generation failed: ${result.reason}`);
         }
     }
 
