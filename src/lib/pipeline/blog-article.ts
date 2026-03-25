@@ -473,6 +473,48 @@ export function sanitizeMarkdownLinks(mdx: string): string {
         }
     );
 
+    // Pass 5: Strip stub/placeholder internal links and truncated external URLs.
+    // Claude often generates:
+    //   - [text](/video) or [text](/questions) with no ID/slug
+    //   - [text](/video/VIDEO_ID) using the literal template placeholder
+    //   - [text](https://journals.sagepub.com) with domain only, no path
+    const STUB_INTERNAL_PATTERNS = [
+        /^\/video\/?$/,              // bare /video or /video/
+        /^\/questions\/?$/,          // bare /questions or /questions/
+        /^\/video\/VIDEO_ID/i,       // literal template placeholder
+        /^\/experiencer\/?$/,        // bare /experiencer
+    ];
+    result = result.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        (_match, text: string, url: string) => {
+            const trimmedUrl = url.trim();
+
+            // Check for stub internal paths
+            if (STUB_INTERNAL_PATTERNS.some(pat => pat.test(trimmedUrl))) {
+                console.log(`[sanitize-links] Stripped stub internal link: [${text}](${trimmedUrl})`);
+                return text;
+            }
+
+            // Check for truncated external URLs (domain only, no meaningful path)
+            if (trimmedUrl.startsWith('http')) {
+                try {
+                    const parsed = new URL(trimmedUrl);
+                    // Domain-only URL with no path, or path is just "/"
+                    if (parsed.pathname === '/' || parsed.pathname === '') {
+                        console.log(`[sanitize-links] Stripped domain-only external URL: [${text}](${trimmedUrl})`);
+                        return text;
+                    }
+                } catch {
+                    // Malformed URL — strip it
+                    console.log(`[sanitize-links] Stripped malformed URL: [${text}](${trimmedUrl})`);
+                    return text;
+                }
+            }
+
+            return _match;
+        }
+    );
+
     return result;
 }
 

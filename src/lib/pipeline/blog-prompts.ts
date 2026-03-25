@@ -227,7 +227,7 @@ LINKING RULES (critical):
 - ⛔ NEVER link to youtube.com or youtu.be. ALL video references MUST use internal paths: [description](/video/VIDEO_ID). Our site hosts these videos at /video/VIDEO_ID — never link to external YouTube pages.
 - If referencing Project Profound NDE accounts, link to them with [description](/video/VIDEO_ID).
 - Every article should have at least 5-8 inline links to research sources from the SOURCES list above.
-- ⚠️ MANDATORY: Every article MUST include at least 3 inline links to Project Profound video accounts (the /video/ links provided above). Weave these into the prose naturally as supporting evidence. If no video accounts were provided, reference 2-3 with [an experiencer on Project Profound](/video/VIDEO_ID).
+- ⚠️ MANDATORY: Every article MUST include at least 3 inline links to Project Profound video accounts (the /video/ links provided above). Weave these into the prose naturally as supporting evidence. If no video accounts were provided, mention "accounts on Project Profound" or "experiencers on Project Profound" WITHOUT a link. Do NOT invent or guess video IDs.
 - In the "references" array, use the actual URLs from SOURCES. Set url to null for books.
 
 IMPORTANT REMINDERS:
