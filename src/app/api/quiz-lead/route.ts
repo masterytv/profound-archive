@@ -134,7 +134,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[quiz-lead] unexpected error:", err);
-    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: `Unexpected error: ${msg}` }, { status: 500 });
   }
 }
 
