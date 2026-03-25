@@ -34,6 +34,7 @@ import { analyzeJourneyFlow } from '@/lib/ai/journey-flow';
 import { analyzeCvndeScore } from '@/lib/ai/cvnde';
 import { generateNdeSummary } from '@/lib/ai/nde-summary';
 import { buildFingerprint } from '@/lib/ai/fingerprint';
+import { syncExperiencerProfile } from '@/lib/pipeline/experiencer-sync';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -391,7 +392,29 @@ export async function processVideoIntake(
             }
         }
 
-        // ─── Step 14: Mark complete ──────────────────────────────────
+        // ─── Step 14.5: Sync experiencer profile ─────────────────
+        if (classification?.experiencerFullName) {
+            const startSync = Date.now();
+            logStep('Sync Experiencer Profile', 'running');
+            try {
+                const syncResult = await syncExperiencerProfile(
+                    supabase, classification.experiencerFullName, videoId
+                );
+                logStep('Sync Experiencer Profile', 'success',
+                    syncResult.created
+                        ? `Created profile: /experiencer/${syncResult.slug} (${syncResult.videoCount} videos)`
+                        : syncResult.updated
+                            ? `Updated profile: /experiencer/${syncResult.slug} (${syncResult.videoCount} videos)`
+                            : `Profile exists: /experiencer/${syncResult.slug}`,
+                    Date.now() - startSync
+                );
+            } catch (syncErr: any) {
+                // Non-fatal — don't block the pipeline for profile sync failures
+                logStep('Sync Experiencer Profile', 'failed', syncErr.message, Date.now() - startSync);
+            }
+        }
+
+        // ─── Step 15: Mark complete ──────────────────────────────────
         await updateIntakeStatus(supabase, videoId, 'complete');
         logStep('Pipeline Complete', 'success', `Video fully processed`);
 
