@@ -3,7 +3,7 @@ import { isAdminUser } from '@/lib/auth/admin-guard';
 import { generateBlogArticle, generateGuideArticle, type ArticleStep } from '@/lib/pipeline/blog-article';
 import { generateStoryArticle, type StoryStep } from '@/lib/pipeline/blog-story';
 
-export const maxDuration = 300; // 5-min timeout — pipeline can be slow
+export const maxDuration = 600; // 10-min timeout — guide drafts with Claude can take 2-3 min
 
 /**
  * POST /api/admin/blog/generate
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     });
 }
 
-// Shared SSE stream helper
+// Shared SSE stream helper with keepalive to prevent Cloudflare proxy timeouts
 function streamResponse(
     run: (send: (data: Record<string, unknown>) => void) => Promise<void>
 ): Response {
@@ -81,11 +81,27 @@ function streamResponse(
                 );
             };
 
+            // Send keepalive pings every 15s to prevent Cloudflare from
+            // cutting the connection during long-running Claude calls.
+            // SSE comments (lines starting with :) are silently ignored
+            // by the browser but reset the proxy idle timer.
+            const keepalive = setInterval(() => {
+                try {
+                    controller.enqueue(
+                        new TextEncoder().encode(`: keepalive\n\n`)
+                    );
+                } catch {
+                    // Stream already closed — clear interval
+                    clearInterval(keepalive);
+                }
+            }, 15_000);
+
             try {
                 await run(send);
             } catch (err) {
                 send({ type: 'error', error: String(err) });
             } finally {
+                clearInterval(keepalive);
                 controller.close();
             }
         },
