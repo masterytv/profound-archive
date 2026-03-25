@@ -23,7 +23,7 @@ import {
     buildDeathSceneImagePrompt,
     buildAfterlifeEncounterImagePrompt,
 } from './blog-story-prompts';
-import { sanitizeMarkdownLinks } from './blog-article';
+import { sanitizeMarkdownLinks, stripMarkdownLinks } from './blog-article';
 import { SEO_REFRESH_PROMPT } from './blog-prompts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -409,7 +409,7 @@ async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
             { role: 'user', content: userPrompt },
             { role: 'assistant', content: '{' },
         ],
-        max_tokens: 8000,
+        max_tokens: 16000, // Stories are 2-4K words + JSON overhead — 8K was causing truncation
         temperature: 0.7,
     });
 
@@ -417,7 +417,32 @@ async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
     // Strip markdown code fence if present
     jsonStr = jsonStr.replace(/```json\s*/g, '').replace(/```\s*/g, '');
 
-    const draft = JSON.parse(jsonStr) as StoryDraft;
+    let draft: StoryDraft;
+    try {
+        draft = JSON.parse(jsonStr) as StoryDraft;
+    } catch (parseErr) {
+        // Attempt JSON repair for truncated output (unterminated strings/objects)
+        console.warn(`[story] JSON parse failed, attempting repair: ${String(parseErr).slice(0, 100)}`);
+        try {
+            let repaired = jsonStr;
+            // Close any unterminated string
+            const quoteCount = (repaired.match(/(?<!\\)"/g) || []).length;
+            if (quoteCount % 2 !== 0) {
+                repaired += '"';
+            }
+            // Close open braces/brackets
+            const openBraces = (repaired.match(/{/g) || []).length;
+            const closeBraces = (repaired.match(/}/g) || []).length;
+            const openBrackets = (repaired.match(/\[/g) || []).length;
+            const closeBrackets = (repaired.match(/]/g) || []).length;
+            for (let i = 0; i < openBrackets - closeBrackets; i++) repaired += ']';
+            for (let i = 0; i < openBraces - closeBraces; i++) repaired += '}';
+            draft = JSON.parse(repaired) as StoryDraft;
+            console.log('[story] JSON repair succeeded');
+        } catch {
+            throw new Error(`Claude returned invalid JSON (repair failed): ${jsonStr.slice(0, 200)}`);
+        }
+    }
 
     if (!draft.body_mdx || draft.body_mdx.length < 500) {
         throw new Error('Draft body too short or missing');
@@ -589,7 +614,7 @@ async function publishStory(
             author_name: 'Thomas Wood',
             status: 'published',
             published_at: new Date().toISOString(),
-            lead_paragraph: draft.lead_paragraph,
+            lead_paragraph: stripMarkdownLinks(draft.lead_paragraph),
             body_mdx: sanitizeMarkdownLinks(body),
             read_time_mins: draft.read_time_mins,
             word_count: draft.word_count,
