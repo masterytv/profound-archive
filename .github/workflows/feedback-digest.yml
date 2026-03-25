@@ -1,0 +1,25 @@
+name: Feedback Digest Weekly
+
+on:
+  schedule:
+    # Every Monday at 9:00 AM UTC (5:00 AM ET)
+    - cron: "0 9 * * 1"
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+jobs:
+  send-digest:
+    name: Send Weekly Feedback Digest
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger feedback digest endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            "https://projectprofound.org/api/email/feedback-digest")
+          echo "Response code: $response"
+          if [ "$response" != "200" ]; then
+            echo "::error::Feedback digest returned HTTP $response"
+            exit 1
+          fi

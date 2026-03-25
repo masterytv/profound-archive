@@ -7,6 +7,7 @@ import Script from 'next/script';
 import AuthConfirmationToast from '@/components/auth-confirmation-toast';
 import ChatPopup from '@/components/chat-popup';
 import CesFeedbackWidget from '@/components/ces-feedback-widget';
+import WelcomeFeedback from '@/components/welcome-feedback';
 import { Suspense } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -47,6 +48,7 @@ export default function RootLayout({
           <main className="flex-grow">{children}</main>
           <SiteFooter />
           <ChatPopup />
+          <WelcomeFeedback />
           {/* CES feedback widget — Suspense required because it reads useSearchParams */}
           <Suspense fallback={null}>
             <CesFeedbackWidget />

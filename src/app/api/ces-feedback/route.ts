@@ -17,10 +17,10 @@ function getServiceClient() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { score, path, session_id, user_id } = body
+    const { score, path, session_id, user_id, source, feature, context_id } = body
 
-    if (typeof score !== 'number' || score < 1 || score > 7) {
-      return NextResponse.json({ error: 'score must be an integer between 1 and 7' }, { status: 400 })
+    if (typeof score !== 'number' || score < 0 || score > 7) {
+      return NextResponse.json({ error: 'score must be an integer between 0 and 7' }, { status: 400 })
     }
 
     if (!session_id || typeof session_id !== 'string') {
@@ -37,6 +37,9 @@ export async function POST(req: NextRequest) {
         session_id,
         user_id: user_id ?? null,
         phase: 'score_only',
+        source: typeof source === 'string' ? source : 'ces_widget',
+        feature: typeof feature === 'string' ? feature : null,
+        context_id: typeof context_id === 'string' ? context_id : null,
       })
       .select('id, session_id')
       .single()
