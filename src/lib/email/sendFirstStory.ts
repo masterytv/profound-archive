@@ -20,16 +20,27 @@ function adminClient() {
   );
 }
 
-function computeNextSend(frequency: string): Date {
+// All recurring emails send at 6:00 AM ET (10:00 UTC).
+function computeNextSend(frequency: string): string {
   const now = new Date();
+  const TARGET_HOUR_UTC = 10;
+
+  const next = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    TARGET_HOUR_UTC, 0, 0, 0
+  ));
+  next.setUTCDate(next.getUTCDate() + 1);
+
   switch (frequency) {
-    case "daily":   now.setDate(now.getDate() + 1); break;
-    case "3day":    now.setDate(now.getDate() + 3); break;
-    case "weekly":  now.setDate(now.getDate() + 7); break;
-    case "monthly": now.setDate(now.getDate() + 30); break;
-    default:        now.setDate(now.getDate() + 7);
+    case "daily":   /* already +1 day */                    break;
+    case "3day":    next.setUTCDate(next.getUTCDate() + 2); break;
+    case "weekly":  next.setUTCDate(next.getUTCDate() + 6); break;
+    case "monthly": next.setUTCDate(next.getUTCDate() + 29); break;
+    default:        next.setUTCDate(next.getUTCDate() + 6); break;
   }
-  return now;
+  return next.toISOString();
 }
 
 interface LeadInfo {
@@ -91,7 +102,7 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
       // Update next_send_at so the cron will retry later with a different video
       await supabase
         .from("quiz_leads")
-        .update({ next_send_at: computeNextSend(lead.frequency).toISOString() })
+        .update({ next_send_at: computeNextSend(lead.frequency) })
         .eq("id", lead.id);
       return { ok: false, error: "Duplicate video — will retry next cycle" };
     }
@@ -149,7 +160,7 @@ export async function sendFirstStory(lead: LeadInfo): Promise<{ ok: boolean; err
       .from("quiz_leads")
       .update({
         last_sent_at: new Date().toISOString(),
-        next_send_at: computeNextSend(lead.frequency).toISOString(),
+        next_send_at: computeNextSend(lead.frequency),
         send_count:   1,
       })
       .eq("id", lead.id),

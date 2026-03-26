@@ -4,7 +4,7 @@
 // Protected by x-cron-secret header.
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { resend, EMAIL_FROM } from "@/lib/email/resend";
 import { VideoEmail } from "@/lib/email/templates/VideoEmail";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
@@ -13,16 +13,42 @@ import type { ArchetypeId } from "@/lib/quiz/archetypes";
 
 const MAX_BATCH = 50; // Stay well within Resend's free 100/day limit
 
+// All recurring emails send at 6:00 AM ET (10:00 UTC).
+// This computes the NEXT occurrence of 6am ET based on frequency.
 function computeNextSend(frequency: string): string {
   const now = new Date();
+
+  // Target: 10:00 UTC (6am ET / 7am EDT — close enough year-round)
+  const TARGET_HOUR_UTC = 10;
+
+  // Start from tomorrow at the target hour
+  const next = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    TARGET_HOUR_UTC, 0, 0, 0
+  ));
+
+  // If we haven't passed today's target yet, "tomorrow" is still today
+  // But for scheduling the NEXT send, always advance at least 1 day
+  next.setUTCDate(next.getUTCDate() + 1);
+
   switch (frequency) {
-    case "daily":   now.setDate(now.getDate() + 1); break;
-    case "3day":    now.setDate(now.getDate() + 3); break;
-    case "weekly":  now.setDate(now.getDate() + 7); break;
-    case "monthly": now.setDate(now.getDate() + 30); break;
-    default:        now.setDate(now.getDate() + 7);
+    case "daily":   /* already +1 day */                    break;
+    case "3day":    next.setUTCDate(next.getUTCDate() + 2); break; // +1 already, so +2 more = 3
+    case "weekly":  next.setUTCDate(next.getUTCDate() + 6); break; // +1 already, so +6 more = 7
+    case "monthly": next.setUTCDate(next.getUTCDate() + 29); break; // +1 already, so +29 more = 30
+    default:        next.setUTCDate(next.getUTCDate() + 6); break;
   }
-  return now.toISOString();
+
+  return next.toISOString();
+}
+
+function adminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
 }
 
 export async function GET(req: NextRequest) {
@@ -31,12 +57,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabase = await createClient();
+  // Use service-role client to bypass RLS
+  const supabase = adminClient();
 
   // Fetch all leads due for a send (skip newsletter — broadcast-only list)
   const { data: leads, error } = await supabase
     .from("quiz_leads")
-    .select("id, email, archetype, frequency, unsubscribe_token")
+    .select("id, email, archetype, frequency, unsubscribe_token, send_count")
     .eq("is_active", true)
     .neq("archetype", "newsletter")
     .or("next_send_at.is.null,next_send_at.lte." + new Date().toISOString())
@@ -52,6 +79,14 @@ export async function GET(req: NextRequest) {
   }
 
   const results = { sent: 0, failed: 0, skipped: 0, errors: [] as string[] };
+
+  // Pre-fetch all templates (avoid N+1 queries)
+  const { data: allTemplates } = await supabase
+    .from("email_templates")
+    .select("archetype, subject, intro_text, cta_text, profile_report");
+  const templateMap = new Map(
+    (allTemplates ?? []).map(t => [t.archetype, t])
+  );
 
   // Track videos picked this run, keyed by email — prevents same-run dupes
   // when multiple subscriptions for the same email are processed together
@@ -110,6 +145,10 @@ export async function GET(req: NextRequest) {
       }
       // ───────────────────────────────────────────────────────────────────────
 
+      // Get template overrides from pre-fetched map
+      const tpl = templateMap.get(archetype);
+      const isFirstSend = (lead.send_count ?? 0) === 0;
+
       const unsubscribeUrl = `https://projectprofound.org/unsubscribe?email=${encodeURIComponent(lead.email)}`;
 
       const html = await render(
@@ -123,13 +162,16 @@ export async function GET(req: NextRequest) {
           viewCount:      video.viewCount,
           frequency:      lead.frequency,
           unsubscribeUrl,
+          introText:      tpl?.intro_text     ?? undefined,
+          ctaText:        tpl?.cta_text       ?? undefined,
+          profileReport:  isFirstSend ? (tpl?.profile_report ?? undefined) : undefined,
         })
       );
 
       const { data: sendData, error: sendError } = await resend.emails.send({
         from:    EMAIL_FROM,
         to:      [lead.email],
-        subject: `A near-death story for ${archetypeData?.label ?? archetype}`,
+        subject: tpl?.subject ?? `A near-death story for ${archetypeData?.label ?? archetype}`,
         html,
       });
 
@@ -151,6 +193,7 @@ export async function GET(req: NextRequest) {
         .update({
           last_sent_at: new Date().toISOString(),
           next_send_at: computeNextSend(lead.frequency),
+          send_count:   (lead.send_count ?? 0) + 1,
         })
         .eq("id", lead.id);
 
