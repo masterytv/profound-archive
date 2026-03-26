@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { 
   Mail, Users, BarChart2, Send, Check, X, RefreshCw, 
@@ -54,7 +54,7 @@ function StatCard({ label, value, icon: Icon, accent }: {
 
 // ── Main Component ─────────────────────────────────────────────────────────
 export function EmailCrmClient() {
-  const supabase = createClient();
+
 
   const [stats, setStats]   = useState<CrmStats | null>(null);
   const [leads, setLeads]   = useState<Lead[]>([]);
@@ -126,7 +126,19 @@ export function EmailCrmClient() {
   useEffect(() => { loadData(); }, [loadData]);
 
   async function toggleActive(lead: Lead) {
-    await supabase.from("quiz_leads").update({ is_active: !lead.is_active }).eq("id", lead.id);
+    try {
+      const res = await fetch("/api/email/manage-leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle_active", lead_id: lead.id }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error("[crm] toggle_active failed:", data);
+      }
+    } catch (err) {
+      console.error("[crm] toggle_active error:", err);
+    }
     loadData();
   }
 
@@ -360,11 +372,19 @@ export function EmailCrmClient() {
                             <button
                               title="Send one story now"
                               onClick={async () => {
-                                await fetch("/api/email/send", {
-                                  method: "POST",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({ lead_id: lead.id }),
-                                });
+                                try {
+                                  const res = await fetch("/api/email/send", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ lead_id: lead.id }),
+                                  });
+                                  if (!res.ok) {
+                                    const data = await res.json().catch(() => ({}));
+                                    alert(`Send failed: ${data.error ?? res.statusText}`);
+                                  }
+                                } catch (err) {
+                                  alert(`Send error: ${err}`);
+                                }
                                 loadData();
                               }}
                               className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
