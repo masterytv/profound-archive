@@ -154,6 +154,24 @@ export async function POST(req: NextRequest) {
 
   const unsubscribeUrl = `${unsubscribeBase}/unsubscribe?email=${encodeURIComponent(email)}`;
 
+  // Fetch template overrides (subject, intro, cta, profile report) from DB
+  const { data: tpl } = await admin
+    .from("email_templates")
+    .select("subject, intro_text, cta_text, profile_report")
+    .eq("archetype", archetype)
+    .maybeSingle();
+
+  // Determine if this is the first send (show profile report)
+  let isFirstSend = false;
+  if (leadId !== "00000000-0000-0000-0000-000000000000") {
+    const { data: leadData } = await admin
+      .from("quiz_leads")
+      .select("send_count")
+      .eq("id", leadId)
+      .single();
+    isFirstSend = (leadData?.send_count ?? 0) === 0;
+  }
+
   // Render and send
   const html = await render(
     VideoEmail({
@@ -166,13 +184,16 @@ export async function POST(req: NextRequest) {
       viewCount:      video.viewCount,
       frequency,
       unsubscribeUrl,
+      introText:      tpl?.intro_text ?? undefined,
+      ctaText:        tpl?.cta_text   ?? undefined,
+      profileReport:  isFirstSend ? (tpl?.profile_report ?? undefined) : undefined,
     })
   );
 
   const { data: sendData, error: sendError } = await resend.emails.send({
     from:    EMAIL_FROM,
     to:      [email],
-    subject: `A near-death story for ${archetypeData?.label ?? archetype}`,
+    subject: tpl?.subject ?? `A near-death story for ${archetypeData?.label ?? archetype}`,
     html,
   });
 
