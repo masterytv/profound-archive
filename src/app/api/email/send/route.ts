@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { resend } from "@/lib/email/resend";
 import { VideoEmail } from "@/lib/email/templates/VideoEmail";
 import { WelcomeEmail } from "@/lib/email/templates/WelcomeEmail";
@@ -53,6 +54,14 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
+
+  // Use service-role client for all data operations (quiz_leads has no
+  // authenticated SELECT RLS policy, so session client can't read leads)
+  const admin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
+
   let leadId: string;
   let email: string;
   let archetype: ArchetypeId;
@@ -60,7 +69,7 @@ export async function POST(req: NextRequest) {
 
   if (body.lead_id) {
     // Cron path: look up lead from DB
-    const { data: lead, error } = await supabase
+    const { data: lead, error } = await admin
       .from("quiz_leads")
       .select("*")
       .eq("id", body.lead_id)
@@ -87,7 +96,7 @@ export async function POST(req: NextRequest) {
 
   // ── Newsletter welcome — special path, no video pick ──────────────────────
   if ((body.archetype ?? archetype) === "newsletter_welcome") {
-    const { data: tpl } = await supabase
+    const { data: tpl } = await admin
       .from("email_templates")
       .select("subject, intro_text, cta_text, cta_href")
       .eq("archetype", "newsletter_welcome")
@@ -118,7 +127,7 @@ export async function POST(req: NextRequest) {
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  const { data: videoRows, error: rpcError } = await supabase.rpc("pick_video_for_archetype", {
+  const { data: videoRows, error: rpcError } = await admin.rpc("pick_video_for_archetype", {
     p_archetype: archetype,
     p_lead_id:   leadId,
   });
@@ -176,13 +185,13 @@ export async function POST(req: NextRequest) {
 
   // Log send + update lead (only for real leads, not test)
   if (leadId !== "00000000-0000-0000-0000-000000000000") {
-    await supabase.from("email_sends").insert({
+    await admin.from("email_sends").insert({
       lead_id:   leadId,
       video_id:  video.videoId,
       resend_id: sendData?.id,
     });
 
-    await supabase
+    await admin
       .from("quiz_leads")
       .update({
         last_sent_at: new Date().toISOString(),
@@ -191,7 +200,7 @@ export async function POST(req: NextRequest) {
       .eq("id", leadId);
 
     // Increment send_count atomically via RPC to avoid race conditions
-    await supabase.rpc("increment_send_count", { p_lead_id: leadId });
+    await admin.rpc("increment_send_count", { p_lead_id: leadId });
   }
 
   return NextResponse.json({
