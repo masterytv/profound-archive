@@ -62,7 +62,7 @@ export default async function HomeV2() {
 
     return (
         <div className="min-h-screen">
-            {/* ═══ Section 1+2: Hero + Pathway (Two-Column Split) ═══ */}
+            {/* ═══ Section 1: Hero (Single Column) ═══ */}
             <section className="relative overflow-hidden hero-gradient">
                 {/* Decorative grid dots */}
                 <div
@@ -73,131 +73,129 @@ export default async function HomeV2() {
                     }}
                 />
 
-                <div className="relative container mx-auto px-4 pt-16 pb-12 max-w-7xl">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-                        {/* ── Left Column: Headline + Search ── */}
-                        <div className="text-center lg:text-left">
-                            <h1
-                                className="text-3xl sm:text-4xl md:text-[2.75rem] font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-6 leading-[1.1] whitespace-nowrap"
-                                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                <div className="relative container mx-auto px-4 pt-20 pb-12 max-w-5xl">
+                    {/* ── Headline + Search ── */}
+                    <div className="text-center mb-16 md:mb-20">
+                        <h1
+                            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-6 leading-[1.1]"
+                            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                        >
+                            What happens when we{" "}
+                            <span
+                                className="text-blue-600"
+                                style={{ fontStyle: "italic" }}
                             >
-                                What happens when we{" "}
-                                <span
-                                    className="text-blue-600"
-                                    style={{ fontStyle: "italic" }}
-                                >
-                                    die
-                                </span>
-                                ?
-                            </h1>
+                                die
+                            </span>
+                            ?
+                        </h1>
 
-                            <p className="max-w-xl text-slate-600 dark:text-slate-400 text-lg md:text-xl mb-8 leading-relaxed mx-auto lg:mx-0">
-                                5,000+ people came back to tell us. Search their accounts,
-                                scored by three research scales.
-                            </p>
+                        <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg md:text-xl mb-10 leading-relaxed">
+                            5,000+ people came back to tell us. Search their accounts,
+                            scored by three research scales.
+                        </p>
 
-                            {/* Search bar */}
-                            <div className="max-w-xl mb-8 mx-auto lg:mx-0">
-                                <HeroSearchBar />
-                            </div>
-
-                            {/* Stats ribbon */}
-                            <div className="flex flex-wrap justify-center lg:justify-start gap-6 md:gap-10 text-sm">
-                                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                                    <Search className="w-4 h-4 text-blue-500" />
-                                    <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">5,000+</strong> Accounts</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                                    <TrendingUp className="w-4 h-4 text-emerald-500" />
-                                    <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">3</strong> Research Scales</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                                    <Cpu className="w-4 h-4 text-violet-500" />
-                                    <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">AI-Powered</strong> Analysis</span>
-                                </div>
-                            </div>
+                        {/* Search bar */}
+                        <div className="max-w-2xl mx-auto mb-10">
+                            <HeroSearchBar />
                         </div>
 
-                        {/* ── Right Column: Compass + Side Doors ── */}
-                        <div className="flex flex-col gap-4">
-                            {/* Primary CTA — NDE Compass */}
-                            <Link
-                                href="/compass"
-                                className="group relative block rounded-2xl border-2 border-purple-200 dark:border-purple-500/30 bg-gradient-to-br from-purple-50 via-white to-violet-50 dark:from-purple-900/20 dark:via-slate-800/80 dark:to-violet-900/20 p-6 md:p-8 text-center hover:border-purple-300 dark:hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
-                            >
-                                <div className="flex items-center justify-center gap-2.5 mb-3">
-                                    <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <Compass className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                                    </div>
+                        {/* Stats ribbon */}
+                        <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-sm">
+                            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                                <Search className="w-4 h-4 text-blue-500" />
+                                <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">5,000+</strong> Accounts</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                                <TrendingUp className="w-4 h-4 text-emerald-500" />
+                                <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">3</strong> Research Scales</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                                <Cpu className="w-4 h-4 text-violet-500" />
+                                <span><strong className="text-slate-800 dark:text-slate-200 font-semibold">AI-Powered</strong> Analysis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Compass CTA + Side Doors ── */}
+                    <div className="max-w-3xl mx-auto">
+                        {/* Primary CTA — NDE Compass */}
+                        <Link
+                            href="/compass"
+                            className="group relative block rounded-2xl border-2 border-purple-200 dark:border-purple-500/30 bg-gradient-to-br from-purple-50 via-white to-violet-50 dark:from-purple-900/20 dark:via-slate-800/80 dark:to-violet-900/20 p-6 md:p-8 text-center hover:border-purple-300 dark:hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 mb-4"
+                        >
+                            <div className="flex items-center justify-center gap-2.5 mb-3">
+                                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Compass className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                 </div>
-                                <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1.5">
-                                    Not sure where to start?
+                            </div>
+                            <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1.5">
+                                Not sure where to start?
+                            </p>
+                            <h2
+                                className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2"
+                                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                            >
+                                Take the 60-Second NDE Compass
+                            </h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-4">
+                                4 questions. No wrong answers. We&apos;ll find the experiences
+                                that matter to you.
+                            </p>
+                            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 dark:bg-purple-500 text-white font-medium text-sm hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors shadow-sm">
+                                Find my starting point &rarr;
+                            </span>
+                        </Link>
+
+                        {/* Three Side Doors */}
+                        <div className="grid grid-cols-3 gap-3">
+                            {/* Research Path */}
+                            <Link
+                                href="/explore"
+                                className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 bg-white dark:bg-white/5 p-4 text-center hover:border-emerald-300 dark:hover:border-emerald-500/40 hover:shadow-lg transition-all duration-300"
+                            >
+                                <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <FlaskConical className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                </div>
+                                <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                                    I&apos;m Researching
+                                </h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                    Browse by evidence, depth, and impact scores.
                                 </p>
-                                <h2
-                                    className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2"
-                                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-                                >
-                                    Take the 60-Second NDE Compass
-                                </h2>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-4">
-                                    4 questions. No wrong answers. We&apos;ll find the experiences
-                                    that matter to you.
-                                </p>
-                                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 dark:bg-purple-500 text-white font-medium text-sm hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors shadow-sm">
-                                    Find my starting point &rarr;
-                                </span>
                             </Link>
 
-                            {/* Two Side Doors */}
-                            <div className="grid grid-cols-3 gap-3">
-                                {/* Research Path */}
-                                <Link
-                                    href="/explore"
-                                    className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 bg-white dark:bg-white/5 p-4 text-center hover:border-emerald-300 dark:hover:border-emerald-500/40 hover:shadow-lg transition-all duration-300"
-                                >
-                                    <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <FlaskConical className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                    </div>
-                                    <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                                        I&apos;m Researching
-                                    </h3>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                        Browse by evidence, depth, and impact scores.
-                                    </p>
-                                </Link>
+                            {/* Experiencer Path */}
+                            <Link
+                                href="/experiencers"
+                                className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 bg-white dark:bg-white/5 p-4 text-center hover:border-amber-300 dark:hover:border-amber-500/40 hover:shadow-lg transition-all duration-300"
+                            >
+                                <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                </div>
+                                <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+                                    I&apos;m an Experiencer
+                                </h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                    See how your experience compares.
+                                </p>
+                            </Link>
 
-                                {/* Experiencer Path */}
-                                <Link
-                                    href="/experiencers"
-                                    className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 bg-white dark:bg-white/5 p-4 text-center hover:border-amber-300 dark:hover:border-amber-500/40 hover:shadow-lg transition-all duration-300"
-                                >
-                                    <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                    </div>
-                                    <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
-                                        I&apos;m an Experiencer
-                                    </h3>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                        See how your experience compares.
-                                    </p>
-                                </Link>
-
-                                {/* Join the Community */}
-                                <Link
-                                    href="/join"
-                                    className="group flex flex-col items-center gap-2 rounded-2xl border border-blue-200/80 dark:border-blue-500/30 bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-900/30 dark:via-slate-800/80 dark:to-indigo-900/20 p-4 text-center hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300"
-                                >
-                                    <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <Heart className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                                    </div>
-                                    <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
-                                        Join the Community
-                                    </h3>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                        Free account. Save, collect, and explore.
-                                    </p>
-                                </Link>
-                            </div>
+                            {/* Join the Community */}
+                            <Link
+                                href="/join"
+                                className="group flex flex-col items-center gap-2 rounded-2xl border border-blue-200/80 dark:border-blue-500/30 bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-900/30 dark:via-slate-800/80 dark:to-indigo-900/20 p-4 text-center hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300"
+                            >
+                                <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Heart className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                                    Join the Community
+                                </h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                    Free account. Save, collect, and explore.
+                                </p>
+                            </Link>
                         </div>
                     </div>
                 </div>

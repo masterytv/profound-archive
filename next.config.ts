@@ -36,6 +36,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/quiz", destination: "/compass", permanent: true },
       { source: "/quiz/types", destination: "/compass/types", permanent: true },
+      { source: "/chat", destination: "/chat-compassionate", permanent: true },
     ];
   },
   typescript: {
