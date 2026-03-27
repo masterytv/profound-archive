@@ -409,7 +409,7 @@ async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
             { role: 'user', content: userPrompt },
             { role: 'assistant', content: '{' },
         ],
-        max_tokens: 16000, // Stories are 2-4K words + JSON overhead — 8K was causing truncation
+        max_tokens: 12000, // Stories are 2-4K words + JSON overhead — 8K truncated, 16K hit credit limits
         temperature: 0.7,
     });
 
