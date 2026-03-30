@@ -136,6 +136,19 @@ export default function IntakePage() {
                 body: JSON.stringify({ url: url.trim() }),
             });
 
+            // Guard: infrastructure (Cloud Run / Firebase) may return HTML error pages
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('[Intake] Non-JSON response:', response.status, text.slice(0, 200));
+                setError(
+                    response.status === 504 || response.status === 502
+                        ? `Server timeout (${response.status}). The pipeline may take longer than Cloud Run allows. Try again or check server logs.`
+                        : `Server returned an unexpected response (HTTP ${response.status}). This may be a deployment or auth issue.`
+                );
+                return;
+            }
+
             const data = await response.json();
 
             if (!response.ok && !data.steps) {
