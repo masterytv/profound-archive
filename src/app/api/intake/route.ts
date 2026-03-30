@@ -1,24 +1,62 @@
 /**
- * Video Intake API Route
+ * Video Intake API Route (Async Job Pattern)
  * 
- * POST /api/intake — Submit a YouTube URL for processing
+ * POST /api/intake — Queue a YouTube URL for processing. Returns a jobId immediately.
+ * GET  /api/intake?jobId=xxx — Poll for job status/results.
+ * 
+ * The pipeline runs in a fire-and-forget internal fetch to /api/intake/process,
+ * bypassing Cloudflare's 100s timeout. Cloud Run's 300s timeout applies instead.
  * 
  * Auth: Admin role via Supabase session OR CRON_SECRET bearer token
- * Returns: IntakeResult with step-by-step processing details
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-import { processVideoIntake } from '@/lib/pipeline/intake';
 
-export const maxDuration = 300; // 5 minutes — matches existing batch routes
 export const dynamic = 'force-dynamic';
+
+// ─── GET: Poll for job status ────────────────────────────────────────────────
+
+export async function GET(request: NextRequest) {
+    try {
+        const jobId = request.nextUrl.searchParams.get('jobId');
+        if (!jobId) {
+            return NextResponse.json({ error: 'Missing jobId parameter' }, { status: 400 });
+        }
+
+        // Auth check
+        const isAuthorized = await checkAuth(request);
+        if (!isAuthorized) {
+            return NextResponse.json(
+                { error: 'Unauthorized. Admin access required.' },
+                { status: 401 }
+            );
+        }
+
+        const supabase = getSupabaseAdmin();
+        const { data: job, error } = await supabase
+            .from('jobs')
+            .select('id, youtube_url, video_title, status, error_message, result, video_id, created_at, updated_at')
+            .eq('id', jobId)
+            .single();
+
+        if (error || !job) {
+            return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+        }
+
+        return NextResponse.json(job);
+    } catch (error: any) {
+        console.error('[Intake GET] Error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+// ─── POST: Queue a new intake job ────────────────────────────────────────────
 
 export async function POST(request: Request) {
     try {
-        // ── Parse request body ──────────────────────────────────────
         const body = await request.json();
         const { url } = body;
 
@@ -29,7 +67,7 @@ export async function POST(request: Request) {
             );
         }
 
-        // ── Auth check: admin session OR CRON_SECRET ────────────────
+        // Auth check
         const isAuthorized = await checkAuth(request);
         if (!isAuthorized) {
             return NextResponse.json(
@@ -38,19 +76,57 @@ export async function POST(request: Request) {
             );
         }
 
-        // ── Run the pipeline ────────────────────────────────────────
-        console.log(`[Intake API] Processing URL: ${url}`);
-        const result = await processVideoIntake(url);
+        const supabase = getSupabaseAdmin();
 
-        // Map status to appropriate HTTP code
-        const statusCode = result.status === 'failed' ? 500
-            : result.status === 'already_exists' ? 200
-                : 200;
+        // Insert a job record with "processing" status
+        const { data: job, error: insertError } = await supabase
+            .from('jobs')
+            .insert({
+                youtube_url: url.trim(),
+                status: 'processing',
+            })
+            .select('id')
+            .single();
 
-        return NextResponse.json(result, { status: statusCode });
+        if (insertError || !job) {
+            console.error('[Intake POST] Failed to create job:', insertError);
+            return NextResponse.json(
+                { error: 'Failed to create job record' },
+                { status: 500 }
+            );
+        }
+
+        console.log(`[Intake POST] Created job ${job.id} for URL: ${url}`);
+
+        // Fire-and-forget: call the processing endpoint on localhost.
+        // Using localhost (not the public URL) bypasses Cloudflare's 100s proxy timeout.
+        // On Cloud Run, the PORT env var is set (defaults to 8080).
+        // In local dev, Next.js uses port 3000.
+        const cronSecret = process.env.CRON_SECRET;
+        const port = process.env.PORT || '3000';
+        const internalOrigin = `http://localhost:${port}`;
+
+        fetch(`${internalOrigin}/api/intake/process`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${cronSecret}`,
+            },
+            body: JSON.stringify({ jobId: job.id, url: url.trim() }),
+        }).catch((err) => {
+            // Log but don't block — the process route handles its own errors
+            console.error('[Intake POST] Fire-and-forget fetch failed:', err.message);
+        });
+
+        // Return immediately with the job ID — client will poll GET
+        return NextResponse.json({
+            jobId: job.id,
+            status: 'processing',
+            message: 'Job queued. Poll GET /api/intake?jobId=<id> for status.',
+        }, { status: 202 });
 
     } catch (error: any) {
-        console.error('[Intake API] Unhandled error:', error);
+        console.error('[Intake POST] Unhandled error:', error);
         return NextResponse.json(
             { error: error.message || 'Internal server error' },
             { status: 500 }
@@ -58,7 +134,14 @@ export async function POST(request: Request) {
     }
 }
 
-// ── Auth Helper ─────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function getSupabaseAdmin() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) throw new Error('Missing Supabase environment variables');
+    return createClient(url, key);
+}
 
 async function checkAuth(request: Request): Promise<boolean> {
     // Method 1: CRON_SECRET bearer token (for scheduler/CLI)
@@ -91,7 +174,6 @@ async function checkAuth(request: Request): Promise<boolean> {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return false;
 
-        // Check admin role
         const adminSupabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || ''

@@ -4,12 +4,12 @@
  * Video Intake Admin Page
  * 
  * Form to submit a YouTube URL for processing through the intake pipeline.
- * Shows real-time processing status and results.
+ * Uses async job pattern: POST queues, then polls GET for progress.
  * 
  * Route: /admin/intake
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Upload,
     CheckCircle2,
@@ -47,6 +47,18 @@ interface IntakeResult {
     analysisSummary?: string;
     error?: string;
     steps: IntakeStep[];
+}
+
+interface JobRecord {
+    id: string;
+    youtube_url: string;
+    video_title: string | null;
+    status: string;
+    error_message: string | null;
+    result: IntakeResult | null;
+    video_id: string | null;
+    created_at: string;
+    updated_at: string;
 }
 
 // ─── Status Icon Components ─────────────────────────────────────────────────
@@ -113,6 +125,11 @@ const resultBadge: Record<string, {
     },
 };
 
+// Terminal statuses that stop polling
+const TERMINAL_STATUSES = new Set([
+    'complete', 'failed', 'not_profound', 'no_captions', 'already_exists', 'is_short'
+]);
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function IntakePage() {
@@ -120,6 +137,76 @@ export default function IntakePage() {
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<IntakeResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [jobId, setJobId] = useState<string | null>(null);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    // Clean up intervals on unmount
+    useEffect(() => {
+        return () => {
+            if (pollRef.current) clearInterval(pollRef.current);
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, []);
+
+    const stopPolling = useCallback(() => {
+        if (pollRef.current) {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+        }
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+    }, []);
+
+    const pollForStatus = useCallback((id: string) => {
+        // Start elapsed timer
+        const startTime = Date.now();
+        timerRef.current = setInterval(() => {
+            setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
+        }, 1000);
+
+        // Poll every 3 seconds
+        pollRef.current = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/intake?jobId=${id}`);
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({ error: 'Poll failed' }));
+                    console.error('[Intake Poll] Error:', errData);
+                    return; // Keep polling — might be a transient error
+                }
+
+                const job: JobRecord = await res.json();
+
+                if (TERMINAL_STATUSES.has(job.status)) {
+                    stopPolling();
+                    setIsLoading(false);
+
+                    if (job.result) {
+                        // Full pipeline result available
+                        setResult(job.result);
+                    } else {
+                        // No result JSONB yet — construct a minimal display
+                        if (job.status === 'failed') {
+                            setError(job.error_message || 'Pipeline failed without details');
+                        } else {
+                            setResult({
+                                status: job.status,
+                                videoId: job.video_id || '',
+                                title: job.video_title || undefined,
+                                steps: [],
+                            });
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('[Intake Poll] Network error:', err);
+                // Keep polling through transient errors
+            }
+        }, 3000);
+    }, [stopPolling]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -128,6 +215,8 @@ export default function IntakePage() {
         setIsLoading(true);
         setResult(null);
         setError(null);
+        setJobId(null);
+        setElapsedSeconds(0);
 
         try {
             const response = await fetch('/api/intake', {
@@ -136,31 +225,45 @@ export default function IntakePage() {
                 body: JSON.stringify({ url: url.trim() }),
             });
 
-            // Guard: infrastructure (Cloud Run / Firebase) may return HTML error pages
+            // Guard against non-JSON responses from infrastructure
             const contentType = response.headers.get('content-type') || '';
             if (!contentType.includes('application/json')) {
-                const text = await response.text();
-                console.error('[Intake] Non-JSON response:', response.status, text.slice(0, 200));
-                setError(
-                    response.status === 504 || response.status === 502
-                        ? `Server timeout (${response.status}). The pipeline may take longer than Cloud Run allows. Try again or check server logs.`
-                        : `Server returned an unexpected response (HTTP ${response.status}). This may be a deployment or auth issue.`
-                );
+                setError(`Server returned an unexpected response (HTTP ${response.status}).`);
+                setIsLoading(false);
                 return;
             }
 
             const data = await response.json();
 
-            if (!response.ok && !data.steps) {
+            if (!response.ok) {
                 setError(data.error || 'Unknown error');
+                setIsLoading(false);
+                return;
+            }
+
+            // Job was queued — start polling
+            if (data.jobId) {
+                setJobId(data.jobId);
+                pollForStatus(data.jobId);
             } else {
+                // Fallback: direct result (shouldn't happen with new API)
                 setResult(data);
+                setIsLoading(false);
             }
         } catch (err: any) {
             setError(err.message || 'Network error');
-        } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleReset = () => {
+        stopPolling();
+        setUrl('');
+        setResult(null);
+        setError(null);
+        setJobId(null);
+        setElapsedSeconds(0);
+        setIsLoading(false);
     };
 
     const badge = result ? resultBadge[result.status] : null;
@@ -235,6 +338,26 @@ export default function IntakePage() {
                         <p className="text-red-800 font-medium text-sm">Error</p>
                         <p className="text-red-600 text-sm mt-0.5">{error}</p>
                     </div>
+                </div>
+            )}
+
+            {/* Processing State */}
+            {isLoading && !result && (
+                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-12 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
+                        <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                    </div>
+                    <p className="text-slate-700 dark:text-slate-200 font-medium">Processing video through the intake pipeline...</p>
+                    <p className="text-slate-400 text-sm mt-1">
+                        {elapsedSeconds > 0
+                            ? `${elapsedSeconds}s elapsed — This typically takes 60–120 seconds`
+                            : 'This typically takes 60–120 seconds'}
+                    </p>
+                    {jobId && (
+                        <p className="text-slate-300 dark:text-slate-500 text-xs mt-3 font-mono">
+                            Job ID: {jobId}
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -362,10 +485,7 @@ export default function IntakePage() {
                                 <ArrowRight className="w-3.5 h-3.5" />
                             </a>
                             <button
-                                onClick={() => {
-                                    setUrl('');
-                                    setResult(null);
-                                }}
+                                onClick={handleReset}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/20 hover:border-slate-300 transition-all cursor-pointer"
                             >
                                 <RotateCcw className="w-3.5 h-3.5" />
@@ -373,17 +493,17 @@ export default function IntakePage() {
                             </button>
                         </div>
                     )}
-                </div>
-            )}
 
-            {/* Loading State */}
-            {isLoading && !result && (
-                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-12 text-center">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
-                        <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
-                    </div>
-                    <p className="text-slate-700 dark:text-slate-200 font-medium">Processing video through the intake pipeline...</p>
-                    <p className="text-slate-400 text-sm mt-1">This typically takes 30–60 seconds</p>
+                    {/* Reset for non-complete states */}
+                    {result.status !== 'complete' && (
+                        <button
+                            onClick={handleReset}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/20 hover:border-slate-300 transition-all cursor-pointer"
+                        >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            Try Another
+                        </button>
+                    )}
                 </div>
             )}
         </div>
