@@ -12,6 +12,7 @@
 - **Auth Tokens:** Always use `getUser()` on the server, NEVER `getSession()`. Use `getAll`/`setAll` for cookie management, never individual get/set methods.
 - **Static Page Build:** `generateStaticParams` and `generateMetadata` MUST use the anon/service client. Never use `createClient()` from `@/lib/supabase/server` as `cookies()` throws outside request scopes.
 - **No `after()` on Cloud Run:** Firebase App Hosting (Cloud Run) throttles CPU after the response is sent. Never use `after()` for critical work in cron/pipeline routes — it will be silently killed. Run pipelines synchronously with `maxDuration = 300` and `--max-time 300` on the curl.
+- **Cloudflare 100s Proxy Timeout:** The site sits behind Cloudflare, which enforces a hard 100-second timeout (HTTP 524) on all proxied requests. Any route that takes >100s (e.g., intake pipeline) MUST use the async job pattern: POST queues a job and fire-and-forgets processing via `localhost` (bypassing Cloudflare), client polls GET for status. See `/api/intake` + `/api/intake/process`.
 
 ## 3. Styling & Theming (CRITICAL)
 - **Token System:** Use `globals.css` semantic tokens (`bg-background`, `bg-card`, `text-foreground`). 
