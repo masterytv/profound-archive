@@ -98,31 +98,14 @@ export async function POST(request: Request) {
 
         console.log(`[Intake POST] Created job ${job.id} for URL: ${url}`);
 
-        // Fire-and-forget: call the processing endpoint on localhost.
-        // Using localhost (not the public URL) bypasses Cloudflare's 100s proxy timeout.
-        // On Cloud Run, the PORT env var is set (defaults to 8080).
-        // In local dev, Next.js uses port 3000.
-        const cronSecret = process.env.CRON_SECRET;
-        const port = process.env.PORT || '3000';
-        const internalOrigin = `http://localhost:${port}`;
-
-        fetch(`${internalOrigin}/api/intake/process`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${cronSecret}`,
-            },
-            body: JSON.stringify({ jobId: job.id, url: url.trim() }),
-        }).catch((err) => {
-            // Log but don't block — the process route handles its own errors
-            console.error('[Intake POST] Fire-and-forget fetch failed:', err.message);
-        });
-
-        // Return immediately with the job ID — client will poll GET
+        // Return immediately with the job ID.
+        // The frontend will trigger /api/intake/process from the browser,
+        // ensuring the processing request gets its own full request context.
+        // (Server-side fire-and-forget is killed by Cloud Run CPU throttling post-response.)
         return NextResponse.json({
             jobId: job.id,
             status: 'processing',
-            message: 'Job queued. Poll GET /api/intake?jobId=<id> for status.',
+            url: url.trim(),
         }, { status: 202 });
 
     } catch (error: any) {

@@ -1,16 +1,20 @@
 /**
- * Video Intake Processing Route (Internal)
+ * Video Intake Processing Route
  * 
  * POST /api/intake/process — Runs the full intake pipeline for a queued job.
  * 
- * Called internally by POST /api/intake via fire-and-forget fetch.
- * Auth: CRON_SECRET only (not browser-accessible).
+ * Called by the browser's fire-and-forget fetch after the job is queued.
+ * The browser doesn't throttle pending fetches, so this runs for up to 300s.
+ * Cloudflare will 524 the browser's fetch, but that's fine — we don't read
+ * the response. The frontend polls GET /api/intake?jobId=xxx for status.
  * 
- * Updates the jobs table when complete so the frontend can poll for results.
+ * Auth: Admin session (cookie) OR CRON_SECRET bearer token.
  */
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { processVideoIntake } from '@/lib/pipeline/intake';
 
 export const maxDuration = 300; // 5 minutes — Cloud Run timeout
@@ -23,15 +27,62 @@ function getSupabaseAdmin() {
     return createClient(url, key);
 }
 
+async function checkAuth(request: Request): Promise<boolean> {
+    // Method 1: CRON_SECRET bearer token
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+        return true;
+    }
+
+    // Method 2: Debug mode bypass (local dev only)
+    if (process.env.IS_DEBUG_MODE) {
+        return true;
+    }
+
+    // Method 3: Supabase session with admin role
+    try {
+        const cookieStore = await cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                cookies: {
+                    getAll() {
+                        return cookieStore.getAll();
+                    },
+                },
+            }
+        );
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return false;
+
+        const adminSupabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+        );
+
+        const { data: profile } = await adminSupabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        return profile?.role === 'admin' || profile?.role === 'super_admin';
+    } catch {
+        return false;
+    }
+}
+
 export async function POST(request: Request) {
-    // Parse body and capture jobId early for error recovery
+    // Parse body early for error recovery
     let jobId: string | null = null;
 
     try {
-        // Auth: CRON_SECRET only (internal route)
-        const authHeader = request.headers.get('authorization');
-        const cronSecret = process.env.CRON_SECRET;
-        if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+        // Auth check
+        const isAuthorized = await checkAuth(request);
+        if (!isAuthorized) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -46,7 +97,7 @@ export async function POST(request: Request) {
         const supabase = getSupabaseAdmin();
         console.log(`[Intake Process] Starting pipeline for job ${jobId}: ${url}`);
 
-        // Run the full pipeline
+        // Run the full pipeline (this takes 60-120s)
         const result = await processVideoIntake(url);
 
         // Update the job record with the result
@@ -72,7 +123,7 @@ export async function POST(request: Request) {
     } catch (error: any) {
         console.error('[Intake Process] Unhandled error:', error);
 
-        // Mark the job as failed in DB (if we have the jobId)
+        // Mark the job as failed in DB
         if (jobId) {
             try {
                 const supabase = getSupabaseAdmin();
@@ -85,7 +136,7 @@ export async function POST(request: Request) {
                     })
                     .eq('id', jobId);
             } catch {
-                // Best-effort — if this fails, the job will stay as "processing"
+                // Best-effort
             }
         }
 

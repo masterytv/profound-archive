@@ -219,6 +219,7 @@ export default function IntakePage() {
         setElapsedSeconds(0);
 
         try {
+            // Step 1: Queue the job (returns immediately with jobId)
             const response = await fetch('/api/intake', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -241,15 +242,31 @@ export default function IntakePage() {
                 return;
             }
 
-            // Job was queued — start polling
-            if (data.jobId) {
-                setJobId(data.jobId);
-                pollForStatus(data.jobId);
-            } else {
-                // Fallback: direct result (shouldn't happen with new API)
-                setResult(data);
+            if (!data.jobId) {
+                setError('No job ID returned');
                 setIsLoading(false);
+                return;
             }
+
+            setJobId(data.jobId);
+
+            // Step 2: Fire-and-forget the processing from the browser.
+            // Cloudflare will kill this fetch with a 524 after ~100s, but that's OK.
+            // The server-side Cloud Run container keeps running for up to 300s.
+            // We don't read the response — the GET poller detects completion.
+            fetch('/api/intake/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ jobId: data.jobId, url: data.url }),
+            }).catch(() => {
+                // Expected: Cloudflare 524 timeout or network error
+                // The pipeline continues server-side regardless
+                console.log('[Intake] Process fetch ended (expected — pipeline continues server-side)');
+            });
+
+            // Step 3: Start polling for completion
+            pollForStatus(data.jobId);
+
         } catch (err: any) {
             setError(err.message || 'Network error');
             setIsLoading(false);
