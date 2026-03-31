@@ -287,6 +287,13 @@ OUTPUT FORMAT:
         return { correctedBody: article, correctedRefs: refs, stats };
     }
 
+    // If Claude hit max_tokens, the corrected body is incomplete — keep original
+    const finishReason = correctResponse.choices[0]?.finish_reason;
+    if (finishReason === 'length') {
+        console.warn(`    [verify] TRUNCATION DETECTED in correction pass (finish_reason: "length"). Keeping original body.`);
+        return { correctedBody: article, correctedRefs: refs, stats };
+    }
+
     return {
         correctedBody: corrected.body_mdx ?? article,
         correctedRefs: corrected.references ?? refs,

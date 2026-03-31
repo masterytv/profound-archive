@@ -70,7 +70,7 @@ function getOpenRouter() {
     return new OpenAI({
         apiKey,
         baseURL: 'https://openrouter.ai/api/v1',
-        timeout: 4 * 60 * 1000, // 4-minute timeout — drafts can take 2-3 minutes
+        timeout: 6 * 60 * 1000, // 6-minute timeout — drafts with 24K max_tokens can take 3-4 minutes
         defaultHeaders: {
             'HTTP-Referer': 'https://projectprofound.org',
             'X-Title': 'Project Profound Story Pipeline',
@@ -409,14 +409,24 @@ async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
             { role: 'user', content: userPrompt },
             { role: 'assistant', content: '{' },
         ],
-        max_tokens: 12000, // Stories are 2-4K words + JSON overhead — 8K truncated, 16K hit credit limits
+        max_tokens: 24000, // Must be high enough to never truncate a 4K-word story in JSON. Truncation = broken article.
         temperature: 0.7,
     });
 
     const rawContent = response?.choices?.[0]?.message?.content;
+    const finishReason = response?.choices?.[0]?.finish_reason ?? 'unknown';
+
     if (!rawContent || rawContent.trim().length === 0) {
-        const finishReason = response?.choices?.[0]?.finish_reason ?? 'unknown';
         throw new Error(`Claude returned empty content (finish_reason: ${finishReason}). Model may be overloaded or the request was filtered.`);
+    }
+
+    // HARD BLOCK: Never publish a truncated story. If Claude hit max_tokens, the article is incomplete.
+    if (finishReason === 'length') {
+        throw new Error(
+            `TRUNCATION DETECTED: Claude hit max_tokens and stopped mid-output (finish_reason: "length"). ` +
+            `Output was ${rawContent.length} chars. The story would be incomplete. ` +
+            `Increase max_tokens or reduce input context size.`
+        );
     }
 
     let jsonStr = '{' + rawContent;
@@ -730,13 +740,10 @@ export async function generateStoryArticle(
             `"${rawDraft.title}" (${rawDraft.word_count} words)`,
             Date.now() - t0);
 
-        // ── Stage 4: Voice pass ──
-        t0 = Date.now();
-        emit('Voice pass', 'running', 'Removing AI tics, enforcing house style...');
-        const polishedDraft = await applyVoicePass(rawDraft);
-        emit('Voice pass', 'success',
-            `${polishedDraft.word_count} words after polish`,
-            Date.now() - t0);
+        // Voice pass removed — voice calibration rules are now baked into the
+        // draft system prompt, eliminating the riskiest truncation point.
+        // The draft IS the polished output.
+        const polishedDraft = rawDraft;
 
         // ── Stage 5: Images ──
         t0 = Date.now();

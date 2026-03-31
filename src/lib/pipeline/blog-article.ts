@@ -309,7 +309,7 @@ async function draftArticle(
             // Assistant prefill forces JSON output (Claude-specific)
             { role: 'assistant', content: '{' },
         ],
-        max_tokens: 16000,
+        max_tokens: 24000, // Must be high enough to never truncate. Truncation = broken article.
         temperature: 0.7,
     });
 
@@ -322,6 +322,15 @@ async function draftArticle(
         draft = JSON.parse(cleaned);
     } catch {
         throw new Error(`Claude returned invalid JSON: ${cleaned.slice(0, 200)}`);
+    }
+
+    // HARD BLOCK: Never publish a truncated article
+    const finishReason = response.choices[0]?.finish_reason;
+    if (finishReason === 'length') {
+        throw new Error(
+            `TRUNCATION DETECTED: Claude hit max_tokens and stopped mid-output (finish_reason: "length"). ` +
+            `Output was ${cleaned.length} chars. The article would be incomplete.`
+        );
     }
 
     // Validate required fields
@@ -765,17 +774,12 @@ export async function generateBlogArticle(
         finishStep(s3b, 'failed', `Image skipped: ${String(err)}`, t3b, onStep);
     }
 
-    // ── Step 4 ────────────────────────────────────────────────────────────────
+    // Voice pass removed — voice calibration rules are baked into the draft
+    // system prompt. This eliminates the most dangerous truncation point
+    // (the voice pass had max_tokens: 6000, which truncated long articles).
+    // The draft IS the polished output.
     const s4 = steps[4];
-    startStep(s4, onStep);
-    const t4 = Date.now();
-    result.status = 'polishing';
-    try {
-        draft = await voicePass(draft!);
-        finishStep(s4, 'success', `Revised to ${draft.word_count} words`, t4, onStep);
-    } catch (err) {
-        finishStep(s4, 'failed', `Voice pass failed (using raw draft): ${String(err)}`, t4, onStep);
-    }
+    finishStep(s4, 'skipped', 'Voice rules applied during draft (one-pass mode)', Date.now(), onStep);
 
     // ── Step 4b: Verify facts & links (non-fatal) ─────────────────────────────
     const s4b = steps[5];
