@@ -413,7 +413,13 @@ async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
         temperature: 0.7,
     });
 
-    let jsonStr = '{' + (response.choices[0]?.message?.content ?? '{}');
+    const rawContent = response?.choices?.[0]?.message?.content;
+    if (!rawContent || rawContent.trim().length === 0) {
+        const finishReason = response?.choices?.[0]?.finish_reason ?? 'unknown';
+        throw new Error(`Claude returned empty content (finish_reason: ${finishReason}). Model may be overloaded or the request was filtered.`);
+    }
+
+    let jsonStr = '{' + rawContent;
     // Strip markdown code fence if present
     jsonStr = jsonStr.replace(/```json\s*/g, '').replace(/```\s*/g, '');
 
@@ -466,7 +472,13 @@ async function applyVoicePass(draft: StoryDraft): Promise<StoryDraft> {
         temperature: 0.3,
     });
 
-    const revisedBody = voiceResponse.choices[0]?.message?.content ?? draft.body_mdx;
+    const voiceContent = voiceResponse?.choices?.[0]?.message?.content;
+    const revisedBody = (voiceContent && voiceContent.trim().length > 100)
+        ? voiceContent
+        : draft.body_mdx; // Fall back to original if voice pass returned empty/short
+    if (!voiceContent) {
+        console.warn('[story] Voice pass returned empty content, keeping original body');
+    }
 
     // Refresh SEO fields
     const seoResponse = await openRouter.chat.completions.create({
