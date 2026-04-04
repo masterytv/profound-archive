@@ -48,7 +48,7 @@ export function HeroSearchBar() {
                     onChange={(e) => setQuery(e.target.value)}
                     className="w-full pl-11 pr-28 h-14 text-lg rounded-full border-2 border-primary/20 focus:border-primary shadow-lg bg-white dark:bg-slate-800 dark:border-slate-600/50 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
-                <Search className="w-5 h-5 absolute left-4 top-4.5 text-muted-foreground" />
+                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Button
                     type="submit"
                     size="lg"

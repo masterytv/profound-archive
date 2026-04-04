@@ -419,7 +419,7 @@ function SearchContent() {
                                     className="w-full pl-12 pr-32 h-14 text-lg rounded-2xl border-2 border-slate-200 dark:border-slate-700 focus:border-blue-400 shadow-sm bg-white dark:bg-white/5 dark:text-slate-100 dark:placeholder:text-slate-500"
                                     style={{ fontSize: "16px" }}
                                 />
-                                <Search className="w-5 h-5 absolute left-4 top-4.5 text-slate-400" />
+                                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                 <div className="absolute right-1.5 top-1.5 flex items-center gap-1.5">
                                     {user && searchTerm.trim() && (
                                         <Button
