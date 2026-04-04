@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "index:typesense": "tsc --project scripts/tsconfig.json && node --require dotenv/config scripts/index-data.js",
+
     "warm": "ts-node --project scripts/tsconfig.json scripts/warm-questions.ts",
     "warm:prod": "ts-node --project scripts/tsconfig.json scripts/warm-questions.ts --url=https://projectprofound.org"
   },
@@ -75,7 +75,7 @@
     "resend": "^6.9.3",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "typesense": "^2.1.0",
+
     "zod": "^3.25.0"
   },
   "devDependencies": {

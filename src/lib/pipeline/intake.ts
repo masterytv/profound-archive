@@ -9,8 +9,7 @@
  * 5. Classify experience type (lightweight gate)
  * 6. Run full analysis suite (7 passes in parallel)
  * 7. Generate embeddings for search and chat
- * 8. Sync to Typesense search index
- * 9. Generate experience fingerprint
+ * 8. Generate experience fingerprint
  * 
  * Designed as a pure function so it can be called from:
  * - Admin UI form (via API route)
@@ -20,7 +19,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
-import Typesense from 'typesense';
+
 import { parseYouTubeUrl, fetchVideoMetadata, fetchChannelMetadata, type VideoMetadata } from '@/lib/youtube/scraper';
 import { fetchCaptions } from '@/lib/youtube/subtitles';
 import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/transcript-processor';
@@ -358,15 +357,7 @@ export async function processVideoIntake(
         await generateEmbeddings(supabase, videoId, transcripts);
         logStep('Generate Embeddings', 'success', 'Search + chat embeddings created', Date.now() - startEmbed);
 
-        // ─── Step 12: Sync to Typesense ──────────────────────────────
-        const startTypesense = Date.now();
-        logStep('Typesense Index', 'running');
-        const indexedCount = await syncToTypesense(supabase, videoId, metadata, transcripts);
-        if (indexedCount > 0) {
-            logStep('Typesense Index', 'success', `${indexedCount} chunks indexed`, Date.now() - startTypesense);
-        } else {
-            logStep('Typesense Index', 'skipped', 'Typesense not configured or no chunks');
-        }
+
 
         // ─── Step 13: Generate fingerprint ───────────────────────────
         if (core) {
@@ -775,75 +766,6 @@ async function batchEmbed(openai: OpenAI, texts: string[]): Promise<(number[] | 
     }
 
     return results;
-}
-
-// ─── Helper: Sync Video to Typesense Index ────────────────────────────────────
-
-/**
- * Index this video's search chunks into Typesense for keyword search.
- * Gracefully skips if Typesense is not configured (env vars missing).
- * Returns the number of documents indexed (0 if skipped).
- */
-async function syncToTypesense(
-    supabase: any,
-    videoId: string,
-    metadata: VideoMetadata,
-    transcripts: ProcessedTranscripts,
-): Promise<number> {
-    const host = process.env.TYPESENSE_HOST;
-    const apiKey = process.env.TYPESENSE_API_KEY;
-    const protocol = process.env.TYPESENSE_PROTOCOL || 'http';
-    const port = parseInt(process.env.TYPESENSE_PORT || '8108', 10);
-
-    if (!host || !apiKey) {
-        return 0; // Typesense not configured — skip
-    }
-
-    try {
-        const typesense = new Typesense.Client({
-            nodes: [{ host, port, protocol }],
-            apiKey,
-            connectionTimeoutSeconds: 10,
-        });
-
-        // Fetch the video record for search metadata
-        const { data: video } = await supabase
-            .from('nde_vids')
-            .select('videoId, title, url, thumbnailUrl, date, viewCount, channelName, isNde')
-            .eq('videoId', videoId)
-            .single();
-
-        if (!video || transcripts.searchChunks.length === 0) return 0;
-
-        const documents = transcripts.searchChunks.map(chunk => ({
-            title: video.title || '',
-            content: chunk.content,
-            videoId: video.videoId,
-            channelName: video.channelName || '',
-            isNde: video.isNde || 'possible_nde',
-            viewCount: video.viewCount || 0,
-            date: video.date ? Math.floor(new Date(video.date).getTime() / 1000) : 0,
-            thumbnailUrl: video.thumbnailUrl || '',
-            url: video.url || '',
-            start_time: chunk.start_time,
-        }));
-
-        const results = await typesense
-            .collections('videos')
-            .documents()
-            .import(documents, { action: 'upsert', batch_size: 500 });
-
-        const failed = results.filter((r: any) => r.success === false);
-        if (failed.length > 0) {
-            console.error(`[Intake] Typesense: ${failed.length} docs failed to index`);
-        }
-
-        return documents.length - failed.length;
-    } catch (error: any) {
-        // Non-fatal: search indexing failure shouldn't break the pipeline
-        console.error('[Intake] Typesense sync error (non-fatal):', error.message);
-        return 0;
-    }
 }
 
 

@@ -1,35 +1,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import Typesense from 'typesense';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
 // --- Configuration ---
 
-// Typesense Client
-const getTypesenseClient = () => {
-    const host = process.env.TYPESENSE_HOST;
-    const apiKey = process.env.TYPESENSE_API_KEY;
-    const protocol = process.env.TYPESENSE_PROTOCOL || 'http';
-    const port = parseInt(process.env.TYPESENSE_PORT || '8108', 10);
-
-    if (!host || !apiKey) {
-        throw new Error("Missing Typesense configuration");
-    }
-
-    return new Typesense.Client({
-        nodes: [{ host, port, protocol }],
-        apiKey,
-        connectionTimeoutSeconds: 5
-    });
-};
-
-// Supabase Client (Service Role for search? Or standard client depending on permissions)
-// For generic operations, createClient from utils is synonymous with client-side or anon.
-// However, api routes safely run server-side.
+// Supabase Client (service role for server-side operations)
 const getSupabaseClient = () => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    // Prefer Service Key for server-side operations to bypass RLS
     const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
@@ -52,7 +30,7 @@ export async function POST(req: NextRequest) {
     try {
         const { searchTerm, filters, sortBy, page, type = 'keyword', similarity = 0.50 } = await req.json();
         const pageNum = page || 1;
-        const perPage = 12; // Standardize page size
+        const perPage = 12;
 
         console.log(`Executing /search3 (${type}): "${searchTerm}" page ${pageNum}`);
 
@@ -71,80 +49,128 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// --- Keyword Search (Typesense + Supabase Summary Enrichment) ---
+// --- Keyword Search (PostgreSQL FTS via Supabase RPC) ---
 async function handleKeywordSearch(searchTerm: string, filters: any, sortBy: any, page: number, perPage: number) {
-    const typesense = getTypesenseClient();
+    const supabase = getSupabaseClient();
 
-    // 1. Prepare Filters
-    const filterArr: string[] = [];
-    Object.entries(filters || {}).forEach(([field, values]: [string, any]) => {
-        if (!Array.isArray(values) || values.length === 0) return;
+    // 1. Parse sort
+    let sortColumn = 'viewCount';
+    let sortDirection = 'DESC';
 
-        if (field === 'minGreyson') {
-            filterArr.push(`greysonScore:>=${parseInt(values[0])}`);
-        } else if (field === 'minTransformation') {
-            filterArr.push(`transformationScore:>=${parseInt(values[0])}`);
-        } else if (field === 'minVeridical') {
-            filterArr.push(`veridicalScore:>=${parseInt(values[0])}`);
-        } else {
-            const fieldValues = values.map((v: string) => `\`${v}\``).join(', ');
-            filterArr.push(`${field}:=[${fieldValues}]`);
-        }
-    });
-    const filterConditions = filterArr.join(' && ');
-
-    // 2. Prepare Sort
-    let sortQuery = 'viewCount:desc';
     if (searchTerm && searchTerm !== '*') {
-        sortQuery = '_text_match:desc';
+        sortColumn = 'relevance';
     }
+
     if (sortBy) {
-        const [field, dir] = sortBy.split(':');
-        // Handle mapped sorts if they differ from Typesense fields
-        sortQuery = sortBy;
-    }
-
-    const searchParameters = {
-        'q': searchTerm || '*',
-        'query_by': 'content,title',
-        'page': page,
-        'per_page': perPage,
-        'facet_by': 'channelName,isNde,experienceType,triggerCategory,overallTone,intensityBucket',
-        'filter_by': [filterConditions, 'isNde:!=not_nde'].filter(Boolean).join(' && '),
-        'sort_by': sortQuery,
-        'max_facet_values': 100,
-    };
-
-    // 3. Execute Typesense Search
-    const searchResults: any = await typesense.collections('videos').documents().search(searchParameters);
-
-    // 4. Enrich with Summaries from Supabase
-    // Extract video IDs from hits
-    const hits = searchResults.hits || [];
-    const videoIds = hits.map((hit: any) => hit.document.videoId);
-
-    if (videoIds.length > 0) {
-        const supabase = getSupabaseClient();
-        const { data: summaries, error } = await supabase
-            .from('nde_vids')
-            .select('videoId, analysis_nde_summary')
-            .in('videoId', videoIds);
-
-        if (!error && summaries) {
-            // Map summaries to hits
-            const summaryMap = new Map(summaries.map((s: any) => [s.videoId, s.analysis_nde_summary]));
-            hits.forEach((hit: any) => {
-                const summary = summaryMap.get(hit.document.videoId);
-                if (summary) {
-                    hit.document.analysis_nde_summary = summary;
-                }
-            });
-        } else if (error) {
-            console.error("Error fetching summaries:", error);
+        const parts = sortBy.split(':');
+        if (parts.length === 2) {
+            sortColumn = parts[0];
+            sortDirection = parts[1].toUpperCase();
+        } else {
+            sortColumn = sortBy;
         }
     }
 
-    return NextResponse.json(searchResults);
+    // Map Typesense sort names to our RPC names
+    if (sortColumn === '_text_match' || sortColumn === 'text_match') sortColumn = 'relevance';
+
+    // 2. Process filters
+    const filterChannelName = filters?.channelName?.length > 0 ? filters.channelName : null;
+    const filterExperienceType = filters?.experienceType?.length > 0 ? filters.experienceType : null;
+    const filterTriggerCategory = filters?.triggerCategory?.length > 0 ? filters.triggerCategory : null;
+    const filterOverallTone = filters?.overallTone?.length > 0 ? filters.overallTone : null;
+    const filterMinGreyson = filters?.minGreyson?.length > 0 ? parseInt(filters.minGreyson[0]) : null;
+    const filterMinTransformation = filters?.minTransformation?.length > 0 ? parseInt(filters.minTransformation[0]) : null;
+    const filterMinVeridical = filters?.minVeridical?.length > 0 ? parseInt(filters.minVeridical[0]) : null;
+
+    // Convert intensityBucket labels to min/max
+    let filterIntensityMin = null;
+    let filterIntensityMax = null;
+    if (filters?.intensityBucket?.length > 0) {
+        let min = 10;
+        let max = 1;
+        if (filters.intensityBucket.includes('Mild')) { min = Math.min(min, 1); max = Math.max(max, 3); }
+        if (filters.intensityBucket.includes('Moderate')) { min = Math.min(min, 4); max = Math.max(max, 5); }
+        if (filters.intensityBucket.includes('Deep')) { min = Math.min(min, 6); max = Math.max(max, 7); }
+        if (filters.intensityBucket.includes('Profound')) { min = Math.min(min, 8); max = Math.max(max, 10); }
+        if (min <= max) {
+            filterIntensityMin = min;
+            filterIntensityMax = max;
+        }
+    }
+
+    // 3. Execute search via Supabase RPC
+    const offset = (page - 1) * perPage;
+
+    const { data, error } = await supabase.rpc('keyword_search_videos', {
+        search_query: searchTerm || '*',
+        sort_column: sortColumn,
+        sort_direction: sortDirection,
+        page_limit: perPage,
+        page_offset: offset,
+        filter_channel_name: filterChannelName,
+        filter_experience_type: filterExperienceType,
+        filter_trigger_category: filterTriggerCategory,
+        filter_overall_tone: filterOverallTone,
+        filter_intensity_min: filterIntensityMin,
+        filter_intensity_max: filterIntensityMax,
+        filter_greyson_min: filterMinGreyson,
+        filter_transformation_min: filterMinTransformation,
+        filter_veridical_min: filterMinVeridical,
+    });
+
+    if (error) {
+        console.error('Keyword search RPC error:', error);
+        throw error;
+    }
+
+    // 4. Get total count from first row (all rows carry it via window function)
+    const totalCount = data?.length > 0 ? Number(data[0].total_count) : 0;
+
+    // 5. Format response to match frontend's expected Typesense-like structure
+    const hits = (data || []).map((item: any) => ({
+        document: {
+            id: `${item.video_id}-${item.id}`,
+            videoId: item.video_id,
+            title: item.title,
+            content: item.content,
+            channelName: item.channelName,
+            isNde: null,
+            viewCount: item.viewCount,
+            date: item.date ? new Date(item.date).getTime() / 1000 : 0,
+            thumbnailUrl: item.thumbnailUrl,
+            url: item.url,
+            start_time: item.start_time,
+            analysis_nde_summary: item.analysis_nde_summary,
+        },
+        highlights: []
+    }));
+
+    // 6. Fetch facet counts
+    const facetCounts = await fetchFacets(supabase);
+
+    return NextResponse.json({
+        found: totalCount,
+        hits,
+        facet_counts: facetCounts,
+        page,
+    });
+}
+
+// --- Shared: Fetch Facets from Supabase ---
+async function fetchFacets(supabase: any): Promise<any[]> {
+    try {
+        const { data, error } = await supabase.rpc('keyword_search_facets');
+        if (error) {
+            console.error('Facet RPC error:', error);
+            return [];
+        }
+        // RPC returns a jsonb array of facet objects
+        return data || [];
+    } catch (err) {
+        console.error('Failed to fetch facets:', err);
+        return [];
+    }
 }
 
 // --- Semantic Search (OpenAI + Supabase Vector RPC) ---
@@ -161,7 +187,6 @@ async function handleSemanticSearch(searchTerm: string, filters: any, page: numb
     const embedding = embeddingResponse.data[0].embedding;
 
     // 2. Determine Sort
-    // Frontend passes "viewCount:desc", RPC expects "viewCount", "DESC"
     let sortColumn = 'similarity';
     let sortDirection = 'DESC';
 
@@ -175,7 +200,7 @@ async function handleSemanticSearch(searchTerm: string, filters: any, page: numb
         }
     }
 
-    if (sortColumn === '_text_match') sortColumn = 'similarity'; // Map typesense sort to supabase sort
+    if (sortColumn === '_text_match' || sortColumn === 'text_match') sortColumn = 'similarity';
 
     // 3. Process filters for Semantic Search RPC
     const filterExperienceType = filters?.experienceType?.length > 0 ? filters.experienceType : null;
@@ -185,7 +210,6 @@ async function handleSemanticSearch(searchTerm: string, filters: any, page: numb
     const filterMinTransformation = filters?.minTransformation?.length > 0 ? parseInt(filters.minTransformation[0]) : null;
     const filterMinVeridical = filters?.minVeridical?.length > 0 ? parseInt(filters.minVeridical[0]) : null;
 
-    // Convert intensityBucket selected labels to min/max rating values
     let filterIntensityMin = null;
     let filterIntensityMax = null;
     if (filters?.intensityBucket?.length > 0) {
@@ -225,50 +249,30 @@ async function handleSemanticSearch(searchTerm: string, filters: any, page: numb
         throw error;
     }
 
-    // 4. Format response to match Typesense structure (roughly) to re-use frontend components if possible
-    // But frontend expecting "hits" structure or can adapt.
-    // Let's return a unified structure if possible? 
-    // Actually the frontend for /search2 expects specific Typesense structure.
-    // Let's mimic it for the hits.
-
     const hits = data.map((item: any) => ({
         document: {
-            id: item.video_id, // Map for key
+            id: item.video_id,
             videoId: item.video_id,
             title: item.title,
             content: item.content,
             channelName: item.channelName,
-            isNde: null, // Data not available in this RPC return
+            isNde: null,
             viewCount: item.viewCount,
-            date: new Date(item.date).getTime() / 1000, // Typesense expects unix timestamp in seconds
+            date: new Date(item.date).getTime() / 1000,
             thumbnailUrl: item.thumbnailUrl,
             url: item.url,
             start_time: item.start_time,
             analysis_nde_summary: item.analysis_nde_summary,
-            // Extra fields for semantic display
             similarity: item.similarity
         },
-        highlights: [] // No highlights for vector search
+        highlights: []
     }));
 
-    // 5. Fetch global facet counts from Typesense so the sidebar still works
-    let facetCounts: any[] = [];
-    try {
-        const typesense = getTypesenseClient();
-        const facetParams = {
-            'q': '*',
-            'per_page': 0,
-            'facet_by': 'channelName,isNde,experienceType,triggerCategory,overallTone,intensityBucket',
-            'max_facet_values': 100,
-        };
-        const tsResult: any = await typesense.collections('videos').documents().search(facetParams);
-        facetCounts = tsResult.facet_counts || [];
-    } catch (err) {
-        console.error("Failed to fetch facets for semantic search:", err);
-    }
+    // 5. Fetch facet counts from Supabase (replaces Typesense facet fetch)
+    const facetCounts = await fetchFacets(supabase);
 
     return NextResponse.json({
-        found: 100, // Approx or just indicate there are results. RPC doesn't return count.
+        found: 100, // Approx — semantic RPC doesn't return total count
         hits: hits,
         facet_counts: facetCounts,
         page: page

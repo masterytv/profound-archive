@@ -21,12 +21,7 @@
 | `OPENAI_API_KEY` | OpenAI API Key (GPT-4o-mini, text-embedding-3-small) | Server-only |
 
 ### Search
-| Variable | Description | Scope |
-|---|---|---|
-| `TYPESENSE_HOST` | IP address of self-hosted Typesense server (Hetzner/Coolify) | Server-only |
-| `TYPESENSE_API_KEY` | Typesense Admin API Key (rotated Feb 2026) | Server-only |
-| `TYPESENSE_PORT` | Typesense port (default: `8108`) | Server-only |
-| `TYPESENSE_PROTOCOL` | Typesense protocol (`http` or `https`) | Server-only |
+> **Note:** Search is powered by PostgreSQL full-text search via Supabase RPCs (`keyword_search_videos`, `keyword_search_facets`). No external search service env vars are required.
 
 ### Intake Pipeline
 | Variable | Description | Scope |
@@ -65,7 +60,7 @@ They are referenced in `apphosting.yaml` using `secret:` references — **never 
 |---|---|---|
 | `OPENAI_API_KEY` | `projects/432036554831/secrets/OPENAI_API_KEY/versions/1` | ✅ Feb 2026 |
 | `SUPABASE_SERVICE_KEY` | `projects/432036554831/secrets/SUPABASE_SERVICE_KEY/versions/1` | — |
-| `TYPESENSE_API_KEY` | `TYPESENSE_API_KEY` | ✅ Feb 2026 |
+
 | `SUPADATA_API_KEY` | `projects/432036554831/secrets/SUPADATA_API_KEY/versions/1` | ✅ Mar 2026 |
 | `YOUTUBE_API_KEY` | `projects/432036554831/secrets/YOUTUBE_API_KEY/versions/latest` | — |
 | `CRON_SECRET` | `projects/432036554831/secrets/CRON_SECRET/versions/3` | — |

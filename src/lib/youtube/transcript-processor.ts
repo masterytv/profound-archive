@@ -25,7 +25,7 @@ export interface ProcessedTranscripts {
     /** Clean text without timestamps — stored in nde_vids.subtitles_cleaned, used by chat */
     cleaned: string;
 
-    /** Chunks with timestamps for Typesense search — stored in nde_punctuated_embeddings */
+    /** Chunks with timestamps for keyword search — stored in nde_punctuated_embeddings */
     searchChunks: SearchChunk[];
 
     /** Chunks without timestamps for RAG chat — stored in nde_chatbot_chunks */
