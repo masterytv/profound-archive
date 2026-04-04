@@ -4,7 +4,10 @@ on:
   schedule:
     # Process 1 video from the queue every 10 minutes.
     # Calls the Firebase App Hosting DIRECT URL (APP_DIRECT_URL secret) to
-    # bypass Cloudflare's 100s connection limit. Cloud Run allows up to 300s.
+    # bypass Cloudflare's 100s connection limit. Cloud Run timeoutSeconds: 600.
+    #
+    # Pipeline timing (as of Apr 2026): 300-465s per video.
+    # curl --max-time 540 gives headroom within the 10-min cron interval.
     - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
@@ -16,6 +19,7 @@ on:
 jobs:
   scanner-process:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - name: Trigger Video Processing
         run: |
@@ -23,7 +27,8 @@ jobs:
             "https://${{ secrets.APP_DIRECT_URL }}/api/scanner/process" \
             -H "Content-Type: application/json" \
             -d "{\"secret\": \"${{ secrets.CRON_SECRET }}\", \"videosPerTick\": ${{ github.event.inputs.videos_per_tick || 1 }}}" \
-            --max-time 280)
+            --connect-timeout 15 \
+            --max-time 540)
           echo "HTTP Status: $HTTP_CODE"
           cat /tmp/response.txt
           echo ""

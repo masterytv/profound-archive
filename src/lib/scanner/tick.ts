@@ -11,8 +11,8 @@
  *
  * - runProcessTick(supabase, count)
  *     Pull `count` videos from the pending queue and run each through the full
- *     14-step intake pipeline. Can be slow (30-90s per video). Called every
- *     10 minutes with count=1 to stay well under Cloudflare's 100s timeout.
+ *     14-step intake pipeline. Can be slow (300-465s per video). Called every
+ *     10 minutes with count=1 to stay under the curl timeout.
  *
  * - runScannerTick(supabase, videosPerTick)
  *     Legacy combined wrapper — calls runDiscoverTick then runProcessTick.
