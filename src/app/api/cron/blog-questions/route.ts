@@ -8,17 +8,17 @@
  *   count — number of articles (default 1, max 3)
  *
  * ARCHITECTURE NOTE:
- * The pipeline takes 2-5 minutes (Claude draft + Perplexity research + fal.ai images).
+ * The pipeline takes 2-5 minutes (Perplexity research + Claude draft + fal.ai images + verification).
  * Runs synchronously — Firebase App Hosting (Cloud Run) throttles CPU after
  * the response is sent, so after() callbacks are silently killed.
- * The GitHub Actions curl has --max-time 300 which matches our maxDuration.
+ * The GitHub Actions curl has --max-time 540 which provides headroom.
  */
 
 import { NextResponse } from 'next/server';
 import { generateBlogArticle } from '@/lib/pipeline/blog-article';
 import { createClient } from '@supabase/supabase-js';
 
-export const maxDuration = 300; // 5 min timeout for serverless
+export const maxDuration = 540; // 9 min — matches curl --max-time in GHA workflow
 
 export async function POST(req: Request) {
     // Auth: verify cron secret

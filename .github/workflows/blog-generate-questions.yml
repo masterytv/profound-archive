@@ -27,7 +27,8 @@ jobs:
             echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
             RESPONSE=$(curl -s -w "\n%{http_code}" \
               -X POST \
-              --max-time 300 \
+              --connect-timeout 15 \
+              --max-time 540 \
               -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
               -H "Content-Type: application/json" \
               "https://${{ secrets.APP_DIRECT_URL }}/api/cron/blog-questions?count=$COUNT")
