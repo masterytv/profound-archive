@@ -310,6 +310,16 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
         notFound();
     }
 
+    // Return 404 for videos from hidden (defunct) channels
+    const { data: channelHidden } = await supabase
+        .from('channels')
+        .select('hidden')
+        .eq('channel_id', video.channelId)
+        .single();
+    if (channelHidden?.hidden) {
+        notFound();
+    }
+
     const { data: analysis } = await supabase
         .from("nde_analysis")
         .select(

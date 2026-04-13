@@ -31,13 +31,24 @@ async function fetchCuratedVideos(
     poolSize: number = 50,
     displayCount: number = 6
 ) {
-    const { data: veridicalPool } = await supabase
+    // Fetch hidden channel IDs once to exclude from all queries
+    const { data: hiddenChannels } = await supabase
+        .from('channels')
+        .select('channel_id')
+        .eq('hidden', true);
+    const hiddenIds = (hiddenChannels || []).map(c => c.channel_id);
+
+    const veridicalQuery = supabase
         .from("nde_vids")
         .select("videoId, title, thumbnailUrl, channelName, rvnde_total_score, rvnde_level")
         .eq("isNde", "clear_nde")
         .not("rvnde_total_score", "is", null)
         .order("rvnde_total_score", { ascending: false })
         .limit(poolSize);
+    if (hiddenIds.length > 0) {
+        veridicalQuery.not('channelId', 'in', `(${hiddenIds.join(',')})`);
+    }
+    const { data: veridicalPool } = await veridicalQuery;
 
     const { data: transformationPool } = await supabase
         .from("nde_analysis")
@@ -61,12 +72,17 @@ async function fetchCuratedVideos(
     ];
 
     const uniqueIds = [...new Set(analysisVideoIds)];
-    const { data: videoMeta } = uniqueIds.length
-        ? await supabase
+    const videoMetaQuery = uniqueIds.length
+        ? supabase
             .from("nde_vids")
-            .select("videoId, title, thumbnailUrl, channelName")
+            .select("videoId, title, thumbnailUrl, channelName, channelId")
             .in("videoId", uniqueIds)
-        : { data: [] };
+        : null;
+    // Exclude hidden channel videos from score pools
+    if (videoMetaQuery && hiddenIds.length > 0) {
+        videoMetaQuery.not('channelId', 'in', `(${hiddenIds.join(',')})`);
+    }
+    const { data: videoMeta } = videoMetaQuery ? await videoMetaQuery : { data: [] };
 
     const metaMap = new Map(
         (videoMeta || []).map((v) => [v.videoId, v])
@@ -149,13 +165,24 @@ export default async function HomeAlt1() {
         seed + 20
     ).slice(0, 4);
 
+    // Fetch hidden channel IDs to exclude from Just Added
+    const { data: hiddenChannelsHome } = await supabase
+        .from('channels')
+        .select('channel_id')
+        .eq('hidden', true);
+    const hiddenIdsHome = (hiddenChannelsHome || []).map(c => c.channel_id);
+
     // Fetch "Just Added" — latest 5 clear_nde videos by created_at
-    const { data: justAddedVideos } = await supabase
+    const justAddedQuery = supabase
         .from('nde_vids')
         .select('"videoId", title, "thumbnailUrl", "channelName", created_at')
         .eq('isNde', 'clear_nde')
         .order('created_at', { ascending: false })
         .limit(5);
+    if (hiddenIdsHome.length > 0) {
+        justAddedQuery.not('channelId', 'in', `(${hiddenIdsHome.join(',')})`);
+    }
+    const { data: justAddedVideos } = await justAddedQuery;
 
     const justAdded = (justAddedVideos || []) as Array<{
         videoId: string;

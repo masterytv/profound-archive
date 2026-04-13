@@ -79,12 +79,17 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
         notFound()
     }
 
-    // Fetch enriched channel data (avatar, banner, description)
+    // Fetch enriched channel data (avatar, banner, description, hidden flag)
     const { data: channelEnriched } = await supabase
         .from('channels')
-        .select('avatar_url, banner_url, description, country, subscriber_count')
+        .select('avatar_url, banner_url, description, country, subscriber_count, hidden')
         .eq('channel_id', channelId)
         .single()
+
+    // Return 404 for channels hidden due to YouTube removal
+    if (channelEnriched?.hidden) {
+        notFound()
+    }
 
     // Use enriched subscriber count (from YouTube API) as primary source
     const subscriberCount = channelEnriched?.subscriber_count || channelMeta.numberOfSubscribers || 0
