@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
@@ -51,6 +51,74 @@ interface AnalysisData {
 interface VeridicalData {
     rvnde_total_score: number | null;
     rvnde_level: string | null;
+}
+
+// Sub-component for transcript chunks with truncation support
+interface TranscriptChunkProps {
+    content: string;
+    linkUrl: string;
+    searchTerm?: string;
+    highlightTerm: (text: string, term?: string) => React.ReactNode;
+    timestampStr: string | null;
+    similarity?: number;
+    isOversized: boolean;
+    truncateLength: number;
+    hasTimestamp: boolean;
+    videoId: string;
+    videoTitle: string;
+    videoThumbnailUrl: string;
+    startTime?: number;
+    user?: User | null;
+}
+
+function TranscriptChunk({
+    content, linkUrl, searchTerm, highlightTerm,
+    timestampStr, similarity, isOversized, truncateLength,
+    hasTimestamp, videoId, videoTitle, videoThumbnailUrl, startTime, user
+}: TranscriptChunkProps) {
+    const [isChunkExpanded, setIsChunkExpanded] = useState(false);
+    const displayContent = isOversized && !isChunkExpanded
+        ? content.substring(0, truncateLength) + "..."
+        : content;
+
+    return (
+        <div className="group relative pl-4 border-l-2 border-primary/20 hover:border-primary transition-colors">
+            <Link href={linkUrl} className="block">
+                <div className="text-sm text-foreground/80 leading-relaxed">
+                    &quot;{highlightTerm(displayContent, searchTerm)}&quot;
+                </div>
+            </Link>
+            {isOversized && (
+                <Button
+                    variant="link"
+                    className="p-0 h-auto text-xs text-primary/70 hover:text-primary"
+                    onClick={(e) => { e.preventDefault(); setIsChunkExpanded(!isChunkExpanded); }}
+                >
+                    {isChunkExpanded ? "Show Less" : `Show More (${content.length.toLocaleString()} chars)`}
+                </Button>
+            )}
+            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                {timestampStr && (
+                    <span className="bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        {timestampStr}
+                    </span>
+                )}
+                {similarity != null && (
+                    <span>Match: {(similarity * 100).toFixed(0)}%</span>
+                )}
+                {hasTimestamp && (
+                    <SaveToCollectionButton
+                        videoId={videoId}
+                        videoTitle={videoTitle}
+                        videoThumbnailUrl={videoThumbnailUrl}
+                        startTime={startTime!}
+                        content={content}
+                        user={user}
+                    />
+                )}
+            </div>
+        </div>
+    );
 }
 
 export function SearchResultCardV4({ video, searchTerm, user }: SearchResultCardV4Props) {
@@ -262,34 +330,28 @@ export function SearchResultCardV4({ video, searchTerm, user }: SearchResultCard
                                 ? `/video/${video.video_id}?t=${Math.floor(t.start_time!)}`
                                 : `/video/${video.video_id}`;
 
+                            // Truncate oversized transcript chunks to prevent wall-of-text display
+                            const TRANSCRIPT_TRUNCATE_LENGTH = 400;
+                            const isOversized = t.content.length > TRANSCRIPT_TRUNCATE_LENGTH;
+
                             return (
-                                <div key={idx} className="group relative pl-4 border-l-2 border-primary/20 hover:border-primary transition-colors">
-                                    <Link href={linkUrl} className="block">
-                                        <div className="text-sm text-foreground/80 leading-relaxed">
-                                            &quot;{highlightTerm(t.content, searchTerm)}&quot;
-                                        </div>
-                                    </Link>
-                                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                                        {timestampStr && (
-                                            <span className="bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                                {timestampStr}
-                                            </span>
-                                        )}
-                                        {t.similarity != null && (
-                                            <span>Match: {(t.similarity * 100).toFixed(0)}%</span>
-                                        )}
-                                        {hasTimestamp && (
-                                            <SaveToCollectionButton
-                                                videoId={video.video_id}
-                                                videoTitle={video.title}
-                                                videoThumbnailUrl={video.thumbnailUrl}
-                                                startTime={t.start_time!}
-                                                content={t.content}
-                                                user={user}
-                                            />
-                                        )}
-                                    </div>
-                                </div>
+                                <TranscriptChunk
+                                    key={idx}
+                                    content={t.content}
+                                    linkUrl={linkUrl}
+                                    searchTerm={searchTerm}
+                                    highlightTerm={highlightTerm}
+                                    timestampStr={timestampStr}
+                                    similarity={t.similarity}
+                                    isOversized={isOversized}
+                                    truncateLength={TRANSCRIPT_TRUNCATE_LENGTH}
+                                    hasTimestamp={hasTimestamp}
+                                    videoId={video.video_id}
+                                    videoTitle={video.title}
+                                    videoThumbnailUrl={video.thumbnailUrl}
+                                    startTime={t.start_time}
+                                    user={user}
+                                />
                             );
                         })}
                     </div>

@@ -8,6 +8,7 @@
 | AI Context | Primary AI context file | [GEMINI.md](../GEMINI.md) |
 | Architecture | System architecture & design | [ARCHITECTURE.md](./ARCHITECTURE.md) |
 | Learnings | **Fixes for common AI mistakes** | [LEARNINGS.md](./LEARNINGS.md) |
+| Technical Debt | Known issues to fix later | [TECH_DEBT.md](./TECH_DEBT.md) |
 | Getting Started | Setup & onboarding | [GETTING_STARTED.md](./GETTING_STARTED.md) |
 | Environment Variables | All env vars & secrets | [ENVIRONMENT.md](./ENVIRONMENT.md) |
 
