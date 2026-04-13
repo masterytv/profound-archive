@@ -35,3 +35,8 @@
 
 ## 7. React Lifecycle
 - **Unstable useEffect Deps:** NEVER put a custom hook's return object in a `useEffect` dependency array (e.g., `useEffect(() => cleanup(), [audio])`). The hook returns a new object reference each render, causing cleanup to fire on EVERY re-render — killing audio, timers, etc. Use `useRef` + empty deps `[]` for unmount-only cleanup.
+
+## 8. Database & Search Performance
+- **PL/pgSQL for FTS RPCs:** SQL functions that branch on `WHERE tsq IS NULL OR search_vector @@ tsq` prevent the GIN index from being used (planner can't determine which branch at plan time → SEQ SCAN). Use PL/pgSQL with `IF/ELSE` to present clean single-branch queries. `keyword_search_videos` was rewritten this way (3,058ms → 105ms).
+- **Soft-Delete Channels:** To remove a defunct channel, set `channels.hidden = true`, delete rows from `nde_punctuated_embeddings`, `nde_analysis`, and `nde_chatbot_chunks`, clean `experiencer_profiles`, but KEEP `nde_vids` as archive. Frontend checks `hidden` flag for 404s. Do NOT filter in RPCs — it breaks query planner performance.
+- **Supabase Timeouts:** `anon` role has 3s timeout, `authenticated` 8s, `service_role` no limit. API routes using `SUPABASE_SERVICE_KEY` get unlimited timeout. Verify this env var is set in Firebase Studio deployment.
