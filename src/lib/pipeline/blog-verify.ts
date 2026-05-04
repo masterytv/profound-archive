@@ -6,7 +6,7 @@
  * blog article pipeline without changing voice or tone.
  *
  * 3 stages:
- * 1. Claim extraction + fact-checking (GPT-4o-mini + Perplexity)
+ * 1. Claim extraction + fact-checking (GPT-4o-mini + Tavily search)
  * 2. Link validation (health + relevance + fix/strip)
  * 3. Correction pass (Claude Sonnet 4.5 — surgical fact fixes only)
  */
@@ -129,8 +129,8 @@ async function extractAndVerifyClaims(
     stats: VerifyResult['stats'];
 }> {
     const openRouter = getOpenRouter();
-    const perplexityKey = process.env.PERPLEXITY_API_KEY;
-    if (!perplexityKey) throw new Error('Missing PERPLEXITY_API_KEY');
+    const tavilyKey = process.env.TAVILY_API_KEY;
+    if (!tavilyKey) throw new Error('Missing TAVILY_API_KEY');
 
     // ── Step 1a: Extract claims with GPT-4o-mini ──
     console.log('    [verify] Extracting factual claims...');
@@ -174,41 +174,58 @@ Return a JSON array. Be exhaustive — extract at least 20 claims.`,
 
     console.log(`    [verify] Extracted ${claims.length} claims`);
 
-    // ── Step 1b: Verify via Perplexity ──
-    console.log('    [verify] Verifying claims via Perplexity...');
+    // ── Step 1b: Verify via Tavily search + Claude ──
+    console.log('    [verify] Verifying claims via Tavily + Claude...');
 
     const claimsList = claims.map((c, i) =>
         `[${i + 1}] CLAIM: "${c.claim}"\n    VERIFY: ${c.context}\n    SEARCH: ${c.entities?.join(', ') ?? 'none'}`
     ).join('\n\n');
 
-    const verifyRes = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${perplexityKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            model: 'sonar-pro',
-            messages: [
-                { role: 'system', content: 'You are a meticulous fact-checker. Search academic databases and authoritative sources to verify each claim. Return valid JSON.' },
-                {
-                    role: 'user',
-                    content: `Fact-check ${claims.length} claims from an NDE article. For EACH claim:
+    // Search Tavily for evidence to verify claims (batch as one query)
+    const claimSearchQuery = claims.slice(0, 10).map(c => c.claim).join('; ');
+    let tavilyEvidence = '';
+    try {
+        const tavilyRes = await fetch('https://api.tavily.com/search', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${tavilyKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                query: `Verify NDE claims: ${claimSearchQuery.slice(0, 400)}`,
+                search_depth: 'advanced',
+                max_results: 10,
+                include_answer: true,
+                include_domains: ['pubmed.ncbi.nlm.nih.gov', 'pmc.ncbi.nlm.nih.gov', 'iands.org', 'nderf.org', 'frontiersin.org'],
+            }),
+        });
+        if (tavilyRes.ok) {
+            const tavilyData = await tavilyRes.json() as { answer?: string; results: Array<{ title: string; url: string; content: string }> };
+            tavilyEvidence = (tavilyData.answer ?? '') + '\n\nSOURCES:\n' +
+                tavilyData.results.map((r, i) => `[${i + 1}] ${r.title}\n    URL: ${r.url}\n    ${r.content.slice(0, 200)}`).join('\n\n');
+        }
+    } catch (err) {
+        console.warn(`    [verify] Tavily search failed (non-fatal): ${err}`);
+    }
+
+    // Use Claude to analyze the evidence against each claim
+    const verifyResponse = await openRouter.chat.completions.create({
+        model: 'openai/gpt-4o-mini',
+        messages: [
+            { role: 'system', content: 'You are a meticulous fact-checker. Use the provided search evidence to verify each claim. Return valid JSON.' },
+            {
+                role: 'user',
+                content: `Fact-check ${claims.length} claims from an NDE article using the search evidence below. For EACH claim:
 1. VERIFY accuracy (numbers, dates, attributions)
 2. CORRECT if wrong
 3. SOURCE: find primary URL (PubMed, journal, org homepage)
 4. TYPE: "academic", "book", or "site"
 
-CLAIMS:\n${claimsList}\n\nReturn JSON array: [{"claim_number": N, "status": "correct"|"incorrect"|"partially_correct"|"unverifiable", "correction": null or corrected info, "source_title": "...", "source_url": "...", "source_type": "...", "notes": "..."}]`,
-                },
-            ],
-            return_citations: true,
-            temperature: 0.1,
-            max_tokens: 12000,
-        }),
+SEARCH EVIDENCE:\n${tavilyEvidence}\n\nCLAIMS:\n${claimsList}\n\nReturn JSON array: [{"claim_number": N, "status": "correct"|"incorrect"|"partially_correct"|"unverifiable", "correction": null or corrected info, "source_title": "...", "source_url": "...", "source_type": "...", "notes": "..."}]`,
+            },
+        ],
+        temperature: 0.1,
+        max_tokens: 12000,
     });
 
-    if (!verifyRes.ok) throw new Error(`Verify ${verifyRes.status}: ${await verifyRes.text()}`);
-    const verifyData = await verifyRes.json();
-    const verifyText = verifyData.choices[0]?.message?.content ?? '';
-    const verifyCitations = verifyData.citations ?? [];
+    const verifyText = verifyResponse.choices[0]?.message?.content ?? '';
 
     // Parse verification results
     let verified: unknown;
@@ -405,7 +422,7 @@ async function validateLinks(
     refs: ArticleReference[],
 ): Promise<{ body_mdx: string; references: ArticleReference[]; linksChecked: number; linksOk: number; linksFixed: number; linksStripped: number }> {
     const openRouter = getOpenRouter();
-    const perplexityKey = process.env.PERPLEXITY_API_KEY;
+    const tavilyKey = process.env.TAVILY_API_KEY;
 
     // Extract all external URLs
     const bodyLinks = [...(article.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g))].map(m => ({
@@ -527,83 +544,87 @@ async function validateLinks(
     let fixedArticle = article;
     let fixedRefs = [...refs];
 
-    if (bad.length > 0 && perplexityKey) {
-        console.log(`    [links] ${bad.length} broken/irrelevant, searching for replacements...`);
-
-        const fixPrompt = `Fix these broken/irrelevant URLs from an NDE article:\n\n${bad.map((b, i) => `[${i + 1}] ${b.error?.startsWith('irrelevant') ? 'IRRELEVANT' : 'BROKEN'}: ${b.url}\n    TEXT: "${b.text}"\n    ERROR: ${b.error || 'HTTP ' + b.status}`).join('\n\n')}\n\nRules: Prefer HTTPS. For PubMed use https://pubmed.ncbi.nlm.nih.gov/PMID/. Do NOT link to Amazon (return null for books).\n\nReturn JSON: [{"broken_url": "...", "replacement_url": "... or null", "notes": "..."}]`;
+    if (bad.length > 0 && tavilyKey) {
+        console.log(`    [links] ${bad.length} broken/irrelevant, searching for replacements via Tavily...`);
 
         try {
-            const fixRes = await fetch('https://api.perplexity.ai/chat/completions', {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${perplexityKey}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'sonar-pro',
-                    messages: [
-                        { role: 'system', content: 'Find working replacement URLs. Return valid JSON.' },
-                        { role: 'user', content: fixPrompt },
-                    ],
-                    temperature: 0.1,
-                    max_tokens: 4000,
-                }),
-            });
+            // Search Tavily for each broken link's anchor text to find replacement URLs
+            const fixes: Array<{ broken_url: string; replacement_url: string | null }> = [];
+            for (const badLink of bad) {
+                try {
+                    const searchRes = await fetch('https://api.tavily.com/search', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${tavilyKey}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: badLink.text,
+                            search_depth: 'basic',
+                            max_results: 3,
+                            include_domains: badLink.url.includes('pubmed') ? ['pubmed.ncbi.nlm.nih.gov', 'pmc.ncbi.nlm.nih.gov'] : undefined,
+                        }),
+                    });
+                    if (searchRes.ok) {
+                        const searchData = await searchRes.json() as { results: Array<{ url: string }> };
+                        const topResult = searchData.results?.[0];
+                        fixes.push({
+                            broken_url: badLink.url,
+                            replacement_url: topResult?.url ?? null,
+                        });
+                    } else {
+                        fixes.push({ broken_url: badLink.url, replacement_url: null });
+                    }
+                } catch {
+                    fixes.push({ broken_url: badLink.url, replacement_url: null });
+                }
+            }
 
-            if (fixRes.ok) {
-                const fixData = await fixRes.json();
-                const fixText = fixData.choices[0]?.message?.content ?? '';
-                const fixMatch = fixText.match(/\[[\s\S]*\]/);
-                if (fixMatch) {
-                    const fixes = JSON.parse(fixMatch[0]) as Array<{ broken_url: string; replacement_url: string | null }>;
+            for (const fix of fixes) {
+                // Find the original bad link to get its claim text
+                const badLink = bad.find(b => b.url === fix.broken_url);
 
-                    for (const fix of fixes) {
-                        // Find the original bad link to get its claim text
-                        const badLink = bad.find(b => b.url === fix.broken_url);
+                if (fix.replacement_url) {
+                    // Reject if replacement is the same as the broken URL
+                    if (fix.replacement_url === fix.broken_url) {
+                        console.log(`    [links] ↻ Replacement same as broken, stripping: ${fix.broken_url}`);
+                        fixedArticle = stripLink(fixedArticle, fix.broken_url);
+                        fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
+                        linksStripped++;
+                        continue;
+                    }
 
-                        if (fix.replacement_url) {
-                            // Reject if replacement is the same as the broken URL
-                            if (fix.replacement_url === fix.broken_url) {
-                                console.log(`    [links] ↻ Replacement same as broken, stripping: ${fix.broken_url}`);
+                    // Verify replacement: HTTP health check
+                    const verifyResult = await checkLink({ url: fix.replacement_url, text: '', source: 'body' });
+                    if (!verifyResult.ok) {
+                        fixedArticle = stripLink(fixedArticle, fix.broken_url);
+                        fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
+                        linksStripped++;
+                        continue;
+                    }
+
+                    // For PubMed replacements: also verify content relevance via title keyword overlap
+                    const isPubMedReplacement = fix.replacement_url.includes('pubmed.ncbi.nlm.nih.gov') || fix.replacement_url.includes('pmc.ncbi.nlm.nih.gov');
+                    if (isPubMedReplacement && badLink?.text) {
+                        const metaResult = await getPageMetadata({ url: fix.replacement_url, text: badLink.text, source: 'body' });
+                        if (metaResult.pageTitle) {
+                            const { overlaps } = hasTitleKeywordOverlap(badLink.text, metaResult.pageTitle);
+                            if (!overlaps) {
+                                console.log(`    [links] ✗ Replacement also mismatched: "${badLink.text}" → "${metaResult.pageTitle}"`);
                                 fixedArticle = stripLink(fixedArticle, fix.broken_url);
                                 fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
                                 linksStripped++;
                                 continue;
                             }
-
-                            // Verify replacement: HTTP health check
-                            const verifyResult = await checkLink({ url: fix.replacement_url, text: '', source: 'body' });
-                            if (!verifyResult.ok) {
-                                fixedArticle = stripLink(fixedArticle, fix.broken_url);
-                                fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
-                                linksStripped++;
-                                continue;
-                            }
-
-                            // For PubMed replacements: also verify content relevance via title keyword overlap
-                            const isPubMedReplacement = fix.replacement_url.includes('pubmed.ncbi.nlm.nih.gov') || fix.replacement_url.includes('pmc.ncbi.nlm.nih.gov');
-                            if (isPubMedReplacement && badLink?.text) {
-                                const metaResult = await getPageMetadata({ url: fix.replacement_url, text: badLink.text, source: 'body' });
-                                if (metaResult.pageTitle) {
-                                    const { overlaps } = hasTitleKeywordOverlap(badLink.text, metaResult.pageTitle);
-                                    if (!overlaps) {
-                                        console.log(`    [links] ✗ Replacement also mismatched: "${badLink.text}" → "${metaResult.pageTitle}"`);
-                                        fixedArticle = stripLink(fixedArticle, fix.broken_url);
-                                        fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
-                                        linksStripped++;
-                                        continue;
-                                    }
-                                }
-                            }
-
-                            // Replacement passed all checks — apply it
-                            fixedArticle = fixedArticle.replaceAll(fix.broken_url, fix.replacement_url);
-                            fixedRefs = fixedRefs.map(r => r.url === fix.broken_url ? { ...r, url: fix.replacement_url } : r);
-                            linksFixed++;
-                        } else {
-                            // No replacement — strip
-                            fixedArticle = stripLink(fixedArticle, fix.broken_url);
-                            fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
-                            linksStripped++;
                         }
                     }
+
+                    // Replacement passed all checks — apply it
+                    fixedArticle = fixedArticle.replaceAll(fix.broken_url, fix.replacement_url);
+                    fixedRefs = fixedRefs.map(r => r.url === fix.broken_url ? { ...r, url: fix.replacement_url } : r);
+                    linksFixed++;
+                } else {
+                    // No replacement — strip
+                    fixedArticle = stripLink(fixedArticle, fix.broken_url);
+                    fixedRefs = fixedRefs.filter(r => r.url !== fix.broken_url);
+                    linksStripped++;
                 }
             }
         } catch (err) {

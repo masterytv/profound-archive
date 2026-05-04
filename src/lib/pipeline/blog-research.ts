@@ -1,14 +1,15 @@
 /**
- * Blog Pipeline — Perplexity Research Module
+ * Blog Pipeline — Tavily Research Module
  *
- * Calls Perplexity Sonar Pro to fetch authoritative sources on a question.
+ * Calls Tavily Search API to fetch authoritative sources on a question.
  * Includes citation usage tracking to prevent the same studies from
  * appearing in every article.
  *
- * Changes (2026-03-19):
- * - Temperature 0.2 → 0.4 for more variety
- * - Domain list expanded from 10 → 15, randomly rotating 8 per call
- * - Added getOverusedCitationUrls() for filtering before draft step
+ * Migration history:
+ * - 2026-05-04: Replaced Perplexity Sonar Pro with Tavily (free tier, 1K credits/mo).
+ *   Perplexity quota exhausted; Tavily provides richer structured results
+ *   (title + url + content per result) vs Perplexity's flat citation arrays.
+ * - 2026-03-19: Temperature 0.2 → 0.4, domain list expanded, random rotation added.
  */
 
 import { buildResearchPrompt } from './blog-prompts';
@@ -26,12 +27,12 @@ export interface ResearchResult {
     summary: string;
     keyFindings: string[];
     citations: ResearchCitation[];
-    rawText: string; // full Perplexity response for the draft prompt
+    rawText: string; // full research response for the draft prompt
 }
 
 // ─── Domain Filter (expanded + rotated) ───────────────────────────────────────
-// 15 high-authority domains. Each call picks 8 randomly to stay within
-// Perplexity's limit while ensuring different domains surface different articles.
+// 15 high-authority domains. Each call picks 8 randomly to ensure
+// different domains surface different articles across calls.
 
 const ALL_RESEARCH_DOMAINS = [
     // Academic / journal
@@ -59,7 +60,7 @@ const DOMAINS_PER_CALL = 8;
 
 /**
  * Fisher-Yates shuffle + slice to pick N random domains per call.
- * Ensures different Perplexity calls search different domain subsets.
+ * Ensures different Tavily calls search different domain subsets.
  */
 function pickRandomDomains(count: number): string[] {
     const shuffled = [...ALL_RESEARCH_DOMAINS];
@@ -72,10 +73,64 @@ function pickRandomDomains(count: number): string[] {
 
 // ─── Client ───────────────────────────────────────────────────────────────────
 
-function getPerplexityClient() {
-    const apiKey = process.env.PERPLEXITY_API_KEY;
-    if (!apiKey) throw new Error('Missing PERPLEXITY_API_KEY environment variable');
+function getTavilyApiKey() {
+    const apiKey = process.env.TAVILY_API_KEY;
+    if (!apiKey) throw new Error('Missing TAVILY_API_KEY environment variable');
     return apiKey;
+}
+
+// ─── Tavily Search Helper ─────────────────────────────────────────────────────
+
+interface TavilySearchResult {
+    title: string;
+    url: string;
+    content: string;
+    score: number;
+    raw_content?: string | null;
+}
+
+interface TavilySearchResponse {
+    query: string;
+    answer?: string;
+    results: TavilySearchResult[];
+    response_time: string;
+}
+
+/**
+ * Call Tavily Search API. Returns structured results with AI answer.
+ * Basic search = 1 credit, Advanced = 2 credits.
+ */
+async function tavilySearch(params: {
+    query: string;
+    searchDepth?: 'basic' | 'advanced';
+    maxResults?: number;
+    includeDomains?: string[];
+    includeAnswer?: boolean | 'basic' | 'advanced';
+}): Promise<TavilySearchResponse> {
+    const apiKey = getTavilyApiKey();
+
+    const response = await fetch('https://api.tavily.com/search', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            query: params.query,
+            search_depth: params.searchDepth ?? 'basic',
+            max_results: params.maxResults ?? 10,
+            include_domains: params.includeDomains,
+            include_answer: params.includeAnswer ?? true,
+            topic: 'general',
+        }),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Tavily API error ${response.status}: ${errorText}`);
+    }
+
+    return response.json() as Promise<TavilySearchResponse>;
 }
 
 // ─── Citation Usage Tracking ──────────────────────────────────────────────────
@@ -165,81 +220,52 @@ export async function getOverusedUrls(maxUses = 3): Promise<Set<string>> {
 // ─── Main Function ────────────────────────────────────────────────────────────
 
 /**
- * Research a question using Perplexity Sonar Pro.
+ * Research a question using Tavily Search.
  * Returns a structured brief with key findings and citations.
  */
 export async function researchQuestion(question: string, consumerQuestion?: string): Promise<ResearchResult> {
-    const apiKey = getPerplexityClient();
     const domains = pickRandomDomains(DOMAINS_PER_CALL);
 
-    console.log(`[research] Perplexity search using ${domains.length} domains: ${domains.join(', ')}`);
+    console.log(`[research] Tavily search using ${domains.length} domains: ${domains.join(', ')}`);
 
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            model: 'sonar-pro',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are a compassionate research assistant for a blog about near-death experiences. You gather information from scientific research, popular websites and blogs, books about NDEs, and other high-authority sources. Be precise about sources and citations.',
-                },
-                {
-                    role: 'user',
-                    content: buildResearchPrompt(question, consumerQuestion),
-                },
-            ],
-            search_domain_filter: domains,
-            return_citations: true,
-            search_recency_filter: 'month', // prefer recent but not limited to
-            temperature: 0.4, // increased from 0.2 for more variety
-            max_tokens: 2048,
-        }),
+    // Build the research prompt — same prompt used previously, now sent as the search query
+    const researchPrompt = buildResearchPrompt(question, consumerQuestion);
+
+    const data = await tavilySearch({
+        query: researchPrompt,
+        searchDepth: 'basic', // 1 credit per call
+        maxResults: 10,
+        includeDomains: domains,
+        includeAnswer: true,
     });
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Perplexity API error ${response.status}: ${errorText}`);
-    }
+    // The AI-generated answer serves as the research summary for Claude
+    const rawText = data.answer ?? data.results.map(r => `${r.title}\n${r.content}`).join('\n\n');
 
-    const data = await response.json() as {
-        choices: Array<{ message: { content: string } }>;
-        citations?: Array<string | { url: string; title?: string; snippet?: string }>;
-    };
+    // Map Tavily results to our citation format
+    const citations: ResearchCitation[] = data.results
+        .filter(r => r.url && r.url.length > 0)
+        .map(r => ({
+            url: r.url,
+            title: r.title || r.url,
+            snippet: r.content || '',
+        }));
 
-    const rawText = data.choices[0]?.message?.content ?? '';
-
-    // Parse citations from Perplexity's structured response
-    // Perplexity sometimes returns citations as plain URL strings, sometimes as objects
-    let citations: ResearchCitation[] = (data.citations ?? []).map((c) => {
-        if (typeof c === 'string') {
-            return { url: c, title: c, snippet: '' };
-        }
-        return {
-            url: c.url ?? '',
-            title: c.title ?? c.url ?? '',
-            snippet: c.snippet ?? '',
-        };
-    }).filter(c => c.url.length > 0);
-
-    // Fallback: if no structured citations, extract URLs from the raw text
     if (citations.length === 0) {
+        // Fallback: extract URLs from the answer text
         const urlRegex = /https?:\/\/[^\s\])"']+/g;
         const foundUrls = [...new Set(rawText.match(urlRegex) ?? [])];
-        citations = foundUrls.map((url) => ({
+        citations.push(...foundUrls.map((url) => ({
             url,
             title: url,
             snippet: '',
-        }));
+        })));
         if (citations.length > 0) {
-            console.log(`[research] Extracted ${citations.length} URLs from raw text (no structured citations)`);
+            console.log(`[research] Extracted ${citations.length} URLs from answer text (no structured results)`);
         }
     }
 
-    // Extract key findings as bullet lines from the raw text
+    // Extract key findings as bullet lines from the answer text
     const keyFindings = rawText
         .split('\n')
         .filter((line) => line.trim().startsWith('-') || line.trim().startsWith('•'))
@@ -261,63 +287,31 @@ import { buildGuideResearchPrompt } from './blog-prompts';
 
 /**
  * Research a topic comprehensively for a pillar guide page.
- * Uses a broader prompt and higher max_tokens than single-question research.
+ * Uses advanced search depth for better relevance on broad topics.
  */
 export async function researchGuideTopic(title: string, targetQuery: string): Promise<ResearchResult> {
-    const apiKey = getPerplexityClient();
     const domains = pickRandomDomains(DOMAINS_PER_CALL);
 
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            model: 'sonar-pro',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are a comprehensive research assistant for a pillar guide about near-death experiences. This guide must be the most authoritative page on the internet for this topic. Gather data from scientific research, books, popular sources, and cultural perspectives. Be precise about sources and citations.',
-                },
-                {
-                    role: 'user',
-                    content: buildGuideResearchPrompt(title, targetQuery),
-                },
-            ],
-            search_domain_filter: domains,
-            return_citations: true,
-            search_recency_filter: 'month',
-            temperature: 0.4, // increased from 0.2
-            max_tokens: 3000,
-        }),
+    const data = await tavilySearch({
+        query: buildGuideResearchPrompt(title, targetQuery),
+        searchDepth: 'advanced', // 2 credits — higher quality for comprehensive guides
+        maxResults: 15,
+        includeDomains: domains,
+        includeAnswer: 'advanced',
     });
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Perplexity API error ${response.status}: ${errorText}`);
-    }
+    const rawText = data.answer ?? data.results.map(r => `${r.title}\n${r.content}`).join('\n\n');
 
-    const data = await response.json() as {
-        choices: Array<{ message: { content: string } }>;
-        citations?: Array<string | { url: string; title?: string; snippet?: string }>;
-    };
+    // Same flexible parsing as researchQuestion
+    let citations: ResearchCitation[] = data.results
+        .filter(r => r.url && r.url.length > 0)
+        .map(r => ({
+            url: r.url,
+            title: r.title || r.url,
+            snippet: r.content || '',
+        }));
 
-    const rawText = data.choices[0]?.message?.content ?? '';
-
-    // Same flexible parsing as researchQuestion — handles both string and object arrays
-    let citations: ResearchCitation[] = (data.citations ?? []).map((c) => {
-        if (typeof c === 'string') {
-            return { url: c, title: c, snippet: '' };
-        }
-        return {
-            url: c.url ?? '',
-            title: c.title ?? c.url ?? '',
-            snippet: c.snippet ?? '',
-        };
-    }).filter(c => c.url.length > 0);
-
-    // Fallback: extract URLs from raw text if no structured citations
+    // Fallback: extract URLs from answer text if no structured results
     if (citations.length === 0) {
         const urlRegex = /https?:\/\/[^\s\])"']+/g;
         const foundUrls = [...new Set(rawText.match(urlRegex) ?? [])];
@@ -327,7 +321,7 @@ export async function researchGuideTopic(title: string, targetQuery: string): Pr
             snippet: '',
         }));
         if (citations.length > 0) {
-            console.log(`[research-guide] Extracted ${citations.length} URLs from raw text (no structured citations)`);
+            console.log(`[research-guide] Extracted ${citations.length} URLs from answer text (no structured results)`);
         }
     }
 

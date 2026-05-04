@@ -8,7 +8,7 @@
  *   count — number of articles (default 1, max 3)
  *
  * ARCHITECTURE NOTE:
- * The pipeline takes 2-5 minutes (Perplexity research + Claude draft + fal.ai images + verification).
+ * The pipeline takes 2-5 minutes (Tavily research + Claude draft + fal.ai images + verification).
  * Runs synchronously — Firebase App Hosting (Cloud Run) throttles CPU after
  * the response is sent, so after() callbacks are silently killed.
  * The GitHub Actions curl has --max-time 540 which provides headroom.

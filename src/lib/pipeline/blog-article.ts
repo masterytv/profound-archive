@@ -9,7 +9,7 @@
  *
  * 5 steps (mirrors intake.ts pattern):
  * 1. Context assembly   — Supabase question + top NDE chunks
- * 2. Perplexity research — sonar-pro with domain filter
+ * 2. Tavily research    — web search with domain filter
  * 3. Claude draft       — full MDX article via OpenRouter
  * 4. Voice pass         — strip AI tics, enforce Gladwellian rhythm
  * 5. Publish            — insert blog_posts row (status = 'draft')
@@ -649,7 +649,7 @@ export async function generateBlogArticle(
 ): Promise<BlogArticleResult> {
     const steps: ArticleStep[] = [
         makeStep('Context assembly'),
-        makeStep('Research (Perplexity + NoeticMap)'),
+        makeStep('Research (Tavily + NoeticMap)'),
         makeStep('Claude draft'),
         makeStep('Hero image'),
         makeStep('Voice calibration pass'),
@@ -697,7 +697,7 @@ export async function generateBlogArticle(
         return { ...result, status: 'failed', error: String(err) };
     }
 
-    // ── Step 2: Research (Perplexity + NoeticMap + citation filtering) ─────────
+    // ── Step 2: Research (Tavily + NoeticMap + citation filtering) ───────────
     const s2 = steps[1];
     startStep(s2, onStep);
     const t2 = Date.now();
@@ -705,14 +705,14 @@ export async function generateBlogArticle(
     let noeticMapSummary = '';
     let overusedWarning = '';
     try {
-        // Run Perplexity + NoeticMap + citation counting in parallel
-        const [perplexityResult, citationCounts, noeticResult] = await Promise.all([
+        // Run Tavily + NoeticMap + citation counting in parallel
+        const [researchResult, citationCounts, noeticResult] = await Promise.all([
             researchQuestion(context.question, context.consumerQuestion),
             getCitationUsageCounts(),
             searchNoeticMap(context.question, 10).catch(() => ({ citations: [], rawSummary: '' })),
         ]);
 
-        research = perplexityResult;
+        research = researchResult;
         noeticMapSummary = noeticResult.rawSummary;
 
         // Filter overused citations (≥3 uses across all articles)
@@ -739,7 +739,7 @@ export async function generateBlogArticle(
 
         const nm = noeticResult.citations.length;
         finishStep(s2, 'success',
-            `${originalCount} Perplexity + ${nm} NoeticMap citations · ${research.citations.length} after filtering · ${research.keyFindings.length} key findings`,
+            `${originalCount} Tavily + ${nm} NoeticMap citations · ${research.citations.length} after filtering · ${research.keyFindings.length} key findings`,
             t2, onStep);
     } catch (err) {
         finishStep(s2, 'failed', String(err), t2, onStep);
@@ -1046,7 +1046,7 @@ export async function generateGuideArticle(
 ): Promise<BlogArticleResult> {
     const steps: ArticleStep[] = [
         makeStep('Context assembly'),
-        makeStep('Research (Perplexity + NoeticMap)'),
+        makeStep('Research (Tavily + NoeticMap)'),
         makeStep('Claude guide draft'),
         makeStep('Hero image'),
         makeStep('Voice calibration pass'),
@@ -1094,19 +1094,19 @@ export async function generateGuideArticle(
         return { ...result, status: 'failed', error: String(err) };
     }
 
-    // ── Step 2: Research (Perplexity + NoeticMap + citation filtering) ──────────
+    // ── Step 2: Research (Tavily + NoeticMap + citation filtering) ──────────
     const s2 = steps[1];
     startStep(s2, onStep);
     const t2 = Date.now();
     result.status = 'researching';
     try {
-        const [perplexityResult, citationCounts, noeticResult] = await Promise.all([
+        const [researchResult, citationCounts, noeticResult] = await Promise.all([
             researchGuideTopic(pillarTitle, targetQuery),
             getCitationUsageCounts(),
             searchNoeticMap(targetQuery, 10).catch(() => ({ citations: [], rawSummary: '' })),
         ]);
 
-        research = perplexityResult;
+        research = researchResult;
 
         // Merge NoeticMap summary into the rawText for the draft prompt
         if (noeticResult.rawSummary) {
@@ -1125,7 +1125,7 @@ export async function generateGuideArticle(
 
         const nm = noeticResult.citations.length;
         finishStep(s2, 'success',
-            `${originalCount} Perplexity + ${nm} NoeticMap citations · ${research.citations.length} after filtering · ${research.keyFindings.length} key findings`,
+            `${originalCount} Tavily + ${nm} NoeticMap citations · ${research.citations.length} after filtering · ${research.keyFindings.length} key findings`,
             t2, onStep);
     } catch (err) {
         finishStep(s2, 'failed', String(err), t2, onStep);

@@ -43,6 +43,14 @@
 | `NEXT_PUBLIC_N8N_WEBHOOK_URL` | n8n general webhook (legacy) |
 | `NEXT_PUBLIC_CHAT_TEST_WEBHOOK_URL` | n8n test webhook (legacy) |
 
+### Blog Pipeline
+| Variable | Description | Scope |
+|---|---|---|
+| `OPENROUTER_API_KEY` | OpenRouter key (Claude Sonnet 4.5 for article drafting + voice pass) | Server-only |
+| `TAVILY_API_KEY` | Tavily Search API key (research + fact-checking, free tier 1K credits/mo) | Server-only |
+| `FAL_API_KEY` | fal.ai key for hero image generation (Flux Dev) | Server-only |
+| ~~`PERPLEXITY_API_KEY`~~ | **Deprecated May 2026** — quota exhausted, replaced by Tavily | — |
+
 ### Debug / Misc
 | Variable | Description |
 |---|---|

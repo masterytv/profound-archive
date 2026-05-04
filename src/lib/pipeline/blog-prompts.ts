@@ -152,7 +152,7 @@ ${GLADWELL_VOICE_RULES}
 ${QEO_STRUCTURE_RULES}
 
 CONTENT RULES:
-- You have access to: (a) research citations from Perplexity, (b) real quotes from NDE experiencers on Project Profound, (c) the question metadata.
+- You have access to: (a) research citations from web search, (b) real quotes from NDE experiencers on Project Profound, (c) the question metadata.
 - USE EXPERIENCER QUOTES VERBATIM as provided. Do not clean, paraphrase, or shorten them. Keep their original wording including any grammatical imperfections or tangents.
 - Category tag for this article: big-question
 - Author: use the provided author name.
@@ -212,7 +212,7 @@ CONSUMER PHRASING (how searchers phrase it): ${params.consumerQuestion}
 TOPIC CONTEXT (internal — do NOT quote directly): ${params.hydePassage}
 AUTHOR: ${params.authorName}
 
-RESEARCH FROM PERPLEXITY:
+RESEARCH FROM WEB SEARCH:
 ${params.research}
 
 REAL NDE EXPERIENCER QUOTES — use 2-3 of these VERBATIM (do not paraphrase, clean up, or shorten them — include their exact words with any imperfections):
@@ -220,7 +220,7 @@ ${chunks}
 ${videoSection}
 
 LINKING RULES (critical):
-- The SOURCES list above contains verified, working URLs from Perplexity. Use THESE URLs for inline links.
+- The SOURCES list above contains verified, working URLs from web search. Use THESE URLs for inline links.
 - When citing a study, researcher, or organization mentioned in the sources, link to the SOURCE URL provided — e.g., [Lancet study on cardiac arrest survivors](https://pubmed.ncbi.nlm.nih.gov/XXXXX/).
 - ⛔ Do NOT fabricate or guess URLs. If a fact isn't in the SOURCES list, mention it without a link.
 - ⛔ Do NOT link book titles to Amazon. Mention books by title and author in prose only.
@@ -380,7 +380,7 @@ GUIDE-SPECIFIC STRUCTURE RULES:
   Use the provided slugs. Don't fabricate URLs.
 
 CONTENT RULES:
-- You have access to: (a) research citations from Perplexity, (b) real quotes from NDE experiencers on Project Profound, (c) the question metadata, (d) related question slugs for internal linking.
+- You have access to: (a) research citations from web search, (b) real quotes from NDE experiencers on Project Profound, (c) the question metadata, (d) related question slugs for internal linking.
 - USE EXPERIENCER QUOTES VERBATIM as provided. Do not clean, paraphrase, or shorten them.
 - Category tag for this article: guide
 - Author: use the provided author name.
@@ -449,7 +449,7 @@ GUIDE TITLE (use as H1): ${params.pillarTitle}
 PRIMARY SEARCH QUERY: ${params.targetQuery}
 AUTHOR: ${params.authorName}
 
-RESEARCH FROM PERPLEXITY:
+RESEARCH FROM WEB SEARCH:
 ${params.research}
 
 REAL NDE EXPERIENCER QUOTES — use 3-4 of these VERBATIM:
@@ -459,7 +459,7 @@ ${relatedQuestionsSection}
 ${existingGuidesSection}
 
 LINKING RULES (critical):
-- The SOURCES list above contains verified, working URLs from Perplexity. Use THESE URLs for inline links.
+- The SOURCES list above contains verified, working URLs from web search. Use THESE URLs for inline links.
 - When citing a study, researcher, or organization mentioned in the sources, link to the SOURCE URL provided.
 - ⛔ Do NOT fabricate or guess URLs. If a fact isn't in the SOURCES list, mention it without a link.
 - ⛔ Do NOT link book titles to Amazon. Mention books by title and author in prose only.

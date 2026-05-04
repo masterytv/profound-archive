@@ -2,7 +2,7 @@
  * Blog Pipeline — NoeticMap Research Module
  *
  * Queries NoeticMap's semantic search API (869+ NDE papers indexed)
- * to find topic-relevant academic papers that Perplexity misses.
+ * to find topic-relevant academic papers that Tavily's web search misses.
  *
  * Two endpoints used:
  *   1. /api/research/hub-search?q=...&limit=N  — semantic vector search
@@ -49,7 +49,7 @@ function doiToUrl(doi: string | null): string | null {
 
 /**
  * Query NoeticMap's semantic search for NDE papers relevant to a topic.
- * Returns formatted citations compatible with the Perplexity research format.
+ * Returns formatted citations compatible with the Tavily research format.
  *
  * @param query - The search query (article question or topic)
  * @param limit - Max papers to return (default 10)
@@ -113,7 +113,7 @@ export async function searchNoeticMap(
         console.log(`[noeticmap] Found ${relevantPapers.length} relevant papers for "${query.slice(0, 50)}..."`);
         return { citations, rawSummary };
     } catch (err) {
-        // Non-fatal — if NoeticMap is down, we still have Perplexity
+        // Non-fatal — if NoeticMap is down, we still have Tavily
         console.warn(`[noeticmap] Search failed (non-fatal): ${err}`);
         return { citations: [], rawSummary: '' };
     }

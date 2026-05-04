@@ -27,8 +27,9 @@
 
 ## 5. AI & Infrastructure
 - **Claude JSON Forcing:** To get reliable JSON from Claude, you MUST use Assistant Prefill: `{ role: 'assistant', content: '{' }`. System prompts are not enough.
-- **Secrets:** `apphosting.yaml` secrets MUST be pinned to a specific version (e.g., `/versions/1`). Firebase App Hosting will fail builds if set to `/versions/latest`.
+- **Secrets:** `apphosting.yaml` secrets MUST be pinned to a specific version (e.g., `/versions/1`). Firebase App Hosting will fail builds if set to `/versions/latest`. The Firebase App Hosting service account (`firebase-app-hosting-compute@...`) has **project-level** Secret Manager Secret Accessor — new secrets are automatically accessible. Do NOT recommend per-secret IAM bindings; they are inherited.
 - **Formatting:** No Em Dashes (—) in AI outputs. Use parentheses or commas.
+- **Blog Research Provider:** Research pipeline uses **Tavily Search API** (`TAVILY_API_KEY`, free tier 1K credits/mo). Replaced Perplexity (quota exhausted) May 2026. Calls are in `blog-research.ts` (research) and `blog-verify.ts` (fact-check + link repair).
 
 ## 6. Zod & Validation
 - **Zod Strips Unknown Properties:** When adding new fields to TypeScript config interfaces (e.g., `secondary_audio_cue`, `loop`), you MUST also add them to the corresponding Zod schema. Zod's `.parse()` / `.safeParse()` silently drops any properties not defined in the schema. This will cause runtime data loss with zero compile errors.
