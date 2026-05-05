@@ -654,26 +654,51 @@ function stripLink(article: string, url: string): string {
 // ─── Deterministic Markdown Link Sanitizer ────────────────────────────────────
 
 /**
+ * Deterministic slug: lowercase, strip non-alpha, collapse spaces to hyphens.
+ * Duplicated from question-utils.ts to avoid circular imports in the pipeline.
+ */
+function questionToSlug(question: string): string {
+    return question
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .slice(0, 100);
+}
+
+/**
  * Fix malformed markdown links that Claude/voice-pass generates.
  * Runs BEFORE AI-driven verification so link extraction regex works correctly.
  *
  * Known patterns:
- * 1. Unclosed parens: [text](/questions    or [text](https://doi.org
- * 2. Truncated internal links: [text](/questions  (missing slug + closing paren)
- * 3. Bare DOI domain: [text](https://doi.org) (no actual DOI path)
- * 4. Trailing comma/period inside URL: [text](https://example.com,)
- * 5. Missing closing paren at end of line/before whitespace
+ * 1. Broken /questions/ links: missing slug, truncated, or unclosed parens
+ *    → Reconstruct the slug from the link text using the same toSlug() logic
+ * 2. Bare DOI domain: [text](https://doi.org) (no actual DOI path)
+ * 3. Trailing comma/period inside URL: [text](https://example.com,)
+ * 4. Missing closing paren at end of line/before whitespace
  */
 function sanitizeMalformedLinks(body: string): { sanitized: string; fixCount: number } {
     let fixCount = 0;
     let result = body;
 
-    // Pattern 1: [text](/questions without a closing paren — strip to plain text
-    // Matches [link text](/questions followed by end-of-line, whitespace, or next sentence
-    result = result.replace(/\[([^\]]+)\]\(\/questions(?:\/[^)\s]*)?(?:\s|$|(?=[A-Z]))/gm, (match, text) => {
+    // Pattern 1: Broken /questions/ links — reconstruct slug from the link text
+    // Catches: [text](/questions), [text](/questions/, [text](/questions/partial-slug (no closing paren)
+    // Uses the link text (which is the question) to generate the correct slug
+    result = result.replace(/\[([^\]]+)\]\(\/questions(?:\/[^)\s]*)?\)?(?=[\s,.\n]|$)/gm, (match, text) => {
+        // Check if the link is already well-formed: [text](/questions/valid-slug)
+        const wellFormed = /\[([^\]]+)\]\(\/questions\/[a-z0-9-]{5,}\)$/.test(match);
+        if (wellFormed) return match;
+
+        const slug = questionToSlug(text);
+        if (slug.length > 4) {
+            fixCount++;
+            console.log(`    [link-sanitizer] Reconstructed /questions/ link: "${text.slice(0, 50)}..." → /questions/${slug.slice(0, 50)}`);
+            return `[${text}](/questions/${slug})`;
+        }
+        // Link text too short to be a real question — strip the link
         fixCount++;
-        console.log(`    [link-sanitizer] Stripped broken internal link: "${text.slice(0, 60)}..."`);
-        return text + ' ';
+        console.log(`    [link-sanitizer] Stripped unrecoverable /questions/ link: "${text.slice(0, 60)}"`);
+        return text;
     });
 
     // Pattern 2: [text](https://doi.org) or [text](https://doi.org, — bare DOI with no path
