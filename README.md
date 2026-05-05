@@ -29,3 +29,5 @@ If you are an AI assistant, please read [GEMINI.md](./GEMINI.md) for context.
 
 ## Contributing
 Please refer to the [Vibecoding Guide](./docs/guides/VIBECODING_GUIDE.md) for development workflows.
+
+<!-- MCP Test Timestamp: 2026-05-05 -->
