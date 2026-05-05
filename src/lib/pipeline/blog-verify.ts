@@ -651,6 +651,75 @@ function stripLink(article: string, url: string): string {
     return article.replace(linkRegex, '$1');
 }
 
+// ─── Deterministic Markdown Link Sanitizer ────────────────────────────────────
+
+/**
+ * Fix malformed markdown links that Claude/voice-pass generates.
+ * Runs BEFORE AI-driven verification so link extraction regex works correctly.
+ *
+ * Known patterns:
+ * 1. Unclosed parens: [text](/questions    or [text](https://doi.org
+ * 2. Truncated internal links: [text](/questions  (missing slug + closing paren)
+ * 3. Bare DOI domain: [text](https://doi.org) (no actual DOI path)
+ * 4. Trailing comma/period inside URL: [text](https://example.com,)
+ * 5. Missing closing paren at end of line/before whitespace
+ */
+function sanitizeMalformedLinks(body: string): { sanitized: string; fixCount: number } {
+    let fixCount = 0;
+    let result = body;
+
+    // Pattern 1: [text](/questions without a closing paren — strip to plain text
+    // Matches [link text](/questions followed by end-of-line, whitespace, or next sentence
+    result = result.replace(/\[([^\]]+)\]\(\/questions(?:\/[^)\s]*)?(?:\s|$|(?=[A-Z]))/gm, (match, text) => {
+        fixCount++;
+        console.log(`    [link-sanitizer] Stripped broken internal link: "${text.slice(0, 60)}..."`);
+        return text + ' ';
+    });
+
+    // Pattern 2: [text](https://doi.org) or [text](https://doi.org, — bare DOI with no path
+    result = result.replace(/\[([^\]]+)\]\(https?:\/\/doi\.org[,)]?\)/g, (match, text) => {
+        fixCount++;
+        console.log(`    [link-sanitizer] Stripped bare DOI link: "${text.slice(0, 60)}..."`);
+        return text;
+    });
+    // Also catch bare doi.org without closing paren
+    result = result.replace(/\[([^\]]+)\]\(https?:\/\/doi\.org[^)]*(?:\s|$)/gm, (match, text) => {
+        fixCount++;
+        console.log(`    [link-sanitizer] Stripped malformed DOI link: "${text.slice(0, 60)}..."`);
+        return text + ' ';
+    });
+
+    // Pattern 3: Any markdown link missing closing paren at end of line
+    // [text](url-without-closing-paren<EOL>
+    result = result.replace(/\[([^\]]+)\]\(([^)\s]+)\s*$/gm, (match, text, url) => {
+        // If the URL looks like a real URL, try to close it
+        if (url.startsWith('http') || url.startsWith('/')) {
+            fixCount++;
+            console.log(`    [link-sanitizer] Closed unclosed link: "${text.slice(0, 40)}" -> ${url.slice(0, 60)}`);
+            return `[${text}](${url})`;
+        }
+        // Otherwise strip the broken link
+        fixCount++;
+        return text;
+    });
+
+    // Pattern 4: Trailing comma inside URL before closing paren: [text](url,)
+    result = result.replace(/\[([^\]]+)\]\(([^)]+?)[,.]\)/g, (match, text, url) => {
+        if (url.startsWith('http') || url.startsWith('/')) {
+            fixCount++;
+            console.log(`    [link-sanitizer] Removed trailing punctuation from URL: ${url.slice(0, 60)}`);
+            return `[${text}](${url})`;
+        }
+        return match;
+    });
+
+    if (fixCount > 0) {
+        console.log(`    [link-sanitizer] Fixed ${fixCount} malformed markdown link(s)`);
+    }
+
+    return { sanitized: result, fixCount };
+}
+
 // ─── Main Orchestrator ────────────────────────────────────────────────────────
 
 /**
@@ -664,8 +733,14 @@ export async function verifyArticle(
 ): Promise<VerifyResult> {
     console.log('  [blog-verify] Starting verification pipeline...');
 
+    // Stage 0: Deterministic link syntax fixes (before AI passes touch the text)
+    const { sanitized: cleanedBody, fixCount: linkSyntaxFixes } = sanitizeMalformedLinks(bodyMdx);
+    if (linkSyntaxFixes > 0) {
+        console.log(`  [blog-verify] Pre-cleaned ${linkSyntaxFixes} malformed link(s)`);
+    }
+
     // Stage 1: Fact-check + corrections
-    const { correctedBody, correctedRefs, stats } = await extractAndVerifyClaims(bodyMdx, references);
+    const { correctedBody, correctedRefs, stats } = await extractAndVerifyClaims(cleanedBody, references);
 
     // Stage 2: Link validation
     const linkResult = await validateLinks(correctedBody, correctedRefs);
@@ -674,10 +749,16 @@ export async function verifyArticle(
     stats.links_fixed = linkResult.linksFixed;
     stats.links_stripped = linkResult.linksStripped;
 
+    // Stage 3: Final pass — catch any malformed links introduced by correction/voice passes
+    const { sanitized: finalBody, fixCount: finalFixes } = sanitizeMalformedLinks(linkResult.body_mdx);
+    if (finalFixes > 0) {
+        console.log(`  [blog-verify] Post-cleaned ${finalFixes} additional malformed link(s)`);
+    }
+
     console.log(`  [blog-verify] Complete: ${stats.claims_correct}/${stats.claims_extracted} correct, ${stats.links_ok}/${stats.links_checked} links OK`);
 
     return {
-        body_mdx: linkResult.body_mdx,
+        body_mdx: finalBody,
         references: linkResult.references,
         stats,
     };
