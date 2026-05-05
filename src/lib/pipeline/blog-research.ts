@@ -228,11 +228,12 @@ export async function researchQuestion(question: string, consumerQuestion?: stri
 
     console.log(`[research] Tavily search using ${domains.length} domains: ${domains.join(', ')}`);
 
-    // Build the research prompt — same prompt used previously, now sent as the search query
-    const researchPrompt = buildResearchPrompt(question, consumerQuestion);
+    // Tavily query limit is 400 chars. Use the consumer-facing question (short, natural language)
+    // rather than the full research prompt which was designed for Perplexity's chat interface.
+    const searchQuery = (consumerQuestion || question).slice(0, 400);
 
     const data = await tavilySearch({
-        query: researchPrompt,
+        query: searchQuery,
         searchDepth: 'basic', // 1 credit per call
         maxResults: 10,
         includeDomains: domains,
@@ -292,8 +293,11 @@ import { buildGuideResearchPrompt } from './blog-prompts';
 export async function researchGuideTopic(title: string, targetQuery: string): Promise<ResearchResult> {
     const domains = pickRandomDomains(DOMAINS_PER_CALL);
 
+    // Tavily query limit is 400 chars. Use the target search query directly.
+    const searchQuery = `${title}: ${targetQuery}`.slice(0, 400);
+
     const data = await tavilySearch({
-        query: buildGuideResearchPrompt(title, targetQuery),
+        query: searchQuery,
         searchDepth: 'advanced', // 2 credits — higher quality for comprehensive guides
         maxResults: 15,
         includeDomains: domains,
