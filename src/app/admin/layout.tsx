@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List, ListVideo, Mail, BarChart3, TrendingUp, FileText, UserCheck } from "lucide-react";
+import { Settings, LogOut, Users, Shield, MessageSquare, LayoutDashboard, Upload, Radar, List, ListVideo, Mail, BarChart3, TrendingUp, FileText, UserCheck, Radio, Scan, Tv, UserCircle } from "lucide-react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -181,6 +181,39 @@ export default async function AdminLayout({
                         >
                             <TrendingUp className="w-4 h-4 text-emerald-500" />
                             Analytics
+                        </Link>
+
+                        {/* ── UAP ── */}
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500 px-3 pt-5 pb-1.5">
+                            UAP
+                        </p>
+                        <Link
+                            href="/admin/uap"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <Radio className="w-4 h-4 text-violet-500" />
+                            Dashboard
+                        </Link>
+                        <Link
+                            href="/admin/uap/classifier"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <Scan className="w-4 h-4 text-violet-500" />
+                            Classifier
+                        </Link>
+                        <Link
+                            href="/admin/uap/channels"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <Tv className="w-4 h-4 text-violet-500" />
+                            Channels
+                        </Link>
+                        <Link
+                            href="/admin/uap/contactees"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <UserCircle className="w-4 h-4 text-violet-500" />
+                            Contactees
                         </Link>
                     </nav>
 

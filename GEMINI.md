@@ -43,9 +43,16 @@ Do not guess how this app works. Read these files when touching related systems:
    - **What does NOT belong:** One-off bug fixes, single-route implementation details, library API notes, or anything that only matters for one file.
    - **Prune-on-write:** Before adding a new rule, review the existing list. Move any resolved, outdated, or narrowly-scoped rules to `docs/LEARNINGS_ARCHIVE.md` with a date stamp.
    - **If you exceed 30 rules after your edit, you MUST archive the least-critical entries before finishing.**
+7. **Sprint Progress Tracking (MANDATORY):** `directives/SPRINT.md` is the **single source of truth** for task completion across conversations.
+   - **Read SPRINT.md at session start** to determine what's done (`[x]`) and what's next (`[ ]`).
+   - **Update `- [ ]` → `- [x]`** in SPRINT.md immediately when you complete a task. Do NOT defer this.
+   - **Update the Sprint Status table** at the top when a sprint is fully complete.
+   - **Never rely solely on brain artifacts** (walkthroughs, task.md) for cross-conversation state — they are conversation-scoped and may not be read by the next session.
+   - If the next task to work on is ambiguous, read the Sprint Status table first, then scan for the first unchecked `- [ ]` in the current sprint.
 
 ## 6. Current Development Focus
-- **Active Task:** Migrating remaining n8n batch workflows to native code (See `docs/workflows/OVERVIEW.md`).
+- **Active Task:** UAP Vertical — Sprint 2 (Pipeline). See `directives/SPRINT.md` Sprint Status table.
+- **Previous:** n8n batch workflow migration (complete). UAP Sprint 1: Foundation (complete 2026-05-06).
 - *(For a history of completed features, see `docs/LEARNINGS_ARCHIVE.md`)*
 
 ## 7. Skills Archive

@@ -1,0 +1,34 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "UAP & UFO Encounters | Project Profound",
+  description:
+    "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research through AI-powered search and analysis.",
+  openGraph: {
+    title: "UAP & UFO Encounters | Project Profound",
+    description:
+      "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research.",
+    type: "website",
+  },
+};
+
+export default function UapLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="uap-domain min-h-screen"
+      style={
+        {
+          "--domain-accent": "#8b5cf6",
+          "--domain-accent-light": "#ede9fe",
+          "--domain-accent-dark": "#6d28d9",
+        } as React.CSSProperties
+      }
+    >
+      {children}
+    </div>
+  );
+}
