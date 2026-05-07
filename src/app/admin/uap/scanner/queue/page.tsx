@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import {
   Loader2,
   RefreshCw,
@@ -34,27 +33,19 @@ export default function UapScannerQueuePage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [actionLoading, setActionLoading] = useState<number | null>(null);
-  const supabase = createClient();
 
   const fetchQueue = useCallback(async () => {
     setLoading(true);
     try {
-      let query = supabase
-        .from("uap_scan_queue")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(200);
-
-      if (filter !== "all") {
-        query = query.eq("status", filter);
-      }
-
-      const { data } = await query;
-      setItems((data ?? []) as QueueItem[]);
+      const res = await fetch(`/api/admin/uap-scanner?view=scan_queue&filter=${filter}`);
+      const data = await res.json();
+      setItems(data.items || []);
+    } catch (err) {
+      console.error('Failed to load UAP scan queue:', err);
     } finally {
       setLoading(false);
     }
-  }, [supabase, filter]);
+  }, [filter]);
 
   useEffect(() => {
     fetchQueue();
@@ -63,10 +54,14 @@ export default function UapScannerQueuePage() {
   const retryItem = async (id: number) => {
     setActionLoading(id);
     try {
-      await supabase
-        .from("uap_scan_queue")
-        .update({ status: "pending", error: null, processed_at: null })
-        .eq("id", id);
+      const item = items.find(i => i.id === id);
+      if (item) {
+        await fetch('/api/admin/uap-scanner', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'reset_item', videoId: item.video_id }),
+        });
+      }
       fetchQueue();
     } finally {
       setActionLoading(null);
@@ -76,10 +71,11 @@ export default function UapScannerQueuePage() {
   const skipItem = async (id: number) => {
     setActionLoading(id);
     try {
-      await supabase
-        .from("uap_scan_queue")
-        .update({ status: "skipped" })
-        .eq("id", id);
+      await fetch('/api/admin/uap-scanner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'skip_item', id }),
+      });
       fetchQueue();
     } finally {
       setActionLoading(null);

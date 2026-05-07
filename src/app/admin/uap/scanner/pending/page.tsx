@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import {
   Loader2,
   RefreshCw,
@@ -30,33 +29,39 @@ export default function UapScannerPendingPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("failed");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchPending = useCallback(async () => {
     setLoading(true);
     try {
-      let query = supabase
-        .from("uap_vids")
-        .select("video_id, title, channel_name, intake_status, tier, date, error_message")
-        .order("date", { ascending: false })
-        .limit(200);
+      const res = await fetch('/api/admin/uap-scanner?view=queue');
+      const data = await res.json();
+      let items = data.items || [];
 
-      if (filter === "failed") {
-        query = query.in("intake_status", ["failed", "error", "no_captions"]);
-      } else if (filter === "no_captions") {
-        query = query.eq("intake_status", "no_captions");
+      // Apply client-side filter to match the selected tab
+      if (filter === "no_captions") {
+        items = items.filter((v: any) => v.intake_status === "no_captions");
       } else if (filter === "error") {
-        query = query.in("intake_status", ["failed", "error"]);
+        items = items.filter((v: any) => ["failed", "error"].includes(v.intake_status));
       } else if (filter === "out_of_scope") {
-        query = query.eq("intake_status", "out_of_scope");
+        items = items.filter((v: any) => v.intake_status === "out_of_scope");
       }
+      // "failed" tab = all failed statuses (default from API)
 
-      const { data } = await query;
-      setVideos((data ?? []) as PendingVideo[]);
+      setVideos(items.map((v: any) => ({
+        video_id: v.video_id,
+        title: v.title,
+        channel_name: v.channel_name,
+        intake_status: v.intake_status,
+        tier: v.tier,
+        date: v.classified_at || null,
+        error_message: v.intake_error || null,
+      })));
+    } catch (err) {
+      console.error('Failed to load pending videos:', err);
     } finally {
       setLoading(false);
     }
-  }, [supabase, filter]);
+  }, [filter]);
 
   useEffect(() => {
     fetchPending();
@@ -65,11 +70,11 @@ export default function UapScannerPendingPage() {
   const requeueVideo = async (videoId: string) => {
     setActionLoading(videoId);
     try {
-      // Reset intake_status to 'pending' for re-processing
-      await supabase
-        .from("uap_vids")
-        .update({ intake_status: "pending", error_message: null })
-        .eq("video_id", videoId);
+      await fetch('/api/admin/uap-scanner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset_item', videoId }),
+      });
       fetchPending();
     } finally {
       setActionLoading(null);

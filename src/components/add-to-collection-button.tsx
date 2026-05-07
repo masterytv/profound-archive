@@ -149,6 +149,7 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
         video_thumbnail_url: videoThumbnailUrl || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
         start_time: integerStartTime, // Use integer version
         content: content,
+        domain: 'nde',
       });
 
       if (error) {

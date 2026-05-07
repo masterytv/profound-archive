@@ -331,7 +331,8 @@ function SearchContent() {
                 search_type: searchType,
                 sort_by: sortBy,
                 sort_direction: direction,
-                similarity_threshold: similarity
+                similarity_threshold: similarity,
+                domain: 'nde',
             });
         if (error) {
             toast({ title: 'Error saving search', description: error.message, variant: 'destructive' });

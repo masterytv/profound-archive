@@ -143,6 +143,7 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
         video_id: videoId,
         video_title: videoTitle,
         video_thumbnail_url: videoThumbnailUrl || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+        domain: 'nde',
       });
 
       if (error) {

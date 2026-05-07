@@ -21,7 +21,7 @@
  * - Writes to uap_vids / uap_channels / uap_punctuated_embeddings / uap_chatbot_chunks
  * - Classification produces tier/track/content_type instead of isNde
  * - Tier 3 gate replaces NDE's "not_profound" gate
- * - No analysis suite (greyson, transformation, etc.) — UAP triad analysis runs separately
+ * - UAP triad analysis suite (evidence, contact depth, transformation, summary) runs inline
  * - Contactee profile sync (Step 12.5) uses contactee-sync.ts instead of experiencer-sync.ts
  */
 
@@ -33,6 +33,11 @@ import { fetchCaptions } from '@/lib/youtube/subtitles';
 import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/transcript-processor';
 import { parseIsoDuration } from '@/lib/scanner/discover';
 import { syncContacteeProfile } from '@/lib/pipeline/contactee-sync';
+import { classifyUapContent } from '@/lib/ai/classify-uap';
+import { analyzeUapEvidenceScore } from '@/lib/ai/uap-evidence';
+import { analyzeUapContactDepthScore } from '@/lib/ai/uap-contact-depth';
+import { analyzeUapTransformationScore } from '@/lib/ai/uap-transformation';
+import { generateUapSummary } from '@/lib/ai/uap-summary';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -40,6 +45,7 @@ export type UapIntakeStatus =
     | 'scraping'
     | 'classifying'
     | 'punctuating'
+    | 'analyzing'
     | 'embedding'
     | 'complete'
     | 'failed'
@@ -81,44 +87,8 @@ function getOpenAIClient() {
     return new OpenAI({ apiKey });
 }
 
-// ─── Classification Prompt (same as uap-batch-classify.ts) ──────────────────
-
-const UAP_CLASSIFY_PROMPT = `You are a content classifier for a UAP (Unidentified Aerial Phenomena) research platform.
-
-Classify this video transcript into one of three tiers:
-
-**Tier 1 — First-Person Encounter Account**
-The speaker describes their own personal encounter with UAP/UFOs, aliens, or non-human intelligence.
-This includes: close encounters, abductions, contact experiences, channeling sessions where the speaker is the experiencer.
-Track: "encounters"
-
-**Tier 2 — Program/Investigative Content** 
-Journalism, documentaries, researcher presentations, government disclosure analysis, AATIP/AAWSAP discussion, congressional hearing coverage, expert panels.
-Track: "program"
-
-**Tier 3 — Out of Scope**
-Entertainment, fiction, debunking without substance, conspiracy theory without evidence, clickbait, unrelated content.
-Track: "excluded"
-
-Also classify the content_type:
-- "testimony" (Tier 1: direct witness account)
-- "interview" (Tier 1: experiencer being interviewed)
-- "panel" (Tier 2: expert discussion/panel)
-- "documentary" (Tier 2: produced investigative content)
-- "news" (Tier 2: news coverage of UAP events)
-- "lecture" (Tier 2: academic/researcher presentation)
-- "hearing" (Tier 2: government hearing/testimony)
-- "commentary" (Tier 2: analysis/commentary on UAP topics)
-- "other" (catch-all)
-
-Respond in JSON:
-{
-  "tier": 1|2|3,
-  "track": "encounters"|"program"|"excluded",
-  "content_type": "testimony"|"interview"|"panel"|"documentary"|"news"|"lecture"|"hearing"|"commentary"|"other",
-  "confidence": 0-100,
-  "justification": "Brief explanation"
-}`;
+// Classification is handled by imported classifyUapContent() from classify-uap.ts
+// (see imports above — includes CoT reasoning, few-shot examples, gpt-4o)
 
 // ─── Main Pipeline ───────────────────────────────────────────────────────────
 
@@ -279,33 +249,16 @@ export async function processUapVideoIntake(
         await upsertUapVideoRecord(supabase, videoId, metadata, transcripts, null, null, null, 'classifying');
 
         // ─── Step 8: Classify (tier/track/content_type) ──────────────
+        // Uses classify-uap.ts with CoT reasoning, few-shot examples, and gpt-4o
         const startClassify = Date.now();
         logStep('Classify Content', 'running');
-        let classification: { tier: number; track: string; content_type: string; confidence: number; justification: string } | null = null;
 
-        try {
-            const openai = getOpenAIClient();
-            const truncatedText = transcripts.punctuated.slice(0, 12000);
-            const userPrompt = `Title: ${metadata.title || 'Unknown'}\nDescription: ${(metadata.description || '').slice(0, 500)}\n\nTranscript:\n${truncatedText}`;
-
-            const response = await openai.chat.completions.create({
-                model: 'gpt-4o-mini',
-                messages: [
-                    { role: 'system', content: UAP_CLASSIFY_PROMPT },
-                    { role: 'user', content: userPrompt },
-                ],
-                response_format: { type: 'json_object' },
-                temperature: 0.1,
-                max_tokens: 500,
-            });
-
-            const raw = response.choices[0]?.message?.content || '';
-            classification = JSON.parse(raw);
-        } catch (e: any) {
-            logStep('Classify Content', 'failed', `Classification error: ${e.message}`);
-            await updateUapIntakeStatus(supabase, videoId, 'failed', `Classification failed: ${e.message}`);
-            return { status: 'failed', videoId, title: metadata.title || undefined, steps, error: `Classification failed: ${e.message}` };
-        }
+        const classification = await classifyUapContent(
+            transcripts.punctuated,
+            metadata.title || undefined,
+            metadata.description || undefined,
+            metadata.channelTitle || undefined,
+        );
 
         if (!classification) {
             logStep('Classify Content', 'failed', 'Classification returned null');
@@ -314,11 +267,11 @@ export async function processUapVideoIntake(
         }
 
         logStep('Classify Content', 'success',
-            `Tier ${classification.tier} / ${classification.track} / ${classification.content_type} (${classification.confidence}% confidence)`,
+            `Tier ${classification.tier} / ${classification.track} / ${classification.content_type} (${classification.confidence}% confidence) [speaker: ${classification.speaker_role}]`,
             Date.now() - startClassify
         );
 
-        // Update classification fields
+        // Update classification fields + experiencer_name
         await supabase
             .from('uap_vids')
             .update({
@@ -326,6 +279,7 @@ export async function processUapVideoIntake(
                 track: classification.track,
                 content_type: classification.content_type,
                 classified_at: new Date().toISOString(),
+                experiencer_name: classification.experiencer_name || null,
             })
             .eq('video_id', videoId);
 
@@ -356,6 +310,95 @@ export async function processUapVideoIntake(
             })
             .eq('video_id', videoId);
         logStep('Punctuate Transcript', 'success', 'Transcript punctuated via processTranscripts()');
+
+        // ─── Step 10.5: Full Analysis Suite (Tier 1 only) ────────────
+        // Mirrors NDE pipeline: run all analysis passes in parallel, save to uap_analysis + uap_vids
+        if (classification.tier === 1 && transcripts.punctuated) {
+            const startAnalysis = Date.now();
+            logStep('Analysis Suite', 'running', '4 parallel analysis passes (Evidence, Contact Depth, Transformation, Summary)');
+            await updateUapIntakeStatus(supabase, videoId, 'analyzing');
+
+            const transcript = transcripts.punctuated;
+
+            // Run all 4 passes in parallel — each is an independent LLM call
+            const [evidenceResult, contactDepthResult, transformationResult, summaryResult] =
+                await Promise.all([
+                    analyzeUapEvidenceScore(transcript).catch((e: Error) => {
+                        logStep('Analysis: Evidence', 'failed', e.message);
+                        return null;
+                    }),
+                    analyzeUapContactDepthScore(transcript).catch((e: Error) => {
+                        logStep('Analysis: Contact Depth', 'failed', e.message);
+                        return null;
+                    }),
+                    analyzeUapTransformationScore(transcript).catch((e: Error) => {
+                        logStep('Analysis: Transformation', 'failed', e.message);
+                        return null;
+                    }),
+                    generateUapSummary(transcript).catch((e: Error) => {
+                        logStep('Analysis: Summary', 'failed', e.message);
+                        return null;
+                    }),
+                ]);
+
+            // Build the uap_analysis record
+            const analysisRecord: Record<string, any> = {
+                video_id: videoId,
+                analysis_model: 'gpt-4o-mini',
+                analyzed_at: new Date().toISOString(),
+            };
+
+            if (evidenceResult) {
+                analysisRecord.evidence_score = evidenceResult.total_score;
+                analysisRecord.evidence_breakdown = evidenceResult.criteria;
+                // Hynek/Vallée types come from classification context, not evidence scoring
+                // They'll be populated if the classify step extracted them
+            }
+
+            if (contactDepthResult) {
+                analysisRecord.contact_depth_score = contactDepthResult.total_score;
+                analysisRecord.contact_depth_breakdown = contactDepthResult.breakdown;
+            }
+
+            if (transformationResult) {
+                analysisRecord.transformation_score =
+                    transformationResult.quantitative_metrics.full_transformation_score;
+                analysisRecord.transformation_breakdown = {
+                    quantitative_metrics: transformationResult.quantitative_metrics,
+                    domain_analysis: transformationResult.domain_analysis,
+                    qualitative_profile: transformationResult.qualitative_profile,
+                };
+            }
+
+            // Upsert to uap_analysis
+            const { error: analysisError } = await supabase
+                .from('uap_analysis')
+                .upsert(analysisRecord, { onConflict: 'video_id' });
+
+            if (analysisError) {
+                logStep('Analysis Suite', 'failed',
+                    `Failed to save analysis: ${analysisError.message}`, Date.now() - startAnalysis);
+                // Non-fatal — continue pipeline even if analysis save fails
+            } else {
+                const passCount = [evidenceResult, contactDepthResult, transformationResult, summaryResult]
+                    .filter(Boolean).length;
+                logStep('Analysis Suite', 'success',
+                    `${passCount}/4 passes completed. ESS=${evidenceResult?.total_score ?? '—'} CDS=${contactDepthResult?.total_score ?? '—'} CTI=${transformationResult?.quantitative_metrics.full_transformation_score ?? '—'}`,
+                    Date.now() - startAnalysis);
+            }
+
+            // Save summary to uap_vids (separate column for easy access)
+            if (summaryResult?.uap_summary) {
+                await supabase
+                    .from('uap_vids')
+                    .update({ analysis_uap_summary: summaryResult.uap_summary })
+                    .eq('video_id', videoId);
+                logStep('Analysis: Summary', 'success',
+                    `Summary saved (${summaryResult.uap_summary.length} chars)`);
+            }
+        } else if (classification.tier !== 1) {
+            logStep('Analysis Suite', 'skipped', `Tier ${classification.tier} — analysis only runs for Tier 1`);
+        }
 
         // ─── Step 11: Generate embeddings ────────────────────────────
         const startEmbed = Date.now();
@@ -443,10 +486,10 @@ async function upsertUapVideoRecord(
         channel_id: metadata.channelId,
         channel_name: metadata.channelName,
         view_count: metadata.viewCount,
-        like_count: metadata.likes,
-        comment_count: metadata.commentsCount,
+        likes: metadata.likes,
+        comments_count: metadata.commentsCount,
         duration: metadata.duration,
-        published_at: metadata.date,
+        date: metadata.date,
         thumbnail_url: metadata.thumbnailUrl,
         url: metadata.url || `https://www.youtube.com/watch?v=${videoId}`,
         intake_status: intakeStatus,

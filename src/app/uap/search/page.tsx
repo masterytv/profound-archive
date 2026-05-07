@@ -15,7 +15,11 @@ import {
   Keyboard,
   Clock,
   Filter,
+  Bookmark,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 import type { Metadata } from "next";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -111,6 +115,8 @@ export default function UapSearchPage() {
 function UapSearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const supabase = createClient();
+  const { toast } = useToast();
 
   // State from URL
   const initialQuery = searchParams.get("q") ?? "";
@@ -123,7 +129,22 @@ function UapSearchContent() {
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<Record<string, unknown>>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Check auth for save functionality
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const { data } = await supabase.auth.getUser();
+        setUser(data.user);
+      } catch {
+        // AbortError from auth locks is harmless
+      }
+    };
+    getUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Run search on mount if URL has query
   useEffect(() => {
@@ -171,6 +192,29 @@ function UapSearchContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSearch(query, mode, 1);
+  };
+
+  const handleSaveSearch = async () => {
+    if (!user) return;
+    if (!query.trim()) {
+      toast({ title: "Cannot save empty search", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase
+      .from("saved_searches")
+      .insert({
+        user_id: user.id,
+        search_term: query.trim(),
+        search_type: mode,
+        sort_by: "relevance",
+        sort_direction: "desc",
+        domain: "uap",
+      });
+    if (error) {
+      toast({ title: "Error saving search", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Search Saved!", description: `"${query.trim()}" saved to your dashboard.` });
+    }
   };
 
   return (
@@ -232,6 +276,16 @@ function UapSearchContent() {
               </button>
             </div>
 
+            {user && query.trim() && (
+              <button
+                type="button"
+                onClick={handleSaveSearch}
+                className="p-2.5 text-slate-400 hover:text-green-600 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/10 transition-colors"
+                aria-label="Save search to dashboard"
+              >
+                <Bookmark className="w-4 h-4" />
+              </button>
+            )}
             <button
               type="submit"
               disabled={loading}

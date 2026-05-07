@@ -33,6 +33,24 @@ export async function GET(req: NextRequest) {
     const supabase = getAdminSupabase();
     const { searchParams } = new URL(req.url);
 
+    // Scan queue inspector: raw scan queue items (for /admin/uap/scanner/queue)
+    if (searchParams.get('view') === 'scan_queue') {
+        const filterStatus = searchParams.get('filter');
+        let query = supabase
+            .from('uap_scan_queue')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(200);
+
+        if (filterStatus && filterStatus !== 'all') {
+            query = query.eq('status', filterStatus);
+        }
+
+        const { data: items, error: sqErr } = await query;
+        if (sqErr) return NextResponse.json({ error: sqErr.message }, { status: 500 });
+        return NextResponse.json({ items: items || [] });
+    }
+
     // Queue inspector: query uap_vids for real intake status
     if (searchParams.get('view') === 'queue') {
         const { data: items, error: qErr } = await supabase
@@ -273,6 +291,19 @@ export async function POST(req: NextRequest) {
             } catch (err: any) {
                 return NextResponse.json({ error: err.message }, { status: 500 });
             }
+        }
+
+        case 'skip_item': {
+            const { id } = body;
+            if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+
+            const { error } = await supabase
+                .from('uap_scan_queue')
+                .update({ status: 'skipped' })
+                .eq('id', id);
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ success: true });
         }
 
         case 'reset_item': {
