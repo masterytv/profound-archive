@@ -187,7 +187,7 @@ export default async function TimelinePage() {
                           </div>
                         </div>
                         <Link
-                          href={`/uap/programs/${event.source_video_id}`}
+                          href={`/uap/video/${event.source_video_id}`}
                           className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-green-600 dark:hover:text-green-400 mt-2 transition-colors"
                         >
                           <Play className="w-3 h-3" />

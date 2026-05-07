@@ -14,6 +14,7 @@
 | Sprint 3: Core Pages | ✅ Complete | 2026-05-06 |
 | Sprint 4: Profiles & Discovery | ✅ Complete | 2026-05-06 |
 | Sprint 5: Content & Polish | ✅ Complete | 2026-05-07 |
+| Sprint 6: Deep Analysis & Search | 🚧 In Progress | — |
 
 ## Environment Setup
 
@@ -594,6 +595,53 @@ For every UAP file you create:
 - **Done:** All code-level gates pass. Build + Lighthouse deferred to CI deployment (OS-level port binding restriction on dev machine, not a code issue).
 
 > **Git Push:** 3 commits (65 files, 12,071 insertions) staged locally. Push with `git push origin main` when network access is restored.
+
+---
+
+## Sprint 6: Deep Analysis & Search (Week 6-7)
+
+> Build the deep phenomenological analysis pipeline for UAP Tier 1 encounters, render it as a rich Research Breakdown UI, wire into intake, and use structured data for advanced search/filter.
+
+### Epic 6.1: Phenomenology Pipeline
+- [x] Story 6.1.1: Schema migration + Zod types (0.5d) ✅ 2026-05-07
+- [x] Story 6.1.2: AI prompt engineering + manual testing (2d) ✅ 2026-05-07
+- [x] Story 6.1.3: Pipeline integration + batch backfill script (0.5d) ✅ 2026-05-07
+
+### Epic 6.2: Research Breakdown UI
+- [x] Story 6.2.1: Core components — `UapResearchBreakdown.tsx` + `UapEncounterContextCard.tsx` (1.5d) ✅ 2026-05-07
+- [x] Story 6.2.2: Video detail integration — ported to unified `/uap/video/[id]` page (0.5d) ✅ 2026-05-07
+- [x] Story 6.2.3: Route consolidation — merged `/encounters/[slug]` + `/programs/[slug]` into `/video/[id]`, updated 7 files, deleted old routes (0.5d) ✅ 2026-05-07
+
+### Epic 6.2B: Encounter Context Pipeline
+- [x] Story 6.2B.1: Schema + migration — `encounter_context JSONB` column on `uap_analysis` (0.25d) ✅ 2026-05-07
+- [x] Story 6.2B.2: `analyzeUapEncounterContext()` module — date, location, military, connected cases (0.5d) ✅ 2026-05-07
+- [x] Story 6.2B.3: Pipeline integration — 6th parallel pass in `intake-uap.ts` (0.25d) ✅ 2026-05-07
+- [x] Story 6.2B.4: Test + batch backfill scripts (0.25d) ✅ 2026-05-07
+- [ ] Story 6.2B.5: Run batch backfill on all Tier 1 videos
+
+### Epic 6.3: Advanced Search & Filters
+- [ ] Story 6.3.1: Phenomenology-powered filters (1d)
+
+### Epic 6.4: Technical Debt Cleanup
+- [ ] Story 6.4.1: metadataBase, nav entry, unit test (0.5d)
+- [ ] Story 6.4.2: Contactee dedup + data quality (0.5d)
+
+### Epic 6.5: Methodology Documentation
+- [ ] Story 6.5.1: UAP analysis methodology page (1d)
+
+### Epic 6.6: Event Timeline Infrastructure
+> Partially covered by Epic 6.2B (encounter_context extraction). Full event table + timeline UI deferred.
+- [x] Story 6.6.1-6.6.4: Lean implementation — `encounter_context` JSONB captures event_date, location, named_witnesses, connected_cases per video. Full `uap_events` table deferred to post-launch. ✅ 2026-05-07
+- [ ] Story 6.6.5: Event Timeline UI — chronological timeline view, mass events larger, cross-linked contactee lists per event (1.5d)
+
+### Epic 6.7: Unified Intake Pipeline & Re-Analysis
+> Build a single, unified intake orchestrator (`intake-uap.ts`) that handles all ingestion (Admin UI, Channel Scanner, GitHub queue) and dynamically branches into Tier 1 (Phenomenology/Triad) or Tier 2 (Program Intel) pipelines.
+> Then, gracefully wipe legacy data and queue the entire corpus for a slow, IO-safe re-processing run.
+
+- [ ] Story 6.7.1: Build `intake-uap.ts` unified pipeline — Update `src/lib/pipeline/intake-uap.ts` to execute both Tier 1 analysis (phenomenology, context, triad) and Tier 2 analysis (program intel) based on the video's tier, rather than splitting logic. (1d)
+- [ ] Story 6.7.2: Wire up external triggers — Ensure the Admin Intake page (`/admin/intake`), the Channel Scanner tick (`/api/scanner`), and the GitHub queue processor all seamlessly utilize the single `processUapVideoIntake` pipeline. (0.5d)
+- [ ] Story 6.7.3: Build database reset script (`scripts/uap-reset-analysis.ts`) — A script that removes all existing `uap_analysis` and `uap_vids.classified_at` data for Tier 1 and Tier 2 videos, pushing them into `uap_scan_queue` (or `uap_jobs`) to be picked up by the background processor. (0.5d)
+- [ ] Story 6.7.4: Queue Throttling Strategy — Adjust the GitHub Action schedule (`uap-scanner-process.yml`) or queue batch size to ensure the processing spaces out gracefully over a week, preventing Supabase IO spikes (Micro plan limits) while remaining well under the $200/mo cost limit. (0.25d)
 
 ---
 

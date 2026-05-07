@@ -157,7 +157,7 @@ export default function UapChatUI() {
                   {msg.citations.map((cite) => (
                     <Link
                       key={cite.video_id}
-                      href={`/uap/encounters/${cite.video_id}`}
+                      href={`/uap/video/${cite.video_id}`}
                       className="flex items-start gap-2 text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
                     >
                       <ExternalLink className="w-3 h-3 mt-0.5 flex-shrink-0" />

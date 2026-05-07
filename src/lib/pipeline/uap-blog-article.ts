@@ -5,7 +5,7 @@
  * Key differences from NDE version:
  * - Reads from uap_questions instead of nde_questions
  * - Uses search_uap_punctuated_embeddings RPC (different filter params)
- * - Internal links: /uap/encounters/ instead of /video/
+ * - Internal links: /uap/video/ instead of /video/
  * - Publishes with domain: 'uap' in blog_posts
  * - No NoeticMap integration (NDE-specific academic paper index)
  * - UAP-specific prompt templates from uap-blog-prompts.ts

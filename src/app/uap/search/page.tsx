@@ -83,8 +83,8 @@ function formatDate(epochSec: number): string {
   }
 }
 
-function videoRoute(tier: number, videoId: string): string {
-  return tier === 1 ? `/uap/encounters/${videoId}` : `/uap/programs/${videoId}`;
+function videoRoute(_tier: number, videoId: string): string {
+  return `/uap/video/${videoId}`;
 }
 
 const CONTENT_TYPE_LABELS: Record<string, string> = {

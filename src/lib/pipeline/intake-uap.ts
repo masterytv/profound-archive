@@ -38,6 +38,9 @@ import { analyzeUapEvidenceScore } from '@/lib/ai/uap-evidence';
 import { analyzeUapContactDepthScore } from '@/lib/ai/uap-contact-depth';
 import { analyzeUapTransformationScore } from '@/lib/ai/uap-transformation';
 import { generateUapSummary } from '@/lib/ai/uap-summary';
+import { analyzeUapPhenomenology } from '@/lib/ai/uap-phenomenology';
+import { analyzeUapEncounterContext } from '@/lib/ai/uap-encounter-context';
+import { analyzeUapProgramIntel } from '@/lib/ai/uap-program-intel';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -315,13 +318,13 @@ export async function processUapVideoIntake(
         // Mirrors NDE pipeline: run all analysis passes in parallel, save to uap_analysis + uap_vids
         if (classification.tier === 1 && transcripts.punctuated) {
             const startAnalysis = Date.now();
-            logStep('Analysis Suite', 'running', '4 parallel analysis passes (Evidence, Contact Depth, Transformation, Summary)');
+            logStep('Analysis Suite', 'running', '6 parallel analysis passes (Evidence, Contact Depth, Transformation, Summary, Phenomenology, Encounter Context)');
             await updateUapIntakeStatus(supabase, videoId, 'analyzing');
 
             const transcript = transcripts.punctuated;
 
-            // Run all 4 passes in parallel — each is an independent LLM call
-            const [evidenceResult, contactDepthResult, transformationResult, summaryResult] =
+            // Run all 6 passes in parallel — each is an independent LLM call
+            const [evidenceResult, contactDepthResult, transformationResult, summaryResult, phenomResult, contextResult] =
                 await Promise.all([
                     analyzeUapEvidenceScore(transcript).catch((e: Error) => {
                         logStep('Analysis: Evidence', 'failed', e.message);
@@ -337,6 +340,14 @@ export async function processUapVideoIntake(
                     }),
                     generateUapSummary(transcript).catch((e: Error) => {
                         logStep('Analysis: Summary', 'failed', e.message);
+                        return null;
+                    }),
+                    analyzeUapPhenomenology(transcript).catch((e: Error) => {
+                        logStep('Analysis: Phenomenology', 'failed', e.message);
+                        return null;
+                    }),
+                    analyzeUapEncounterContext(transcript).catch((e: Error) => {
+                        logStep('Analysis: Encounter Context', 'failed', e.message);
                         return null;
                     }),
                 ]);
@@ -370,6 +381,16 @@ export async function processUapVideoIntake(
                 };
             }
 
+            // Phenomenology deep analysis
+            if (phenomResult) {
+                analysisRecord.phenomenology_breakdown = phenomResult;
+            }
+
+            // Encounter context (location, date, military, connected cases)
+            if (contextResult) {
+                analysisRecord.encounter_context = contextResult;
+            }
+
             // Upsert to uap_analysis
             const { error: analysisError } = await supabase
                 .from('uap_analysis')
@@ -380,10 +401,10 @@ export async function processUapVideoIntake(
                     `Failed to save analysis: ${analysisError.message}`, Date.now() - startAnalysis);
                 // Non-fatal — continue pipeline even if analysis save fails
             } else {
-                const passCount = [evidenceResult, contactDepthResult, transformationResult, summaryResult]
+                const passCount = [evidenceResult, contactDepthResult, transformationResult, summaryResult, phenomResult, contextResult]
                     .filter(Boolean).length;
                 logStep('Analysis Suite', 'success',
-                    `${passCount}/4 passes completed. ESS=${evidenceResult?.total_score ?? '—'} CDS=${contactDepthResult?.total_score ?? '—'} CTI=${transformationResult?.quantitative_metrics.full_transformation_score ?? '—'}`,
+                    `${passCount}/6 passes completed. ESS=${evidenceResult?.total_score ?? '—'} CDS=${contactDepthResult?.total_score ?? '—'} CTI=${transformationResult?.quantitative_metrics.full_transformation_score ?? '—'} PHENOM=${phenomResult ? '✓' : '—'} CTX=${contextResult ? '✓' : '—'}`,
                     Date.now() - startAnalysis);
             }
 
@@ -396,8 +417,47 @@ export async function processUapVideoIntake(
                 logStep('Analysis: Summary', 'success',
                     `Summary saved (${summaryResult.uap_summary.length} chars)`);
             }
+        } else if (classification.tier === 2 && transcripts.punctuated) {
+            // Tier 2: Program Intelligence 3-pass extraction + Summary
+            const startAnalysis = Date.now();
+            logStep('Analysis Suite (Tier 2)', 'running', '3-pass Program Intel + Summary');
+            await updateUapIntakeStatus(supabase, videoId, 'analyzing');
+
+            const transcript = transcripts.punctuated;
+            const [programIntelResult, summaryResult] = await Promise.all([
+                analyzeUapProgramIntel(transcript).catch((e: Error) => {
+                    logStep('Analysis: Program Intel', 'failed', e.message);
+                    return null;
+                }),
+                generateUapSummary(transcript).catch((e: Error) => {
+                    logStep('Analysis: Summary', 'failed', e.message);
+                    return null;
+                }),
+            ]);
+
+            const analysisRecord: Record<string, any> = {
+                video_id: videoId,
+                analysis_model: 'gpt-4o-mini',
+                analyzed_at: new Date().toISOString(),
+            };
+            if (programIntelResult) {
+                analysisRecord.program_intel_breakdown = programIntelResult;
+            }
+
+            await supabase.from('uap_analysis').upsert(analysisRecord, { onConflict: 'video_id' });
+
+            if (summaryResult?.uap_summary) {
+                await supabase.from('uap_vids')
+                    .update({ analysis_uap_summary: summaryResult.uap_summary })
+                    .eq('video_id', videoId);
+            }
+
+            const passCount = [programIntelResult, summaryResult].filter(Boolean).length;
+            logStep('Analysis Suite (Tier 2)', 'success',
+                `${passCount}/2 passes completed. INTEL=${programIntelResult ? '✓' : '—'} SUMMARY=${summaryResult ? '✓' : '—'}`,
+                Date.now() - startAnalysis);
         } else if (classification.tier !== 1) {
-            logStep('Analysis Suite', 'skipped', `Tier ${classification.tier} — analysis only runs for Tier 1`);
+            logStep('Analysis Suite', 'skipped', `Tier ${classification.tier} — analysis only runs for Tier 1 & 2`);
         }
 
         // ─── Step 11: Generate embeddings ────────────────────────────

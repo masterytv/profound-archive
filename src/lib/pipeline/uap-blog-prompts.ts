@@ -6,7 +6,7 @@
  * - Slug format: uap-[topic] instead of nde-[topic]
  * - Research domains: UAP/UFO-specific sources instead of NDE sources
  * - Voice: Informed UAP investigator rather than NDE consciousness researcher
- * - Internal links: /uap/encounters/ instead of /video/
+ * - Internal links: /uap/video/ instead of /video/
  * - Question links: /uap/questions/ instead of /questions/
  */
 
@@ -50,12 +50,12 @@ Voice Characteristics: The writing should feel like a conversation with a knowle
 </critical_rules>
 
 <handling_evidence>
-- QUOTES: Use provided experiencer/witness quotes VERBATIM. Keep all grammatical errors, hesitations, and tangents. Each quote has a Source link; when you use a quote, link to its source using Markdown, e.g., [one account on Project Profound](/uap/encounters/VIDEO_ID?t=123).
+- QUOTES: Use provided experiencer/witness quotes VERBATIM. Keep all grammatical errors, hesitations, and tangents. Each quote has a Source link; when you use a quote, link to its source using Markdown, e.g., [one account on Project Profound](/uap/video/VIDEO_ID?t=123).
 - RESEARCHERS: Maximum 3-4 researchers total. Go deep on 1-2 of them.
 - CITATIONS: Zero bracketed citations [Author, Year]. Integrate naturally: "A 2023 Harvard study by Avi Loeb..." ONLY link to URLs explicitly provided in the research brief. NEVER construct or guess URLs.
 - STATISTICS: Round uncertain numbers.
 - NO PERSONAL CLAIMS: Do not claim to have personally interviewed anyone unless the brief says you did.
-- VIDEO REFERENCES: Each experiencer quote has a Source link to its Project Profound encounter page. Format naturally: [one account on Project Profound](/uap/encounters/VIDEO_ID?t=123). Do not list separately.
+- VIDEO REFERENCES: Each experiencer quote has a Source link to its Project Profound encounter page. Format naturally: [one account on Project Profound](/uap/video/VIDEO_ID?t=123). Do not list separately.
 - OUTBOUND LINKS: When you mention a published study, link to its URL if provided. When you mention organizations like MUFON, SCU, or SOL Foundation, link to their homepage. ⛔ BOOKS: Do NOT hyperlink book titles to Amazon. Reference in plain text only.
 </handling_evidence>
 
@@ -192,14 +192,14 @@ export function buildUapDraftUserPrompt(params: {
         .slice(0, 5)
         .map((c, i) => {
             const timeParam = c.startTime ? `?t=${Math.floor(c.startTime)}` : '';
-            const sourceLink = `/uap/encounters/${c.videoId}${timeParam}`;
+            const sourceLink = `/uap/video/${c.videoId}${timeParam}`;
             const fromLabel = c.title ? ` — from "${c.title}"${c.channelName ? ` on ${c.channelName}` : ''}` : '';
             return `[Witness ${i + 1}${fromLabel}]: "${c.content}"\n  Source link: ${sourceLink}`;
         })
         .join("\n\n");
 
     const videoSection = params.videoReferences && params.videoReferences.length > 0
-        ? `\nPROJECT PROFOUND UAP ACCOUNTS (MANDATORY — you MUST reference at least 3 of these with links to our site):\n${params.videoReferences.map((v, i) => `[Account ${i + 1}]: "${v.title}" ${v.experiencerName ? `(${v.experiencerName})` : ''} ${v.channelName ? `on ${v.channelName}` : ''}\n  Link: /uap/encounters/${v.videoId}`).join('\n')}\n\nThese are REAL accounts on our platform. You MUST include inline links to at least 3 of them, woven naturally into the article. Format: [witness account on Project Profound](/uap/encounters/VIDEO_ID). Do NOT list them separately.`
+        ? `\nPROJECT PROFOUND UAP ACCOUNTS (MANDATORY — you MUST reference at least 3 of these with links to our site):\n${params.videoReferences.map((v, i) => `[Account ${i + 1}]: "${v.title}" ${v.experiencerName ? `(${v.experiencerName})` : ''} ${v.channelName ? `on ${v.channelName}` : ''}\n  Link: /uap/video/${v.videoId}`).join('\n')}\n\nThese are REAL accounts on our platform. You MUST include inline links to at least 3 of them, woven naturally into the article. Format: [witness account on Project Profound](/uap/video/VIDEO_ID). Do NOT list them separately.`
         : '';
 
     return `Write a long-form blog article answering this question for Project Profound's UAP section.
@@ -220,9 +220,9 @@ LINKING RULES (critical):
 - The SOURCES list above contains verified, working URLs from web search. Use THESE URLs for inline links.
 - ⛔ Do NOT fabricate or guess URLs.
 - ⛔ Do NOT link book titles to Amazon.
-- ⛔ NEVER link to youtube.com or youtu.be. ALL video references MUST use internal paths: [description](/uap/encounters/VIDEO_ID).
+- ⛔ NEVER link to youtube.com or youtu.be. ALL video references MUST use internal paths: [description](/uap/video/VIDEO_ID).
 - Every article should have at least 5-8 inline links to research sources from the SOURCES list above.
-- ⚠️ MANDATORY: Every article MUST include at least 3 inline links to Project Profound encounter accounts (the /uap/encounters/ links provided above).
+- ⚠️ MANDATORY: Every article MUST include at least 3 inline links to Project Profound encounter accounts (the /uap/video/ links provided above).
 - In the "references" array, use the actual URLs from SOURCES. Set url to null for books.
 
 IMPORTANT REMINDERS:

@@ -55,7 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
     }));
 
-    // ── UAP: Encounter pages (Tier 1 + Tier 2 with transcripts) ─────────────
+    // ── UAP: Video pages (Tier 1 encounters + Tier 2 research/programs) ───────
     const { data: uapEncounters } = await supabase
         .from('uap_vids')
         .select('video_id, updated_at')
@@ -64,7 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .order('video_id');
 
     const uapEncounterUrls: MetadataRoute.Sitemap = (uapEncounters ?? []).map((v) => ({
-        url: `https://projectprofound.org/uap/encounters/${v.video_id}`,
+        url: `https://projectprofound.org/uap/video/${v.video_id}`,
         lastModified: v.updated_at ?? new Date().toISOString(),
         changeFrequency: 'monthly' as const,
         priority: 0.65,

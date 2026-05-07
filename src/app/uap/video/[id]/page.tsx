@@ -8,6 +8,7 @@ import {
   Calendar,
   BookOpen,
   ChevronDown,
+  Radar,
 } from "lucide-react";
 import {
   Collapsible,
@@ -19,8 +20,15 @@ import { TimestampLink } from "@/components/video/TimestampLink";
 import { SocialShareButton } from "@/components/video/ShareButton";
 // Tier 1 components
 import { TriadScoresPanel, type TriadScores } from "@/components/uap/TriadScoresPanel";
+import { UapResearchBreakdown, type EvidenceBreakdown } from "@/components/uap/UapResearchBreakdown";
+import { UapEncounterContextCard } from "@/components/uap/UapEncounterContextCard";
+import type { UapPhenomenologyResult } from "@/lib/ai/uap-phenomenology";
+import type { UapEncounterContextResult } from "@/lib/ai/uap-encounter-context";
 // Tier 2 components
 import { KnowledgePanel, type KnowledgeData } from "@/components/uap/KnowledgePanel";
+import { UapProgramIntelCard } from "@/components/uap/program-intel/UapProgramIntelCard";
+import { UapProgramIntelSummaryCard } from "@/components/uap/program-intel/UapProgramIntelSummaryCard";
+import type { UapProgramIntelResult } from "@/lib/ai/uap-program-intel";
 
 // ─── Build Client (SSG-safe — no cookies()) ─────────────────────────────────
 
@@ -145,12 +153,13 @@ async function getUapVideo(videoId: string) {
       evidence_score, evidence_breakdown, hynek_type, vallee_type,
       contact_depth_score, contact_depth_breakdown,
       transformation_score, transformation_breakdown,
-      experience_type, phenomenology, entities, overall_tone,
+      experience_type, phenomenology, phenomenology_breakdown, encounter_context,
+      entities, overall_tone,
       physical_effects, technology_described, message_content,
       recurrence_pattern, witness_count, evidence_types,
       claims, people_mentioned, programs_mentioned,
       timeline_events, consciousness_connections,
-      content_safety
+      content_safety, program_intel_breakdown
     `)
     .eq("video_id", videoId)
     .single();
@@ -358,6 +367,40 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
               </div>
             )}
 
+            {/* ── Tier 1: Encounter Context + Deep Analysis ────────────── */}
+            {isTier1 && analysis?.encounter_context && (
+              <UapEncounterContextCard
+                data={analysis.encounter_context as UapEncounterContextResult}
+              />
+            )}
+
+            {isTier1 && analysis?.phenomenology_breakdown && (
+              <UapResearchBreakdown
+                data={analysis.phenomenology_breakdown as UapPhenomenologyResult}
+                evidenceBreakdown={analysis.evidence_breakdown as EvidenceBreakdown | null}
+              />
+            )}
+
+            {/* Legacy phenomenology grid (fallback for older Tier 1 records) */}
+            {isTier1 && !analysis?.phenomenology_breakdown && analysis?.phenomenology && (
+              <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
+                  <Radar className="w-4 h-4 text-green-500" />
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                    Phenomenology
+                  </h2>
+                </div>
+                <div className="px-6 py-5">
+                  <PhenomenologyGrid data={analysis.phenomenology} />
+                </div>
+              </div>
+            )}
+
+            {/* ── Tier 2: Program Intelligence Breakdown ────────────── */}
+            {!isTier1 && analysis?.program_intel_breakdown && (
+              <UapProgramIntelCard data={analysis.program_intel_breakdown as UapProgramIntelResult} />
+            )}
+
             {/* Timestamped Transcript */}
             {(transcriptBlocks || video.subtitles_punctuated) && (
               <Collapsible>
@@ -396,30 +439,68 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
                 </div>
               </Collapsible>
             )}
-          </div>
 
-          {/* Right Sidebar (desktop only) */}
-          <div className="hidden lg:block space-y-6 lg:pr-1">
-            {/* Tier-conditional sidebar */}
-            {isTier1 && triadScores && <TriadScoresPanel scores={triadScores} />}
-            {!isTier1 && knowledgeData && <KnowledgePanel data={knowledgeData} />}
-
-            {/* External link */}
-            {video.url && (
-              <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-4">
-                <a
-                  href={video.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-green-600 dark:text-green-400 hover:underline font-medium"
+            {/* Tier 1: Comfort footer */}
+            {isTier1 && (
+              <div className="bg-green-50/40 dark:bg-green-900/20 border border-green-100 dark:border-green-800/50 rounded-2xl px-6 py-6 space-y-3">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                  Have you had a similar experience?
+                </p>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Many people have reported encounters they struggle to explain. You are not alone.
+                  Project Profound collects and analyzes these accounts to advance understanding.
+                </p>
+                <Link
+                  href="/uap/chat"
+                  className="text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors inline-flex items-center gap-1"
                 >
-                  Watch on YouTube →
-                </a>
+                  Talk about it with AI →
+                </Link>
               </div>
             )}
           </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6 lg:pr-1">
+            {/* Tier-conditional sidebar */}
+            {isTier1 && triadScores && <TriadScoresPanel scores={triadScores} />}
+            {!isTier1 && analysis?.program_intel_breakdown ? (
+              <UapProgramIntelSummaryCard data={analysis.program_intel_breakdown as UapProgramIntelResult} />
+            ) : (
+              !isTier1 && knowledgeData && <KnowledgePanel data={knowledgeData} />
+            )}
+
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Phenomenology Grid (legacy fallback for older Tier 1 records) ────────
+
+function PhenomenologyGrid({ data }: { data: unknown }) {
+  if (!data || typeof data !== "object") return null;
+  const entries = Object.entries(data as Record<string, unknown>).filter(
+    ([, v]) => v !== null && v !== undefined && v !== "" && v !== false
+  );
+  if (entries.length === 0) return null;
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      {entries.map(([key, value]) => (
+        <div
+          key={key}
+          className="bg-slate-50 dark:bg-white/5 rounded-lg p-2.5 border border-slate-100 dark:border-white/10"
+        >
+          <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide block mb-0.5">
+            {key.replace(/_/g, " ")}
+          </span>
+          <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+            {typeof value === "boolean" ? "Yes" : String(value)}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

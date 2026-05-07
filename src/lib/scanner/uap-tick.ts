@@ -195,7 +195,7 @@ export async function runUapProcessTick(
     const processed: UapProcessedVideo[] = [];
     let meaningfulCount = 0;
     let totalAttempts = 0;
-    const maxAttempts = videosPerTick * 5;
+    const maxAttempts = videosPerTick * 15; // Increased to allow skipping long streaks of Tier 3s
 
     const touchedIds = new Set<number>();
     const touchedChannelIds = new Set<string>();
@@ -251,7 +251,7 @@ export async function runUapProcessTick(
             intakeStatus = result.status;
             tier = result.tier ?? null;
 
-            const isSkipped = result.status === 'no_captions' || result.status === 'already_exists';
+            const isSkipped = result.status === 'no_captions' || result.status === 'already_exists' || result.status === 'out_of_scope';
 
             finalStatus = (result.status === 'complete' || result.status === 'already_exists')
                 ? 'complete'

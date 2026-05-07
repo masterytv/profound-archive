@@ -69,11 +69,7 @@ function formatDate(d: string | null): string {
 }
 
 function videoRoute(video: VideoRow): string {
-  // Tier 1 → encounters, Tier 2 → programs
-  if (video.tier === 1 || video.track === "encounters") {
-    return `/uap/encounters/${video.video_id}`;
-  }
-  return `/uap/programs/${video.video_id}`;
+  return `/uap/video/${video.video_id}`;
 }
 
 // ─── Data Fetching ──────────────────────────────────────────────────────────
