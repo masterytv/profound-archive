@@ -21,7 +21,7 @@ jobs:
       - name: Trigger UAP Video Processing
         run: |
           HTTP_CODE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST \
-            "https://${{ secrets.APP_DIRECT_URL }}/api/uap/intake/process" \
+            "https://${{ secrets.APP_DIRECT_URL }}/api/uap/scanner/process" \
             -H "Content-Type: application/json" \
             -d "{\"secret\": \"${{ secrets.CRON_SECRET }}\", \"videosPerTick\": ${{ github.event.inputs.videos_per_tick || 1 }}}" \
             --connect-timeout 15 \
