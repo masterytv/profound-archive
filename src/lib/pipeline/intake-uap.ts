@@ -22,7 +22,7 @@
  * - Classification produces tier/track/content_type instead of isNde
  * - Tier 3 gate replaces NDE's "not_profound" gate
  * - No analysis suite (greyson, transformation, etc.) — UAP triad analysis runs separately
- * - No experiencer sync — UAP contactee profiles are separate
+ * - Contactee profile sync (Step 12.5) uses contactee-sync.ts instead of experiencer-sync.ts
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -32,6 +32,7 @@ import { parseYouTubeUrl, fetchVideoMetadata, fetchChannelMetadata, type VideoMe
 import { fetchCaptions } from '@/lib/youtube/subtitles';
 import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/transcript-processor';
 import { parseIsoDuration } from '@/lib/scanner/discover';
+import { syncContacteeProfile } from '@/lib/pipeline/contactee-sync';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -364,7 +365,41 @@ export async function processUapVideoIntake(
         await generateUapEmbeddings(supabase, videoId, transcripts);
         logStep('Generate Embeddings', 'success', 'Search + chat embeddings created', Date.now() - startEmbed);
 
-        // ─── Step 12: Mark complete ──────────────────────────────────
+        // ─── Step 12.5: Sync contactee profile ──────────────────────
+        // Mirrors NDE intake.ts Step 14.5 — auto-create/update contactee profiles
+        if (classification.tier === 1) {
+            const startSync = Date.now();
+            // Fetch the experiencer_name (set during classification in Step 8)
+            const { data: vidRow } = await supabase
+                .from('uap_vids')
+                .select('experiencer_name')
+                .eq('video_id', videoId)
+                .single();
+
+            if (vidRow?.experiencer_name) {
+                logStep('Sync Contactee Profile', 'running');
+                try {
+                    const syncResult = await syncContacteeProfile(
+                        supabase, vidRow.experiencer_name, videoId
+                    );
+                    logStep('Sync Contactee Profile', 'success',
+                        syncResult.created
+                            ? `Created profile: /uap/contactees/${syncResult.slug} (${syncResult.videoCount} videos)`
+                            : syncResult.updated
+                                ? `Updated profile: /uap/contactees/${syncResult.slug} (${syncResult.videoCount} videos)`
+                                : `Profile exists: /uap/contactees/${syncResult.slug}`,
+                        Date.now() - startSync
+                    );
+                } catch (syncErr: any) {
+                    // Non-fatal — don't block the pipeline for profile sync failures
+                    logStep('Sync Contactee Profile', 'failed', syncErr.message, Date.now() - startSync);
+                }
+            } else {
+                logStep('Sync Contactee Profile', 'skipped', 'No experiencer_name extracted');
+            }
+        }
+
+        // ─── Step 13: Mark complete ──────────────────────────────────
         await updateUapIntakeStatus(supabase, videoId, 'complete');
         logStep('Pipeline Complete', 'success', `Video fully processed (Tier ${classification.tier})`);
 

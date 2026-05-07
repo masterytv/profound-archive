@@ -55,3 +55,4 @@ mcp-config.json
 # vscode — contains local OAuth credentials, never commit
 .vscode/settings.json
 tmp-pg/
+triad-output.log

@@ -119,20 +119,27 @@ interface ParsedSegment {
 
 /**
  * Parse raw_timestamped_subtitles JSONB into typed segments.
- * Handles both array-of-objects and plain string formats.
+ * Handles:
+ *   - { subtitles: [...] } wrapper objects (actual DB format)
+ *   - Bare arrays of { text, start, end/duration }
+ *   - Plain strings
  */
 function parseRawSubtitles(raw: unknown): ParsedSegment[] {
   if (!raw) return [];
 
-  // Array of { text, start, duration } or { text, offset, duration }
+  // Unwrap { subtitles: [...] } wrapper (actual format in uap_vids)
+  if (typeof raw === 'object' && !Array.isArray(raw) && raw !== null) {
+    const obj = raw as Record<string, unknown>;
+    if (Array.isArray(obj.subtitles)) {
+      return parseSegmentArray(obj.subtitles);
+    }
+    // Unknown object shape
+    return [];
+  }
+
+  // Bare array of segments
   if (Array.isArray(raw)) {
-    return raw
-      .map((seg: Record<string, unknown>) => ({
-        text: String(seg.text || '').trim(),
-        start: Number(seg.start ?? seg.offset ?? 0),
-        duration: Number(seg.duration ?? 0),
-      }))
-      .filter(seg => seg.text.length > 0);
+    return parseSegmentArray(raw);
   }
 
   // Plain string — wrap in a single segment (no timestamp info)
@@ -141,6 +148,23 @@ function parseRawSubtitles(raw: unknown): ParsedSegment[] {
   }
 
   return [];
+}
+
+/** Parse an array of subtitle segment objects into typed segments. */
+function parseSegmentArray(arr: unknown[]): ParsedSegment[] {
+  return arr
+    .filter((seg): seg is Record<string, unknown> => seg != null && typeof seg === 'object')
+    .map((s) => {
+      const start = Number(s.start ?? s.offset ?? 0);
+      const end = Number(s.end ?? 0);
+      return {
+        text: String(s.text || '').trim(),
+        start,
+        // UAP data uses { start, end } while NDE uses { start, duration }
+        duration: s.duration != null ? Number(s.duration) : (end > start ? end - start : 0),
+      };
+    })
+    .filter(seg => seg.text.length > 0);
 }
 
 // ─── Chunking (mirrors transcript-processor.ts) ──────────────────────────────

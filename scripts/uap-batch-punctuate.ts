@@ -22,7 +22,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
 const BATCH_SIZE = 5;
 const BATCH_DELAY_MS = 500;
-const MAX_VIDEOS_PER_RUN = 500;
+const MAX_VIDEOS_PER_RUN = 1000;
 
 async function main() {
   const supabase = createClient(

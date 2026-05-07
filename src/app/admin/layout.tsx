@@ -215,6 +215,20 @@ export default async function AdminLayout({
                             <UserCircle className="w-4 h-4 text-violet-500" />
                             Contactees
                         </Link>
+                        <Link
+                            href="/admin/uap/blog"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <FileText className="w-4 h-4 text-green-500" />
+                            UAP Blog
+                        </Link>
+                        <Link
+                            href="/admin/uap/questions"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all"
+                        >
+                            <List className="w-4 h-4 text-green-500" />
+                            UAP Questions
+                        </Link>
                     </nav>
 
                     {/* Exit Link */}
