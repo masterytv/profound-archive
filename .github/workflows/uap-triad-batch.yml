@@ -1,0 +1,46 @@
+name: UAP Triad Analysis (Weekly)
+
+on:
+  schedule:
+    # Run weekly on Sundays at 06:00 UTC (2am ET)
+    # Processes unscored Tier 1 videos with all 3 UAP-CET triad modules
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max videos to process'
+        required: false
+        default: '100'
+      concurrency:
+        description: 'Concurrent videos (default 3)'
+        required: false
+        default: '3'
+
+jobs:
+  triad-batch:
+    name: UAP Triad Batch Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run UAP triad batch
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          npx tsx scripts/uap-batch-triad.ts \
+            --limit ${{ github.event.inputs.limit || '100' }} \
+            --concurrency ${{ github.event.inputs.concurrency || '3' }}

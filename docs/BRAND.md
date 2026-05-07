@@ -79,7 +79,27 @@ Each research scale has a dedicated color accent:
 | Transformation header | `linear-gradient(135deg, #FFF1F2 0%, #F8FAFC 100%)` |
 | Greyson header | `linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 100%)` |
 
----
+### UAP Domain — Green "Tinted Skin"
+
+UAP pages use the `.uap-domain` class (set in `uap/layout.tsx`) to override CSS variables site-wide. This means **one change in `globals.css` updates every UAP component**.
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `green-600` | `#16a34a` | Primary accent, buttons, links, focus rings |
+| `green-100` | `#DCFCE7` | Hero gradient, light backgrounds |
+| `green-50` | `#F0FDF4` | Hero gradient mid, CTA backgrounds |
+| `green-700` | `#15803d` | Hover state accent |
+
+**UAP Score Badges**: Reuse NDE score colors (emerald/blue/rose) since the triads map 1:1 (Evidence↔Veridical, Contact Depth↔Greyson, Transformation↔Transformation).
+
+**UAP Gradients**:
+
+| Context | Light | Dark |
+|---------|-------|------|
+| Hero | `linear-gradient(135deg, #DCFCE7 0%, #F0FDF4 40%, #D1FAE5 100%)` | `linear-gradient(135deg, #0a1510, #0f1a12, #0a1510)` |
+| CTA | `linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)` | `linear-gradient(135deg, #0f1a12, #0a1510)` |
+
+**Header Domain Pill**: When on `/uap/*` routes, a green "UFO & UAP" pill appears next to the logo.
 
 ## 3. Component Patterns
 

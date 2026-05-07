@@ -81,6 +81,34 @@ body {
     --cta-from:  #0A1229;
     --cta-to:    #060C1C;
   }
+
+  /* ─── UAP Domain — Green "Tinted Skin" ────────────────────────── */
+  /*
+   * When a page is wrapped in .uap-domain (see uap/layout.tsx),
+   * gradient tokens shift from NDE blue to UAP green.
+   * Score badge colors reuse NDE equivalents (emerald/blue/rose)
+   * since the triads map 1:1 and the green domain accent provides
+   * sufficient visual separation.
+   */
+  .uap-domain {
+    --primary: 142 71% 45%;           /* green-600 #16a34a */
+    --ring: 142 71% 45%;
+    --hero-from: #DCFCE7;   /* green-100 */
+    --hero-mid:  #F0FDF4;   /* green-50 */
+    --hero-to:   #D1FAE5;   /* emerald-100 */
+    --cta-from:  #F0FDF4;
+    --cta-to:    #DCFCE7;
+  }
+
+  .dark .uap-domain {
+    --primary: 142 71% 45%;           /* green-600 — unchanged in dark */
+    --ring: 142 71% 45%;
+    --hero-from: #0a1510;   /* deep green-tinted navy */
+    --hero-mid:  #0f1a12;   /* green-tinted midnight */
+    --hero-to:   #0a1510;
+    --cta-from:  #0f1a12;
+    --cta-to:    #0a1510;
+  }
 }
 
 @layer base {

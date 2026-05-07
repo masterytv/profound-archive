@@ -1,0 +1,64 @@
+name: UAP Blog — Daily Question Article (1pm ET)
+
+on:
+  schedule:
+    - cron: '0 17 * * *'                 # Daily 17:00 UTC = 1pm ET (EDT) — offset 1h from NDE
+  workflow_dispatch:                    # manual trigger for testing
+    inputs:
+      count:
+        description: 'Number of articles to generate (max 3)'
+        required: false
+        default: '1'
+
+jobs:
+  generate:
+    name: Generate & publish UAP blog article
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Trigger UAP blog generation
+        run: |
+          COUNT="${{ github.event.inputs.count || '1' }}"
+          MAX_ATTEMPTS=3
+          ATTEMPT=1
+
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -X POST \
+              --connect-timeout 15 \
+              --max-time 540 \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              -H "Content-Type: application/json" \
+              "https://${{ secrets.APP_DIRECT_URL }}/api/cron/uap-blog-questions?count=$COUNT")
+
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            BODY=$(echo "$RESPONSE" | head -n -1)
+
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Success on attempt $ATTEMPT"
+              break
+            fi
+
+            echo "⚠️ Attempt $ATTEMPT failed with status $HTTP_CODE"
+            echo "Response: $BODY"
+            if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
+              echo "Retrying in 10 seconds..."
+              sleep 10
+            fi
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::UAP blog generation failed with status $HTTP_CODE after $MAX_ATTEMPTS attempts"
+            exit 1
+          fi
+
+# ── Required GitHub Secrets ──────────────────────────────────────────────────
+# CRON_SECRET      — same secret used by scanner/tick and other cron routes
+# APP_DIRECT_URL   — Firebase App Hosting direct URL (bypasses Cloudflare)
+# ─────────────────────────────────────────────────────────────────────────────

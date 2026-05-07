@@ -22,9 +22,9 @@ export default function UapLayout({
       className="uap-domain min-h-screen"
       style={
         {
-          "--domain-accent": "#8b5cf6",
-          "--domain-accent-light": "#ede9fe",
-          "--domain-accent-dark": "#6d28d9",
+          "--domain-accent": "#16a34a",
+          "--domain-accent-light": "#DCFCE7",
+          "--domain-accent-dark": "#15803d",
         } as React.CSSProperties
       }
     >

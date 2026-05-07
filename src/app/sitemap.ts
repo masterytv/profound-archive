@@ -2,7 +2,9 @@ import { createClient } from '@/lib/supabase/server';
 import type { MetadataRoute } from 'next';
 
 /**
- * Dynamic sitemap — includes questions, blog posts, and experiencer profiles.
+ * Dynamic sitemap — includes NDE questions, blog posts, experiencer profiles,
+ * and UAP encounters, contactees, channels, and programs.
+ *
  * Visited by Google, Bing, and AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.)
  * at /sitemap.xml
  *
@@ -11,7 +13,7 @@ import type { MetadataRoute } from 'next';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = await createClient();
 
-    // Active question pages
+    // ── NDE: Active question pages ──────────────────────────────────────────
     const { data: questions } = await supabase
         .from('nde_questions')
         .select('slug, updated_at')
@@ -25,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
     }));
 
-    // Published blog posts
+    // ── Published blog posts (NDE + UAP — domain-agnostic) ──────────────────
     const { data: blogPosts } = await supabase
         .from('blog_posts')
         .select('slug, published_at, updated_at, category')
@@ -36,11 +38,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `https://projectprofound.org/blog/${p.slug}`,
         lastModified: p.updated_at ?? p.published_at ?? new Date().toISOString(),
         changeFrequency: 'monthly' as const,
-        // Cluster (pillar) pages get highest priority, others slightly lower
         priority: p.category === 'guide' ? 0.9 : 0.75,
     }));
 
-    // Published experiencer profiles
+    // ── NDE: Published experiencer profiles ─────────────────────────────────
     const { data: experiencers } = await supabase
         .from('experiencer_profiles')
         .select('slug, updated_at')
@@ -54,15 +55,74 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
     }));
 
-    // Static high-priority pages
+    // ── UAP: Encounter pages (Tier 1 + Tier 2 with transcripts) ─────────────
+    const { data: uapEncounters } = await supabase
+        .from('uap_vids')
+        .select('video_id, updated_at')
+        .in('tier', [1, 2])
+        .not('transcript', 'is', null)
+        .order('video_id');
+
+    const uapEncounterUrls: MetadataRoute.Sitemap = (uapEncounters ?? []).map((v) => ({
+        url: `https://projectprofound.org/uap/encounters/${v.video_id}`,
+        lastModified: v.updated_at ?? new Date().toISOString(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.65,
+    }));
+
+    // ── UAP: Contactee profiles ─────────────────────────────────────────────
+    const { data: contactees } = await supabase
+        .from('uap_contactees')
+        .select('slug, updated_at')
+        .order('slug');
+
+    const contacteeUrls: MetadataRoute.Sitemap = (contactees ?? []).map((c) => ({
+        url: `https://projectprofound.org/uap/contactees/${c.slug}`,
+        lastModified: c.updated_at ?? new Date().toISOString(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+    }));
+
+    // ── UAP: Channel pages ──────────────────────────────────────────────────
+    const { data: uapChannels } = await supabase
+        .from('uap_channels')
+        .select('handle, updated_at')
+        .eq('hidden', false)
+        .not('handle', 'is', null)
+        .order('handle');
+
+    const channelUrls: MetadataRoute.Sitemap = (uapChannels ?? []).map((ch) => ({
+        url: `https://projectprofound.org/uap/channels/${ch.handle}`,
+        lastModified: ch.updated_at ?? new Date().toISOString(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.55,
+    }));
+
+    // ── Static high-priority pages ──────────────────────────────────────────
     const staticUrls: MetadataRoute.Sitemap = [
+        // NDE domain
         { url: 'https://projectprofound.org',                lastModified: new Date(), changeFrequency: 'daily',   priority: 1.0 },
         { url: 'https://projectprofound.org/questions',      lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9 },
         { url: 'https://projectprofound.org/blog',           lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
         { url: 'https://projectprofound.org/experiencer',    lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
         { url: 'https://projectprofound.org/channels',       lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.7 },
         { url: 'https://projectprofound.org/resources',      lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+        // UAP domain
+        { url: 'https://projectprofound.org/uap',            lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9 },
+        { url: 'https://projectprofound.org/uap/search',     lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
+        { url: 'https://projectprofound.org/uap/contactees', lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
+        { url: 'https://projectprofound.org/uap/channels',   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.7 },
+        { url: 'https://projectprofound.org/uap/timeline',   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.7 },
+        { url: 'https://projectprofound.org/uap/chat',       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     ];
 
-    return [...staticUrls, ...questionUrls, ...blogUrls, ...experiencerUrls];
+    return [
+        ...staticUrls,
+        ...questionUrls,
+        ...blogUrls,
+        ...experiencerUrls,
+        ...uapEncounterUrls,
+        ...contacteeUrls,
+        ...channelUrls,
+    ];
 }

@@ -1,0 +1,41 @@
+name: UAP Knowledge Extraction (Weekly)
+
+on:
+  schedule:
+    # Run weekly on Sundays at 08:00 UTC (4am ET) — after triad batch completes
+    # Extracts people, claims, events, programs from Tier 2 UAP videos
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max videos to process'
+        required: false
+        default: '100'
+
+jobs:
+  knowledge-batch:
+    name: UAP Knowledge Extraction Batch
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run UAP knowledge extraction
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          npx tsx scripts/uap-knowledge-batch.ts \
+            --limit ${{ github.event.inputs.limit || '100' }}

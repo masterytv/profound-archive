@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   Search,
   MessageSquare,
@@ -8,6 +9,22 @@ import {
   Radio,
   Users,
 } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "UFO & UAP Encounters — AI-Powered Analysis | Project Profound",
+  description:
+    "Explore first-person UAP contact accounts, government disclosure analysis, and investigative research. AI-powered evidence scoring, semantic search, and researcher chat across 500+ analyzed encounters.",
+  openGraph: {
+    title: "UFO & UAP Encounters — AI-Powered Analysis | Project Profound",
+    description:
+      "Explore first-person UAP contact accounts, government disclosure analysis, and investigative research through AI-powered search and analysis.",
+    type: "website",
+    url: "https://projectprofound.org/uap",
+  },
+  alternates: {
+    canonical: "https://projectprofound.org/uap",
+  },
+};
 
 // Server-side data fetching with anon key (SSG-safe per LEARNINGS.md)
 async function getUapStats() {
@@ -40,7 +57,7 @@ export default async function UapLandingPage() {
         "Browse first-person UAP contact accounts analyzed with evidence scoring and transformation metrics.",
       icon: Telescope,
       href: "/uap/search",
-      color: "violet",
+      color: "green",
     },
     {
       title: "Search Archive",
@@ -48,7 +65,7 @@ export default async function UapLandingPage() {
         "Search across thousands of videos using keyword or AI-powered semantic search with timestamped results.",
       icon: Search,
       href: "/uap/search",
-      color: "purple",
+      color: "green",
     },
     {
       title: "Ask the Archive",
@@ -56,7 +73,7 @@ export default async function UapLandingPage() {
         "Chat with an AI researcher grounded in real UAP video content. Every answer cites its sources.",
       icon: MessageSquare,
       href: "/uap/chat",
-      color: "indigo",
+      color: "green",
     },
   ];
 
@@ -64,12 +81,12 @@ export default async function UapLandingPage() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-950/40 via-background to-indigo-950/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-950/40 via-background to-emerald-950/30" />
         <div className="relative max-w-6xl mx-auto px-6 py-20 md:py-28">
           <div className="flex items-center gap-2 mb-6">
-            <Radio className="w-5 h-5 text-violet-400" />
-            <span className="text-sm font-medium text-violet-400 uppercase tracking-wider">
-              UAP Archive
+            <Radio className="w-5 h-5 text-green-400" />
+            <span className="text-sm font-medium text-green-400 uppercase tracking-wider">
+              UFO & UAP Archive
             </span>
           </div>
           <h1
@@ -78,7 +95,7 @@ export default async function UapLandingPage() {
           >
             UFO & UAP
             <br />
-            <span className="text-violet-400">Encounters & Research</span>
+            <span className="text-green-400">Encounters & Research</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
             AI-analyzed archive of first-person contact accounts and disclosure
@@ -110,7 +127,7 @@ export default async function UapLandingPage() {
           <div className="flex gap-4">
             <Link
               href="/uap/search"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl transition-colors"
             >
               <Search className="w-4 h-4" />
               Search Archive
@@ -133,10 +150,10 @@ export default async function UapLandingPage() {
             <Link
               key={card.title}
               href={card.href}
-              className="group relative p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 hover:border-violet-500/30"
+              className="group relative p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 hover:border-green-500/30"
             >
-              <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center mb-4 group-hover:bg-violet-500/20 transition-colors">
-                <card.icon className="w-5 h-5 text-violet-400" />
+              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center mb-4 group-hover:bg-green-500/20 transition-colors">
+                <card.icon className="w-5 h-5 text-green-400" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 {card.title}
@@ -166,9 +183,9 @@ export default async function UapLandingPage() {
             </p>
           </div>
           <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-violet-500/5 border border-violet-500/10">
+            <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/10">
               <div className="flex items-center gap-3 mb-2">
-                <Users className="w-5 h-5 text-violet-400" />
+                <Users className="w-5 h-5 text-green-400" />
                 <h3 className="font-semibold text-foreground">
                   Track 1: Encounters
                 </h3>
@@ -179,9 +196,9 @@ export default async function UapLandingPage() {
                 research scales.
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
+            <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
               <div className="flex items-center gap-3 mb-2">
-                <BarChart3 className="w-5 h-5 text-indigo-400" />
+                <BarChart3 className="w-5 h-5 text-emerald-400" />
                 <h3 className="font-semibold text-foreground">
                   Track 2: Program & Research
                 </h3>

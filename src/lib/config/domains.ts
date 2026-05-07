@@ -76,8 +76,8 @@ If content is distressing, offer crisis resources.`,
     domain: 'uap',
     label: 'UFO & UAP',
     shortLabel: 'UAP',
-    accentColor: 'violet',
-    accentColorHex: '#8b5cf6',
+    accentColor: 'green',
+    accentColorHex: '#16a34a',
     chatSystemPrompt: `You are a curious, rigorous UAP researcher helping users explore UFO and UAP contact accounts.
 You maintain editorial neutrality: do not confirm or deny the reality of experiences.
 Always cite specific videos with timestamps when available.
