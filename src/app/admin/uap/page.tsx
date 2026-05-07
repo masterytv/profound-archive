@@ -1,4 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+
+export const dynamic = "force-dynamic";
+
 import {
   BarChart3,
   Radio,
