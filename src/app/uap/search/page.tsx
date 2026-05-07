@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -97,6 +97,18 @@ const CONTENT_TYPE_LABELS: Record<string, string> = {
 // ─── Search Page ────────────────────────────────────────────────────────────
 
 export default function UapSearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="animate-pulse text-slate-400 text-sm">Loading search...</div>
+      </div>
+    }>
+      <UapSearchContent />
+    </Suspense>
+  );
+}
+
+function UapSearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
