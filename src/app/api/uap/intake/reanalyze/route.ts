@@ -4,100 +4,98 @@ import { analyzeUapPhenomenology } from '@/lib/ai/uap-phenomenology';
 import { analyzeUapEncounterContext } from '@/lib/ai/uap-encounter-context';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300;
 
 /**
  * POST /api/uap/intake/reanalyze
+ * Targeted re-analysis of specific UAP videos.
+ * Re-runs selected analysis passes without full pipeline reset.
  *
- * Re-runs phenomenology and/or encounter context analysis for a specific video.
- * Used when schema fixes require re-processing without full pipeline re-run.
- *
- * Body: { videoId: string, secret: string, passes?: string[] }
- * passes defaults to ['phenomenology', 'encounter_context']
+ * Body: { videoId: string, secret: string, passes?: ('phenomenology' | 'encounter_context')[] }
+ * Default passes: ['phenomenology', 'encounter_context']
  */
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => ({}));
-  const { videoId, secret, passes } = body;
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { videoId, secret, passes = ['phenomenology', 'encounter_context'] } = body;
 
-  if (secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  if (!videoId) {
-    return NextResponse.json({ error: 'Missing videoId' }, { status: 400 });
-  }
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-  );
-
-  // Fetch transcript
-  const { data: vid, error: vidError } = await supabase
-    .from('uap_vids')
-    .select('title, subtitles_punctuated, tier')
-    .eq('video_id', videoId)
-    .single();
-
-  if (vidError || !vid?.subtitles_punctuated) {
-    return NextResponse.json({
-      error: vidError?.message || 'No transcript found',
-    }, { status: 404 });
-  }
-
-  if (vid.tier !== 1) {
-    return NextResponse.json({
-      error: `Video is Tier ${vid.tier}, phenomenology is Tier 1 only`,
-    }, { status: 400 });
-  }
-
-  const activePasses = passes || ['phenomenology', 'encounter_context'];
-  const results: Record<string, any> = {};
-  const updates: Record<string, any> = {};
-
-  // Run requested passes in parallel
-  const promises: Promise<void>[] = [];
-
-  if (activePasses.includes('phenomenology')) {
-    promises.push(
-      analyzeUapPhenomenology(vid.subtitles_punctuated).then(r => {
-        results.phenomenology = r ? 'success' : 'failed';
-        if (r) updates.phenomenology_breakdown = r;
-      })
-    );
-  }
-
-  if (activePasses.includes('encounter_context')) {
-    promises.push(
-      analyzeUapEncounterContext(vid.subtitles_punctuated).then(r => {
-        results.encounter_context = r ? 'success' : 'failed';
-        if (r) updates.encounter_context = r;
-      })
-    );
-  }
-
-  await Promise.all(promises);
-
-  // Save results
-  if (Object.keys(updates).length > 0) {
-    const { error: saveError } = await supabase
-      .from('uap_analysis')
-      .update(updates)
-      .eq('video_id', videoId);
-
-    if (saveError) {
-      return NextResponse.json({
-        error: `Save failed: ${saveError.message}`,
-        results,
-      }, { status: 500 });
+    // Auth check
+    if (secret !== process.env.CRON_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-  }
 
-  return NextResponse.json({
-    success: true,
-    videoId,
-    title: vid.title,
-    results,
-    updatedFields: Object.keys(updates),
-  });
+    if (!videoId) {
+      return NextResponse.json({ error: 'videoId is required' }, { status: 400 });
+    }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_KEY!,
+    );
+
+    // Fetch transcript
+    const { data: video, error: videoError } = await supabase
+      .from('uap_vids')
+      .select('title, subtitles_punctuated')
+      .eq('video_id', videoId)
+      .single();
+
+    if (videoError || !video?.subtitles_punctuated) {
+      return NextResponse.json(
+        { error: 'Video not found or no transcript', details: videoError?.message },
+        { status: 404 }
+      );
+    }
+
+    console.log(`[reanalyze] Video: "${video.title}" (${videoId})`);
+    console.log(`[reanalyze] Transcript: ${video.subtitles_punctuated.length} chars`);
+    console.log(`[reanalyze] Passes: ${passes.join(', ')}`);
+
+    const results: Record<string, unknown> = {};
+    const updatePayload: Record<string, unknown> = {};
+
+    // Run phenomenology pass
+    if (passes.includes('phenomenology')) {
+      console.log('[reanalyze] Running phenomenology analysis...');
+      const phenomResult = await analyzeUapPhenomenology(video.subtitles_punctuated);
+      results.phenomenology = phenomResult ? 'success' : 'failed';
+      if (phenomResult) {
+        updatePayload.phenomenology_breakdown = phenomResult;
+      }
+    }
+
+    // Run encounter context pass
+    if (passes.includes('encounter_context')) {
+      console.log('[reanalyze] Running encounter context analysis...');
+      const contextResult = await analyzeUapEncounterContext(video.subtitles_punctuated);
+      results.encounter_context = contextResult ? 'success' : 'failed';
+      if (contextResult) {
+        updatePayload.encounter_context = contextResult;
+      }
+    }
+
+    // Save results
+    if (Object.keys(updatePayload).length > 0) {
+      const { error: updateError } = await supabase
+        .from('uap_analysis')
+        .update(updatePayload)
+        .eq('video_id', videoId);
+
+      if (updateError) {
+        console.error('[reanalyze] Save error:', updateError.message);
+        return NextResponse.json(
+          { error: 'Failed to save results', details: updateError.message },
+          { status: 500 }
+        );
+      }
+    }
+
+    console.log('[reanalyze] ✅ Complete:', results);
+    return NextResponse.json({ videoId, results, saved: Object.keys(updatePayload) });
+  } catch (error) {
+    console.error('[reanalyze] Error:', error);
+    return NextResponse.json(
+      { error: 'Internal error', details: String(error) },
+      { status: 500 }
+    );
+  }
 }
