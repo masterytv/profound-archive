@@ -396,10 +396,10 @@ function ConsciousnessPanel({ data }: { data: ConsciousnessAlteration }) {
 
 function PhysicalEffectsPanel({ effects }: { effects: PhysicalEffects }) {
   const categories = [
-    { label: "Physiological", items: effects.witness_physiological, color: "red" },
-    { label: "Vehicle / Equipment", items: effects.vehicle_equipment, color: "amber" },
-    { label: "Environmental", items: effects.environmental, color: "blue" },
-    { label: "Temporal", items: effects.temporal, color: "purple" },
+    { label: "Physiological", items: effects.witness_physiological ?? [], color: "red" },
+    { label: "Vehicle / Equipment", items: effects.vehicle_equipment ?? [], color: "amber" },
+    { label: "Environmental", items: effects.environmental ?? [], color: "blue" },
+    { label: "Temporal", items: effects.temporal ?? [], color: "purple" },
   ].filter((c) => c.items.length > 0);
 
   if (categories.length === 0 && !effects.details) {
@@ -657,17 +657,17 @@ export function UapResearchBreakdown({ data, evidenceBreakdown, className }: Uap
 
         {/* Craft Observation */}
         <Section title="Craft Observation" icon={Radar} defaultOpen={data?.craft_observation?.observed || false}>
-          <CraftPanel craft={data?.craft_observation || { observed: false, description: "", five_observables: { sudden_acceleration: false, hypersonic_velocities: false, low_observability: false, trans_medium_travel: false, positive_lift: false } }} />
+          <CraftPanel craft={data?.craft_observation || { observed: false, shape: 'none', size_estimate: 'unknown', color: 'unknown', luminosity: 'not_stated', sound: 'not_stated', movement: [], five_observables: { instantaneous_acceleration: false, hypersonic_velocity: false, low_observability: false, trans_medium_travel: false, positive_lift: false }, description: '' }} />
         </Section>
 
         {/* Consciousness Alteration */}
         <Section title="Consciousness Alteration" icon={Brain} defaultOpen={false}>
-          <ConsciousnessPanel data={data?.consciousness_alteration || { altered_state: false }} />
+          <ConsciousnessPanel data={data?.consciousness_alteration || { state_of_consciousness: 'not_stated', time_perception: 'not_stated', thought_clarity: 'not_stated', memory_quality: 'not_stated', screen_memory_details: '', agency: 'not_stated', reality_assessment: 'not_stated', reality_quote: '', oz_factor: false, ontological_shock_rating: 5 }} />
         </Section>
 
         {/* Physical Effects */}
         <Section title="Physical Effects" icon={Zap} defaultOpen={false}>
-          <PhysicalEffectsPanel effects={data?.physical_effects || { present: false, physiological: [], psychological: [], environmental: [] }} />
+          <PhysicalEffectsPanel effects={data?.physical_effects || { witness_physiological: [], vehicle_equipment: [], environmental: [], temporal: [], details: '' }} />
         </Section>
 
         {/* Emotional Progression */}
