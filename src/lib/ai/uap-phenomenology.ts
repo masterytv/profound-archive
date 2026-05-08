@@ -25,40 +25,40 @@ const getOpenAIClient = () => {
 
 const EncounterPhaseEnum = z.enum([
   'precursor', 'onset', 'approach', 'immersion',
-  'communication', 'separation', 'aftermath',
+  'communication', 'separation', 'aftermath', 'not_stated', 'unknown'
 ]);
 
 const UapEntityTypeEnum = z.enum([
   'grey', 'tall_grey', 'mantis', 'insectoid_other', 'reptilian',
   'nordic', 'tall_white', 'humanoid', 'hybrid',
   'light_being', 'blue_being', 'angelic', 'demonic',
-  'shadow_entity', 'hooded_cloaked', 'robotic', 'amorphous', 'unknown',
+  'shadow_entity', 'hooded_cloaked', 'robotic', 'amorphous', 'unknown', 'not_stated'
 ]);
 
-const EntityCountEnum = z.enum(['single', 'few', 'many']);
-const LuminosityEnum = z.enum(['radiant', 'glowing', 'normal', 'dark', 'translucent', 'not_stated']);
-const DemeanorEnum = z.enum(['benevolent', 'neutral', 'clinical', 'menacing', 'curious', 'authoritative', 'not_stated']);
-const CommMethodEnum = z.enum(['telepathy', 'verbal', 'gesture', 'emotional', 'technological', 'presence_only', 'none', 'not_stated']);
+const EntityCountEnum = z.enum(['single', 'few', 'many', 'unknown', 'not_stated']);
+const LuminosityEnum = z.enum(['radiant', 'glowing', 'normal', 'dark', 'translucent', 'not_stated', 'unknown']);
+const DemeanorEnum = z.enum(['benevolent', 'neutral', 'clinical', 'menacing', 'curious', 'authoritative', 'not_stated', 'unknown']);
+const CommMethodEnum = z.enum(['telepathy', 'verbal', 'gesture', 'emotional', 'technological', 'presence_only', 'none', 'not_stated', 'unknown']);
 const InteractionTypeEnum = z.enum([
   'observation', 'medical_exam', 'teaching', 'abduction', 'consensual_contact',
-  'guided_tour', 'warning', 'task_assignment', 'none', 'not_stated',
+  'guided_tour', 'warning', 'task_assignment', 'none', 'not_stated', 'unknown'
 ]);
 
-const ConsciousnessStateEnum = z.enum(['normal_waking', 'heightened', 'trance', 'paralysis', 'hyper_lucid', 'dissociated', 'not_stated']);
-const TimePerceptionEnum = z.enum(['normal', 'dilated', 'compressed', 'missing_time', 'timeless', 'not_stated']);
-const ThoughtClarityEnum = z.enum(['enhanced', 'normal', 'diminished', 'overwhelmed', 'controlled_by_other', 'not_stated']);
-const MemoryQualityEnum = z.enum(['perfect_recall', 'vivid', 'partial', 'fragmentary', 'screen_memory', 'recovered', 'not_stated']);
-const AgencyEnum = z.enum(['full_control', 'partial_control', 'no_control', 'directed', 'not_stated']);
-const RealityAssessmentEnum = z.enum(['more_real', 'equally_real', 'dreamlike', 'surreal', 'hyperreal', 'not_stated']);
+const ConsciousnessStateEnum = z.enum(['normal_waking', 'heightened', 'trance', 'paralysis', 'hyper_lucid', 'dissociated', 'not_stated', 'unknown']);
+const TimePerceptionEnum = z.enum(['normal', 'dilated', 'compressed', 'missing_time', 'timeless', 'not_stated', 'unknown']);
+const ThoughtClarityEnum = z.enum(['enhanced', 'normal', 'diminished', 'overwhelmed', 'controlled_by_other', 'not_stated', 'unknown']);
+const MemoryQualityEnum = z.enum(['perfect_recall', 'vivid', 'partial', 'fragmentary', 'screen_memory', 'recovered', 'not_stated', 'unknown']);
+const AgencyEnum = z.enum(['full_control', 'partial_control', 'no_control', 'directed', 'not_stated', 'unknown']);
+const RealityAssessmentEnum = z.enum(['more_real', 'equally_real', 'dreamlike', 'surreal', 'hyperreal', 'not_stated', 'unknown']);
 
 const CraftShapeEnum = z.enum([
   'disc', 'triangle', 'sphere', 'cigar', 'tic_tac', 'chevron',
   'diamond', 'delta', 'boomerang', 'irregular', 'morphing', 'other', 'unknown', 'none', 'not_stated',
 ]);
-const CraftLuminosityEnum = z.enum(['self_luminous', 'reflective', 'dark', 'pulsating', 'color_shifting', 'not_stated']);
-const CraftSoundEnum = z.enum(['silent', 'humming', 'buzzing', 'roaring', 'pulsing', 'other', 'not_stated']);
+const CraftLuminosityEnum = z.enum(['self_luminous', 'reflective', 'dark', 'pulsating', 'color_shifting', 'not_stated', 'unknown']);
+const CraftSoundEnum = z.enum(['silent', 'humming', 'buzzing', 'roaring', 'pulsing', 'other', 'not_stated', 'unknown']);
 
-const DurationEstimateEnum = z.enum(['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years', 'ongoing', 'unknown', 'missing_time']);
+const DurationEstimateEnum = z.enum(['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years', 'ongoing', 'unknown', 'missing_time', 'not_stated']);
 
 // ─── LLM Output Normalizer ───────────────────────────────────────────────────
 // gpt-4o-mini frequently returns "not stated" or "not described" instead of

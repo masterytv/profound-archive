@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { runUapProcessTick } from '@/lib/scanner/uap-tick';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET|POST /api/uap/scanner/process
  *

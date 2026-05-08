@@ -260,7 +260,7 @@ export async function processUapVideoIntake(
             transcripts.punctuated,
             metadata.title || undefined,
             metadata.description || undefined,
-            metadata.channelTitle || undefined,
+            undefined, // channel title not in metadata object
         );
 
         if (!classification) {
@@ -361,7 +361,7 @@ export async function processUapVideoIntake(
 
             if (evidenceResult) {
                 analysisRecord.evidence_score = evidenceResult.total_score;
-                analysisRecord.evidence_breakdown = evidenceResult.criteria;
+                analysisRecord.evidence_breakdown = evidenceResult;
                 // Hynek/Vallée types come from classification context, not evidence scoring
                 // They'll be populated if the classify step extracted them
             }
