@@ -9,6 +9,8 @@ import {
   BookOpen,
   ChevronDown,
   Radar,
+  Loader2,
+  Database,
 } from "lucide-react";
 import {
   Collapsible,
@@ -368,37 +370,70 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
             )}
 
             {/* ── Tier 1: Encounter Context + Deep Analysis ────────────── */}
-            {isTier1 && analysis?.encounter_context && (
+            {isTier1 && video.intake_status !== "punctuated" && video.intake_status !== "pending" && (
               <UapEncounterContextCard
-                data={analysis.encounter_context as UapEncounterContextResult}
+                data={analysis?.encounter_context as UapEncounterContextResult | null}
               />
             )}
 
-            {isTier1 && analysis?.phenomenology_breakdown && (
-              <UapResearchBreakdown
-                data={analysis.phenomenology_breakdown as UapPhenomenologyResult}
-                evidenceBreakdown={analysis.evidence_breakdown as EvidenceBreakdown | null}
-              />
-            )}
-
-            {/* Legacy phenomenology grid (fallback for older Tier 1 records) */}
-            {isTier1 && !analysis?.phenomenology_breakdown && analysis?.phenomenology && (
-              <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
-                  <Radar className="w-4 h-4 text-green-500" />
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-                    Phenomenology
-                  </h2>
+            {isTier1 && (
+              video.intake_status === "punctuated" || video.intake_status === "pending" ? (
+                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
+                    <Radar className="w-4 h-4 text-green-500" />
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                      Research Breakdown
+                    </h2>
+                  </div>
+                  <div className="px-6 py-8 text-center">
+                    <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400 font-medium">Analysis pending</p>
+                    <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">This video is in the queue for deep phenomenological extraction.</p>
+                  </div>
                 </div>
-                <div className="px-6 py-5">
-                  <PhenomenologyGrid data={analysis.phenomenology} />
+              ) : analysis?.phenomenology && !analysis?.phenomenology_breakdown ? (
+                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
+                    <Radar className="w-4 h-4 text-green-500" />
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                      Phenomenology
+                    </h2>
+                  </div>
+                  <div className="px-6 py-5">
+                    <PhenomenologyGrid data={analysis.phenomenology} />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <UapResearchBreakdown
+                  data={analysis?.phenomenology_breakdown as UapPhenomenologyResult | null}
+                  evidenceBreakdown={analysis?.evidence_breakdown as EvidenceBreakdown | null}
+                />
+              )
             )}
 
             {/* ── Tier 2: Program Intelligence Breakdown ────────────── */}
-            {!isTier1 && analysis?.program_intel_breakdown && (
-              <UapProgramIntelCard data={analysis.program_intel_breakdown as UapProgramIntelResult} />
+            {!isTier1 && (
+              video.intake_status === "punctuated" || video.intake_status === "pending" ? (
+                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
+                    <Database className="w-4 h-4 text-green-500" />
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                      Program Intelligence
+                    </h2>
+                  </div>
+                  <div className="px-6 py-8 text-center">
+                    <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400 font-medium">Analysis pending</p>
+                    <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">This video is in the queue for deep program intelligence extraction.</p>
+                  </div>
+                </div>
+              ) : (
+                <UapProgramIntelCard data={analysis?.program_intel_breakdown as UapProgramIntelResult | null} />
+              )
             )}
 
             {/* Timestamped Transcript */}

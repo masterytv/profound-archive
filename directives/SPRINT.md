@@ -638,10 +638,10 @@ For every UAP file you create:
 > Build a single, unified intake orchestrator (`intake-uap.ts`) that handles all ingestion (Admin UI, Channel Scanner, GitHub queue) and dynamically branches into Tier 1 (Phenomenology/Triad) or Tier 2 (Program Intel) pipelines.
 > Then, gracefully wipe legacy data and queue the entire corpus for a slow, IO-safe re-processing run.
 
-- [ ] Story 6.7.1: Build `intake-uap.ts` unified pipeline — Update `src/lib/pipeline/intake-uap.ts` to execute both Tier 1 analysis (phenomenology, context, triad) and Tier 2 analysis (program intel) based on the video's tier, rather than splitting logic. (1d)
-- [ ] Story 6.7.2: Wire up external triggers — Ensure the Admin Intake page (`/admin/intake`), the Channel Scanner tick (`/api/scanner`), and the GitHub queue processor all seamlessly utilize the single `processUapVideoIntake` pipeline. (0.5d)
-- [ ] Story 6.7.3: Build database reset script (`scripts/uap-reset-analysis.ts`) — A script that removes all existing `uap_analysis` and `uap_vids.classified_at` data for Tier 1 and Tier 2 videos, pushing them into `uap_scan_queue` (or `uap_jobs`) to be picked up by the background processor. (0.5d)
-- [ ] Story 6.7.4: Queue Throttling Strategy — Adjust the GitHub Action schedule (`uap-scanner-process.yml`) or queue batch size to ensure the processing spaces out gracefully over a week, preventing Supabase IO spikes (Micro plan limits) while remaining well under the $200/mo cost limit. (0.25d)
+- [x] Story 6.7.1: Build `intake-uap.ts` unified pipeline — Update `src/lib/pipeline/intake-uap.ts` to execute both Tier 1 analysis (phenomenology, context, triad) and Tier 2 analysis (program intel) based on the video's tier, rather than splitting logic. (1d) ✅ 2026-05-07
+- [x] Story 6.7.2: Wire up external triggers — Ensure the Admin Intake page (`/admin/intake`), the Channel Scanner tick (`/api/scanner`), and the GitHub queue processor all seamlessly utilize the single `processUapVideoIntake` pipeline. (0.5d) ✅ 2026-05-07
+- [x] Story 6.7.3: Build database reset script (`scripts/uap-reset-analysis.ts`) — A script that removes all existing `uap_analysis` and `uap_vids.classified_at` data for Tier 1 and Tier 2 videos, pushing them into `uap_scan_queue` (or `uap_jobs`) to be picked up by the background processor. (0.5d) ✅ 2026-05-07
+- [x] Story 6.7.4: Queue Throttling Strategy — Adjust the GitHub Action schedule (`uap-scanner-process.yml`) or queue batch size to ensure the processing spaces out gracefully over a week, preventing Supabase IO spikes (Micro plan limits) while remaining well under the $200/mo cost limit. (0.25d) ✅ 2026-05-07
 
 ---
 

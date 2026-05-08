@@ -61,13 +61,15 @@ const CraftSoundEnum = z.enum(['silent', 'humming', 'buzzing', 'roaring', 'pulsi
 const DurationEstimateEnum = z.enum(['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years', 'ongoing', 'unknown', 'missing_time', 'not_stated']);
 
 // ─── LLM Output Normalizer ───────────────────────────────────────────────────
-// gpt-4o-mini frequently returns "not stated" or "not described" instead of
-// the underscored enum value "not_stated". This preprocessor normalizes
-// common LLM drift patterns before Zod validation.
-//
-// IMPORTANT: Only normalize SHORT strings (≤30 chars) without sentence punctuation.
-// This targets enum values while preserving readable free-text descriptions,
-// labels, and quotes which should keep their natural spaces.
+// gpt-4o-mini frequently returns values like "not stated", "N/A", "none",
+// or "not described" instead of the underscored enum values. This preprocessor
+// normalizes common LLM drift patterns before Zod validation.
+
+const NOT_STATED_SYNONYMS = new Set([
+  'not stated', 'not_described', 'not described', 'n/a', 'na', 'none stated',
+  'not available', 'not applicable', 'not mentioned', 'not specified',
+  'unspecified', 'undetermined', 'not reported', 'not provided',
+]);
 
 function normalizeLlmOutput(raw: Record<string, unknown>): Record<string, unknown> {
   return JSON.parse(
@@ -75,8 +77,8 @@ function normalizeLlmOutput(raw: Record<string, unknown>): Record<string, unknow
       if (typeof value !== 'string') return value;
       const lower = value.toLowerCase().trim();
 
-      // Map common "not stated" variants to canonical enum value (any length)
-      if (lower === 'not stated' || lower === 'not described' || lower === 'not_described') {
+      // Map "not stated" synonyms to canonical enum value
+      if (NOT_STATED_SYNONYMS.has(lower)) {
         return 'not_stated';
       }
 
@@ -93,132 +95,163 @@ function normalizeLlmOutput(raw: Record<string, unknown>): Record<string, unknow
   );
 }
 
-// ─── Sub-schemas ─────────────────────────────────────────────────────────────
+// ─── Sub-schemas (with .catch() fallbacks for LLM resilience) ────────────────
+// Every enum field gets .catch('unknown') or .catch('not_stated') so that
+// a single unexpected value doesn't kill the entire phenomenology extraction.
+// Every numeric field gets .catch() so out-of-range values degrade gracefully.
+
+const defaultSensory = { active: false, description: '', extraordinary: false, intensity: 0 };
 
 const EncounterFlowPhaseSchema = z.object({
-  phase: EncounterPhaseEnum,
-  label: z.string(),
-  present: z.boolean(),
-  duration_estimate: DurationEstimateEnum,
-  description: z.string(),
-  key_quote: z.string(),
+  phase: EncounterPhaseEnum.catch('unknown'),
+  label: z.string().catch(''),
+  present: z.boolean().catch(false),
+  duration_estimate: DurationEstimateEnum.catch('unknown'),
+  description: z.string().catch(''),
+  key_quote: z.string().catch(''),
 });
 
 const SensoryChannelSchema = z.object({
-  active: z.boolean(),
-  description: z.string(),
-  extraordinary: z.boolean(),
-  intensity: z.number().min(0).max(10),
+  active: z.boolean().catch(false),
+  description: z.string().catch(''),
+  extraordinary: z.boolean().catch(false),
+  intensity: z.number().min(0).max(10).catch(0),
 });
 
 const EmotionEntrySchema = z.object({
-  emotion: z.string(),
-  intensity: z.number().min(1).max(10),
-  context: z.string(),
-  phase: EncounterPhaseEnum.optional(),
+  emotion: z.string().catch(''),
+  intensity: z.number().min(0).max(10).catch(1),
+  context: z.string().catch(''),
+  phase: EncounterPhaseEnum.optional().catch(undefined),
 });
 
 const ConsciousnessAlterationSchema = z.object({
-  state_of_consciousness: ConsciousnessStateEnum,
-  time_perception: TimePerceptionEnum,
-  thought_clarity: ThoughtClarityEnum,
-  memory_quality: MemoryQualityEnum,
-  screen_memory_details: z.string(),
-  agency: AgencyEnum,
-  reality_assessment: RealityAssessmentEnum,
-  reality_quote: z.string(),
-  oz_factor: z.boolean(),
-  ontological_shock_rating: z.number().min(1).max(10),
+  state_of_consciousness: ConsciousnessStateEnum.catch('not_stated'),
+  time_perception: TimePerceptionEnum.catch('not_stated'),
+  thought_clarity: ThoughtClarityEnum.catch('not_stated'),
+  memory_quality: MemoryQualityEnum.catch('not_stated'),
+  screen_memory_details: z.string().catch(''),
+  agency: AgencyEnum.catch('not_stated'),
+  reality_assessment: RealityAssessmentEnum.catch('not_stated'),
+  reality_quote: z.string().catch(''),
+  oz_factor: z.boolean().catch(false),
+  ontological_shock_rating: z.number().min(1).max(10).catch(5),
 });
 
 const UapEntityEncounterSchema = z.object({
-  order: z.number(),
-  entity_type: UapEntityTypeEnum,
-  count: EntityCountEnum,
-  appearance: z.string(),
-  height_estimate: z.string(),
-  luminosity: LuminosityEnum,
-  demeanor: DemeanorEnum,
-  communication_method: CommMethodEnum,
-  interaction_type: InteractionTypeEnum,
-  message_summary: z.string(),
-  message_quote: z.string(),
-  behavior: z.string(),
-  confidence: z.number().min(0).max(100),
+  order: z.number().catch(0),
+  entity_type: UapEntityTypeEnum.catch('unknown'),
+  count: EntityCountEnum.catch('unknown'),
+  appearance: z.string().catch(''),
+  height_estimate: z.string().catch('not_stated'),
+  luminosity: LuminosityEnum.catch('not_stated'),
+  demeanor: DemeanorEnum.catch('not_stated'),
+  communication_method: CommMethodEnum.catch('not_stated'),
+  interaction_type: InteractionTypeEnum.catch('not_stated'),
+  message_summary: z.string().catch(''),
+  message_quote: z.string().catch(''),
+  behavior: z.string().catch(''),
+  confidence: z.number().min(0).max(100).catch(50),
 });
 
 const FiveObservablesSchema = z.object({
-  instantaneous_acceleration: z.boolean(),
-  hypersonic_velocity: z.boolean(),
-  low_observability: z.boolean(),
-  trans_medium_travel: z.boolean(),
-  positive_lift: z.boolean(),
+  instantaneous_acceleration: z.boolean().catch(false),
+  hypersonic_velocity: z.boolean().catch(false),
+  low_observability: z.boolean().catch(false),
+  trans_medium_travel: z.boolean().catch(false),
+  positive_lift: z.boolean().catch(false),
 });
 
 const CraftObservationSchema = z.object({
-  observed: z.boolean(),
-  shape: CraftShapeEnum,
-  size_estimate: z.string(),
-  color: z.string(),
-  luminosity: CraftLuminosityEnum,
-  sound: CraftSoundEnum,
-  movement: z.array(z.string()),
-  five_observables: FiveObservablesSchema,
-  description: z.string(),
+  observed: z.boolean().catch(false),
+  shape: CraftShapeEnum.catch('none'),
+  size_estimate: z.string().catch('unknown'),
+  color: z.string().catch('unknown'),
+  luminosity: CraftLuminosityEnum.catch('not_stated'),
+  sound: CraftSoundEnum.catch('not_stated'),
+  movement: z.array(z.string()).catch([]),
+  five_observables: FiveObservablesSchema.catch({
+    instantaneous_acceleration: false, hypersonic_velocity: false,
+    low_observability: false, trans_medium_travel: false, positive_lift: false,
+  }),
+  description: z.string().catch(''),
 });
 
 const PhysicalEffectsSchema = z.object({
-  witness_physiological: z.array(z.string()),
-  vehicle_equipment: z.array(z.string()),
-  environmental: z.array(z.string()),
-  temporal: z.array(z.string()),
-  details: z.string(),
+  witness_physiological: z.array(z.string()).catch([]),
+  vehicle_equipment: z.array(z.string()).catch([]),
+  environmental: z.array(z.string()).catch([]),
+  temporal: z.array(z.string()).catch([]),
+  details: z.string().catch(''),
 });
 
 const SensoryChannelsSchema = z.object({
-  visual: SensoryChannelSchema,
-  auditory: SensoryChannelSchema,
-  tactile: SensoryChannelSchema,
-  olfactory: SensoryChannelSchema,
-  gustatory: SensoryChannelSchema,
-  kinesthetic: SensoryChannelSchema,
-  electromagnetic: SensoryChannelSchema,
-  proprioceptive: SensoryChannelSchema,
-  noetic: SensoryChannelSchema,
+  visual: SensoryChannelSchema.catch(defaultSensory),
+  auditory: SensoryChannelSchema.catch(defaultSensory),
+  tactile: SensoryChannelSchema.catch(defaultSensory),
+  olfactory: SensoryChannelSchema.catch(defaultSensory),
+  gustatory: SensoryChannelSchema.catch(defaultSensory),
+  kinesthetic: SensoryChannelSchema.catch(defaultSensory),
+  electromagnetic: SensoryChannelSchema.catch(defaultSensory),
+  proprioceptive: SensoryChannelSchema.catch(defaultSensory),
+  noetic: SensoryChannelSchema.catch(defaultSensory),
 });
 
 // ─── Root Schema ─────────────────────────────────────────────────────────────
+// Top-level fields also get .catch() so the parse never fails outright.
+// The LLM might omit or rename a top-level section; we salvage what we can.
 
 export const UapPhenomenologySchema = z.object({
   // Encounter Flow
-  encounter_flow: z.array(EncounterFlowPhaseSchema),
-  encounter_duration_estimate: z.string(),
+  encounter_flow: z.array(EncounterFlowPhaseSchema).catch([]),
+  encounter_duration_estimate: z.string().catch('unknown'),
 
   // Sensory Channels
-  sensory_channels: SensoryChannelsSchema,
+  sensory_channels: SensoryChannelsSchema.catch({
+    visual: defaultSensory, auditory: defaultSensory, tactile: defaultSensory,
+    olfactory: defaultSensory, gustatory: defaultSensory, kinesthetic: defaultSensory,
+    electromagnetic: defaultSensory, proprioceptive: defaultSensory, noetic: defaultSensory,
+  }),
 
   // Emotional Arc
-  emotional_progression: z.array(EmotionEntrySchema),
-  dominant_emotion: z.string(),
+  emotional_progression: z.array(EmotionEntrySchema).catch([]),
+  dominant_emotion: z.string().catch('not_stated'),
 
   // Consciousness
-  consciousness_alteration: ConsciousnessAlterationSchema,
+  consciousness_alteration: ConsciousnessAlterationSchema.catch({
+    state_of_consciousness: 'not_stated', time_perception: 'not_stated',
+    thought_clarity: 'not_stated', memory_quality: 'not_stated',
+    screen_memory_details: '', agency: 'not_stated',
+    reality_assessment: 'not_stated', reality_quote: '',
+    oz_factor: false, ontological_shock_rating: 5,
+  }),
 
   // Entities
-  entities: z.array(UapEntityEncounterSchema),
-  entity_count: z.number(),
-  dominant_entity_type: z.string(),
+  entities: z.array(UapEntityEncounterSchema).catch([]),
+  entity_count: z.number().catch(0),
+  dominant_entity_type: z.string().catch('none'),
 
   // Craft
-  craft_observation: CraftObservationSchema,
+  craft_observation: CraftObservationSchema.catch({
+    observed: false, shape: 'none', size_estimate: 'unknown', color: 'unknown',
+    luminosity: 'not_stated', sound: 'not_stated', movement: [],
+    five_observables: {
+      instantaneous_acceleration: false, hypersonic_velocity: false,
+      low_observability: false, trans_medium_travel: false, positive_lift: false,
+    },
+    description: '',
+  }),
 
   // Physical Effects
-  physical_effects: PhysicalEffectsSchema,
+  physical_effects: PhysicalEffectsSchema.catch({
+    witness_physiological: [], vehicle_equipment: [],
+    environmental: [], temporal: [], details: '',
+  }),
 
   // Meta
-  distinguishing_features: z.string(),
-  encounter_modality: z.string(),
-  hynek_classification: z.string(),
+  distinguishing_features: z.string().catch(''),
+  encounter_modality: z.string().catch('unknown'),
+  hynek_classification: z.string().catch('unknown'),
 });
 
 export type UapPhenomenologyResult = z.infer<typeof UapPhenomenologySchema>;
@@ -419,15 +452,25 @@ export async function analyzeUapPhenomenology(subtitles: string): Promise<UapPhe
     const raw = JSON.parse(content);
     // Normalize LLM output drift ("not stated" → "not_stated", spaces → underscores)
     const normalized = normalizeLlmOutput(raw);
+
+    // With .catch() fallbacks on every field, .parse() should never throw.
+    // If it somehow does, safeParse catches it and we log the issue.
     const parsed = UapPhenomenologySchema.safeParse(normalized);
 
     if (!parsed.success) {
-      console.error("[uap-phenomenology] Zod validation failed:", JSON.stringify(parsed.error.issues, null, 2));
-      // Log the raw output for debugging so we can iterate on the prompt
+      // This should be extremely rare now that every field has a .catch() fallback.
+      // Log the specific failures for prompt iteration.
+      console.error("[uap-phenomenology] Zod validation failed (unexpected with .catch() guards):");
+      for (const issue of parsed.error.issues) {
+        console.error(`  Path: ${issue.path.join('.')} | Code: ${issue.code} | ${issue.message}`);
+      }
       console.error("[uap-phenomenology] Raw output keys:", Object.keys(raw));
       return null;
     }
 
+    console.log('[uap-phenomenology] ✅ Parsed successfully. Encounter flow phases:', parsed.data.encounter_flow.length,
+      '| Entities:', parsed.data.entity_count,
+      '| Craft observed:', parsed.data.craft_observation.observed);
     return parsed.data;
   } catch (error) {
     console.error("[uap-phenomenology] Analysis error:", error);

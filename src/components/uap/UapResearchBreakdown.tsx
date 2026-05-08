@@ -78,7 +78,7 @@ function Section({
 
 function EncounterFlowTimeline({ phases }: { phases: EncounterFlowPhase[] }) {
   const activePhases = phases.filter((p) => p.present);
-  if (activePhases.length === 0) return <p className="text-xs text-slate-400">No phases detected</p>;
+  if (!phases || activePhases.length === 0) return <p className="text-xs text-slate-400 p-3 italic">The analysis found no relevant content for this section.</p>;
 
   const phaseColors: Record<string, string> = {
     precursor: "from-slate-400 to-slate-500",
@@ -150,7 +150,7 @@ function SensoryChannelsGrid({
   const activeChannels = Object.entries(channels).filter(
     ([, ch]) => ch.active
   );
-  if (activeChannels.length === 0) return <p className="text-xs text-slate-400">No sensory data detected</p>;
+  if (!channels || activeChannels.length === 0) return <p className="text-xs text-slate-400 p-3 italic">The analysis found no relevant content for this section.</p>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -197,7 +197,7 @@ function SensoryChannelsGrid({
 // ─── Entity Encounters ──────────────────────────────────────────────────────
 
 function EntityList({ entities }: { entities: UapEntityEncounter[] }) {
-  if (entities.length === 0) return <p className="text-xs text-slate-400">No entities detected</p>;
+  if (!entities || entities.length === 0) return <p className="text-xs text-slate-400 p-3 italic">The analysis found no relevant content for this section.</p>;
 
   const typeEmoji: Record<string, string> = {
     grey: "👽", tall_grey: "👽", mantis: "🦗", insectoid_other: "🦗",
@@ -271,7 +271,7 @@ function EntityList({ entities }: { entities: UapEntityEncounter[] }) {
 // ─── Craft Observation ──────────────────────────────────────────────────────
 
 function CraftPanel({ craft }: { craft: CraftObservation }) {
-  if (!craft.observed) return <p className="text-xs text-slate-400">No craft observed</p>;
+  if (!craft || !craft.observed) return <p className="text-xs text-slate-400 p-3 italic">The analysis found no relevant content for this section.</p>;
 
   const observables = Object.entries(craft.five_observables);
   const activeCount = observables.filter(([, v]) => v).length;
@@ -453,7 +453,7 @@ function EmotionalProgressionBar({
   emotions: EmotionEntry[];
   dominant: string;
 }) {
-  if (emotions.length === 0) return null;
+  if (!emotions || emotions.length === 0) return <p className="text-xs text-slate-400 p-3 italic">The analysis found no relevant content for this section.</p>;
 
   return (
     <div className="space-y-1.5">
@@ -505,8 +505,8 @@ function scoreTier(score: number): { color: string; label: string } {
   return { color: "text-slate-400", label: "Weak" };
 }
 
-function levelColor(level: string): string {
-  const l = level.toLowerCase();
+function levelColor(level?: string): string {
+  const l = (level || "").toLowerCase();
   if (l.includes("high") || l.includes("strong")) return "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800";
   if (l.includes("moderate")) return "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800";
   return "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10";
@@ -514,7 +514,7 @@ function levelColor(level: string): string {
 
 function EvidencePanel({ evidence }: { evidence: EvidenceBreakdown }) {
   const maxScore = 3; // Each criterion is scored 1-3
-  const criteriaEntries = Object.entries(evidence.criteria);
+  const criteriaEntries = Object.entries(evidence?.criteria || {});
 
   return (
     <div className="space-y-3">
@@ -522,15 +522,15 @@ function EvidencePanel({ evidence }: { evidence: EvidenceBreakdown }) {
       <div className="flex items-center gap-2 flex-wrap">
         <span className={cn(
           "text-[10px] font-medium px-2 py-0.5 rounded-full border",
-          levelColor(evidence.level)
+          levelColor(evidence?.level)
         )}>
-          {evidence.level}
+          {evidence?.level || "Unknown"}
         </span>
         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10">
-          Score: {evidence.total_score}/21
+          Score: {evidence?.total_score || 0}/21
         </span>
         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 capitalize">
-          {evidence.source_type?.replace(/_/g, " ")}
+          {evidence?.source_type?.replace(/_/g, " ") || "Unknown"}
         </span>
       </div>
 
@@ -582,7 +582,7 @@ function EvidencePanel({ evidence }: { evidence: EvidenceBreakdown }) {
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 interface UapResearchBreakdownProps {
-  data: UapPhenomenologyResult;
+  data?: UapPhenomenologyResult | null;
   evidenceBreakdown?: EvidenceBreakdown | null;
   className?: string;
 }
@@ -612,86 +612,74 @@ export function UapResearchBreakdown({ data, evidenceBreakdown, className }: Uap
       {/* Classification badges */}
       <div className="px-6 pt-4 pb-2 flex flex-wrap gap-2">
         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
-          {data.encounter_modality?.replace(/_/g, " ") || "encounter"}
+          {data?.encounter_modality?.replace(/_/g, " ") || "encounter"}
         </span>
         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10">
-          {data.hynek_classification}
+          {data?.hynek_classification || "Unknown Classification"}
         </span>
-        {data.encounter_duration_estimate && data.encounter_duration_estimate !== "unknown" && (
+        {data?.encounter_duration_estimate && data.encounter_duration_estimate !== "unknown" && (
           <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10">
             Duration: {data.encounter_duration_estimate}
           </span>
         )}
-        {data.entity_count > 0 && (
+        {data?.entity_count && data.entity_count > 0 ? (
           <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800">
             {data.entity_count} {data.entity_count === 1 ? "entity" : "entities"} — {data.dominant_entity_type?.replace(/_/g, " ")}
           </span>
-        )}
+        ) : null}
       </div>
 
       {/* Sections */}
       <div className="px-6 pb-6 space-y-3">
         {/* Evidence Summary — first section for credibility context */}
-        {evidenceBreakdown && (
-          <Section title="Evidence Summary" icon={ShieldCheck} defaultOpen={true}>
+        <Section title="Evidence Summary" icon={ShieldCheck} defaultOpen={true}>
+          {evidenceBreakdown ? (
             <EvidencePanel evidence={evidenceBreakdown} />
-          </Section>
-        )}
+          ) : (
+            <p className="text-xs text-slate-400 p-3 italic">The analysis found no relevant content for this section.</p>
+          )}
+        </Section>
 
         {/* Encounter Flow */}
-        {data.encounter_flow?.length > 0 && (
-          <Section title="Encounter Flow" icon={Radar} defaultOpen={true}>
-            <EncounterFlowTimeline phases={data.encounter_flow} />
-          </Section>
-        )}
+        <Section title="Encounter Flow" icon={Radar} defaultOpen={true}>
+          <EncounterFlowTimeline phases={data?.encounter_flow || []} />
+        </Section>
 
         {/* Sensory Channels */}
-        {data.sensory_channels && (
-          <Section title="Sensory Channels" icon={Eye} defaultOpen={true}>
-            <SensoryChannelsGrid channels={data.sensory_channels} />
-          </Section>
-        )}
+        <Section title="Sensory Channels" icon={Eye} defaultOpen={true}>
+          <SensoryChannelsGrid channels={data?.sensory_channels || {}} />
+        </Section>
 
         {/* Entities */}
-        {data.entities?.length > 0 && (
-          <Section title={`Entity Encounters (${data.entity_count})`} icon={Users} defaultOpen={true}>
-            <EntityList entities={data.entities} />
-          </Section>
-        )}
+        <Section title={`Entity Encounters (${data?.entity_count || 0})`} icon={Users} defaultOpen={true}>
+          <EntityList entities={data?.entities || []} />
+        </Section>
 
         {/* Craft Observation */}
-        {data.craft_observation && (
-          <Section title="Craft Observation" icon={Radar} defaultOpen={data.craft_observation.observed}>
-            <CraftPanel craft={data.craft_observation} />
-          </Section>
-        )}
+        <Section title="Craft Observation" icon={Radar} defaultOpen={data?.craft_observation?.observed || false}>
+          <CraftPanel craft={data?.craft_observation || { observed: false, description: "", five_observables: { sudden_acceleration: false, hypersonic_velocities: false, low_observability: false, trans_medium_travel: false, positive_lift: false } }} />
+        </Section>
 
         {/* Consciousness Alteration */}
-        {data.consciousness_alteration && (
-          <Section title="Consciousness Alteration" icon={Brain} defaultOpen={false}>
-            <ConsciousnessPanel data={data.consciousness_alteration} />
-          </Section>
-        )}
+        <Section title="Consciousness Alteration" icon={Brain} defaultOpen={false}>
+          <ConsciousnessPanel data={data?.consciousness_alteration || { altered_state: false }} />
+        </Section>
 
         {/* Physical Effects */}
-        {data.physical_effects && (
-          <Section title="Physical Effects" icon={Zap} defaultOpen={false}>
-            <PhysicalEffectsPanel effects={data.physical_effects} />
-          </Section>
-        )}
+        <Section title="Physical Effects" icon={Zap} defaultOpen={false}>
+          <PhysicalEffectsPanel effects={data?.physical_effects || { present: false, physiological: [], psychological: [], environmental: [] }} />
+        </Section>
 
         {/* Emotional Progression */}
-        {data.emotional_progression?.length > 0 && (
-          <Section title="Emotional Arc" icon={Heart} defaultOpen={false}>
-            <EmotionalProgressionBar
-              emotions={data.emotional_progression}
-              dominant={data.dominant_emotion}
-            />
-          </Section>
-        )}
+        <Section title="Emotional Arc" icon={Heart} defaultOpen={false}>
+          <EmotionalProgressionBar
+            emotions={data?.emotional_progression || []}
+            dominant={data?.dominant_emotion || ""}
+          />
+        </Section>
 
         {/* Distinguishing Features */}
-        {data.distinguishing_features && (
+        {data?.distinguishing_features && (
           <div className="bg-green-50/40 dark:bg-green-900/10 rounded-lg p-3 border border-green-100 dark:border-green-800/30">
             <span className="text-[10px] font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider block mb-1">
               What makes this encounter unique

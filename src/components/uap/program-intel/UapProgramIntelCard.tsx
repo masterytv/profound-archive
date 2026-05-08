@@ -479,12 +479,13 @@ function SecrecySection({ mechanisms }: { mechanisms: SecrecyMechanism[] }) {
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
-interface UapProgramIntelCardProps {
-  data: UapProgramIntelResult;
+export function UapProgramIntelCard({
+  data,
+  className,
+}: {
+  data?: UapProgramIntelResult | null;
   className?: string;
-}
-
-export function UapProgramIntelCard({ data, className }: UapProgramIntelCardProps) {
+}) {
   return (
     <div
       className={cn(
@@ -509,9 +510,9 @@ export function UapProgramIntelCard({ data, className }: UapProgramIntelCardProp
       {/* Sections */}
       <div className="px-6 py-6 space-y-3">
         {/* Executive Summary & Primary Revelation */}
-        {(data.executive_summary || data.primary_revelation) && (
+        {(data?.executive_summary || data?.primary_revelation) && (
           <div className="bg-slate-50 dark:bg-slate-900/20 rounded-xl p-4 border border-slate-200 dark:border-slate-800 mb-4">
-            {data.executive_summary && (
+            {data?.executive_summary && (
               <div className="mb-3">
                 <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
                   Executive Summary
@@ -521,7 +522,7 @@ export function UapProgramIntelCard({ data, className }: UapProgramIntelCardProp
                 </p>
               </div>
             )}
-            {data.primary_revelation && (
+            {data?.primary_revelation && (
               <div>
                 <span className="text-[10px] font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider block mb-1">
                   Primary Revelation
@@ -534,40 +535,40 @@ export function UapProgramIntelCard({ data, className }: UapProgramIntelCardProp
           </div>
         )}
 
-        <Section id="intel-persons" title={`Named Persons (${data.persons?.length || 0})`} icon={Users} defaultOpen={data.persons?.length > 0}>
-          <PersonsSection persons={data.persons || []} />
+        <Section id="intel-persons" title={`Named Persons (${data?.persons?.length || 0})`} icon={Users} defaultOpen={(data?.persons?.length || 0) > 0}>
+          <PersonsSection persons={data?.persons || []} />
         </Section>
 
-        <Section id="intel-programs" title={`Programs & Operations (${data.programs?.length || 0})`} icon={Building2} defaultOpen={data.programs?.length > 0}>
-          <ProgramsSection programs={data.programs || []} />
+        <Section id="intel-programs" title={`Programs & Operations (${data?.programs?.length || 0})`} icon={Building2} defaultOpen={(data?.programs?.length || 0) > 0}>
+          <ProgramsSection programs={data?.programs || []} />
         </Section>
 
-        <Section id="intel-claims" title={`Claims & Evidence (${data.claims?.length || 0})`} icon={FileText} defaultOpen={data.claims?.length > 0}>
-          <ClaimsSection claims={data.claims || []} />
+        <Section id="intel-claims" title={`Claims & Evidence (${data?.claims?.length || 0})`} icon={FileText} defaultOpen={(data?.claims?.length || 0) > 0}>
+          <ClaimsSection claims={data?.claims || []} />
         </Section>
 
-        <Section id="intel-organizations" title={`Organizations (${data.organizations?.length || 0})`} icon={Building} defaultOpen={false}>
-          <OrganizationsSection orgs={data.organizations || []} />
+        <Section id="intel-organizations" title={`Organizations (${data?.organizations?.length || 0})`} icon={Building} defaultOpen={false}>
+          <OrganizationsSection orgs={data?.organizations || []} />
         </Section>
 
-        <Section id="intel-locations" title={`Locations & Facilities (${data.locations?.length || 0})`} icon={MapPin} defaultOpen={false}>
-          <LocationsSection locations={data.locations || []} />
+        <Section id="intel-locations" title={`Locations & Facilities (${data?.locations?.length || 0})`} icon={MapPin} defaultOpen={false}>
+          <LocationsSection locations={data?.locations || []} />
         </Section>
 
-        <Section id="intel-technologies" title={`Technology & Materials (${data.technologies?.length || 0})`} icon={Cpu} defaultOpen={false}>
-          <TechnologySection technologies={data.technologies || []} />
+        <Section id="intel-technologies" title={`Technology & Materials (${data?.technologies?.length || 0})`} icon={Cpu} defaultOpen={false}>
+          <TechnologySection technologies={data?.technologies || []} />
         </Section>
 
-        <Section id="intel-psi" title={`Psi & Consciousness (${data.psi_consciousness?.length || 0})`} icon={Brain} defaultOpen={false}>
-          <PsiSection psi={data.psi_consciousness || []} />
+        <Section id="intel-psi" title={`Psi & Consciousness (${data?.psi_consciousness?.length || 0})`} icon={Brain} defaultOpen={false}>
+          <PsiSection psi={data?.psi_consciousness || []} />
         </Section>
 
-        <Section id="intel-legislative" title={`Legislative & Disclosure (${data.legislative_events?.length || 0})`} icon={Scale} defaultOpen={false}>
-          <LegislativeSection events={data.legislative_events || []} />
+        <Section id="intel-legislative" title={`Legislative & Disclosure (${data?.legislative_events?.length || 0})`} icon={Scale} defaultOpen={false}>
+          <LegislativeSection events={data?.legislative_events || []} />
         </Section>
 
-        <Section id="intel-secrecy" title={`Secrecy Mechanisms (${data.secrecy_mechanisms?.length || 0})`} icon={Lock} defaultOpen={false}>
-          <SecrecySection mechanisms={data.secrecy_mechanisms || []} />
+        <Section id="intel-secrecy" title={`Secrecy Mechanisms (${data?.secrecy_mechanisms?.length || 0})`} icon={Lock} defaultOpen={false}>
+          <SecrecySection mechanisms={data?.secrecy_mechanisms || []} />
         </Section>
 
         {/* AI disclaimer */}

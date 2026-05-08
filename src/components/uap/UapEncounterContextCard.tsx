@@ -60,23 +60,24 @@ function LocationCard({ location }: { location: LocationContext }) {
         )}
       </div>
 
-      {location.nearby_facilities.length > 0 && (
-        <div className="pl-6">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-            Nearby Facilities
-          </span>
-          <div className="flex flex-wrap gap-1 mt-0.5">
-            {location.nearby_facilities.map((f) => (
-              <span
-                key={f}
-                className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
-              >
-                {cleanText(f)}
-              </span>
-            ))}
+        {/* Connected Cases */}
+        {location.nearby_facilities.length > 0 && (
+          <div className="pt-2 border-t border-slate-50 dark:border-white/5">
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">
+              Connected Encounters ({location.nearby_facilities.length})
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {location.nearby_facilities.map((cc, i) => (
+                <span
+                  key={i}
+                  className="text-[10px] px-2 py-0.5 rounded-md bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/10"
+                >
+                  {cleanText(cc)}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }
@@ -151,20 +152,19 @@ function ConnectedCasesList({ cases }: { cases: ConnectedCase[] }) {
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 interface UapEncounterContextCardProps {
-  data: UapEncounterContextResult;
+  data?: UapEncounterContextResult | null;
   className?: string;
 }
 
 export function UapEncounterContextCard({ data, className }: UapEncounterContextCardProps) {
-  const hasDate = isStated(data.event_date);
-  const hasLocation = isStated(data.location?.description);
-  const hasMilitary = data.military_context?.is_military_witness;
-  const hasCases = data.connected_cases?.length > 0;
-  const hasWitnesses = data.total_witnesses_mentioned > 1 || data.named_witnesses?.length > 0;
-  const hasAuthority = data.reported_to_authorities;
+  const hasDate = data ? isStated(data.event_date) : false;
+  const hasLocation = data ? isStated(data.location?.description) : false;
+  const hasMilitary = data?.military_context?.is_military_witness ?? false;
+  const hasCases = (data?.connected_cases?.length ?? 0) > 0;
+  const hasWitnesses = data ? (data.total_witnesses_mentioned > 1 || (data.named_witnesses?.length ?? 0) > 0) : false;
+  const hasAuthority = data?.reported_to_authorities ?? false;
 
-  // Don't render if there's nothing meaningful
-  if (!hasDate && !hasLocation && !hasMilitary && !hasCases) return null;
+  const hasAnyContent = hasDate || hasLocation || hasMilitary || hasCases || hasWitnesses || hasAuthority;
 
   return (
     <div
@@ -188,8 +188,14 @@ export function UapEncounterContextCard({ data, className }: UapEncounterContext
       </div>
 
       <div className="px-6 py-5 space-y-4">
+        {!hasAnyContent && (
+          <p className="text-xs text-slate-400 p-3 italic bg-slate-50 dark:bg-slate-900/20 rounded-lg border border-dashed border-slate-200 dark:border-slate-800 text-center">
+            The analysis found no structured encounter context.
+          </p>
+        )}
+
         {/* Date/Time row */}
-        {(hasDate || isStated(data.event_time)) && (
+        {data && (hasDate || isStated(data.event_time)) && (
           <div className="flex items-center gap-2 flex-wrap">
             <Calendar className="w-3.5 h-3.5 text-green-500" />
             {hasDate && (
@@ -211,13 +217,13 @@ export function UapEncounterContextCard({ data, className }: UapEncounterContext
         )}
 
         {/* Location */}
-        {hasLocation && <LocationCard location={data.location} />}
+        {data && hasLocation && <LocationCard location={data.location} />}
 
         {/* Military Context */}
-        {hasMilitary && <MilitaryCard military={data.military_context} />}
+        {data && hasMilitary && <MilitaryCard military={data.military_context} />}
 
         {/* Additional Witnesses */}
-        {hasWitnesses && (
+        {data && hasWitnesses && (
           <div className="flex items-center gap-2 flex-wrap">
             <Users className="w-3.5 h-3.5 text-green-500" />
             <span className="text-[11px] text-slate-600 dark:text-slate-400">
@@ -238,7 +244,7 @@ export function UapEncounterContextCard({ data, className }: UapEncounterContext
         )}
 
         {/* Authority Reporting */}
-        {hasAuthority && (
+        {data && hasAuthority && (
           <div className="flex items-start gap-2">
             <FileWarning className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
             <div>
