@@ -124,11 +124,35 @@ function groupSegmentsIntoBlocks(segments: TimestampedSegment[], blockDurationSe
 // Content type labels
 const CONTENT_TYPE_LABELS: Record<string, string> = {
   first_person: "First-Person Account",
+  interview: "Interview with Experiencer",
+  retold_encounter: "Retold Encounter",
   retold_story: "Retold Account",
   research_analysis: "Research & Analysis",
   program_disclosure: "Government & Disclosure",
+  investigative_journalism: "Investigative Journalism",
+  documentary_survey: "Documentary",
+  news_commentary: "News & Commentary",
   out_of_scope: "Other",
 };
+
+// Encounter row type from uap_encounters table
+interface EncounterRow {
+  id: string;
+  experiencer_name: string | null;
+  source_type: string;
+  encounter_label: string | null;
+  encounter_index: number;
+  phenomenology_breakdown: unknown;
+  encounter_context: unknown;
+  evidence_score: number | null;
+  evidence_breakdown: unknown;
+  contact_depth_score: number | null;
+  contact_depth_breakdown: unknown;
+  transformation_score: number | null;
+  transformation_breakdown: unknown;
+  hynek_type: string | null;
+  vallee_type: string | null;
+}
 
 // ─── Data Fetching ──────────────────────────────────────────────────────────
 
@@ -138,7 +162,7 @@ async function getUapVideo(videoId: string) {
     .from("uap_vids")
     .select(`
       video_id, title, channel_name, channel_id, channel_url,
-      date, view_count, experiencer_name, content_type, tier, track,
+      date, view_count, experiencer_name, content_type, source_type, tier, track,
       analysis_uap_summary, subtitles_punctuated,
       raw_timestamped_subtitles, url, thumbnail_url, intake_status
     `)
@@ -148,7 +172,7 @@ async function getUapVideo(videoId: string) {
 
   if (error || !video) return null;
 
-  // Fetch analysis (works for both tiers — different fields populated)
+  // Fetch analysis (program intel lives here for all tiers)
   const { data: analysis } = await supabase
     .from("uap_analysis")
     .select(`
@@ -166,6 +190,20 @@ async function getUapVideo(videoId: string) {
     .eq("video_id", videoId)
     .single();
 
+  // Fetch per-encounter data from the new uap_encounters table
+  const { data: encounters } = await supabase
+    .from("uap_encounters")
+    .select(`
+      id, experiencer_name, source_type, encounter_label, encounter_index,
+      phenomenology_breakdown, encounter_context,
+      evidence_score, evidence_breakdown,
+      contact_depth_score, contact_depth_breakdown,
+      transformation_score, transformation_breakdown,
+      hynek_type, vallee_type
+    `)
+    .eq("video_id", videoId)
+    .order("encounter_index");
+
   // Look up contactee profile by checking if this video_id is in their video_ids array
   const { data: contactee } = await supabase
     .from("uap_contactee_profiles")
@@ -173,7 +211,7 @@ async function getUapVideo(videoId: string) {
     .contains("video_ids", [videoId])
     .single();
 
-  return { video, analysis, contactee };
+  return { video, analysis, encounters: (encounters || []) as EncounterRow[], contactee };
 }
 
 // ─── Metadata ───────────────────────────────────────────────────────────────
@@ -213,11 +251,26 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
   const result = await getUapVideo(id);
   if (!result) notFound();
 
-  const { video, analysis, contactee } = result;
+  const { video, analysis, encounters, contactee } = result;
   const isTier1 = video.tier === 1;
+  const hasEncounters = encounters.length > 0;
 
-  // Build triad scores for Tier 1 sidebar
-  const triadScores: TriadScores | null = isTier1 && analysis ? {
+  // Build triad scores from encounters (new) or fall back to analysis (legacy)
+  // For the sidebar, use the first encounter with triad data
+  const primaryEncounter = encounters.find(e =>
+    e.evidence_score != null || e.contact_depth_score != null || e.transformation_score != null
+  );
+  const triadScores: TriadScores | null = primaryEncounter ? {
+    evidence_score: primaryEncounter.evidence_score,
+    evidence_breakdown: primaryEncounter.evidence_breakdown as TriadScores["evidence_breakdown"],
+    contact_depth_score: primaryEncounter.contact_depth_score,
+    contact_depth_breakdown: primaryEncounter.contact_depth_breakdown as TriadScores["contact_depth_breakdown"],
+    transformation_score: primaryEncounter.transformation_score,
+    transformation_breakdown: primaryEncounter.transformation_breakdown as TriadScores["transformation_breakdown"],
+    hynek_type: primaryEncounter.hynek_type,
+    vallee_type: primaryEncounter.vallee_type,
+  } : (isTier1 && analysis ? {
+    // Legacy fallback: read from uap_analysis
     evidence_score: analysis.evidence_score,
     evidence_breakdown: analysis.evidence_breakdown as TriadScores["evidence_breakdown"],
     contact_depth_score: analysis.contact_depth_score,
@@ -226,7 +279,7 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
     transformation_breakdown: analysis.transformation_breakdown as TriadScores["transformation_breakdown"],
     hynek_type: analysis.hynek_type,
     vallee_type: analysis.vallee_type,
-  } : null;
+  } : null);
 
   // Build knowledge data for Tier 2 sidebar
   const knowledgeData: KnowledgeData | null = !isTier1 && analysis ? {
@@ -242,7 +295,7 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
   const transcriptBlocks = rawSegments ? groupSegmentsIntoBlocks(rawSegments) : null;
 
   const contentLabel = CONTENT_TYPE_LABELS[video.content_type ?? ""] ?? video.content_type?.replace(/_/g, " ") ?? "";
-  const tierLabel = isTier1 ? "Encounter" : "Research";
+  const tierLabel = isTier1 ? "First Person Encounter" : "Research and Intelligence";
   const breadcrumbLabel = isTier1 ? "Encounters" : "Research";
   const summaryHeading = isTier1 ? "The Encounter" : "Summary";
 
@@ -321,17 +374,28 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
                 )}
               </div>
 
-              {/* Experiencer name (Tier 1) */}
-              {video.experiencer_name && (
-                <div className="text-sm text-slate-500 dark:text-slate-400">
-                  Experiencer:{" "}
-                  {contactee ? (
-                    <Link href={`/uap/contactees/${contactee.slug}`} className="font-bold text-green-600 dark:text-green-400 hover:underline">{video.experiencer_name}</Link>
-                  ) : (
-                    <span className="font-bold text-slate-700 dark:text-slate-300">{video.experiencer_name}</span>
-                  )}
-                </div>
-              )}
+              {/* Experiencer name(s) — prefer encounters table for completeness */}
+              {(() => {
+                // Build experiencer name list from encounters (more complete than classifier's 5K-char excerpt)
+                const encounterNames = hasEncounters
+                  ? encounters.map(e => e.experiencer_name).filter(Boolean)
+                  : [];
+                const displayName = encounterNames.length > 0
+                  ? encounterNames.join(', ')
+                  : video.experiencer_name;
+                
+                if (!displayName) return null;
+                return (
+                  <div className="text-sm text-slate-500 dark:text-slate-400">
+                    Experiencer:{" "}
+                    {contactee ? (
+                      <Link href={`/uap/experiencer/${contactee.slug}`} className="font-bold text-green-600 dark:text-green-400 hover:underline">{displayName}</Link>
+                    ) : (
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{displayName}</span>
+                    )}
+                  </div>
+                );
+              })()}
 
               <SocialShareButton
                 url={`https://projectprofound.org/uap/video/${video.video_id}`}
@@ -341,9 +405,32 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
             </div>
 
             {/* Mobile-only sidebar content */}
-            <div className="lg:hidden">
-              {isTier1 && triadScores && <TriadScoresPanel scores={triadScores} />}
-              {!isTier1 && knowledgeData && <KnowledgePanel data={knowledgeData} />}
+            <div className="lg:hidden space-y-4">
+              {analysis?.program_intel_breakdown && (
+                <UapProgramIntelSummaryCard data={analysis.program_intel_breakdown as UapProgramIntelResult} />
+              )}
+              {!analysis?.program_intel_breakdown && knowledgeData && <KnowledgePanel data={knowledgeData} />}
+              {hasEncounters && encounters.map((enc) => {
+                const encName = enc.experiencer_name || enc.encounter_label || `Encounter ${enc.encounter_index + 1}`;
+                const hasTriad = enc.evidence_score != null || enc.contact_depth_score != null || enc.transformation_score != null;
+                if (!hasTriad) return null;
+                const encTriad: TriadScores = {
+                  evidence_score: enc.evidence_score,
+                  evidence_breakdown: enc.evidence_breakdown as TriadScores["evidence_breakdown"],
+                  contact_depth_score: enc.contact_depth_score,
+                  contact_depth_breakdown: enc.contact_depth_breakdown as TriadScores["contact_depth_breakdown"],
+                  transformation_score: enc.transformation_score,
+                  transformation_breakdown: enc.transformation_breakdown as TriadScores["transformation_breakdown"],
+                  hynek_type: enc.hynek_type,
+                  vallee_type: enc.vallee_type,
+                };
+                return (
+                  <div key={enc.id}>
+                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">{encName}</p>
+                    <TriadScoresPanel scores={encTriad} />
+                  </div>
+                );
+              })}
             </div>
 
             {/* AI Summary */}
@@ -369,52 +456,10 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
               </div>
             )}
 
-            {/* ── Tier 1: Encounter Context + Deep Analysis ────────────── */}
-            {isTier1 && video.intake_status !== "punctuated" && video.intake_status !== "pending" && (
-              <UapEncounterContextCard
-                data={analysis?.encounter_context as UapEncounterContextResult | null}
-              />
-            )}
-
-            {isTier1 && (
-              video.intake_status === "punctuated" || video.intake_status === "pending" ? (
-                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
-                    <Radar className="w-4 h-4 text-green-500" />
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-                      Research Breakdown
-                    </h2>
-                  </div>
-                  <div className="px-6 py-8 text-center">
-                    <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
-                    </div>
-                    <p className="text-slate-600 dark:text-slate-400 font-medium">Analysis pending</p>
-                    <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">This video is in the queue for deep phenomenological extraction.</p>
-                  </div>
-                </div>
-              ) : analysis?.phenomenology && !analysis?.phenomenology_breakdown ? (
-                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
-                    <Radar className="w-4 h-4 text-green-500" />
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-                      Phenomenology
-                    </h2>
-                  </div>
-                  <div className="px-6 py-5">
-                    <PhenomenologyGrid data={analysis.phenomenology} />
-                  </div>
-                </div>
-              ) : (
-                <UapResearchBreakdown
-                  data={analysis?.phenomenology_breakdown as UapPhenomenologyResult | null}
-                  evidenceBreakdown={analysis?.evidence_breakdown as EvidenceBreakdown | null}
-                />
-              )
-            )}
-
-            {/* ── Tier 2: Program Intelligence Breakdown ────────────── */}
-            {!isTier1 && (
+            {/* ── Program Intelligence (ALL tiers — shown first for consistency) ── */}
+            {analysis?.program_intel_breakdown ? (
+              <UapProgramIntelCard data={analysis.program_intel_breakdown as UapProgramIntelResult | null} />
+            ) : (
               video.intake_status === "punctuated" || video.intake_status === "pending" ? (
                 <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
                   <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
@@ -431,9 +476,89 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
                     <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">This video is in the queue for deep program intelligence extraction.</p>
                   </div>
                 </div>
-              ) : (
-                <UapProgramIntelCard data={analysis?.program_intel_breakdown as UapProgramIntelResult | null} />
-              )
+              ) : null
+            )}
+
+            {/* ── Encounter Context + Deep Analysis (from uap_encounters) ─── */}
+            {hasEncounters && encounters.map((enc) => {
+              const encPhenomData = enc.phenomenology_breakdown as UapPhenomenologyResult | null;
+              const encContextData = enc.encounter_context as UapEncounterContextResult | null;
+              const encEvidenceData = enc.evidence_breakdown as EvidenceBreakdown | null;
+              const encName = enc.experiencer_name || 'Unknown Experiencer';
+              const isRetold = enc.source_type === 'retold_encounter';
+
+              return (
+                <div key={enc.id} className="space-y-6">
+                  {/* Encounter header for multi-encounter videos */}
+                  {encounters.length > 1 && (
+                    <div className="flex items-center gap-3 pt-4">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-xs font-bold">
+                        {enc.encounter_index + 1}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                          {enc.encounter_label || `${encName}'s Encounter`}
+                        </h3>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          {encName} · {isRetold ? 'Retold Account' : enc.source_type === 'interview_with_experiencer' ? 'Interview' : 'First-Person'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <UapEncounterContextCard data={encContextData} />
+                  <UapResearchBreakdown
+                    data={encPhenomData}
+                    evidenceBreakdown={encEvidenceData}
+                  />
+                </div>
+              );
+            })}
+
+            {/* Legacy fallback: show from uap_analysis if no encounters yet */}
+            {!hasEncounters && isTier1 && video.intake_status !== "punctuated" && video.intake_status !== "pending" && (
+              <>
+                <UapEncounterContextCard
+                  data={analysis?.encounter_context as UapEncounterContextResult | null}
+                />
+                {analysis?.phenomenology && !analysis?.phenomenology_breakdown ? (
+                  <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
+                      <Radar className="w-4 h-4 text-green-500" />
+                      <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                        Phenomenology
+                      </h2>
+                    </div>
+                    <div className="px-6 py-5">
+                      <PhenomenologyGrid data={analysis.phenomenology} />
+                    </div>
+                  </div>
+                ) : (
+                  <UapResearchBreakdown
+                    data={analysis?.phenomenology_breakdown as UapPhenomenologyResult | null}
+                    evidenceBreakdown={analysis?.evidence_breakdown as EvidenceBreakdown | null}
+                  />
+                )}
+              </>
+            )}
+
+            {/* Analysis Pending state */}
+            {!hasEncounters && isTier1 && (video.intake_status === "punctuated" || video.intake_status === "pending") && (
+              <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
+                  <Radar className="w-4 h-4 text-green-500" />
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
+                    Encounter Research Breakdown
+                  </h2>
+                </div>
+                <div className="px-6 py-8 text-center">
+                  <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 font-medium">Analysis pending</p>
+                  <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">This video is in the queue for deep phenomenological extraction.</p>
+                </div>
+              </div>
             )}
 
             {/* Timestamped Transcript */}
@@ -497,14 +622,87 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
 
           {/* Right Sidebar */}
           <div className="space-y-6 lg:pr-1">
-            {/* Tier-conditional sidebar */}
-            {isTier1 && triadScores && <TriadScoresPanel scores={triadScores} />}
-            {!isTier1 && analysis?.program_intel_breakdown ? (
+            {/* Program Intel Summary (all tiers — shown first for consistency) */}
+            {analysis?.program_intel_breakdown && (
               <UapProgramIntelSummaryCard data={analysis.program_intel_breakdown as UapProgramIntelResult} />
-            ) : (
-              !isTier1 && knowledgeData && <KnowledgePanel data={knowledgeData} />
             )}
 
+            {/* Legacy knowledge panel fallback */}
+            {!analysis?.program_intel_breakdown && knowledgeData && (
+              <KnowledgePanel data={knowledgeData} />
+            )}
+
+            {/* Multi-encounter triads — one panel per encounter */}
+            {hasEncounters ? (
+              <>
+                {encounters.map((enc) => {
+                  const encName = enc.experiencer_name || enc.encounter_label || `Encounter ${enc.encounter_index + 1}`;
+                  const hasTriad = enc.evidence_score != null || enc.contact_depth_score != null || enc.transformation_score != null;
+                  const isRetold = enc.source_type === 'retold_encounter';
+                  const sourceLabel = isRetold ? 'Retold Account' : enc.source_type === 'interview_with_experiencer' ? 'Interview' : 'First-Person';
+
+                  if (hasTriad) {
+                    const encTriad: TriadScores = {
+                      evidence_score: enc.evidence_score,
+                      evidence_breakdown: enc.evidence_breakdown as TriadScores["evidence_breakdown"],
+                      contact_depth_score: enc.contact_depth_score,
+                      contact_depth_breakdown: enc.contact_depth_breakdown as TriadScores["contact_depth_breakdown"],
+                      transformation_score: enc.transformation_score,
+                      transformation_breakdown: enc.transformation_breakdown as TriadScores["transformation_breakdown"],
+                      hynek_type: enc.hynek_type,
+                      vallee_type: enc.vallee_type,
+                    };
+                    return (
+                      <div key={enc.id}>
+                        {/* Encounter name header */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                            {enc.encounter_index + 1}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{encName}</p>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500">{sourceLabel}</p>
+                          </div>
+                        </div>
+                        <TriadScoresPanel scores={encTriad} />
+                      </div>
+                    );
+                  }
+
+                  // Retold / no-triad encounter — compact label
+                  return (
+                    <div key={enc.id} className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 text-[10px] font-bold flex-shrink-0">
+                          {enc.encounter_index + 1}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{encName}</p>
+                          <p className="text-[10px] text-slate-400 dark:text-slate-500">{sourceLabel}</p>
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
+                        {isRetold
+                          ? "This is a retold account. Triad scoring requires direct experiencer testimony."
+                          : "Encounter analysis completed. No triad scores available."}
+                      </p>
+                    </div>
+                  );
+                })}
+              </>
+            ) : (
+              /* No encounters at all — show pending state for Tier 1 */
+              isTier1 && (
+                <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm p-6">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">
+                    Contact Experience Triad
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Analysis pending. This encounter has not yet been processed by our UAP research suite.
+                  </p>
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>

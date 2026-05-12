@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Radio } from "lucide-react"
+import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar, Globe, Building2 } from "lucide-react"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -278,6 +278,99 @@ export default function SiteHeader() {
                         <div>
                           <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Search Transcripts</div>
                           <div className="text-xs text-slate-400">Full-text search across UAP transcripts</div>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/uap/intelligence"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <BarChart3 className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Research Intelligence</div>
+                          <div className="text-xs text-slate-400">Cross-video analytics &amp; insights</div>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/uap/events"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <Calendar className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Events</div>
+                          <div className="text-xs text-slate-400">Major UAP events &amp; milestones</div>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/uap/experiencer"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <Users className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Experiencers</div>
+                          <div className="text-xs text-slate-400">Experiencer profiles</div>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/uap/persons"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <Globe className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Persons of Interest</div>
+                          <div className="text-xs text-slate-400">Key figures in UAP research</div>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/uap/programs"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <Shield className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Programs</div>
+                          <div className="text-xs text-slate-400">Government & research projects</div>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/uap/organizations"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <Globe className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Organizations</div>
+                          <div className="text-xs text-slate-400">Agencies & institutions</div>
+                        </div>
+                      </Link>
+                      {/* Cross-Domain Research — spans both NDE and UAP */}
+                      <div className="mx-3 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
+                      <Link
+                        href="/research/cross-domain"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-50 to-green-50 dark:from-violet-500/20 dark:to-green-500/20 flex items-center justify-center">
+                          <Sparkles className="w-4 h-4 text-violet-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Cross-Domain Research</div>
+                          <div className="text-xs text-slate-400">NDE ↔ UAP phenomenology</div>
                         </div>
                       </Link>
                     </>
@@ -709,6 +802,62 @@ export default function SiteHeader() {
                             >
                               <Search className="w-4 h-4 text-green-600" />
                               Search Transcripts
+                            </Link>
+                            <Link
+                              href="/uap/intelligence"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <BarChart3 className="w-4 h-4 text-green-600" />
+                              Research Intelligence
+                            </Link>
+                            <Link
+                              href="/uap/events"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Calendar className="w-4 h-4 text-green-600" />
+                              Events
+                            </Link>
+                            <Link
+                              href="/uap/experiencer"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Users className="w-4 h-4 text-green-600" />
+                              Experiencers
+                            </Link>
+                            <Link
+                              href="/uap/persons"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Globe className="w-4 h-4 text-green-600" />
+                              Persons of Interest
+                            </Link>
+                            <Link
+                              href="/uap/programs"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Shield className="w-4 h-4 text-green-600" />
+                              Programs
+                            </Link>
+                            <Link
+                              href="/uap/organizations"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Building2 className="w-4 h-4 text-green-600" />
+                              Organizations
+                            </Link>
+                            <Link
+                              href="/research/cross-domain"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Sparkles className="w-4 h-4 text-violet-600" />
+                              Cross-Domain Research
                             </Link>
                           </>
                         ) : (

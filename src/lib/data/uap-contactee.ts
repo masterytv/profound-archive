@@ -61,7 +61,7 @@ export interface ContacteeVideo {
   title: string;
   channel_name: string | null;
   channel_id: string | null;
-  published_at: string | null;
+  date: string | null;
   thumbnail_url: string | null;
   view_count: string | null;
   tier: number;
@@ -193,7 +193,7 @@ export async function getContacteeVideos(videoIds: string[]): Promise<ContacteeV
   // Fetch videos
   const { data: videos, error: videosError } = await supabase
     .from('uap_vids')
-    .select('video_id, title, channel_name, channel_id, published_at, thumbnail_url, view_count, tier, track, content_type, duration')
+    .select('video_id, title, channel_name, channel_id, date, thumbnail_url, view_count, tier, track, content_type, duration')
     .in('video_id', videoIds)
     .order('view_count', { ascending: false });
 

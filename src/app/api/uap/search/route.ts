@@ -70,6 +70,11 @@ async function handleKeywordSearch(
   const filterChannelName = Array.isArray(filters?.channelName) && filters.channelName.length > 0 ? filters.channelName : null;
   const filterHynekType = Array.isArray(filters?.hynekType) && filters.hynekType.length > 0 ? filters.hynekType : null;
   const filterContentType = (filters?.contentType as string) ?? null;
+  // Phenomenology filters
+  const filterExperienceType = (filters?.experienceType as string) ?? null;
+  const filterEntityType = (filters?.entityType as string) ?? null;
+  const filterEvidenceType = (filters?.evidenceType as string) ?? null;
+  const filterRecurrence = (filters?.recurrence as string) ?? null;
 
   const offset = (page - 1) * perPage;
 
@@ -84,6 +89,10 @@ async function handleKeywordSearch(
     filter_channel_name: filterChannelName,
     filter_hynek_type: filterHynekType,
     filter_content_type: filterContentType,
+    filter_experience_type: filterExperienceType,
+    filter_entity_type: filterEntityType,
+    filter_evidence_type: filterEvidenceType,
+    filter_recurrence: filterRecurrence,
   });
 
   if (error) {
@@ -152,6 +161,11 @@ async function handleSemanticSearch(
   const filterTier = filters?.tier ? Number(filters.tier) : null;
   const filterTrack = filters?.track as string | null ?? null;
   const filterContentType = (filters?.contentType as string) ?? null;
+  // Phenomenology filters
+  const filterExperienceType = (filters?.experienceType as string) ?? null;
+  const filterEntityType = (filters?.entityType as string) ?? null;
+  const filterEvidenceType = (filters?.evidenceType as string) ?? null;
+  const filterRecurrence = (filters?.recurrence as string) ?? null;
 
   const offset = (page - 1) * perPage;
 
@@ -165,6 +179,10 @@ async function handleSemanticSearch(
     filter_tier: filterTier,
     filter_track: filterTrack,
     filter_content_type: filterContentType,
+    filter_experience_type: filterExperienceType,
+    filter_entity_type: filterEntityType,
+    filter_evidence_type: filterEvidenceType,
+    filter_recurrence: filterRecurrence,
   });
 
   if (error) {

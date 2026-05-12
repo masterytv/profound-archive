@@ -125,6 +125,24 @@ const PrimaryTopicEnum = z.enum([
 
 const ConnectionTypeEnum = z.enum(['person', 'organization', 'program', 'location']).catch('person');
 
+const KnowledgeSourceEnum = z.enum([
+  'firsthand',           // Person directly witnessed/participated
+  'secondhand',          // Person was told by a direct participant
+  'documented',          // Backed by documents, FOIA, official records
+  'alleged',             // Unverified claim, no direct source cited
+]).catch('alleged');
+
+const VideoToneEnum = z.enum([
+  'investigative',       // Fact-finding, evidence-focused
+  'conspiratorial',      // Assumes coverup, connects dots speculatively
+  'academic',            // Scientific, methodological
+  'experiential',        // First-person storytelling
+  'journalistic',        // News reporting style
+  'editorial',           // Opinion-driven
+  'emotional',           // Fear/wonder/awe-driven
+  'neutral',             // Balanced presentation
+]).catch('neutral');
+
 // ─── Sub-Schemas ─────────────────────────────────────────────────────────────
 
 const PersonMentionSchema = z.object({
@@ -139,7 +157,10 @@ const PersonMentionSchema = z.object({
   first_public_date: z.string().optional(),
   claims_made: z.array(z.string()).catch([]),
   credibility_indicators: z.array(z.string()).catch([]),
+  credibility_score: z.number().min(0).max(100).optional(),
+  credibility_indicator_count: z.number().min(0).optional(),
   quote: z.string(),
+  quote_timestamp_seconds: z.number().optional(),
   confidence: z.number().min(0).max(100),
 });
 
@@ -227,6 +248,7 @@ const ClaimExtractionSchema = z.object({
   original_source: z.string().optional(),
   context: ClaimContextEnum,
   under_oath: z.boolean(),
+  knowledge_source: KnowledgeSourceEnum,
   event_date: z.string().optional(),
   date_of_claim: z.string().optional(),
   specificity: SpecificityEnum,
@@ -234,6 +256,7 @@ const ClaimExtractionSchema = z.object({
   corroboration_mentioned: z.array(z.string()).catch([]),
   supporting_evidence: z.array(z.string()).catch([]),
   counter_evidence: z.array(z.string()).catch([]),
+  timestamp_seconds: z.number().optional(),
   confidence: z.number().min(0).max(100),
 });
 
@@ -247,6 +270,7 @@ const LegislativeEventSchema = z.object({
   status: LegislativeStatusEnum.optional(),
   significance: z.number().min(1).max(10),
   quote: z.string(),
+  quote_timestamp_seconds: z.number().optional(),
 });
 
 const ConnectionEdgeSchema = z.object({
@@ -265,6 +289,7 @@ export const UapProgramIntelSchema = z.object({
   primary_topic: PrimaryTopicEnum,
   secondary_topics: z.array(PrimaryTopicEnum).catch([]),
   era_focus: z.array(z.string()).catch([]),
+  video_tone: VideoToneEnum,
   persons: z.array(PersonMentionSchema).catch([]),
   organizations: z.array(OrganizationMentionSchema).catch([]),
   programs: z.array(ProgramMentionSchema).catch([]),
@@ -314,8 +339,11 @@ OUTPUT SCHEMA:
       "active_period": "string (optional)",
       "first_public_date": "string (optional)",
       "claims_made": ["array of strings"],
-      "credibility_indicators": ["array of strings"],
+      "credibility_indicators": ["array of strings - verifiable facts like security clearance, sworn testimony, ICIG complaint, career sacrifice"],
+      "credibility_score": 0-100,
+      "credibility_indicator_count": 0,
       "quote": "string (direct quote, max 40 words)",
+      "quote_timestamp_seconds": "number (optional, integer seconds of when this quote appears in the video)",
       "confidence": 0-100
     }
   ],
@@ -355,7 +383,9 @@ EXTRACTION RULES:
 - Only extract persons, organizations, or programs explicitly named in the transcript. Never infer entities not directly stated.
 - 'under_oath' should only be noted in 'credibility_indicators' if the transcript explicitly states sworn testimony.
 - 'stance' reflects the person's position on UAP disclosure.
-- 'credibility_indicators' are verifiable facts (e.g., security clearance level, oath, ICIG complaint).
+- 'credibility_indicators' are verifiable facts (e.g., security clearance level, oath, ICIG complaint, career sacrifice, peer-reviewed publications).
+- 'credibility_score' (0-100): Rate based on this rubric: clearance level held (+20), sworn testimony (+20), career sacrifice / whistleblower risk (+15), corroborating witnesses (+15), documented evidence (+15), peer review / academic credentials (+15). Sum applicable factors.
+- 'credibility_indicator_count': Set to the length of the credibility_indicators array you produce for this person.
 - For 'persons', quote must be a DIRECT quote from the transcript (max 40 words) or empty string.
 
 CRITICAL: Output ONLY valid JSON. No markdown, no code blocks, no explanation. Never use em dashes in output text -- use commas or semicolons instead.`;
@@ -431,6 +461,7 @@ OUTPUT SCHEMA:
       "original_source": "string (optional)",
       "context": "congressional_testimony" | "interview" | "documentary" | "leaked_document" | "news_report" | "analysis" | "speculation" | "firsthand_account",
       "under_oath": true/false,
+      "knowledge_source": "firsthand" | "secondhand" | "documented" | "alleged",
       "event_date": "string (optional)",
       "date_of_claim": "string (optional)",
       "specificity": "vague" | "specific" | "highly_specific",
@@ -438,6 +469,7 @@ OUTPUT SCHEMA:
       "corroboration_mentioned": ["array of strings"],
       "supporting_evidence": ["array of strings"],
       "counter_evidence": ["array of strings"],
+      "timestamp_seconds": "number (optional, integer seconds of when this claim is stated in the video)",
       "confidence": 0-100
     }
   ],
@@ -451,7 +483,8 @@ OUTPUT SCHEMA:
       "legislation_name": "string (optional)",
       "status": "passed" | "failed" | "amended" | "pending" | "stripped",
       "significance": 1-10,
-      "quote": "string"
+      "quote": "string",
+      "quote_timestamp_seconds": "number (optional, integer seconds of when this quote appears in the video)"
     }
   ],
   "secrecy_mechanisms": [
@@ -480,6 +513,7 @@ OUTPUT SCHEMA:
   "primary_topic": "legacy_program_structure" | "crash_retrieval" | "reverse_engineering" | "whistleblower_testimony" | "congressional_hearing" | "legislation_disclosure" | "technology_science" | "consciousness_psi" | "historical_case" | "coverup_secrecy" | "international_programs" | "military_encounters" | "media_analysis" | "other",
   "secondary_topics": ["array of PrimaryTopicEnum"],
   "era_focus": ["array of strings"],
+  "video_tone": "investigative" | "conspiratorial" | "academic" | "experiential" | "journalistic" | "editorial" | "emotional" | "neutral",
   "executive_summary": "string (2-3 sentences)",
   "intelligence_value": 1-10,
   "primary_revelation": "string (single most important new claim)"
@@ -488,10 +522,13 @@ OUTPUT SCHEMA:
 EXTRACTION RULES:
 - Claims must use dual-date tracking: 'event_date' (when it happened) vs 'date_of_claim' (when stated publicly).
 - 'under_oath' is ONLY true if explicitly stated as sworn testimony.
+- 'knowledge_source' classifies HOW the source_person knows this claim: 'firsthand' (directly witnessed/participated), 'secondhand' (told by a direct participant), 'documented' (backed by official records, FOIA releases, or published papers), 'alleged' (unverified, no direct source cited). Default to 'alleged' when unclear.
 - 'key_connections' should reference entities explicitly linked within the transcript. Connect what you can see.
-- 'video_type', 'primary_topic', 'secondary_topics', 'era_focus' classify the whole video.
+- 'video_type', 'primary_topic', 'secondary_topics', 'era_focus', 'video_tone' classify the whole video.
+- 'video_tone' captures the overall presentation style: 'investigative' (fact-finding, evidence-focused), 'conspiratorial' (assumes coverup), 'academic' (scientific, methodological), 'experiential' (first-person storytelling), 'journalistic' (news reporting), 'editorial' (opinion-driven), 'emotional' (fear/wonder/awe-driven), 'neutral' (balanced).
 - 'executive_summary' should be exactly 2-3 sentences.
 - 'primary_revelation' should be the single most important or novel claim in the transcript.
+- FIRST-PERSON ENCOUNTERS: For videos where an experiencer describes direct contact with non-human entities, altered consciousness, or anomalous phenomena, extract their key assertions as claims with category "non_human_intelligence" and context "firsthand_account". This includes: entity descriptions, telepathic communication, out-of-body experiences, consciousness expansion, anomalous perceptions, and physical effects. Use "Unnamed individual" or the experiencer's name as source_person. These claims are valuable intelligence even without named government sources.
 
 CRITICAL: Output ONLY valid JSON. No markdown, no code blocks, no explanation. Never use em dashes in output text -- use commas or semicolons instead.`;
 

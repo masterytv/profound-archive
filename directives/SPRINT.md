@@ -14,7 +14,8 @@
 | Sprint 3: Core Pages | ✅ Complete | 2026-05-06 |
 | Sprint 4: Profiles & Discovery | ✅ Complete | 2026-05-06 |
 | Sprint 5: Content & Polish | ✅ Complete | 2026-05-07 |
-| Sprint 6: Deep Analysis & Search | 🚧 In Progress | — |
+| Sprint 6: Deep Analysis & Search | ✅ Complete | 2026-05-12 |
+| Sprint 7: Mass Analysis & Intelligence | 🚧 In Progress | — |
 
 ## Environment Setup
 
@@ -617,22 +618,23 @@ For every UAP file you create:
 - [x] Story 6.2B.2: `analyzeUapEncounterContext()` module — date, location, military, connected cases (0.5d) ✅ 2026-05-07
 - [x] Story 6.2B.3: Pipeline integration — 6th parallel pass in `intake-uap.ts` (0.25d) ✅ 2026-05-07
 - [x] Story 6.2B.4: Test + batch backfill scripts (0.25d) ✅ 2026-05-07
-- [ ] Story 6.2B.5: Run batch backfill on all Tier 1 videos
+- [x] Story 6.2B.5: ~~Run batch backfill on all Tier 1 videos~~ — Skipped; mass re-analysis will populate encounter_context for all videos.
 
 ### Epic 6.3: Advanced Search & Filters
-- [ ] Story 6.3.1: Phenomenology-powered filters (1d)
+- [x] Story 6.3.1: Phenomenology-powered filters (1d) — Facets RPC returns experience_type, entity_type, evidence_type, recurrence. Both keyword + semantic RPCs accept new filter params. UI conditionally shows dropdowns when facet data exists. ✅ 2026-05-12
 
 ### Epic 6.4: Technical Debt Cleanup
-- [ ] Story 6.4.1: metadataBase, nav entry, unit test (0.5d)
-- [ ] Story 6.4.2: Contactee dedup + data quality (0.5d)
+- [x] Story 6.4.1: metadataBase added to root layout, methodology sitemap entry. ✅ 2026-05-12
+- [x] Story 6.4.2: Contactee dedup + data quality (0.5d) — 383→375 profiles: 7 merges, 1 composite split. ✅ 2026-05-12
 
 ### Epic 6.5: Methodology Documentation
-- [ ] Story 6.5.1: UAP analysis methodology page (1d)
+- [x] Story 6.5.1: UAP analysis methodology page — Classification, Hynek/Vallée, CET Triad, phenomenology extraction, program intel, pipeline steps, limitations & transparency. ✅ 2026-05-12
 
 ### Epic 6.6: Event Timeline Infrastructure
 > Partially covered by Epic 6.2B (encounter_context extraction). Full event table + timeline UI deferred.
-- [x] Story 6.6.1-6.6.4: Lean implementation — `encounter_context` JSONB captures event_date, location, named_witnesses, connected_cases per video. Full `uap_events` table deferred to post-launch. ✅ 2026-05-07
-- [ ] Story 6.6.5: Event Timeline UI — chronological timeline view, mass events larger, cross-linked contactee lists per event (1.5d)
+- [x] Story 6.6.0: UAP Events Normalization — `uap_events` table + RLS + indexes, seed script (`scripts/uap-seed-events.ts`) with 15 well-known events, `/uap/events` index + `[slug]` detail pages, pipeline event matching, nav entries, sitemap. Needs production seed run. ✅ 2026-05-12
+- [x] Story 6.6.1-6.6.4: Lean implementation — `encounter_context` JSONB captures event_date, location, named_witnesses, connected_cases per video. ✅ 2026-05-07
+- [x] Story 6.6.5: Event Timeline UI — Full rewrite: reads from `uap_events` table, decade anchor-scroll pills, color-coded event type legend + badges, mass event visual weighting (glow + ★), contactee cross-link pills, location display, witness counts, legacy timeline_events fallback. ✅ 2026-05-12
 
 ### Epic 6.7: Unified Intake Pipeline & Re-Analysis
 > Build a single, unified intake orchestrator (`intake-uap.ts`) that handles all ingestion (Admin UI, Channel Scanner, GitHub queue) and dynamically branches into Tier 1 (Phenomenology/Triad) or Tier 2 (Program Intel) pipelines.
@@ -652,3 +654,97 @@ For every UAP file you create:
 - [x] Each story has "done" criteria
 - [x] First sprint identified
 - [x] Environment setup documented
+
+---
+
+# Sprint 7: Mass Analysis & Intelligence Layer
+
+> Approved: 2026-05-12 | ~2.5 weeks
+> Focus: Mass re-analysis, video explore filters, full entity resolution, dashboard enrichment, NDE↔UAP cross-domain, automated 365 Facts
+
+---
+
+### Epic 7.1: Mass Re-Analysis Execution
+
+> Run hardened pipeline (Sprint 6 schema enrichments) across all Tier 1+2 videos via GitHub Actions queue.
+
+- [x] Story 7.1.1: Validate hardened schemas on 1 test video — verify `video_tone`, `credibility_score`, `witness_count` populated (0.25d) ✅ 2026-05-12
+- [x] Story 7.1.1b: Run full re-analysis on ~27 previously analyzed videos — verify `uap_video_stats` shows non-null enriched fields (0.25d) ✅ 2026-05-12
+- [x] Story 7.1.2: Build `scripts/uap-queue-unanalyzed.ts` — finds Tier 1+2 videos missing `uap_analysis` rows, inserts into `uap_scan_queue`; verify GHA picks up and processes; monitor first 10 videos (0.5d) ✅ 2026-05-12 (0 unanalyzed videos found — all 28 complete)
+- [x] Story 7.1.3: Post-analysis data quality audit — SQL audit NULL rates on enriched fields; verify events populated; verify contactee dedup; fix issues and re-queue (0.5d) ✅ 2026-05-12
+
+---
+
+### Epic 7.2: Video Explore Enhancement
+
+> Enhance existing `/uap/video-explore` with collapsible sidebar filter panel. Four accordion sections: Encounter Filters, Program & Intel Filters, Quality & Scoring, General.
+
+> **Filter sections:**
+> - Encounter: Entity Type (multi-chip), Craft Shape (multi-chip), Five Observables (toggles), Hynek (multi-chip), Experience Type (multi-chip), Recurrence (dropdown)
+> - Program: Video Tone (multi-chip), Primary Topic (multi-chip), Knowledge Source (multi-chip), Has Under-Oath (toggle), Has Psi (toggle)
+> - Quality: Evidence Strength (slider), Contact Depth (slider), Transformation (slider), Intelligence Value (slider)
+> - General: Tier (pills, existing), Content Type (multi-select), Decade (pills), Channel (searchable dropdown)
+
+- [x] Story 7.2.1: Build `UapFilterSidebar.tsx` — accordion sections, multi-select chips, range sliders, toggles; mobile drawer with "Filters (N)" badge; URL-based state; clear all button (1.5d) ✅ 2026-05-12
+- [x] Story 7.2.2: Migration — extend `uap_video_explore_grid` RPC with new filter params for entity_types, craft_shapes, hynek_types, primary_topics, five_observables, recurrence, min_intelligence, has_oath, has_psi, decade, channel; PL/pgSQL branching per LEARNINGS.md (1d) ✅ 2026-05-12
+- [x] Story 7.2.3: Wire page layout — sidebar fixed left (280px desktop), filter drawer (mobile); pass all filter params URL→RPC; keep existing sort presets and pagination (0.5d) ✅ 2026-05-12
+- [x] Story 7.2.4: Build `uap_explore_facets` RPC — returns available values + counts per filter dimension; hide empty options; show count badges (0.5d) ✅ 2026-05-12
+
+---
+
+### Epic 7.3: Intelligence Dashboard Enrichment
+
+> Enrich `/uap/intelligence` dashboard with new analysis data.
+
+- [x] Story 7.3.1: Add tone + credibility analytics — tone distribution chart, avg credibility, knowledge source breakdown, "Top Credible Sources" widget (0.5d) ✅ 2026-05-12
+- [x] Story 7.3.2: Add encounter phenomenology stats — entity type distribution, Hynek breakdown, Five Observables prevalence, most common physical effects (0.5d) ✅ 2026-05-12
+- [x] Story 7.3.3: Build automated daily fact card — `uap_daily_facts` table; `scripts/uap-generate-facts.ts` generates 30 days ahead; `/api/uap/daily-fact` endpoint; fact card component with share button; N-value enforcement (N≥5 percentages, N≥10 correlations); GHA cron weekly generation (1d) ✅ 2026-05-12
+
+---
+
+### Epic 7.4: Full Entity Resolution
+
+> Canonical tables + LLM-assisted deduplication + entity profile pages.
+
+- [x] Story 7.4.1: Migration + script for `uap_canonical_persons` — UUID id, canonical_name, slug, aliases TEXT[], role, affiliation, total_mentions, avg_credibility_score, linked_video_ids, bio; `scripts/uap-build-canonical-persons.ts` with Phase 1 fuzzy grouping (Levenshtein ≤2 + variant rules) + Phase 2 LLM verification; wire into compute-video-stats and intake-uap (1.5d) ✅ 2026-05-12
+- [x] Story 7.4.2: Migration + script for `uap_canonical_programs` and `uap_canonical_orgs` — same pattern as persons; LLM verification for ambiguous merges; seed from existing JSONB (1d) ✅ 2026-05-12
+- [x] Story 7.4.3: Person profile pages — `/uap/persons` index + `/uap/persons/[slug]` detail (name, role, credibility, claims, video appearances, connected entities, JSON-LD); add to nav + sitemap (1d) ✅ 2026-05-12
+- [x] Story 7.4.4: Program + org profile pages — `/uap/programs/[slug]` + `/uap/organizations/[slug]` detail with timeline, key figures, connected videos; index pages; add to nav + sitemap (0.5d) ✅ 2026-05-12
+
+---
+
+### Epic 7.5: NDE↔UAP Cross-Domain Comparison (Lightweight)
+
+> Academically novel: compare phenomenological overlaps between NDE experiencers and UAP contactees.
+
+- [x] Story 7.5.1: Build cross-domain comparison page — `src/app/research/cross-domain/page.tsx`; queries Supabase directly (server component, no self-fetch); aggregates NDE + UAP phenomenology for entity types, consciousness states, emotional arcs, physical effects; dual-bar overlap visualization; top 10 overlaps ranked by significance; academic framing with N-values (1d) ✅ 2026-05-12
+- [x] Story 7.5.2: Cross-domain API endpoint — `/api/research/cross-domain/route.ts`; aggregates phenomenology from both domains; dead exec_sql call removed; kept for external API consumers; cached with ISR (0.5d) ✅ 2026-05-12
+
+---
+
+### Epic 7.6: Pipeline Reliability & Monitoring
+
+> Ensure mass analysis runs reliably.
+
+- [x] Story 7.6.1: Enhanced admin monitoring — Pipeline Health section with analyzed-today, errors (24h), queue depth + ETA; Recent Failures table with `intake_error`; "Retry All Failed" bulk button (client component + `retry_all_failed` API action) (0.5d) ✅ 2026-05-12
+- [x] Story 7.6.2: DRM/restricted content handling — verified `drm_protected` status in intake-uap.ts (YouTube Movies/Premium detection); pipeline skips gracefully; admin pages display DRM badge; dashboard shows DRM count (0.25d) ✅ 2026-05-12
+
+---
+
+### Epic 7.7: Entity Directory Sort & Filter
+
+> Add sort/filter controls to entity index pages matching the experiencer directory pattern. Each page gets a sort dropdown (high/low toggle) and client-side search.
+
+> **Reference implementation:** `src/app/uap/experiencer/page.tsx` + `UapExperiencerSearch.tsx`
+
+> **Sort options per page:**
+> - **Persons** (`/uap/persons`, 81 rows): Videos, Mentions, Credibility, Name — high/low
+> - **Organizations** (`/uap/organizations`, 51 rows): Videos, Mentions, Name — high/low
+> - **Programs** (`/uap/programs`, 23 rows): Videos, Mentions, Name — high/low
+> - **Events** (`/uap/events`, 15 rows): Sources, Witnesses, Date, Name — high/low
+
+- [x] Story 7.7.1: Persons sort & search — Convert to client component with URL-based sort state; sort by `linked_video_ids` length / `total_mentions` / `avg_credibility_score` / `canonical_name`; text search on name + aliases; high/low toggle (0.5d) ✅ 2026-05-12
+- [x] Story 7.7.2: Organizations sort & search — same pattern; sort by `linked_video_ids` length / `total_mentions` / `canonical_name`; search on name + aliases (0.5d) ✅ 2026-05-12
+- [x] Story 7.7.3: Programs sort & search — same pattern; sort by `linked_video_ids` length / `total_mentions` / `canonical_name`; search on name + aliases (0.5d) ✅ 2026-05-12
+- [x] Story 7.7.4: Events sort & search — sort by `source_count` / `witness_count` / `year` / `name`; search on name + location; high/low toggle (0.5d) ✅ 2026-05-12
+- [x] Story 7.7.5: Credibility Score Methodology page — `/uap/methodology/credibility` explaining the 6-factor rubric, scoring process, strengths & limitations; linked all Cred pills (index + detail) to open page in new tab (0.25d) ✅ 2026-05-12

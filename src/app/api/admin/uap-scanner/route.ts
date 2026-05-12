@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
         const { data: items, error: qErr } = await supabase
             .from('uap_vids')
             .select('video_id, title, channel_id, channel_name, intake_status, intake_error')
-            .in('intake_status', ['failed', 'no_captions', 'out_of_scope', 'embedding'])
+            .in('intake_status', ['failed', 'no_captions', 'drm_protected', 'out_of_scope', 'embedding'])
             .order('classified_at', { ascending: false });
 
         if (qErr) return NextResponse.json({ error: qErr.message }, { status: 500 });
@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
         for (const row of uapVidCounts) {
             if (row.intake_status === 'complete') intakeTotals.accepted++;
             else if (row.intake_status === 'out_of_scope') intakeTotals.rejected++;
-            else if (['failed', 'no_captions', 'embedding'].includes(row.intake_status)) intakeTotals.failed++;
+            else if (['failed', 'no_captions', 'drm_protected', 'embedding'].includes(row.intake_status)) intakeTotals.failed++;
         }
     }
 
@@ -401,6 +401,42 @@ export async function POST(req: NextRequest) {
             } catch (err: any) {
                 return NextResponse.json({ error: err.message }, { status: 500 });
             }
+        }
+
+        case 'retry_all_failed': {
+            // Bulk re-queue all failed intake videos
+            const { data: failedVids, error: fetchErr } = await supabase
+                .from('uap_vids')
+                .select('video_id, channel_id')
+                .eq('intake_status', 'failed');
+
+            if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 500 });
+            if (!failedVids || failedVids.length === 0) {
+                return NextResponse.json({ success: true, count: 0 });
+            }
+
+            // Reset intake_status and intake_error for each video
+            const videoIds = failedVids.map((v: any) => v.video_id);
+            await supabase
+                .from('uap_vids')
+                .update({ intake_status: null, intake_error: null })
+                .in('video_id', videoIds);
+
+            // Re-add to scan queue
+            const queueItems = failedVids.map((v: any) => ({
+                video_id: v.video_id,
+                video_url: `https://www.youtube.com/watch?v=${v.video_id}`,
+                channel_id: v.channel_id || null,
+                status: 'pending',
+                error: null,
+                processed_at: null,
+                intake_result: null,
+            }));
+            await supabase
+                .from('uap_scan_queue')
+                .upsert(queueItems, { onConflict: 'video_url', ignoreDuplicates: false });
+
+            return NextResponse.json({ success: true, count: failedVids.length });
         }
 
         default:

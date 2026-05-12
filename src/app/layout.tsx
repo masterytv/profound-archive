@@ -12,6 +12,7 @@ import { Suspense } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://projectprofound.org'),
   title: 'Project Profound: Near Death Experiences and Consciousness',
   description: 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences.',
   icons: {

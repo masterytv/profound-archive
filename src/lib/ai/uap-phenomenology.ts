@@ -60,6 +60,14 @@ const CraftSoundEnum = z.enum(['silent', 'humming', 'buzzing', 'roaring', 'pulsi
 
 const DurationEstimateEnum = z.enum(['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years', 'ongoing', 'unknown', 'missing_time', 'not_stated']);
 
+const RecurrencePatternEnum = z.enum([
+  'single_event',        // One-time encounter
+  'recurring',           // Multiple encounters over time
+  'lifelong',            // Ongoing since childhood
+  'clustered',           // Multiple events in a short period
+  'not_stated',
+]).catch('not_stated');
+
 // ─── LLM Output Normalizer ───────────────────────────────────────────────────
 // gpt-4o-mini frequently returns values like "not stated", "N/A", "none",
 // or "not described" instead of the underscored enum values. This preprocessor
@@ -109,6 +117,7 @@ const EncounterFlowPhaseSchema = z.object({
   duration_estimate: DurationEstimateEnum.catch('unknown'),
   description: z.string().catch(''),
   key_quote: z.string().catch(''),
+  key_quote_timestamp_seconds: z.number().optional(),
 });
 
 const SensoryChannelSchema = z.object({
@@ -134,6 +143,7 @@ const ConsciousnessAlterationSchema = z.object({
   agency: AgencyEnum.catch('not_stated'),
   reality_assessment: RealityAssessmentEnum.catch('not_stated'),
   reality_quote: z.string().catch(''),
+  reality_quote_timestamp_seconds: z.number().optional(),
   oz_factor: z.boolean().catch(false),
   ontological_shock_rating: z.number().min(1).max(10).catch(5),
 });
@@ -150,6 +160,7 @@ const UapEntityEncounterSchema = z.object({
   interaction_type: InteractionTypeEnum.catch('not_stated'),
   message_summary: z.string().catch(''),
   message_quote: z.string().catch(''),
+  message_quote_timestamp_seconds: z.number().optional(),
   behavior: z.string().catch(''),
   confidence: z.number().min(0).max(100).catch(50),
 });
@@ -252,6 +263,8 @@ export const UapPhenomenologySchema = z.object({
   distinguishing_features: z.string().catch(''),
   encounter_modality: z.string().catch('unknown'),
   hynek_classification: z.string().catch('unknown'),
+  witness_count: z.number().min(1).optional(),
+  recurrence_pattern: RecurrencePatternEnum,
 });
 
 export type UapPhenomenologyResult = z.infer<typeof UapPhenomenologySchema>;
@@ -285,7 +298,8 @@ OUTPUT SCHEMA:
       "present": true/false,
       "duration_estimate": "seconds" | "minutes" | "hours" | "days" | "weeks" | "months" | "years" | "ongoing" | "unknown" | "missing_time",
       "description": "1-2 sentence summary of what happened in this phase",
-      "key_quote": "direct quote from transcript (max 40 words)"
+      "key_quote": "direct quote from transcript (max 40 words)",
+      "key_quote_timestamp_seconds": "number (optional, integer seconds of when this quote appears in the video)"
     }
   ],
   "encounter_duration_estimate": "total estimated duration of the encounter",
@@ -316,6 +330,7 @@ OUTPUT SCHEMA:
     "agency": "full_control" | "partial_control" | "no_control" | "directed" | "not_stated",
     "reality_assessment": "more_real" | "equally_real" | "dreamlike" | "surreal" | "hyperreal" | "not_stated",
     "reality_quote": "supporting quote about how real the experience felt, or empty string",
+    "reality_quote_timestamp_seconds": "number (optional, integer seconds of when this quote appears in the video)",
     "oz_factor": true/false,
     "ontological_shock_rating": 1-10
   },
@@ -333,6 +348,7 @@ OUTPUT SCHEMA:
       "interaction_type": "observation" | "medical_exam" | "teaching" | "abduction" | "consensual_contact" | "guided_tour" | "warning" | "task_assignment" | "none" | "not_stated",
       "message_summary": "key content conveyed, or 'none'",
       "message_quote": "direct quote from transcript (max 40 words), or empty string",
+      "message_quote_timestamp_seconds": "number (optional, integer seconds of when this quote appears in the video)",
       "behavior": "narrative description of what the entity DID",
       "confidence": 0-100
     }
@@ -368,7 +384,9 @@ OUTPUT SCHEMA:
 
   "distinguishing_features": "1-2 sentence summary of what makes THIS encounter phenomenologically unique",
   "encounter_modality": "physical_sighting" | "close_encounter" | "abduction" | "dream_vision" | "meditation_ce5" | "ongoing_contact",
-  "hynek_classification": "CE1" | "CE2" | "CE3" | "CE4" | "CE5" | "NL" | "DD"
+  "hynek_classification": "CE1" | "CE2" | "CE3" | "CE4" | "CE5" | "NL" | "DD",
+  "witness_count": 1,
+  "recurrence_pattern": "single_event" | "recurring" | "lifelong" | "clustered" | "not_stated"
 }
 
 EXTRACTION RULES:
@@ -410,6 +428,19 @@ Physical Effects:
 - Arrays should contain only the specific subcategory keys that were described.
 - If no physical effects, use empty arrays and empty details string.
 
+Witness Count:
+- Count ALL witnesses mentioned as present during the encounter, including the primary experiencer (minimum 1).
+- If the experiencer says "my friend and I," witness_count = 2. If "a group of us," estimate based on context.
+- If truly unknown or not stated, omit the field entirely.
+
+Recurrence Pattern:
+- 'single_event': One-time encounter, never happened before or after.
+- 'recurring': Multiple separate encounters over time (months to years).
+- 'lifelong': Ongoing since childhood, often with multiple distinct encounters.
+- 'clustered': Multiple events in a short period (days to weeks).
+- 'not_stated': Cannot determine from transcript.
+- Base this ONLY on what the experiencer says. If they only describe one event without mentioning others, use 'single_event'.
+
 ANTI-HALLUCINATION RULE: If a section is not described in the transcript, use empty arrays, "not_stated", false, 0, or empty strings. NEVER infer or fabricate data that is not explicitly stated in the transcript.`;
 
 // ─── Analysis Function ───────────────────────────────────────────────────────
@@ -450,6 +481,26 @@ export async function analyzeUapPhenomenology(subtitles: string): Promise<UapPhe
     }
 
     const raw = JSON.parse(content);
+
+    // ── DEBUG: Log raw LLM output before any processing ──
+    console.log('[uap-phenomenology] 🔍 RAW LLM OUTPUT DIAGNOSTICS:');
+    console.log('  Top-level keys:', Object.keys(raw));
+    console.log('  encounter_flow:', Array.isArray(raw.encounter_flow) ? `${raw.encounter_flow.length} phases` : typeof raw.encounter_flow);
+    console.log('  entities:', Array.isArray(raw.entities) ? `${raw.entities.length} entities` : typeof raw.entities);
+    console.log('  entity_count:', raw.entity_count);
+    console.log('  craft_observation.observed:', raw.craft_observation?.observed);
+    console.log('  craft_observation.shape:', raw.craft_observation?.shape);
+    if (raw.sensory_channels) {
+      const active = Object.entries(raw.sensory_channels)
+        .filter(([, ch]: [string, unknown]) => (ch as Record<string, unknown>)?.active)
+        .map(([name]) => name);
+      console.log('  Active sensory channels:', active.length > 0 ? active.join(', ') : 'NONE');
+    } else {
+      console.log('  sensory_channels: MISSING FROM OUTPUT');
+    }
+    console.log('  emotional_progression:', Array.isArray(raw.emotional_progression) ? `${raw.emotional_progression.length} entries` : typeof raw.emotional_progression);
+    console.log('  Raw JSON preview (first 500 chars):', JSON.stringify(raw).slice(0, 500));
+
     // Normalize LLM output drift ("not stated" → "not_stated", spaces → underscores)
     const normalized = normalizeLlmOutput(raw);
 
@@ -458,8 +509,6 @@ export async function analyzeUapPhenomenology(subtitles: string): Promise<UapPhe
     const parsed = UapPhenomenologySchema.safeParse(normalized);
 
     if (!parsed.success) {
-      // This should be extremely rare now that every field has a .catch() fallback.
-      // Log the specific failures for prompt iteration.
       console.error("[uap-phenomenology] Zod validation failed (unexpected with .catch() guards):");
       for (const issue of parsed.error.issues) {
         console.error(`  Path: ${issue.path.join('.')} | Code: ${issue.code} | ${issue.message}`);
@@ -468,9 +517,14 @@ export async function analyzeUapPhenomenology(subtitles: string): Promise<UapPhe
       return null;
     }
 
-    console.log('[uap-phenomenology] ✅ Parsed successfully. Encounter flow phases:', parsed.data.encounter_flow.length,
-      '| Entities:', parsed.data.entity_count,
-      '| Craft observed:', parsed.data.craft_observation.observed);
+    // ── DEBUG: Log post-parse results to compare with raw ──
+    console.log('[uap-phenomenology] ✅ Parsed successfully:');
+    console.log('  Encounter flow phases:', parsed.data.encounter_flow.length, '(present:', parsed.data.encounter_flow.filter(p => p.present).length, ')');
+    console.log('  Entities:', parsed.data.entity_count, '| Dominant:', parsed.data.dominant_entity_type);
+    console.log('  Craft observed:', parsed.data.craft_observation.observed, '| Shape:', parsed.data.craft_observation.shape);
+    const activeSensory = Object.entries(parsed.data.sensory_channels).filter(([, ch]) => ch.active).map(([n]) => n);
+    console.log('  Active sensory (post-parse):', activeSensory.length > 0 ? activeSensory.join(', ') : 'NONE');
+    console.log('  Emotions:', parsed.data.emotional_progression.length, '| Dominant:', parsed.data.dominant_emotion);
     return parsed.data;
   } catch (error) {
     console.error("[uap-phenomenology] Analysis error:", error);

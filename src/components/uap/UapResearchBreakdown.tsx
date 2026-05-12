@@ -28,6 +28,8 @@ import type {
   EmotionEntry,
   SensoryChannel,
 } from "@/lib/ai/uap-phenomenology";
+import { TimestampLink } from "@/components/video/TimestampLink";
+import { formatTimestamp } from "@/lib/ai/format-timestamped-transcript";
 
 // ─── Display Helper ─────────────────────────────────────────────────────────
 // Old batch runs stored free-text fields with underscores instead of spaces.
@@ -120,9 +122,17 @@ function EncounterFlowTimeline({ phases }: { phases: EncounterFlowPhase[] }) {
               {cleanText(phase.description)}
             </p>
             {phase.key_quote && (
-              <p className="text-[11px] text-slate-500 dark:text-slate-500 italic mt-1 border-l-2 border-green-300 dark:border-green-700 pl-2">
-                &ldquo;{cleanText(phase.key_quote)}&rdquo;
-              </p>
+              <div className="flex items-start gap-1.5 mt-1">
+                <p className="text-[11px] text-slate-500 dark:text-slate-500 italic border-l-2 border-green-300 dark:border-green-700 pl-2">
+                  &ldquo;{cleanText(phase.key_quote)}&rdquo;
+                </p>
+                {phase.key_quote_timestamp_seconds != null && (
+                  <TimestampLink
+                    seconds={phase.key_quote_timestamp_seconds}
+                    label={`[${formatTimestamp(phase.key_quote_timestamp_seconds)}]`}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -257,9 +267,17 @@ function EntityList({ entities }: { entities: UapEntityEncounter[] }) {
               </p>
             )}
             {entity.message_quote && (
-              <p className="text-[11px] italic text-slate-400 border-l-2 border-green-300 dark:border-green-700 pl-2">
-                &ldquo;{cleanText(entity.message_quote)}&rdquo;
-              </p>
+              <div className="flex items-start gap-1.5">
+                <p className="text-[11px] italic text-slate-400 border-l-2 border-green-300 dark:border-green-700 pl-2">
+                  &ldquo;{cleanText(entity.message_quote)}&rdquo;
+                </p>
+                {entity.message_quote_timestamp_seconds != null && (
+                  <TimestampLink
+                    seconds={entity.message_quote_timestamp_seconds}
+                    label={`[${formatTimestamp(entity.message_quote_timestamp_seconds)}]`}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -379,9 +397,17 @@ function ConsciousnessPanel({ data }: { data: ConsciousnessAlteration }) {
       </div>
 
       {data.reality_quote && (
-        <p className="text-[11px] italic text-slate-500 dark:text-slate-400 border-l-2 border-green-300 dark:border-green-700 pl-2">
-          &ldquo;{cleanText(data.reality_quote)}&rdquo;
-        </p>
+        <div className="flex items-start gap-1.5">
+          <p className="text-[11px] italic text-slate-500 dark:text-slate-400 border-l-2 border-green-300 dark:border-green-700 pl-2">
+            &ldquo;{cleanText(data.reality_quote)}&rdquo;
+          </p>
+          {data.reality_quote_timestamp_seconds != null && (
+            <TimestampLink
+              seconds={data.reality_quote_timestamp_seconds}
+              label={`[${formatTimestamp(data.reality_quote_timestamp_seconds)}]`}
+            />
+          )}
+        </div>
       )}
       {data.screen_memory_details && (
         <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -602,7 +628,7 @@ export function UapResearchBreakdown({ data, evidenceBreakdown, className }: Uap
           className="text-lg font-bold text-slate-900 dark:text-slate-100"
           style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
         >
-          Research Breakdown
+          Encounter Research Breakdown
         </h2>
         <span className="text-[10px] text-slate-400 ml-auto">
           Phenomenological Analysis

@@ -1,26 +1,20 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, Suspense } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Search,
   X,
-  Play,
-  Calendar,
-  Eye,
-  ChevronRight,
   Sparkles,
   Keyboard,
-  Clock,
   Filter,
   Bookmark,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import type { Metadata } from "next";
+import { UapSearchResultCard, type GroupedUapVideo } from "@/components/uap-search-result-card";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -55,36 +49,43 @@ interface SearchResponse {
     tracks?: string[];
     hynek_types?: string[];
     channel_names?: string[];
+    experience_types?: string[];
+    recurrence_patterns?: string[];
+    entity_types?: string[];
+    evidence_type_values?: string[];
   };
   page: number;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
-function formatCount(n: number | null): string {
-  if (!n) return "0";
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toLocaleString();
-}
 
-function formatTimestamp(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
-
-function formatDate(epochSec: number): string {
-  if (!epochSec) return "";
-  try {
-    return new Date(epochSec * 1000).toLocaleDateString(undefined, { year: "numeric", month: "short" });
-  } catch {
-    return "";
+/** Group flat search hits by videoId, collecting transcript chunks under each video */
+function groupResultsByVideo(hits: SearchHit[]): GroupedUapVideo[] {
+  const grouped = new Map<string, GroupedUapVideo>();
+  for (const hit of hits) {
+    const doc = hit.document;
+    if (!grouped.has(doc.videoId)) {
+      grouped.set(doc.videoId, {
+        videoId: doc.videoId,
+        url: doc.url,
+        title: doc.title,
+        thumbnailUrl: doc.thumbnailUrl,
+        date: doc.date,
+        viewCount: doc.viewCount,
+        channelName: doc.channelName,
+        summary: doc.summary,
+        tier: doc.tier,
+        track: doc.track,
+        transcripts: [],
+      });
+    }
+    grouped.get(doc.videoId)!.transcripts.push({
+      content: doc.content,
+      startTime: doc.startTime,
+      similarity: doc.similarity,
+    });
   }
-}
-
-function videoRoute(_tier: number, videoId: string): string {
-  return `/uap/video/${videoId}`;
+  return Array.from(grouped.values());
 }
 
 const CONTENT_TYPE_LABELS: Record<string, string> = {
@@ -131,6 +132,12 @@ function UapSearchContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Group flat hits by videoId for rich card display
+  const groupedResults = useMemo(
+    () => (results ? groupResultsByVideo(results.hits) : []),
+    [results],
+  );
 
   // Check auth for save functionality
   useEffect(() => {
@@ -356,9 +363,14 @@ function UapSearchContent() {
         )}
 
         {!loading && results && results.hits.length > 0 && (
-          <div className="space-y-3">
-            {results.hits.map((hit) => (
-              <SearchResultCard key={hit.document.id} doc={hit.document} />
+          <div className="space-y-4">
+            {groupedResults.map((video) => (
+              <UapSearchResultCard
+                key={video.videoId}
+                video={video}
+                searchTerm={query}
+                user={user}
+              />
             ))}
           </div>
         )}
@@ -409,83 +421,6 @@ function UapSearchContent() {
   );
 }
 
-// ─── Result Card ────────────────────────────────────────────────────────────
-
-function SearchResultCard({ doc }: { doc: SearchDocument }) {
-  const href = doc.startTime
-    ? `${videoRoute(doc.tier, doc.videoId)}?t=${Math.floor(doc.startTime)}`
-    : videoRoute(doc.tier, doc.videoId);
-
-  return (
-    <Link
-      href={href}
-      className="group flex gap-4 p-4 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 hover:shadow-md hover:border-green-300/60 dark:hover:border-green-600/30 transition-all"
-    >
-      {/* Thumbnail */}
-      <div className="relative w-40 sm:w-48 h-24 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
-        {doc.thumbnailUrl ? (
-          <Image src={doc.thumbnailUrl} alt={doc.title} fill sizes="200px" className="object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Play className="w-6 h-6 text-slate-400" />
-          </div>
-        )}
-        {doc.startTime && doc.startTime > 0 && (
-          <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-white text-[10px] font-mono rounded">
-            <Clock className="w-2.5 h-2.5 inline mr-0.5" />
-            {formatTimestamp(doc.startTime)}
-          </div>
-        )}
-        <div className="absolute top-1 left-1">
-          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-            doc.tier === 1 ? "bg-green-600/90 text-white" : "bg-slate-800/80 text-slate-200"
-          }`}>
-            {doc.tier === 1 ? "Encounter" : "Research"}
-          </span>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors line-clamp-2 leading-snug mb-1">
-          {doc.title}
-        </h3>
-        <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mb-2">
-          {doc.channelName && <span>{doc.channelName}</span>}
-          {doc.date > 0 && (
-            <>
-              <span className="text-slate-300 dark:text-slate-600">·</span>
-              <span className="flex items-center gap-0.5">
-                <Calendar className="w-3 h-3" /> {formatDate(doc.date)}
-              </span>
-            </>
-          )}
-          {doc.viewCount > 0 && (
-            <>
-              <span className="text-slate-300 dark:text-slate-600">·</span>
-              <span className="flex items-center gap-0.5">
-                <Eye className="w-3 h-3" /> {formatCount(doc.viewCount)}
-              </span>
-            </>
-          )}
-          {doc.similarity && (
-            <>
-              <span className="text-slate-300 dark:text-slate-600">·</span>
-              <span className="text-green-600 dark:text-green-400 font-medium">
-                {Math.round(doc.similarity * 100)}% match
-              </span>
-            </>
-          )}
-        </div>
-        {doc.content && (
-          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2">
-            {doc.content}
-          </p>
-        )}
-      </div>
-    </Link>
-  );
-}
 
 // ─── Filter Bar ─────────────────────────────────────────────────────────────
 
@@ -535,6 +470,79 @@ function FilterBar({
           <option value="">All Types</option>
           {facets.content_types.map((ct) => (
             <option key={ct} value={ct}>{CONTENT_TYPE_LABELS[ct] ?? ct.replace(/_/g, " ")}</option>
+          ))}
+        </select>
+      )}
+
+      {/* Experience Type */}
+      {facets.experience_types && facets.experience_types.length > 0 && (
+        <select
+          value={(filters.experienceType as string) ?? ""}
+          onChange={(e) => onChange({ ...filters, experienceType: e.target.value || null })}
+          className="text-xs px-2.5 py-1.5 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
+        >
+          <option value="">Experience Type</option>
+          {facets.experience_types.map((et) => (
+            <option key={et} value={et}>{et.replace(/_/g, " ")}</option>
+          ))}
+        </select>
+      )}
+
+      {/* Entity Type */}
+      {facets.entity_types && facets.entity_types.length > 0 && (
+        <select
+          value={(filters.entityType as string) ?? ""}
+          onChange={(e) => onChange({ ...filters, entityType: e.target.value || null })}
+          className="text-xs px-2.5 py-1.5 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
+        >
+          <option value="">Entity Type</option>
+          {facets.entity_types.map((et) => (
+            <option key={et} value={et}>{et.replace(/_/g, " ")}</option>
+          ))}
+        </select>
+      )}
+
+      {/* Evidence Type */}
+      {facets.evidence_type_values && facets.evidence_type_values.length > 0 && (
+        <select
+          value={(filters.evidenceType as string) ?? ""}
+          onChange={(e) => onChange({ ...filters, evidenceType: e.target.value || null })}
+          className="text-xs px-2.5 py-1.5 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
+        >
+          <option value="">Evidence Type</option>
+          {facets.evidence_type_values.map((ev) => (
+            <option key={ev} value={ev}>{ev.replace(/_/g, " ")}</option>
+          ))}
+        </select>
+      )}
+
+      {/* Recurrence Pattern */}
+      {facets.recurrence_patterns && facets.recurrence_patterns.length > 0 && (
+        <select
+          value={(filters.recurrence as string) ?? ""}
+          onChange={(e) => onChange({ ...filters, recurrence: e.target.value || null })}
+          className="text-xs px-2.5 py-1.5 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
+        >
+          <option value="">Recurrence</option>
+          {facets.recurrence_patterns.map((rp) => (
+            <option key={rp} value={rp}>{rp.replace(/_/g, " ")}</option>
+          ))}
+        </select>
+      )}
+
+      {/* Hynek Classification */}
+      {facets.hynek_types && facets.hynek_types.length > 0 && (
+        <select
+          value={(filters.hynekType as string) ?? ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            onChange({ ...filters, hynekType: val ? [val] : null });
+          }}
+          className="text-xs px-2.5 py-1.5 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
+        >
+          <option value="">Hynek Class</option>
+          {facets.hynek_types.map((ht) => (
+            <option key={ht} value={ht}>{ht}</option>
           ))}
         </select>
       )}

@@ -41,6 +41,10 @@ import { generateUapSummary } from '@/lib/ai/uap-summary';
 import { analyzeUapPhenomenology } from '@/lib/ai/uap-phenomenology';
 import { analyzeUapEncounterContext } from '@/lib/ai/uap-encounter-context';
 import { analyzeUapProgramIntel } from '@/lib/ai/uap-program-intel';
+import { segmentEncounters, extractEncounterText, deduplicateEncounterNames, type EncounterSegment } from '@/lib/ai/uap-encounter-segment';
+import { formatTimestampedTranscript } from '@/lib/ai/format-timestamped-transcript';
+import { addTimestampsToProgramIntel, addTimestampsToPhenomenology } from '@/lib/ai/match-quote-timestamp';
+import { computeVideoStats, mergeEncounterStats } from '@/lib/pipeline/compute-video-stats';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -54,6 +58,7 @@ export type UapIntakeStatus =
     | 'failed'
     | 'out_of_scope'
     | 'no_captions'
+    | 'drm_protected'
     | 'already_exists'
     | 'is_short';
 
@@ -226,10 +231,16 @@ export async function processUapVideoIntake(
         const captionResult = await fetchCaptions(videoId);
 
         if (!captionResult || captionResult.segments.length === 0) {
-            logStep('Fetch Captions', 'failed', 'No captions available');
-            await upsertUapVideoRecord(supabase, videoId, metadata, null, null, null, null, 'no_captions');
+            // Detect DRM-protected content (YouTube Movies, paid rentals)
+            const drmChannels = ['youtube movies', 'youtube premium'];
+            const isDrm = drmChannels.includes((metadata.channelName || '').toLowerCase());
+            const captionStatus: UapIntakeStatus = isDrm ? 'drm_protected' : 'no_captions';
+            logStep('Fetch Captions', 'failed', isDrm
+                ? 'DRM-protected content (YouTube Movies) — captions not accessible via API'
+                : 'No captions available');
+            await upsertUapVideoRecord(supabase, videoId, metadata, null, null, null, null, captionStatus);
             return {
-                status: 'no_captions',
+                status: captionStatus,
                 videoId,
                 title: metadata.title || undefined,
                 steps,
@@ -274,15 +285,19 @@ export async function processUapVideoIntake(
             Date.now() - startClassify
         );
 
-        // Update classification fields + experiencer_name
+        // Update classification fields + experiencer_name + source_type
+        const experiencerNamesStr = classification.experiencer_names.length > 0
+            ? classification.experiencer_names.join(', ')
+            : classification.experiencer_name || null;
         await supabase
             .from('uap_vids')
             .update({
                 tier: classification.tier,
                 track: classification.track,
                 content_type: classification.content_type,
+                source_type: classification.source_type,
                 classified_at: new Date().toISOString(),
-                experiencer_name: classification.experiencer_name || null,
+                experiencer_name: experiencerNamesStr,
             })
             .eq('video_id', videoId);
 
@@ -314,117 +329,20 @@ export async function processUapVideoIntake(
             .eq('video_id', videoId);
         logStep('Punctuate Transcript', 'success', 'Transcript punctuated via processTranscripts()');
 
-        // ─── Step 10.5: Full Analysis Suite (Tier 1 only) ────────────
-        // Mirrors NDE pipeline: run all analysis passes in parallel, save to uap_analysis + uap_vids
-        if (classification.tier === 1 && transcripts.punctuated) {
+        // ─── Step 10.5: Dual Analysis Suite (ALL Tier 1 + Tier 2) ────
+        // A. Program Intel + Summary run on ALL videos
+        // B. Encounter segmentation + per-encounter analysis for encounter content
+        if (transcripts.punctuated && (classification.tier === 1 || classification.tier === 2)) {
             const startAnalysis = Date.now();
-            logStep('Analysis Suite', 'running', '6 parallel analysis passes (Evidence, Contact Depth, Transformation, Summary, Phenomenology, Encounter Context)');
             await updateUapIntakeStatus(supabase, videoId, 'analyzing');
-
             const transcript = transcripts.punctuated;
 
-            // Run all 6 passes in parallel — each is an independent LLM call
-            const [evidenceResult, contactDepthResult, transformationResult, summaryResult, phenomResult, contextResult] =
-                await Promise.all([
-                    analyzeUapEvidenceScore(transcript).catch((e: Error) => {
-                        logStep('Analysis: Evidence', 'failed', e.message);
-                        return null;
-                    }),
-                    analyzeUapContactDepthScore(transcript).catch((e: Error) => {
-                        logStep('Analysis: Contact Depth', 'failed', e.message);
-                        return null;
-                    }),
-                    analyzeUapTransformationScore(transcript).catch((e: Error) => {
-                        logStep('Analysis: Transformation', 'failed', e.message);
-                        return null;
-                    }),
-                    generateUapSummary(transcript).catch((e: Error) => {
-                        logStep('Analysis: Summary', 'failed', e.message);
-                        return null;
-                    }),
-                    analyzeUapPhenomenology(transcript).catch((e: Error) => {
-                        logStep('Analysis: Phenomenology', 'failed', e.message);
-                        return null;
-                    }),
-                    analyzeUapEncounterContext(transcript).catch((e: Error) => {
-                        logStep('Analysis: Encounter Context', 'failed', e.message);
-                        return null;
-                    }),
-                ]);
+            // Build raw timestamped data reference for deterministic timestamp matching
+            const rawTimestamped = transcripts.rawTimestamped;
 
-            // Build the uap_analysis record
-            const analysisRecord: Record<string, any> = {
-                video_id: videoId,
-                analysis_model: 'gpt-4o-mini',
-                analyzed_at: new Date().toISOString(),
-            };
-
-            if (evidenceResult) {
-                analysisRecord.evidence_score = evidenceResult.total_score;
-                analysisRecord.evidence_breakdown = evidenceResult;
-                // Hynek/Vallée types come from classification context, not evidence scoring
-                // They'll be populated if the classify step extracted them
-            }
-
-            if (contactDepthResult) {
-                analysisRecord.contact_depth_score = contactDepthResult.total_score;
-                analysisRecord.contact_depth_breakdown = contactDepthResult.breakdown;
-            }
-
-            if (transformationResult) {
-                analysisRecord.transformation_score =
-                    transformationResult.quantitative_metrics.full_transformation_score;
-                analysisRecord.transformation_breakdown = {
-                    quantitative_metrics: transformationResult.quantitative_metrics,
-                    domain_analysis: transformationResult.domain_analysis,
-                    qualitative_profile: transformationResult.qualitative_profile,
-                };
-            }
-
-            // Phenomenology deep analysis
-            if (phenomResult) {
-                analysisRecord.phenomenology_breakdown = phenomResult;
-            }
-
-            // Encounter context (location, date, military, connected cases)
-            if (contextResult) {
-                analysisRecord.encounter_context = contextResult;
-            }
-
-            // Upsert to uap_analysis
-            const { error: analysisError } = await supabase
-                .from('uap_analysis')
-                .upsert(analysisRecord, { onConflict: 'video_id' });
-
-            if (analysisError) {
-                logStep('Analysis Suite', 'failed',
-                    `Failed to save analysis: ${analysisError.message}`, Date.now() - startAnalysis);
-                // Non-fatal — continue pipeline even if analysis save fails
-            } else {
-                const passCount = [evidenceResult, contactDepthResult, transformationResult, summaryResult, phenomResult, contextResult]
-                    .filter(Boolean).length;
-                logStep('Analysis Suite', 'success',
-                    `${passCount}/6 passes completed. ESS=${evidenceResult?.total_score ?? '—'} CDS=${contactDepthResult?.total_score ?? '—'} CTI=${transformationResult?.quantitative_metrics.full_transformation_score ?? '—'} PHENOM=${phenomResult ? '✓' : '—'} CTX=${contextResult ? '✓' : '—'}`,
-                    Date.now() - startAnalysis);
-            }
-
-            // Save summary to uap_vids (separate column for easy access)
-            if (summaryResult?.uap_summary) {
-                await supabase
-                    .from('uap_vids')
-                    .update({ analysis_uap_summary: summaryResult.uap_summary })
-                    .eq('video_id', videoId);
-                logStep('Analysis: Summary', 'success',
-                    `Summary saved (${summaryResult.uap_summary.length} chars)`);
-            }
-        } else if (classification.tier === 2 && transcripts.punctuated) {
-            // Tier 2: Program Intelligence 3-pass extraction + Summary
-            const startAnalysis = Date.now();
-            logStep('Analysis Suite (Tier 2)', 'running', '3-pass Program Intel + Summary');
-            await updateUapIntakeStatus(supabase, videoId, 'analyzing');
-
-            const transcript = transcripts.punctuated;
-            const [programIntelResult, summaryResult] = await Promise.all([
+            // ── A. Program Intel + Summary (ALL videos) ──────────────
+            logStep('Analysis: Program Intel + Summary', 'running', 'Running on all Tier 1+2 videos');
+            const [programIntelRaw, summaryResult] = await Promise.all([
                 analyzeUapProgramIntel(transcript).catch((e: Error) => {
                     logStep('Analysis: Program Intel', 'failed', e.message);
                     return null;
@@ -435,6 +353,12 @@ export async function processUapVideoIntake(
                 }),
             ]);
 
+            // Post-process: add deterministic timestamps via caption segment matching
+            const programIntelResult = programIntelRaw
+                ? addTimestampsToProgramIntel(programIntelRaw, rawTimestamped)
+                : null;
+
+            // Save program intel to uap_analysis
             const analysisRecord: Record<string, any> = {
                 video_id: videoId,
                 analysis_model: 'gpt-4o-mini',
@@ -443,20 +367,324 @@ export async function processUapVideoIntake(
             if (programIntelResult) {
                 analysisRecord.program_intel_breakdown = programIntelResult;
             }
-
             await supabase.from('uap_analysis').upsert(analysisRecord, { onConflict: 'video_id' });
 
+            // Save summary to uap_vids
             if (summaryResult?.uap_summary) {
                 await supabase.from('uap_vids')
                     .update({ analysis_uap_summary: summaryResult.uap_summary })
                     .eq('video_id', videoId);
             }
-
-            const passCount = [programIntelResult, summaryResult].filter(Boolean).length;
-            logStep('Analysis Suite (Tier 2)', 'success',
-                `${passCount}/2 passes completed. INTEL=${programIntelResult ? '✓' : '—'} SUMMARY=${summaryResult ? '✓' : '—'}`,
+            logStep('Analysis: Program Intel + Summary', 'success',
+                `INTEL=${programIntelResult ? '✓' : '—'} SUMMARY=${summaryResult ? '✓' : '—'}`,
                 Date.now() - startAnalysis);
-        } else if (classification.tier !== 1) {
+
+            // ── Compute + upsert video aggregate stats ───────────────
+            if (programIntelResult) {
+                try {
+                    const stats = computeVideoStats(videoId, programIntelResult);
+                    await supabase.from('uap_video_stats').upsert(stats, { onConflict: 'video_id' });
+                    logStep('Video Stats', 'success',
+                        `persons=${stats.persons_count} claims=${stats.claims_count} tone=${stats.video_tone}`);
+                } catch (statsErr: any) {
+                    logStep('Video Stats', 'failed', statsErr.message);
+                }
+            }
+
+            // ── B. Encounter Analysis (if encounter content detected) ─
+            const hasEncounterContent = classification.experiencer_names.length > 0
+                || classification.content_type === 'first_person'
+                || classification.content_type === 'interview'
+                || classification.content_type === 'retold_encounter';
+
+            if (hasEncounterContent) {
+                const startEncounters = Date.now();
+
+                // Clear old encounter rows for re-processing
+                await supabase.from('uap_encounters').delete().eq('video_id', videoId);
+
+                // Determine encounter segments
+                let segments: Array<{
+                    experiencer_name: string;
+                    encounter_label: string;
+                    source_type: 'direct_experiencer' | 'interview_with_experiencer' | 'retold_encounter';
+                    text: string;
+                    index: number;
+                }> = [];
+
+                if (classification.has_multiple_encounters) {
+                    // Multi-encounter: run segmentation LLM pass
+                    logStep('Encounter Segmentation', 'running', 'Splitting transcript into per-encounter segments');
+                    try {
+                        const segResult = await segmentEncounters(transcript, classification.experiencer_names, metadata.title || undefined);
+                        segments = segResult.encounters.map((seg, i) => ({
+                            experiencer_name: seg.experiencer_name,
+                            encounter_label: seg.encounter_label,
+                            source_type: seg.source_type,
+                            text: extractEncounterText(transcript, seg),
+                            index: i,
+                        }));
+                        logStep('Encounter Segmentation', 'success',
+                            `${segments.length} encounters: ${segments.map(s => s.experiencer_name).join(', ')}`,
+                            Date.now() - startEncounters);
+                    } catch (segErr: any) {
+                        logStep('Encounter Segmentation', 'failed', segErr.message);
+                        // Fallback: single encounter with full transcript
+                        segments = [{
+                            experiencer_name: classification.experiencer_names[0] || 'Unknown Experiencer',
+                            encounter_label: `Encounter described in "${transcripts.searchChunks[0]?.content?.slice(0, 50) || 'video'}"`,
+                            source_type: classification.source_type as any || 'retold_encounter',
+                            text: transcript,
+                            index: 0,
+                        }];
+                    }
+                } else {
+                    // Single encounter: use full transcript
+                    const srcType = classification.source_type === 'direct_experiencer'
+                        || classification.source_type === 'interview_with_experiencer'
+                        || classification.source_type === 'retold_encounter'
+                        ? classification.source_type
+                        : 'retold_encounter';
+                    segments = [{
+                        experiencer_name: classification.experiencer_names[0] || classification.experiencer_name || 'Unknown Experiencer',
+                        encounter_label: `${classification.experiencer_names[0] || 'Experiencer'}'s Encounter`,
+                        source_type: srcType as any,
+                        text: transcript,
+                        index: 0,
+                    }];
+                }
+
+                // ── Name Deduplication (ASR misspelling fix) ─────────
+                if (segments.length > 1) {
+                    logStep('Name Deduplication', 'running', `Checking ${segments.length} names for ASR duplicates`);
+                    try {
+                        // Build EncounterSegment-compatible objects for dedup
+                        const segmentsForDedup = segments.map(s => ({
+                            experiencer_name: s.experiencer_name,
+                            encounter_label: s.encounter_label,
+                            source_type: s.source_type,
+                            start_char_approx: 0,
+                            end_char_approx: s.text.length,
+                        }));
+                        const dedupedSegments = await deduplicateEncounterNames(segmentsForDedup, metadata.title || undefined);
+                        
+                        if (dedupedSegments.length < segments.length) {
+                            // Re-map segments based on deduped names
+                            const dedupedNames = new Set(dedupedSegments.map(d => d.experiencer_name));
+                            // Keep only first segment per canonical name, merge text from duplicates
+                            const mergedSegments: typeof segments = [];
+                            for (const deduped of dedupedSegments) {
+                                // Find all original segments that match this canonical name
+                                const originals = segments.filter(s => {
+                                    const nameMatch = s.experiencer_name === deduped.experiencer_name;
+                                    if (nameMatch) return true;
+                                    // Check if this segment was merged into deduped
+                                    return !dedupedNames.has(s.experiencer_name);
+                                });
+                                
+                                // Use the original segment with the most text if found, otherwise use first
+                                const best = originals.sort((a, b) => b.text.length - a.text.length)[0] 
+                                    || segments[0];
+                                mergedSegments.push({
+                                    ...best,
+                                    experiencer_name: deduped.experiencer_name,
+                                    encounter_label: deduped.encounter_label,
+                                    source_type: deduped.source_type,
+                                    index: mergedSegments.length,
+                                });
+                            }
+                            segments = mergedSegments;
+                            logStep('Name Deduplication', 'success', 
+                                `Deduped to ${segments.length}: ${segments.map(s => s.experiencer_name).join(', ')}`);
+                        } else {
+                            logStep('Name Deduplication', 'success', 'No duplicates found');
+                        }
+                    } catch (dedupErr: any) {
+                        logStep('Name Deduplication', 'failed', dedupErr.message);
+                        // Continue with original segments
+                    }
+                }
+
+                // ── Per-encounter analysis loop ─────────────────────
+                for (const seg of segments) {
+                    const startSeg = Date.now();
+                    const runTriad = seg.source_type === 'direct_experiencer'
+                        || seg.source_type === 'interview_with_experiencer';
+
+                    logStep(`Encounter: ${seg.experiencer_name}`, 'running',
+                        `${runTriad ? 'Phenom + Context + Triad' : 'Phenom + Context only'} (${seg.source_type})`);
+
+                    // Run encounter-specific analyses in parallel
+                    const encounterPromises: Promise<any>[] = [
+                        analyzeUapPhenomenology(seg.text).catch((e: Error) => {
+                            logStep(`Phenom: ${seg.experiencer_name}`, 'failed', e.message);
+                            return null;
+                        }),
+                        analyzeUapEncounterContext(seg.text).catch((e: Error) => {
+                            logStep(`Context: ${seg.experiencer_name}`, 'failed', e.message);
+                            return null;
+                        }),
+                    ];
+
+                    // Triad only for direct/interview (not retold)
+                    if (runTriad) {
+                        encounterPromises.push(
+                            analyzeUapEvidenceScore(seg.text).catch((e: Error) => {
+                                logStep(`Evidence: ${seg.experiencer_name}`, 'failed', e.message);
+                                return null;
+                            }),
+                            analyzeUapContactDepthScore(seg.text).catch((e: Error) => {
+                                logStep(`Contact Depth: ${seg.experiencer_name}`, 'failed', e.message);
+                                return null;
+                            }),
+                            analyzeUapTransformationScore(seg.text).catch((e: Error) => {
+                                logStep(`Transformation: ${seg.experiencer_name}`, 'failed', e.message);
+                                return null;
+                            }),
+                        );
+                    }
+
+                    const results = await Promise.all(encounterPromises);
+                    const [phenomResult, contextResult] = results;
+                    const evidenceResult = runTriad ? results[2] : null;
+                    const contactDepthResult = runTriad ? results[3] : null;
+                    const transformationResult = runTriad ? results[4] : null;
+
+                    // Build uap_encounters row
+                    const encounterRow: Record<string, any> = {
+                        video_id: videoId,
+                        experiencer_name: seg.experiencer_name,
+                        source_type: seg.source_type,
+                        encounter_label: seg.encounter_label,
+                        encounter_index: seg.index,
+                        segment_text: seg.text !== transcript ? seg.text : null, // Don't duplicate full transcript
+                        analysis_model: 'gpt-4o-mini',
+                        analyzed_at: new Date().toISOString(),
+                    };
+
+                    // Post-process: add deterministic timestamps via caption segment matching
+                    if (phenomResult) encounterRow.phenomenology_breakdown = addTimestampsToPhenomenology(phenomResult, rawTimestamped);
+                    if (contextResult) encounterRow.encounter_context = contextResult;
+
+                    if (evidenceResult) {
+                        encounterRow.evidence_score = evidenceResult.total_score;
+                        encounterRow.evidence_breakdown = evidenceResult;
+                    }
+                    if (contactDepthResult) {
+                        encounterRow.contact_depth_score = contactDepthResult.total_score;
+                        encounterRow.contact_depth_breakdown = contactDepthResult.breakdown;
+                    }
+                    if (transformationResult) {
+                        encounterRow.transformation_score = transformationResult.quantitative_metrics.full_transformation_score;
+                        encounterRow.transformation_breakdown = {
+                            quantitative_metrics: transformationResult.quantitative_metrics,
+                            domain_analysis: transformationResult.domain_analysis,
+                            qualitative_profile: transformationResult.qualitative_profile,
+                        };
+                    }
+
+                    const { error: encError } = await supabase.from('uap_encounters').insert(encounterRow);
+                    if (encError) {
+                        logStep(`Encounter: ${seg.experiencer_name}`, 'failed',
+                            `DB insert failed: ${encError.message}`, Date.now() - startSeg);
+                    } else {
+                        const scores = runTriad
+                            ? ` ESS=${evidenceResult?.total_score ?? '—'} CDS=${contactDepthResult?.total_score ?? '—'} CTI=${transformationResult?.quantitative_metrics?.full_transformation_score ?? '—'}`
+                            : ' (no triad — retold)';
+                        logStep(`Encounter: ${seg.experiencer_name}`, 'success',
+                            `PHENOM=${phenomResult ? '✓' : '—'} CTX=${contextResult ? '✓' : '—'}${scores}`,
+                            Date.now() - startSeg);
+                    }
+                }
+
+                logStep('Encounter Analysis', 'success',
+                    `${segments.length} encounter(s) processed`, Date.now() - startEncounters);
+
+                // ── Merge encounter-level stats into uap_video_stats ─
+                try {
+                    // Fetch all encounter rows for this video to compute aggregates
+                    const { data: encounterRows } = await supabase
+                        .from('uap_encounters')
+                        .select('evidence_score, contact_depth_score, transformation_score, phenomenology_breakdown')
+                        .eq('video_id', videoId);
+
+                    if (encounterRows && encounterRows.length > 0) {
+                        const hasCraft = encounterRows.some((r: any) =>
+                            r.phenomenology_breakdown?.craft_observation?.observed === true
+                        );
+                        const dominantEntity = encounterRows[0]?.phenomenology_breakdown?.dominant_entity_type || null;
+                        const evidenceScores = encounterRows.map((r: any) => r.evidence_score).filter(Boolean);
+                        const contactScores = encounterRows.map((r: any) => r.contact_depth_score).filter(Boolean);
+                        const transScores = encounterRows.map((r: any) => r.transformation_score).filter(Boolean);
+
+                        const encounterStats = mergeEncounterStats({ video_id: videoId }, {
+                            encounterCount: encounterRows.length,
+                            dominantEntityType: dominantEntity,
+                            maxEvidenceScore: evidenceScores.length > 0 ? Math.max(...evidenceScores) : null,
+                            maxContactDepthScore: contactScores.length > 0 ? Math.max(...contactScores) : null,
+                            maxTransformationScore: transScores.length > 0 ? Math.max(...transScores) : null,
+                            hasCraftObservation: hasCraft,
+                        });
+                        await supabase.from('uap_video_stats').upsert(encounterStats, { onConflict: 'video_id' });
+                        logStep('Encounter Stats', 'success',
+                            `encounters=${encounterRows.length} craft=${hasCraft} entity=${dominantEntity}`);
+                    }
+                } catch (statsErr: any) {
+                    logStep('Encounter Stats', 'failed', statsErr.message);
+                }
+
+                // ── Tier Reconciliation ──────────────────────────────
+                // The classifier sees only 5K chars and may label a documentary as Tier 2.
+                // But the segmenter sees the full transcript and may discover first-person voices.
+                // If ANY encounter has a direct/interview source_type, promote to Tier 1.
+                const hasFirstPersonVoice = segments.some(s =>
+                    s.source_type === 'direct_experiencer' || s.source_type === 'interview_with_experiencer'
+                );
+                if (hasFirstPersonVoice && classification.tier === 2) {
+                    const oldTier = classification.tier;
+                    classification.tier = 1;
+                    classification.track = 'encounters';
+                    classification.content_type = 'interview';
+                    
+                    // Update experiencer names from segments (more complete than classifier's 5K excerpt)
+                    const segNames = segments.map(s => s.experiencer_name).filter(Boolean);
+                    if (segNames.length > 0) {
+                        classification.experiencer_names = segNames;
+                    }
+                    const updatedNamesStr = classification.experiencer_names.join(', ');
+
+                    await supabase
+                        .from('uap_vids')
+                        .update({
+                            tier: 1,
+                            track: 'encounters',
+                            content_type: 'interview',
+                            experiencer_name: updatedNamesStr,
+                        })
+                        .eq('video_id', videoId);
+
+                    logStep('Tier Reconciliation', 'success',
+                        `PROMOTED Tier ${oldTier} → Tier 1 (first-person voice detected in ${segments.filter(s => s.source_type === 'direct_experiencer' || s.source_type === 'interview_with_experiencer').length}/${segments.length} encounters)`);
+                }
+
+                // ── Multi-Encounter Flag ─────────────────────────────
+                // Mark videos with multiple encounters for potential frontier model re-analysis
+                const isMulti = segments.length > 1;
+                await supabase
+                    .from('uap_vids')
+                    .update({
+                        multi_encounter: isMulti,
+                        encounter_count: segments.length,
+                    })
+                    .eq('video_id', videoId);
+                if (isMulti) {
+                    logStep('Multi-Encounter Flag', 'success',
+                        `Flagged for re-analysis (${segments.length} encounters)`);
+                }
+            } else {
+                logStep('Encounter Analysis', 'skipped', 'No encounter content detected');
+            }
+        } else if (classification.tier !== 1 && classification.tier !== 2) {
             logStep('Analysis Suite', 'skipped', `Tier ${classification.tier} — analysis only runs for Tier 1 & 2`);
         }
 
@@ -468,37 +696,95 @@ export async function processUapVideoIntake(
         await generateUapEmbeddings(supabase, videoId, transcripts);
         logStep('Generate Embeddings', 'success', 'Search + chat embeddings created', Date.now() - startEmbed);
 
-        // ─── Step 12.5: Sync contactee profile ──────────────────────
-        // Mirrors NDE intake.ts Step 14.5 — auto-create/update contactee profiles
-        if (classification.tier === 1) {
+        // ─── Step 12.5: Sync contactee profiles ─────────────────────
+        // Sync a profile for each named experiencer (supports multi-encounter)
+        if (classification.tier === 1 || classification.content_type === 'retold_encounter') {
             const startSync = Date.now();
-            // Fetch the experiencer_name (set during classification in Step 8)
-            const { data: vidRow } = await supabase
-                .from('uap_vids')
-                .select('experiencer_name')
-                .eq('video_id', videoId)
-                .single();
+            const names = classification.experiencer_names.filter(n =>
+                n && !n.startsWith('Unnamed') && !n.startsWith('Anonymous') && !n.startsWith('Witness ')
+            );
 
-            if (vidRow?.experiencer_name) {
-                logStep('Sync Contactee Profile', 'running');
-                try {
-                    const syncResult = await syncContacteeProfile(
-                        supabase, vidRow.experiencer_name, videoId
-                    );
-                    logStep('Sync Contactee Profile', 'success',
-                        syncResult.created
-                            ? `Created profile: /uap/contactees/${syncResult.slug} (${syncResult.videoCount} videos)`
-                            : syncResult.updated
-                                ? `Updated profile: /uap/contactees/${syncResult.slug} (${syncResult.videoCount} videos)`
-                                : `Profile exists: /uap/contactees/${syncResult.slug}`,
-                        Date.now() - startSync
-                    );
-                } catch (syncErr: any) {
-                    // Non-fatal — don't block the pipeline for profile sync failures
-                    logStep('Sync Contactee Profile', 'failed', syncErr.message, Date.now() - startSync);
+            if (names.length > 0) {
+                logStep('Sync Contactee Profiles', 'running', `${names.length} name(s): ${names.join(', ')}`);
+                for (const name of names) {
+                    try {
+                        const syncResult = await syncContacteeProfile(supabase, name, videoId);
+                        logStep(`Contactee: ${name}`, 'success',
+                            syncResult.created
+                                ? `Created: /uap/experiencer/${syncResult.slug}`
+                                : syncResult.updated
+                                    ? `Updated: /uap/experiencer/${syncResult.slug} (${syncResult.videoCount} videos)`
+                                    : `Exists: /uap/experiencer/${syncResult.slug}`);
+                    } catch (syncErr: any) {
+                        logStep(`Contactee: ${name}`, 'failed', syncErr.message);
+                    }
                 }
+                logStep('Sync Contactee Profiles', 'success',
+                    `${names.length} profile(s) synced`, Date.now() - startSync);
             } else {
-                logStep('Sync Contactee Profile', 'skipped', 'No experiencer_name extracted');
+                logStep('Sync Contactee Profiles', 'skipped', 'No named experiencers to sync');
+            }
+        }
+        // ─── Step 12.7: Match extracted events to uap_events ─────
+        // Link this video's timeline_events to normalized uap_events rows
+        {
+            const startEventMatch = Date.now();
+            try {
+                const { data: analysisRow } = await supabase
+                    .from('uap_analysis')
+                    .select('timeline_events')
+                    .eq('video_id', videoId)
+                    .maybeSingle();
+
+                const timelineEvents = analysisRow?.timeline_events;
+                if (Array.isArray(timelineEvents) && timelineEvents.length > 0) {
+                    // Fetch all known events for matching
+                    const { data: knownEvents } = await supabase
+                        .from('uap_events')
+                        .select('id, slug, name, aliases, year, video_ids');
+
+                    if (knownEvents && knownEvents.length > 0) {
+                        let matched = 0;
+                        for (const te of timelineEvents) {
+                            const title = ((te as any)?.title || (te as any)?.event || '').trim().toLowerCase();
+                            const teYear = (te as any)?.year || ((te as any)?.date ? parseInt((te as any).date, 10) : null);
+                            if (!title) continue;
+
+                            for (const known of knownEvents as any[]) {
+                                const allNames = [known.name, ...(known.aliases || [])].map((n: string) => n.toLowerCase());
+                                const isMatch = allNames.some((alias: string) =>
+                                    title.includes(alias) || alias.includes(title)
+                                ) || (teYear === known.year && allNames.some((alias: string) => {
+                                    const words = title.split(/\s+/);
+                                    return words.filter((w: string) => alias.includes(w)).length >= Math.ceil(words.length * 0.6);
+                                }));
+
+                                if (isMatch) {
+                                    const currentVids: string[] = known.video_ids || [];
+                                    if (!currentVids.includes(videoId)) {
+                                        await supabase
+                                            .from('uap_events')
+                                            .update({
+                                                video_ids: [...currentVids, videoId],
+                                                updated_at: new Date().toISOString(),
+                                            })
+                                            .eq('id', known.id);
+                                        matched++;
+                                    }
+                                    break; // Only match each timeline event to one known event
+                                }
+                            }
+                        }
+                        logStep('Match Events', 'success',
+                            `Matched ${matched} timeline event(s) to known events`, Date.now() - startEventMatch);
+                    } else {
+                        logStep('Match Events', 'skipped', 'No known events in DB yet');
+                    }
+                } else {
+                    logStep('Match Events', 'skipped', 'No timeline_events in analysis');
+                }
+            } catch (eventErr: any) {
+                logStep('Match Events', 'failed', eventErr.message);
             }
         }
 
@@ -558,6 +844,12 @@ async function upsertUapVideoRecord(
     if (tier !== null) record.tier = tier;
     if (track) record.track = track;
     if (content_type) record.content_type = content_type;
+
+    // Compute publish year for time-series analysis
+    if (metadata.date) {
+        const year = new Date(metadata.date).getFullYear();
+        if (year >= 2000 && year <= 2100) record.video_publish_year = year;
+    }
 
     if (transcripts) {
         record.raw_timestamped_subtitles = transcripts.rawTimestamped;

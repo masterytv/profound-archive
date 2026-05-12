@@ -27,6 +27,8 @@ import type {
   ClaimExtraction,
   LegislativeEvent,
 } from "@/lib/ai/uap-program-intel";
+import { TimestampLink } from "@/components/video/TimestampLink";
+import { formatTimestamp } from "@/lib/ai/format-timestamped-transcript";
 
 // ─── Display Helper ─────────────────────────────────────────────────────────
 function cleanText(text: string | undefined | null): string {
@@ -138,9 +140,17 @@ function PersonsSection({ persons }: { persons: PersonMention[] }) {
               )}
 
               {person.quote && (
-                <p className="text-[11px] italic text-blue-700 dark:text-blue-300 mt-2 border-l-2 border-blue-300 dark:border-blue-600 pl-2">
-                  &ldquo;{cleanText(person.quote)}&rdquo;
-                </p>
+                <div className="flex items-start gap-1.5 mt-2">
+                  <p className="text-[11px] italic text-blue-700 dark:text-blue-300 border-l-2 border-blue-300 dark:border-blue-600 pl-2">
+                    &ldquo;{cleanText(person.quote)}&rdquo;
+                  </p>
+                  {person.quote_timestamp_seconds != null && (
+                    <TimestampLink
+                      seconds={person.quote_timestamp_seconds}
+                      label={`[${formatTimestamp(person.quote_timestamp_seconds)}]`}
+                    />
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -223,9 +233,17 @@ function ClaimsSection({ claims }: { claims: ClaimExtraction[] }) {
             )}
           </div>
           
-          <p className="text-xs text-amber-900 dark:text-amber-100 font-medium mb-1">
-            {cleanText(claim.claim_text)}
-          </p>
+          <div className="flex items-start gap-1.5">
+            <p className="text-xs text-amber-900 dark:text-amber-100 font-medium mb-1">
+              {cleanText(claim.claim_text)}
+            </p>
+            {claim.timestamp_seconds != null && (
+              <TimestampLink
+                seconds={claim.timestamp_seconds}
+                label={`[${formatTimestamp(claim.timestamp_seconds)}]`}
+              />
+            )}
+          </div>
           
           <div className="flex items-center gap-2 text-[10px] text-amber-700 dark:text-amber-400 mt-2">
             <span className="font-semibold">Source: {cleanText(claim.source_person)}</span>
@@ -432,9 +450,17 @@ function LegislativeSection({ events }: { events: LegislativeEvent[] }) {
             )}
 
             {event.quote && (
-              <p className="text-[11px] italic text-green-700 dark:text-green-300 border-l-2 border-green-400 dark:border-green-600 pl-2">
-                &ldquo;{cleanText(event.quote)}&rdquo;
-              </p>
+              <div className="flex items-start gap-1.5">
+                <p className="text-[11px] italic text-green-700 dark:text-green-300 border-l-2 border-green-400 dark:border-green-600 pl-2">
+                  &ldquo;{cleanText(event.quote)}&rdquo;
+                </p>
+                {event.quote_timestamp_seconds != null && (
+                  <TimestampLink
+                    seconds={event.quote_timestamp_seconds}
+                    label={`[${formatTimestamp(event.quote_timestamp_seconds)}]`}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -502,9 +528,6 @@ export function UapProgramIntelCard({
         >
           Program Intelligence Analysis
         </h2>
-        <span className="text-[10px] text-slate-400 ml-auto">
-          Tier 2 Video Breakdown
-        </span>
       </div>
 
       {/* Sections */}

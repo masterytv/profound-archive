@@ -19,6 +19,8 @@ interface SaveToCollectionButtonProps {
   startTime: number;
   content: string;
   user?: User | null;
+  /** Which domain this save belongs to — determines dashboard section. Defaults to 'nde'. */
+  domain?: 'nde' | 'uap';
 }
 
 interface Collection {
@@ -28,7 +30,7 @@ interface Collection {
   hasVideo: boolean;
 }
 
-export default function SaveToCollectionButton({ videoId, videoTitle, videoThumbnailUrl, startTime, content, user: initialUser }: SaveToCollectionButtonProps) {
+export default function SaveToCollectionButton({ videoId, videoTitle, videoThumbnailUrl, startTime, content, user: initialUser, domain = 'nde' }: SaveToCollectionButtonProps) {
   const [user, setUser] = useState<User | null>(initialUser || null);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -149,7 +151,7 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
         video_thumbnail_url: videoThumbnailUrl || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
         start_time: integerStartTime, // Use integer version
         content: content,
-        domain: 'nde',
+        domain,
       });
 
       if (error) {

@@ -77,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .order('slug');
 
     const contacteeUrls: MetadataRoute.Sitemap = (contactees ?? []).map((c) => ({
-        url: `https://projectprofound.org/uap/contactees/${c.slug}`,
+        url: `https://projectprofound.org/uap/experiencer/${c.slug}`,
         lastModified: c.updated_at ?? new Date().toISOString(),
         changeFrequency: 'monthly' as const,
         priority: 0.7,
@@ -98,6 +98,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.55,
     }));
 
+    // ── UAP: Event pages ────────────────────────────────────────────────────
+    const { data: uapEvents } = await supabase
+        .from('uap_events')
+        .select('slug, updated_at')
+        .order('slug');
+
+    const eventUrls: MetadataRoute.Sitemap = (uapEvents ?? []).map((e) => ({
+        url: `https://projectprofound.org/uap/events/${e.slug}`,
+        lastModified: e.updated_at ?? new Date().toISOString(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+    }));
+
     // ── Static high-priority pages ──────────────────────────────────────────
     const staticUrls: MetadataRoute.Sitemap = [
         // NDE domain
@@ -110,10 +123,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // UAP domain
         { url: 'https://projectprofound.org/uap',            lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9 },
         { url: 'https://projectprofound.org/uap/search',     lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
-        { url: 'https://projectprofound.org/uap/contactees', lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
+        { url: 'https://projectprofound.org/uap/experiencer', lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
         { url: 'https://projectprofound.org/uap/channels',   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.7 },
         { url: 'https://projectprofound.org/uap/timeline',   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.7 },
-        { url: 'https://projectprofound.org/uap/chat',       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+        { url: 'https://projectprofound.org/uap/events',       lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
+        { url: 'https://projectprofound.org/uap/methodology',  lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+        { url: 'https://projectprofound.org/uap/chat',         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     ];
 
     return [
@@ -124,5 +139,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...uapEncounterUrls,
         ...contacteeUrls,
         ...channelUrls,
+        ...eventUrls,
     ];
 }

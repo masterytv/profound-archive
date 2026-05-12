@@ -3,6 +3,10 @@
  * Usage: npx tsx scripts/uap-reanalyze-phenom.ts [videoId]
  * Default: DsiKEBAFmm4 (Travis Walton)
  */
+import 'dotenv/config';
+import { config } from 'dotenv';
+config({ path: '.env.local' }); // Next.js uses .env.local
+
 import { createClient } from '@supabase/supabase-js';
 import { analyzeUapPhenomenology } from '../src/lib/ai/uap-phenomenology';
 

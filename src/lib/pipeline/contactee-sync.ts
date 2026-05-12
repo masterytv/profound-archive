@@ -36,9 +36,24 @@ export interface ContacteeSyncResult {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-/** Convert a full name to a URL-safe slug */
-function toSlug(name: string): string {
+/** Honorific/title prefixes to strip for slug generation */
+const STRIP_PREFIXES = /^(Dr|Prof|Gen|Col|Lt|Sgt|Rev|Sen|Rep|Cmdr|Capt|Maj|Adm)\.?\s+/i;
+
+/** Strip single-letter middle initials (e.g., 'Frank E. Mannor' → 'Frank Mannor') */
+const STRIP_MIDDLE_INITIALS = /\s+[A-Z]\.\s+/g;
+
+/** Normalize a name for consistent matching and slug generation */
+function normalizeName(name: string): string {
   return name
+    .replace(STRIP_PREFIXES, '')
+    .replace(STRIP_MIDDLE_INITIALS, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Convert a full name to a URL-safe slug (uses normalized form) */
+function toSlug(name: string): string {
+  return normalizeName(name)
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
@@ -70,7 +85,7 @@ export async function syncContacteeProfile(
     return { created: false, updated: false, enriched: false, slug: '', profileId: '', videoCount: 0, message: 'Empty name' };
   }
 
-  // 1. Check if profile already exists (case-insensitive match)
+  // 1. Check if profile already exists (case-insensitive match on display_name)
   const { data: existingProfile } = await supabase
     .from('uap_contactee_profiles')
     .select('id, slug, display_name, video_ids')
@@ -78,19 +93,32 @@ export async function syncContacteeProfile(
     .limit(1)
     .maybeSingle();
 
-  if (existingProfile) {
+  // 1b. Fallback: check by normalized slug (catches 'Frank E. Mannor' → 'frank-mannor')
+  const normalizedSlug = toSlug(trimmedName);
+  let resolvedProfile = existingProfile;
+  if (!resolvedProfile) {
+    const { data: slugMatch } = await supabase
+      .from('uap_contactee_profiles')
+      .select('id, slug, display_name, video_ids')
+      .eq('slug', normalizedSlug)
+      .limit(1)
+      .maybeSingle();
+    resolvedProfile = slugMatch;
+  }
+
+  if (resolvedProfile) {
     // Profile exists — ensure video_ids includes this new videoId
-    const currentVideoIds: string[] = existingProfile.video_ids || [];
+    const currentVideoIds: string[] = resolvedProfile.video_ids || [];
 
     if (currentVideoIds.includes(videoId)) {
       // Already linked — just re-enrich to refresh data
-      const enrichResult = await generateContacteeProfile(supabase, existingProfile.id);
+      const enrichResult = await generateContacteeProfile(supabase, resolvedProfile.id);
       return {
         created: false,
         updated: false,
         enriched: enrichResult.status === 'success',
-        slug: existingProfile.slug,
-        profileId: existingProfile.id,
+        slug: resolvedProfile.slug,
+        profileId: resolvedProfile.id,
         videoCount: currentVideoIds.length,
         message: `Already linked, re-enriched: ${enrichResult.message}`,
       };
@@ -104,25 +132,25 @@ export async function syncContacteeProfile(
         video_ids: updatedVideoIds,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', existingProfile.id);
+      .eq('id', resolvedProfile.id);
 
     if (updateError) {
       return {
         created: false, updated: false, enriched: false,
-        slug: existingProfile.slug, profileId: existingProfile.id,
+        slug: resolvedProfile.slug, profileId: resolvedProfile.id,
         videoCount: currentVideoIds.length,
         message: `Failed to update video_ids: ${updateError.message}`,
       };
     }
 
     // Re-enrich with the new video included
-    const enrichResult = await generateContacteeProfile(supabase, existingProfile.id);
+    const enrichResult = await generateContacteeProfile(supabase, resolvedProfile.id);
     return {
       created: false,
       updated: true,
       enriched: enrichResult.status === 'success',
-      slug: existingProfile.slug,
-      profileId: existingProfile.id,
+      slug: resolvedProfile.slug,
+      profileId: resolvedProfile.id,
       videoCount: updatedVideoIds.length,
       message: `Added video, now ${updatedVideoIds.length} videos. ${enrichResult.message}`,
     };

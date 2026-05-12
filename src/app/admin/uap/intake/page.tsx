@@ -100,6 +100,12 @@ const resultBadge: Record<string, {
         cardClass: 'bg-red-50 border-red-200',
         iconBgClass: 'bg-red-100',
     },
+    drm_protected: {
+        label: 'DRM Protected (YouTube Movies)',
+        icon: <AlertTriangle className="w-5 h-5 text-amber-600" />,
+        cardClass: 'bg-amber-50 border-amber-200',
+        iconBgClass: 'bg-amber-100',
+    },
     no_captions: {
         label: 'No Captions Available',
         icon: <AlertTriangle className="w-5 h-5 text-amber-600" />,
@@ -194,7 +200,7 @@ export default function UapIntakePage() {
                     const job: JobRecord = await pollRes.json();
                     setCurrentJob(job);
 
-                    if (['complete', 'failed', 'already_exists', 'out_of_scope', 'no_captions', 'is_short'].includes(job.status)) {
+                    if (['complete', 'failed', 'already_exists', 'out_of_scope', 'no_captions', 'drm_protected', 'is_short'].includes(job.status)) {
                         cleanup();
                     }
                 } catch {

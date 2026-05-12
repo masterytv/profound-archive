@@ -93,6 +93,12 @@ const ConnectedCaseSchema = z.object({
   date_mentioned: z.string(),        // "March 1997", "December 1980"
 });
 
+const MediaCoverageSchema = z.object({
+  was_reported_in_media: z.boolean(),
+  media_outlets: z.array(z.string()).catch([]),
+  documentary_appearances: z.array(z.string()).catch([]),
+});
+
 // ─── Root Schema ─────────────────────────────────────────────────────────────
 
 export const UapEncounterContextSchema = z.object({
@@ -117,12 +123,16 @@ export const UapEncounterContextSchema = z.object({
   // Official reporting
   reported_to_authorities: z.boolean(),  // did they report to police/military/FAA?
   authority_response: z.string(),        // "Air Force investigated", "police filed report", "not stated"
+  
+  // Media coverage — enables "most-documented encounters" analysis
+  media_coverage: MediaCoverageSchema.optional(),
 });
 
 export type UapEncounterContextResult = z.infer<typeof UapEncounterContextSchema>;
 export type LocationContext = z.infer<typeof LocationContextSchema>;
 export type MilitaryContext = z.infer<typeof MilitaryContextSchema>;
 export type ConnectedCase = z.infer<typeof ConnectedCaseSchema>;
+export type MediaCoverage = z.infer<typeof MediaCoverageSchema>;
 
 // ─── System Prompt ───────────────────────────────────────────────────────────
 
@@ -164,7 +174,12 @@ Respond with a single JSON object matching this structure:
   "total_witnesses_mentioned": 3,
   "named_witnesses": ["Bill", "Andrew"],
   "reported_to_authorities": true,
-  "authority_response": "police investigated but found nothing"
+  "authority_response": "police investigated but found nothing",
+  "media_coverage": {
+    "was_reported_in_media": true,
+    "media_outlets": ["local TV news"],
+    "documentary_appearances": ["Unsolved Mysteries S3E5"]
+  }
 }
 
 EXTRACTION RULES:
@@ -204,6 +219,13 @@ Witnesses:
 Authority Response:
 - reported_to_authorities: did the experiencer or other witnesses report to any official body?
 - authority_response: what happened when they reported? Use "not stated" if they didn't report or didn't mention the response.
+
+Media Coverage:
+- was_reported_in_media: true ONLY if the transcript explicitly mentions news coverage, newspaper articles, TV reports, or documentary appearances about this specific encounter.
+- media_outlets: names of news organizations that covered the encounter (e.g., "CNN", "New York Times", "local TV news").
+- documentary_appearances: specific documentaries or TV shows that featured this encounter (e.g., "Unsolved Mysteries S2E1", "The Phenomenon").
+- If no media coverage is mentioned, omit the entire media_coverage object.
+- Do NOT infer media coverage from the fact that the video exists on YouTube — the YouTube video itself is NOT media coverage.
 
 ANTI-HALLUCINATION RULE: Extract ONLY what is explicitly stated in the transcript. Use "not stated", false, 0, null, or empty arrays for anything not mentioned. NEVER infer or fabricate context.`;
 

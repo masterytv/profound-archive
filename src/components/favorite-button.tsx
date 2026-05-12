@@ -14,9 +14,11 @@ interface FavoriteButtonProps {
   videoTitle: string;
   videoThumbnailUrl?: string;
   user?: User | null;
+  /** Which domain this favorite belongs to. Defaults to 'nde'. */
+  domain?: 'nde' | 'uap';
 }
 
-export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl, user: initialUser }: FavoriteButtonProps) {
+export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl, user: initialUser, domain = 'nde' }: FavoriteButtonProps) {
   const [user, setUser] = useState<User | null>(initialUser || null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -143,7 +145,7 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
         video_id: videoId,
         video_title: videoTitle,
         video_thumbnail_url: videoThumbnailUrl || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-        domain: 'nde',
+        domain,
       });
 
       if (error) {

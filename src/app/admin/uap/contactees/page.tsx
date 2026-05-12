@@ -261,7 +261,7 @@ export default function AdminContacteesPage() {
                       <input value={editName} onChange={e => setEditName(e.target.value)}
                         className="w-full px-2 py-1 rounded border border-emerald-500/30 bg-emerald-500/10 text-sm text-foreground dark:[color-scheme:dark]" />
                     ) : (
-                      <a href={`/uap/contactees/${c.slug}`} target="_blank" rel="noopener noreferrer"
+                      <a href={`/uap/experiencer/${c.slug}`} target="_blank" rel="noopener noreferrer"
                         className="text-foreground hover:text-emerald-400 transition-colors flex items-center gap-1.5">
                         {c.display_name}
                         <ExternalLink className="w-3 h-3 text-muted-foreground" />

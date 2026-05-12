@@ -174,6 +174,7 @@ export default function AdminClassifierReview() {
       pending: "bg-amber-500/10 text-amber-400",
       out_of_scope: "bg-red-500/10 text-red-400",
       no_captions: "bg-slate-500/10 text-slate-400",
+      drm_protected: "bg-amber-500/10 text-amber-400",
       is_short: "bg-slate-500/10 text-slate-400",
       failed: "bg-red-500/10 text-red-400",
     };
@@ -278,6 +279,7 @@ export default function AdminClassifierReview() {
           <option value="pending">Pending</option>
           <option value="out_of_scope">Out of Scope</option>
           <option value="no_captions">No Captions</option>
+          <option value="drm_protected">DRM Protected</option>
           <option value="is_short">Short</option>
           <option value="failed">Failed</option>
         </select>

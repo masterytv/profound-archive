@@ -1,0 +1,15 @@
+-- Sprint 7: Enhanced Video Explore Grid RPC + Facets RPC
+-- Applied: 2026-05-12
+-- 
+-- Changes:
+-- 1. Enhanced uap_video_explore_grid RPC with 12 new filter parameters:
+--    p_entity_types, p_craft_shapes, p_hynek_types, p_five_observables,
+--    p_video_tones, p_primary_topics, p_recurrence, p_min_intelligence,
+--    p_has_oath, p_has_psi, p_decade, p_channel
+-- 2. Added 5 new return columns: video_tone, intelligence_value, 
+--    has_psi_content, has_under_oath_claims, dominant_entity_type
+-- 3. Created uap_explore_facets() RPC returning facet counts for sidebar
+-- 4. Backward compatible: all new params have defaults; existing callers unaffected
+
+-- See supabase migration applied via MCP: enhance_video_explore_grid_rpc
+-- See supabase migration applied via MCP: create_explore_facets_rpc

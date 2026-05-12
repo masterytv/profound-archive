@@ -251,11 +251,15 @@ export async function runUapProcessTick(
             intakeStatus = result.status;
             tier = result.tier ?? null;
 
-            const isSkipped = result.status === 'no_captions' || result.status === 'already_exists' || result.status === 'out_of_scope';
+            const isSkipped = result.status === 'no_captions'
+                || result.status === 'already_exists'
+                || result.status === 'out_of_scope'
+                || result.status === 'is_short'
+                || result.status === 'drm_protected';
 
             finalStatus = (result.status === 'complete' || result.status === 'already_exists')
                 ? 'complete'
-                : (result.status === 'out_of_scope' || result.status === 'no_captions')
+                : isSkipped
                     ? 'skipped'
                     : 'failed';
 

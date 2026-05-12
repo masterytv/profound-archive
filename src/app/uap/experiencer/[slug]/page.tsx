@@ -141,7 +141,7 @@ function ScoreBar({
 function VideoCard({ video }: { video: ContacteeVideoWithAnalysis }) {
   return (
     <Link
-      href={`/uap/${video.tier === 1 ? "encounters" : "programs"}/${video.video_id}`}
+      href={`/uap/video/${video.video_id}`}
       className="group flex gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors border border-slate-200 dark:border-slate-700"
     >
       <div className="relative w-32 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700">
@@ -170,15 +170,24 @@ function VideoCard({ video }: { video: ContacteeVideoWithAnalysis }) {
           {video.channel_name || "Unknown Channel"}
         </p>
         {video.analysis && (
-          <div className="flex gap-2 mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+          <div className="flex gap-3 mt-1.5 text-xs font-medium">
             {video.analysis.evidence_score != null && (
-              <span>ESS: {video.analysis.evidence_score}</span>
+              <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+                <Shield className="w-3 h-3" />
+                Evidence {Math.round((video.analysis.evidence_score / 28) * 100)}%
+              </span>
             )}
             {video.analysis.contact_depth_score != null && (
-              <span>CDS: {video.analysis.contact_depth_score}</span>
+              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                <Zap className="w-3 h-3" />
+                Depth {Math.round((video.analysis.contact_depth_score / 32) * 100)}%
+              </span>
             )}
             {video.analysis.transformation_score != null && (
-              <span>CTI: {video.analysis.transformation_score}</span>
+              <span className="inline-flex items-center gap-1 text-teal-600 dark:text-teal-400">
+                <Eye className="w-3 h-3" />
+                Impact {Math.round((video.analysis.transformation_score / 50) * 100)}%
+              </span>
             )}
           </div>
         )}
@@ -214,11 +223,11 @@ export default async function ContacteeProfilePage({
       {/* ── Breadcrumb ──────────────────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-4 pt-6 pb-2">
         <Link
-          href="/uap/contactees"
+          href="/uap/experiencer"
           className="inline-flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          All Contactees
+          All Experiencers
         </Link>
       </div>
 
@@ -495,7 +504,7 @@ export default async function ContacteeProfilePage({
             description:
               profile.summary ||
               `UAP contact experiencer profiled by Project Profound`,
-            url: `https://projectprofound.org/uap/contactees/${profile.slug}`,
+            url: `https://projectprofound.org/uap/experiencer/${profile.slug}`,
             image: profile.photo_url || undefined,
           }),
         }}
