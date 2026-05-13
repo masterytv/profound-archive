@@ -17,6 +17,7 @@
 | Sprint 6: Deep Analysis & Search | ✅ Complete | 2026-05-12 |
 | Sprint 7: Mass Analysis & Intelligence | ✅ Complete | 2026-05-12 |
 | Sprint 8: Scanner Expansion | ✅ Complete (8.3.2, 8.3.4 deferred) | 2026-05-13 |
+| Sprint 9: Engagement & CRM | ✅ Complete | 2026-05-13 |
 
 ## Environment Setup
 
@@ -835,3 +836,53 @@ For every UAP file you create:
 - [x] Story 8.6.9: Update Experiencer detail page — keep rich VideoCard format, add cross-links (Persons, Programs, Events) (0.25d) ✅ 2026-05-13
 - [x] Story 8.6.10: Update Channels detail page — keep video grid, add cross-links (Persons, Programs, Experiencers, Events) (0.25d) ✅ 2026-05-13
 - **Done when:** All 6 entity types show standardized video table (or rich cards for experiencers), cross-entity link sections, and channel features. TypeScript compiles clean.
+
+---
+
+### Epic 8.7: Channel Directory Sort/Pagination & Detail Video Grid ✅ 2026-05-13
+
+> Standardize the `/uap/channels` index and `/uap/channels/[handle]` detail pages to match the experiencer and video-explore directory UX patterns.
+
+- [x] Story 8.7.1: Update `get_uap_channel_stats` RPC — add `subscriber_count` and `total_view_count` to return signature (deployed + local migration updated) (0.1d) ✅ 2026-05-13
+- [x] Story 8.7.2: Create `UapChannelSearch` component — client-side search for channel directory, mirrors `UapExperiencerSearch` pattern (0.1d) ✅ 2026-05-13
+- [x] Story 8.7.3: Rebuild `/uap/channels` index — 6 sort options (Videos, Subscribers, Views, Encounters, Programs, Name), direction toggle, search, pagination (30/page), hero stats, JSON-LD (0.5d) ✅ 2026-05-13
+- [x] Story 8.7.4: Rebuild `/uap/channels/[handle]` detail — replace tier-grouped VideoGrid with reusable `UapGridControls` + `UapVideoCard` components (from video-explore); sortable (date, views, evidence, contact depth, transformation, title), searchable by title, tier-filterable, paginated (12/page) (0.5d) ✅ 2026-05-13
+- [x] Story 8.7.5: Fix PostgREST `!left` join failure — replaced embedded join with two-query approach (fetch videos → batch-fetch analysis → merge client-side) to resolve silent 0-result bug (0.25d) ✅ 2026-05-13
+- **Done when:** Channel index has working sort/search/pagination; channel detail shows all channel videos in sortable/pageable grid; TypeScript compiles clean.
+
+---
+
+## Sprint 9: Engagement — Newsletter Separation, CRM Broadcast & Campaign History
+
+> **Goal:** Separate NDE and UAP newsletter tracks, add admin broadcast email composer with campaign logging, and update email sender identity.
+
+### Epic 9.1: Newsletter Domain Separation
+> Separate UAP newsletter subscribers from NDE subscribers while keeping them in the same `quiz_leads` table.
+
+- [x] Story 9.1.1: Add `newsletter_uap` archetype — `/api/quiz-lead` routing, `uap_compass_config`, `NEWSLETTER_ENTRIES` in CRM (0.5d) ✅ 2026-05-13
+- [x] Story 9.1.2: Fix unique constraint — update `quiz_leads_one_compass_per_email` to allow same email across newsletter domains (0.25d) ✅ 2026-05-13
+- **Done when:** Users can subscribe to UAP newsletter separately from NDE. CRM shows both newsletter archetypes with correct icons/labels.
+
+### Epic 9.2: Admin CRM — Engagement Sidebar & Filtering
+> Expand admin portal with dedicated engagement navigation and enhanced CRM filtering.
+
+- [x] Story 9.2.1: Add "Engagement" section to AdminSidebar — Users, Email CRM, Email Templates, CES Feedback links (0.25d) ✅ 2026-05-13
+- [x] Story 9.2.2: CRM archetype filter — support individual newsletter/compass selection + "All Subscribers" mode (0.25d) ✅ 2026-05-13
+- **Done when:** UAP admin sidebar has Engagement section. CRM filters by archetype including newsletters.
+
+### Epic 9.3: Broadcast Email Composer & Campaign History
+> Replace simple blast-template button with a full email composer and persistent campaign logging.
+
+- [x] Story 9.3.1: Create `email_campaigns` DB table — subject, body, target, sent/failed counts, status, timestamps (0.25d) ✅ 2026-05-13
+- [x] Story 9.3.2: Create `BroadcastEmail` React Email template — branded chrome with custom subject/body/optional CTA (0.25d) ✅ 2026-05-13
+- [x] Story 9.3.3: Rewrite `/api/email/broadcast` — accept custom subject/body, render BroadcastEmail, log to campaigns table (0.5d) ✅ 2026-05-13
+- [x] Story 9.3.4: Create `/api/email/campaigns` GET endpoint — campaign history for admin CRM (0.25d) ✅ 2026-05-13
+- [x] Story 9.3.5: CRM Compose UI — inline compose form (subject, body, CTA fields) replacing old confirmation dialog (0.5d) ✅ 2026-05-13
+- [x] Story 9.3.6: CRM Campaign History table — broadcast log with subject, audience, sent/failed counts, status, timestamps (0.25d) ✅ 2026-05-13
+- **Done when:** Admin can compose custom broadcast emails, send to filtered audiences, and review campaign history in CRM.
+
+### Epic 9.4: Email Sender Identity
+> Update From address across all email sends.
+
+- [x] Story 9.4.1: Change sender from `Project Profound Stories <stories@...>` to `Project Profound <noreply@...>` in `.env.local`, `apphosting.yaml`, and `resend.ts` fallback (0.1d) ✅ 2026-05-13
+- **Done when:** All outbound emails send from `Project Profound <noreply@mail.projectprofound.org>`.
