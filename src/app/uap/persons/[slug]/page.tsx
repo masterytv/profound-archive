@@ -2,14 +2,26 @@
  * UAP Person Detail Page
  *
  * /uap/persons/[slug] — Individual person profile with video appearances,
- * credibility analysis, and JSON-LD structured data.
+ * cross-entity links, credibility analysis, and JSON-LD structured data.
  */
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { User, Film, ArrowLeft, Shield, ExternalLink } from 'lucide-react';
+import {
+  User, Film, ArrowLeft, Shield, Building2, FileText,
+  Calendar, Users, Radio,
+} from 'lucide-react';
+import UapVideoReferenceTable, { type VideoRef } from '@/components/uap/UapVideoReferenceTable';
+import UapEntityLinkSection from '@/components/uap/UapEntityLinkSection';
+import {
+  findLinkedPrograms,
+  findLinkedOrgs,
+  findLinkedEvents,
+  findLinkedExperiencers,
+  findLinkedChannels,
+} from '@/lib/data/uap-entity-links';
 
 export const revalidate = 3600;
 
@@ -31,14 +43,14 @@ async function getPerson(slug: string) {
 
   if (!person) return null;
 
-  // Fetch linked videos
-  let videos: any[] = [];
+  // Fetch linked videos with full data for the table
+  let videos: VideoRef[] = [];
   if (person.linked_video_ids?.length > 0) {
     const { data } = await supabase
       .from('uap_vids')
-      .select('video_id, title, tier, content_type, channel_name, thumbnail_url')
+      .select('video_id, title, tier, content_type, channel_name, thumbnail_url, view_count, date')
       .in('video_id', person.linked_video_ids);
-    videos = data || [];
+    videos = (data || []) as VideoRef[];
   }
 
   return { person, videos };
@@ -85,6 +97,22 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
   if (!result) notFound();
 
   const { person, videos } = result;
+  const videoIds = person.linked_video_ids || [];
+
+  // Parallel cross-entity link discovery
+  const [
+    linkedPrograms,
+    linkedOrgs,
+    linkedEvents,
+    linkedExperiencers,
+    linkedChannels,
+  ] = await Promise.all([
+    findLinkedPrograms(videoIds, slug),
+    findLinkedOrgs(videoIds, slug),
+    findLinkedEvents(videoIds, slug),
+    findLinkedExperiencers(videoIds, slug),
+    findLinkedChannels(videoIds),
+  ]);
 
   // JSON-LD structured data
   const jsonLd = {
@@ -177,7 +205,7 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
         </section>
 
         {/* Content */}
-        <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-8">
+        <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-10">
 
           {/* Bio */}
           {person.bio && (
@@ -187,56 +215,54 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
             </section>
           )}
 
-          {/* Video Appearances */}
-          <section>
-            <h2 className="text-lg font-semibold text-foreground font-serif mb-4">
-              Video Appearances ({videos.length})
-            </h2>
-            <div className="space-y-3">
-              {videos.map(video => (
-                <Link
-                  key={video.video_id}
-                  href={`/uap/video/${video.video_id}`}
-                  className="group flex items-center gap-4 p-4 rounded-xl border border-border/60 bg-card
-                             hover:shadow-md hover:border-[var(--domain-accent)]/30 transition-all"
-                >
-                  {/* Thumbnail */}
-                  {video.thumbnail_url && (
-                    <div className="w-20 h-12 rounded-lg overflow-hidden shrink-0 bg-muted">
-                      <img
-                        src={video.thumbnail_url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
+          {/* Video Appearances (Standardized Table) */}
+          <UapVideoReferenceTable
+            videos={videos}
+            title={`Video References (${videos.length})`}
+            emptyMessage="No videos linked to this person yet."
+          />
 
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-foreground group-hover:text-[var(--domain-accent)] transition-colors truncate">
-                      {video.title}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium">
-                        Tier {video.tier}
-                      </span>
-                      {video.content_type && (
-                        <span className="text-[10px] text-muted-foreground capitalize">
-                          {video.content_type.replace(/_/g, ' ')}
-                        </span>
-                      )}
-                      {video.channel_name && (
-                        <span className="text-[10px] text-muted-foreground/60 truncate">
-                          · {video.channel_name}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+          {/* ── Standardized Cross-Entity Links (canonical order) ── */}
+          <UapEntityLinkSection
+            icon={Radio}
+            title={`Featured on Channels (${linkedChannels.length})`}
+            description="Channels that have published videos discussing this person."
+            entities={linkedChannels.map((ch) => ({
+              slug: ch.channel_id,
+              name: ch.name,
+              subtitle: `${ch.video_count} video${ch.video_count !== 1 ? 's' : ''}`,
+              href: ch.href,
+              count: ch.video_count,
+            }))}
+          />
 
-                  <ExternalLink className="w-4 h-4 text-muted-foreground/30 group-hover:text-[var(--domain-accent)] transition-colors shrink-0" />
-                </Link>
-              ))}
-            </div>
-          </section>
+          <UapEntityLinkSection
+            icon={Users}
+            title={`Linked Experiencers (${linkedExperiencers.length})`}
+            description="These experiencers appear in the same videos where this person is discussed. This reflects topical co-occurrence, not a direct relationship."
+            entities={linkedExperiencers}
+          />
+
+          <UapEntityLinkSection
+            icon={Calendar}
+            title={`Linked Events (${linkedEvents.length})`}
+            description="These events are discussed in the same videos where this person is mentioned. This reflects topical co-occurrence, not confirmed involvement."
+            entities={linkedEvents}
+          />
+
+          <UapEntityLinkSection
+            icon={Building2}
+            title={`Linked Organizations (${linkedOrgs.length})`}
+            description="These organizations appear in the same videos where this person is discussed. This reflects topical co-occurrence, not a confirmed affiliation."
+            entities={linkedOrgs}
+          />
+
+          <UapEntityLinkSection
+            icon={FileText}
+            title={`Linked Programs (${linkedPrograms.length})`}
+            description="These programs appear in the same videos where this person is discussed. This reflects topical co-occurrence, not a confirmed affiliation."
+            entities={linkedPrograms}
+          />
         </div>
       </div>
     </>

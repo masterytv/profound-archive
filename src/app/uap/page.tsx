@@ -9,6 +9,7 @@ import {
   Radio,
   Users,
 } from "lucide-react";
+import { InlineNewsletterCTA } from "@/components/InlineNewsletterCTA";
 
 export const metadata: Metadata = {
   title: "UFO & UAP Encounters — AI-Powered Analysis | Project Profound",
@@ -210,6 +211,13 @@ export default async function UapLandingPage() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Newsletter CTA */}
+      <section className="max-w-6xl mx-auto px-6 py-16 border-t border-white/10">
+        <div className="max-w-xl mx-auto">
+          <InlineNewsletterCTA domain="uap" />
         </div>
       </section>
     </div>

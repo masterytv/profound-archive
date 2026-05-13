@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = adminClient();
-    const isNewsletter = archetype === "newsletter";
+    const isNewsletter = archetype === "newsletter_nde" || archetype === "newsletter_uap";
 
     if (isNewsletter) {
       // ── Newsletter: simple upsert, idempotent ──
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       .update({ is_active: false })
       .eq("email", email)
       .eq("is_active", true)
-      .neq("archetype", "newsletter");
+      .not("archetype", "like", "newsletter_%");
 
     // Step 2: Get the logged-in user (if any) to link the row to their profile.
     // We use the server client (reads cookies) — this is a Server Component context.
@@ -140,13 +140,13 @@ export async function POST(req: Request) {
 }
 
 // Sends the newsletter welcome email using the customizable DB template
-async function sendWelcomeEmail(lead: { email: string; unsubscribe_token: string }) {
+async function sendWelcomeEmail(lead: { email: string; archetype: string; unsubscribe_token: string }) {
   const supabase = adminClient();
 
   const { data: tmpl } = await supabase
     .from("email_templates")
     .select("subject, intro_text, cta_text, cta_href")
-    .eq("archetype", "newsletter_welcome")
+    .eq("archetype", `${lead.archetype}_welcome`)
     .maybeSingle();
 
   const unsubscribeUrl = `https://projectprofound.org/unsubscribe?token=${lead.unsubscribe_token}`;

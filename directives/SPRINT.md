@@ -15,8 +15,8 @@
 | Sprint 4: Profiles & Discovery | ✅ Complete | 2026-05-06 |
 | Sprint 5: Content & Polish | ✅ Complete | 2026-05-07 |
 | Sprint 6: Deep Analysis & Search | ✅ Complete | 2026-05-12 |
-| Sprint 7: Mass Analysis & Intelligence | 🚧 In Progress | — |
-| Sprint 8: Scanner Expansion | ⏳ Planned | — |
+| Sprint 7: Mass Analysis & Intelligence | ✅ Complete | 2026-05-12 |
+| Sprint 8: Scanner Expansion | ✅ Complete (8.3.2, 8.3.4 deferred) | 2026-05-13 |
 
 ## Environment Setup
 
@@ -817,3 +817,21 @@ For every UAP file you create:
 - [x] Story 8.5.5: Schema migration — add `retry_count INTEGER DEFAULT 0` to `uap_scan_queue` (0.1d) ✅ 2026-05-13
 - [x] Story 8.5.6: Scanner queue UI — retry/skip buttons on skipped items, "Retry All Skipped" bulk action, `retry_all_skipped` API action (0.25d) ✅ 2026-05-13
 - **Done when:** Transient Supadata failures (429, 500, timeout) auto-retry up to 3x; genuine no-captions stays permanently skipped; admin queue shows retry controls on skipped items.
+
+---
+
+### Epic 8.6: Entity Detail Page Standardization ✅ 2026-05-13
+
+> Unify all UAP entity detail pages with standardized video reference tables and cross-entity link discovery via shared `video_ids` arrays. Zero-migration approach — uses PostgreSQL `&&` (array overlap) operator against existing `linked_video_ids` columns.
+
+- [x] Story 8.6.1: Create `src/lib/data/uap-entity-links.ts` — 6 server-side cross-link discovery functions (Persons, Programs, Orgs, Events, Experiencers, Channels) using `&&` overlap (0.5d) ✅ 2026-05-13
+- [x] Story 8.6.2: Create `UapVideoReferenceTable` component — sortable (views/date/title/type), paginated, responsive (table on desktop, cards on mobile) (0.5d) ✅ 2026-05-13
+- [x] Story 8.6.3: Create `UapEntityLinkSection` component — reusable cross-link grid with icon, title, and entity cards (0.25d) ✅ 2026-05-13
+- [x] Story 8.6.4: Backfill `uap_events.video_ids` — SQL title/alias matching; 14/15 events linked (0.25d) ✅ 2026-05-13
+- [x] Story 8.6.5: Update Events detail page — video table + cross-links (Persons, Programs, Orgs, Experiencers, Channels) (0.25d) ✅ 2026-05-13
+- [x] Story 8.6.6: Update Persons detail page — video table + cross-links (Programs, Orgs, Experiencers, Events, Channels) (0.25d) ✅ 2026-05-13
+- [x] Story 8.6.7: Update Programs detail page — video table + cross-links (Persons, Orgs, Events, Channels) (0.25d) ✅ 2026-05-13
+- [x] Story 8.6.8: Update Organizations detail page — video table + cross-links (Persons, Programs, Events, Channels) (0.25d) ✅ 2026-05-13
+- [x] Story 8.6.9: Update Experiencer detail page — keep rich VideoCard format, add cross-links (Persons, Programs, Events) (0.25d) ✅ 2026-05-13
+- [x] Story 8.6.10: Update Channels detail page — keep video grid, add cross-links (Persons, Programs, Experiencers, Events) (0.25d) ✅ 2026-05-13
+- **Done when:** All 6 entity types show standardized video table (or rich cards for experiencers), cross-entity link sections, and channel features. TypeScript compiles clean.

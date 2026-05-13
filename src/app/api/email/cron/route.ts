@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     .from("quiz_leads")
     .select("id, email, archetype, frequency, unsubscribe_token, send_count")
     .eq("is_active", true)
-    .neq("archetype", "newsletter")
+    .not("archetype", "like", "newsletter_%")
     .or("next_send_at.is.null,next_send_at.lte." + new Date().toISOString())
     .limit(MAX_BATCH);
 

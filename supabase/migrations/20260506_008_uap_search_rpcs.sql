@@ -286,6 +286,8 @@ RETURNS TABLE(
   channel_name TEXT,
   track TEXT,
   avatar_url TEXT,
+  subscriber_count BIGINT,
+  total_view_count BIGINT,
   video_count BIGINT,
   avg_evidence_score NUMERIC,
   avg_contact_depth NUMERIC,
@@ -301,6 +303,8 @@ BEGIN
         c.channel_name,
         c.track,
         c.avatar_url,
+        c.subscriber_count,
+        c.total_view_count,
         COUNT(v.video_id) AS video_count,
         ROUND(AVG(a.evidence_score)::numeric, 1) AS avg_evidence_score,
         ROUND(AVG(a.contact_depth_score)::numeric, 1) AS avg_contact_depth,
@@ -312,7 +316,7 @@ BEGIN
     LEFT JOIN public.uap_vids v ON c.channel_id = v.channel_id
     LEFT JOIN public.uap_analysis a ON v.video_id = a.video_id
     WHERE c.hidden = false
-    GROUP BY c.channel_id, c.channel_name, c.track, c.avatar_url
+    GROUP BY c.channel_id, c.channel_name, c.track, c.avatar_url, c.subscriber_count, c.total_view_count
     ORDER BY video_count DESC;
 END;
 $$ LANGUAGE plpgsql STABLE;

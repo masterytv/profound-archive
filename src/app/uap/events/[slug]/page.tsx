@@ -11,9 +11,22 @@ import {
   Globe,
   ArrowLeft,
   ChevronRight,
-  ExternalLink,
   Shield,
+  Building2,
+  FileText,
+  User,
+  Radio,
+  Info,
 } from "lucide-react";
+import UapVideoReferenceTable, { type VideoRef } from "@/components/uap/UapVideoReferenceTable";
+import UapEntityLinkSection from "@/components/uap/UapEntityLinkSection";
+import {
+  findLinkedPersons,
+  findLinkedPrograms,
+  findLinkedOrgs,
+  findLinkedExperiencers,
+  findLinkedChannels,
+} from "@/lib/data/uap-entity-links";
 
 export const revalidate = 86400;
 
@@ -43,14 +56,6 @@ interface UapEvent {
   contactee_ids: string[];
   witness_count: number | null;
   source_count: number;
-}
-
-interface LinkedVideo {
-  video_id: string;
-  title: string;
-  channel_name: string | null;
-  thumbnail_url: string | null;
-  view_count: number | null;
 }
 
 interface LinkedContactee {
@@ -88,15 +93,15 @@ async function getEvent(slug: string): Promise<UapEvent | null> {
   return data as UapEvent;
 }
 
-async function getLinkedVideos(videoIds: string[]): Promise<LinkedVideo[]> {
+async function getLinkedVideos(videoIds: string[]): Promise<VideoRef[]> {
   if (!videoIds || videoIds.length === 0) return [];
   const supabase = buildClient();
   const { data } = await supabase
     .from("uap_vids")
-    .select("video_id, title, channel_name, thumbnail_url, view_count")
+    .select("video_id, title, channel_name, thumbnail_url, view_count, date, tier, content_type")
     .in("video_id", videoIds)
     .order("view_count", { ascending: false });
-  return (data || []) as LinkedVideo[];
+  return (data || []) as VideoRef[];
 }
 
 async function getLinkedContactees(ids: string[]): Promise<LinkedContactee[]> {
@@ -109,7 +114,7 @@ async function getLinkedContactees(ids: string[]): Promise<LinkedContactee[]> {
   return (data || []) as LinkedContactee[];
 }
 
-async function getRelatedEvents(currentSlug: string, year: number | null, eventType: string): Promise<UapEvent[]> {
+async function getRelatedEvents(currentSlug: string, year: number | null): Promise<UapEvent[]> {
   const supabase = buildClient();
   let query = supabase
     .from("uap_events")
@@ -118,7 +123,6 @@ async function getRelatedEvents(currentSlug: string, year: number | null, eventT
     .order("source_count", { ascending: false })
     .limit(6);
 
-  // Prefer same era or same type
   if (year) {
     query = query.gte("year", year - 15).lte("year", year + 15);
   }
@@ -167,10 +171,27 @@ export default async function EventDetailPage({
   const event = await getEvent(slug);
   if (!event) notFound();
 
-  const [linkedVideos, linkedContactees, relatedEvents] = await Promise.all([
-    getLinkedVideos(event.video_ids),
+  const videoIds = event.video_ids || [];
+
+  // Parallel data fetch — linked entities + cross-links
+  const [
+    linkedVideos,
+    linkedContactees,
+    relatedEvents,
+    linkedPersons,
+    linkedPrograms,
+    linkedOrgs,
+    linkedExperiencers,
+    linkedChannels,
+  ] = await Promise.all([
+    getLinkedVideos(videoIds),
     getLinkedContactees(event.contactee_ids),
-    getRelatedEvents(event.slug, event.year, event.event_type),
+    getRelatedEvents(event.slug, event.year),
+    findLinkedPersons(videoIds, event.slug),
+    findLinkedPrograms(videoIds, event.slug),
+    findLinkedOrgs(videoIds, event.slug),
+    findLinkedExperiencers(videoIds, event.slug),
+    findLinkedChannels(videoIds),
   ]);
 
   const typeConfig = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.unknown;
@@ -260,12 +281,28 @@ export default async function EventDetailPage({
       </section>
 
       <div className="max-w-4xl mx-auto px-4 pb-16 space-y-12">
-        {/* ── Linked Contactees ─────────────────────────────────── */}
+        {/* ── Video References (Standardized Table) ───────────────── */}
+        <UapVideoReferenceTable
+          videos={linkedVideos}
+          title={`Video References (${linkedVideos.length})`}
+          emptyMessage="No videos linked to this event yet."
+        />
+
+        {/* ── Linked Experiencers (from contactee_ids) ────────────── */}
         {linkedContactees.length > 0 && (
           <section>
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2 font-serif">
               <Users className="w-5 h-5 text-green-500" />
               Linked Experiencers
+              <span className="relative inline-flex">
+                <button type="button" className="peer p-0.5 rounded-full text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400 focus:text-slate-500 dark:focus:text-slate-400 focus:outline-none transition-colors" aria-label="More information" tabIndex={0}>
+                  <Info className="w-4 h-4" />
+                </button>
+                <span role="tooltip" className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 w-64 sm:w-72 px-3 py-2 rounded-lg text-xs font-normal leading-relaxed bg-slate-800 dark:bg-slate-700 text-slate-200 dark:text-slate-300 shadow-lg border border-slate-700 dark:border-slate-600 opacity-0 invisible scale-95 peer-hover:opacity-100 peer-hover:visible peer-hover:scale-100 peer-focus:opacity-100 peer-focus:visible peer-focus:scale-100 transition-all duration-150 ease-out z-50">
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 dark:bg-slate-700 border-l border-t border-slate-700 dark:border-slate-600 rotate-45" />
+                  Individuals directly associated with this event based on witness and contactee records.
+                </span>
+              </span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {linkedContactees.map((c) => (
@@ -304,62 +341,63 @@ export default async function EventDetailPage({
           </section>
         )}
 
-        {/* ── Linked Videos ─────────────────────────────────────── */}
-        {linkedVideos.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-              <Play className="w-5 h-5 text-green-500" />
-              Video References
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {linkedVideos.map((v) => (
-                <Link
-                  key={v.video_id}
-                  href={`/uap/video/${v.video_id}`}
-                  className="group flex items-start gap-3 p-3 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-green-300 dark:hover:border-green-700 transition-colors"
-                >
-                  {/* Thumbnail */}
-                  <div className="relative w-28 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-slate-200 dark:bg-slate-800">
-                    {v.thumbnail_url ? (
-                      <Image
-                        src={v.thumbnail_url}
-                        alt={v.title}
-                        fill
-                        className="object-cover"
-                        sizes="112px"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Play className="w-6 h-6 text-slate-400" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-green-600 dark:group-hover:text-green-400 line-clamp-2 transition-colors">
-                      {v.title}
-                    </h3>
-                    {v.channel_name && (
-                      <p className="text-xs text-slate-400 mt-0.5">{v.channel_name}</p>
-                    )}
-                    {v.view_count != null && v.view_count > 1000 && (
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        {(v.view_count / 1000).toFixed(0)}k views
-                      </p>
-                    )}
-                  </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5" />
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* ── Standardized Cross-Entity Links (canonical order) ── */}
+        <UapEntityLinkSection
+          icon={Radio}
+          title={`Featured on Channels (${linkedChannels.length})`}
+          description="Channels that have published videos discussing this event."
+          entities={linkedChannels.map((ch) => ({
+            slug: ch.channel_id,
+            name: ch.name,
+            subtitle: `${ch.video_count} video${ch.video_count !== 1 ? 's' : ''}`,
+            href: ch.href,
+            count: ch.video_count,
+          }))}
+        />
+
+        <UapEntityLinkSection
+          icon={Users}
+          title={`Linked Experiencers (${linkedExperiencers.length})`}
+          description="These experiencers are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a confirmed involvement."
+          entities={linkedExperiencers}
+        />
+
+        <UapEntityLinkSection
+          icon={User}
+          title={`Linked Persons of Interest (${linkedPersons.length})`}
+          description="These individuals are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a direct connection to the event itself."
+          entities={linkedPersons}
+        />
+
+        <UapEntityLinkSection
+          icon={Building2}
+          title={`Linked Organizations (${linkedOrgs.length})`}
+          description="These organizations are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a direct organizational connection."
+          entities={linkedOrgs}
+        />
+
+        <UapEntityLinkSection
+          icon={FileText}
+          title={`Linked Programs (${linkedPrograms.length})`}
+          description="These programs are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a direct organizational connection."
+          entities={linkedPrograms}
+        />
 
         {/* ── Related Events ───────────────────────────────────── */}
         {relatedEvents.length > 0 && (
           <section>
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2 font-serif">
               <Shield className="w-5 h-5 text-green-500" />
               Related Events
+              <span className="relative inline-flex">
+                <button type="button" className="peer p-0.5 rounded-full text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400 focus:text-slate-500 dark:focus:text-slate-400 focus:outline-none transition-colors" aria-label="More information" tabIndex={0}>
+                  <Info className="w-4 h-4" />
+                </button>
+                <span role="tooltip" className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 w-64 sm:w-72 px-3 py-2 rounded-lg text-xs font-normal leading-relaxed bg-slate-800 dark:bg-slate-700 text-slate-200 dark:text-slate-300 shadow-lg border border-slate-700 dark:border-slate-600 opacity-0 invisible scale-95 peer-hover:opacity-100 peer-hover:visible peer-hover:scale-100 peer-focus:opacity-100 peer-focus:visible peer-focus:scale-100 transition-all duration-150 ease-out z-50">
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 dark:bg-slate-700 border-l border-t border-slate-700 dark:border-slate-600 rotate-45" />
+                  Other UAP events from a similar time period, sorted by number of video references in the archive.
+                </span>
+              </span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {relatedEvents.map((e) => {

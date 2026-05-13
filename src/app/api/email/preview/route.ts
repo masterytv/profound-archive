@@ -23,11 +23,11 @@ export async function GET(req: NextRequest) {
   const archetype = req.nextUrl.searchParams.get("archetype") ?? "griever";
 
   // ── Newsletter welcome preview ───────────────────────────────────────────
-  if (archetype === "newsletter_welcome") {
+  if (archetype.startsWith("newsletter_") && archetype.endsWith("_welcome")) {
     const { data: tpl } = await supabase
       .from("email_templates")
       .select("intro_text, cta_text, cta_href")
-      .eq("archetype", "newsletter_welcome")
+      .eq("archetype", archetype)
       .maybeSingle();
 
     const html = await render(

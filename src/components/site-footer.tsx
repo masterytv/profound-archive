@@ -115,13 +115,12 @@ export default function SiteFooter() {
           <p className="text-xs text-slate-400">
             © {new Date().getFullYear()} Project Profound. Dive deep into the experience.
           </p>
-          <a
-            data-formkit-toggle="893453eeff"
-            href="https://project-profound.kit.com/893453eeff"
+          <Link
+            href="/unsubscribe"
             className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
           >
-            Subscribe to Newsletter
-          </a>
+            Manage Newsletter Preferences
+          </Link>
         </div>
       </div>
     </footer>

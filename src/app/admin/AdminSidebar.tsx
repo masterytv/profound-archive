@@ -109,6 +109,15 @@ const UAP_NAV: NavSection[] = [
       { label: "Channels", href: "/admin/uap/channels", icon: Tv, iconColor: "text-green-500" },
     ],
   },
+  {
+    title: "Engagement",
+    items: [
+      { label: "Users", href: "/admin/users", icon: Users },
+      { label: "Email CRM", href: "/admin/email", icon: Mail, iconColor: "text-purple-500" },
+      { label: "Email Templates", href: "/admin/email/templates", icon: Mail, indent: true },
+      { label: "CES Feedback", href: "/admin/ces", icon: BarChart3, iconColor: "text-blue-500" },
+    ],
+  },
 ];
 
 // ─── Sidebar Component ──────────────────────────────────────────────────────

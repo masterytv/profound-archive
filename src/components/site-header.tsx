@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { useRouter, usePathname } from "next/navigation"
 import { NewsletterModal } from "@/components/NewsletterModal"
+import type { NewsletterDomain } from "@/components/NewsletterModal"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -181,93 +182,6 @@ export default function SiteHeader() {
                   {isUap ? (
                     <>
                       <Link
-                        href="/uap"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Radio className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Browse Encounters</div>
-                          <div className="text-xs text-slate-400">First-person UAP contact accounts</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap#programs"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <BookOpen className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Programs & Research</div>
-                          <div className="text-xs text-slate-400">Disclosure analysis & investigations</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap/channels"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Tv className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">By Channel</div>
-                          <div className="text-xs text-slate-400">Browse by UAP content channel</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <LayoutGrid className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Browse Videos</div>
-                          <div className="text-xs text-slate-400">Filter by topic, scores & type</div>
-                        </div>
-                      </Link>
-                      {/* Score sub-items — mirrors NDE structure */}
-                      <div className="pl-6 border-l-2 border-green-100 dark:border-green-900/40 ml-8 space-y-0.5">
-                        <Link
-                          href="/uap"
-                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
-                          onClick={() => setExploreOpen(false)}
-                        >
-                          <LayoutGrid className="w-3.5 h-3.5 text-green-500" />
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Browse All</span>
-                        </Link>
-                        <Link
-                          href="/uap/search?sort=ess"
-                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
-                          onClick={() => setExploreOpen(false)}
-                        >
-                          <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">By Evidence Strength</span>
-                        </Link>
-                        <Link
-                          href="/uap/search?sort=cds"
-                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
-                          onClick={() => setExploreOpen(false)}
-                        >
-                          <Brain className="w-3.5 h-3.5 text-blue-500" />
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">By Contact Depth</span>
-                        </Link>
-                        <Link
-                          href="/uap/search?sort=cti"
-                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
-                          onClick={() => setExploreOpen(false)}
-                        >
-                          <Sparkles className="w-3.5 h-3.5 text-rose-500" />
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">By Transformation</span>
-                        </Link>
-                      </div>
-                      <Link
                         href="/uap/search"
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         onClick={() => setExploreOpen(false)}
@@ -281,31 +195,60 @@ export default function SiteHeader() {
                         </div>
                       </Link>
                       <Link
-                        href="/uap/intelligence"
+                        href="/uap/video-explore"
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         onClick={() => setExploreOpen(false)}
                       >
                         <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <BarChart3 className="w-4 h-4 text-green-600" />
+                          <LayoutGrid className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Research Intelligence</div>
-                          <div className="text-xs text-slate-400">Cross-video analytics &amp; insights</div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Browse Videos</div>
+                          <div className="text-xs text-slate-400">Filter by topic, scores & type</div>
                         </div>
                       </Link>
+                      {/* Tier sub-items */}
+                      <div className="pl-6 border-l-2 border-green-100 dark:border-green-900/40 ml-8 space-y-0.5">
+                        <Link
+                          href="/uap/video-explore"
+                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
+                          onClick={() => setExploreOpen(false)}
+                        >
+                          <LayoutGrid className="w-3.5 h-3.5 text-green-500" />
+                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Browse All</span>
+                        </Link>
+                        <Link
+                          href="/uap/video-explore?tier=1"
+                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
+                          onClick={() => setExploreOpen(false)}
+                        >
+                          <Radio className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Encounters</span>
+                        </Link>
+                        <Link
+                          href="/uap/video-explore?tier=2"
+                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
+                          onClick={() => setExploreOpen(false)}
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-blue-500" />
+                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Research</span>
+                        </Link>
+                      </div>
                       <Link
-                        href="/uap/events"
+                        href="/uap/channels"
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         onClick={() => setExploreOpen(false)}
                       >
                         <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Calendar className="w-4 h-4 text-green-600" />
+                          <Tv className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Events</div>
-                          <div className="text-xs text-slate-400">Major UAP events &amp; milestones</div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Channels</div>
+                          <div className="text-xs text-slate-400">Browse by UAP content channel</div>
                         </div>
                       </Link>
+                      {/* Divider between browse and entity directories */}
+                      <div className="mx-3 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
                       <Link
                         href="/uap/experiencer"
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
@@ -333,6 +276,32 @@ export default function SiteHeader() {
                         </div>
                       </Link>
                       <Link
+                        href="/uap/events"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <Calendar className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Events</div>
+                          <div className="text-xs text-slate-400">Major UAP events & milestones</div>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/uap/organizations"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
+                          <Building2 className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Organizations</div>
+                          <div className="text-xs text-slate-400">Agencies & institutions</div>
+                        </div>
+                      </Link>
+                      <Link
                         href="/uap/programs"
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         onClick={() => setExploreOpen(false)}
@@ -345,21 +314,21 @@ export default function SiteHeader() {
                           <div className="text-xs text-slate-400">Government & research projects</div>
                         </div>
                       </Link>
+                      {/* Research section divider */}
+                      <div className="mx-3 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
                       <Link
-                        href="/uap/organizations"
+                        href="/uap/intelligence"
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         onClick={() => setExploreOpen(false)}
                       >
                         <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Globe className="w-4 h-4 text-green-600" />
+                          <BarChart3 className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Organizations</div>
-                          <div className="text-xs text-slate-400">Agencies & institutions</div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Intelligence</div>
+                          <div className="text-xs text-slate-400">Cross-video analytics & insights</div>
                         </div>
                       </Link>
-                      {/* Cross-Domain Research — spans both NDE and UAP */}
-                      <div className="mx-3 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
                       <Link
                         href="/research/cross-domain"
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
@@ -369,7 +338,7 @@ export default function SiteHeader() {
                           <Sparkles className="w-4 h-4 text-violet-600" />
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Cross-Domain Research</div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Cross-Domain</div>
                           <div className="text-xs text-slate-400">NDE ↔ UAP phenomenology</div>
                         </div>
                       </Link>
@@ -553,7 +522,11 @@ export default function SiteHeader() {
             {/* Newsletter */}
             <button
               onClick={() => setNewsletterOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 hover:bg-blue-50/60 dark:hover:bg-blue-500/20 transition-all"
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                isUap
+                  ? 'text-teal-600 dark:text-teal-300 hover:text-teal-700 dark:hover:text-teal-200 hover:bg-teal-50/60 dark:hover:bg-teal-500/20'
+                  : 'text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 hover:bg-blue-50/60 dark:hover:bg-blue-500/20'
+              }`}
             >
               <Mail className="w-3.5 h-3.5" />
               Newsletter
@@ -730,72 +703,6 @@ export default function SiteHeader() {
                         {isUap ? (
                           <>
                             <Link
-                              href="/uap"
-                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                              onClick={() => setMobileMenuOpen(false)}
-                            >
-                              <Radio className="w-4 h-4 text-green-600" />
-                              Browse Encounters
-                            </Link>
-                            <Link
-                              href="/uap#programs"
-                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                              onClick={() => setMobileMenuOpen(false)}
-                            >
-                              <BookOpen className="w-4 h-4 text-green-600" />
-                              Programs & Research
-                            </Link>
-                            <Link
-                              href="/uap/channels"
-                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                              onClick={() => setMobileMenuOpen(false)}
-                            >
-                              <Tv className="w-4 h-4 text-green-600" />
-                              By Channel
-                            </Link>
-                            <Link
-                              href="/uap"
-                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                              onClick={() => setMobileMenuOpen(false)}
-                            >
-                              <LayoutGrid className="w-4 h-4 text-green-600" />
-                              Browse Videos
-                            </Link>
-                            <div className="pl-6 border-l-2 border-green-200 dark:border-green-900/40 ml-2 space-y-0.5">
-                              <Link
-                                href="/uap"
-                                className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                                onClick={() => setMobileMenuOpen(false)}
-                              >
-                                <LayoutGrid className="w-3.5 h-3.5 text-green-500" />
-                                Browse All
-                              </Link>
-                              <Link
-                                href="/uap/search?sort=ess"
-                                className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                                onClick={() => setMobileMenuOpen(false)}
-                              >
-                                <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                                By Evidence Strength
-                              </Link>
-                              <Link
-                                href="/uap/search?sort=cds"
-                                className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                                onClick={() => setMobileMenuOpen(false)}
-                              >
-                                <Brain className="w-3.5 h-3.5 text-blue-500" />
-                                By Contact Depth
-                              </Link>
-                              <Link
-                                href="/uap/search?sort=cti"
-                                className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-                                onClick={() => setMobileMenuOpen(false)}
-                              >
-                                <Sparkles className="w-3.5 h-3.5 text-rose-500" />
-                                By Transformation
-                              </Link>
-                            </div>
-                            <Link
                               href="/uap/search"
                               className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                               onClick={() => setMobileMenuOpen(false)}
@@ -804,21 +711,49 @@ export default function SiteHeader() {
                               Search Transcripts
                             </Link>
                             <Link
-                              href="/uap/intelligence"
+                              href="/uap/video-explore"
                               className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                               onClick={() => setMobileMenuOpen(false)}
                             >
-                              <BarChart3 className="w-4 h-4 text-green-600" />
-                              Research Intelligence
+                              <LayoutGrid className="w-4 h-4 text-green-600" />
+                              Browse Videos
                             </Link>
+                            <div className="pl-6 border-l-2 border-green-200 dark:border-green-900/40 ml-2 space-y-0.5">
+                              <Link
+                                href="/uap/video-explore"
+                                className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                <LayoutGrid className="w-3.5 h-3.5 text-green-500" />
+                                Browse All
+                              </Link>
+                              <Link
+                                href="/uap/video-explore?tier=1"
+                                className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                <Radio className="w-3.5 h-3.5 text-emerald-500" />
+                                Encounters
+                              </Link>
+                              <Link
+                                href="/uap/video-explore?tier=2"
+                                className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                <BookOpen className="w-3.5 h-3.5 text-blue-500" />
+                                Research
+                              </Link>
+                            </div>
                             <Link
-                              href="/uap/events"
+                              href="/uap/channels"
                               className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                               onClick={() => setMobileMenuOpen(false)}
                             >
-                              <Calendar className="w-4 h-4 text-green-600" />
-                              Events
+                              <Tv className="w-4 h-4 text-green-600" />
+                              Channels
                             </Link>
+                            {/* Entity directories divider */}
+                            <div className="mx-1 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
                             <Link
                               href="/uap/experiencer"
                               className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -836,12 +771,12 @@ export default function SiteHeader() {
                               Persons of Interest
                             </Link>
                             <Link
-                              href="/uap/programs"
+                              href="/uap/events"
                               className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                               onClick={() => setMobileMenuOpen(false)}
                             >
-                              <Shield className="w-4 h-4 text-green-600" />
-                              Programs
+                              <Calendar className="w-4 h-4 text-green-600" />
+                              Events
                             </Link>
                             <Link
                               href="/uap/organizations"
@@ -852,12 +787,30 @@ export default function SiteHeader() {
                               Organizations
                             </Link>
                             <Link
+                              href="/uap/programs"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Shield className="w-4 h-4 text-green-600" />
+                              Programs
+                            </Link>
+                            {/* Research divider */}
+                            <div className="mx-1 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
+                            <Link
+                              href="/uap/intelligence"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <BarChart3 className="w-4 h-4 text-green-600" />
+                              Intelligence
+                            </Link>
+                            <Link
                               href="/research/cross-domain"
                               className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                               onClick={() => setMobileMenuOpen(false)}
                             >
                               <Sparkles className="w-4 h-4 text-violet-600" />
-                              Cross-Domain Research
+                              Cross-Domain
                             </Link>
                           </>
                         ) : (
@@ -1012,7 +965,11 @@ export default function SiteHeader() {
                     {/* Newsletter */}
                     <button
                       onClick={() => { setNewsletterOpen(true); setMobileMenuOpen(false); }}
-                      className="flex items-center gap-2.5 text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 font-medium"
+                      className={`flex items-center gap-2.5 font-medium ${
+                        isUap
+                          ? 'text-teal-600 dark:text-teal-300 hover:text-teal-700 dark:hover:text-teal-200'
+                          : 'text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200'
+                      }`}
                     >
                       <Mail className="w-4 h-4" />
                       Newsletter
@@ -1036,7 +993,7 @@ export default function SiteHeader() {
         </div>
       </div>
     </nav>
-    {newsletterOpen && <NewsletterModal onClose={() => setNewsletterOpen(false)} />}
+    {newsletterOpen && <NewsletterModal onClose={() => setNewsletterOpen(false)} domain={(isUap ? 'uap' : 'nde') as NewsletterDomain} />}
   </>
   )
 }

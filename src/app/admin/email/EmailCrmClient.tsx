@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { 
   Mail, Users, BarChart2, Send, Check, X, RefreshCw, 
-  ChevronDown, ChevronUp, Eye, AlertCircle
+  ChevronDown, ChevronUp, Eye, AlertCircle, Megaphone, History, FileText
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -34,6 +34,12 @@ interface CrmStats {
 const FREQ_LABELS: Record<string, string> = {
   daily: "Daily", "3day": "3-day", weekly: "Weekly", monthly: "Monthly"
 };
+
+// Newsletter archetypes (not in ARCHETYPES const)
+const NEWSLETTER_ENTRIES: { id: string; icon: string; label: string }[] = [
+  { id: "newsletter_nde", icon: "✦", label: "NDE Newsletter" },
+  { id: "newsletter_uap", icon: "🛸", label: "UAP Newsletter" },
+];
 
 // ── Stat Card ─────────────────────────────────────────────────────────────
 function StatCard({ label, value, icon: Icon, accent }: {
@@ -72,6 +78,30 @@ export function EmailCrmClient() {
   const [testFreq, setTestFreq]     = useState("weekly");
   const [testLoading, setTestLoading] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  // Broadcast compose state
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [composeCtaText, setComposeCtaText] = useState("");
+  const [composeCtaHref, setComposeCtaHref] = useState("");
+  const [broadcastLoading, setBroadcastLoading] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState<{ sent: number; failed: number; total: number; errors: string[] } | null>(null);
+
+  // Campaign history
+  interface Campaign {
+    id: string;
+    subject: string;
+    target_archetype: string;
+    sent_count: number;
+    failed_count: number;
+    total_count: number;
+    status: string;
+    created_at: string;
+    sent_at: string | null;
+  }
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaignsLoading, setCampaignsLoading] = useState(false);
 
   const PAGE_SIZE = 25;
 
@@ -164,6 +194,59 @@ export function EmailCrmClient() {
     }
   }
 
+  async function handleBroadcast() {
+    if (!composeSubject.trim() || !composeBody.trim()) return;
+    setBroadcastLoading(true);
+    setBroadcastResult(null);
+    try {
+      const res = await fetch("/api/email/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          archetype: filterArchetype,
+          subject: composeSubject.trim(),
+          bodyText: composeBody.trim(),
+          ctaText: composeCtaText.trim() || undefined,
+          ctaHref: composeCtaHref.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBroadcastResult(data);
+        setComposeOpen(false);
+        setComposeSubject("");
+        setComposeBody("");
+        setComposeCtaText("");
+        setComposeCtaHref("");
+        loadCampaigns();
+      } else {
+        setBroadcastResult({ sent: 0, failed: 1, total: 0, errors: [data.error ?? "Broadcast failed"] });
+      }
+    } catch (e) {
+      setBroadcastResult({ sent: 0, failed: 1, total: 0, errors: [String(e)] });
+    } finally {
+      setBroadcastLoading(false);
+      loadData();
+    }
+  }
+
+  async function loadCampaigns() {
+    setCampaignsLoading(true);
+    try {
+      const res = await fetch("/api/email/campaigns");
+      if (res.ok) {
+        setCampaigns(await res.json());
+      }
+    } catch (err) {
+      console.error("[crm] loadCampaigns error:", err);
+    } finally {
+      setCampaignsLoading(false);
+    }
+  }
+
+  // Load campaigns on mount
+  useEffect(() => { loadCampaigns(); }, []);
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between">
@@ -198,7 +281,8 @@ export function EmailCrmClient() {
           </div>
           <div className="flex flex-wrap gap-3">
             {Object.entries(stats.by_archetype).sort((a,b) => b[1]-a[1]).map(([arch, cnt]) => {
-              const a = ARCHETYPES[arch as keyof typeof ARCHETYPES];
+              const a = ARCHETYPES[arch as keyof typeof ARCHETYPES]
+                ?? NEWSLETTER_ENTRIES.find(n => n.id === arch);
               return (
                 <div key={arch} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
                   <span className="text-base">{a?.icon ?? "✦"}</span>
@@ -231,9 +315,15 @@ export function EmailCrmClient() {
             onChange={e => setTestArch(e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none dark:[color-scheme:dark]"
           >
-            {Object.entries(ARCHETYPES).map(([id, a]) => (
-              <option key={id} value={id}>{a.icon} {a.label}</option>
-            ))}
+            <optgroup label="Compass Archetypes">
+              {Object.entries(ARCHETYPES).map(([id, a]) => (
+                <option key={id} value={id}>{a.icon} {a.label}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Welcome Emails">
+              <option value="newsletter_nde_welcome">✦ NDE Welcome</option>
+              <option value="newsletter_uap_welcome">🛸 UAP Welcome</option>
+            </optgroup>
           </select>
           <select
             value={testFreq}
@@ -271,10 +361,17 @@ export function EmailCrmClient() {
             onChange={e => { setFilterArchetype(e.target.value); setPage(0); }}
             className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground dark:[color-scheme:dark]"
           >
-            <option value="all">All archetypes</option>
-            {Object.entries(ARCHETYPES).map(([id, a]) => (
-              <option key={id} value={id}>{a.label}</option>
-            ))}
+            <option value="all">All Subscribers</option>
+            <optgroup label="Compass Archetypes">
+              {Object.entries(ARCHETYPES).map(([id, a]) => (
+                <option key={id} value={id}>{a.icon} {a.label}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Newsletters">
+              {NEWSLETTER_ENTRIES.map(n => (
+                <option key={n.id} value={n.id}>{n.icon} {n.label}</option>
+              ))}
+            </optgroup>
           </select>
           <select
             value={filterActive}
@@ -300,7 +397,143 @@ export function EmailCrmClient() {
           >
             {sortDir === "desc" ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
           </button>
+
+          {/* Broadcast button */}
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => { setComposeOpen(!composeOpen); setBroadcastResult(null); }}
+              disabled={broadcastLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium disabled:opacity-50 transition-colors"
+            >
+              <Megaphone className="w-3.5 h-3.5" />
+              {broadcastLoading ? "Sending…" : composeOpen ? "Close Composer" : "Compose Broadcast"}
+            </button>
+          </div>
         </div>
+
+        {/* Email Compose Form */}
+        {composeOpen && (
+          <div className="mx-4 mt-3 mb-1 p-5 rounded-xl border border-amber-500/30 bg-amber-500/5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Megaphone className="w-4 h-4 text-amber-600" />
+              <h3 className="text-sm font-semibold text-foreground">Compose Broadcast Email</h3>
+              <span className="ml-auto text-xs text-muted-foreground">
+                To: {filterArchetype === "all" ? "All Subscribers" : (() => {
+                  const nl = NEWSLETTER_ENTRIES.find(n => n.id === filterArchetype);
+                  const arch = ARCHETYPES[filterArchetype as keyof typeof ARCHETYPES];
+                  return nl?.label ?? arch?.label ?? filterArchetype;
+                })()}
+                {stats && filterArchetype === "all"
+                  ? ` (${stats.active} active)`
+                  : stats?.by_archetype?.[filterArchetype]
+                    ? ` (${stats.by_archetype[filterArchetype]} total)`
+                    : ""
+                }
+              </span>
+            </div>
+
+            {/* Subject */}
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Subject Line</label>
+              <input
+                type="text"
+                value={composeSubject}
+                onChange={e => setComposeSubject(e.target.value)}
+                placeholder="e.g., New Research Published on Project Profound"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/30 dark:[color-scheme:dark]"
+              />
+            </div>
+
+            {/* Body */}
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Email Body</label>
+              <textarea
+                value={composeBody}
+                onChange={e => setComposeBody(e.target.value)}
+                placeholder="Write your email content here. Use blank lines to separate paragraphs."
+                rows={8}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/30 dark:[color-scheme:dark] resize-y"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Separate paragraphs with blank lines. The email will use the Project Profound branded template.</p>
+            </div>
+
+            {/* Optional CTA */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">CTA Button Text (optional)</label>
+                <input
+                  type="text"
+                  value={composeCtaText}
+                  onChange={e => setComposeCtaText(e.target.value)}
+                  placeholder="e.g., Read the Article →"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/30 dark:[color-scheme:dark]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">CTA Link URL (optional)</label>
+                <input
+                  type="url"
+                  value={composeCtaHref}
+                  onChange={e => setComposeCtaHref(e.target.value)}
+                  placeholder="https://projectprofound.org/..."
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/30 dark:[color-scheme:dark]"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                onClick={handleBroadcast}
+                disabled={broadcastLoading || !composeSubject.trim() || !composeBody.trim()}
+                className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium disabled:opacity-50 transition-colors"
+              >
+                {broadcastLoading ? "Sending…" : "Send Broadcast →"}
+              </button>
+              <button
+                onClick={() => setComposeOpen(false)}
+                className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+              {!composeSubject.trim() && composeBody.trim() && (
+                <span className="text-xs text-amber-600">Subject is required</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Broadcast result */}
+        {broadcastResult && (
+          <div className={`mx-4 mt-3 mb-1 p-4 rounded-xl border ${
+            broadcastResult.failed === 0
+              ? "border-emerald-500/30 bg-emerald-500/5"
+              : "border-amber-500/30 bg-amber-500/5"
+          }`}>
+            <div className="flex items-center gap-2">
+              {broadcastResult.failed === 0
+                ? <Check className="w-4 h-4 text-emerald-500" />
+                : <AlertCircle className="w-4 h-4 text-amber-500" />
+              }
+              <span className="text-sm font-medium text-foreground">
+                Broadcast complete: {broadcastResult.sent} sent, {broadcastResult.failed} failed out of {broadcastResult.total}
+              </span>
+              <button
+                onClick={() => setBroadcastResult(null)}
+                className="ml-auto p-1 rounded hover:bg-muted text-muted-foreground"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            {broadcastResult.errors.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {broadcastResult.errors.map((e, i) => (
+                  <p key={i} className="text-xs text-destructive">{e}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Table */}
         <div className="overflow-x-auto">
@@ -323,7 +556,8 @@ export function EmailCrmClient() {
               </thead>
               <tbody>
                 {leads.map(lead => {
-                  const arch = ARCHETYPES[lead.archetype as keyof typeof ARCHETYPES];
+                  const arch = ARCHETYPES[lead.archetype as keyof typeof ARCHETYPES]
+                    ?? NEWSLETTER_ENTRIES.find(n => n.id === lead.archetype);
                   const isExpanded = expandedLead === lead.id;
                   return (
                     <>
@@ -438,6 +672,82 @@ export function EmailCrmClient() {
               Next →
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* ── Campaign History ── */}
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="flex items-center gap-2 p-4 border-b border-border bg-muted/30">
+          <History className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Broadcast History</span>
+          <button
+            onClick={loadCampaigns}
+            className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <RefreshCw className="w-3 h-3" />
+            Refresh
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          {campaignsLoading ? (
+            <div className="p-6 text-center text-muted-foreground text-sm">Loading…</div>
+          ) : campaigns.length === 0 ? (
+            <div className="p-6 text-center text-muted-foreground text-sm">No campaigns sent yet.</div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/20 text-left">
+                  <th className="px-4 py-3 font-medium text-muted-foreground">Subject</th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">Audience</th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground text-center">Sent</th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground text-center">Failed</th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">Status</th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">Sent At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaigns.map(c => {
+                  const archLabel = c.target_archetype === "all"
+                    ? "All Subscribers"
+                    : NEWSLETTER_ENTRIES.find(n => n.id === c.target_archetype)?.label
+                      ?? ARCHETYPES[c.target_archetype as keyof typeof ARCHETYPES]?.label
+                      ?? c.target_archetype;
+                  return (
+                    <tr key={c.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-3 text-foreground max-w-[250px] truncate">
+                        <span className="flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          {c.subject}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{archLabel}</td>
+                      <td className="px-4 py-3 text-xs font-medium text-emerald-600 text-center">{c.sent_count}</td>
+                      <td className="px-4 py-3 text-xs font-medium text-center">
+                        {c.failed_count > 0
+                          ? <span className="text-destructive">{c.failed_count}</span>
+                          : <span className="text-muted-foreground">0</span>
+                        }
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          c.status === "sent"
+                            ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400"
+                            : c.status === "sending"
+                              ? "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"
+                              : "bg-slate-100 dark:bg-slate-700 text-slate-500"
+                        }`}>
+                          {c.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {c.sent_at ? new Date(c.sent_at).toLocaleString() : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

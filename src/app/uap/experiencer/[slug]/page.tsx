@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, Play, ExternalLink, Eye, Shield, Zap, Radio, Clock, User } from "lucide-react";
+import { ArrowLeft, Play, ExternalLink, Eye, Shield, Zap, Radio, Clock, User, Users, Calendar, FileText, Building2 } from "lucide-react";
 import Image from "next/image";
 import {
   getContacteeProfile,
@@ -10,6 +10,14 @@ import {
   type ContacteeProfile,
   type ContacteeVideoWithAnalysis,
 } from "@/lib/data/uap-contactee";
+import UapEntityLinkSection from "@/components/uap/UapEntityLinkSection";
+import {
+  findLinkedPersons,
+  findLinkedPrograms,
+  findLinkedEvents,
+  findLinkedOrgs,
+  findLinkedChannels,
+} from "@/lib/data/uap-entity-links";
 
 export const revalidate = 86400;
 
@@ -207,8 +215,16 @@ export default async function ContacteeProfilePage({
   const profile = await getContacteeProfile(slug);
   if (!profile) notFound();
 
-  // Fetch all linked videos with analysis
-  const videos = await getContacteeVideos(profile.video_ids);
+  // Fetch all linked videos with analysis + cross-entity links
+  const videoIds = profile.video_ids || [];
+  const [videos, linkedPersons, linkedPrograms, linkedEvents, linkedOrgs, linkedChannels] = await Promise.all([
+    getContacteeVideos(videoIds),
+    findLinkedPersons(videoIds, slug),
+    findLinkedPrograms(videoIds, slug),
+    findLinkedEvents(videoIds, slug),
+    findLinkedOrgs(videoIds),
+    findLinkedChannels(videoIds),
+  ]);
 
   // Compute initials for avatar placeholder
   const initials = profile.display_name
@@ -333,7 +349,7 @@ export default async function ContacteeProfilePage({
             {/* Videos */}
             <div className="bg-white dark:bg-slate-900/60 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
               <SectionHeading>
-                Video Testimonies ({videos.length})
+                Video References ({videos.length})
               </SectionHeading>
               {videos.length > 0 ? (
                 <div className="space-y-3">
@@ -365,6 +381,46 @@ export default async function ContacteeProfilePage({
                 </div>
               </div>
             )}
+
+            {/* ── Standardized Cross-Entity Links (canonical order) ── */}
+            <div className="bg-white dark:bg-slate-900/60 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-8">
+              <UapEntityLinkSection
+                icon={Radio}
+                title={`Featured on Channels (${linkedChannels.length})`}
+                description="Channels that have published videos featuring this experiencer."
+                entities={linkedChannels.map((ch) => ({
+                  slug: ch.channel_id,
+                  name: ch.name,
+                  subtitle: `${ch.video_count} video${ch.video_count !== 1 ? 's' : ''}`,
+                  href: ch.href,
+                  count: ch.video_count,
+                }))}
+              />
+              <UapEntityLinkSection
+                icon={User}
+                title={`Linked Persons of Interest (${linkedPersons.length})`}
+                description="These individuals are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not a direct relationship."
+                entities={linkedPersons}
+              />
+              <UapEntityLinkSection
+                icon={Calendar}
+                title={`Linked Events (${linkedEvents.length})`}
+                description="These events are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not confirmed involvement."
+                entities={linkedEvents}
+              />
+              <UapEntityLinkSection
+                icon={Building2}
+                title={`Linked Organizations (${linkedOrgs.length})`}
+                description="These organizations are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not a confirmed affiliation."
+                entities={linkedOrgs}
+              />
+              <UapEntityLinkSection
+                icon={FileText}
+                title={`Linked Programs (${linkedPrograms.length})`}
+                description="These programs are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not a confirmed connection."
+                entities={linkedPrograms}
+              />
+            </div>
           </div>
 
           {/* Right Column: Scores + Themes + Social */}

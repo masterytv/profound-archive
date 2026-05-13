@@ -52,7 +52,8 @@ We'll show you NDE videos that pique your curiosity and sense of exploration. St
 
 // Extra templates not tied to an NDE archetype
 const EXTRA_TEMPLATES = [
-  { id: "newsletter_welcome", icon: "✉️", label: "Newsletter Welcome", note: "Sent immediately when someone subscribes to the Newsletter." },
+  { id: "newsletter_nde_welcome", icon: "✦", label: "NDE Welcome", note: "Sent when someone subscribes to the NDE Newsletter." },
+  { id: "newsletter_uap_welcome", icon: "🛸", label: "UAP Welcome", note: "Sent when someone subscribes to the UAP Newsletter." },
 ];
 
 export default function EmailTemplatesPage() {
@@ -152,7 +153,7 @@ export default function EmailTemplatesPage() {
       });
       const data = await res.json();
       setTestResult(res.ok
-        ? { ok: true, msg: data.type === "newsletter_welcome" ? "Sent! Welcome email delivered." : `Sent! Video: ${data.video}` }
+        ? { ok: true, msg: data.type?.includes("welcome") ? "Sent! Welcome email delivered." : `Sent! Video: ${data.video}` }
         : { ok: false, msg: data.error ?? "Send failed" });
     } catch (e) {
       setTestResult({ ok: false, msg: String(e) });
@@ -331,7 +332,7 @@ export default function EmailTemplatesPage() {
               </div>
 
               {/* CTA href — only for newsletter_welcome */}
-              {selected === "newsletter_welcome" && (
+              {selected.startsWith("newsletter_") && selected.endsWith("_welcome") && (
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Button link URL

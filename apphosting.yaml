@@ -70,7 +70,7 @@ env:
     secret: projects/432036554831/secrets/RESEND_API_KEY/versions/1
   # Verified sending domain (mail.projectprofound.org verified in Resend)
   - variable: RESEND_FROM
-    value: "Project Profound Stories <stories@mail.projectprofound.org>"
+    value: "Project Profound <noreply@mail.projectprofound.org>"
 
   # Apify API token — kept for potential future use (currently unused)
   - variable: APIFY_API_TOKEN

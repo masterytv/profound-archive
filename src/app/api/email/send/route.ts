@@ -107,11 +107,12 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Newsletter welcome — special path, no video pick ──────────────────────
-  if ((body.archetype ?? archetype) === "newsletter_welcome") {
+  const resolvedArchetype = (body.archetype ?? archetype) as string;
+  if (resolvedArchetype.startsWith("newsletter_") && resolvedArchetype.endsWith("_welcome")) {
     const { data: tpl } = await admin
       .from("email_templates")
       .select("subject, intro_text, cta_text, cta_href")
-      .eq("archetype", "newsletter_welcome")
+      .eq("archetype", resolvedArchetype)
       .maybeSingle();
 
     const unsubscribeUrl = `https://projectprofound.org/unsubscribe?email=${encodeURIComponent(email)}`;
@@ -135,7 +136,7 @@ export async function POST(req: NextRequest) {
       const msg = (sendError as { message?: string })?.message ?? JSON.stringify(sendError);
       return NextResponse.json({ error: `Resend: ${msg}` }, { status: 500 });
     }
-    return NextResponse.json({ success: true, type: "newsletter_welcome" });
+    return NextResponse.json({ success: true, type: resolvedArchetype });
   }
   // ─────────────────────────────────────────────────────────────────────────
 

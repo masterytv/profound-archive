@@ -13,10 +13,17 @@ import { Loader2 } from "lucide-react";
 // ── Full list of available lists ─────────────────────────────────────────────
 const ALL_LISTS = [
   {
-    id: "newsletter",
-    icon: "✉️",
-    label: "Newsletter",
-    desc: "Occasional updates on new research, features, and insights from the archive.",
+    id: "newsletter_nde",
+    icon: "✦",
+    label: "NDE Research Newsletter",
+    desc: "Updates on near-death experience research, new features, and insights from 5,000+ accounts.",
+    type: "newsletter" as const,
+  },
+  {
+    id: "newsletter_uap",
+    icon: "🛸",
+    label: "UAP Intelligence Newsletter",
+    desc: "Updates on UAP encounter research, high-credibility sightings, government programs, and contact reports.",
     type: "newsletter" as const,
   },
   ...Object.entries(ARCHETYPES).map(([id, a]) => ({
@@ -237,7 +244,7 @@ function UnsubscribeContent() {
 
         {/* General Newsletter — top */}
         <div>
-          <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-3">General Newsletter</p>
+          <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-3">Newsletters</p>
           {ALL_LISTS.filter(l => l.type === "newsletter").map(list => {
             const state = local[list.id] ?? { active: false, frequency: "weekly" };
             return (
