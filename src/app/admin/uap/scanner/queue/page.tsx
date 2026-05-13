@@ -96,6 +96,21 @@ export default function UapScannerQueuePage() {
     skipped: "text-slate-400",
   };
 
+  const retryAllSkipped = async () => {
+    if (!confirm(`Retry all ${statusCounts.skipped || 0} skipped items? They'll be re-queued as pending.`)) return;
+    setLoading(true);
+    try {
+      await fetch('/api/admin/uap-scanner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'retry_all_skipped' }),
+      });
+      fetchQueue();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -130,6 +145,18 @@ export default function UapScannerQueuePage() {
             {status !== "all" && statusCounts[status] ? ` (${statusCounts[status]})` : ""}
           </button>
         ))}
+
+        {/* Bulk retry for skipped items */}
+        {filter === "skipped" && (statusCounts.skipped || 0) > 0 && (
+          <button
+            onClick={retryAllSkipped}
+            disabled={loading}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors disabled:opacity-50"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Retry All Skipped ({statusCounts.skipped})
+          </button>
+        )}
       </div>
 
       <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
@@ -182,13 +209,13 @@ export default function UapScannerQueuePage() {
                       {new Date(item.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {item.status === "failed" && (
+                      {(item.status === "failed" || item.status === "skipped") && (
                         <div className="flex items-center gap-1 justify-center">
                           <button
                             onClick={() => retryItem(item.id)}
                             disabled={actionLoading === item.id}
                             className="p-1 rounded hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors"
-                            title="Retry"
+                            title="Retry — re-queue for processing"
                           >
                             {actionLoading === item.id ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -196,14 +223,16 @@ export default function UapScannerQueuePage() {
                               <RotateCcw className="w-4 h-4 text-green-500" />
                             )}
                           </button>
-                          <button
-                            onClick={() => skipItem(item.id)}
-                            disabled={actionLoading === item.id}
-                            className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-                            title="Skip"
-                          >
-                            <SkipForward className="w-4 h-4 text-slate-400" />
-                          </button>
+                          {item.status === "failed" && (
+                            <button
+                              onClick={() => skipItem(item.id)}
+                              disabled={actionLoading === item.id}
+                              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                              title="Skip"
+                            >
+                              <SkipForward className="w-4 h-4 text-slate-400" />
+                            </button>
+                          )}
                         </div>
                       )}
                     </td>

@@ -16,6 +16,7 @@
 | Sprint 5: Content & Polish | ✅ Complete | 2026-05-07 |
 | Sprint 6: Deep Analysis & Search | ✅ Complete | 2026-05-12 |
 | Sprint 7: Mass Analysis & Intelligence | 🚧 In Progress | — |
+| Sprint 8: Scanner Expansion | ⏳ Planned | — |
 
 ## Environment Setup
 
@@ -748,3 +749,71 @@ For every UAP file you create:
 - [x] Story 7.7.3: Programs sort & search — same pattern; sort by `linked_video_ids` length / `total_mentions` / `canonical_name`; search on name + aliases (0.5d) ✅ 2026-05-12
 - [x] Story 7.7.4: Events sort & search — sort by `source_count` / `witness_count` / `year` / `name`; search on name + location; high/low toggle (0.5d) ✅ 2026-05-12
 - [x] Story 7.7.5: Credibility Score Methodology page — `/uap/methodology/credibility` explaining the 6-factor rubric, scoring process, strengths & limitations; linked all Cred pills (index + detail) to open page in new tab (0.25d) ✅ 2026-05-12
+
+---
+
+## Sprint 8: Scanner Expansion — Playlists, Priority, & Discovery
+
+> Approved: 2026-05-13 | ~1.5 weeks
+> Focus: Three-tier source architecture (channels + playlists + keyword monitors), queue priority system, single-video submission
+
+> **Context:** Currently the scanner only ingests from full channel uploads. This prevents targeting specific playlists (e.g., History Channel's "Ancient Aliens" — 1,000 relevant videos from an 11,000-video channel) and channels with sparse relevant content (e.g., Mr. Ballen's ~10 alien encounter videos out of 763). See `uap_pipeline_report.md` for full analysis.
+
+---
+
+### Epic 8.1: Queue Priority System
+
+> Foundation: adds priority ordering + source tracking to `uap_scan_queue` so playlist-sourced videos process first.
+
+- [x] Story 8.1.1: Schema migration — Add `priority INTEGER DEFAULT 5 NOT NULL` (1=highest), `source_type TEXT DEFAULT 'channel'` ('channel' | 'playlist' | 'keyword_monitor' | 'manual'), `source_id TEXT` to `uap_scan_queue`; add index on `(status, priority, created_at)` (0.25d) ✅ 2026-05-13
+- [x] Story 8.1.2: Update `uap-tick.ts` `runUapProcessTick()` — Change queue ordering to `ORDER BY priority ASC, created_at ASC`; retain round-robin channel fairness within priority tiers (0.25d) ✅ 2026-05-13
+- [x] Story 8.1.3: Update `uap-discover.ts` and `uap-tick.ts` discover — Set `source_type = 'channel'` and `source_id = channel_id` on all channel-sourced queue inserts (0.25d) ✅ 2026-05-13
+- **Done when:** Queue processes priority=1 videos before priority=5; source tracking visible in admin queue inspector.
+
+---
+
+### Epic 8.2: Playlist Support (Core Feature)
+
+> Standalone `uap_playlists` table. Playlists are added independently — the parent channel does NOT need to be in the channel scanner. YouTube `playlistItems.list` API works identically for custom playlists.
+
+- [x] Story 8.2.1: Schema migration — Create `uap_playlists` table (playlist_id PK, playlist_title, channel_id, channel_name, track, priority, scanner_enabled, last_scanned_at, video_count, created_at) with RLS (public read, service_role write) (0.25d) ✅ 2026-05-13
+- [x] Story 8.2.2: Build `src/lib/scanner/uap-playlist-discover.ts` — `discoverNewPlaylistVideos()` using YouTube `playlistItems.list`; `runUapPlaylistDiscoverTick(supabase)` picks least-recently-scanned enabled playlist; queues with `source_type = 'playlist'`, `priority = playlist.priority`; deduplicates against `uap_vids` + `uap_scan_queue` (1d) ✅ 2026-05-13
+- [x] Story 8.2.3: Wire playlist discovery into cron — Call `runUapPlaylistDiscoverTick()` from hourly discover endpoint (or add as separate pg_cron job offset by 2 min) (0.25d) ✅ 2026-05-13
+- [x] Story 8.2.4: Extend admin scanner API (`/api/admin/uap-scanner`) — GET returns playlists with queue counts + "channel-in-scanner" flag; POST actions: `add_playlist` (resolve playlist URL/ID via YouTube API, get title + channel info), `toggle_playlist`, extend `discover_all` to include playlists, extend `run_audit` to include playlist audit (1d) ✅ 2026-05-13
+- [x] Story 8.2.5: Admin scanner UI — Add "Scanner-Enabled Playlists" table section below channels: Playlist Name, Channel Name, "Also in Scanner" badge (green if `channel_id` matches an enabled channel), Track, Priority, Pending count, Last Scanned, Toggle; Add "Add Playlist" form with URL input, track selector, priority dropdown (1d) ✅ 2026-05-13
+- **Done when:** Admin can add "Ancient Aliens" playlist without adding History Channel; playlist videos appear in queue with priority=1; "Also in Scanner" badge shows correctly for Eyes on Cinema playlists.
+
+---
+
+### Epic 8.3: Keyword-Monitored Channels (Phase 2 — Deferrable)
+
+> For channels with no relevant playlist but sparse encounter content (e.g., Mr. Ballen). Uses YouTube `search.list` API (100x more expensive per call than `playlistItems`). Build only after Epic 8.2 is validated. **UI shell built but scanning disabled by default.**
+
+- [x] Story 8.3.1: Schema migration — Create `uap_keyword_monitors` table (id UUID PK, channel_id, channel_name, search_terms TEXT[], scanner_enabled, last_scanned_at, priority, created_at) with RLS (0.25d) ✅ 2026-05-13
+- [ ] Story 8.3.2: Build `src/lib/scanner/uap-keyword-discover.ts` — Uses YouTube `search.list` with `channelId` + `q` (joined search terms) filter; queues matching videos with `source_type = 'keyword_monitor'`; weekly cadence to conserve API quota (1d) — **DEFERRED: activate when channel/playlist scans slow down**
+- [x] Story 8.3.3: Extend admin scanner API + UI — "Keyword-Monitored Channels" section: add channel + search terms input, matched video count, last scanned, toggle; `add_keyword_monitor` and `toggle_keyword_monitor` actions (1d) ✅ 2026-05-13
+- [ ] Story 8.3.4: Weekly cron job — pg_cron or GHA schedule for keyword re-scanning (weekly Sunday 6am ET) (0.25d) — **DEFERRED**
+- **Done when:** Admin can add Mr. Ballen with search terms ["alien encounter", "UFO", "abduction"]; weekly scan discovers matching videos without scanning all 763.
+
+---
+
+### Epic 8.4: Single Video Submission (Quick Win)
+
+> Enables adding individual videos from any channel without adding the channel or a playlist. Useful for one-off discoveries from community suggestions.
+
+- [x] Story 8.4.1: Add "Submit Single Video" form to scanner admin page — paste YouTube URL, resolves video metadata (title, channel), inserts into `uap_scan_queue` with `source_type = 'manual'`, `priority = 1`; API action `add_single_video` in `/api/admin/uap-scanner` (0.5d) ✅ 2026-05-13
+- **Done when:** Admin can paste a single YouTube URL and it appears in the queue with highest priority.
+
+---
+
+### Epic 8.5: Fix False `no_captions` — Differentiate Genuine vs Transient Failures ✅ 2026-05-13
+
+> Root cause: `fetchCaptions()` returned `null` for all failures — genuine "no captions" AND transient API errors (429/500/timeout). Pipeline couldn't distinguish them and permanently marked 46+ videos as `no_captions` when they actually had captions.
+
+- [x] Story 8.5.1: Update `subtitles.ts` — change `fetchCaptions()` from `CaptionResult | null` to `CaptionFetchResult` with `failureReason`, `retryable` flag, and `message`. Maps each Supadata HTTP status to the correct reason (0.5d) ✅ 2026-05-13
+- [x] Story 8.5.2: Update `intake-uap.ts` — add `caption_fetch_failed` to `UapIntakeStatus`, route retryable failures to `caption_fetch_failed` instead of `no_captions` (0.25d) ✅ 2026-05-13
+- [x] Story 8.5.3: Update `intake.ts` (NDE) — same pattern, add `caption_fetch_failed` to `IntakeStatus` (0.25d) ✅ 2026-05-13
+- [x] Story 8.5.4: Update `uap-tick.ts` — auto-retry with backoff: `caption_fetch_failed` items get re-queued to `pending` with `retry_count++` up to 3 attempts; after 3 they stay `failed` (0.5d) ✅ 2026-05-13
+- [x] Story 8.5.5: Schema migration — add `retry_count INTEGER DEFAULT 0` to `uap_scan_queue` (0.1d) ✅ 2026-05-13
+- [x] Story 8.5.6: Scanner queue UI — retry/skip buttons on skipped items, "Retry All Skipped" bulk action, `retry_all_skipped` API action (0.25d) ✅ 2026-05-13
+- **Done when:** Transient Supadata failures (429, 500, timeout) auto-retry up to 3x; genuine no-captions stays permanently skipped; admin queue shows retry controls on skipped items.

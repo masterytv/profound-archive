@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { discoverNewUapVideos, getExistingUapVideoIds } from '@/lib/scanner/uap-discover';
 import { runUapScannerTick } from '@/lib/scanner/uap-tick';
+import { runUapPlaylistDiscoverTick, resolvePlaylistMetadata, extractPlaylistId } from '@/lib/scanner/uap-playlist-discover';
 import { isAdminUser } from '@/lib/auth/admin-guard';
 import { resolveChannelId, fetchChannelMetadata } from '@/lib/youtube/scraper';
 
@@ -121,8 +122,44 @@ export async function GET(req: NextRequest) {
         }
     }
 
+    // Sprint 8: Fetch playlists with scanner info
+    const { data: playlists, error: playlistError } = await supabase
+        .from('uap_playlists')
+        .select('playlist_id, playlist_title, channel_id, channel_name, track, priority, scanner_enabled, last_scanned_at, video_count')
+        .order('playlist_title');
+
+    // Sprint 8: Fetch keyword monitors
+    const { data: keywordMonitors, error: kwError } = await supabase
+        .from('uap_keyword_monitors')
+        .select('id, channel_id, channel_name, search_terms, scanner_enabled, last_scanned_at, priority, videos_found')
+        .order('channel_name');
+
+    // Sprint 8: Build channel-in-scanner lookup for playlists
+    const enabledChannelIds = new Set(
+        (channels || []).filter((c: any) => c.scanner_enabled).map((c: any) => c.channel_id)
+    );
+
+    // Sprint 8: Add playlist queue counts
+    const playlistsWithCounts = await Promise.all(
+        (playlists || []).map(async (p: any) => {
+            const { count } = await supabase
+                .from('uap_scan_queue')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'pending')
+                .eq('source_type', 'playlist')
+                .eq('source_id', p.playlist_id);
+            return {
+                ...p,
+                pending_count: count ?? 0,
+                channel_in_scanner: p.channel_id ? enabledChannelIds.has(p.channel_id) : false,
+            };
+        })
+    );
+
     return NextResponse.json({
         channels,
+        playlists: playlistsWithCounts,
+        keywordMonitors: keywordMonitors || [],
         queueStats,
         recentRuns,
         aggregateStats: intakeTotals,
@@ -437,6 +474,401 @@ export async function POST(req: NextRequest) {
                 .upsert(queueItems, { onConflict: 'video_url', ignoreDuplicates: false });
 
             return NextResponse.json({ success: true, count: failedVids.length });
+        }
+
+        case 'retry_all_skipped': {
+            // Bulk re-queue all skipped scan queue items (mostly no_captions false negatives)
+            const { data: skippedItems, error: skipFetchErr } = await supabase
+                .from('uap_scan_queue')
+                .select('id, video_id, channel_id')
+                .eq('status', 'skipped');
+
+            if (skipFetchErr) return NextResponse.json({ error: skipFetchErr.message }, { status: 500 });
+            if (!skippedItems || skippedItems.length === 0) {
+                return NextResponse.json({ success: true, count: 0 });
+            }
+
+            // Reset queue rows to pending
+            const skippedIds = skippedItems.map((s: any) => s.id);
+            await supabase
+                .from('uap_scan_queue')
+                .update({
+                    status: 'pending',
+                    error: null,
+                    processed_at: null,
+                    intake_result: null,
+                })
+                .in('id', skippedIds);
+
+            // Also reset any uap_vids rows that were written with no_captions / drm_protected
+            const skippedVideoIds = skippedItems.map((s: any) => s.video_id).filter(Boolean);
+            if (skippedVideoIds.length > 0) {
+                await supabase
+                    .from('uap_vids')
+                    .update({ intake_status: null, intake_error: null })
+                    .in('video_id', skippedVideoIds)
+                    .in('intake_status', ['no_captions', 'drm_protected', 'is_short', 'out_of_scope']);
+            }
+
+            return NextResponse.json({ success: true, count: skippedItems.length });
+        }
+
+        // ─── Sprint 8: Playlist actions ─────────────────────────────────
+
+        case 'run_playlist_tick': {
+            try {
+                const result = await runUapPlaylistDiscoverTick(supabase);
+                return NextResponse.json({ success: true, ...result });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+        }
+
+        case 'audit_playlists': {
+            try {
+                const { data: pls } = await supabase
+                    .from('uap_playlists')
+                    .select('playlist_id, playlist_title, channel_id, channel_name, priority')
+                    .eq('scanner_enabled', true)
+                    .order('playlist_title');
+
+                if (!pls || pls.length === 0) {
+                    return NextResponse.json({ success: true, playlists: 0, totalNew: 0, results: [] });
+                }
+
+                const existingVideoIds = await getExistingUapVideoIds(supabase);
+                const { data: queuedVids } = await supabase.from('uap_scan_queue').select('video_id');
+                if (queuedVids) {
+                    for (const qv of queuedVids) { if (qv.video_id) existingVideoIds.add(qv.video_id); }
+                }
+
+                let totalNew = 0;
+                const results: any[] = [];
+
+                for (const pl of pls) {
+                    try {
+                        const discovery = await discoverNewUapVideos(
+                            pl.channel_id || 'unknown', pl.playlist_id, pl.playlist_title,
+                            existingVideoIds, 50, 50,
+                        );
+                        totalNew += discovery.newVideos.length;
+                        results.push({
+                            playlistId: pl.playlist_id,
+                            playlistTitle: pl.playlist_title,
+                            channelName: pl.channel_name,
+                            totalFetched: discovery.totalFetched,
+                            newToImport: discovery.newVideos.length,
+                            alreadyInDb: discovery.alreadyInDb,
+                        });
+                        // Add discovered IDs to prevent cross-playlist double-counting
+                        for (const v of discovery.newVideos) { existingVideoIds.add(v.videoId); }
+                    } catch (err: any) {
+                        results.push({ playlistId: pl.playlist_id, playlistTitle: pl.playlist_title, error: err.message });
+                    }
+                }
+
+                return NextResponse.json({ success: true, playlists: pls.length, totalNew, results });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+        }
+
+        case 'add_playlist': {
+            const { input: plInput, track: plTrack, priority: plPriority } = body;
+            if (!plInput || typeof plInput !== 'string') {
+                return NextResponse.json({ error: 'Missing or invalid playlist input' }, { status: 400 });
+            }
+
+            try {
+                const playlistId = extractPlaylistId(plInput);
+                if (!playlistId) {
+                    return NextResponse.json({ error: `Could not extract playlist ID from "${plInput}"` }, { status: 400 });
+                }
+
+                // Check if already exists
+                const { data: existingPl } = await supabase
+                    .from('uap_playlists')
+                    .select('playlist_id, playlist_title')
+                    .eq('playlist_id', playlistId)
+                    .single();
+
+                if (existingPl) {
+                    return NextResponse.json({
+                        error: `Playlist "${existingPl.playlist_title}" is already in the system.`,
+                        existing: true,
+                    }, { status: 409 });
+                }
+
+                // Resolve metadata from YouTube
+                const meta = await resolvePlaylistMetadata(playlistId);
+                if (!meta) {
+                    return NextResponse.json({ error: `Playlist ID ${playlistId} not found on YouTube.` }, { status: 404 });
+                }
+
+                const playlistRow = {
+                    playlist_id: meta.playlistId,
+                    playlist_title: meta.title,
+                    channel_id: meta.channelId,
+                    channel_name: meta.channelName,
+                    track: plTrack || 'mixed',
+                    priority: plPriority ?? 1,
+                    scanner_enabled: true,
+                    video_count: meta.videoCount,
+                };
+
+                const { error: insertErr } = await supabase
+                    .from('uap_playlists')
+                    .insert(playlistRow);
+
+                if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 });
+
+                return NextResponse.json({ success: true, playlist: playlistRow });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+        }
+
+        case 'toggle_playlist': {
+            const { playlistId: plId, enabled: plEnabled } = body;
+            const { error } = await supabase
+                .from('uap_playlists')
+                .update({ scanner_enabled: plEnabled })
+                .eq('playlist_id', plId);
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ success: true });
+        }
+
+        case 'remove_playlist': {
+            const { playlistId: rmPlId } = body;
+            if (!rmPlId) return NextResponse.json({ error: 'Missing playlistId' }, { status: 400 });
+
+            const { error } = await supabase
+                .from('uap_playlists')
+                .delete()
+                .eq('playlist_id', rmPlId);
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ success: true });
+        }
+
+        case 'discover_all_playlists': {
+            try {
+                const { data: pls } = await supabase
+                    .from('uap_playlists')
+                    .select('playlist_id, playlist_title, channel_id, channel_name, priority')
+                    .eq('scanner_enabled', true)
+                    .order('playlist_title');
+
+                if (!pls || pls.length === 0) {
+                    return NextResponse.json({ success: true, totalQueued: 0, playlists: 0 });
+                }
+
+                const existingVideoIds = await getExistingUapVideoIds(supabase);
+
+                // Also exclude already-queued videos
+                const { data: queuedVids } = await supabase
+                    .from('uap_scan_queue')
+                    .select('video_id');
+                if (queuedVids) {
+                    for (const qv of queuedVids) {
+                        if (qv.video_id) existingVideoIds.add(qv.video_id);
+                    }
+                }
+
+                let totalQueued = 0;
+                const results: any[] = [];
+
+                for (const pl of pls) {
+                    try {
+                        const discovery = await discoverNewUapVideos(
+                            pl.channel_id || 'unknown',
+                            pl.playlist_id,
+                            pl.playlist_title,
+                            existingVideoIds,
+                            50, 50,
+                        );
+
+                        if (discovery.newVideos.length > 0) {
+                            const plQueueItems = discovery.newVideos.map(v => ({
+                                video_id: v.videoId,
+                                video_url: `https://www.youtube.com/watch?v=${v.videoId}`,
+                                channel_id: pl.channel_id || null,
+                                title: v.title || null,
+                                duration_seconds: v.duration_seconds ?? null,
+                                status: 'pending',
+                                source_type: 'playlist',
+                                source_id: pl.playlist_id,
+                                priority: pl.priority ?? 1,
+                            }));
+                            await supabase
+                                .from('uap_scan_queue')
+                                .upsert(plQueueItems, { onConflict: 'video_url', ignoreDuplicates: true });
+                            totalQueued += discovery.newVideos.length;
+
+                            // Add to existing set to prevent cross-playlist duplication
+                            for (const v of discovery.newVideos) {
+                                existingVideoIds.add(v.videoId);
+                            }
+                        }
+
+                        await supabase
+                            .from('uap_playlists')
+                            .update({
+                                last_scanned_at: new Date().toISOString(),
+                                video_count: discovery.totalFetched,
+                            })
+                            .eq('playlist_id', pl.playlist_id);
+
+                        results.push({
+                            playlistId: pl.playlist_id,
+                            playlistTitle: pl.playlist_title,
+                            queued: discovery.newVideos.length,
+                        });
+                    } catch (err: any) {
+                        results.push({
+                            playlistId: pl.playlist_id,
+                            playlistTitle: pl.playlist_title,
+                            queued: 0,
+                            error: err.message,
+                        });
+                    }
+                }
+
+                return NextResponse.json({ success: true, totalQueued, playlists: pls.length, results });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+        }
+
+        // ─── Sprint 8: Keyword monitor actions ──────────────────────────
+
+        case 'add_keyword_monitor': {
+            const { channelInput, searchTerms, priority: kwPriority } = body;
+            if (!channelInput || !searchTerms || !Array.isArray(searchTerms) || searchTerms.length === 0) {
+                return NextResponse.json({ error: 'Missing channelInput or searchTerms array' }, { status: 400 });
+            }
+
+            try {
+                const kwChannelId = await resolveChannelId(channelInput);
+                if (!kwChannelId) {
+                    return NextResponse.json({ error: `Could not resolve "${channelInput}" to a channel.` }, { status: 404 });
+                }
+
+                const kwMetadata = await fetchChannelMetadata(kwChannelId);
+                const { error: kwInsertErr } = await supabase
+                    .from('uap_keyword_monitors')
+                    .insert({
+                        channel_id: kwChannelId,
+                        channel_name: kwMetadata?.name || channelInput,
+                        search_terms: searchTerms,
+                        priority: kwPriority ?? 2,
+                        scanner_enabled: false, // Disabled by default — expensive API
+                    });
+
+                if (kwInsertErr) return NextResponse.json({ error: kwInsertErr.message }, { status: 500 });
+                return NextResponse.json({
+                    success: true,
+                    channel_name: kwMetadata?.name || channelInput,
+                    note: 'Keyword monitor created but disabled by default. Enable only when channel/playlist scans are no longer adding new videos daily.',
+                });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+        }
+
+        case 'toggle_keyword_monitor': {
+            const { monitorId, enabled: kwEnabled } = body;
+            const { error } = await supabase
+                .from('uap_keyword_monitors')
+                .update({ scanner_enabled: kwEnabled })
+                .eq('id', monitorId);
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ success: true });
+        }
+
+        case 'remove_keyword_monitor': {
+            const { monitorId: rmKwId } = body;
+            if (!rmKwId) return NextResponse.json({ error: 'Missing monitorId' }, { status: 400 });
+
+            const { error } = await supabase
+                .from('uap_keyword_monitors')
+                .delete()
+                .eq('id', rmKwId);
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ success: true });
+        }
+
+        // ─── Sprint 8: Single video submission ──────────────────────────
+
+        case 'add_single_video': {
+            const { videoUrl } = body;
+            if (!videoUrl || typeof videoUrl !== 'string') {
+                return NextResponse.json({ error: 'Missing or invalid videoUrl' }, { status: 400 });
+            }
+
+            try {
+                // Extract video ID from URL
+                let videoId = '';
+                try {
+                    const urlObj = new URL(videoUrl);
+                    videoId = urlObj.searchParams.get('v')
+                        || urlObj.pathname.split('/').pop()
+                        || '';
+                } catch {
+                    // Try treating as raw video ID
+                    videoId = videoUrl.trim();
+                }
+
+                if (!videoId || videoId.length < 5) {
+                    return NextResponse.json({ error: 'Could not extract video ID from URL' }, { status: 400 });
+                }
+
+                // Check if already in queue or DB
+                const { data: existingQueue } = await supabase
+                    .from('uap_scan_queue')
+                    .select('id, status')
+                    .eq('video_id', videoId)
+                    .single();
+
+                if (existingQueue) {
+                    return NextResponse.json({
+                        error: `Video ${videoId} is already in the queue (status: ${existingQueue.status})`,
+                        existing: true,
+                    }, { status: 409 });
+                }
+
+                const { data: existingVid } = await supabase
+                    .from('uap_vids')
+                    .select('video_id, title')
+                    .eq('video_id', videoId)
+                    .single();
+
+                if (existingVid) {
+                    return NextResponse.json({
+                        error: `Video "${existingVid.title || videoId}" is already in the database`,
+                        existing: true,
+                    }, { status: 409 });
+                }
+
+                // Insert into queue with highest priority
+                const { error: svQueueErr } = await supabase
+                    .from('uap_scan_queue')
+                    .insert({
+                        video_url: `https://www.youtube.com/watch?v=${videoId}`,
+                        video_id: videoId,
+                        status: 'pending',
+                        source_type: 'manual',
+                        priority: 1,
+                    });
+
+                if (svQueueErr) return NextResponse.json({ error: svQueueErr.message }, { status: 500 });
+                return NextResponse.json({ success: true, videoId });
+            } catch (err: any) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
         }
 
         default:

@@ -26,6 +26,7 @@
  */
 
 import { discoverNewUapVideos, getExistingUapVideoIds } from './uap-discover';
+import { runUapPlaylistDiscoverTick, PlaylistDiscoverResult } from './uap-playlist-discover';
 import { processUapVideoIntake } from '../pipeline/intake-uap';
 
 // ---------------------------------------------------------------------------
@@ -54,6 +55,7 @@ export interface UapProcessResult {
 
 export interface UapTickResult {
     channel: { id: string; name: string } | null;
+    playlist: PlaylistDiscoverResult | null;
     discovered: number;
     queued: number;
     processed: UapProcessedVideo[];
@@ -122,6 +124,10 @@ export async function runUapDiscoverTick(supabase: any): Promise<UapDiscoverResu
                     title: v.title || null,
                     duration_seconds: v.duration_seconds ?? null,
                     status: 'pending',
+                    // Sprint 8: source tracking for channel-discovered videos
+                    source_type: 'channel',
+                    source_id: channel.channel_id,
+                    priority: 5,
                 }));
 
                 // Insert individually, ignoring duplicates
@@ -219,9 +225,11 @@ export async function runUapProcessTick(
 
         const { data: items, error: queueError } = await supabase
             .from('uap_scan_queue')
-            .select('id, video_url, video_id, channel_id')
+            .select('id, video_url, video_id, channel_id, retry_count')
             .eq('status', 'pending')
             .eq('channel_id', pickedChannelId)
+            // Sprint 8: priority-aware ordering — lower priority number = processed first
+            .order('priority', { ascending: true })
             .order('created_at', { ascending: true })
             .limit(1);
 
@@ -256,6 +264,7 @@ export async function runUapProcessTick(
                 || result.status === 'out_of_scope'
                 || result.status === 'is_short'
                 || result.status === 'drm_protected';
+            // Note: caption_fetch_failed is NOT in isSkipped — it's a retryable failure
 
             finalStatus = (result.status === 'complete' || result.status === 'already_exists')
                 ? 'complete'
@@ -276,6 +285,17 @@ export async function runUapProcessTick(
                 meaningfulCount++;
             }
 
+            // Auto-retry for transient caption fetch failures (rate limit, timeout, etc.)
+            if (result.status === 'caption_fetch_failed') {
+                const currentRetries = item.retry_count || 0;
+                const maxRetries = 3;
+                if (currentRetries < maxRetries) {
+                    console.log(`[UAP Scanner/Process] Auto-retrying ${item.video_id} — caption fetch failed (attempt ${currentRetries + 1}/${maxRetries})`);
+                    finalStatus = 'pending';  // Re-queue for another attempt
+                    // Note: retry_count is incremented in the queue update below
+                }
+            }
+
         } catch (err: any) {
             const errorMsg = err.message || String(err);
             console.error(`[UAP Scanner/Process] Video ${item.video_id} threw error:`, errorMsg);
@@ -285,14 +305,23 @@ export async function runUapProcessTick(
             meaningfulCount++;
         }
 
+        // Build the queue update payload
+        const queueUpdate: Record<string, any> = {
+            status: finalStatus,
+            processed_at: new Date().toISOString(),
+            intake_result: intakeStatus,
+            error: resultError,
+        };
+
+        // Track retry count for auto-retry items reset to pending
+        if (finalStatus === 'pending') {
+            queueUpdate.retry_count = (item.retry_count || 0) + 1;
+            queueUpdate.processed_at = null;  // Clear so it looks like a fresh queue item
+        }
+
         await supabase
             .from('uap_scan_queue')
-            .update({
-                status: finalStatus,
-                processed_at: new Date().toISOString(),
-                intake_result: intakeStatus,
-                error: resultError,
-            })
+            .update(queueUpdate)
             .eq('id', item.id);
 
         processed.push({
@@ -335,7 +364,7 @@ export async function runUapProcessTick(
 // ---------------------------------------------------------------------------
 
 /**
- * Execute a single combined UAP scanner tick: discover then process.
+ * Execute a single combined UAP scanner tick: discover (channels + playlists) then process.
  */
 export async function runUapScannerTick(
     supabase: any,
@@ -344,12 +373,22 @@ export async function runUapScannerTick(
     const startTime = Date.now();
 
     const discoverResult = await runUapDiscoverTick(supabase);
+
+    // Sprint 8: Also discover from playlists
+    let playlistResult: PlaylistDiscoverResult | null = null;
+    try {
+        playlistResult = await runUapPlaylistDiscoverTick(supabase);
+    } catch (err: any) {
+        console.error('[UAP Scanner/Tick] Playlist discover error:', err.message);
+    }
+
     const processResult = await runUapProcessTick(supabase, videosPerTick);
 
     return {
         channel: discoverResult.channel,
-        discovered: discoverResult.discovered,
-        queued: discoverResult.queued,
+        playlist: playlistResult,
+        discovered: discoverResult.discovered + (playlistResult?.discovered ?? 0),
+        queued: discoverResult.queued + (playlistResult?.queued ?? 0),
         processed: processResult.processed,
         totalDurationMs: Date.now() - startTime,
     };
