@@ -34,6 +34,20 @@
 |---|---|---|
 | `CRON_SECRET` | Bearer token for authenticating internal cron/scheduler calls | Server-only |
 
+### Supabase Vault Secrets (pg_cron scheduler)
+The UAP Video Processor runs via `pg_cron` inside Supabase (replaces unreliable GitHub Actions cron — see migration `20260513_001_pg_cron_uap_processor.sql`).
+
+| Vault Secret Name | Description | Managed Via |
+|---|---|---|
+| `uap_processor_url` | Firebase App Hosting direct URL (same as GHA `APP_DIRECT_URL`) | Supabase Dashboard > SQL Editor |
+| `uap_processor_cron_secret` | `CRON_SECRET` value for API auth | Supabase Dashboard > SQL Editor |
+
+**To update:** `SELECT vault.update_secret('uap_processor_url', 'https://new-url');`
+**To view cron jobs:** `SELECT * FROM cron.job;`
+**To pause:** `SELECT cron.unschedule('uap-video-processor');`
+**Full docs:** See migration file `supabase/migrations/20260513_001_pg_cron_uap_processor.sql`
+
+
 ### n8n Webhooks (Legacy — being phased out)
 | Variable | Description |
 |---|---|

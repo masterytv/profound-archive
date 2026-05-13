@@ -37,8 +37,9 @@ jobs:
 
       - name: Run UAP triad batch
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Script reads SUPABASE_SERVICE_KEY (not _ROLE_KEY)
+          NEXT_PUBLIC_SUPABASE_URL: https://vnycavclrndjwmpaugju.supabase.co
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           npx tsx scripts/uap-batch-triad.ts \
