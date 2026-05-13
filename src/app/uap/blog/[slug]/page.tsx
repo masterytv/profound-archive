@@ -52,7 +52,7 @@ async function getPost(slug: string): Promise<BlogPost | null> {
         .from("blog_posts")
         .select("*")
         .eq("slug", slug)
-        .eq("domain", "nde")
+        .eq("domain", "uap")
         .single();
 
     if (!data) return null;
@@ -82,7 +82,7 @@ export async function generateStaticParams() {
         .from("blog_posts")
         .select("slug")
         .eq("status", "published")
-        .eq("domain", "nde");
+        .eq("domain", "uap");
     return (data ?? []).map((p) => ({ slug: p.slug }));
 }
 
@@ -95,7 +95,7 @@ export async function generateMetadata({
     const post = await getPost(slug);
     if (!post) return { title: "Article Not Found | Project Profound" };
 
-    const title = post.seo_title ?? `${post.title} | Project Profound`;
+    const title = post.seo_title ?? `${post.title} | UAP Research — Project Profound`;
     const description = post.seo_description ?? post.lead_paragraph ?? "";
     const ogImageUrl = `https://projectprofound.org/api/og/${post.slug}`;
 
@@ -118,16 +118,15 @@ export async function generateMetadata({
             description,
             images: [ogImageUrl],
         },
-        // Structured data is injected below via JSON-LD script tag
     };
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-    "guide":         "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
-    "big-question":  "bg-violet-50 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
+    "guide":         "bg-teal-50 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300",
+    "big-question":  "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
     "story":         "bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
     "experiencer":   "bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
-    "researcher":    "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
+    "researcher":    "bg-cyan-50 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300",
 };
 
 const REF_TYPE_LABEL: Record<string, string> = {
@@ -137,7 +136,7 @@ const REF_TYPE_LABEL: Record<string, string> = {
     site: "Web",
 };
 
-export default async function BlogPostPage({
+export default async function UapBlogPostPage({
     params,
 }: {
     params: Promise<{ slug: string }>;
@@ -167,7 +166,7 @@ export default async function BlogPostPage({
         year: "numeric", month: "long", day: "numeric",
     });
 
-    // Article JSON-LD for SEO + LLM citation
+    // Article JSON-LD for SEO + LLM citation — UAP-specific URLs
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -185,8 +184,8 @@ export default async function BlogPostPage({
         },
         "datePublished": post.published_at,
         "dateModified": post.updated_at,
-        "url": `https://projectprofound.org/blog/${post.slug}`,
-        "mainEntityOfPage": `https://projectprofound.org/blog/${post.slug}`,
+        "url": `https://projectprofound.org/uap/blog/${post.slug}`,
+        "mainEntityOfPage": `https://projectprofound.org/uap/blog/${post.slug}`,
     };
 
     return (
@@ -225,7 +224,7 @@ export default async function BlogPostPage({
                         <span className="w-2 h-2 rounded-full bg-amber-700 animate-pulse" />
                         DRAFT PREVIEW — Not published
                     </span>
-                    <a href="/admin/blog" className="underline hover:no-underline text-amber-900 ml-2">Publish in admin →</a>
+                    <a href="/admin/uap/blog" className="underline hover:no-underline text-amber-900 ml-2">Publish in admin →</a>
                 </div>
             )}
 
@@ -234,11 +233,11 @@ export default async function BlogPostPage({
                 <div className="border-b border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
                     <div className="container mx-auto px-4 max-w-4xl py-4 flex items-center gap-4">
                         <Link
-                            href="/blog"
-                            className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            href="/uap/blog"
+                            className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                         >
                             <ArrowLeft className="w-3.5 h-3.5" />
-                            Blog
+                            UAP Blog
                         </Link>
                         <span className="text-slate-300 dark:text-slate-600">/</span>
                         <span
@@ -249,7 +248,7 @@ export default async function BlogPostPage({
                         {isAdmin && (
                             <Link
                                 href={`/admin/blog/${post.id}/edit`}
-                                className="ml-auto flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/30 border border-blue-200/60 dark:border-blue-500/30 transition-colors"
+                                className="ml-auto flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-500/30 border border-green-200/60 dark:border-green-500/30 transition-colors"
                             >
                                 <Pencil className="w-3 h-3" />
                                 Edit
@@ -294,16 +293,16 @@ export default async function BlogPostPage({
 
                         {/* Lead paragraph — QEO: first paragraph answers the core question */}
                         {post.lead_paragraph && (
-                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed font-medium border-l-4 border-blue-500/40 pl-5 bg-blue-50/30 dark:bg-blue-500/10 py-3 rounded-r-lg">
+                            <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed font-medium border-l-4 border-green-500/40 pl-5 bg-green-50/30 dark:bg-green-500/10 py-3 rounded-r-lg">
                                 {post.lead_paragraph}
                             </p>
                         )}
 
-                        {/* Cross-link: link to shorter question summary */}
+                        {/* Cross-link: link to UAP question summary page */}
                         {post.source_question_slug && (
                             <Link
-                                href={`/questions/${post.source_question_slug}`}
-                                className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mt-2"
+                                href={`/uap/questions/${post.source_question_slug}`}
+                                className="inline-flex items-center gap-2 text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors mt-2"
                             >
                                 <BookOpen className="w-3.5 h-3.5" />
                                 See a short answer and related videos →
@@ -340,8 +339,8 @@ export default async function BlogPostPage({
                                     prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
                                     prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
                                     prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300
-                                    prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-                                    prose-blockquote:border-blue-500/40 prose-blockquote:bg-blue-50/30 dark:prose-blockquote:bg-blue-500/10
+                                    prose-a:text-green-600 dark:prose-a:text-green-400 prose-a:no-underline hover:prose-a:underline
+                                    prose-blockquote:border-green-500/40 prose-blockquote:bg-green-50/30 dark:prose-blockquote:bg-green-500/10
                                     prose-strong:text-slate-900 dark:prose-strong:text-slate-100"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                                 dangerouslySetInnerHTML={{ __html: markdownToHtml(cleaned) }}
@@ -386,7 +385,7 @@ export default async function BlogPostPage({
                                                     href={ref.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-blue-600 dark:text-blue-400 hover:underline break-words inline-flex items-center gap-1"
+                                                    className="text-green-600 dark:text-green-400 hover:underline break-words inline-flex items-center gap-1"
                                                 >
                                                     {ref.title}
                                                     <ExternalLink className="w-3 h-3 shrink-0" />
@@ -418,7 +417,7 @@ export default async function BlogPostPage({
                         </section>
                     )}
 
-                    {/* Related questions */}
+                    {/* Related questions — link to UAP questions */}
                     {post.related_question_slugs && post.related_question_slugs.length > 0 && (
                         <section className="mt-10">
                             <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">
@@ -428,8 +427,8 @@ export default async function BlogPostPage({
                                 {post.related_question_slugs.map((slug) => (
                                     <Link
                                         key={slug}
-                                        href={`/questions/${slug}`}
-                                        className="text-sm px-3 py-1.5 rounded-lg bg-violet-50 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-500/30 transition-colors"
+                                        href={`/uap/questions/${slug}`}
+                                        className="text-sm px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-500/20 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-500/30 transition-colors"
                                     >
                                         {slug.replace(/-/g, " ")}
                                     </Link>
@@ -441,7 +440,7 @@ export default async function BlogPostPage({
                     {/* Micro feedback */}
                     <div className="mt-10">
                         <MicroFeedback
-                            feature="blog_article"
+                            feature="uap_blog_article"
                             contextId={slug}
                             prompt="Was this article helpful?"
                         />
@@ -450,11 +449,11 @@ export default async function BlogPostPage({
                     {/* Back link */}
                     <div className="mt-12 pt-6 border-t border-slate-100 dark:border-white/10">
                         <Link
-                            href="/blog"
-                            className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            href="/uap/blog"
+                            className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            Back to all articles
+                            Back to UAP articles
                         </Link>
                     </div>
                 </article>

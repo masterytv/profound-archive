@@ -6,12 +6,12 @@ import { BookOpen, Clock, ArrowRight, Tag } from "lucide-react";
 export const revalidate = 3600; // Regenerate hourly
 
 export const metadata: Metadata = {
-    title: "Blog — NDE Research & Insights | Project Profound",
+    title: "Blog — UAP Research & Insights | Project Profound",
     description:
-        "In-depth articles on near-death experiences: the research, the stories, and what they mean. Written by the Project Profound team.",
+        "In-depth articles on UAP encounters, UFO research, and the contact phenomenon. Data-driven analysis from the Project Profound archive.",
     openGraph: {
-        title: "Blog — Project Profound",
-        description: "Research-backed articles on near-death experiences, consciousness, and what happens when we die.",
+        title: "UAP Blog — Project Profound",
+        description: "Research-backed articles on UAP encounters, contact experiences, and the disclosure movement.",
         type: "website",
     },
 };
@@ -25,11 +25,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-    "guide":         "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
-    "big-question":  "bg-violet-50 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
+    "guide":         "bg-teal-50 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300",
+    "big-question":  "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
     "story":         "bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
     "experiencer":   "bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300",
-    "researcher":    "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
+    "researcher":    "bg-cyan-50 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300",
 };
 
 type BlogPost = {
@@ -54,8 +54,8 @@ function PostCard({ post }: { post: BlogPost }) {
 
     return (
         <Link
-            href={`/blog/${post.slug}`}
-            className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-6 hover:shadow-lg hover:border-blue-300/60 dark:hover:border-blue-500/30 transition-all duration-300"
+            href={`/uap/blog/${post.slug}`}
+            className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/10 p-6 hover:shadow-lg hover:border-green-300/60 dark:hover:border-green-500/30 transition-all duration-300"
         >
             {/* Category badge */}
             <div className="flex items-center gap-2 mb-3">
@@ -66,7 +66,7 @@ function PostCard({ post }: { post: BlogPost }) {
 
             {/* Title */}
             <h2
-                className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2 leading-snug group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors"
                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
                 {post.title}
@@ -95,7 +95,7 @@ function PostCard({ post }: { post: BlogPost }) {
                         </>
                     )}
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-green-500 group-hover:translate-x-0.5 transition-all" />
             </div>
         </Link>
     );
@@ -103,13 +103,13 @@ function PostCard({ post }: { post: BlogPost }) {
 
 const CATEGORIES = [
     { value: "all",          label: "All" },
-    { value: "guide",         label: "Guides" },
     { value: "big-question", label: "Big Questions" },
+    { value: "guide",        label: "Guides" },
     { value: "story",        label: "Stories" },
-    { value: "experiencer",  label: "Experiencers", href: "/experiencer" },
+    { value: "experiencer",  label: "Experiencers" },
 ];
 
-export default async function BlogIndexPage({
+export default async function UapBlogIndexPage({
     searchParams,
 }: {
     searchParams: Promise<{ category?: string }>;
@@ -121,7 +121,7 @@ export default async function BlogIndexPage({
         .from("blog_posts")
         .select("id, slug, title, subtitle, category, author_name, lead_paragraph, read_time_mins, tags, published_at")
         .eq("status", "published")
-        .eq("domain", "nde")
+        .eq("domain", "uap")
         .order("published_at", { ascending: false })
         .limit(50);
 
@@ -138,29 +138,29 @@ export default async function BlogIndexPage({
                 <div
                     className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
                     style={{
-                        backgroundImage: "radial-gradient(circle, #2563EB 1px, transparent 1px)",
+                        backgroundImage: "radial-gradient(circle, #10B981 1px, transparent 1px)",
                         backgroundSize: "32px 32px",
                     }}
                 />
                 <div className="relative container mx-auto px-4 max-w-4xl text-center">
-                    <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 bg-blue-50 dark:bg-blue-500/20 rounded-full">
-                        <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                        <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 tracking-wide uppercase">
-                            Project Profound Blog
+                    <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 bg-green-50 dark:bg-green-500/20 rounded-full">
+                        <BookOpen className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                        <span className="text-xs font-semibold text-green-700 dark:text-green-300 tracking-wide uppercase">
+                            UAP Research Blog
                         </span>
                     </div>
                     <h1
                         className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-4 leading-[1.1]"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
-                        What Near-Death Experiences{" "}
-                        <span className="text-blue-600 dark:text-blue-400" style={{ fontStyle: "italic" }}>
+                        What UAP Encounters{" "}
+                        <span className="text-green-600 dark:text-green-400" style={{ fontStyle: "italic" }}>
                             Tell Us
                         </span>
                     </h1>
                     <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-                        Research-backed articles on NDEs, consciousness, and what 5,000 first-person
-                        accounts reveal about the nature of existence.
+                        Data-driven articles on UFO encounters, contact experiences, and disclosure — drawn from
+                        thousands of analyzed testimonies.
                     </p>
                 </div>
             </section>
@@ -179,14 +179,14 @@ export default async function BlogIndexPage({
                                 return (
                                     <Link
                                         key={cat.value}
-                                        href={'href' in cat && cat.href ? cat.href : cat.value === "all" ? "/blog" : `/blog?category=${cat.value}`}
+                                        href={cat.value === "all" ? "/uap/blog" : `/uap/blog?category=${cat.value}`}
                                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                                             isActive
-                                                ? "bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300"
+                                                ? "bg-green-50 dark:bg-green-500/20 text-green-700 dark:text-green-300"
                                                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                                         }`}
                                     >
-                                        <Tag className={`w-3.5 h-3.5 ${isActive ? "text-blue-500" : "text-slate-300"}`} />
+                                        <Tag className={`w-3.5 h-3.5 ${isActive ? "text-green-500" : "text-slate-300"}`} />
                                         {cat.label}
                                     </Link>
                                 );
@@ -212,7 +212,7 @@ export default async function BlogIndexPage({
                                     Articles coming soon
                                 </h2>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
-                                    We are building a comprehensive library of research-backed NDE articles.
+                                    We are building a comprehensive library of research-backed UAP articles.
                                     Check back soon.
                                 </p>
                             </div>

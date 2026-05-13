@@ -177,7 +177,7 @@ export default async function AdminUapBlogPage({
                                             <p className="font-medium text-slate-900 line-clamp-1 group-hover:text-green-600 transition-colors" title={post.title}>
                                                 {post.title}
                                             </p>
-                                            <p className="text-xs text-slate-400 font-mono mt-0.5">/blog/{post.slug}</p>
+                                            <p className="text-xs text-slate-400 font-mono mt-0.5">/uap/blog/{post.slug}</p>
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className={`inline-flex text-xs font-semibold px-2 py-0.5 rounded-full border ${catColor}`}>
@@ -210,7 +210,7 @@ export default async function AdminUapBlogPage({
                                             <div className="flex items-center gap-2 justify-end">
                                                 {post.status === "published" && (
                                                     <a
-                                                        href={`/blog/${post.slug}`}
+                                                        href={`/uap/blog/${post.slug}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-700 font-medium whitespace-nowrap"

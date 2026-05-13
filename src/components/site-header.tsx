@@ -342,6 +342,19 @@ export default function SiteHeader() {
                           <div className="text-xs text-slate-400">NDE ↔ UAP phenomenology</div>
                         </div>
                       </Link>
+                      <Link
+                        href="/uap/blog"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        onClick={() => setExploreOpen(false)}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center">
+                          <BookOpen className="w-4 h-4 text-amber-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Blog</div>
+                          <div className="text-xs text-slate-400">UAP research articles & insights</div>
+                        </div>
+                      </Link>
                     </>
                   ) : (
                     <>
@@ -811,6 +824,14 @@ export default function SiteHeader() {
                             >
                               <Sparkles className="w-4 h-4 text-violet-600" />
                               Cross-Domain
+                            </Link>
+                            <Link
+                              href="/uap/blog"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <BookOpen className="w-4 h-4 text-amber-600" />
+                              Blog
                             </Link>
                           </>
                         ) : (

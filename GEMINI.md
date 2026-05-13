@@ -51,8 +51,8 @@ Do not guess how this app works. Read these files when touching related systems:
    - If the next task to work on is ambiguous, read the Sprint Status table first, then scan for the first unchecked `- [ ]` in the current sprint.
 
 ## 6. Current Development Focus
-- **Active Task:** UAP Vertical — Sprint 2 (Pipeline). See `directives/SPRINT.md` Sprint Status table.
-- **Previous:** n8n batch workflow migration (complete). UAP Sprint 1: Foundation (complete 2026-05-06).
+- **Active Task:** See `directives/SPRINT.md` Sprint Status table for next unchecked items.
+- **Previous:** Sprint 9: Engagement & CRM (complete 2026-05-13). Sprint 8: Scanner Expansion (complete 2026-05-13). Sprints 1-7 complete.
 - *(For a history of completed features, see `docs/LEARNINGS_ARCHIVE.md`)*
 
 ## 7. Skills Archive

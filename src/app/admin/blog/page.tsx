@@ -64,7 +64,8 @@ export default async function AdminBlogPage({
     // Get total count
     const { count: totalCount } = await adminClient
         .from("blog_posts")
-        .select("id", { count: "exact", head: true });
+        .select("id", { count: "exact", head: true })
+        .eq("domain", "nde");
 
     const totalPages = Math.ceil((totalCount ?? 0) / PAGE_SIZE);
     const rangeStart = (currentPage - 1) * PAGE_SIZE;
@@ -74,11 +75,13 @@ export default async function AdminBlogPage({
     const { data: allPosts } = await adminClient
         .from("blog_posts")
         .select("status, word_count")
+        .eq("domain", "nde")
         .limit(500);
 
     const { data: posts, error } = await adminClient
         .from("blog_posts")
         .select("id, slug, title, category, author_name, status, word_count, published_at, updated_at")
+        .eq("domain", "nde")
         .order("updated_at", { ascending: false })
         .range(rangeStart, rangeEnd);
 
@@ -114,7 +117,7 @@ export default async function AdminBlogPage({
                         Blog Management
                     </h1>
                     <p className="text-xs text-slate-500">
-                        {published} published · {drafts} drafts
+                        {published} published · {drafts} drafts · domain: nde
                     </p>
                 </div>
 

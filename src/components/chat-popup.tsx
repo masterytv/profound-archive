@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { usePathname } from "next/navigation"
 import { Send, X, Loader2, MessageCircle, Bot, ThumbsUp, ThumbsDown } from "lucide-react"
 
@@ -9,8 +9,10 @@ type Message = {
     content: string
 }
 
-// Rotating question pool — same as /chat-compassionate
-const ALL_QUESTIONS = [
+// ── Domain Configuration ─────────────────────────────────────────────────────
+
+// NDE question pool
+const NDE_QUESTIONS = [
     "What are common themes in NDEs?",
     "How do cultural backgrounds affect NDE reports?",
     "What percentage of people report seeing deceased relatives?",
@@ -63,6 +65,71 @@ const ALL_QUESTIONS = [
     "What is the verifiable perception in NDEs?",
 ]
 
+// UAP question pool
+const UAP_QUESTIONS = [
+    "What types of entities do contactees describe?",
+    "Are there common physical effects during encounters?",
+    "What do experiencers say about telepathic communication?",
+    "Do people report time distortion during encounters?",
+    "What is the Mantis being phenomenon?",
+    "How do military witnesses describe UAP encounters?",
+    "What happens during a Close Encounter of the Fifth Kind?",
+    "Do experiencers report consciousness changes?",
+    "What physical evidence is most commonly reported?",
+    "Are there patterns in where encounters happen?",
+    "What do people describe about craft interiors?",
+    "How do encounters affect people long-term?",
+    "What is the connection between UAP and consciousness?",
+    "Do children have different encounter experiences?",
+    "What are the Five Observables?",
+    "How do experiencers describe the 'download' experience?",
+    "What do witnesses say about craft movement?",
+    "Are there recurring symbols in contact experiences?",
+    "What happens during missing time events?",
+    "Do experiencers report healing during encounters?",
+]
+
+// Domain-specific config
+const DOMAIN_CONFIG = {
+    nde: {
+        label: "Chat with NDEs",
+        subtitle: "NDE Companion",
+        headerTitle: "Profound Guide",
+        welcome: "Welcome! I'm here to explore near-death experiences with you. Ask me anything about the 5,000+ accounts in our database.",
+        accentBg: "bg-[#2563EB]",
+        accentHover: "hover:bg-[#1d4ed8]",
+        accentShadow: "shadow-blue-600/25",
+        accentRing: "focus:ring-blue-100",
+        accentBorder: "focus:border-blue-400",
+        botBg: "bg-blue-100",
+        botIcon: "text-blue-600",
+        chipHover: "hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700",
+        apiEndpoint: "/api/chat-compassionate",
+        questions: NDE_QUESTIONS,
+        // Pages where this domain's popup is hidden
+        hiddenPaths: ["/chat-compassionate"],
+    },
+    uap: {
+        label: "Chat with UFOs",
+        subtitle: "UAP Research AI",
+        headerTitle: "UAP Guide",
+        welcome: "Welcome! I'm an AI research assistant specializing in UFO, UAP, and alien contact experiences. My answers are grounded exclusively in the analyzed video testimonies in our archive. Ask me anything!",
+        accentBg: "bg-emerald-600",
+        accentHover: "hover:bg-emerald-700",
+        accentShadow: "shadow-emerald-600/25",
+        accentRing: "focus:ring-emerald-100",
+        accentBorder: "focus:border-emerald-400",
+        botBg: "bg-emerald-100 dark:bg-emerald-900/40",
+        botIcon: "text-emerald-600 dark:text-emerald-400",
+        chipHover: "hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700",
+        apiEndpoint: "/api/uap/chat",
+        questions: UAP_QUESTIONS,
+        hiddenPaths: ["/uap/chat"],
+    },
+} as const
+
+type DomainKey = keyof typeof DOMAIN_CONFIG
+
 export default function ChatPopup() {
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
@@ -73,16 +140,34 @@ export default function ChatPopup() {
     const [quickActions, setQuickActions] = useState<string[]>([])
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
+    // Track which domain was active when chat was opened so switching pages
+    // mid-conversation doesn't break context
+    const [activeDomain, setActiveDomain] = useState<DomainKey | null>(null)
 
-    // Hide popup on the full-page chat route
-    const isHidden = pathname === "/chat-compassionate"
+    // Determine domain from pathname
+    const currentDomain: DomainKey | null = useMemo(() => {
+        // Hide on homepage (root "/" exactly)
+        if (pathname === "/") return null
+        // UAP pages
+        if (pathname.startsWith("/uap")) return "uap"
+        // Everything else is NDE domain
+        return "nde"
+    }, [pathname])
 
-    // Initialize session ID and randomize quick actions once
+    // Use the active (locked) domain during conversation, otherwise current
+    const domain = activeDomain ?? currentDomain
+    const config = domain ? DOMAIN_CONFIG[domain] : null
+
+    // Check if popup should be hidden on this specific path
+    const isHidden = !config || config.hiddenPaths.some(p => pathname === p || pathname.startsWith(p + "/"))
+
+    // Initialize session ID and randomize quick actions when domain changes
     useEffect(() => {
+        if (!config) return
         setSessionId(crypto.randomUUID())
-        const shuffled = [...ALL_QUESTIONS].sort(() => 0.5 - Math.random())
+        const shuffled = [...config.questions].sort(() => 0.5 - Math.random())
         setQuickActions(shuffled.slice(0, 3))
-    }, [])
+    }, [domain]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Auto-scroll to latest message
     useEffect(() => {
@@ -96,8 +181,23 @@ export default function ChatPopup() {
         }
     }, [isOpen])
 
+    // When user navigates away from UAP to NDE (or vice versa) while chat is closed,
+    // reset the conversation since context would be wrong
+    useEffect(() => {
+        if (!isOpen && activeDomain && activeDomain !== currentDomain) {
+            setActiveDomain(null)
+            setMessages([])
+        }
+    }, [isOpen, activeDomain, currentDomain])
+
+    const handleOpen = () => {
+        // Lock domain when opening chat so navigation mid-conversation is safe
+        setActiveDomain(currentDomain)
+        setIsOpen(true)
+    }
+
     const sendMessage = async (messageText: string) => {
-        if (!messageText.trim() || isLoading) return
+        if (!messageText.trim() || isLoading || !config) return
 
         const userMessage: Message = { role: "user", content: messageText.trim() }
         setMessages((prev) => [...prev, userMessage])
@@ -105,7 +205,7 @@ export default function ChatPopup() {
         setIsLoading(true)
 
         try {
-            const response = await fetch("/api/chat-compassionate", {
+            const response = await fetch(config.apiEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -120,7 +220,7 @@ export default function ChatPopup() {
             }
 
             const data = await response.json()
-            const formattedContent = data.output || "I apologize, but I couldn't generate a response."
+            const formattedContent = data.output || data.data?.answer || "I apologize, but I couldn't generate a response."
 
             setMessages((prev) => [
                 ...prev,
@@ -162,24 +262,25 @@ export default function ChatPopup() {
         })
     }
 
-    if (isHidden) return null
+    // Don't render on homepage or hidden paths
+    if (isHidden || !config) return null
 
     return (
         <>
             {/* ── Floating Trigger Button ── */}
             {!isOpen && (
                 <button
-                    onClick={() => setIsOpen(true)}
-                    className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-5 py-3
-                     bg-[#2563EB] text-white
-                     rounded-full shadow-lg shadow-blue-600/25
-                     hover:scale-105 hover:bg-[#1d4ed8] active:scale-95
+                    onClick={handleOpen}
+                    className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-5 py-3
+                     ${config.accentBg} text-white
+                     rounded-full shadow-lg ${config.accentShadow}
+                     hover:scale-105 ${config.accentHover} active:scale-95
                      transition-all duration-300 ease-out
-                     animate-subtle-pulse"
+                     animate-subtle-pulse`}
                     aria-label="Open chat"
                 >
                     <MessageCircle className="w-5 h-5" />
-                    <span className="font-semibold text-sm">Chat with NDEs</span>
+                    <span className="font-semibold text-sm">{config.label}</span>
                 </button>
             )}
 
@@ -197,16 +298,16 @@ export default function ChatPopup() {
                      overflow-hidden"
                 >
                     {/* ─ Header ─ */}
-                    <div className="flex items-center justify-between px-4 py-3
-                          bg-[#2563EB]
-                          flex-shrink-0">
+                    <div className={`flex items-center justify-between px-4 py-3
+                          ${config.accentBg}
+                          flex-shrink-0`}>
                         <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center">
                                 <MessageCircle className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-sm text-white leading-tight">Profound Guide</h3>
-                                <p className="text-[11px] text-white/70 leading-tight">NDE Companion</p>
+                                <h3 className="font-bold text-sm text-white leading-tight">{config.headerTitle}</h3>
+                                <p className="text-[11px] text-white/70 leading-tight">{config.subtitle}</p>
                             </div>
                         </div>
                         <button
@@ -225,12 +326,12 @@ export default function ChatPopup() {
                             <div className="flex flex-col gap-4 pt-2">
                                 {/* Welcome bubble */}
                                 <div className="flex gap-2.5">
-                                    <div className="w-7 h-7 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-0.5">
-                                        <Bot className="w-4 h-4 text-blue-600" />
+                                    <div className={`w-7 h-7 rounded-full ${config.botBg} flex-shrink-0 flex items-center justify-center mt-0.5`}>
+                                        <Bot className={`w-4 h-4 ${config.botIcon}`} />
                                     </div>
                                     <div className="bg-white rounded-xl rounded-tl-sm px-3.5 py-2.5 max-w-[85%] border border-slate-200/60 shadow-sm">
                                         <p className="text-sm leading-relaxed text-slate-700">
-                                            Welcome! I&apos;m here to explore near-death experiences with you. Ask me anything about the 5,000+ accounts in our database.
+                                            {config.welcome}
                                         </p>
                                         <div className="flex gap-2 mt-2 opacity-40">
                                             <ThumbsUp className="w-3.5 h-3.5 cursor-pointer hover:opacity-100 transition-opacity text-slate-400" />
@@ -247,10 +348,10 @@ export default function ChatPopup() {
                                             <button
                                                 key={action}
                                                 onClick={() => sendMessage(action)}
-                                                className="text-xs px-3 py-1.5 rounded-full
+                                                className={`text-xs px-3 py-1.5 rounded-full
                                    border border-slate-200 text-slate-600 bg-white
-                                   hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700
-                                   transition-all duration-200 shadow-sm"
+                                   ${config.chipHover}
+                                   transition-all duration-200 shadow-sm`}
                                             >
                                                 {action}
                                             </button>
@@ -266,13 +367,13 @@ export default function ChatPopup() {
                                     className={`flex gap-2.5 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                 >
                                     {message.role === "assistant" && (
-                                        <div className="w-7 h-7 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-0.5">
-                                            <Bot className="w-4 h-4 text-blue-600" />
+                                        <div className={`w-7 h-7 rounded-full ${config.botBg} flex-shrink-0 flex items-center justify-center mt-0.5`}>
+                                            <Bot className={`w-4 h-4 ${config.botIcon}`} />
                                         </div>
                                     )}
                                     <div
                                         className={`max-w-[80%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${message.role === "user"
-                                            ? "bg-[#2563EB] text-white rounded-br-sm shadow-sm"
+                                            ? `${config.accentBg} text-white rounded-br-sm shadow-sm`
                                             : "bg-white text-slate-700 rounded-tl-sm border border-slate-200/60 shadow-sm"
                                             }`}
                                     >
@@ -291,11 +392,11 @@ export default function ChatPopup() {
                         {/* Loading indicator */}
                         {isLoading && (
                             <div className="flex gap-2.5">
-                                <div className="w-7 h-7 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center">
-                                    <Bot className="w-4 h-4 text-blue-600" />
+                                <div className={`w-7 h-7 rounded-full ${config.botBg} flex-shrink-0 flex items-center justify-center`}>
+                                    <Bot className={`w-4 h-4 ${config.botIcon}`} />
                                 </div>
                                 <div className="bg-white rounded-xl rounded-tl-sm px-3.5 py-2.5 border border-slate-200/60 shadow-sm">
-                                    <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                    <Loader2 className={`w-4 h-4 animate-spin ${domain === 'uap' ? 'text-emerald-500' : 'text-blue-500'}`} />
                                 </div>
                             </div>
                         )}
@@ -314,20 +415,20 @@ export default function ChatPopup() {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 disabled={isLoading}
-                                className="flex-1 bg-slate-50 border border-slate-200 rounded-full
+                                className={`flex-1 bg-slate-50 border border-slate-200 rounded-full
                            px-4 py-2.5 text-sm text-slate-800
                            placeholder:text-slate-400
-                           focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100
+                           focus:outline-none ${config.accentBorder} focus:ring-2 ${config.accentRing}
                            disabled:opacity-50
-                           transition-all"
+                           transition-all`}
                             />
                             <button
                                 onClick={handleSend}
                                 disabled={isLoading || !input.trim()}
-                                className="w-10 h-10 rounded-full bg-[#2563EB] hover:bg-[#1d4ed8]
+                                className={`w-10 h-10 rounded-full ${config.accentBg} ${config.accentHover}
                            flex items-center justify-center
                            disabled:opacity-40 disabled:cursor-not-allowed
-                           transition-all duration-200 flex-shrink-0 shadow-sm"
+                           transition-all duration-200 flex-shrink-0 shadow-sm`}
                                 aria-label="Send message"
                             >
                                 {isLoading ? (
