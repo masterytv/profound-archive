@@ -923,12 +923,12 @@ For every UAP file you create:
 
 ### Epic 10.4: Multi-Encounter Deduplication (Fixes #2, Issue 1)
 
-- [ ] Story 10.4.1: Run multi-encounter merge script on 9 identified videos — `SVfb7jkuigs`, `pC6HtTT7hx8`, `qYi9rtscZ24`, `2GFB_lt2GIs`, `Gs5LJqiHLp8`, `BA-lbBgCLWY`, `Nowe75xt8Vk`, `uzEAoT9-r4I`, `fSrnynOlW1o` (0.5d)
+- [x] Story 10.4.1: Run multi-encounter merge script on 9 identified videos — `SVfb7jkuigs`, `pC6HtTT7hx8`, `qYi9rtscZ24`, `2GFB_lt2GIs`, `Gs5LJqiHLp8`, `BA-lbBgCLWY`, `Nowe75xt8Vk`, `uzEAoT9-r4I`, `fSrnynOlW1o` (0.5d) ✅ (Verified: 3 videos merged to 1 encounter each (SVfb7jkuigs, pC6HtTT7hx8, uzEAoT9-r4I). Remaining multi-encounter videos are legitimately multi-person — different experiencers correctly separated as direct_experiencer vs retold_encounter. Completed in prior session.)
 
 ### Epic 10.5: Experiencer Display Logic (Fixes #2, Issues 2 & 3)
 
-- [ ] Story 10.5.1: Filter "Experiencer:" line on video detail page — only show `direct_experiencer` account types, hide retold accounts (systemic fix, not per-video) (0.5d)
-- [ ] Story 10.5.2: Hide empty analysis sections for retold accounts below video player — suppress research breakdown panels when account_type is retold and data is empty (0.5d)
+- [x] Story 10.5.1: Filter "Experiencer:" line on video detail page — only show `direct_experiencer` account types, hide retold accounts (systemic fix, not per-video) (0.5d) ✅ (Verified: video/[id]/page.tsx line 384 — `.filter(e => e.source_type !== 'retold_encounter')` applied to experiencer name display. Completed in prior session.)
+- [x] Story 10.5.2: Hide empty analysis sections for retold accounts below video player — suppress research breakdown panels when account_type is retold and data is empty (0.5d) ✅ (Verified: video/[id]/page.tsx line 490 — `if (enc.source_type === 'retold_encounter') return null;` skips research breakdown for retold accounts. Completed in prior session.)
 
 ---
 
