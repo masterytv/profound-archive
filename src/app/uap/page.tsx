@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 // Server-side data fetching with anon key (SSG-safe per LEARNINGS.md)
 async function getUapStats() {
   const supabase = createClient(

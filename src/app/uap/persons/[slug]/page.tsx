@@ -23,7 +23,7 @@ import {
   findLinkedChannels,
 } from '@/lib/data/uap-entity-links';
 
-export const revalidate = 3600;
+export const revalidate = 86400; // ISR: revalidate once per day
 
 function getSupabase() {
   return createClient(

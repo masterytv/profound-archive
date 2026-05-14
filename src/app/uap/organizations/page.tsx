@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Organizations | UAP Research | Project Profound',
   description: 'Browse government agencies, research institutions, and organizations connected to UAP/UFO phenomena.',
 };
-export const revalidate = 3600;
+export const revalidate = 86400; // ISR: revalidate once per day
 
 const SORT_OPTIONS = [
   { value: 'videos', label: 'Videos' },

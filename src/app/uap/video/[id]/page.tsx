@@ -32,6 +32,8 @@ import { UapProgramIntelCard } from "@/components/uap/program-intel/UapProgramIn
 import { UapProgramIntelSummaryCard } from "@/components/uap/program-intel/UapProgramIntelSummaryCard";
 import type { UapProgramIntelResult } from "@/lib/ai/uap-program-intel";
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 // ─── Build Client (SSG-safe — no cookies()) ─────────────────────────────────
 
 function buildClient() {

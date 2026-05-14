@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import { BookOpen, Clock, ArrowRight, Tag } from "lucide-react";
 
-export const revalidate = 3600; // Regenerate hourly
+export const revalidate = 86400; // ISR: revalidate once per day
 
 export const metadata: Metadata = {
     title: "Blog — UAP Research & Insights | Project Profound",

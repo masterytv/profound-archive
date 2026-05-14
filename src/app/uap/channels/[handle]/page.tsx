@@ -26,6 +26,8 @@ import { UapVideoCard } from "@/components/uap-explore/UapVideoCard";
 import { UapGridControls } from "@/components/uap-explore/UapGridControls";
 import type { UapExploreItem } from "@/components/uap-explore/types";
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 // ─── Build Client (SSG-safe) ────────────────────────────────────────────────
 
 function buildClient() {

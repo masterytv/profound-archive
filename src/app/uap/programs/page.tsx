@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Programs & Projects | UAP Research | Project Profound',
   description: 'Browse government programs, research projects, and investigations related to UAP/UFO phenomena — extracted from analyzed video testimony.',
 };
-export const revalidate = 3600;
+export const revalidate = 86400; // ISR: revalidate once per day
 
 const SORT_OPTIONS = [
   { value: 'videos', label: 'Videos' },

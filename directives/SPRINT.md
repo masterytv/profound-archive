@@ -918,8 +918,8 @@ For every UAP file you create:
 
 ### Epic 10.3: Caching & ISR (Fixes #1)
 
-- [ ] Story 10.3.1: Implement daily ISR revalidation for entity pages (`/experiencers`, `/persons`, `/events`, `/organizations`, `/programs`, `/uap`, `/channels`) — stats refresh once/day without full rebuild (0.5d)
-- [ ] Story 10.3.2: Evaluate SEO impact of daily stat changes vs. static snapshots — decide on approach per page type (0.25d)
+- [x] Story 10.3.1: Implement daily ISR revalidation for entity pages (`/experiencers`, `/persons`, `/events`, `/organizations`, `/programs`, `/uap`, `/channels`) — stats refresh once/day without full rebuild (0.5d) ✅ (Standardized all 19 UAP entity pages to `revalidate = 86400`. Previously: orgs/programs/persons were hourly (3600); video/[id], channels/[handle], and /uap landing had no ISR. Now all consistent at 24h. Pages intentionally excluded: video-explore (searchParams → always dynamic), search/chat (interactive), methodology (static).)
+- [x] Story 10.3.2: Evaluate SEO impact of daily stat changes vs. static snapshots — decide on approach per page type (0.25d) ✅ (Decision: Daily ISR for all entity index + detail pages — stats change slowly, SEO benefits from stable content. Video Explorer stays dynamic (filter-driven). Intelligence dashboard uses fetch-level cache (3600s) for client-side charts. NDE-side entity pages use cookie-based `createClient` — ISR incompatible, would need refactor to SSG-safe client for future ISR.)
 
 ### Epic 10.4: Multi-Encounter Deduplication (Fixes #2, Issue 1)
 
