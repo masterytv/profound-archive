@@ -49,7 +49,6 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
   useEffect(() => {
     let isMounted = true;
     const getUser = async () => {
-      console.log(`[SaveButton] Checking auth for ${videoId}`);
       try {
         let currentUser = initialUser;
         if (!currentUser) {
@@ -65,14 +64,17 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
         if (error instanceof Error && error.name === 'AbortError') return;
         console.error(`[SaveButton] Auth error for ${videoId}:`, error);
       } finally {
-        if (isMounted) {
-          console.log(`[SaveButton] Auth check complete for ${videoId}`);
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     };
     getUser();
-    return () => { isMounted = false; };
+
+    // Listen for auth state changes so login/logout is reflected immediately
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isMounted) setUser(session?.user ?? null);
+    });
+
+    return () => { isMounted = false; subscription.unsubscribe(); };
   }, [supabase, videoId]);
 
   const fetchData = async (currentUser: User) => {
@@ -193,7 +195,16 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
     setIsCreating(false);
   };
 
-  const handleLoginPrompt = () => {
+  const handleLoginPrompt = async () => {
+    // Re-check auth before showing the prompt — handles race where initial check hadn't completed
+    const { data: { user: freshUser } } = await supabase.auth.getUser();
+    if (freshUser) {
+      setUser(freshUser);
+      // Now that we have a user, open the popover instead of showing the error
+      setIsPopoverOpen(true);
+      return;
+    }
+
     toast({
       title: "Login Required",
       description: "You must be logged in to save collections.",

@@ -29,7 +29,6 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
   useEffect(() => {
     let isMounted = true;
     const checkUserAndFavoriteStatus = async () => {
-      console.log(`[FavoriteButton] Checking status for ${videoId}`);
       try {
         let currentUser = initialUser;
         if (!currentUser) {
@@ -64,19 +63,30 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
         if (error instanceof Error && error.name === 'AbortError') return;
         console.error(`[FavoriteButton] Error for ${videoId}:`, error);
       } finally {
-        if (isMounted) {
-          console.log(`[FavoriteButton] Check complete for ${videoId}`);
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     };
 
     checkUserAndFavoriteStatus();
-    return () => { isMounted = false; };
+
+    // Listen for auth state changes so login/logout is reflected immediately
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isMounted) setUser(session?.user ?? null);
+    });
+
+    return () => { isMounted = false; subscription.unsubscribe(); };
   }, [supabase, videoId]);
 
   const toggleFavorite = async () => {
-    if (!user) {
+    // Re-check auth if user is null — handles race where initial check hadn't completed
+    let currentUser = user;
+    if (!currentUser) {
+      const { data: { user: freshUser } } = await supabase.auth.getUser();
+      currentUser = freshUser;
+      if (currentUser) setUser(currentUser);
+    }
+
+    if (!currentUser) {
       toast({
         title: "Login Required",
         description: "You must be logged in to save favorites.",
@@ -96,14 +106,14 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
     let { data: collection } = await supabase
       .from('collections')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', currentUser.id)
       .eq('name', 'Favorites')
       .single();
 
     if (!collection) {
       const { data: newCollection, error } = await supabase
         .from('collections')
-        .insert({ user_id: user.id, name: 'Favorites' })
+        .insert({ user_id: currentUser.id, name: 'Favorites' })
         .select('id')
         .single();
 
@@ -140,7 +150,7 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
     } else {
       // Add to favorites
       const { error } = await supabase.from('favorites').insert({
-        user_id: user.id,
+        user_id: currentUser.id,
         collection_id: collection.id,
         video_id: videoId,
         video_title: videoTitle,
