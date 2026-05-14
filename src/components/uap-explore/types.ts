@@ -25,6 +25,7 @@ export interface UapExploreItem {
   has_psi_content: boolean | null;
   has_under_oath_claims: boolean | null;
   dominant_entity_type: string | null;
+  summary_snippet: string | null;
 }
 
 // ─── Tier Filter Definitions ─────────────────────────────────────────────────
@@ -64,15 +65,16 @@ export const UAP_SORT_PRESETS: SortPreset[] = [
 export interface SortField {
   value: string;
   label: string;
+  description?: string;
 }
 
 export const UAP_SORT_FIELDS: SortField[] = [
-  { value: "date", label: "Date Published" },
-  { value: "view_count", label: "Views" },
-  { value: "evidence_score", label: "Evidence Strength" },
-  { value: "contact_depth_score", label: "Contact Depth" },
-  { value: "transformation_score", label: "Transformation" },
-  { value: "intelligence_value", label: "Intelligence Value" },
+  { value: "date", label: "Date Published", description: "When the video was published on YouTube" },
+  { value: "view_count", label: "Views", description: "Total YouTube view count" },
+  { value: "evidence_score", label: "Evidence Strength", description: "UAP Evidence Strength Scale (UAP-ESS): radar data, physical traces, corroborating witnesses, documentation quality (0-35)" },
+  { value: "contact_depth_score", label: "Contact Depth", description: "How deep and detailed the encounter was — proximity, duration, communication, entity interaction (0-35)" },
+  { value: "transformation_score", label: "Transformation", description: "Lasting personal impact on the experiencer — worldview changes, abilities, life direction (0-50)" },
+  { value: "intelligence_value", label: "Intelligence Value", description: "Composite measure of how much actionable intelligence a video contributes: unique claims, named sources, referenced programs, verifiable details, and corroborating evidence (0-100)" },
   { value: "channel_name", label: "Channel" },
   { value: "title", label: "Title" },
 ];

@@ -18,6 +18,10 @@
 | Sprint 7: Mass Analysis & Intelligence | ✅ Complete | 2026-05-12 |
 | Sprint 8: Scanner Expansion | ✅ Complete (8.3.2, 8.3.4 deferred) | 2026-05-13 |
 | Sprint 9: Engagement & CRM | ✅ Complete | 2026-05-13 |
+| Sprint 10: Site Fixes & Polish | 🔲 Not Started | — |
+| Sprint 11: Unified Homepage & Brand Evolution | 🔲 Not Started | — |
+| Sprint 12: Security Audit | 🔲 Not Started | — |
+| Backlog: Revenue & Growth Strategy | 📋 Brainstorm | — |
 
 ## Environment Setup
 
@@ -886,3 +890,188 @@ For every UAP file you create:
 
 - [x] Story 9.4.1: Change sender from `Project Profound Stories <stories@...>` to `Project Profound <noreply@...>` in `.env.local`, `apphosting.yaml`, and `resend.ts` fallback (0.1d) ✅ 2026-05-13
 - **Done when:** All outbound emails send from `Project Profound <noreply@mail.projectprofound.org>`.
+
+---
+
+## Sprint 10: Site Fixes & Polish
+
+> Source: `Site Audit - Fixes.md` (Fixes #1) + `Site Fixes #2.md` (Fixes #2)
+> Priority: High — production-visible issues
+
+### Epic 10.1: Visual & UI Fixes (Fixes #1)
+
+- [x] Story 10.1.1: Fix green text contrast on `/uap` home — match "Search Archive" button color (0.1d) ✅ (hero uses consistent `text-green-500` / button uses `bg-green-600`)
+- [x] Story 10.1.2: Count total analytical data points across pipeline and display on UAP home (e.g., "X data points across Y analysis dimensions") (0.5d) ✅ (now shows dynamic: Videos / AI-Analyzed / Encounters / Channels / 22 Analysis Dimensions — fetched live from DB)
+- [x] Story 10.1.3: Change "AI video summary" pill → smaller "Video Summary (AI)" pill (0.1d) ✅ (already `Video Summary (AI)` in all 3 search result card components)
+- [x] Story 10.1.4: Add video summary snippet to video explorer result cards (0.5d) ✅ (RPC returns `summary_snippet`; experiencer + summary moved inside expandable Details section after type pills, 5-line clamp, before View Full Analysis)
+- [x] Story 10.1.5: Define "Intelligence Value" sort with tooltip explanation (0.25d) ✅ (sort fields have `description` tooltips via `title` attr; filter sidebar has inline description under slider)
+- [x] Story 10.1.6: Fix methodology/credibility page — dark mode only, needs light/dark theme (0.25d) ✅ (uses `bg-background text-foreground` + `dark:` variants throughout)
+- [x] Story 10.1.7: Fix Persons page formatting — bracket/quote cleanup for org affiliations (e.g., `["OSS","CIA"]` → `OSS, CIA`), capitalize role labels (0.25d) ✅ (JSON.parse + `.join(', ')` + `.replace(/\b\w/g, c => c.toUpperCase())` on both index and detail pages)
+
+### Epic 10.2: Data & Content Fixes (Fixes #1)
+
+- [ ] Story 10.2.1: Fix Save/Store buttons — "login required" error when already logged in (0.5d)
+- [ ] Story 10.2.2: Video Explorer — populate High Net classification and recurrence filters; evaluate additional filter dimensions (0.5d)
+- [ ] Story 10.2.3: Org pages — add AI-generated summary from video context; fix spelling (Carlile → Carlyle, etc.) (1d)
+- [ ] Story 10.2.4: Normalize duplicate organizations (US Air Force vs U.S. Air Force, etc.) — merge + redirect (0.5d)
+- [ ] Story 10.2.5: Fix Intelligence page empty in production but working locally — likely ISR/build issue (0.25d)
+
+### Epic 10.3: Caching & ISR (Fixes #1)
+
+- [ ] Story 10.3.1: Implement daily ISR revalidation for entity pages (`/experiencers`, `/persons`, `/events`, `/organizations`, `/programs`, `/uap`, `/channels`) — stats refresh once/day without full rebuild (0.5d)
+- [ ] Story 10.3.2: Evaluate SEO impact of daily stat changes vs. static snapshots — decide on approach per page type (0.25d)
+
+### Epic 10.4: Multi-Encounter Deduplication (Fixes #2, Issue 1)
+
+- [ ] Story 10.4.1: Run multi-encounter merge script on 9 identified videos — `SVfb7jkuigs`, `pC6HtTT7hx8`, `qYi9rtscZ24`, `2GFB_lt2GIs`, `Gs5LJqiHLp8`, `BA-lbBgCLWY`, `Nowe75xt8Vk`, `uzEAoT9-r4I`, `fSrnynOlW1o` (0.5d)
+
+### Epic 10.5: Experiencer Display Logic (Fixes #2, Issues 2 & 3)
+
+- [ ] Story 10.5.1: Filter "Experiencer:" line on video detail page — only show `direct_experiencer` account types, hide retold accounts (systemic fix, not per-video) (0.5d)
+- [ ] Story 10.5.2: Hide empty analysis sections for retold accounts below video player — suppress research breakdown panels when account_type is retold and data is empty (0.5d)
+
+---
+
+## Sprint 11: Unified Homepage & Brand Evolution
+
+> **Goal:** Design and build a new unified homepage that positions Project Profound as a consciousness research platform spanning NDE and UAP verticals. This page is designed FIRST, then deployed as the home page when ready.
+> **Launch gate:** ≥500 encounter videos analyzed + ≥2,000 total UAP videos
+
+### Epic 11.1: Unified Homepage Design & Build
+
+> **Vision:** A new era in understanding consciousness — from both scientific/academic and personal/direct experience perspectives. The page invites casual users to explore NDE or UAP videos and academic users to explore data. It showcases cross-domain commonalities, our hypothesis, and open-minded exploration. We're at the crest of a wave of new understanding about what it means to be human.
+>
+> **Design at `/consciousness` (not replacing `/` until launch)**
+
+- [ ] Story 11.1.1: Design homepage mockup — wireframe with hero (consciousness thesis), dual-path CTA (NDE vs UAP), cross-domain highlights from `/research/cross-domain`, stats showcase, community invite (0.5d)
+- [ ] Story 11.1.2: Build hero section — cinematic, compelling intro with the consciousness framing; animated or parallax; "Explore NDEs" and "Explore UAP" dual CTAs (1d)
+- [ ] Story 11.1.3: Build cross-domain highlights section — pull top overlapping phenomena from cross-domain research data; graphical visualization (e.g., Venn diagram, connection map) (1d)
+- [ ] Story 11.1.4: Build stats showcase — combined corpus stats (total videos, experiencers, data points, analysis dimensions) with animated counters (0.5d)
+- [ ] Story 11.1.5: Build "For Researchers" section — link to cross-domain comparison, methodology docs, data explorer (0.5d)
+- [ ] Story 11.1.6: Build "For Explorers" section — featured videos, recent discoveries, curated journeys (0.5d)
+- [ ] Story 11.1.7: Polish & test — responsive design, dark/light mode, Lighthouse audit, A11y (0.5d)
+- [ ] Story 11.1.8: Launch gate check — verify ≥500 encounters + ≥2,000 total UAP videos → swap `/consciousness` to `/` (0.1d)
+
+### Epic 11.2: About Page Rewrite
+
+- [ ] Story 11.2.1: Rewrite `/about` page — broader consciousness research framing, team, mission, methodology overview, dual-domain positioning (1d)
+
+### Epic 11.3: GoFundMe Page Rewrite
+
+> Current copy focuses only on NDEs. Needs to broaden to consciousness research including UAP contactee analysis, cross-domain phenomenology, and the unified platform vision.
+
+- [ ] Story 11.3.1: Draft new GoFundMe copy — consciousness framing, NDE + UAP verticals, cross-domain discoveries, updated project list, updated expense context (0.5d)
+- [ ] Story 11.3.2: Update live GoFundMe page with approved copy (0.1d)
+
+---
+
+## Sprint 12: Security Audit
+
+> Full security review of the application, database, API, and infrastructure.
+
+### Epic 12.1: Application Security Audit
+
+- [ ] Story 12.1.1: Auth & session audit — verify Supabase Auth patterns, session handling, token refresh, middleware protection, CSRF (0.5d)
+- [ ] Story 12.1.2: API route audit — verify all admin routes use `isAdminUser()` guard, rate limiting, input validation (0.5d)
+- [ ] Story 12.1.3: RLS policy audit — verify all tables have correct read/write policies, no data leakage via service_role misuse (0.5d)
+- [ ] Story 12.1.4: Client-side security — verify no service_role keys in client code, no XSS vectors in user-generated content, CSP headers (0.25d)
+- [ ] Story 12.1.5: Dependency audit — `npm audit`, check for known vulnerabilities, update critical packages (0.25d)
+- [ ] Story 12.1.6: Infrastructure review — Firebase App Hosting config, Supabase project settings, CORS, environment variable hygiene (0.25d)
+- [ ] Story 12.1.7: OWASP Top 10 checklist — systematic review against current OWASP guidelines (0.5d)
+- [ ] Story 12.1.8: Penetration testing — basic pentest of public-facing endpoints and auth flows (0.5d)
+- [ ] Story 12.1.9: Security report & remediation plan — document findings, prioritize fixes, implement critical items (0.5d)
+
+---
+
+## Backlog: Revenue & Growth Strategy
+
+> **Goal:** Create a user experience that generates WOW, Curiosity, Sharing, Participation, Virality, and Community — then monetize sustainably.
+
+### Revenue Ideas (Brainstorm)
+
+> Priority: Drive traffic FIRST, then monetize.
+
+#### Tier 1: Low-Effort, Near-Term
+1. **Freemium model** — Free: limited searches (e.g., 5/day), AI chat (3 questions/day), basic video browse. Paid ($5-10/mo): unlimited search, unlimited AI chat, saved searches, collections, export, advanced filters
+2. **Sponsorship slots** — Sell featured placement to UAP/NDE channels, event organizers, conference promoters (e.g., MUFON, IANDS, Conscious Life Expo)
+3. **Affiliate links** — Books, courses, and products mentioned in videos → Amazon affiliate, course platform referrals
+
+#### Tier 2: Medium-Effort, Growth Phase
+4. **Display ads** — Google AdSense or premium ad network once traffic justifies (≥50K monthly pageviews target)
+5. **Viral content channel** — Repurpose AI-generated insights as short-form content (TikTok/Reels/Shorts): "Did you know?" facts, cross-domain discoveries, experiencer highlights → drives traffic back to site
+6. **Newsletter premium tier** — Free weekly digest vs. paid deep-dive with exclusive analysis, early access to new features
+7. **API access** — Researchers/developers pay for structured data access (video metadata, analysis results, embeddings)
+
+#### Tier 3: High-Effort, Community Phase
+8. **Interactive experiences** — "Are You a Hybrid?" personality quiz → shareable results → viral loop; "Remote Viewing Training" progressive game with leaderboards; "Match Your NDE" — find the most similar reported experience to your own
+9. **Merchandise** — After building brand recognition: consciousness-themed apparel, posters of cross-domain data visualizations, "I Explored the Data" stickers
+10. **Live events / webinars** — Paid virtual events with experiencers, researchers; Q&A with AI-assisted real-time analysis
+11. **Course/certification** — "UAP Research Methods" using our methodology framework; certificate of completion
+12. **Data reports** — Premium downloadable PDF reports: "State of UAP Disclosure 2026", "Cross-Domain Phenomenology Annual Review"
+
+#### AI-Generated Additional Ideas
+13. **Community contributions** — Users submit their own experiences for AI analysis (free basic, paid detailed); builds the dataset while engaging users
+14. **Embeddable widgets** — Offer embeddable "UAP Fact of the Day" or "NDE Quote" widgets for other websites/blogs → backlinks + traffic
+15. **Research grants** — Apply for academic grants using the platform's unique cross-domain dataset as a research tool
+16. **White-label analysis** — License the analysis pipeline to other research organizations (MUFON, IANDS, universities)
+17. **Gamification** — Achievement badges for exploring content ("Watched 10 Encounters", "Explored Cross-Domain"), leaderboards, community challenges → retention + virality
+
+### Growth Strategy (Traffic First)
+
+- [ ] Define SEO content strategy — target long-tail keywords around NDE/UAP phenomenology
+- [ ] Build social media presence — automated posting of daily facts, cross-domain discoveries
+- [ ] Launch viral content channel (YouTube Shorts / TikTok) — AI-narrated insights from the data
+- [ ] Community building — Discord/forum for experiencers and researchers
+- [ ] Press/media outreach — unique cross-domain findings as press releases
+- [ ] Academic partnerships — collaborate with consciousness researchers for credibility + citations
+- [ ] Influencer partnerships — guest features with UAP/NDE content creators whose channels we analyze
+
+---
+
+### Backlog: External Data Source Integration
+
+> Analyze open-source UAP data repos for potential integration, cross-referencing, or feature inspiration.
+
+#### Repo 1: Argus UFO AI Data ([GitHub](https://github.com/Mugeshgithub/Argus_UFO_AI_Data)) · [Live Demo](https://argus-ufo-ai-data.vercel.app)
+
+> **What it is:** A Next.js data science platform analyzing **79,621 NUFORC sighting reports** (1941–2014) with NLP pipeline, bias correction, credibility scoring, and behavioral clustering. MIT licensed.
+>
+> **Key assets:**
+> - 79,621 parsed NUFORC sighting records with extracted fields (shape, speed, movement, duration, military context, physics-violation language)
+> - Bias correction methodology (World Bank internet penetration normalization)
+> - Per-capita state normalization (Washington State #1 at 58.6/100k)
+> - 6 behavioral clusters (silent+instant, high-altitude hover, formation, military proximity, EM interference, trace evidence)
+> - Multi-factor credibility ranking (radar confirmation, witness type, corroboration, physical traces)
+> - 77 hardest-to-explain cases (silent flight + instant acceleration)
+> - 207 reports with explicit physics-violation language
+
+**Integration brainstorm:**
+- [ ] Story B.EXT.1: Import NUFORC sighting data as a third data layer alongside our video testimony corpus — cross-reference NUFORC reports with video-mentioned events/locations/dates (1d)
+- [ ] Story B.EXT.2: Adopt/adapt bias correction methodology for our own temporal analysis (our data skews post-2015 YouTube) (0.5d)
+- [ ] Story B.EXT.3: Compare Argus behavioral clusters against our phenomenology extraction (entity types, craft shapes, Five Observables) — potential cross-domain validation (0.5d)
+- [ ] Story B.EXT.4: Build a "Sightings vs Testimonies" comparison page — NUFORC sighting density map overlaid with our video testimony geographic mentions (1d)
+- [ ] Story B.EXT.5: Integrate Argus credibility scoring as a complementary signal alongside our UAP-ESS evidence scale (0.5d)
+- [ ] Story B.EXT.6: Link or embed their interactive global heatmap as a "Sightings Map" feature on our site (0.25d)
+
+#### Repo 2: PURSUE Open Atlas ([GitHub](https://github.com/AlexZhangji/ufo-pursue-open-atlas)) · [Live Demo](https://ufo.gpt2077.com) · [HuggingFace](https://huggingface.co/datasets/alex-zhang42/ufo-pursue-open-atlas)
+
+> **What it is:** The U.S. Department of War **PURSUE Release 01** declassified UFO/UAP documents — 161 records, 4,153 pages, VLM-extracted into clean Markdown with inline image captions. CC0 licensed. Includes 3D globe atlas, side-by-side document viewer, and hybrid keyword+AI search.
+>
+> **Key assets:**
+> - 161 declassified government records (DoW, FBI, NASA, State Dept) spanning 80 years
+> - 4,153 pages with VLM-extracted Markdown (86.6% image-only scans — no other searchable text exists)
+> - Per-page JPEG renders at 200 DPI
+> - Hybrid BM25 + semantic search with BGE embeddings
+> - 3D globe atlas visualization
+> - Agency metadata (FBI, DoW, State, NASA), incident locations, dates
+> - `corpus.jsonl` — ready-to-ingest structured data
+> - Full audit trail with corrections.json
+
+**Integration brainstorm:**
+- [ ] Story B.EXT.7: Import PURSUE corpus.jsonl into Supabase as `uap_declassified_docs` table — page text, agency, date, location, classification level (0.5d)
+- [ ] Story B.EXT.8: Build `/uap/documents` page — searchable archive of declassified government documents, filterable by agency/era/record type (1d)
+- [ ] Story B.EXT.9: Cross-reference declassified document events with our video testimony mentions — e.g., when a video discusses "Project Blue Book", link to the actual declassified pages (1d)
+- [ ] Story B.EXT.10: Embed or link to PURSUE's 3D globe atlas as a "Declassified Map" feature — complements our video-based geographic analysis (0.25d)
+- [ ] Story B.EXT.11: Add declassified document context to our Research Assistant chat — RAG over government documents alongside video transcripts for richer answers (1d)
+- [ ] Story B.EXT.12: Build "Primary Sources" section on video detail pages — when a video mentions specific programs/events, show related declassified documents (0.5d)
+- [ ] Story B.EXT.13: Create a "Government vs Testimony" comparison view — what the declassified documents say about an event vs. what experiencers report (1d)

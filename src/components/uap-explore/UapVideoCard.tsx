@@ -130,13 +130,6 @@ export function UapVideoCard({
           )}
         </div>
 
-        {/* Experiencer name (Tier 1 only) */}
-        {video.experiencer_name && (
-          <div className="text-xs text-slate-500 dark:text-slate-400">
-            Experiencer: <strong className="text-slate-700 dark:text-slate-300">{video.experiencer_name}</strong>
-          </div>
-        )}
-
         {/* Expand/collapse */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -175,6 +168,20 @@ export function UapVideoCard({
                 </span>
               )}
             </div>
+
+            {/* Experiencer name (Tier 1 only) — inside details */}
+            {video.experiencer_name && (
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                Experiencer: <strong className="text-slate-700 dark:text-slate-300">{video.experiencer_name}</strong>
+              </div>
+            )}
+
+            {/* AI Summary snippet — inside details, up to 5 lines */}
+            {video.summary_snippet && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-5">
+                {video.summary_snippet}{video.summary_snippet.length >= 198 ? "…" : ""}
+              </p>
+            )}
 
             {/* Triad score bars (Tier 1 only) */}
             {hasTriadScores && (

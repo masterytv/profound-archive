@@ -409,6 +409,9 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
           <FilterLabel>
             Min Intelligence Value: {minIntelligence || "Any"}
           </FilterLabel>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-2 leading-relaxed">
+            Composite score (0-10) based on unique claims, named sources, referenced programs, and verifiable details.
+          </p>
           <input
             type="range"
             min={0}

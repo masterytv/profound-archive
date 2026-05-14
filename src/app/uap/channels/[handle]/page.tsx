@@ -283,6 +283,7 @@ export default async function UapChannelDetailPage({
       has_psi_content: null,
       has_under_oath_claims: null,
       dominant_entity_type: null,
+      summary_snippet: null,
     };
   });
 

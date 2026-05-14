@@ -34,17 +34,26 @@ async function getUapStats() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const [{ count: totalVideos }, { count: totalChannels }] = await Promise.all([
+  const [
+    { count: totalVideos },
+    { count: totalChannels },
+    { count: analyzedVideos },
+    { count: totalEncounters },
+  ] = await Promise.all([
     supabase.from("uap_vids").select("*", { count: "exact", head: true }),
     supabase
       .from("uap_channels")
       .select("*", { count: "exact", head: true })
       .eq("hidden", false),
+    supabase.from("uap_analysis").select("*", { count: "exact", head: true }),
+    supabase.from("uap_encounters").select("*", { count: "exact", head: true }),
   ]);
 
   return {
     totalVideos: totalVideos || 0,
     totalChannels: totalChannels || 0,
+    analyzedVideos: analyzedVideos || 0,
+    totalEncounters: totalEncounters || 0,
   };
 }
 
@@ -100,13 +109,13 @@ export default async function UapLandingPage() {
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
             AI-analyzed archive of first-person contact accounts and disclosure
-            research. Every video scored across 150+ analysis points including
+            research. Every video scored across 22 analysis dimensions including
             evidence strength, contact depth, entity taxonomy, craft observation,
             consciousness alteration, and personal transformation.
           </p>
 
           {/* Stats */}
-          <div className="flex gap-8 mb-10">
+          <div className="flex flex-wrap gap-6 sm:gap-8 mb-10">
             <div>
               <div className="text-3xl font-bold text-foreground">
                 {stats.totalVideos.toLocaleString()}
@@ -115,13 +124,25 @@ export default async function UapLandingPage() {
             </div>
             <div>
               <div className="text-3xl font-bold text-foreground">
+                {stats.analyzedVideos.toLocaleString()}
+              </div>
+              <div className="text-sm text-muted-foreground">AI-Analyzed</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-foreground">
+                {stats.totalEncounters.toLocaleString()}
+              </div>
+              <div className="text-sm text-muted-foreground">Encounters</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-foreground">
                 {stats.totalChannels.toLocaleString()}
               </div>
               <div className="text-sm text-muted-foreground">Channels</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-foreground">150+</div>
-              <div className="text-sm text-muted-foreground">Analysis Points</div>
+              <div className="text-3xl font-bold text-foreground">22</div>
+              <div className="text-sm text-muted-foreground">Analysis Dimensions</div>
             </div>
           </div>
 

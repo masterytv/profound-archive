@@ -127,7 +127,7 @@ export function UapGridControls({
             className="text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-400 dark:[color-scheme:dark] cursor-pointer"
           >
             {UAP_SORT_FIELDS.map((field) => (
-              <option key={field.value} value={field.value}>
+              <option key={field.value} value={field.value} title={field.description}>
                 {field.label}
               </option>
             ))}

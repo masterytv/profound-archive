@@ -138,6 +138,7 @@ export default async function UapVideoExplorePage({ searchParams }: PageProps) {
     has_psi_content: row.has_psi_content ?? null,
     has_under_oath_claims: row.has_under_oath_claims ?? null,
     dominant_entity_type: row.dominant_entity_type ?? null,
+    summary_snippet: row.summary_snippet ?? null,
   }));
 
   return (
