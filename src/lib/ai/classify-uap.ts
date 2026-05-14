@@ -114,8 +114,10 @@ Map content_type to source_type as follows:
 7. **"Primary Sources" Signal**: If the title mentions "Primary Sources", "Historical Accounts", or "From History", the content is virtually always a narrator reading historical documents = Tier 2 documentary_survey.
 
 ## MULTI-ENCOUNTER DETECTION
-Scan the transcript for multiple distinct encounters:
-- If the transcript describes encounters involving 2+ different experiencers (e.g., "Travis Walton's abduction... and then Betty Hill's encounter..."), set has_multiple_encounters: true.
+Scan the transcript for encounters by DIFFERENT PEOPLE:
+- has_multiple_encounters means 2+ DIFFERENT EXPERIENCERS, NOT multiple events from one person's life.
+- If ONE person (e.g., Isabelle Boivin) describes 6 different encounters throughout her life, that is has_multiple_encounters: FALSE — she is a single experiencer with a rich history.
+- If a documentary covers Travis Walton AND Betty Hill (two different people), that is has_multiple_encounters: TRUE.
 - List ALL experiencer names you can identify in experiencer_names[].
 - If an experiencer is unnamed, use a contextual label like "Unnamed Ranch Worker" or "Anonymous Military Pilot" or "Witness 1".
 - For Tier 2 research/program content that doesn't describe specific encounters, set has_multiple_encounters: false and experiencer_names: [].

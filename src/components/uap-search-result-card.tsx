@@ -428,7 +428,7 @@ export function UapSearchResultCard({
                   variant="outline"
                   className="text-[10px] px-1 py-0 border-green-500/50 text-green-600 dark:text-green-400"
                 >
-                  AI Video Summary - AI makes mistakes
+                  Video Summary (AI)
                 </Badge>
               </div>
               <p className="text-foreground/90">

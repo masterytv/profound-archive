@@ -85,8 +85,8 @@ export default async function UapLandingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-green-950/40 via-background to-emerald-950/30" />
         <div className="relative max-w-6xl mx-auto px-6 py-20 md:py-28">
           <div className="flex items-center gap-2 mb-6">
-            <Radio className="w-5 h-5 text-green-400" />
-            <span className="text-sm font-medium text-green-400 uppercase tracking-wider">
+            <Radio className="w-5 h-5 text-green-500" />
+            <span className="text-sm font-medium text-green-500 uppercase tracking-wider">
               UFO & UAP Archive
             </span>
           </div>
@@ -96,12 +96,13 @@ export default async function UapLandingPage() {
           >
             UFO & UAP
             <br />
-            <span className="text-green-400">Encounters & Research</span>
+            <span className="text-green-500">Encounters & Research</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
             AI-analyzed archive of first-person contact accounts and disclosure
-            research. Every video scored for evidence strength, contact depth,
-            and personal transformation.
+            research. Every video scored across 150+ analysis points including
+            evidence strength, contact depth, entity taxonomy, craft observation,
+            consciousness alteration, and personal transformation.
           </p>
 
           {/* Stats */}
@@ -119,8 +120,8 @@ export default async function UapLandingPage() {
               <div className="text-sm text-muted-foreground">Channels</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-foreground">3</div>
-              <div className="text-sm text-muted-foreground">Analysis Axes</div>
+              <div className="text-3xl font-bold text-foreground">150+</div>
+              <div className="text-sm text-muted-foreground">Analysis Points</div>
             </div>
           </div>
 
@@ -154,7 +155,7 @@ export default async function UapLandingPage() {
               className="group relative p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 hover:border-green-500/30"
             >
               <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center mb-4 group-hover:bg-green-500/20 transition-colors">
-                <card.icon className="w-5 h-5 text-green-400" />
+                <card.icon className="w-5 h-5 text-green-500" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 {card.title}
@@ -186,7 +187,7 @@ export default async function UapLandingPage() {
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/10">
               <div className="flex items-center gap-3 mb-2">
-                <Users className="w-5 h-5 text-green-400" />
+                <Users className="w-5 h-5 text-green-500" />
                 <h3 className="font-semibold text-foreground">
                   Track 1: Encounters
                 </h3>

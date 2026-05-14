@@ -467,6 +467,44 @@ export async function processUapVideoIntake(
                     }];
                 }
 
+                // ── Safety Net: Collapse segments with the same experiencer name ─
+                // Even if segmenter returns multiple segments for the same person
+                // (e.g., 6 events from Isabelle Boivin's life), collapse into one
+                // encounter that uses the full transcript for analysis.
+                if (segments.length > 1) {
+                    const nameGroups = new Map<string, typeof segments>();
+                    for (const seg of segments) {
+                        const key = seg.experiencer_name.toLowerCase().trim();
+                        const group = nameGroups.get(key) || [];
+                        group.push(seg);
+                        nameGroups.set(key, group);
+                    }
+
+                    // If all segments have the same name, collapse to one
+                    const uniqueNames = nameGroups.size;
+                    if (uniqueNames < segments.length) {
+                        const collapsed: typeof segments = [];
+                        let idx = 0;
+                        for (const [, group] of nameGroups) {
+                            if (group.length === 1) {
+                                collapsed.push({ ...group[0], index: idx++ });
+                            } else {
+                                // Merge: use the first segment's metadata but full transcript
+                                collapsed.push({
+                                    experiencer_name: group[0].experiencer_name,
+                                    encounter_label: `${group[0].experiencer_name}'s Encounters`,
+                                    source_type: group[0].source_type,
+                                    text: transcript, // Use full transcript for merged encounters
+                                    index: idx++,
+                                });
+                                logStep('Collapse Same-Name Encounters', 'success',
+                                    `Merged ${group.length} segments for "${group[0].experiencer_name}" into one`);
+                            }
+                        }
+                        segments = collapsed;
+                    }
+                }
+
                 // ── Name Deduplication (ASR misspelling fix) ─────────
                 if (segments.length > 1) {
                     logStep('Name Deduplication', 'running', `Checking ${segments.length} names for ASR duplicates`);
@@ -576,7 +614,13 @@ export async function processUapVideoIntake(
                     };
 
                     // Post-process: add deterministic timestamps via caption segment matching
-                    if (phenomResult) encounterRow.phenomenology_breakdown = addTimestampsToPhenomenology(phenomResult, rawTimestamped);
+                    if (phenomResult) {
+                        encounterRow.phenomenology_breakdown = addTimestampsToPhenomenology(phenomResult, rawTimestamped);
+                        // Promote key classifications to dedicated columns for filtering
+                        if (phenomResult.hynek_classification && phenomResult.hynek_classification !== 'unknown') {
+                            encounterRow.hynek_type = phenomResult.hynek_classification;
+                        }
+                    }
                     if (contextResult) encounterRow.encounter_context = contextResult;
 
                     if (evidenceResult) {

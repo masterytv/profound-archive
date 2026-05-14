@@ -33,8 +33,8 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
       try {
         let currentUser = initialUser;
         if (!currentUser) {
-          const { data: { session } } = await supabase.auth.getSession();
-          currentUser = session?.user ?? null;
+          const { data: { user: authUser } } = await supabase.auth.getUser();
+          currentUser = authUser ?? null;
         }
 
         if (!isMounted) return;

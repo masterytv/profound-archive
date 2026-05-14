@@ -53,8 +53,8 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
       try {
         let currentUser = initialUser;
         if (!currentUser) {
-          const { data: { session } } = await supabase.auth.getSession();
-          currentUser = (session?.user ?? null) as typeof currentUser;
+          const { data: { user: authUser } } = await supabase.auth.getUser();
+          currentUser = (authUser ?? null) as typeof currentUser;
         }
 
         if (isMounted) {

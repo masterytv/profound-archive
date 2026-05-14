@@ -24,9 +24,11 @@ export const metadata: Metadata = {
 
 // Fetch analytics from our API route
 async function getAnalytics() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
+  // NEXT_PUBLIC_SITE_URL is set in production (e.g., https://projectprofound.org)
+  // VERCEL_URL is set in Vercel deployments (without protocol)
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+    || 'http://localhost:3000';
 
   try {
     const res = await fetch(`${baseUrl}/api/uap/analytics`, {

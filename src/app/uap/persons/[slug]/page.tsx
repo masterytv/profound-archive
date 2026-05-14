@@ -159,9 +159,17 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
                   {person.canonical_name}
                 </h1>
                 {person.role && (
-                  <p className="text-sm text-muted-foreground mt-1 capitalize">
-                    {person.role.replace(/_/g, ' ')}
-                    {person.affiliation && ` · ${Array.isArray(person.affiliation) ? person.affiliation.join(', ') : person.affiliation}`}
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {person.role.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    {person.affiliation && (() => {
+                      try {
+                        const parsed = JSON.parse(person.affiliation);
+                        const affiliations = Array.isArray(parsed) ? parsed.join(', ') : String(parsed);
+                        return ` · ${affiliations}`;
+                      } catch {
+                        return ` · ${person.affiliation}`;
+                      }
+                    })()}
                   </p>
                 )}
 

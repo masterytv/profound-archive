@@ -225,7 +225,7 @@ export function SearchResultCard({ result, video, searchTerm, user }: SearchResu
                     {summary && (
                         <div className="bg-muted/30 p-3 rounded-md text-sm">
                             <div className="flex items-center gap-2 mb-1">
-                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-primary/50 text-primary">AI Video Summary - AI makes mistakes</Badge>
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 border-primary/50 text-primary">Video Summary (AI)</Badge>
                             </div>
                             <p className="text-foreground/90">
                                 {displayedSummary}

@@ -75,7 +75,7 @@ YouTube auto-transcription frequently MISSPELLS proper names, creating multiple 
 
 ## RULES
 1. Each encounter involves a DIFFERENT person/group experiencing a UAP event.
-2. If the same person has multiple separate encounters at different times, list each one separately.
+2. If the same person has multiple separate encounters at different times throughout their life, DO NOT list each one separately. Combine them into ONE encounter under that person's name. A single experiencer telling their life story = ONE encounter, regardless of how many events they describe.
 3. Two people experiencing the SAME event together (e.g., a married couple abducted together) = 1 encounter, not 2. List both names: "Betty & Barney Hill".
 4. FAMILY/HOUSEHOLD GROUPING: If a parent describes their children's experiences as part of the same family encounter, that is ONE encounter under the parent's name (e.g., "Jody & Family"), NOT separate encounters per child. Children briefly mentioned ("my son saw shadows", "Paula drew a picture") are part of the parent's encounter.
 5. MINIMUM SUBSTANCE THRESHOLD: Only create a separate encounter if the person's experience is described in SUBSTANTIAL detail — at least several sentences of their own testimony or a detailed narrative about their specific encounter. Brief mentions, single-line references, or names dropped in passing do NOT qualify as separate encounters. Fold them into the encounter of whoever is telling the story.
