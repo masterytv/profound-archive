@@ -910,7 +910,7 @@ For every UAP file you create:
 
 ### Epic 10.2: Data & Content Fixes (Fixes #1)
 
-- [x] Story 10.2.1: Fix Save/Store buttons — "login required" error when already logged in (0.5d) ✅ (Root cause: auth race condition — each button independently called getUser() on mount; if click happened before check completed, user was null. Fix: added onAuthStateChange listener + re-check auth on click before showing error toast)
+- [x] Story 10.2.1: Fix Save/Store buttons — "login required" error when already logged in (0.5d) ✅ (Three fixes: 1) Switched client-side getUser()→getSession() to avoid navigator.lock contention with 12+ cards; 2) Removed conflicting middleware.ts (Next.js 16 uses proxy.ts); 3) Added domain column to collections table so UAP/NDE each have separate collections)
 - [ ] Story 10.2.2: Video Explorer — populate High Net classification and recurrence filters; evaluate additional filter dimensions (0.5d)
 - [ ] Story 10.2.3: Org pages — add AI-generated summary from video context; fix spelling (Carlile → Carlyle, etc.) (1d)
 - [ ] Story 10.2.4: Normalize duplicate organizations (US Air Force vs U.S. Air Force, etc.) — merge + redirect (0.5d)
