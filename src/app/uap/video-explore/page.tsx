@@ -55,6 +55,9 @@ export default async function UapVideoExplorePage({ searchParams }: PageProps) {
   const minIntelligence = parseInt((params.minIntel as string) || "0", 10);
   const hasOath = parseBoolParam(params.oath);
   const hasPsi = parseBoolParam(params.psi);
+  const hasCraft = parseBoolParam(params.craft);
+  const hasBiologics = parseBoolParam(params.biologics);
+  const hasCrash = parseBoolParam(params.crash);
 
   const supabase = await createClient();
 
@@ -86,6 +89,9 @@ export default async function UapVideoExplorePage({ searchParams }: PageProps) {
       p_min_intelligence: minIntelligence,
       p_has_oath: hasOath,
       p_has_psi: hasPsi,
+      p_has_craft: hasCraft,
+      p_has_biologics: hasBiologics,
+      p_has_crash: hasCrash,
       p_decade: decade,
       p_channel: channel,
     }),

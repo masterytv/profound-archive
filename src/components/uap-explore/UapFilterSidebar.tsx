@@ -223,6 +223,9 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
   const minIntelligence = parseInt(searchParams.get("minIntel") || "0", 10);
   const hasOath = getBoolParam(searchParams, "oath");
   const hasPsi = getBoolParam(searchParams, "psi");
+  const hasCraft = getBoolParam(searchParams, "craft");
+  const hasBiologics = getBoolParam(searchParams, "biologics");
+  const hasCrash = getBoolParam(searchParams, "crash");
 
   // Count active filters for badge
   const activeCount =
@@ -235,7 +238,10 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
     (recurrence ? 1 : 0) +
     (minIntelligence > 0 ? 1 : 0) +
     (hasOath !== null ? 1 : 0) +
-    (hasPsi !== null ? 1 : 0);
+    (hasPsi !== null ? 1 : 0) +
+    (hasCraft !== null ? 1 : 0) +
+    (hasBiologics !== null ? 1 : 0) +
+    (hasCrash !== null ? 1 : 0);
 
   // ─── URL update helper ───────────────────────────────────────────
   const updateParams = useCallback(
@@ -394,6 +400,30 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
             checked={hasPsi}
             onChange={(v) =>
               updateParams({ psi: v === null ? "" : String(v) })
+            }
+          />
+          <FilterToggle
+            label="Craft Observation"
+            count={facets.toggle_counts.has_craft}
+            checked={hasCraft}
+            onChange={(v) =>
+              updateParams({ craft: v === null ? "" : String(v) })
+            }
+          />
+          <FilterToggle
+            label="Biologics Claims"
+            count={facets.toggle_counts.has_biologics}
+            checked={hasBiologics}
+            onChange={(v) =>
+              updateParams({ biologics: v === null ? "" : String(v) })
+            }
+          />
+          <FilterToggle
+            label="Crash Retrieval"
+            count={facets.toggle_counts.has_crash}
+            checked={hasCrash}
+            onChange={(v) =>
+              updateParams({ crash: v === null ? "" : String(v) })
             }
           />
         </div>
