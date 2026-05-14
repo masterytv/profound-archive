@@ -58,6 +58,7 @@ export default async function UapVideoExplorePage({ searchParams }: PageProps) {
   const hasCraft = parseBoolParam(params.craft);
   const hasBiologics = parseBoolParam(params.biologics);
   const hasCrash = parseBoolParam(params.crash);
+  const minCredibility = parseInt((params.minCred as string) || "0", 10);
 
   const supabase = await createClient();
 
@@ -92,6 +93,7 @@ export default async function UapVideoExplorePage({ searchParams }: PageProps) {
       p_has_craft: hasCraft,
       p_has_biologics: hasBiologics,
       p_has_crash: hasCrash,
+      p_min_credibility: minCredibility,
       p_decade: decade,
       p_channel: channel,
     }),

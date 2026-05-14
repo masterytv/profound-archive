@@ -226,6 +226,7 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
   const hasCraft = getBoolParam(searchParams, "craft");
   const hasBiologics = getBoolParam(searchParams, "biologics");
   const hasCrash = getBoolParam(searchParams, "crash");
+  const minCredibility = parseInt(searchParams.get("minCred") || "0", 10);
 
   // Count active filters for badge
   const activeCount =
@@ -241,7 +242,8 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
     (hasPsi !== null ? 1 : 0) +
     (hasCraft !== null ? 1 : 0) +
     (hasBiologics !== null ? 1 : 0) +
-    (hasCrash !== null ? 1 : 0);
+    (hasCrash !== null ? 1 : 0) +
+    (minCredibility > 0 ? 1 : 0);
 
   // ─── URL update helper ───────────────────────────────────────────
   const updateParams = useCallback(
@@ -433,7 +435,7 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
       <AccordionSection
         title="Quality & Scoring"
         icon={<Brain className="w-3.5 h-3.5 text-purple-500" />}
-        defaultOpen={minIntelligence > 0}
+        defaultOpen={minIntelligence > 0 || minCredibility > 0}
       >
         <div>
           <FilterLabel>
@@ -457,6 +459,30 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
             <span>Any</span>
             <span>5</span>
             <span>10</span>
+          </div>
+        </div>
+        <div>
+          <FilterLabel>
+            Min Credibility Score: {minCredibility || "Any"}
+          </FilterLabel>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-2 leading-relaxed">
+            Average speaker credibility (0-100) based on credentials, track record, corroboration, and public standing.
+          </p>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={minCredibility}
+            onChange={(e) =>
+              updateParams({ minCred: e.target.value === "0" ? "" : e.target.value })
+            }
+            className="w-full h-1.5 accent-purple-600 cursor-pointer"
+          />
+          <div className="flex justify-between text-[10px] text-slate-400 tabular-nums">
+            <span>Any</span>
+            <span>50</span>
+            <span>100</span>
           </div>
         </div>
       </AccordionSection>
