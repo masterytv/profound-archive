@@ -4,7 +4,7 @@ import Image from "next/image";
 import {
   Brain, Telescope, Sparkles, Search, MessageCircle,
   Cpu, ChevronRight, BookOpen, Users, Shield,
-  Heart, Globe, Lightbulb, Scale, Handshake,
+  Heart, Globe, Lightbulb, Scale, Handshake, ExternalLink,
 } from "lucide-react";
 import { ContactForm } from "./ContactForm";
 
@@ -403,26 +403,29 @@ export default function AboutNewPage() {
           </div>
         </section>
 
-        {/* ── Blog CTA ────────────────────────────────────────────────────── */}
+        {/* ── Contribute CTA ─────────────────────────────────────────── */}
         <section className="py-16 md:py-20 border-t border-slate-200/60 dark:border-white/10">
-          <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-white/[0.02] p-8 md:p-12 text-center">
+          <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-gradient-to-br from-violet-50/50 to-emerald-50/50 dark:from-violet-900/10 dark:to-emerald-900/10 p-8 md:p-12 text-center">
             <h2
               className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-3"
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
-              Read Our Research
+              Support This Research
             </h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto mb-6">
-              We publish our findings, methodology decisions, and cross-domain discoveries
-              on the blog. Everything is free and open.
+              Project Profound is independently funded. Your contribution helps us
+              maintain the archive, expand our analysis pipeline, and keep everything
+              free and open for researchers and experiencers worldwide.
             </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 text-white font-medium rounded-xl hover:bg-violet-700 transition-colors"
+            <a
+              href="https://www.gofundme.com/f/project-profound"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
             >
-              Visit the Blog
-              <ChevronRight className="w-4 h-4" />
-            </Link>
+              Contribute
+              <ExternalLink className="w-4 h-4" />
+            </a>
           </div>
         </section>
 
