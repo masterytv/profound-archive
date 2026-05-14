@@ -9,7 +9,9 @@
 
 ## 2. Server & API Rules
 - **Admin Security:** ALL `/api/admin/*` routes MUST import and use `isAdminUser()` from `src/lib/auth/admin-guard.ts`.
-- **Auth Tokens:** Always use `getUser()` on the server, NEVER `getSession()`. Use `getAll`/`setAll` for cookie management, never individual get/set methods.
+- **Auth Tokens (Server):** Always use `getUser()` on the server, NEVER `getSession()`. Use `getAll`/`setAll` for cookie management, never individual get/set methods.
+- **Auth Tokens (Client):** In client components (buttons, cards), use `getSession()` for UI gating (show/hide save buttons). `getUser()` acquires `navigator.locks` — with many components mounting simultaneously (12+ search cards), this causes `AbortError: signal is aborted without reason`.
+- **Session Persistence:** `src/proxy.ts` handles auth cookie refresh on every request. NEVER delete or disable this file. Next.js 16 uses `proxy.ts` instead of `middleware.ts` — do NOT create a `middleware.ts` file (causes fatal conflict).
 - **Static Page Build:** `generateStaticParams` and `generateMetadata` MUST use the anon/service client. Never use `createClient()` from `@/lib/supabase/server` as `cookies()` throws outside request scopes.
 - **No `after()` or fire-and-forget on Cloud Run:** Firebase App Hosting (Cloud Run) throttles CPU after the response is sent. This kills `after()`, non-awaited `fetch()`, and any background work. Run pipelines synchronously with `maxDuration = 300`. For user-facing routes that call long pipelines, use the **browser-triggered async pattern** (see below).
 - **Cloudflare 100s Proxy Timeout:** The site sits behind Cloudflare, which enforces a hard 100-second timeout (HTTP 524). For pipelines >100s: POST queues a job in `jobs` table → browser fire-and-forgets to `/api/intake/process` (Cloud Run keeps processing for 300s even after Cloudflare kills the response) → frontend polls GET for status from `jobs` table. Never fire-and-forget from the server response handler.
