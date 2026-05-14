@@ -45,6 +45,7 @@ import { segmentEncounters, extractEncounterText, deduplicateEncounterNames, typ
 import { formatTimestampedTranscript } from '@/lib/ai/format-timestamped-transcript';
 import { addTimestampsToProgramIntel, addTimestampsToPhenomenology } from '@/lib/ai/match-quote-timestamp';
 import { computeVideoStats, mergeEncounterStats } from '@/lib/pipeline/compute-video-stats';
+import { generateMissingSummariesForVideo } from '@/lib/pipeline/entity-summaries';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -842,6 +843,27 @@ export async function processUapVideoIntake(
                 }
             } catch (eventErr: any) {
                 logStep('Match Events', 'failed', eventErr.message);
+            }
+        }
+
+        // ─── Step 12.9: Generate entity summaries for new entities ──
+        // Auto-generate AI descriptions for any orgs/persons/programs linked
+        // to this video that don't have descriptions yet.
+        {
+            const startSummaries = Date.now();
+            try {
+                const openai = getOpenAIClient();
+                const summaryCounts = await generateMissingSummariesForVideo(supabase, openai, videoId);
+                const total = summaryCounts.orgs + summaryCounts.persons + summaryCounts.programs;
+                if (total > 0) {
+                    logStep('Entity Summaries', 'success',
+                        `Generated ${total} summary(ies): ${summaryCounts.orgs} orgs, ${summaryCounts.persons} persons, ${summaryCounts.programs} programs`,
+                        Date.now() - startSummaries);
+                } else {
+                    logStep('Entity Summaries', 'skipped', 'All linked entities already have descriptions');
+                }
+            } catch (summaryErr: any) {
+                logStep('Entity Summaries', 'failed', summaryErr.message);
             }
         }
 

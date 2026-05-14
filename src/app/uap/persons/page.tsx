@@ -267,9 +267,17 @@ export default async function PersonsPage({
               </h3>
 
               {person.role && (
-                <p className="text-xs text-muted-foreground mt-1 capitalize">
-                  {person.role.replace(/_/g, ' ')}
-                  {person.affiliation && ` · ${person.affiliation}`}
+                <p className="text-xs text-muted-foreground mt-1">
+                  {person.role.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                  {person.affiliation && (() => {
+                    try {
+                      const parsed = JSON.parse(person.affiliation);
+                      const str = Array.isArray(parsed) ? parsed.join(', ') : String(parsed);
+                      return ` · ${str}`;
+                    } catch {
+                      return ` · ${person.affiliation}`;
+                    }
+                  })()}
                 </p>
               )}
 

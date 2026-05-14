@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { UapProgramIntelResult } from "@/lib/ai/uap-program-intel";
 import { cn } from "@/lib/utils";
 import { Users, Building2, FileText, Building, MapPin, Cpu, Brain, Scale, Lock, BarChart3 } from "lucide-react";
@@ -95,6 +96,16 @@ export function UapProgramIntelSummaryCard({ data }: UapProgramIntelSummaryCardP
               </div>
             );
           })}
+        </div>
+
+        {/* Methodology link */}
+        <div className="pt-3 border-t border-slate-100 dark:border-white/10 mt-auto">
+          <Link
+            href="/uap/methodology"
+            className="text-[11px] font-medium text-green-600 dark:text-green-400 hover:underline"
+          >
+            About our methodology →
+          </Link>
         </div>
       </div>
     </div>

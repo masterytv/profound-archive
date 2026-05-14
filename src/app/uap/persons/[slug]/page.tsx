@@ -172,6 +172,9 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
                     })()}
                   </p>
                 )}
+                {person.bio && (
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-3">{person.bio}</p>
+                )}
 
                 {/* Stats row */}
                 <div className="flex flex-wrap items-center gap-3 mt-4">
@@ -214,14 +217,6 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
 
         {/* Content */}
         <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-10">
-
-          {/* Bio */}
-          {person.bio && (
-            <section>
-              <h2 className="text-lg font-semibold text-foreground font-serif mb-3">About</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">{person.bio}</p>
-            </section>
-          )}
 
           {/* Video Appearances (Standardized Table) */}
           <UapVideoReferenceTable

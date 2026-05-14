@@ -107,25 +107,24 @@ export default function CredibilityMethodologyPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.1),transparent_60%)]" />
+      <section className="relative overflow-hidden border-b border-border/60" style={{ background: 'linear-gradient(135deg, var(--domain-accent-light, #DCFCE7)08, var(--background) 40%, var(--domain-accent-light, #DCFCE7)04)' }}>
         <div className="max-w-4xl mx-auto px-4 pt-20 pb-12 relative">
           <Link
             href="/uap/methodology"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-8"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-[var(--domain-accent)] transition-colors mb-8"
           >
             <ArrowLeft className="w-3 h-3" />
             Back to Full Methodology
           </Link>
 
-          <div className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-6">
+          <div className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 mb-6">
             <Shield className="w-3.5 h-3.5" />
             Credibility Scoring
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-br from-white via-slate-200 to-slate-400 bg-clip-text text-transparent mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight text-foreground mb-4">
             Credibility Score Methodology
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
+          <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">
             Understanding the &quot;Cred&quot; badge shown on person profiles, how it is calculated,
             and what it does and does not tell you.
           </p>
@@ -134,11 +133,11 @@ export default function CredibilityMethodologyPage() {
 
       {/* What It Is */}
       <section className="max-w-4xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-          <Scale className="w-5 h-5 text-emerald-400" />
+        <h2 className="text-2xl font-bold font-serif mb-4 flex items-center gap-2">
+          <Scale className="w-5 h-5 text-[var(--domain-accent)]" />
           What Is the Credibility Score?
         </h2>
-        <div className="bg-card rounded-xl border border-border p-6 space-y-4 text-muted-foreground leading-relaxed">
+        <div className="bg-card rounded-2xl border border-border/60 p-6 space-y-4 text-muted-foreground leading-relaxed">
           <p>
             The <strong className="text-foreground">Credibility Score</strong> is a{" "}
             <strong className="text-foreground">0-100 composite metric</strong> assigned to each person
@@ -164,8 +163,8 @@ export default function CredibilityMethodologyPage() {
 
       {/* The Rubric */}
       <section className="max-w-4xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-violet-400" />
+        <h2 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2">
+          <FileText className="w-5 h-5 text-[var(--domain-accent)]" />
           Scoring Rubric
         </h2>
         <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -177,11 +176,11 @@ export default function CredibilityMethodologyPage() {
           {RUBRIC_FACTORS.map((f) => (
             <div
               key={f.factor}
-              className="bg-white/5 rounded-xl border border-white/10 p-5 hover:border-emerald-500/30 transition-colors"
+              className="bg-card rounded-2xl border border-border/60 p-5 hover:shadow-lg hover:border-green-200 dark:hover:border-green-800 transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-foreground">{f.factor}</h3>
-                <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                <h3 className="font-semibold font-serif text-foreground">{f.factor}</h3>
+                <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                   +{f.points} pts
                 </span>
               </div>
@@ -190,7 +189,7 @@ export default function CredibilityMethodologyPage() {
                 {f.examples.map((ex) => (
                   <span
                     key={ex}
-                    className="text-[11px] px-2 py-0.5 rounded-md bg-white/5 text-slate-500 border border-white/5"
+                    className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-200/60 dark:border-green-800/40"
                   >
                     {ex}
                   </span>
@@ -201,11 +200,11 @@ export default function CredibilityMethodologyPage() {
         </div>
 
         {/* Score visualization */}
-        <div className="mt-8 bg-white/5 rounded-xl border border-white/10 p-6">
-          <h3 className="font-semibold text-foreground mb-4">Score Interpretation</h3>
+        <div className="mt-8 bg-card rounded-2xl border border-border/60 p-6">
+          <h3 className="font-semibold font-serif text-foreground mb-4">Score Interpretation</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="w-20 text-right text-sm font-mono font-bold text-emerald-400">
+              <span className="w-20 text-right text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400">
                 70-100
               </span>
               <div className="flex-1 h-3 rounded-full bg-emerald-500/20 relative overflow-hidden">
@@ -216,7 +215,7 @@ export default function CredibilityMethodologyPage() {
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-20 text-right text-sm font-mono font-bold text-amber-400">
+              <span className="w-20 text-right text-sm font-mono font-bold text-amber-700 dark:text-amber-400">
                 40-69
               </span>
               <div className="flex-1 h-3 rounded-full bg-amber-500/20 relative overflow-hidden">
@@ -227,7 +226,7 @@ export default function CredibilityMethodologyPage() {
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-20 text-right text-sm font-mono font-bold text-red-400">
+              <span className="w-20 text-right text-sm font-mono font-bold text-red-700 dark:text-red-400">
                 0-39
               </span>
               <div className="flex-1 h-3 rounded-full bg-red-500/20 relative overflow-hidden">
@@ -243,14 +242,14 @@ export default function CredibilityMethodologyPage() {
 
       {/* How It's Calculated */}
       <section className="max-w-4xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-          <Brain className="w-5 h-5 text-pink-400" />
+        <h2 className="text-2xl font-bold font-serif mb-4 flex items-center gap-2">
+          <Brain className="w-5 h-5 text-[var(--domain-accent)]" />
           How It&apos;s Calculated
         </h2>
-        <div className="bg-card rounded-xl border border-border p-6 space-y-4 text-muted-foreground leading-relaxed text-sm">
+        <div className="bg-card rounded-2xl border border-border/60 p-6 space-y-4 text-muted-foreground leading-relaxed text-sm">
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <span className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-300 shrink-0">
+              <span className="w-7 h-7 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 flex items-center justify-center text-xs font-bold text-green-700 dark:text-green-400 shrink-0">
                 1
               </span>
               <div>
@@ -260,18 +259,18 @@ export default function CredibilityMethodologyPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-300 shrink-0">
+              <span className="w-7 h-7 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 flex items-center justify-center text-xs font-bold text-green-700 dark:text-green-400 shrink-0">
                 2
               </span>
               <div>
                 <strong className="text-foreground">Per-Person Scoring</strong> — For each named person,
                 the AI identifies which of the six rubric factors are supported by evidence in the transcript.
-                It produces a list of <code className="text-emerald-300 bg-white/5 px-1 rounded text-xs">credibility_indicators</code> (verifiable
+                It produces a list of <code className="text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-1 rounded text-xs">credibility_indicators</code> (verifiable
                 facts) and sums the corresponding point values.
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-300 shrink-0">
+              <span className="w-7 h-7 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 flex items-center justify-center text-xs font-bold text-green-700 dark:text-green-400 shrink-0">
                 3
               </span>
               <div>
@@ -282,7 +281,7 @@ export default function CredibilityMethodologyPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-300 shrink-0">
+              <span className="w-7 h-7 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 flex items-center justify-center text-xs font-bold text-green-700 dark:text-green-400 shrink-0">
                 4
               </span>
               <div>
@@ -298,13 +297,13 @@ export default function CredibilityMethodologyPage() {
 
       {/* Strengths */}
       <section className="max-w-4xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+        <h2 className="text-2xl font-bold font-serif mb-4 flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           Strengths
         </h2>
-        <div className="bg-emerald-500/5 rounded-xl border border-emerald-500/20 p-6 space-y-3 text-sm text-muted-foreground leading-relaxed">
+        <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-200/60 dark:border-emerald-800/40 p-6 space-y-3 text-sm text-muted-foreground leading-relaxed">
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Consistent application</strong> — Every person is evaluated
               against the same six-factor rubric. No human bias, favoritism, or reputation effects
@@ -312,7 +311,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Evidence-anchored</strong> — The rubric is grounded in
               verifiable, objective facts (clearances, sworn testimony, documentation), not subjective
@@ -320,7 +319,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Multi-source averaging</strong> — Scores improve with
               more data. A person mentioned across many videos has a more robust average than someone
@@ -328,7 +327,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Transparent rubric</strong> — The exact factors and point
               values are published here. Researchers can independently assess whether the AI&apos;s
@@ -336,7 +335,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Scalable</strong> — The same analysis has been applied
               uniformly across hundreds of videos, something no human team could achieve with the same
@@ -348,13 +347,13 @@ export default function CredibilityMethodologyPage() {
 
       {/* Weaknesses */}
       <section className="max-w-4xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-          <XCircle className="w-5 h-5 text-red-400" />
+        <h2 className="text-2xl font-bold font-serif mb-4 flex items-center gap-2">
+          <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
           Limitations &amp; Weaknesses
         </h2>
-        <div className="bg-red-500/5 rounded-xl border border-red-500/20 p-6 space-y-3 text-sm text-muted-foreground leading-relaxed">
+        <div className="bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-200/60 dark:border-red-800/40 p-6 space-y-3 text-sm text-muted-foreground leading-relaxed">
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Transcript-dependent</strong> — The AI can only score
               indicators mentioned in the video transcript. If a person holds a TS/SCI clearance but
@@ -363,7 +362,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Not a truth detector</strong> — A high credibility score
               means the person has many verifiable indicators of institutional credibility. It does not
@@ -372,7 +371,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">AI interpretation errors</strong> — GPT-4o-mini may
               occasionally misattribute indicators (e.g., confusing a journalist&apos;s report about
@@ -380,7 +379,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Institutional bias in rubric design</strong> — The
               rubric inherently favors people with government/military backgrounds (clearances,
@@ -390,7 +389,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">Video selection bias</strong> — The score reflects what
               channels in our corpus say about a person. If the corpus is skewed toward channels that
@@ -398,7 +397,7 @@ export default function CredibilityMethodologyPage() {
             </span>
           </div>
           <div className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400 mt-1.5 shrink-0" />
             <span>
               <strong className="text-foreground">No cross-verification</strong> — The AI does not
               independently verify whether a claimed credential is real. If a transcript says
@@ -410,9 +409,9 @@ export default function CredibilityMethodologyPage() {
 
       {/* Bottom CTA */}
       <section className="max-w-4xl mx-auto px-4 py-10 pb-20">
-        <div className="bg-white/5 rounded-xl border border-white/10 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="bg-card rounded-2xl border border-border/60 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-1">
-            <h3 className="font-semibold text-foreground mb-1">Explore Persons of Interest</h3>
+            <h3 className="font-semibold font-serif text-foreground mb-1">Explore Persons of Interest</h3>
             <p className="text-sm text-muted-foreground">
               See the credibility scores in context alongside video appearances, roles, and
               extracted claims.
@@ -421,7 +420,7 @@ export default function CredibilityMethodologyPage() {
           <div className="flex gap-3">
             <Link
               href="/uap/persons"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-colors"
             >
               <Users className="w-4 h-4" />
               Browse Persons

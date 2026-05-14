@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   TrendingUp,
   Brain,
@@ -105,6 +107,7 @@ function ScoreCard({
   accentText,
   accentIcon,
   breakdown,
+  methodologyHref,
 }: {
   icon: typeof TrendingUp;
   label: string;
@@ -117,6 +120,7 @@ function ScoreCard({
   accentText: string;
   accentIcon: string;
   breakdown: React.ReactNode;
+  methodologyHref: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const pct = score !== null ? Math.round((score / maxScore) * 100) : null;
@@ -151,6 +155,12 @@ function ScoreCard({
             {description}
           </p>
           {breakdown}
+          <Link
+            href={methodologyHref}
+            className="inline-flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400 hover:underline mt-3"
+          >
+            Learn about this scale →
+          </Link>
         </div>
       )}
     </div>
@@ -295,6 +305,7 @@ export function TriadScoresPanel({ scores }: TriadScoresPanelProps) {
           accentBorder="border-emerald-200 dark:border-emerald-800"
           accentText="text-emerald-700 dark:text-emerald-300"
           accentIcon="text-emerald-600 dark:text-emerald-400"
+          methodologyHref="/uap/methodology/evidence-strength"
           breakdown={
             scores.evidence_breakdown?.criteria ? (
               <CriterionGrid criteria={scores.evidence_breakdown.criteria} />
@@ -316,6 +327,7 @@ export function TriadScoresPanel({ scores }: TriadScoresPanelProps) {
           accentBorder="border-blue-200 dark:border-blue-800"
           accentText="text-blue-700 dark:text-blue-300"
           accentIcon="text-blue-600 dark:text-blue-400"
+          methodologyHref="/uap/methodology/contact-depth"
           breakdown={
             scores.contact_depth_breakdown?.categories ? (
               <div className="space-y-3">
@@ -349,6 +361,7 @@ export function TriadScoresPanel({ scores }: TriadScoresPanelProps) {
           accentBorder="border-rose-200 dark:border-rose-800"
           accentText="text-rose-700 dark:text-rose-300"
           accentIcon="text-rose-600 dark:text-rose-400"
+          methodologyHref="/uap/methodology/transformation"
           breakdown={
             scores.transformation_breakdown?.domains ? (
               <CriterionGrid criteria={scores.transformation_breakdown.domains} />

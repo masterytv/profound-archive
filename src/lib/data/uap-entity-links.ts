@@ -59,13 +59,26 @@ export async function findLinkedPersons(
 
   return data
     .filter((p) => p.slug !== excludeSlug)
-    .map((p) => ({
-      slug: p.slug,
-      name: p.canonical_name,
-      subtitle: [p.role?.replace(/_/g, ' '), p.affiliation].filter(Boolean).join(' · ') || undefined,
-      href: `/uap/persons/${p.slug}`,
-      count: p.total_mentions ?? 0,
-    }));
+    .map((p) => {
+      // Parse affiliation JSON string (stored as text, e.g., '["OSS","CIA"]')
+      let affiliationStr: string | undefined;
+      if (p.affiliation) {
+        try {
+          const parsed = JSON.parse(p.affiliation);
+          affiliationStr = Array.isArray(parsed) ? parsed.join(', ') : String(parsed);
+        } catch {
+          affiliationStr = p.affiliation;
+        }
+      }
+      const roleStr = p.role?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+      return {
+        slug: p.slug,
+        name: p.canonical_name,
+        subtitle: [roleStr, affiliationStr].filter(Boolean).join(' · ') || undefined,
+        href: `/uap/persons/${p.slug}`,
+        count: p.total_mentions ?? 0,
+      };
+    });
 }
 
 /**

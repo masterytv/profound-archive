@@ -124,7 +124,10 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ slug
               <div className="flex-1 min-w-0">
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-serif tracking-tight">{org.canonical_name}</h1>
                 {org.org_type && (
-                  <p className="text-sm text-muted-foreground mt-1 capitalize">{org.org_type.replace(/_/g, ' ')}</p>
+                  <p className="text-sm text-muted-foreground mt-1"><span className="font-semibold capitalize">{org.org_type.replace(/_/g, ' ')}</span></p>
+                )}
+                {org.description && (
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-3">{org.description}</p>
                 )}
                 <div className="flex flex-wrap items-center gap-3 mt-4">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/60 bg-card text-sm">
@@ -146,12 +149,6 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ slug
         </section>
 
         <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-10">
-          {org.description && (
-            <section>
-              <h2 className="text-lg font-semibold text-foreground font-serif mb-3">About</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">{org.description}</p>
-            </section>
-          )}
 
           {/* Video References (Standardized Table) */}
           <UapVideoReferenceTable

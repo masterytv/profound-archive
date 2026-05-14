@@ -113,12 +113,14 @@ function ScoreBar({
   max,
   icon: Icon,
   color,
+  href,
 }: {
   label: string;
   score: number | null;
   max: number;
   icon: React.ElementType;
   color: string;
+  href: string;
 }) {
   if (score == null) return null;
   const pct = Math.round((score / max) * 100);
@@ -126,10 +128,13 @@ function ScoreBar({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-sm">
-        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+        <Link
+          href={href}
+          className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+        >
           <Icon className="w-3.5 h-3.5" />
           {label}
-        </span>
+        </Link>
         <span className="font-semibold text-slate-800 dark:text-slate-200">
           {score.toFixed(1)} / {max}
         </span>
@@ -438,6 +443,7 @@ export default async function ContacteeProfilePage({
                     max={28}
                     icon={Shield}
                     color="bg-green-500"
+                    href="/uap/methodology/evidence-strength"
                   />
                   <ScoreBar
                     label="Contact Depth"
@@ -445,6 +451,7 @@ export default async function ContacteeProfilePage({
                     max={32}
                     icon={Zap}
                     color="bg-emerald-500"
+                    href="/uap/methodology/contact-depth"
                   />
                   <ScoreBar
                     label="Transformation"
@@ -452,8 +459,15 @@ export default async function ContacteeProfilePage({
                     max={50}
                     icon={Eye}
                     color="bg-teal-500"
+                    href="/uap/methodology/transformation"
                   />
                 </div>
+                <Link
+                  href="/uap/methodology"
+                  className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400 hover:underline mt-3"
+                >
+                  About our scoring methodology →
+                </Link>
               </div>
             )}
 
