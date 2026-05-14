@@ -18,8 +18,8 @@
 | Sprint 7: Mass Analysis & Intelligence | ✅ Complete | 2026-05-12 |
 | Sprint 8: Scanner Expansion | ✅ Complete (8.3.2, 8.3.4 deferred) | 2026-05-13 |
 | Sprint 9: Engagement & CRM | ✅ Complete | 2026-05-13 |
-| Sprint 10: Site Fixes & Polish | 🔲 Not Started | — |
-| Sprint 11: Unified Homepage & Brand Evolution | 🔲 Not Started | — |
+| Sprint 10: Site Fixes & Polish | ✅ Complete | 2026-05-14 |
+| Sprint 11: Unified Homepage & Brand Evolution | 🔄 In Progress | — |
 | Sprint 12: Security Audit | 🔲 Not Started | — |
 | Backlog: Revenue & Growth Strategy | 📋 Brainstorm | — |
 
@@ -943,14 +943,15 @@ For every UAP file you create:
 >
 > **Design at `/consciousness` (not replacing `/` until launch)**
 
-- [ ] Story 11.1.1: Design homepage mockup — wireframe with hero (consciousness thesis), dual-path CTA (NDE vs UAP), cross-domain highlights from `/research/cross-domain`, stats showcase, community invite (0.5d)
-- [ ] Story 11.1.2: Build hero section — cinematic, compelling intro with the consciousness framing; animated or parallax; "Explore NDEs" and "Explore UAP" dual CTAs (1d)
-- [ ] Story 11.1.3: Build cross-domain highlights section — pull top overlapping phenomena from cross-domain research data; graphical visualization (e.g., Venn diagram, connection map) (1d)
-- [ ] Story 11.1.4: Build stats showcase — combined corpus stats (total videos, experiencers, data points, analysis dimensions) with animated counters (0.5d)
-- [ ] Story 11.1.5: Build "For Researchers" section — link to cross-domain comparison, methodology docs, data explorer (0.5d)
-- [ ] Story 11.1.6: Build "For Explorers" section — featured videos, recent discoveries, curated journeys (0.5d)
-- [ ] Story 11.1.7: Polish & test — responsive design, dark/light mode, Lighthouse audit, A11y (0.5d)
-- [ ] Story 11.1.8: Launch gate check — verify ≥500 encounters + ≥2,000 total UAP videos → swap `/consciousness` to `/` (0.1d)
+- [x] Story 11.1.1: Design homepage mockup — wireframe with hero (consciousness thesis), dual-path CTA (NDE vs UAP), cross-domain highlights from `/research/cross-domain`, stats showcase, community invite (0.5d)
+- [x] Story 11.1.2: Build hero section — cinematic, compelling intro with the consciousness framing; animated or parallax; "Explore NDEs" and "Explore UAP" dual CTAs (1d)
+- [x] Story 11.1.3: Build cross-domain highlights section — pull top overlapping phenomena from cross-domain research data; graphical visualization (e.g., Venn diagram, connection map) (1d)
+- [x] Story 11.1.4: Build stats showcase — combined corpus stats (total videos, experiencers, data points, analysis dimensions) with animated counters (0.5d)
+- [x] Story 11.1.5: Build "For Researchers" section — link to cross-domain comparison, methodology docs, data explorer (0.5d)
+- [x] Story 11.1.6: Build "For Explorers" section — featured videos, recent discoveries, curated journeys (0.5d)
+- [x] Story 11.1.7: UAP Landing Page Redesign — replace `/uap` with a comprehensive "Mega Page" architecture mirroring the Explore mega menu with benefit-driven copy and CSS-only animations (1d) ✅ 2026-05-14
+- [x] Story 11.1.8: Polish & test — responsive design, dark/light mode, Lighthouse audit, A11y (0.5d)
+- [ ] Story 11.1.9: Launch gate check — verify ≥500 encounters + ≥2,000 total UAP videos → swap `/consciousness` to `/` (0.1d)
 
 ### Epic 11.2: About Page Rewrite
 
