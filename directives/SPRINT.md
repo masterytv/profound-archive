@@ -951,11 +951,11 @@ For every UAP file you create:
 - [x] Story 11.1.6: Build "For Explorers" section — featured videos, recent discoveries, curated journeys (0.5d)
 - [x] Story 11.1.7: UAP Landing Page Redesign — replace `/uap` with a comprehensive "Mega Page" architecture mirroring the Explore mega menu with benefit-driven copy and CSS-only animations (1d) ✅ 2026-05-14
 - [x] Story 11.1.8: Polish & test — responsive design, dark/light mode, Lighthouse audit, A11y (0.5d)
-- [ ] Story 11.1.9: Launch gate check — verify ≥500 encounters + ≥2,000 total UAP videos → swap `/consciousness` to `/` (0.1d)
+- **Route swap (`/home-new` → `/`) deferred — will be done manually when UAP encounter analysis reaches critical mass.**
 
 ### Epic 11.2: About Page Rewrite
 
-- [ ] Story 11.2.1: Rewrite `/about` page — broader consciousness research framing, team, mission, methodology overview, dual-domain positioning (1d)
+- [x] Story 11.2.1: Rewrite `/about` page — broader consciousness research framing, team, mission, methodology overview, dual-domain positioning (1d) ✅ 2026-05-14 (built at `/about-new`)
 
 ### Epic 11.3: GoFundMe Page Rewrite
 
