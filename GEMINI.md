@@ -61,3 +61,32 @@ Do not guess how this app works. Read these files when touching related systems:
 - If a task requires a skill not in the active set, check the archive before building from scratch.
 - To restore: `mv ~/.gemini/antigravity/skills-archive/<skill-name> ~/.gemini/antigravity/skills/`
 - See `skills_keep_list.md` in the brain artifacts for the full rationale.
+
+## 8. Antigravity Sandbox Restrictions (MANDATORY — Do NOT Attempt These Commands)
+
+> **⚠️ TOKEN-SAVING RULE:** The Antigravity IDE runs terminal commands inside a macOS sandbox that blocks credential access, network-dependent package management, and certain filesystem operations. **Do NOT attempt the commands below** — they will always fail with `EPERM: operation not permitted` or hang waiting for auth. Instead, tell the user to run them in their host terminal.
+
+### Blocked Commands (Always Fail in Agent Terminal)
+| Category | Blocked Commands | Reason |
+|---|---|---|
+| **Git (network)** | `git push`, `git pull`, `git fetch`, `git clone` | No access to SSH keys or credential helpers |
+| **Git (destructive)** | `git push -f`, `git reset --hard` | Classified as destructive; requires manual approval even outside sandbox |
+| **Package install** | `npm install`, `npm ci`, `yarn install`, `pnpm install` | Network access + filesystem write restrictions (EPERM) |
+| **Package runners** | `npx <script>`, `bunx`, `pnpx` | Downloads + executes external code; blocked by network sandbox |
+| **System tools** | `brew install`, `sudo`, `chmod`, `chown` | System-level modifications outside workspace boundary |
+| **Credential tools** | `gcloud auth`, `firebase login`, `supabase login`, `ssh` | Cannot access host keychain or credential store |
+| **Deployment** | `vercel deploy`, `firebase deploy`, `fly deploy` | Requires both network + credentials |
+
+### What the Agent CAN Do
+- ✅ `git add`, `git commit`, `git status`, `git diff`, `git log` (local-only git operations)
+- ✅ `npm run dev`, `npm run build`, `npm test` (using already-installed packages)
+- ✅ Read/write files within the workspace
+- ✅ Use MCP tools (GitHub MCP for push/PR, Supabase MCP for DB operations)
+- ✅ `cat`, `ls`, `find`, `grep`, `head`, `tail`, `wc` and other read-only utilities
+
+### Workaround Protocol
+When a task requires a blocked command:
+1. **Do NOT attempt the command.** It wastes tokens and produces confusing error output.
+2. **Tell the user** exactly what to run in their host terminal.
+3. **For git push:** Use the `git-pushing` skill which leverages the GitHub MCP `push_files` tool, or ask the user to push manually.
+4. **For npm install:** Ask the user to run it in their terminal, then proceed with `npm run dev` after they confirm.

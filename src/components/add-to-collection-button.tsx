@@ -52,8 +52,10 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
       try {
         let currentUser = initialUser;
         if (!currentUser) {
-          const { data: { user: authUser } } = await supabase.auth.getUser();
-          currentUser = (authUser ?? null) as typeof currentUser;
+          // Use getSession() instead of getUser() to avoid navigator.lock contention
+          // when many buttons mount simultaneously. Session check is sufficient for UI gating.
+          const { data: { session } } = await supabase.auth.getSession();
+          currentUser = (session?.user ?? null) as typeof currentUser;
         }
 
         if (isMounted) {
@@ -68,13 +70,7 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
       }
     };
     getUser();
-
-    // Listen for auth state changes so login/logout is reflected immediately
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (isMounted) setUser(session?.user ?? null);
-    });
-
-    return () => { isMounted = false; subscription.unsubscribe(); };
+    return () => { isMounted = false; };
   }, [supabase, videoId]);
 
   const fetchData = async (currentUser: User) => {
@@ -197,12 +193,16 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
 
   const handleLoginPrompt = async () => {
     // Re-check auth before showing the prompt — handles race where initial check hadn't completed
-    const { data: { user: freshUser } } = await supabase.auth.getUser();
-    if (freshUser) {
-      setUser(freshUser);
-      // Now that we have a user, open the popover instead of showing the error
-      setIsPopoverOpen(true);
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const freshUser = session?.user ?? null;
+      if (freshUser) {
+        setUser(freshUser);
+        setIsPopoverOpen(true);
+        return;
+      }
+    } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') return;
     }
 
     toast({

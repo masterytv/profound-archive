@@ -32,8 +32,10 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
       try {
         let currentUser = initialUser;
         if (!currentUser) {
-          const { data: { user: authUser } } = await supabase.auth.getUser();
-          currentUser = authUser ?? null;
+          // Use getSession() instead of getUser() to avoid navigator.lock contention
+          // when many buttons mount simultaneously. Session check is sufficient for UI gating.
+          const { data: { session } } = await supabase.auth.getSession();
+          currentUser = session?.user ?? null;
         }
 
         if (!isMounted) return;
@@ -68,22 +70,20 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
     };
 
     checkUserAndFavoriteStatus();
-
-    // Listen for auth state changes so login/logout is reflected immediately
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (isMounted) setUser(session?.user ?? null);
-    });
-
-    return () => { isMounted = false; subscription.unsubscribe(); };
+    return () => { isMounted = false; };
   }, [supabase, videoId]);
 
   const toggleFavorite = async () => {
-    // Re-check auth if user is null — handles race where initial check hadn't completed
+    // Re-check auth if user is null — handles race where initial mount check hadn't completed
     let currentUser = user;
     if (!currentUser) {
-      const { data: { user: freshUser } } = await supabase.auth.getUser();
-      currentUser = freshUser;
-      if (currentUser) setUser(currentUser);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        currentUser = session?.user ?? null;
+        if (currentUser) setUser(currentUser);
+      } catch (e) {
+        if (e instanceof Error && e.name === 'AbortError') return;
+      }
     }
 
     if (!currentUser) {

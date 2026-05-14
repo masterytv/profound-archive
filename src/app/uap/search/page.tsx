@@ -139,17 +139,17 @@ function UapSearchContent() {
     [results],
   );
 
-  // Check auth for save functionality
+  // Check auth for save functionality — use getSession() to avoid navigator.lock contention
   useEffect(() => {
-    const getUser = async () => {
+    const checkSession = async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        setUser(data.user);
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
       } catch {
-        // AbortError from auth locks is harmless
+        // Harmless — session not available yet
       }
     };
-    getUser();
+    checkSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
