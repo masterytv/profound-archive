@@ -18,12 +18,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+// Lazy client creation — avoids crashing during Next.js static page collection
+// when env vars aren't available (Firebase App Hosting build)
+function getSupabaseAdmin() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) throw new Error('Missing Supabase environment variables');
+    return createClient(url, key);
+}
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+function getOpenAI() {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error('Missing OPENAI_API_KEY');
+    return new OpenAI({ apiKey });
+}
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
 
@@ -72,7 +80,7 @@ Rules:
 - If you don't have enough context to write meaningfully, write a brief factual identification only
 - Do NOT mention Project Profound or "this archive" in the description`;
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
             { role: 'system', content: systemPrompt },
@@ -89,7 +97,7 @@ Rules:
 
 async function getVideoTitles(videoIds: string[]): Promise<string[]> {
     if (!videoIds?.length) return [];
-    const { data } = await supabase
+    const { data } = await getSupabaseAdmin()
         .from('uap_vids')
         .select('title')
         .in('video_id', videoIds.slice(0, 10)); // Cap at 10 for context window
@@ -97,7 +105,7 @@ async function getVideoTitles(videoIds: string[]): Promise<string[]> {
 }
 
 async function processOrgs(): Promise<{ updated: number; errors: string[] }> {
-    const { data: orgs } = await supabase
+    const { data: orgs } = await getSupabaseAdmin()
         .from('uap_canonical_orgs')
         .select('id, canonical_name, org_type, aliases, total_mentions, linked_video_ids')
         .is('description', null)
@@ -113,7 +121,7 @@ async function processOrgs(): Promise<{ updated: number; errors: string[] }> {
             const videoTitles = await getVideoTitles(org.linked_video_ids);
             const description = await generateSummary('organization', org.canonical_name, org, videoTitles);
             if (description) {
-                await supabase
+                await getSupabaseAdmin()
                     .from('uap_canonical_orgs')
                     .update({ description })
                     .eq('id', org.id);
@@ -131,7 +139,7 @@ async function processOrgs(): Promise<{ updated: number; errors: string[] }> {
 }
 
 async function processPersons(): Promise<{ updated: number; errors: string[] }> {
-    const { data: persons } = await supabase
+    const { data: persons } = await getSupabaseAdmin()
         .from('uap_canonical_persons')
         .select('id, canonical_name, role, affiliation, aliases, total_mentions, avg_credibility_score, linked_video_ids')
         .is('bio', null)
@@ -147,7 +155,7 @@ async function processPersons(): Promise<{ updated: number; errors: string[] }> 
             const videoTitles = await getVideoTitles(person.linked_video_ids);
             const bio = await generateSummary('person', person.canonical_name, person, videoTitles);
             if (bio) {
-                await supabase
+                await getSupabaseAdmin()
                     .from('uap_canonical_persons')
                     .update({ bio })
                     .eq('id', person.id);
@@ -165,7 +173,7 @@ async function processPersons(): Promise<{ updated: number; errors: string[] }> 
 }
 
 async function processPrograms(): Promise<{ updated: number; errors: string[] }> {
-    const { data: programs } = await supabase
+    const { data: programs } = await getSupabaseAdmin()
         .from('uap_canonical_programs')
         .select('id, canonical_name, program_type, aliases, total_mentions, linked_video_ids')
         .is('description', null)
@@ -181,7 +189,7 @@ async function processPrograms(): Promise<{ updated: number; errors: string[] }>
             const videoTitles = await getVideoTitles(program.linked_video_ids);
             const description = await generateSummary('program', program.canonical_name, program, videoTitles);
             if (description) {
-                await supabase
+                await getSupabaseAdmin()
                     .from('uap_canonical_programs')
                     .update({ description })
                     .eq('id', program.id);

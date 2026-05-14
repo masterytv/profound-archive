@@ -61,31 +61,84 @@ export async function POST(request: Request) {
     byVideo.set(enc.video_id, group);
   }
 
-  // Find videos with multiple encounter rows but only 1 distinct name
+  // Helper: extract base person name (before " & ", " and " suffixes)
+  const getBaseName = (name: string): string => {
+    const lower = name.toLowerCase().trim();
+    const ampIdx = lower.indexOf(' & ');
+    if (ampIdx > 0) return lower.slice(0, ampIdx).trim();
+    const andIdx = lower.indexOf(' and ');
+    if (andIdx > 0) return lower.slice(0, andIdx).trim();
+    return lower;
+  };
+
+  // Helper: check if two names refer to the same person (fuzzy match)
+  const isSamePerson = (a: string, b: string): boolean => {
+    const aFull = a.toLowerCase().trim();
+    const bFull = b.toLowerCase().trim();
+    if (aFull === bFull) return true;
+    const aBase = getBaseName(a);
+    const bBase = getBaseName(b);
+    if (aBase === bBase) return true;
+    if (aBase.includes(bBase) || bBase.includes(aBase)) return true;
+    if (aFull.includes(bFull) || bFull.includes(aFull)) return true;
+    return false;
+  };
+
+  // Find videos with multiple encounter rows for the same person
+  // Uses fuzzy matching to catch "Person" + "Person & Wife" variants
   const videosToFix: Array<{
     videoId: string;
     encounterCount: number;
-    experiencerName: string;
-    sourceType: string;
+    groups: Array<{
+      experiencerName: string;
+      sourceType: string;
+      count: number;
+    }>;
     encounterIds: string[];
   }> = [];
 
   for (const [videoId, encounters] of byVideo) {
     if (encounters.length <= 1) continue;
 
-    const distinctNames = new Set(encounters.map(e => e.experiencer_name.toLowerCase().trim()));
-    if (distinctNames.size === 1) {
+    // Build fuzzy groups: cluster names that match the same person
+    const groups: Array<typeof encounters> = [];
+    for (const enc of encounters) {
+      let placed = false;
+      for (const group of groups) {
+        if (isSamePerson(enc.experiencer_name, group[0].experiencer_name)) {
+          group.push(enc);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        groups.push([enc]);
+      }
+    }
+
+    // Check if any person has duplicate rows (>1 row for same person)
+    const hasDuplicates = groups.some(g => g.length > 1);
+    if (hasDuplicates) {
       videosToFix.push({
         videoId,
         encounterCount: encounters.length,
-        experiencerName: encounters[0].experiencer_name,
-        sourceType: encounters[0].source_type,
+        groups: groups.map(g => ({
+          experiencerName: g
+            .map(e => e.experiencer_name)
+            .sort((a, b) => a.length - b.length)[0], // shortest = cleanest
+          sourceType: g.find(e =>
+            e.source_type === 'direct_experiencer' || e.source_type === 'interview_with_experiencer'
+          )?.source_type || g[0].source_type,
+          count: g.length,
+        })),
         encounterIds: encounters.map(e => e.id),
       });
     }
   }
 
-  console.log(`[fix-encounters] Found ${videosToFix.length} videos with over-split encounters`);
+  const totalWillBecome = videosToFix.reduce((sum, v) => sum + v.groups.length, 0);
+
+  console.log(`[fix-encounters] Found ${videosToFix.length} videos with over-split encounters (${totalWillBecome} total after fix)`);
 
   if (dryRun) {
     return NextResponse.json({
@@ -94,15 +147,15 @@ export async function POST(request: Request) {
       videoIds: videosToFix.map(v => v.videoId),
       details: videosToFix.map(v => ({
         videoId: v.videoId,
-        experiencer: v.experiencerName,
         currentEncounterCount: v.encounterCount,
-        willBecome: 1,
+        willBecome: v.groups.length,
+        persons: v.groups.map(g => `${g.experiencerName} (${g.count}→1)`),
       })),
     });
   }
 
   // ── Fix each video ────────────────────────────────────────────────────────
-  const results: Array<{ videoId: string; status: string; deleted: number }> = [];
+  const results: Array<{ videoId: string; status: string; deleted: number; newCount: number }> = [];
 
   for (const video of videosToFix) {
     try {
@@ -113,47 +166,51 @@ export async function POST(request: Request) {
         .eq('video_id', video.videoId);
 
       if (deleteError) {
-        results.push({ videoId: video.videoId, status: 'delete_failed', deleted: 0 });
+        results.push({ videoId: video.videoId, status: 'delete_failed', deleted: 0, newCount: 0 });
         continue;
       }
 
-      // Insert ONE clean encounter row with no analysis (reanalyze will fill it)
+      // Insert ONE clean encounter row PER distinct person (no analysis — reanalyze will fill it)
+      const rowsToInsert = video.groups.map((g, i) => ({
+        video_id: video.videoId,
+        experiencer_name: g.experiencerName,
+        source_type: g.sourceType,
+        encounter_label: `${g.experiencerName}'s Encounter`,
+        encounter_index: i,
+        segment_text: null, // null = use full transcript
+        analysis_model: null,
+        analyzed_at: null,
+      }));
+
       const { error: insertError } = await supabase
         .from('uap_encounters')
-        .insert({
-          video_id: video.videoId,
-          experiencer_name: video.experiencerName,
-          source_type: video.sourceType,
-          encounter_label: `${video.experiencerName}'s Encounter`,
-          encounter_index: 0,
-          segment_text: null, // null = use full transcript
-          analysis_model: null,
-          analyzed_at: null,
-        });
+        .insert(rowsToInsert);
 
       if (insertError) {
-        results.push({ videoId: video.videoId, status: 'insert_failed', deleted: video.encounterCount });
+        results.push({ videoId: video.videoId, status: 'insert_failed', deleted: video.encounterCount, newCount: 0 });
         continue;
       }
 
       // Update uap_vids flags
+      const isMulti = video.groups.length > 1;
       await supabase
         .from('uap_vids')
         .update({
-          multi_encounter: false,
-          encounter_count: 1,
+          multi_encounter: isMulti,
+          encounter_count: video.groups.length,
         })
         .eq('video_id', video.videoId);
 
       results.push({
         videoId: video.videoId,
         status: 'consolidated',
-        deleted: video.encounterCount - 1,
+        deleted: video.encounterCount - video.groups.length,
+        newCount: video.groups.length,
       });
 
-      console.log(`[fix-encounters] ✅ ${video.videoId}: ${video.encounterCount} → 1 (${video.experiencerName})`);
+      console.log(`[fix-encounters] ✅ ${video.videoId}: ${video.encounterCount} → ${video.groups.length} (${video.groups.map(g => g.experiencerName).join(', ')})`);
     } catch (err: any) {
-      results.push({ videoId: video.videoId, status: `error: ${err.message}`, deleted: 0 });
+      results.push({ videoId: video.videoId, status: `error: ${err.message}`, deleted: 0, newCount: 0 });
     }
   }
 
@@ -167,3 +224,4 @@ export async function POST(request: Request) {
     results,
   });
 }
+

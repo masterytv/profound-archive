@@ -376,9 +376,12 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
 
               {/* Experiencer name(s) — prefer encounters table for completeness */}
               {(() => {
-                // Build experiencer name list from encounters (more complete than classifier's 5K-char excerpt)
+                // Build experiencer name list — only direct/interview experiencers, not retold accounts
                 const encounterNames = hasEncounters
-                  ? encounters.map(e => e.experiencer_name).filter(Boolean)
+                  ? [...new Set(encounters
+                      .filter(e => e.source_type !== 'retold_encounter')
+                      .map(e => e.experiencer_name)
+                      .filter(Boolean))]
                   : [];
                 const displayName = encounterNames.length > 0
                   ? encounterNames.join(', ')
@@ -481,6 +484,9 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
 
             {/* ── Encounter Context + Deep Analysis (from uap_encounters) ─── */}
             {hasEncounters && encounters.map((enc) => {
+              // Skip retold encounters — they produce mostly empty analysis cards
+              if (enc.source_type === 'retold_encounter') return null;
+
               const encPhenomData = enc.phenomenology_breakdown as UapPhenomenologyResult | null;
               const encContextData = enc.encounter_context as UapEncounterContextResult | null;
               const encEvidenceData = enc.evidence_breakdown as EvidenceBreakdown | null;

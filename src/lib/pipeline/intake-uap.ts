@@ -472,34 +472,88 @@ export async function processUapVideoIntake(
                 // Even if segmenter returns multiple segments for the same person
                 // (e.g., 6 events from Isabelle Boivin's life), collapse into one
                 // encounter that uses the full transcript for analysis.
+                // Also handles fuzzy name variants like "Person & Wife", "Person & Mother"
+                // by collapsing them when one name is a prefix/substring of another.
                 if (segments.length > 1) {
-                    const nameGroups = new Map<string, typeof segments>();
+                    // Helper: extract the "base" person name (before " & ", " and ")
+                    const getBaseName = (name: string): string => {
+                        const lower = name.toLowerCase().trim();
+                        // Strip "&/and companion" suffixes: "Steven Bird & Wife" → "steven bird"
+                        const ampIdx = lower.indexOf(' & ');
+                        if (ampIdx > 0) return lower.slice(0, ampIdx).trim();
+                        const andIdx = lower.indexOf(' and ');
+                        if (andIdx > 0) return lower.slice(0, andIdx).trim();
+                        return lower;
+                    };
+
+                    // Build a canonical key for each segment using fuzzy matching
+                    // Two names match if: exact match, or one base name contains the other
+                    const canonicalKeys: string[] = [];
+                    const keyMap = new Map<string, string>(); // normalized → canonical
+
                     for (const seg of segments) {
-                        const key = seg.experiencer_name.toLowerCase().trim();
+                        const base = getBaseName(seg.experiencer_name);
+                        const full = seg.experiencer_name.toLowerCase().trim();
+
+                        // Check if this name matches an existing canonical key
+                        let matchedKey: string | null = null;
+                        for (const [existing, canonical] of keyMap) {
+                            const existingBase = getBaseName(existing);
+                            // Fuzzy match: base names are equal, or one contains the other
+                            if (base === existingBase
+                                || base.includes(existingBase)
+                                || existingBase.includes(base)
+                                || full === existing
+                                || full.includes(existing)
+                                || existing.includes(full)) {
+                                matchedKey = canonical;
+                                break;
+                            }
+                        }
+
+                        if (matchedKey) {
+                            canonicalKeys.push(matchedKey);
+                        } else {
+                            // New canonical name — prefer the shorter/base version
+                            keyMap.set(full, base);
+                            canonicalKeys.push(base);
+                        }
+                    }
+
+                    // Group segments by canonical key
+                    const nameGroups = new Map<string, typeof segments>();
+                    for (let i = 0; i < segments.length; i++) {
+                        const key = canonicalKeys[i];
                         const group = nameGroups.get(key) || [];
-                        group.push(seg);
+                        group.push(segments[i]);
                         nameGroups.set(key, group);
                     }
 
-                    // If all segments have the same name, collapse to one
-                    const uniqueNames = nameGroups.size;
-                    if (uniqueNames < segments.length) {
+                    // If grouping reduced the count, rebuild segments
+                    if (nameGroups.size < segments.length) {
                         const collapsed: typeof segments = [];
                         let idx = 0;
                         for (const [, group] of nameGroups) {
                             if (group.length === 1) {
                                 collapsed.push({ ...group[0], index: idx++ });
                             } else {
-                                // Merge: use the first segment's metadata but full transcript
+                                // Merge: prefer the shortest/cleanest name (the base person)
+                                const bestName = group
+                                    .map(g => g.experiencer_name)
+                                    .sort((a, b) => a.length - b.length)[0];
+                                // Prefer direct_experiencer or interview source_type over retold
+                                const bestSource = group.find(g =>
+                                    g.source_type === 'direct_experiencer' || g.source_type === 'interview_with_experiencer'
+                                )?.source_type || group[0].source_type;
                                 collapsed.push({
-                                    experiencer_name: group[0].experiencer_name,
-                                    encounter_label: `${group[0].experiencer_name}'s Encounters`,
-                                    source_type: group[0].source_type,
+                                    experiencer_name: bestName,
+                                    encounter_label: `${bestName}'s Encounters`,
+                                    source_type: bestSource,
                                     text: transcript, // Use full transcript for merged encounters
                                     index: idx++,
                                 });
                                 logStep('Collapse Same-Name Encounters', 'success',
-                                    `Merged ${group.length} segments for "${group[0].experiencer_name}" into one`);
+                                    `Merged ${group.length} segments for "${bestName}" into one (variants: ${group.map(g => g.experiencer_name).join(', ')})`);
                             }
                         }
                         segments = collapsed;
