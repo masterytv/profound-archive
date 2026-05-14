@@ -219,7 +219,7 @@ export default async function HomeNewPage() {
             Start Exploring
           </Link>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 max-w-3xl mx-auto">
             <InlineNewsletterCTA domain="nde" />
             <InlineNewsletterCTA domain="uap" />
           </div>

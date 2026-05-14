@@ -69,7 +69,7 @@ export function InlineNewsletterCTA({ domain = "nde", className = "" }: Props) {
 
   if (done) {
     return (
-      <div className={`rounded-2xl border p-8 text-center ${config.accentBg} ${className}`}>
+      <div className={`rounded-2xl border p-5 text-center ${config.accentBg} ${className}`}>
         <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-3">
           <Check className="w-5 h-5 text-emerald-400" />
         </div>
@@ -80,7 +80,7 @@ export function InlineNewsletterCTA({ domain = "nde", className = "" }: Props) {
   }
 
   return (
-    <div className={`rounded-2xl border p-8 ${config.accentBg} ${className}`}>
+    <div className={`rounded-2xl border p-5 ${config.accentBg} ${className}`}>
       <div className="flex items-center gap-2 mb-3">
         <Mail className={`w-4 h-4 ${config.accent}`} />
         <h3 className="text-sm font-semibold text-foreground">{config.heading}</h3>
@@ -88,19 +88,19 @@ export function InlineNewsletterCTA({ domain = "nde", className = "" }: Props) {
       <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
         {config.description}
       </p>
-      <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
+      <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="email"
           required
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com"
-          className="flex-1 min-w-[180px] px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-teal-500/40 text-sm dark:[color-scheme:dark]"
+          className="flex-1 min-w-0 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-teal-500/40 text-sm dark:[color-scheme:dark]"
         />
         <button
           type="submit"
           disabled={loading}
-          className={`px-5 py-2.5 rounded-xl text-white text-sm font-medium disabled:opacity-50 transition flex items-center gap-1.5 ${config.buttonBg}`}
+          className={`px-4 py-2 rounded-xl text-white text-sm font-medium whitespace-nowrap disabled:opacity-50 transition flex items-center gap-1.5 ${config.buttonBg}`}
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
           {loading ? "…" : "Subscribe"}
