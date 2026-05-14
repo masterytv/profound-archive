@@ -76,11 +76,12 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
   const fetchData = async (currentUser: User) => {
     setIsLoading(true);
     try {
-      // Fetch all collections and this video's memberships in parallel
+      // Fetch collections scoped to this domain and this video's memberships in parallel
       const { data: collectionsData, error: collectionsError } = await supabase
         .from('collections')
         .select('id, name')
-        .eq('user_id', currentUser.id);
+        .eq('user_id', currentUser.id)
+        .eq('domain', domain);
 
       // Use integerStartTime for the query
       const { data: memberships, error: membershipsError } = await supabase
@@ -171,7 +172,7 @@ export default function SaveToCollectionButton({ videoId, videoTitle, videoThumb
     // 1. Create the new collection
     const { data: newCollection, error: createError } = await supabase
       .from('collections')
-      .insert({ user_id: user.id, name: newCollectionName.trim() })
+      .insert({ user_id: user.id, name: newCollectionName.trim(), domain })
       .select('id, name')
       .single();
 

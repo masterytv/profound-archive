@@ -47,6 +47,7 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
             .select('id')
             .eq('user_id', currentUser.id)
             .eq('name', 'Favorites')
+            .eq('domain', domain)
             .single();
 
           if (collection && isMounted) {
@@ -108,12 +109,13 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
       .select('id')
       .eq('user_id', currentUser.id)
       .eq('name', 'Favorites')
+      .eq('domain', domain)
       .single();
 
     if (!collection) {
       const { data: newCollection, error } = await supabase
         .from('collections')
-        .insert({ user_id: currentUser.id, name: 'Favorites' })
+        .insert({ user_id: currentUser.id, name: 'Favorites', domain })
         .select('id')
         .single();
 
