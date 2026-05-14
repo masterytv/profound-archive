@@ -35,17 +35,46 @@ interface EvidenceBreakdown {
 }
 
 interface ContactDepthBreakdown {
-  level: string;
-  total_score: number;
-  summary_reason: string;
-  categories: Record<string, { items: Record<string, CriterionDetail>; subtotal: number }>;
+  level?: string;
+  total_score?: number;
+  summary_reason?: string;
+  // New shape: categories wrapper
+  categories?: Record<string, { items: Record<string, CriterionDetail>; subtotal: number }>;
+  // Actual DB shape: flat category→items at top level
+  observation?: Record<string, CriterionDetail>;
+  entity_interaction?: Record<string, CriterionDetail>;
+  transcendent_elements?: Record<string, CriterionDetail>;
+  consciousness_alteration?: Record<string, CriterionDetail>;
+}
+
+interface TransformationDomain {
+  name: string;
+  score: number;
+  direction: string;
+  key_quote: string;
+  evidence_summary: string;
 }
 
 interface TransformationBreakdown {
-  level: string;
-  total_score: number;
-  summary_reason: string;
-  domains: Record<string, CriterionDetail>;
+  level?: string;
+  total_score?: number;
+  summary_reason?: string;
+  // Old shape
+  domains?: Record<string, CriterionDetail>;
+  // Actual DB shape
+  domain_analysis?: Record<string, TransformationDomain>;
+  quantitative_metrics?: {
+    transformation_depth: number;
+    transformation_breadth: number;
+    full_transformation_score: number;
+    comparable_transformation_score: number;
+  };
+  qualitative_profile?: {
+    timeline_notes: string;
+    dominant_themes: string[];
+    unique_features: string;
+    integration_notes: string;
+  };
 }
 
 export interface TriadScores {
@@ -91,6 +120,57 @@ function formatCriterionLabel(key: string): string {
     .replace(/_/g, " ")
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Extract usable categories from contact depth breakdown (handles both DB shapes) */
+function getContactCategories(bd: ContactDepthBreakdown): Record<string, { items: Record<string, CriterionDetail>; subtotal: number }> {
+  // If wrapped in a categories object, use that
+  if (bd.categories) return bd.categories;
+  // Otherwise, the 4 category keys are at the top level
+  const categoryKeys = ['observation', 'entity_interaction', 'transcendent_elements', 'consciousness_alteration'] as const;
+  const result: Record<string, { items: Record<string, CriterionDetail>; subtotal: number }> = {};
+  for (const key of categoryKeys) {
+    const items = bd[key];
+    if (items && typeof items === 'object') {
+      const subtotal = Object.values(items).reduce((sum, d) => sum + (d.score || 0), 0);
+      result[key] = { items, subtotal };
+    }
+  }
+  return result;
+}
+
+/** Compute total score from contact depth breakdown */
+function getContactTotalScore(bd: ContactDepthBreakdown): number {
+  if (bd.total_score != null) return bd.total_score;
+  const cats = getContactCategories(bd);
+  return Object.values(cats).reduce((sum, cat) => sum + cat.subtotal, 0);
+}
+
+/** Extract domains from transformation breakdown (handles both DB shapes) */
+function getTransformationDomains(bd: TransformationBreakdown): Record<string, { score: number; reasoning: string; name?: string }> {
+  if (bd.domains) return bd.domains;
+  if (bd.domain_analysis) {
+    const result: Record<string, { score: number; reasoning: string; name?: string }> = {};
+    for (const [key, domain] of Object.entries(bd.domain_analysis)) {
+      result[key] = {
+        score: domain.score,
+        reasoning: domain.evidence_summary || `${domain.direction} — ${domain.key_quote}`,
+        name: domain.name,
+      };
+    }
+    return result;
+  }
+  return {};
+}
+
+/** Compute total score from transformation breakdown */
+function getTransformationTotalScore(bd: TransformationBreakdown): number {
+  if (bd.total_score != null) return bd.total_score;
+  if (bd.quantitative_metrics?.full_transformation_score != null) {
+    return bd.quantitative_metrics.full_transformation_score;
+  }
+  const domains = getTransformationDomains(bd);
+  return Object.values(domains).reduce((sum, d) => sum + (d.score || 0), 0);
 }
 
 // ─── Score Card ─────────────────────────────────────────────────────────────
@@ -151,7 +231,13 @@ function ScoreCard({
       </button>
       {expanded && (
         <div className="px-3 pb-3 border-t border-white/40 dark:border-white/10">
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 mb-3 leading-snug">
+          {/* Total score line: e.g., "Total Score: 12/28 (43%)" */}
+          {score !== null && (
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-2 mb-1">
+              Total Score: {score}/{maxScore} ({pct}%)
+            </p>
+          )}
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3 leading-snug">
             {description}
           </p>
           {breakdown}
@@ -169,7 +255,8 @@ function ScoreCard({
 
 // ─── Criterion Grid ─────────────────────────────────────────────────────────
 
-function CriterionGrid({ criteria }: { criteria: Record<string, CriterionDetail> }) {
+function CriterionGrid({ criteria, maxPerItem }: { criteria: Record<string, { score: number; reasoning: string; name?: string }>; maxPerItem?: number }) {
+  const max = maxPerItem ?? 4;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
       {Object.entries(criteria).map(([key, detail]) => (
@@ -179,10 +266,10 @@ function CriterionGrid({ criteria }: { criteria: Record<string, CriterionDetail>
         >
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-              {formatCriterionLabel(key)}
+              {detail.name || formatCriterionLabel(key)}
             </span>
             <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 bg-white/80 dark:bg-white/10 px-1.5 py-0.5 rounded">
-              {detail.score}/4
+              {detail.score}/{max}
             </span>
           </div>
           <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug">
@@ -316,9 +403,9 @@ export function TriadScoresPanel({ scores }: TriadScoresPanelProps) {
         <ScoreCard
           icon={Brain}
           label="Contact Depth"
-          score={scores.contact_depth_score}
+          score={scores.contact_depth_score ?? (scores.contact_depth_breakdown ? getContactTotalScore(scores.contact_depth_breakdown) : null)}
           maxScore={32}
-          level={scores.contact_depth_score !== null ? getContactLevel(scores.contact_depth_score) : "Pending"}
+          level={scores.contact_depth_score !== null ? getContactLevel(scores.contact_depth_score) : (scores.contact_depth_breakdown ? getContactLevel(getContactTotalScore(scores.contact_depth_breakdown)) : "Pending")}
           description={
             scores.contact_depth_breakdown?.summary_reason ??
             "Measures the depth and quality of the reported contact experience."
@@ -329,30 +416,33 @@ export function TriadScoresPanel({ scores }: TriadScoresPanelProps) {
           accentIcon="text-blue-600 dark:text-blue-400"
           methodologyHref="/uap/methodology/contact-depth"
           breakdown={
-            scores.contact_depth_breakdown?.categories ? (
-              <div className="space-y-3">
-                {Object.entries(scores.contact_depth_breakdown.categories).map(([catKey, cat]) => (
-                  <div key={catKey}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                        {formatCriterionLabel(catKey)}
-                      </span>
-                      <span className="text-[10px] text-slate-500">{cat.subtotal}pts</span>
+            scores.contact_depth_breakdown ? (() => {
+              const cats = getContactCategories(scores.contact_depth_breakdown);
+              return Object.keys(cats).length > 0 ? (
+                <div className="space-y-3">
+                  {Object.entries(cats).map(([catKey, cat]) => (
+                    <div key={catKey}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                          {formatCriterionLabel(catKey)}
+                        </span>
+                        <span className="text-[10px] text-slate-500">{cat.subtotal}pts</span>
+                      </div>
+                      <CriterionGrid criteria={cat.items} maxPerItem={2} />
                     </div>
-                    <CriterionGrid criteria={cat.items} />
-                  </div>
-                ))}
-              </div>
-            ) : null
+                  ))}
+                </div>
+              ) : null;
+            })() : null
           }
         />
 
         <ScoreCard
           icon={Sparkles}
           label="Transformation"
-          score={scores.transformation_score}
+          score={scores.transformation_score ?? (scores.transformation_breakdown ? getTransformationTotalScore(scores.transformation_breakdown) : null)}
           maxScore={50}
-          level={scores.transformation_score !== null ? getTransformationLevel(scores.transformation_score) : "Pending"}
+          level={scores.transformation_score !== null ? getTransformationLevel(scores.transformation_score) : (scores.transformation_breakdown ? getTransformationLevel(getTransformationTotalScore(scores.transformation_breakdown)) : "Pending")}
           description={
             scores.transformation_breakdown?.summary_reason ??
             "Assesses how deeply this experience transformed the witness's worldview and life."
@@ -363,9 +453,12 @@ export function TriadScoresPanel({ scores }: TriadScoresPanelProps) {
           accentIcon="text-rose-600 dark:text-rose-400"
           methodologyHref="/uap/methodology/transformation"
           breakdown={
-            scores.transformation_breakdown?.domains ? (
-              <CriterionGrid criteria={scores.transformation_breakdown.domains} />
-            ) : null
+            scores.transformation_breakdown ? (() => {
+              const domains = getTransformationDomains(scores.transformation_breakdown);
+              return Object.keys(domains).length > 0 ? (
+                <CriterionGrid criteria={domains} maxPerItem={5} />
+              ) : null;
+            })() : null
           }
         />
       </div>

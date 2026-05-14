@@ -86,7 +86,8 @@ export async function POST(request: Request) {
     .single();
 
   if (fetchError || !video) {
-    return NextResponse.json({ error: `Video not found: ${videoId}` }, { status: 404 });
+    console.error(`[reanalyze] Video lookup failed for ${videoId}:`, fetchError?.message, fetchError?.code);
+    return NextResponse.json({ error: `Video not found: ${videoId}`, details: fetchError?.message }, { status: 404 });
   }
 
   if (!video.subtitles_punctuated) {

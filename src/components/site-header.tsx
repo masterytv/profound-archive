@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar, Globe, Building2 } from "lucide-react"
+import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar, Globe, Building2, MessageCircle } from "lucide-react"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -178,184 +178,120 @@ export default function SiteHeader() {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${exploreOpen ? 'rotate-180' : ''}`} />
               </button>
               {exploreOpen && (
-                <div className="absolute top-full left-0 mt-1.5 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
+                <div className="absolute top-full -left-20 mt-1.5 w-[640px] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-3 px-2 z-50">
                   {isUap ? (
-                    <>
-                      <Link
-                        href="/uap/search"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Search className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Search Transcripts</div>
-                          <div className="text-xs text-slate-400">Full-text search across UAP transcripts</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap/video-explore"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <LayoutGrid className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Browse Videos</div>
-                          <div className="text-xs text-slate-400">Filter by topic, scores & type</div>
-                        </div>
-                      </Link>
-                      {/* Tier sub-items */}
-                      <div className="pl-6 border-l-2 border-green-100 dark:border-green-900/40 ml-8 space-y-0.5">
-                        <Link
-                          href="/uap/video-explore"
-                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
-                          onClick={() => setExploreOpen(false)}
-                        >
-                          <LayoutGrid className="w-3.5 h-3.5 text-green-500" />
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Browse All</span>
+                    <div className="grid grid-cols-3 gap-1">
+                      {/* Column 1: Discover */}
+                      <div>
+                        <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Discover</p>
+                        <Link href="/uap/search" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Search className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Search</div>
+                            <div className="text-[11px] text-slate-400">Full-text transcripts</div>
+                          </div>
                         </Link>
-                        <Link
-                          href="/uap/video-explore?tier=1"
-                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
-                          onClick={() => setExploreOpen(false)}
-                        >
-                          <Radio className="w-3.5 h-3.5 text-emerald-500" />
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Encounters</span>
+                        <Link href="/uap/video-explore" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <LayoutGrid className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Browse Videos</div>
+                            <div className="text-[11px] text-slate-400">Filter by topic & type</div>
+                          </div>
                         </Link>
-                        <Link
-                          href="/uap/video-explore?tier=2"
-                          className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
-                          onClick={() => setExploreOpen(false)}
-                        >
-                          <BookOpen className="w-3.5 h-3.5 text-blue-500" />
-                          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Research</span>
+                        <div className="pl-7 ml-2 border-l-2 border-green-100 dark:border-green-900/40 space-y-0.5">
+                          <Link href="/uap/video-explore" className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                            <LayoutGrid className="w-3 h-3 text-green-500" />
+                            <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Browse All</span>
+                          </Link>
+                          <Link href="/uap/video-explore?tier=1" className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                            <Radio className="w-3 h-3 text-emerald-500" />
+                            <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Encounters</span>
+                          </Link>
+                          <Link href="/uap/video-explore?tier=2" className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                            <BookOpen className="w-3 h-3 text-blue-500" />
+                            <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Research</span>
+                          </Link>
+                        </div>
+                        <Link href="/uap/channels" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Tv className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Channels</div>
+                            <div className="text-[11px] text-slate-400">Content creators</div>
+                          </div>
                         </Link>
                       </div>
-                      <Link
-                        href="/uap/channels"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Tv className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Channels</div>
-                          <div className="text-xs text-slate-400">Browse by UAP content channel</div>
-                        </div>
-                      </Link>
-                      {/* Divider between browse and entity directories */}
-                      <div className="mx-3 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
-                      <Link
-                        href="/uap/experiencer"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Users className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Experiencers</div>
-                          <div className="text-xs text-slate-400">Experiencer profiles</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap/persons"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Globe className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Persons of Interest</div>
-                          <div className="text-xs text-slate-400">Key figures in UAP research</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap/events"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Calendar className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Events</div>
-                          <div className="text-xs text-slate-400">Major UAP events & milestones</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap/organizations"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Building2 className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Organizations</div>
-                          <div className="text-xs text-slate-400">Agencies & institutions</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap/programs"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <Shield className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Programs</div>
-                          <div className="text-xs text-slate-400">Government & research projects</div>
-                        </div>
-                      </Link>
-                      {/* Research section divider */}
-                      <div className="mx-3 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
-                      <Link
-                        href="/uap/intelligence"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-500/20 flex items-center justify-center">
-                          <BarChart3 className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Intelligence</div>
-                          <div className="text-xs text-slate-400">Cross-video analytics & insights</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/research/cross-domain"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-50 to-green-50 dark:from-violet-500/20 dark:to-green-500/20 flex items-center justify-center">
-                          <Sparkles className="w-4 h-4 text-violet-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Cross-Domain</div>
-                          <div className="text-xs text-slate-400">NDE ↔ UAP phenomenology</div>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/uap/blog"
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                        onClick={() => setExploreOpen(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center">
-                          <BookOpen className="w-4 h-4 text-amber-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Blog</div>
-                          <div className="text-xs text-slate-400">UAP research articles & insights</div>
-                        </div>
-                      </Link>
-                    </>
+                      {/* Column 2: Directory */}
+                      <div className="border-l border-slate-100 dark:border-slate-700 pl-1">
+                        <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Directory</p>
+                        <Link href="/uap/experiencer" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Users className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Experiencers</div>
+                            <div className="text-[11px] text-slate-400">Contact profiles</div>
+                          </div>
+                        </Link>
+                        <Link href="/uap/persons" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Globe className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Persons</div>
+                            <div className="text-[11px] text-slate-400">Key figures</div>
+                          </div>
+                        </Link>
+                        <Link href="/uap/events" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Calendar className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Events</div>
+                            <div className="text-[11px] text-slate-400">Major milestones</div>
+                          </div>
+                        </Link>
+                        <Link href="/uap/organizations" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Building2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Organizations</div>
+                            <div className="text-[11px] text-slate-400">Agencies & groups</div>
+                          </div>
+                        </Link>
+                        <Link href="/uap/programs" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Shield className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Programs</div>
+                            <div className="text-[11px] text-slate-400">Gov & research projects</div>
+                          </div>
+                        </Link>
+                      </div>
+                      {/* Column 3: Research */}
+                      <div className="border-l border-slate-100 dark:border-slate-700 pl-1">
+                        <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Research</p>
+                        <Link href="/uap/intelligence" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <BarChart3 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Intelligence</div>
+                            <div className="text-[11px] text-slate-400">Analytics & insights</div>
+                          </div>
+                        </Link>
+                        <Link href="/uap/chat" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <MessageCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Research Assistant</div>
+                            <div className="text-[11px] text-slate-400">AI-powered Q&A</div>
+                          </div>
+                        </Link>
+                        <Link href="/research/cross-domain" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <Sparkles className="w-4 h-4 text-violet-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Cross-Domain</div>
+                            <div className="text-[11px] text-slate-400">NDE ↔ UAP links</div>
+                          </div>
+                        </Link>
+                        <Link href="/uap/blog" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
+                          <BookOpen className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Blog</div>
+                            <div className="text-[11px] text-slate-400">Articles & insights</div>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
                   ) : (
                     <>
                       <Link
@@ -816,6 +752,14 @@ export default function SiteHeader() {
                             >
                               <BarChart3 className="w-4 h-4 text-green-600" />
                               Intelligence
+                            </Link>
+                            <Link
+                              href="/uap/chat"
+                              className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <MessageCircle className="w-4 h-4 text-green-600" />
+                              Research Assistant
                             </Link>
                             <Link
                               href="/research/cross-domain"

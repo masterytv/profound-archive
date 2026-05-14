@@ -81,6 +81,36 @@ export default function UapChatUI() {
     }
   };
 
+  // Parse [1], [2] etc. in LLM output and render as clickable superscript badges
+  const renderContentWithCitations = (text: string, citations?: ChatSource[]) => {
+    if (!citations || citations.length === 0) {
+      return text;
+    }
+
+    // Split on citation patterns like [1], [2], [1][2], etc.
+    const parts = text.split(/(\[\d+\])/g);
+    return parts.map((part, i) => {
+      const match = part.match(/^\[(\d+)\]$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        const cite = citations[num - 1];
+        if (cite) {
+          return (
+            <Link
+              key={i}
+              href={`/uap/video/${cite.video_id}`}
+              className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/40 text-[9px] font-bold text-green-700 dark:text-green-300 align-super mx-0.5 hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors no-underline"
+              title={cite.title}
+            >
+              {num}
+            </Link>
+          );
+        }
+      }
+      return <span key={i}>{part}</span>;
+    });
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)]">
       {/* Safety Banner */}
@@ -146,7 +176,9 @@ export default function UapChatUI() {
                   : 'bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-bl-md'
               )}
             >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
+              <div className="whitespace-pre-wrap">
+                {renderContentWithCitations(msg.content, msg.citations)}
+              </div>
 
               {/* Citations */}
               {msg.citations && msg.citations.length > 0 && (
@@ -154,13 +186,15 @@ export default function UapChatUI() {
                   <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                     Sources:
                   </p>
-                  {msg.citations.map((cite) => (
+                  {msg.citations.map((cite, idx) => (
                     <Link
                       key={cite.video_id}
                       href={`/uap/video/${cite.video_id}`}
                       className="flex items-start gap-2 text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
                     >
-                      <ExternalLink className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                      <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/40 text-[9px] font-bold text-green-700 dark:text-green-300 flex-shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
                       <span className="line-clamp-1">{cite.title}</span>
                     </Link>
                   ))}

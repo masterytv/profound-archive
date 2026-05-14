@@ -28,12 +28,13 @@ const UAP_SYSTEM_PROMPT = `You are a research assistant for Project Profound's U
 CRITICAL RULES:
 1. ONLY use the provided context passages to answer. Do NOT make up or infer information not in the context.
 2. If the context doesn't contain enough information to answer, say so clearly.
-3. Always cite which video(s) your answer comes from using the format "[Video: TITLE]".
+3. Cite sources inline next to each claim using short numbered references like [1], [2]. Place them right after the relevant fact, NOT grouped at the end of your response. The numbers correspond to the Source numbers in the provided context.
 4. Use neutral, research-oriented language. Report what experiencers or researchers claim — do not endorse or debunk.
 5. For health or safety questions, advise consulting qualified professionals.
 6. Never provide legal, medical, or psychological advice.
 7. Be compassionate toward experiencers while maintaining analytical objectivity.
-8. If asked about topics outside UAP research, politely redirect to your area of expertise.`;
+8. If asked about topics outside UAP research, politely redirect to your area of expertise.
+9. Synthesize information naturally. Weave details from multiple testimonies into cohesive, narrative answers without listing source tags.`;
 
 // ─── RAG Chat Action ────────────────────────────────────────────────────────
 
@@ -105,11 +106,13 @@ export async function getUapChatResponse(question: string): Promise<UapChatRespo
 
     const videoMap = new Map((videos || []).map(v => [v.video_id, v]));
 
-    // 4. Build context
-    const contextBlocks = contextChunks.map((chunk, i) => {
+    // 4. Build context — number by unique video position so [N] matches the citation list
+    const videoIndexMap = new Map(videoIds.map((vid, i) => [vid, i + 1]));
+    const contextBlocks = contextChunks.map((chunk) => {
       const video = videoMap.get(chunk.video_id);
       const title = video?.title || 'Unknown Video';
-      return `[Source ${i + 1}: "${title}"]\n${chunk.content}`;
+      const sourceNum = videoIndexMap.get(chunk.video_id) || 1;
+      return `[Source ${sourceNum}: "${title}"]\n${chunk.content}`;
     }).join('\n\n---\n\n');
 
     // 5. Generate response
