@@ -972,15 +972,15 @@ For every UAP file you create:
 
 ### Epic 12.1: Application Security Audit
 
-- [ ] Story 12.1.1: Auth & session audit — verify Supabase Auth patterns, session handling, token refresh, middleware protection, CSRF (0.5d)
-- [ ] Story 12.1.2: API route audit — verify all admin routes use `isAdminUser()` guard, rate limiting, input validation (0.5d)
-- [ ] Story 12.1.3: RLS policy audit — verify all tables have correct read/write policies, no data leakage via service_role misuse (0.5d)
-- [ ] Story 12.1.4: Client-side security — verify no service_role keys in client code, no XSS vectors in user-generated content, CSP headers (0.25d)
-- [ ] Story 12.1.5: Dependency audit — `npm audit`, check for known vulnerabilities, update critical packages (0.25d)
-- [ ] Story 12.1.6: Infrastructure review — Firebase App Hosting config, Supabase project settings, CORS, environment variable hygiene (0.25d)
-- [ ] Story 12.1.7: OWASP Top 10 checklist — systematic review against current OWASP guidelines (0.5d)
-- [ ] Story 12.1.8: Penetration testing — basic pentest of public-facing endpoints and auth flows (0.5d)
-- [ ] Story 12.1.9: Security report & remediation plan — document findings, prioritize fixes, implement critical items (0.5d)
+- [x] Story 12.1.1: Auth & session audit — verify Supabase Auth patterns, session handling, token refresh, middleware protection, CSRF (0.5d) ✅ 2026-05-19
+- [x] Story 12.1.2: API route audit — verify all admin routes use `isAdminUser()` guard, rate limiting, input validation (0.5d) ✅ 2026-05-19
+- [x] Story 12.1.3: RLS policy audit — verify all tables have correct read/write policies, no data leakage via service_role misuse (0.5d) ✅ 2026-05-19
+- [x] Story 12.1.4: Client-side security — verify no service_role keys in client code, no XSS vectors in user-generated content, CSP headers (0.25d) ✅ 2026-05-19
+- [ ] Story 12.1.5: Dependency audit — `npm audit fix` run by user (43 vulns found, 2 critical unfixable in genkit chain). User to run `npm audit fix`. (0.25d)
+- [x] Story 12.1.6: Infrastructure review — Firebase App Hosting config, Supabase project settings, CORS, environment variable hygiene (0.25d) ✅ 2026-05-19
+- [x] Story 12.1.7: OWASP Top 10 checklist — systematic review against current OWASP guidelines (0.5d) ✅ 2026-05-19
+- [ ] Story 12.1.8: Penetration testing — manual pentest checklist provided (sandbox blocks browser tool). User to execute curl tests. (0.5d)
+- [x] Story 12.1.9: Security report & remediation plan — document findings, prioritize fixes, implement critical items (0.5d) ✅ 2026-05-19
 
 ---
 
