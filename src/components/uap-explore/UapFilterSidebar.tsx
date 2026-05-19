@@ -25,7 +25,6 @@ import type {
   FacetItem,
 } from "./types";
 import {
-  VIDEO_TONE_LABELS,
   HYNEK_LABELS,
   ENTITY_TYPE_LABELS,
   CONTENT_TYPE_LABELS,
@@ -213,7 +212,8 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
   const [expanded, setExpanded] = useState(false);
 
   // ─── Read current filter state from URL ──────────────────────────
-  const videoTones = getArrayParam(searchParams, "tones");
+  // Video tone filter disabled — all values are 'neutral' due to merge bug (tech debt)
+  // const videoTones = getArrayParam(searchParams, "tones");
   const hynekTypes = getArrayParam(searchParams, "hynek");
   const entityTypes = getArrayParam(searchParams, "entities");
   const contentTypes = getArrayParam(searchParams, "ctypes");
@@ -230,7 +230,6 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
 
   // Count active filters for badge
   const activeCount =
-    videoTones.length +
     hynekTypes.length +
     entityTypes.length +
     contentTypes.length +
@@ -375,17 +374,10 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
       <AccordionSection
         title="Program & Intel"
         icon={<Shield className="w-3.5 h-3.5 text-blue-500" />}
-        defaultOpen={videoTones.length > 0 || hasOath !== null}
+        defaultOpen={hasOath !== null}
       >
-        <div>
-          <FilterLabel>Video Tone</FilterLabel>
-          <FilterChips
-            items={facets.video_tones}
-            selected={videoTones}
-            labels={VIDEO_TONE_LABELS}
-            onToggle={(v) => toggleArrayParam("tones", videoTones, v)}
-          />
-        </div>
+        {/* Video Tone filter removed — all values are 'neutral' due to merge bug in uap-program-intel.ts.
+           Tech debt: backfill tone values then re-enable this section. */}
         <div className="space-y-1.5">
           <FilterLabel>Claims & Content</FilterLabel>
           <FilterToggle

@@ -560,6 +560,7 @@ export async function analyzeUapProgramIntel(subtitles: string): Promise<UapProg
       primary_topic: pass3Raw?.primary_topic ?? 'other',
       secondary_topics: pass3Raw?.secondary_topics ?? [],
       era_focus: pass3Raw?.era_focus ?? [],
+      video_tone: pass3Raw?.video_tone ?? 'neutral',
       // Pass 1: Network
       persons: pass1Raw?.persons ?? [],
       organizations: pass1Raw?.organizations ?? [],

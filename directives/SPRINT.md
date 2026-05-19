@@ -984,6 +984,12 @@ For every UAP file you create:
 
 ---
 
+## Technical Debt
+
+- [ ] **Video Tone Backfill** — `video_tone` was missing from the merge in `uap-program-intel.ts` (line 563). All 1,528 analyzed videos have `video_tone = 'neutral'` in `uap_video_stats`. Root cause fixed (2026-05-19), but existing data needs re-analysis. Options: (A) re-run only Pass 3 to cheaply extract tones, or (B) full re-analysis via `uap-reanalyze-all.ts`. After backfill, re-enable the Video Tone filter in `UapFilterSidebar.tsx` (currently commented out).
+
+---
+
 ## Backlog: Revenue & Growth Strategy
 
 > **Goal:** Create a user experience that generates WOW, Curiosity, Sharing, Participation, Virality, and Community — then monetize sustainably.
