@@ -11,7 +11,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { normalizeEmotion, normalizeCommMethod, incrementNormalized } from '@/lib/research/cross-domain-normalize';
+import { normalizeEmotion, normalizeCommMethod, normalizeEntityType, incrementNormalized } from '@/lib/research/cross-domain-normalize';
 
 export const revalidate = 3600;
 
@@ -103,7 +103,7 @@ export async function GET() {
     if (!Array.isArray(encounters)) continue;
     for (const e of encounters) {
       if (e.entity_type) {
-        ndeEntityCounts.set(e.entity_type, (ndeEntityCounts.get(e.entity_type) || 0) + 1);
+        incrementNormalized(ndeEntityCounts, e.entity_type, normalizeEntityType);
         ndeEntityTotal++;
       }
       if (e.communication_method && e.communication_method !== 'not_stated' && e.communication_method !== 'not stated') {
@@ -144,7 +144,7 @@ export async function GET() {
     if (Array.isArray(pb.entities)) {
       for (const e of pb.entities) {
         if (e.entity_type) {
-          uapEntityCounts.set(e.entity_type, (uapEntityCounts.get(e.entity_type) || 0) + 1);
+          incrementNormalized(uapEntityCounts, e.entity_type, normalizeEntityType);
           uapEntityTotal++;
         }
         if (e.communication_method && e.communication_method !== 'not_stated') {

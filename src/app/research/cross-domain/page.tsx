@@ -11,7 +11,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { Sparkles, Brain, Radio, ArrowRight, FlaskConical, AlertTriangle } from 'lucide-react';
-import { normalizeEmotion, normalizeCommMethod, incrementNormalized } from '@/lib/research/cross-domain-normalize';
+import { normalizeEmotion, normalizeCommMethod, normalizeEntityType, incrementNormalized } from '@/lib/research/cross-domain-normalize';
 
 export const metadata: Metadata = {
   title: 'NDE ↔ UAP Cross-Domain Phenomenology | Project Profound',
@@ -115,7 +115,7 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
       if (!Array.isArray(encounters)) continue;
       for (const e of encounters) {
         if (e.entity_type) {
-          ndeEntityCounts.set(e.entity_type, (ndeEntityCounts.get(e.entity_type) || 0) + 1);
+          incrementNormalized(ndeEntityCounts, e.entity_type, normalizeEntityType);
           ndeEntityTotal++;
         }
         if (e.communication_method && e.communication_method !== 'not_stated' && e.communication_method !== 'not stated') {
@@ -154,7 +154,7 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
       if (Array.isArray(pb.entities)) {
         for (const e of pb.entities) {
           if (e.entity_type) {
-            uapEntityCounts.set(e.entity_type, (uapEntityCounts.get(e.entity_type) || 0) + 1);
+            incrementNormalized(uapEntityCounts, e.entity_type, normalizeEntityType);
             uapEntityTotal++;
           }
           if (e.communication_method && e.communication_method !== 'not_stated') {

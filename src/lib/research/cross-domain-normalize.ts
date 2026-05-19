@@ -2,13 +2,57 @@
  * Cross-Domain Phenomenology Label Normalization
  *
  * Both the NDE and UAP analysis pipelines use LLM-generated labels for
- * emotions and communication methods. These labels are semantically
- * equivalent but lexically different (e.g. NDE "frightening" vs UAP "fear").
+ * entity types, emotions, and communication methods. These labels are
+ * semantically equivalent but lexically different (e.g. NDE "being_of_light"
+ * vs UAP "light_being", NDE "frightening" vs UAP "fear").
  *
  * This module maps the long tail of free-form labels into a curated set
  * of canonical categories so cross-domain comparisons surface real overlaps
  * instead of hiding them behind vocabulary differences.
  */
+
+// ─── Entity Type Normalization ──────────────────────────────────────────────
+
+const ENTITY_MAP: Record<string, string> = {
+  // Light being — NDE calls it "being_of_light", UAP calls it "light_being"
+  being_of_light: 'light_being',
+  light_being: 'light_being',
+
+  // Angel cluster
+  angel: 'angel',
+  angels: 'angel',
+  angelic: 'angel',
+  guardian_angel: 'angel',
+  'guardian angel': 'angel',
+
+  // Demon cluster
+  demon: 'demon',
+  demonic: 'demon',
+  demonic_figure: 'demon',
+  demonic_entity: 'demon',
+  'demonic beings': 'demon',
+
+  // Shadow cluster
+  shadow_figure: 'shadow_entity',
+  shadow_entity: 'shadow_entity',
+
+  // Unknown cluster
+  unknown: 'unknown',
+  unidentified: 'unknown',
+
+  // Guide cluster
+  guide: 'guide',
+  guardian: 'guide',
+
+  // Deceased friend cluster
+  deceased_friend: 'deceased_friend',
+  deceased_friends: 'deceased_friend',
+  friend: 'deceased_friend',
+
+  // Animal cluster
+  animal: 'animal',
+  deceased_pet: 'animal',
+};
 
 // ─── Emotion Normalization ──────────────────────────────────────────────────
 
@@ -292,6 +336,16 @@ const COMM_MAP: Record<string, string> = {
 };
 
 // ─── Exported Functions ─────────────────────────────────────────────────────
+
+/**
+ * Map a raw entity type label to a canonical category.
+ * Unknown labels pass through lowercased (preserves domain-specific types
+ * like "grey", "reptilian", "humanoid" that don't need cross-domain merging).
+ */
+export function normalizeEntityType(raw: string): string {
+  const key = raw.toLowerCase().trim();
+  return ENTITY_MAP[key] ?? key;
+}
 
 /**
  * Map a raw emotion label to a canonical category.
