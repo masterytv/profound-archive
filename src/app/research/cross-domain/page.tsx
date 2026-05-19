@@ -82,10 +82,9 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
     const supabase = getSupabase();
 
     // ── Counts ──────────────────────────────────────────────────────────
-    const [{ count: ndeTotal }, { count: uapTotal }] = await Promise.all([
-      supabase.from('nde_analysis').select('*', { count: 'exact', head: true }),
-      supabase.from('uap_analysis').select('*', { count: 'exact', head: true }),
-    ]);
+    const { count: ndeTotal } = await supabase
+      .from('nde_analysis')
+      .select('*', { count: 'exact', head: true });
 
     // ── Raw data ────────────────────────────────────────────────────────
     const { data: ndeAnalysis } = await supabase
@@ -95,9 +94,14 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
       .limit(6000);
 
     const { data: uapAnalysis } = await supabase
-      .from('uap_analysis')
-      .select('phenomenology_breakdown, experience_type, overall_tone')
-      .not('phenomenology_breakdown', 'is', null);
+      .from('uap_encounters')
+      .select('video_id, phenomenology_breakdown')
+      .not('phenomenology_breakdown', 'is', null)
+      .limit(5000);
+
+    // Compute unique UAP videos for total count
+    const uniqueUapVideos = new Set(uapAnalysis?.map(row => row.video_id) || []);
+    const uapTotal = uniqueUapVideos.size;
 
     // ── Aggregate NDE ───────────────────────────────────────────────────
     const ndeEntityCounts = new Map<string, number>();

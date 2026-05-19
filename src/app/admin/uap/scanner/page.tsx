@@ -29,6 +29,10 @@ interface Channel {
     last_scanned_at: string | null;
     uploads_playlist_id: string | null;
     track: string;
+    pending_count: number;
+    video_count: number;
+    processed_count: number;
+    added_count: number;
 }
 
 interface Playlist {
@@ -42,6 +46,8 @@ interface Playlist {
     last_scanned_at: string | null;
     video_count: number;
     pending_count: number;
+    processed_count: number;
+    added_count: number;
     channel_in_scanner: boolean;
 }
 
@@ -483,8 +489,11 @@ export default function UapScannerAdminPage() {
                         <thead>
                             <tr className="border-b border-white/10 bg-white/[0.02]">
                                 <th className="text-left p-3 text-muted-foreground font-medium">Channel</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Track</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Subscribers</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Priority</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Available</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Pending</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Processed</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Added</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Last Scanned</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Scanner</th>
                             </tr>
@@ -503,17 +512,22 @@ export default function UapScannerAdminPage() {
                                             </div>
                                         </div>
                                     </td>
+                                    <td className="p-3 text-muted-foreground">--</td>
+                                    <td className="p-3 text-muted-foreground">
+                                        {channel.video_count?.toLocaleString() || '—'}
+                                    </td>
                                     <td className="p-3">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                            channel.track === 'encounters' ? 'bg-violet-500/10 text-violet-400' :
-                                            channel.track === 'program' ? 'bg-indigo-500/10 text-indigo-400' :
-                                            'bg-slate-500/10 text-slate-400'
-                                        }`}>
-                                            {channel.track}
-                                        </span>
+                                        {channel.pending_count > 0 ? (
+                                            <span className="text-amber-500 font-medium">{channel.pending_count}</span>
+                                        ) : (
+                                            <span className="text-muted-foreground">0</span>
+                                        )}
                                     </td>
                                     <td className="p-3 text-muted-foreground">
-                                        {channel.subscriber_count?.toLocaleString() || '—'}
+                                        {channel.processed_count.toLocaleString()}
+                                    </td>
+                                    <td className="p-3 text-muted-foreground">
+                                        {channel.added_count.toLocaleString()}
                                     </td>
                                     <td className="p-3 text-muted-foreground text-xs">
                                         {channel.last_scanned_at
@@ -538,7 +552,7 @@ export default function UapScannerAdminPage() {
                             ))}
                             {enabledChannels.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                                    <td colSpan={8} className="p-6 text-center text-muted-foreground">
                                         No channels enabled. Add a channel above to get started.
                                     </td>
                                 </tr>
@@ -559,7 +573,12 @@ export default function UapScannerAdminPage() {
                             <thead>
                                 <tr className="border-b border-white/10 bg-white/[0.02]">
                                     <th className="text-left p-3 text-muted-foreground font-medium">Channel</th>
-                                    <th className="text-left p-3 text-muted-foreground font-medium">Track</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium">Priority</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium">Available</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium">Pending</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium">Processed</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium">Added</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium">Last Scanned</th>
                                     <th className="text-left p-3 text-muted-foreground font-medium">Scanner</th>
                                 </tr>
                             </thead>
@@ -574,7 +593,28 @@ export default function UapScannerAdminPage() {
                                                 <span className="text-muted-foreground">{channel.channel_name}</span>
                                             </div>
                                         </td>
-                                        <td className="p-3 text-muted-foreground text-xs capitalize">{channel.track}</td>
+                                        <td className="p-3 text-muted-foreground">--</td>
+                                        <td className="p-3 text-muted-foreground">
+                                            {channel.video_count?.toLocaleString() || '—'}
+                                        </td>
+                                        <td className="p-3 text-muted-foreground">
+                                            {channel.pending_count > 0 ? (
+                                                <span className="text-amber-500 font-medium">{channel.pending_count}</span>
+                                            ) : (
+                                                <span>0</span>
+                                            )}
+                                        </td>
+                                        <td className="p-3 text-muted-foreground">
+                                            {channel.processed_count.toLocaleString()}
+                                        </td>
+                                        <td className="p-3 text-muted-foreground">
+                                            {channel.added_count.toLocaleString()}
+                                        </td>
+                                        <td className="p-3 text-muted-foreground text-xs">
+                                            {channel.last_scanned_at
+                                                ? new Date(channel.last_scanned_at).toLocaleString()
+                                                : 'Never'}
+                                        </td>
                                         <td className="p-3">
                                             <button
                                                 onClick={() => toggleChannel(channel.channel_id, true)}
@@ -667,11 +707,11 @@ export default function UapScannerAdminPage() {
                         <thead>
                             <tr className="border-b border-white/10 bg-white/[0.02]">
                                 <th className="text-left p-3 text-muted-foreground font-medium">Playlist</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Channel</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Track</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Priority</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Videos</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Available</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Pending</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Processed</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Added</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Last Scanned</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Scanner</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium"></th>
@@ -682,9 +722,7 @@ export default function UapScannerAdminPage() {
                                 <tr key={pl.playlist_id} className="border-b border-white/5 hover:bg-white/[0.02]">
                                     <td className="p-3">
                                         <div className="text-foreground font-medium">{pl.playlist_title}</div>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 mt-1">
                                             <span className="text-muted-foreground text-xs">{pl.channel_name || '—'}</span>
                                             {pl.channel_in_scanner && (
                                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400" title="This channel is also in the channel scanner">
@@ -693,13 +731,16 @@ export default function UapScannerAdminPage() {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="p-3">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${pl.track === 'encounters' ? 'bg-violet-500/10 text-violet-400' : pl.track === 'program' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-500/10 text-slate-400'}`}>{pl.track}</span>
-                                    </td>
                                     <td className="p-3 text-muted-foreground">{pl.priority}</td>
                                     <td className="p-3 text-muted-foreground">{pl.video_count?.toLocaleString() || '—'}</td>
                                     <td className="p-3">
                                         {pl.pending_count > 0 ? <span className="text-amber-500 font-medium">{pl.pending_count}</span> : <span className="text-muted-foreground">0</span>}
+                                    </td>
+                                    <td className="p-3 text-muted-foreground">
+                                        {pl.processed_count.toLocaleString()}
+                                    </td>
+                                    <td className="p-3 text-muted-foreground">
+                                        {pl.added_count.toLocaleString()}
                                     </td>
                                     <td className="p-3 text-muted-foreground text-xs">{pl.last_scanned_at ? new Date(pl.last_scanned_at).toLocaleString() : 'Never'}</td>
                                     <td className="p-3">

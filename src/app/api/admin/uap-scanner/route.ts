@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     // Fetch channels with scanner info
     const { data: channels, error: channelError } = await supabase
         .from('uap_channels')
-        .select('channel_id, channel_name, avatar_url, custom_url, subscriber_count, scanner_enabled, last_scanned_at, uploads_playlist_id, track')
+        .select('channel_id, channel_name, avatar_url, custom_url, subscriber_count, total_video_count, scanner_enabled, last_scanned_at, uploads_playlist_id, track')
         .order('channel_name');
 
     if (channelError) {
@@ -110,13 +110,20 @@ export async function GET(req: NextRequest) {
     // Intake aggregate stats
     const { data: uapVidCounts } = await supabase
         .from('uap_vids')
-        .select('intake_status')
+        .select('channel_id, intake_status')
         .not('intake_status', 'is', null);
 
     const intakeTotals = { accepted: 0, rejected: 0, failed: 0 };
+    const channelAddedCounts = new Map<string, number>();
+
     if (uapVidCounts) {
         for (const row of uapVidCounts) {
-            if (row.intake_status === 'complete') intakeTotals.accepted++;
+            if (row.intake_status === 'complete') {
+                intakeTotals.accepted++;
+                if (row.channel_id) {
+                    channelAddedCounts.set(row.channel_id, (channelAddedCounts.get(row.channel_id) || 0) + 1);
+                }
+            }
             else if (row.intake_status === 'out_of_scope') intakeTotals.rejected++;
             else if (['failed', 'no_captions', 'drm_protected', 'embedding'].includes(row.intake_status)) intakeTotals.failed++;
         }
@@ -142,22 +149,46 @@ export async function GET(req: NextRequest) {
     // Sprint 8: Add playlist queue counts
     const playlistsWithCounts = await Promise.all(
         (playlists || []).map(async (p: any) => {
-            const { count } = await supabase
-                .from('uap_scan_queue')
-                .select('*', { count: 'exact', head: true })
-                .eq('status', 'pending')
-                .eq('source_type', 'playlist')
-                .eq('source_id', p.playlist_id);
+            const [
+                { count: pending_count },
+                { count: processed_count }
+            ] = await Promise.all([
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('status', 'pending'),
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).neq('status', 'pending')
+            ]);
+
             return {
                 ...p,
-                pending_count: count ?? 0,
+                pending_count: pending_count ?? 0,
+                processed_count: processed_count ?? 0,
+                added_count: p.channel_id ? (channelAddedCounts.get(p.channel_id) || 0) : 0,
                 channel_in_scanner: p.channel_id ? enabledChannelIds.has(p.channel_id) : false,
             };
         })
     );
 
+    const channelsWithCounts = await Promise.all(
+        (channels || []).map(async (c: any) => {
+            const [
+                { count: pending_count },
+                { count: processed_count }
+            ] = await Promise.all([
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('channel_id', c.channel_id).in('source_type', ['channel', null]).eq('status', 'pending'),
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('channel_id', c.channel_id).in('source_type', ['channel', null]).neq('status', 'pending')
+            ]);
+
+            return {
+                ...c,
+                pending_count: pending_count ?? 0,
+                processed_count: processed_count ?? 0,
+                added_count: channelAddedCounts.get(c.channel_id) || 0,
+                video_count: c.total_video_count ?? 0,
+            };
+        })
+    );
+
     return NextResponse.json({
-        channels,
+        channels: channelsWithCounts,
         playlists: playlistsWithCounts,
         keywordMonitors: keywordMonitors || [],
         queueStats,
