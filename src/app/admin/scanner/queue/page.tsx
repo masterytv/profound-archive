@@ -1,247 +1,464 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState, useCallback } from "react";
 import {
-    AlertTriangle, SkipForward, RefreshCcw, Loader2,
-    ExternalLink, RotateCcw, Youtube, ChevronDown, ChevronUp,
-    Clock
-} from 'lucide-react';
+  Loader2,
+  RefreshCw,
+  RotateCcw,
+  SkipForward,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  X,
+} from "lucide-react";
 
-// Data comes from nde_vids — persistent source of truth for intake status
+// ─── Types ──────────────────────────────────────────────────────────────────
+
 interface QueueItem {
-    videoId: string;
-    title: string | null;
-    channelId: string | null;
-    channelName: string | null;
-    intake_status: 'failed' | 'no_captions' | 'not_profound' | 'indexing';
-    intake_error: string | null;
-    intake_submitted_at: string | null;
-    intake_completed_at: string | null;
+  id: number;
+  video_id: string;
+  video_url: string;
+  channel_id: string;
+  title: string | null;
+  status: string;
+  created_at: string;
+  processed_at: string | null;
+  intake_result: string | null;
+  error: string | null;
 }
 
-const STATUS_LABELS: Record<string, string> = {
-    failed: 'Failed',
-    no_captions: 'No Captions',
-    not_profound: 'Not Profound',
-    indexing: 'Stuck (indexing)',
+interface QueueResponse {
+  items: QueueItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  facets: {
+    byResult: Record<string, number>;
+    byError: Record<string, number>;
+  };
+  statusCounts: Record<string, number>;
+}
+
+// ─── Constants ──────────────────────────────────────────────────────────────
+
+const STATUS_TABS = ["all", "pending", "processing", "complete", "failed", "skipped"] as const;
+
+const statusColor: Record<string, string> = {
+  pending: "text-amber-500",
+  processing: "text-blue-500",
+  complete: "text-emerald-500",
+  failed: "text-red-500",
+  skipped: "text-slate-400",
 };
 
-const STATUS_CLASSES: Record<string, string> = {
-    failed: 'bg-red-50 dark:bg-red-500/20 text-red-700 dark:text-red-400',
-    no_captions: 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400',
-    not_profound: 'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400',
-    indexing: 'bg-orange-50 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400',
-};
+/** Map raw error strings to clean display labels */
+function normalizeError(error: string | null): string {
+  if (!error) return "";
+  const e = error.toLowerCase();
+  if (e.includes("statement timeout")) return "Statement Timeout";
+  if (e.includes("not found on youtube")) return "Video Not Found";
+  if (e.includes("503")) return "Server Error (503)";
+  if (e.includes("502")) return "Server Error (502)";
+  if (e.includes("region")) return "Region Restricted";
+  if (e.includes("timed out") || e.includes("timeout")) return "Timeout";
+  if (e.includes("transcript unavailable")) return "Transcript Unavailable";
+  if (e.includes("no_captions")) return "No Captions";
+  return error.slice(0, 50);
+}
 
-export default function QueueInspectorPage() {
-    const [items, setItems] = useState<QueueItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState<'all' | 'failed' | 'no_captions' | 'not_profound' | 'indexing'>('all');
-    const [retrying, setRetrying] = useState<string | null>(null);
-    const [expandedError, setExpandedError] = useState<string | null>(null);
+// ─── Page ───────────────────────────────────────────────────────────────────
 
-    const fetchItems = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await fetch('/api/admin/scanner?view=queue');
-            const data = await res.json();
-            setItems(data.items || []);
-        } catch (err) {
-            console.error('Failed to load queue items:', err);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+export default function NdeScannerQueuePage() {
+  const [items, setItems] = useState<QueueItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const [total, setTotal] = useState(0);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
+  const [facets, setFacets] = useState<QueueResponse["facets"]>({ byResult: {}, byError: {} });
+  const [subFilter, setSubFilter] = useState<string | null>(null);
+  const [errorFilter, setErrorFilter] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [batchLoading, setBatchLoading] = useState(false);
 
-    useEffect(() => { fetchItems(); }, [fetchItems]);
+  const fetchQueue = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        view: "queue",
+        filter,
+        page: String(page),
+        pageSize: String(pageSize),
+      });
+      if (subFilter) params.set("subFilter", subFilter);
+      if (errorFilter) params.set("errorFilter", errorFilter);
 
-    // Re-queue a video by calling the intake API directly
-    const retryVideo = async (videoId: string) => {
-        setRetrying(videoId);
-        try {
-            // Reset intake_status in nde_vids and re-insert to scan_queue
-            await fetch('/api/admin/scanner', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'reset_item', videoId }),
-            });
-            setItems(prev => prev.filter(i => i.videoId !== videoId));
-        } finally {
-            setRetrying(null);
-        }
-    };
+      const res = await fetch(`/api/admin/scanner?${params}`);
+      const data: QueueResponse = await res.json();
+      setItems(data.items || []);
+      setTotal(data.total ?? 0);
+      setStatusCounts(data.statusCounts || {});
+      setFacets(data.facets || { byResult: {}, byError: {} });
+    } catch (err) {
+      console.error("Failed to load NDE scan queue:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filter, page, pageSize, subFilter, errorFilter]);
 
-    const counts = {
-        all: items.length,
-        failed: items.filter(i => i.intake_status === 'failed').length,
-        no_captions: items.filter(i => i.intake_status === 'no_captions').length,
-        not_profound: items.filter(i => i.intake_status === 'not_profound').length,
-        indexing: items.filter(i => i.intake_status === 'indexing').length,
-    };
+  useEffect(() => {
+    fetchQueue();
+  }, [fetchQueue]);
 
-    const filtered = filter === 'all' ? items : items.filter(i => i.intake_status === filter);
+  const changeFilter = (newFilter: string) => {
+    setFilter(newFilter);
+    setPage(1);
+    setSubFilter(null);
+    setErrorFilter(null);
+  };
 
-    const TAB_OPTIONS = [
-        { key: 'all', label: `Total Not Accepted (${counts.all})` },
-        { key: 'failed', label: `Failed (${counts.failed})` },
-        { key: 'no_captions', label: `No Captions (${counts.no_captions})` },
-        { key: 'indexing', label: `Stuck (${counts.indexing})` },
-        { key: 'not_profound', label: `Not NDE (${counts.not_profound})` },
-    ] as const;
+  const changeSubFilter = (key: string | null) => {
+    setSubFilter(prev => prev === key ? null : key);
+    setErrorFilter(null);
+    setPage(1);
+  };
 
-    return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100" style={{ fontFamily: 'Crimson Pro, serif' }}>
-                        Queue Inspector
-                    </h1>
-                    <p className="text-sm text-slate-500 mt-0.5">
-                        Videos that failed, had no captions, or got stuck. Review errors and retry individually.
-                    </p>
-                </div>
-                <button
-                    onClick={fetchItems}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
-                >
-                    <RefreshCcw className="w-4 h-4" />
-                    Refresh
-                </button>
-            </div>
+  const changeErrorFilter = (key: string | null) => {
+    setErrorFilter(prev => prev === key ? null : key);
+    setSubFilter(null);
+    setPage(1);
+  };
 
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-1 p-1 bg-slate-100 dark:bg-white/10 rounded-xl w-fit">
-                {TAB_OPTIONS.map(tab => (
-                    <button
-                        key={tab.key}
-                        onClick={() => setFilter(tab.key)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${filter === tab.key
-                            ? 'bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-sm'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                            }`}
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
+  const retryItem = async (id: number) => {
+    setActionLoading(id);
+    try {
+      const item = items.find(i => i.id === id);
+      if (item) {
+        await fetch("/api/admin/scanner", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "reset_item", videoId: item.video_id }),
+        });
+      }
+      fetchQueue();
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
-            {loading ? (
-                <div className="flex items-center justify-center py-20">
-                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-                </div>
-            ) : filtered.length === 0 ? (
-                <div className="text-center py-20 text-slate-400">
-                    <p className="text-lg">Nothing to review</p>
-                    <p className="text-sm mt-1">All videos are processing normally</p>
-                </div>
-            ) : (
-                <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden">
-                    <table className="w-full text-sm">
-                        <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
-                            <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Video</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Channel</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Status</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Processed</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wide">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-white/10">
-                            {filtered.map((item) => (
-                                <>
-                                    <tr key={item.videoId} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
-                                        {/* Video */}
-                                        <td className="px-4 py-3 max-w-xs">
-                                            <div className="space-y-0.5">
-                                                <p className="text-slate-800 dark:text-slate-200 text-xs font-medium truncate">
-                                                    {item.title || <span className="text-slate-400 italic">Untitled</span>}
-                                                </p>
-                                                <a
-                                                    href={`https://www.youtube.com/watch?v=${item.videoId}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center gap-1 text-blue-500 hover:text-blue-700 font-mono text-xs"
-                                                >
-                                                    <Youtube className="w-3 h-3 flex-shrink-0" />
-                                                    {item.videoId}
-                                                    <ExternalLink className="w-2.5 h-2.5" />
-                                                </a>
-                                            </div>
-                                        </td>
+  const skipItem = async (id: number) => {
+    setActionLoading(id);
+    try {
+      await fetch("/api/admin/scanner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "skip_item", id }),
+      });
+      fetchQueue();
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
-                                        {/* Channel */}
-                                        <td className="px-4 py-3 text-xs text-slate-600 max-w-[120px] truncate">
-                                            {item.channelName || item.channelId || '—'}
-                                        </td>
+  const batchRetryFiltered = async () => {
+    const filterDesc = subFilter || errorFilter || filter;
+    if (!confirm(`Retry ${total} items matching "${filterDesc}"? They will be re-queued as pending.`)) return;
+    setBatchLoading(true);
+    try {
+      await fetch("/api/admin/scanner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "batch_retry_filtered",
+          status: filter,
+          intakeResult: subFilter || undefined,
+          errorPattern: errorFilter || undefined,
+        }),
+      });
+      setSubFilter(null);
+      setErrorFilter(null);
+      setPage(1);
+      fetchQueue();
+    } finally {
+      setBatchLoading(false);
+    }
+  };
 
-                                        {/* Status badge */}
-                                        <td className="px-4 py-3">
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_CLASSES[item.intake_status] || 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
-                                                {item.intake_status === 'failed' && <AlertTriangle className="w-3 h-3" />}
-                                                {item.intake_status === 'no_captions' && <SkipForward className="w-3 h-3" />}
-                                                {item.intake_status === 'indexing' && <Clock className="w-3 h-3" />}
-                                                {STATUS_LABELS[item.intake_status] || item.intake_status}
-                                            </span>
-                                        </td>
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const showSubFilters = filter === "failed" || filter === "skipped";
+  const canBatchRetry = showSubFilters && (subFilter || errorFilter) && total > 0;
 
-                                        {/* Processed at */}
-                                        <td className="px-4 py-3 text-xs text-slate-400">
-                                            {item.intake_completed_at
-                                                ? new Date(item.intake_completed_at).toLocaleDateString('en-US', {
-                                                    month: 'short', day: 'numeric',
-                                                    hour: '2-digit', minute: '2-digit'
-                                                })
-                                                : '—'}
-                                        </td>
+  // Build facet chips
+  const facetChips: { label: string; count: number; type: "result" | "error"; key: string }[] = [];
+  if (showSubFilters) {
+    for (const [key, count] of Object.entries(facets.byResult)) {
+      if (key === "__none__") continue;
+      const label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      facetChips.push({ label, count, type: "result", key });
+    }
+    for (const [key, count] of Object.entries(facets.byError)) {
+      facetChips.push({ label: key, count, type: "error", key });
+    }
+    facetChips.sort((a, b) => b.count - a.count);
+  }
 
-                                        {/* Actions */}
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center justify-end gap-1">
-                                                {item.intake_error && (
-                                                    <button
-                                                        onClick={() => setExpandedError(expandedError === item.videoId ? null : item.videoId)}
-                                                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-                                                        title="View error"
-                                                    >
-                                                        {expandedError === item.videoId
-                                                            ? <ChevronUp className="w-3.5 h-3.5" />
-                                                            : <ChevronDown className="w-3.5 h-3.5" />
-                                                        }
-                                                    </button>
-                                                )}
-                                                <button
-                                                    onClick={() => retryVideo(item.videoId)}
-                                                    disabled={retrying === item.videoId}
-                                                    className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/30 transition-colors disabled:opacity-50"
-                                                    title="Reset to pending for retry"
-                                                >
-                                                    {retrying === item.videoId
-                                                        ? <Loader2 className="w-3 h-3 animate-spin" />
-                                                        : <RotateCcw className="w-3 h-3" />
-                                                    }
-                                                    Retry
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    {/* Expanded error row */}
-                                    {expandedError === item.videoId && item.intake_error && (
-                                        <tr key={`${item.videoId}-error`} className="bg-red-50 dark:bg-red-900/20">
-                                            <td colSpan={5} className="px-4 py-3">
-                                                <p className="text-xs text-red-700 font-mono whitespace-pre-wrap break-all">
-                                                    {item.intake_error}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">NDE Scanner Queue</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {total.toLocaleString()} items {filter !== "all" ? `(${filter})` : ""} &middot; Page {page} of {totalPages}
+          </p>
         </div>
-    );
+        <div className="flex items-center gap-2">
+          <select
+            value={pageSize}
+            onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
+            className="px-2 py-1.5 text-xs rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 dark:[color-scheme:dark]"
+          >
+            <option value={25}>25/page</option>
+            <option value={50}>50/page</option>
+            <option value={100}>100/page</option>
+          </select>
+          <button
+            onClick={fetchQueue}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm bg-slate-100 dark:bg-white/10 rounded-lg hover:bg-slate-200 dark:hover:bg-white/15 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Status tab filters */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {STATUS_TABS.map((status) => {
+          const count = status === "all"
+            ? Object.values(statusCounts).reduce((a, b) => a + b, 0)
+            : statusCounts[status] || 0;
+          return (
+            <button
+              key={status}
+              onClick={() => changeFilter(status)}
+              className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
+                filter === status
+                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700"
+                  : "bg-white dark:bg-white/5 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10"
+              }`}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+              {` (${count.toLocaleString()})`}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Sub-filter chips (for failed/skipped) */}
+      {showSubFilters && facetChips.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Filter className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Filter by reason:</span>
+            {(subFilter || errorFilter) && (
+              <button
+                onClick={() => { setSubFilter(null); setErrorFilter(null); setPage(1); }}
+                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600"
+              >
+                <X className="w-3 h-3" /> Clear
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {facetChips.map((chip) => {
+              const isActive =
+                (chip.type === "result" && subFilter === chip.key) ||
+                (chip.type === "error" && errorFilter === chip.key);
+              return (
+                <button
+                  key={`${chip.type}-${chip.key}`}
+                  onClick={() =>
+                    chip.type === "result"
+                      ? changeSubFilter(chip.key)
+                      : changeErrorFilter(chip.key)
+                  }
+                  className={`px-2.5 py-1 text-[11px] rounded-full font-medium transition-colors ${
+                    isActive
+                      ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700"
+                      : "bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10"
+                  }`}
+                >
+                  {chip.label} ({chip.count})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Batch retry button */}
+      {canBatchRetry && (
+        <div className="mb-4">
+          <button
+            onClick={batchRetryFiltered}
+            disabled={batchLoading}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors disabled:opacity-50"
+          >
+            {batchLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RotateCcw className="w-4 h-4" />
+            )}
+            Retry All {total.toLocaleString()} Matching
+          </button>
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 dark:border-white/10">
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left">Video</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Status</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left">Result</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left">Error</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Age</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-slate-400" />
+                  </td>
+                </tr>
+              ) : items.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-slate-400">
+                    No items match current filters
+                  </td>
+                </tr>
+              ) : (
+                items.map((item) => (
+                  <tr key={item.id} className="border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5">
+                    <td className="px-4 py-3 max-w-[250px]">
+                      <p className="font-medium text-slate-900 dark:text-slate-100 truncate text-xs">
+                        {item.title || item.video_id}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-mono">{item.video_id}</p>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`text-xs font-medium ${statusColor[item.status] || "text-slate-500"}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-500 max-w-[120px] truncate">
+                      {item.intake_result?.replace(/_/g, " ") || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-red-400 max-w-[200px] truncate" title={item.error ?? ""}>
+                      {normalizeError(item.error) || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-center text-xs text-slate-400">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {(item.status === "failed" || item.status === "skipped") && (
+                        <div className="flex items-center gap-1 justify-center">
+                          <button
+                            onClick={() => retryItem(item.id)}
+                            disabled={actionLoading === item.id}
+                            className="p-1 rounded hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors"
+                            title="Retry — re-queue for processing"
+                          >
+                            {actionLoading === item.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <RotateCcw className="w-4 h-4 text-green-500" />
+                            )}
+                          </button>
+                          {item.status === "failed" && (
+                            <button
+                              onClick={() => skipItem(item.id)}
+                              disabled={actionLoading === item.id}
+                              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                              title="Skip"
+                            >
+                              <SkipForward className="w-4 h-4 text-slate-400" />
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-white/10">
+            <p className="text-xs text-slate-500">
+              Showing {((page - 1) * pageSize + 1).toLocaleString()}–{Math.min(page * pageSize, total).toLocaleString()} of {total.toLocaleString()}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage(1)}
+                disabled={page === 1}
+                className="px-2 py-1 text-xs rounded bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-slate-50 dark:hover:bg-white/10"
+              >
+                First
+              </button>
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-1 rounded bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-slate-50 dark:hover:bg-white/10"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {(() => {
+                const pages: number[] = [];
+                const start = Math.max(1, page - 2);
+                const end = Math.min(totalPages, page + 2);
+                for (let i = start; i <= end; i++) pages.push(i);
+                return pages.map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`px-2.5 py-1 text-xs rounded border transition-colors ${
+                      p === page
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700"
+                        : "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ));
+              })()}
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="p-1 rounded bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-slate-50 dark:hover:bg-white/10"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setPage(totalPages)}
+                disabled={page === totalPages}
+                className="px-2 py-1 text-xs rounded bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-slate-50 dark:hover:bg-white/10"
+              >
+                Last
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

@@ -19,6 +19,21 @@ function getAdminSupabase() {
     );
 }
 
+/** Collapse verbose error strings into short, filterable patterns */
+function normalizeNdeErrorPattern(error: string): string {
+    if (!error) return 'Unknown';
+    const e = error.toLowerCase();
+    if (e.includes('statement timeout')) return 'Statement Timeout';
+    if (e.includes('not found on youtube')) return 'Video Not Found';
+    if (e.includes('503')) return 'Server Error (503)';
+    if (e.includes('502')) return 'Server Error (502)';
+    if (e.includes('region')) return 'Region Restricted';
+    if (e.includes('timed out') || e.includes('timeout')) return 'Timeout';
+    if (e.includes('transcript unavailable')) return 'Transcript Unavailable';
+    if (e.includes('no_captions')) return 'No Captions';
+    return error.slice(0, 50);
+}
+
 export async function GET(req: NextRequest) {
     // Security: require authenticated admin session
     if (!(await isAdminUser())) {
@@ -28,17 +43,75 @@ export async function GET(req: NextRequest) {
     const supabase = getAdminSupabase();
     const { searchParams } = new URL(req.url);
 
-    // Queue inspector: query nde_vids (persistent source of truth) not scan_queue (transient)
-    // scan_queue items get reset to 'pending' on retry — nde_vids always holds the real intake status
+    // Queue inspector: paginated + filterable (for /admin/scanner/queue)
     if (searchParams.get('view') === 'queue') {
-        const { data: items, error: qErr } = await supabase
-            .from('nde_vids')
-            .select('"videoId", title, "channelId", channelName, intake_status, intake_error, intake_submitted_at, intake_completed_at')
-            .in('intake_status', ['failed', 'no_captions', 'not_profound', 'indexing'])
-            .order('intake_completed_at', { ascending: false });
+        const filterStatus = searchParams.get('filter');
+        const subFilter = searchParams.get('subFilter');       // intake_result exact match
+        const errorFilter = searchParams.get('errorFilter');   // error ILIKE pattern
+        const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+        const pageSize = Math.min(100, Math.max(10, parseInt(searchParams.get('pageSize') || '50', 10)));
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize - 1;
 
-        if (qErr) return NextResponse.json({ error: qErr.message }, { status: 500 });
-        return NextResponse.json({ items: items || [] });
+        let query = supabase
+            .from('scan_queue')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(from, to);
+
+        if (filterStatus && filterStatus !== 'all') {
+            query = query.eq('status', filterStatus);
+        }
+        if (subFilter) {
+            query = query.eq('intake_result', subFilter);
+        }
+        if (errorFilter) {
+            query = query.ilike('error', `%${errorFilter}%`);
+        }
+
+        const { data: items, count: total, error: sqErr } = await query;
+        if (sqErr) return NextResponse.json({ error: sqErr.message }, { status: 500 });
+
+        // Build facets for sub-filter chips
+        let facets: { byResult: Record<string, number>; byError: Record<string, number> } = { byResult: {}, byError: {} };
+        if (filterStatus && filterStatus !== 'all') {
+            const { data: facetRows } = await supabase
+                .from('scan_queue')
+                .select('intake_result, error')
+                .eq('status', filterStatus);
+
+            if (facetRows) {
+                for (const row of facetRows) {
+                    const r = row.intake_result || '__none__';
+                    facets.byResult[r] = (facets.byResult[r] || 0) + 1;
+
+                    if (row.error) {
+                        const pattern = normalizeNdeErrorPattern(row.error);
+                        facets.byError[pattern] = (facets.byError[pattern] || 0) + 1;
+                    }
+                }
+            }
+        }
+
+        // Status tab badge counts
+        const statuses = ['pending', 'processing', 'complete', 'failed', 'skipped'];
+        const statusCounts: Record<string, number> = {};
+        await Promise.all(statuses.map(async (s) => {
+            const { count } = await supabase
+                .from('scan_queue')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', s);
+            statusCounts[s] = count ?? 0;
+        }));
+
+        return NextResponse.json({
+            items: items || [],
+            total: total ?? 0,
+            page,
+            pageSize,
+            facets,
+            statusCounts,
+        });
     }
 
     // Fetch channels with scanner info + video counts
@@ -346,6 +419,61 @@ export async function POST(req: NextRequest) {
 
             if (error) return NextResponse.json({ error: error.message }, { status: 500 });
             return NextResponse.json({ success: true });
+        }
+
+        case 'batch_retry_filtered': {
+            // Retry a filtered subset of failed/skipped items
+            const { status: targetStatus, intakeResult, errorPattern } = body;
+            if (!targetStatus || !['failed', 'skipped'].includes(targetStatus)) {
+                return NextResponse.json({ error: 'status must be "failed" or "skipped"' }, { status: 400 });
+            }
+
+            let matchQuery = supabase
+                .from('scan_queue')
+                .select('id, video_id, channel_id')
+                .eq('status', targetStatus);
+
+            if (intakeResult) {
+                matchQuery = matchQuery.eq('intake_result', intakeResult);
+            }
+            if (errorPattern) {
+                matchQuery = matchQuery.ilike('error', `%${errorPattern}%`);
+            }
+
+            const { data: matchingItems, error: matchErr } = await matchQuery;
+            if (matchErr) return NextResponse.json({ error: matchErr.message }, { status: 500 });
+            if (!matchingItems || matchingItems.length === 0) {
+                return NextResponse.json({ success: true, count: 0 });
+            }
+
+            // Reset queue rows to pending (batch in groups of 100)
+            const matchIds = matchingItems.map((s: any) => s.id);
+            for (let i = 0; i < matchIds.length; i += 100) {
+                const batch = matchIds.slice(i, i + 100);
+                await supabase
+                    .from('scan_queue')
+                    .update({
+                        status: 'pending',
+                        error: null,
+                        processed_at: null,
+                        intake_result: null,
+                    })
+                    .in('id', batch);
+            }
+
+            // Also reset corresponding nde_vids rows
+            const matchVideoIds = matchingItems.map((s: any) => s.video_id).filter(Boolean);
+            if (matchVideoIds.length > 0) {
+                for (let i = 0; i < matchVideoIds.length; i += 100) {
+                    const batch = matchVideoIds.slice(i, i + 100);
+                    await supabase
+                        .from('nde_vids')
+                        .update({ intake_status: null, intake_error: null, intake_completed_at: null })
+                        .in('"videoId"', batch);
+                }
+            }
+
+            return NextResponse.json({ success: true, count: matchingItems.length });
         }
 
         case 'add_channel': {
