@@ -11,6 +11,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { Sparkles, Brain, Radio, ArrowRight, FlaskConical, AlertTriangle } from 'lucide-react';
+import { normalizeEmotion, normalizeCommMethod, incrementNormalized } from '@/lib/research/cross-domain-normalize';
 
 export const metadata: Metadata = {
   title: 'NDE ↔ UAP Cross-Domain Phenomenology | Project Profound',
@@ -118,10 +119,10 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
           ndeEntityTotal++;
         }
         if (e.communication_method && e.communication_method !== 'not_stated' && e.communication_method !== 'not stated') {
-          ndeCommCounts.set(e.communication_method, (ndeCommCounts.get(e.communication_method) || 0) + 1);
+          incrementNormalized(ndeCommCounts, e.communication_method, normalizeCommMethod);
         }
         if (e.emotional_quality) {
-          ndeEmotionCounts.set(e.emotional_quality, (ndeEmotionCounts.get(e.emotional_quality) || 0) + 1);
+          incrementNormalized(ndeEmotionCounts, e.emotional_quality, normalizeEmotion);
         }
       }
     }
@@ -157,13 +158,13 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
             uapEntityTotal++;
           }
           if (e.communication_method && e.communication_method !== 'not_stated') {
-            uapCommCounts.set(e.communication_method, (uapCommCounts.get(e.communication_method) || 0) + 1);
+            incrementNormalized(uapCommCounts, e.communication_method, normalizeCommMethod);
           }
         }
       }
 
       if (pb.dominant_emotion) {
-        uapEmotionCounts.set(pb.dominant_emotion, (uapEmotionCounts.get(pb.dominant_emotion) || 0) + 1);
+        incrementNormalized(uapEmotionCounts, pb.dominant_emotion, normalizeEmotion);
       }
 
       if (pb.physical_effects?.witness_physiological) {
@@ -296,9 +297,9 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
       {
         phenomenon: 'Feelings of Peace/Love',
         nde_label: 'Feelings of peace (core element)',
-        uap_label: 'Emotional quality: loving',
+        uap_label: 'Love/peace emotion',
         nde_pct: Math.round(((ndeCoreElements.get('feelings_of_peace') || 0) / Math.max(ndeCoreTotal, 1)) * 100),
-        uap_pct: 0,
+        uap_pct: Math.round((((uapEmotionCounts.get('love') || 0) + (uapEmotionCounts.get('peace') || 0)) / Math.max(uapAnalysis?.length || 1, 1)) * 100),
         significance: 75,
         description: 'Profound feelings of unconditional love, peace, and acceptance during the encounter.',
       },

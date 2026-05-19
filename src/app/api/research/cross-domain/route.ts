@@ -11,6 +11,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { normalizeEmotion, normalizeCommMethod, incrementNormalized } from '@/lib/research/cross-domain-normalize';
 
 export const revalidate = 3600;
 
@@ -106,10 +107,10 @@ export async function GET() {
         ndeEntityTotal++;
       }
       if (e.communication_method && e.communication_method !== 'not_stated' && e.communication_method !== 'not stated') {
-        ndeCommCounts.set(e.communication_method, (ndeCommCounts.get(e.communication_method) || 0) + 1);
+        incrementNormalized(ndeCommCounts, e.communication_method, normalizeCommMethod);
       }
       if (e.emotional_quality) {
-        ndeEmotionCounts.set(e.emotional_quality, (ndeEmotionCounts.get(e.emotional_quality) || 0) + 1);
+        incrementNormalized(ndeEmotionCounts, e.emotional_quality, normalizeEmotion);
       }
     }
   }
@@ -147,14 +148,14 @@ export async function GET() {
           uapEntityTotal++;
         }
         if (e.communication_method && e.communication_method !== 'not_stated') {
-          uapCommCounts.set(e.communication_method, (uapCommCounts.get(e.communication_method) || 0) + 1);
+          incrementNormalized(uapCommCounts, e.communication_method, normalizeCommMethod);
         }
       }
     }
 
     // Dominant emotion
     if (pb.dominant_emotion) {
-      uapEmotionCounts.set(pb.dominant_emotion, (uapEmotionCounts.get(pb.dominant_emotion) || 0) + 1);
+      incrementNormalized(uapEmotionCounts, pb.dominant_emotion, normalizeEmotion);
     }
 
     // Physical effects
@@ -297,9 +298,9 @@ export async function GET() {
     {
       phenomenon: 'Feelings of Peace/Love',
       nde_label: 'Feelings of peace (core element)',
-      uap_label: 'Emotional quality: loving',
+      uap_label: 'Love/peace emotion',
       nde_pct: Math.round(((ndeCoreElements.get('feelings_of_peace') || 0) / Math.max(ndeCoreTotal, 1)) * 100),
-      uap_pct: 0, // Will be computed from emotional quality
+      uap_pct: Math.round((((uapEmotionCounts.get('love') || 0) + (uapEmotionCounts.get('peace') || 0)) / Math.max(uapAnalysis?.length || 1, 1)) * 100),
       significance: 75,
       description: 'Profound feelings of unconditional love, peace, and acceptance during the encounter.',
     },
