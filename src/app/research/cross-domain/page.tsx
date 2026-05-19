@@ -199,16 +199,16 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
       .sort((a, b) => (b.nde + b.uap) - (a.nde + a.uap))
       .slice(0, 10);
 
-    // Dimension 3: Emotional Qualities
-    const allEmotions = new Set([...ndeEmotionCounts.keys(), ...uapEmotionCounts.keys()]);
-    const emotionData: DomainCount[] = [...allEmotions]
-      .map(cat => ({
-        category: normalizeLabel(cat),
-        nde: ndeEmotionCounts.get(cat) || 0,
-        uap: uapEmotionCounts.get(cat) || 0,
-      }))
-      .sort((a, b) => (b.nde + b.uap) - (a.nde + a.uap))
-      .slice(0, 10);
+    // Dimension 3: Emotional Qualities — fixed valence order (positive → neutral → negative)
+    const emotionOrder = [
+      'love', 'peace', 'joy', 'compassion', 'awe', 'excitement',
+      'curiosity', 'neutral', 'authority', 'shock', 'anxiety', 'fear',
+    ];
+    const emotionData: DomainCount[] = emotionOrder.map(key => ({
+      category: normalizeLabel(key),
+      nde: ndeEmotionCounts.get(key) || 0,
+      uap: uapEmotionCounts.get(key) || 0,
+    }));
 
     // ── Build Overlapping Phenomena ──────────────────────────────────────
 
