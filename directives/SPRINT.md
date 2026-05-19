@@ -19,7 +19,7 @@
 | Sprint 8: Scanner Expansion | ✅ Complete (8.3.2, 8.3.4 deferred) | 2026-05-13 |
 | Sprint 9: Engagement & CRM | ✅ Complete | 2026-05-13 |
 | Sprint 10: Site Fixes & Polish | ✅ Complete | 2026-05-14 |
-| Sprint 11: Unified Homepage & Brand Evolution | 🔄 In Progress | — |
+| Sprint 11: Unified Homepage & Brand Evolution | ✅ Complete | 2026-05-19 |
 | Sprint 12: Security Audit | 🔲 Not Started | — |
 | Backlog: Revenue & Growth Strategy | 📋 Brainstorm | — |
 
@@ -961,8 +961,8 @@ For every UAP file you create:
 
 > Current copy focuses only on NDEs. Needs to broaden to consciousness research including UAP contactee analysis, cross-domain phenomenology, and the unified platform vision.
 
-- [ ] Story 11.3.1: Draft new GoFundMe copy — consciousness framing, NDE + UAP verticals, cross-domain discoveries, updated project list, updated expense context (0.5d)
-- [ ] Story 11.3.2: Update live GoFundMe page with approved copy (0.1d)
+- [x] Story 11.3.1: Draft new GoFundMe copy — consciousness framing, NDE + UAP verticals, cross-domain discoveries, updated project list, updated expense context (0.5d) ✅ 2026-05-14
+- [x] Story 11.3.2: Update live GoFundMe page with approved copy (0.1d) ✅ 2026-05-14
 
 ---
 
