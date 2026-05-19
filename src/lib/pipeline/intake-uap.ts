@@ -46,6 +46,7 @@ import { formatTimestampedTranscript } from '@/lib/ai/format-timestamped-transcr
 import { addTimestampsToProgramIntel, addTimestampsToPhenomenology } from '@/lib/ai/match-quote-timestamp';
 import { computeVideoStats, mergeEncounterStats } from '@/lib/pipeline/compute-video-stats';
 import { generateMissingSummariesForVideo } from '@/lib/pipeline/entity-summaries';
+import { syncEntitiesForVideo } from '@/lib/pipeline/entity-sync';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -835,6 +836,112 @@ export async function processUapVideoIntake(
                     `${names.length} profile(s) synced`, Date.now() - startSync);
             } else {
                 logStep('Sync Contactee Profiles', 'skipped', 'No named experiencers to sync');
+            }
+        }
+        // ─── Step 12.6: Sync canonical entities (persons, orgs, programs) ─
+        // Extract entities from program_intel_breakdown and upsert to canonical tables
+        {
+            const startEntitySync = Date.now();
+            try {
+                const entityResult = await syncEntitiesForVideo(supabase, videoId);
+                const totalCreated = entityResult.persons.created + entityResult.orgs.created + entityResult.programs.created;
+                const totalUpdated = entityResult.persons.updated + entityResult.orgs.updated + entityResult.programs.updated;
+                if (totalCreated > 0 || totalUpdated > 0) {
+                    logStep('Sync Canonical Entities', 'success',
+                        `Created: ${entityResult.persons.created}P/${entityResult.orgs.created}O/${entityResult.programs.created}Pr | ` +
+                        `Updated: ${entityResult.persons.updated}P/${entityResult.orgs.updated}O/${entityResult.programs.updated}Pr`,
+                        Date.now() - startEntitySync);
+                } else {
+                    logStep('Sync Canonical Entities', 'skipped', 'No new entities to sync');
+                }
+            } catch (entitySyncErr: any) {
+                logStep('Sync Canonical Entities', 'failed', entitySyncErr.message);
+            }
+        }
+        // ─── Step 12.6.5: Sync legislative events to uap_events ─────
+        // Extract legislative_events from intel breakdown and upsert
+        {
+            const startEvSync = Date.now();
+            try {
+                const { data: aRow } = await supabase
+                    .from('uap_analysis')
+                    .select('program_intel_breakdown')
+                    .eq('video_id', videoId)
+                    .maybeSingle();
+
+                const legEvents = aRow?.program_intel_breakdown?.legislative_events;
+                if (Array.isArray(legEvents) && legEvents.length > 0) {
+                    let evCreated = 0, evUpdated = 0;
+
+                    for (const ev of legEvents) {
+                        if (!ev?.name || typeof ev.name !== 'string' || ev.name.length < 3) continue;
+
+                        const normalized = ev.name.trim().replace(/\s+/g, ' ').replace(/\s*\(\d{4}\)\s*$/, '');
+                        const slug = normalized.toLowerCase().replace(/['']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 120);
+                        if (!slug || slug.length < 3) continue;
+
+                        // Check if event already exists
+                        const { data: existing } = await supabase
+                            .from('uap_events')
+                            .select('id, video_ids')
+                            .eq('slug', slug)
+                            .maybeSingle();
+
+                        if (existing) {
+                            const currentVids: string[] = existing.video_ids || [];
+                            if (!currentVids.includes(videoId)) {
+                                await supabase
+                                    .from('uap_events')
+                                    .update({
+                                        video_ids: [...currentVids, videoId],
+                                        updated_at: new Date().toISOString(),
+                                    })
+                                    .eq('id', existing.id);
+                                evUpdated++;
+                            }
+                        } else {
+                            // Map event_type
+                            const typeMap: Record<string, string> = {
+                                legislation: 'congressional', congressional: 'congressional',
+                                hearing: 'congressional', disclosure: 'disclosure',
+                                whistleblower: 'whistleblower', crash: 'crash_retrieval',
+                            };
+                            const evType = typeMap[(ev.event_type || '').toLowerCase()] || 'unknown';
+
+                            // Extract year
+                            let year: number | null = null;
+                            if (ev.date) {
+                                const m = ev.date.match(/\b(19|20)\d{2}\b/);
+                                if (m) year = parseInt(m[0], 10);
+                            }
+
+                            const { error: insertErr } = await supabase
+                                .from('uap_events')
+                                .insert({
+                                    name: normalized,
+                                    slug,
+                                    event_date: ev.date || null,
+                                    year,
+                                    event_type: evType,
+                                    description: ev.quote || null,
+                                    video_ids: [videoId],
+                                });
+
+                            if (!insertErr) evCreated++;
+                        }
+                    }
+
+                    if (evCreated > 0 || evUpdated > 0) {
+                        logStep('Sync Events', 'success',
+                            `Created: ${evCreated}, Updated: ${evUpdated}`, Date.now() - startEvSync);
+                    } else {
+                        logStep('Sync Events', 'skipped', 'Events already synced');
+                    }
+                } else {
+                    logStep('Sync Events', 'skipped', 'No legislative_events in intel');
+                }
+            } catch (evSyncErr: any) {
+                logStep('Sync Events', 'failed', evSyncErr.message);
             }
         }
         // ─── Step 12.7: Match extracted events to uap_events ─────

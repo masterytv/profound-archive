@@ -514,3 +514,888 @@
 [2026-05-19T20:48:43.300Z] ✅ [UAP 486/3264] 4vg9rR7r2LI — Tier 1 (2m 6s)
 [2026-05-19T20:48:43.834Z] ⏭️  [UAP 487/3264] CvhB9E_LNJw — is_short (0s)
 [2026-05-19T20:49:41.753Z] ✅ [UAP 488/3264] 2Cd6jj4_0vc — Tier 1 (58s)
+[2026-05-19T20:51:08.163Z] ✅ [UAP 489/3264] u1BTVxWmTug — Tier 2 (2m 24s)
+[2026-05-19T20:52:00.301Z] ✅ [UAP 490/3264] 1lQfZYptrMs — Tier 2 (51s)
+[2026-05-19T20:52:21.107Z] ✅ [UAP 491/3264] TJXLlKs4L7Y — Tier 2 (1m 12s)
+[2026-05-19T20:52:25.155Z] ✅ [UAP 492/3264] myzC829PuwI — Tier 2 (1m 16s)
+[2026-05-19T20:52:32.009Z] ⏭️  [UAP 493/3264] wUIPnRzcFTg — no_captions (6s)
+[2026-05-19T20:53:54.935Z] ✅ [UAP 494/3264] GaH2ZyU9-_k — Tier 1 (1m 29s)
+[2026-05-19T20:54:19.906Z] ✅ [UAP 495/3264] YoSWOrGkZkA — Tier 2 (1m 54s)
+[2026-05-19T20:54:20.293Z] ⏭️  [UAP 496/3264] EhUhOEb7ZY8 — is_short (0s)
+[2026-05-19T20:54:20.318Z] ⏭️  [UAP 497/3264] fhitcQfPF_8 — is_short (0s)
+[2026-05-19T20:56:57.940Z] ✅ [UAP 498/3264] aa9Xx5wI8Rw — Tier 2 (2m 37s)
+[2026-05-19T20:56:58.484Z] ⏭️  [UAP 499/3264] 8FGk8_kwFpY — is_short (0s)
+[2026-05-19T20:57:58.533Z] ✅ [UAP 500/3264] TH10mD9hQas — Tier 2 (1m 0s)
+[2026-05-19T20:58:00.824Z] ✅ [UAP 501/3264] giKtWgsFITM — Tier 1 (1m 2s)
+[2026-05-19T20:58:01.332Z] ⏭️  [UAP 502/3264] 7-xpuL9EQLM — is_short (0s)
+[2026-05-19T20:59:44.345Z] ✅ [UAP 503/3264] Wj334dvxZU4 — Tier 1 (1m 43s)
+[2026-05-19T21:01:57.208Z] ✅ [UAP 504/3264] WBTqsbwJyqU — Tier 2 (3m 56s)
+[2026-05-19T21:02:35.450Z] ✅ [UAP 505/3264] fefUZAGtCO4 — Tier 2 (37s)
+[2026-05-19T21:02:56.968Z] ✅ [UAP 506/3264] QZ8JpUdZAPQ — Tier 2 (59s)
+[2026-05-19T21:03:24.101Z] ✅ [UAP 507/3264] cAZOL5XkEmE — Tier 2 (1m 26s)
+[2026-05-19T21:04:32.177Z] ✅ [UAP 508/3264] thLGknsJ2Qg — Tier 2 (1m 7s)
+[2026-05-19T21:05:38.453Z] ✅ [UAP 509/3264] bVIZO5zTNEY — Tier 1 (2m 14s)
+[2026-05-19T21:05:40.716Z] ✅ [UAP 510/3264] ZH2cBbyhljg — Tier 1 (2m 16s)
+[2026-05-19T21:06:55.565Z] ✅ [UAP 511/3264] 3JnYop6jYvE — Tier 1 (1m 14s)
+[2026-05-19T21:08:57.814Z] ✅ [UAP 512/3264] -S-m6yqDuLY — Tier 2 (3m 16s)
+[2026-05-19T21:09:24.761Z] ✅ [UAP 513/3264] 1f16VvXaSSE — Tier 2 (3m 43s)
+[2026-05-19T21:09:25.278Z] ⏭️  [UAP 514/3264] J-D0E5wWmFk — is_short (0s)
+[2026-05-19T21:09:25.323Z] ⏭️  [UAP 515/3264] lqLPqTheYrg — is_short (0s)
+[2026-05-19T21:09:31.703Z] ⏭️  [UAP 516/3264] RoZdIG4PLGY — no_captions (6s)
+[2026-05-19T21:09:32.172Z] ⏭️  [UAP 517/3264] UQmUo0zMvxw — is_short (0s)
+[2026-05-19T21:09:32.208Z] ⏭️  [UAP 518/3264] lODvKcI5Kgg — is_short (0s)
+[2026-05-19T21:09:32.228Z] ⏭️  [UAP 519/3264] 0a3QWc-V9aE — is_short (0s)
+[2026-05-19T21:10:40.926Z] ✅ [UAP 520/3264] 5Gv5kzlD2B0 — Tier 2 (1m 8s)
+[2026-05-19T21:11:38.328Z] ✅ [UAP 521/3264] 8TYMQOUDQBo — Tier 2 (2m 5s)
+[2026-05-19T21:14:13.600Z] ✅ [UAP 522/3264] pY1XHQBqIY8 — Tier 2 (4m 41s)
+[2026-05-19T21:15:32.222Z] ✅ [UAP 523/3264] E20X_KOkCCw — Tier 2 (1m 18s)
+[2026-05-19T21:15:35.482Z] ✅ [UAP 524/3264] DpOIq41rFAU — Tier 2 (1m 21s)
+[2026-05-19T21:16:14.397Z] ✅ [UAP 525/3264] hR1qPjKQQao — Tier 2 (2m 0s)
+[2026-05-19T21:16:14.451Z] 📊 ── UAP Progress Report ──
+[2026-05-19T21:16:14.451Z]    Processed: 525/3264 | ✅ 216 | ⏭️ 182 | ❌ 127
+[2026-05-19T21:16:14.451Z]    Elapsed: 4h 8m | Avg: 28s/video | ETA: ~21h 37m
+[2026-05-19T21:16:14.813Z] ⏭️  [UAP 526/3264] zNbPP3EPrcA — is_short (0s)
+[2026-05-19T21:16:15.002Z] ⏭️  [UAP 527/3264] iAeVMDIK3JI — is_short (0s)
+[2026-05-19T21:19:04.063Z] ✅ [UAP 528/3264] x8SK7EAcsFo — Tier 2 (2m 49s)
+[2026-05-19T21:19:04.706Z] ⏭️  [UAP 529/3264] OTCl-1RNfyI — is_short (0s)
+[2026-05-19T21:20:14.906Z] ✅ [UAP 530/3264] 6VLJogdP2Ys — Tier 2 (1m 10s)
+[2026-05-19T21:20:42.921Z] ✅ [UAP 531/3264] eA81z8jnOnI — Tier 1 (1m 38s)
+[2026-05-19T21:20:43.481Z] ⏭️  [UAP 532/3264] nVYVrcn86jM — is_short (0s)
+[2026-05-19T21:21:50.594Z] ✅ [UAP 533/3264] oleQsI9uBwQ — Tier 1 (1m 7s)
+[2026-05-19T21:22:52.997Z] ✅ [UAP 534/3264] 4opsdH4hY3s — Tier 2 (2m 9s)
+[2026-05-19T21:23:54.479Z] ✅ [UAP 535/3264] q8pymWSKAPQ — Tier 1 (1m 1s)
+[2026-05-19T21:24:50.952Z] ✅ [UAP 536/3264] U_pddnkiZ8E — Tier 1 (1m 57s)
+[2026-05-19T21:24:53.892Z] ✅ [UAP 537/3264] rBO8z9pHAuA — Tier 1 (2m 0s)
+[2026-05-19T21:24:54.331Z] ⏭️  [UAP 538/3264] 5oo6pu5WnYQ — is_short (0s)
+[2026-05-19T21:24:54.382Z] ⏭️  [UAP 539/3264] iYcUaxjLmCw — is_short (0s)
+[2026-05-19T21:26:42.144Z] ✅ [UAP 540/3264] rd7tTqy73Gk — Tier 1 (1m 47s)
+[2026-05-19T21:26:55.491Z] ⏭️  [UAP 541/3264] ktfELvyDY2o — no_captions (13s)
+[2026-05-19T21:27:33.772Z] ✅ [UAP 542/3264] wqVFN4CfE-4 — Tier 2 (51s)
+[2026-05-19T21:28:11.382Z] ✅ [UAP 543/3264] xPXFcFyZma0 — Tier 1 (1m 29s)
+[2026-05-19T21:28:11.785Z] ⏭️  [UAP 544/3264] FbI_BJUrSgo — is_short (0s)
+[2026-05-19T21:28:11.825Z] ⏭️  [UAP 545/3264] qGTjVY3vStI — is_short (0s)
+[2026-05-19T21:30:44.429Z] ✅ [UAP 546/3264] _sv0Otxtcn4 — Tier 2 (2m 32s)
+[2026-05-19T21:31:39.578Z] ✅ [UAP 547/3264] Rg-pp2BuKKk — Tier 2 (54s)
+[2026-05-19T21:32:43.603Z] ✅ [UAP 548/3264] zRkh3xh5_yU — Tier 2 (1m 58s)
+[2026-05-19T21:33:28.665Z] ✅ [UAP 549/3264] eyCftd_FHwE — Tier 1 (2m 43s)
+[2026-05-19T21:33:29.072Z] ⏭️  [UAP 550/3264] qLW9XFikYNA — is_short (0s)
+[2026-05-19T21:36:31.009Z] ✅ [UAP 551/3264] D2tKCFmJjks — Tier 1 (3m 2s)
+[2026-05-19T21:37:01.460Z] ✅ [UAP 552/3264] areO7Mej44E — Tier 2 (3m 32s)
+[2026-05-19T21:37:01.943Z] ⏭️  [UAP 553/3264] SV1N4m3sm7Q — is_short (0s)
+[2026-05-19T21:37:11.363Z] ❌ [UAP 554/3264] iUovoRKCNmk — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (9s)
+[2026-05-19T21:37:11.363Z] ⚠️  [UAP] Auto-retrying iUovoRKCNmk — caption fetch failed (attempt 1/3)
+[2026-05-19T21:37:11.403Z] ❌ [UAP 555/3264] FW4q3tSzyCA — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (9s)
+[2026-05-19T21:37:11.403Z] ⚠️  [UAP] Auto-retrying FW4q3tSzyCA — caption fetch failed (attempt 1/3)
+[2026-05-19T21:37:58.489Z] ✅ [UAP 556/3264] iUovoRKCNmk — Tier 2 (46s)
+[2026-05-19T21:38:28.701Z] ✅ [UAP 557/3264] FW4q3tSzyCA — Tier 1 (1m 17s)
+[2026-05-19T21:39:46.772Z] ✅ [UAP 558/3264] QJxbyu-9Tj0 — Tier 2 (2m 35s)
+[2026-05-19T21:39:47.244Z] ⏭️  [UAP 559/3264] TWToxNbYJNA — is_short (0s)
+[2026-05-19T21:39:47.248Z] ⏭️  [UAP 560/3264] ZvQMJsohtUA — is_short (0s)
+[2026-05-19T21:40:10.900Z] ❌ [UAP 561/3264] 6WC4o2yY9Ws — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (23s)
+[2026-05-19T21:40:10.900Z] ⚠️  [UAP] Auto-retrying 6WC4o2yY9Ws — caption fetch failed (attempt 1/3)
+[2026-05-19T21:40:11.637Z] ❌ [UAP 562/3264] 6WC4o2yY9Ws — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:11.637Z] ⚠️  [UAP] Auto-retrying 6WC4o2yY9Ws — caption fetch failed (attempt 2/3)
+[2026-05-19T21:40:11.690Z] ❌ [UAP 563/3264] S713pxMKovM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:11.690Z] ⚠️  [UAP] Auto-retrying S713pxMKovM — caption fetch failed (attempt 1/3)
+[2026-05-19T21:40:11.935Z] ❌ [UAP 564/3264] YKFmK-NSnKI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:11.935Z] ⚠️  [UAP] Auto-retrying YKFmK-NSnKI — caption fetch failed (attempt 1/3)
+[2026-05-19T21:40:12.469Z] ❌ [UAP 565/3264] 6WC4o2yY9Ws — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:12.469Z] ⚠️  [UAP] Auto-retrying 6WC4o2yY9Ws — caption fetch failed (attempt 3/3)
+[2026-05-19T21:40:12.703Z] ❌ [UAP 566/3264] S713pxMKovM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:12.703Z] ⚠️  [UAP] Auto-retrying S713pxMKovM — caption fetch failed (attempt 2/3)
+[2026-05-19T21:40:12.942Z] ❌ [UAP 567/3264] YKFmK-NSnKI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:12.942Z] ⚠️  [UAP] Auto-retrying YKFmK-NSnKI — caption fetch failed (attempt 2/3)
+[2026-05-19T21:40:13.497Z] ❌ [UAP 568/3264] 6WC4o2yY9Ws — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:13.554Z] ❌ [UAP 569/3264] S713pxMKovM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:13.554Z] ⚠️  [UAP] Auto-retrying S713pxMKovM — caption fetch failed (attempt 3/3)
+[2026-05-19T21:40:13.561Z] ❌ [UAP 570/3264] YKFmK-NSnKI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:13.561Z] ⚠️  [UAP] Auto-retrying YKFmK-NSnKI — caption fetch failed (attempt 3/3)
+[2026-05-19T21:40:14.097Z] ❌ [UAP 571/3264] S713pxMKovM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:14.132Z] ❌ [UAP 572/3264] YKFmK-NSnKI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:14.162Z] ❌ [UAP 573/3264] SAc9fnpvDGw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:14.163Z] ⚠️  [UAP] Auto-retrying SAc9fnpvDGw — caption fetch failed (attempt 1/3)
+[2026-05-19T21:40:14.490Z] ⏭️  [UAP 574/3264] GWplIX3z5HQ — is_short (0s)
+[2026-05-19T21:40:14.710Z] ❌ [UAP 575/3264] SAc9fnpvDGw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:14.710Z] ⚠️  [UAP] Auto-retrying SAc9fnpvDGw — caption fetch failed (attempt 2/3)
+[2026-05-19T21:40:14.793Z] ❌ [UAP 576/3264] g98NSLN3mlw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:14.793Z] ⚠️  [UAP] Auto-retrying g98NSLN3mlw — caption fetch failed (attempt 1/3)
+[2026-05-19T21:40:15.166Z] ⏭️  [UAP 577/3264] KwI0QEp3X8s — is_short (0s)
+[2026-05-19T21:40:15.287Z] ❌ [UAP 578/3264] SAc9fnpvDGw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:15.287Z] ⚠️  [UAP] Auto-retrying SAc9fnpvDGw — caption fetch failed (attempt 3/3)
+[2026-05-19T21:40:15.298Z] ❌ [UAP 579/3264] g98NSLN3mlw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:15.298Z] ⚠️  [UAP] Auto-retrying g98NSLN3mlw — caption fetch failed (attempt 2/3)
+[2026-05-19T21:40:15.836Z] ❌ [UAP 580/3264] g98NSLN3mlw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:15.836Z] ⚠️  [UAP] Auto-retrying g98NSLN3mlw — caption fetch failed (attempt 3/3)
+[2026-05-19T21:40:15.903Z] ❌ [UAP 581/3264] SAc9fnpvDGw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:16.057Z] ❌ [UAP 582/3264] KdXkUoLzQu0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:40:16.057Z] ⚠️  [UAP] Auto-retrying KdXkUoLzQu0 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:40:16.432Z] ⏭️  [UAP 583/3264] y2mfSVtr3Pc — is_short (0s)
+[2026-05-19T21:40:23.549Z] ❌ [UAP 584/3264] KdXkUoLzQu0 — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (7s)
+[2026-05-19T21:40:23.549Z] ⚠️  [UAP] Auto-retrying KdXkUoLzQu0 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:40:23.550Z] ❌ [UAP 585/3264] g98NSLN3mlw — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (7s)
+[2026-05-19T21:40:48.513Z] ✅ [UAP 586/3264] 8Oz0Y3xGgmE — Tier 2 (24s)
+[2026-05-19T21:41:51.538Z] ✅ [UAP 587/3264] 4n_bRtnIP14 — Tier 2 (1m 27s)
+[2026-05-19T21:42:19.166Z] ✅ [UAP 588/3264] KdXkUoLzQu0 — Tier 2 (1m 55s)
+[2026-05-19T21:42:19.673Z] ⏭️  [UAP 589/3264] Sidt_mMPCN8 — is_short (0s)
+[2026-05-19T21:42:22.790Z] ❌ [UAP 590/3264] knb2J1yNhDA — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (3s)
+[2026-05-19T21:42:22.790Z] ⚠️  [UAP] Auto-retrying knb2J1yNhDA — caption fetch failed (attempt 1/3)
+[2026-05-19T21:42:22.801Z] ❌ [UAP 591/3264] 58H9ehdcnhg — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (3s)
+[2026-05-19T21:42:22.801Z] ⚠️  [UAP] Auto-retrying 58H9ehdcnhg — caption fetch failed (attempt 1/3)
+[2026-05-19T21:42:23.364Z] ❌ [UAP 592/3264] 58H9ehdcnhg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:23.364Z] ⚠️  [UAP] Auto-retrying 58H9ehdcnhg — caption fetch failed (attempt 2/3)
+[2026-05-19T21:42:23.450Z] ❌ [UAP 593/3264] knb2J1yNhDA — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:23.450Z] ⚠️  [UAP] Auto-retrying knb2J1yNhDA — caption fetch failed (attempt 2/3)
+[2026-05-19T21:42:23.547Z] ❌ [UAP 594/3264] D06uQdk2cys — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:23.548Z] ⚠️  [UAP] Auto-retrying D06uQdk2cys — caption fetch failed (attempt 1/3)
+[2026-05-19T21:42:24.054Z] ❌ [UAP 595/3264] 58H9ehdcnhg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:24.054Z] ⚠️  [UAP] Auto-retrying 58H9ehdcnhg — caption fetch failed (attempt 3/3)
+[2026-05-19T21:42:24.181Z] ❌ [UAP 596/3264] knb2J1yNhDA — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:24.181Z] ⚠️  [UAP] Auto-retrying knb2J1yNhDA — caption fetch failed (attempt 3/3)
+[2026-05-19T21:42:24.264Z] ❌ [UAP 597/3264] D06uQdk2cys — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:24.264Z] ⚠️  [UAP] Auto-retrying D06uQdk2cys — caption fetch failed (attempt 2/3)
+[2026-05-19T21:42:24.779Z] ❌ [UAP 598/3264] knb2J1yNhDA — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:24.842Z] ❌ [UAP 599/3264] 58H9ehdcnhg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:25.027Z] ❌ [UAP 600/3264] D06uQdk2cys — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:25.027Z] ⚠️  [UAP] Auto-retrying D06uQdk2cys — caption fetch failed (attempt 3/3)
+[2026-05-19T21:42:25.079Z] 📊 ── UAP Progress Report ──
+[2026-05-19T21:42:25.079Z]    Processed: 600/3264 | ✅ 239 | ⏭️ 199 | ❌ 162
+[2026-05-19T21:42:25.079Z]    Elapsed: 4h 34m | Avg: 27s/video | ETA: ~20h 20m
+[2026-05-19T21:42:25.407Z] ⏭️  [UAP 601/3264] F0A7p65pu2k — is_short (0s)
+[2026-05-19T21:42:25.585Z] ❌ [UAP 602/3264] D06uQdk2cys — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:25.698Z] ❌ [UAP 603/3264] yOnCTPkVACY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:25.698Z] ⚠️  [UAP] Auto-retrying yOnCTPkVACY — caption fetch failed (attempt 1/3)
+[2026-05-19T21:42:26.107Z] ⏭️  [UAP 604/3264] NA-N7Z9jdRg — is_short (0s)
+[2026-05-19T21:42:26.250Z] ❌ [UAP 605/3264] MRQTAHAVG_0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:26.250Z] ⚠️  [UAP] Auto-retrying MRQTAHAVG_0 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:42:26.257Z] ❌ [UAP 606/3264] yOnCTPkVACY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:26.257Z] ⚠️  [UAP] Auto-retrying yOnCTPkVACY — caption fetch failed (attempt 2/3)
+[2026-05-19T21:42:26.636Z] ⏭️  [UAP 607/3264] ZKNgzx7fBiQ — is_short (0s)
+[2026-05-19T21:42:26.773Z] ❌ [UAP 608/3264] yOnCTPkVACY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:26.773Z] ⚠️  [UAP] Auto-retrying yOnCTPkVACY — caption fetch failed (attempt 3/3)
+[2026-05-19T21:42:26.830Z] ❌ [UAP 609/3264] MRQTAHAVG_0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:26.830Z] ⚠️  [UAP] Auto-retrying MRQTAHAVG_0 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:42:27.341Z] ❌ [UAP 610/3264] yOnCTPkVACY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:27.358Z] ❌ [UAP 611/3264] MRQTAHAVG_0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:27.358Z] ⚠️  [UAP] Auto-retrying MRQTAHAVG_0 — caption fetch failed (attempt 3/3)
+[2026-05-19T21:42:27.494Z] ❌ [UAP 612/3264] sxyoJ9CAiAo — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:27.495Z] ⚠️  [UAP] Auto-retrying sxyoJ9CAiAo — caption fetch failed (attempt 1/3)
+[2026-05-19T21:42:27.982Z] ❌ [UAP 613/3264] MRQTAHAVG_0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:28.099Z] ❌ [UAP 614/3264] 9i8lmp64804 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:28.099Z] ⚠️  [UAP] Auto-retrying 9i8lmp64804 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:42:28.175Z] ❌ [UAP 615/3264] sxyoJ9CAiAo — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:42:28.175Z] ⚠️  [UAP] Auto-retrying sxyoJ9CAiAo — caption fetch failed (attempt 2/3)
+[2026-05-19T21:42:59.560Z] ✅ [UAP 616/3264] 9i8lmp64804 — Tier 2 (31s)
+[2026-05-19T21:43:52.478Z] ✅ [UAP 617/3264] sxyoJ9CAiAo — Tier 2 (1m 24s)
+[2026-05-19T21:44:18.769Z] ✅ [UAP 618/3264] uXiXuhxxpMY — Tier 2 (1m 50s)
+[2026-05-19T21:44:19.202Z] ⏭️  [UAP 619/3264] XZPhvH-5670 — is_short (0s)
+[2026-05-19T21:45:09.437Z] ✅ [UAP 620/3264] 2ehmUEG2S2w — Tier 2 (50s)
+[2026-05-19T21:46:07.498Z] ✅ [UAP 621/3264] jWoJ7UMfVLY — Tier 1 (1m 48s)
+[2026-05-19T21:47:51.074Z] ✅ [UAP 622/3264] vJH68O6ehMM — Tier 2 (1m 43s)
+[2026-05-19T21:48:13.871Z] ✅ [UAP 623/3264] rgBTMzFd-hg — Tier 2 (2m 6s)
+[2026-05-19T21:50:48.192Z] ✅ [UAP 624/3264] V00WcEiKRAY — Tier 1 (4m 40s)
+[2026-05-19T21:50:48.625Z] ⏭️  [UAP 625/3264] QRRJmjE58O4 — is_short (0s)
+[2026-05-19T21:50:48.661Z] ⏭️  [UAP 626/3264] npA3p_SbMyI — is_short (0s)
+[2026-05-19T21:51:50.989Z] ✅ [UAP 627/3264] L4CvjWEB6C8 — Tier 2 (1m 2s)
+[2026-05-19T21:52:58.164Z] ✅ [UAP 628/3264] RUlsnBj-L0k — Tier 2 (1m 6s)
+[2026-05-19T21:52:59.387Z] ✅ [UAP 629/3264] eZ7jz_Vxhrs — Tier 2 (1m 8s)
+[2026-05-19T21:53:31.218Z] ✅ [UAP 630/3264] PZtOAz-nMcg — Tier 1 (1m 40s)
+[2026-05-19T21:53:31.669Z] ⏭️  [UAP 631/3264] GO2uxlyXa08 — is_short (0s)
+[2026-05-19T21:54:15.666Z] ✅ [UAP 632/3264] h2i9CQGzEqQ — Tier 2 (44s)
+[2026-05-19T21:55:33.186Z] ✅ [UAP 633/3264] B7Z21-eWwXQ — Tier 2 (2m 1s)
+[2026-05-19T21:56:02.979Z] ✅ [UAP 634/3264] o3BLsRL9lgc — Tier 2 (29s)
+[2026-05-19T21:56:05.389Z] ✅ [UAP 635/3264] Al9-A8NK5jA — Tier 2 (32s)
+[2026-05-19T21:56:57.230Z] ✅ [UAP 636/3264] Zx0xQH8zh94 — Tier 2 (1m 23s)
+[2026-05-19T21:56:57.706Z] ⏭️  [UAP 637/3264] a5zyBFul3b4 — is_short (0s)
+[2026-05-19T21:57:05.629Z] ❌ [UAP 638/3264] g_wPr0LUeg0 — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (8s)
+[2026-05-19T21:57:05.629Z] ⚠️  [UAP] Auto-retrying g_wPr0LUeg0 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:05.692Z] ❌ [UAP 639/3264] rTv37_93n80 — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (8s)
+[2026-05-19T21:57:05.692Z] ⚠️  [UAP] Auto-retrying rTv37_93n80 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:06.325Z] ❌ [UAP 640/3264] g_wPr0LUeg0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:06.325Z] ⚠️  [UAP] Auto-retrying g_wPr0LUeg0 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:06.340Z] ❌ [UAP 641/3264] rTv37_93n80 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:06.340Z] ⚠️  [UAP] Auto-retrying rTv37_93n80 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:06.610Z] ❌ [UAP 642/3264] udGhlL1SQ2A — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:06.610Z] ⚠️  [UAP] Auto-retrying udGhlL1SQ2A — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:07.238Z] ❌ [UAP 643/3264] rTv37_93n80 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:07.238Z] ⚠️  [UAP] Auto-retrying rTv37_93n80 — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:07.407Z] ❌ [UAP 644/3264] udGhlL1SQ2A — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:07.407Z] ⚠️  [UAP] Auto-retrying udGhlL1SQ2A — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:07.463Z] ❌ [UAP 645/3264] g_wPr0LUeg0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:07.463Z] ⚠️  [UAP] Auto-retrying g_wPr0LUeg0 — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:08.004Z] ❌ [UAP 646/3264] g_wPr0LUeg0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:08.005Z] ❌ [UAP 647/3264] udGhlL1SQ2A — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:08.005Z] ⚠️  [UAP] Auto-retrying udGhlL1SQ2A — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:08.087Z] ❌ [UAP 648/3264] rTv37_93n80 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:08.403Z] ⏭️  [UAP 649/3264] i4O_g44WW_w — is_short (0s)
+[2026-05-19T21:57:08.446Z] ⏭️  [UAP 650/3264] rs_YT67WA_U — is_short (0s)
+[2026-05-19T21:57:08.689Z] ❌ [UAP 651/3264] udGhlL1SQ2A — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:09.058Z] ⏭️  [UAP 652/3264] _p2AZptRClA — is_short (0s)
+[2026-05-19T21:57:09.257Z] ❌ [UAP 653/3264] WHIry_C1MTc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:09.257Z] ⚠️  [UAP] Auto-retrying WHIry_C1MTc — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:09.330Z] ❌ [UAP 654/3264] cZ3ng-IBUJU — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:09.330Z] ⚠️  [UAP] Auto-retrying cZ3ng-IBUJU — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:09.702Z] ⏭️  [UAP 655/3264] y5pjvPGN2BM — is_short (0s)
+[2026-05-19T21:57:09.840Z] ❌ [UAP 656/3264] cZ3ng-IBUJU — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:09.840Z] ⚠️  [UAP] Auto-retrying cZ3ng-IBUJU — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:09.863Z] ❌ [UAP 657/3264] WHIry_C1MTc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:09.863Z] ⚠️  [UAP] Auto-retrying WHIry_C1MTc — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:10.408Z] ❌ [UAP 658/3264] WHIry_C1MTc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:10.408Z] ⚠️  [UAP] Auto-retrying WHIry_C1MTc — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:10.418Z] ❌ [UAP 659/3264] cZ3ng-IBUJU — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:10.418Z] ⚠️  [UAP] Auto-retrying cZ3ng-IBUJU — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:10.564Z] ❌ [UAP 660/3264] ZAxI-LDrDqA — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:10.564Z] ⚠️  [UAP] Auto-retrying ZAxI-LDrDqA — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:11.105Z] ❌ [UAP 661/3264] cZ3ng-IBUJU — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:15.143Z] ❌ [UAP 662/3264] ZAxI-LDrDqA — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (4s)
+[2026-05-19T21:57:15.143Z] ⚠️  [UAP] Auto-retrying ZAxI-LDrDqA — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:15.234Z] ❌ [UAP 663/3264] WHIry_C1MTc — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (4s)
+[2026-05-19T21:57:15.787Z] ❌ [UAP 664/3264] ZAxI-LDrDqA — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:15.787Z] ⚠️  [UAP] Auto-retrying ZAxI-LDrDqA — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:15.924Z] ❌ [UAP 665/3264] MJtKuYuMl_4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:15.924Z] ⚠️  [UAP] Auto-retrying MJtKuYuMl_4 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:15.935Z] ❌ [UAP 666/3264] GDM-xvB4r6o — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:15.935Z] ⚠️  [UAP] Auto-retrying GDM-xvB4r6o — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:16.624Z] ❌ [UAP 667/3264] ZAxI-LDrDqA — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:16.631Z] ❌ [UAP 668/3264] MJtKuYuMl_4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:16.631Z] ⚠️  [UAP] Auto-retrying MJtKuYuMl_4 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:16.666Z] ❌ [UAP 669/3264] GDM-xvB4r6o — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:16.666Z] ⚠️  [UAP] Auto-retrying GDM-xvB4r6o — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:17.004Z] ⏭️  [UAP 670/3264] E4LAAgJ-8gY — is_short (0s)
+[2026-05-19T21:57:17.221Z] ❌ [UAP 671/3264] MJtKuYuMl_4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:17.221Z] ⚠️  [UAP] Auto-retrying MJtKuYuMl_4 — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:17.323Z] ❌ [UAP 672/3264] GDM-xvB4r6o — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:17.323Z] ⚠️  [UAP] Auto-retrying GDM-xvB4r6o — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:17.678Z] ⏭️  [UAP 673/3264] j8S18WoZy_Q — is_short (0s)
+[2026-05-19T21:57:17.857Z] ❌ [UAP 674/3264] MJtKuYuMl_4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:17.910Z] ❌ [UAP 675/3264] GDM-xvB4r6o — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:17.947Z] 📊 ── UAP Progress Report ──
+[2026-05-19T21:57:17.947Z]    Processed: 675/3264 | ✅ 256 | ⏭️ 213 | ❌ 206
+[2026-05-19T21:57:17.947Z]    Elapsed: 4h 49m | Avg: 25s/video | ETA: ~18h 31m
+[2026-05-19T21:57:18.299Z] ⏭️  [UAP 676/3264] kVJ5Lc4Sslo — is_short (0s)
+[2026-05-19T21:57:18.465Z] ❌ [UAP 677/3264] O-Zayi-Ob4E — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:18.465Z] ⚠️  [UAP] Auto-retrying O-Zayi-Ob4E — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:18.536Z] ❌ [UAP 678/3264] dc6V0O_OPJ0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:18.536Z] ⚠️  [UAP] Auto-retrying dc6V0O_OPJ0 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:19.104Z] ❌ [UAP 679/3264] O-Zayi-Ob4E — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:19.105Z] ⚠️  [UAP] Auto-retrying O-Zayi-Ob4E — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:19.207Z] ❌ [UAP 680/3264] 1_9D8n890QY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:19.207Z] ⚠️  [UAP] Auto-retrying 1_9D8n890QY — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:19.359Z] ❌ [UAP 681/3264] dc6V0O_OPJ0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:19.359Z] ⚠️  [UAP] Auto-retrying dc6V0O_OPJ0 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:19.856Z] ❌ [UAP 682/3264] O-Zayi-Ob4E — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:19.856Z] ⚠️  [UAP] Auto-retrying O-Zayi-Ob4E — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:19.957Z] ❌ [UAP 683/3264] dc6V0O_OPJ0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:19.957Z] ⚠️  [UAP] Auto-retrying dc6V0O_OPJ0 — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:19.991Z] ❌ [UAP 684/3264] 1_9D8n890QY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:19.992Z] ⚠️  [UAP] Auto-retrying 1_9D8n890QY — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:20.626Z] ❌ [UAP 685/3264] O-Zayi-Ob4E — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:20.655Z] ❌ [UAP 686/3264] 1_9D8n890QY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:20.655Z] ⚠️  [UAP] Auto-retrying 1_9D8n890QY — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:20.696Z] ❌ [UAP 687/3264] dc6V0O_OPJ0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:21.050Z] ⏭️  [UAP 688/3264] d2W0qzSDXvc — is_short (0s)
+[2026-05-19T21:57:21.281Z] ❌ [UAP 689/3264] OeXGKQk3_GY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:21.281Z] ⚠️  [UAP] Auto-retrying OeXGKQk3_GY — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:21.284Z] ❌ [UAP 690/3264] 1_9D8n890QY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:29.006Z] ❌ [UAP 691/3264] 498oaavKijM — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (7s)
+[2026-05-19T21:57:29.006Z] ⚠️  [UAP] Auto-retrying 498oaavKijM — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:29.091Z] ❌ [UAP 692/3264] v8VxTPhQ29U — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (7s)
+[2026-05-19T21:57:29.091Z] ⚠️  [UAP] Auto-retrying v8VxTPhQ29U — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:29.200Z] ❌ [UAP 693/3264] OeXGKQk3_GY — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (7s)
+[2026-05-19T21:57:29.200Z] ⚠️  [UAP] Auto-retrying OeXGKQk3_GY — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:29.794Z] ❌ [UAP 694/3264] OeXGKQk3_GY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:29.794Z] ⚠️  [UAP] Auto-retrying OeXGKQk3_GY — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:29.836Z] ❌ [UAP 695/3264] 498oaavKijM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:29.836Z] ⚠️  [UAP] Auto-retrying 498oaavKijM — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:29.961Z] ❌ [UAP 696/3264] v8VxTPhQ29U — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:29.961Z] ⚠️  [UAP] Auto-retrying v8VxTPhQ29U — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:30.544Z] ❌ [UAP 697/3264] OeXGKQk3_GY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:30.571Z] ❌ [UAP 698/3264] 498oaavKijM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:30.571Z] ⚠️  [UAP] Auto-retrying 498oaavKijM — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:30.624Z] ❌ [UAP 699/3264] v8VxTPhQ29U — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:30.624Z] ⚠️  [UAP] Auto-retrying v8VxTPhQ29U — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:30.999Z] ⏭️  [UAP 700/3264] d53JlJOHvGc — is_short (0s)
+[2026-05-19T21:57:31.156Z] ❌ [UAP 701/3264] 498oaavKijM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:31.239Z] ❌ [UAP 702/3264] v8VxTPhQ29U — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:31.476Z] ⏭️  [UAP 703/3264] bTGRK9a-oHQ — is_short (0s)
+[2026-05-19T21:57:31.581Z] ⏭️  [UAP 704/3264] Od3e3767ttA — is_short (0s)
+[2026-05-19T21:57:31.878Z] ❌ [UAP 705/3264] tm9Nxke9Gt0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:31.878Z] ⚠️  [UAP] Auto-retrying tm9Nxke9Gt0 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:32.207Z] ⏭️  [UAP 706/3264] Ik5SKEGGia8 — is_short (0s)
+[2026-05-19T21:57:32.413Z] ❌ [UAP 707/3264] tm9Nxke9Gt0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:32.413Z] ⚠️  [UAP] Auto-retrying tm9Nxke9Gt0 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:32.510Z] ❌ [UAP 708/3264] E9HPUxD1ZyY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:32.510Z] ⚠️  [UAP] Auto-retrying E9HPUxD1ZyY — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:32.850Z] ⏭️  [UAP 709/3264] slpK4qSroAI — is_short (0s)
+[2026-05-19T21:57:33.113Z] ❌ [UAP 710/3264] tm9Nxke9Gt0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:33.113Z] ⚠️  [UAP] Auto-retrying tm9Nxke9Gt0 — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:33.130Z] ❌ [UAP 711/3264] E9HPUxD1ZyY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:33.130Z] ⚠️  [UAP] Auto-retrying E9HPUxD1ZyY — caption fetch failed (attempt 2/3)
+[2026-05-19T21:57:33.690Z] ❌ [UAP 712/3264] tm9Nxke9Gt0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:33.696Z] ❌ [UAP 713/3264] E9HPUxD1ZyY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:33.696Z] ⚠️  [UAP] Auto-retrying E9HPUxD1ZyY — caption fetch failed (attempt 3/3)
+[2026-05-19T21:57:33.789Z] ❌ [UAP 714/3264] bYlTiylneX4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:33.789Z] ⚠️  [UAP] Auto-retrying bYlTiylneX4 — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:34.357Z] ❌ [UAP 715/3264] E9HPUxD1ZyY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:34.425Z] ❌ [UAP 716/3264] tPWIQn0z-WI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:34.425Z] ⚠️  [UAP] Auto-retrying tPWIQn0z-WI — caption fetch failed (attempt 1/3)
+[2026-05-19T21:57:34.431Z] ❌ [UAP 717/3264] bYlTiylneX4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T21:57:34.431Z] ⚠️  [UAP] Auto-retrying bYlTiylneX4 — caption fetch failed (attempt 2/3)
+[2026-05-19T21:58:09.171Z] ✅ [UAP 718/3264] bYlTiylneX4 — Tier 2 (34s)
+[2026-05-19T21:58:23.077Z] ✅ [UAP 719/3264] 2OPJxDcXY-k — Tier 2 (48s)
+[2026-05-19T22:00:40.814Z] ✅ [UAP 720/3264] tPWIQn0z-WI — Tier 2 (3m 6s)
+[2026-05-19T22:00:41.251Z] ⏭️  [UAP 721/3264] aUMrlCvxtSM — is_short (0s)
+[2026-05-19T22:01:11.210Z] ✅ [UAP 722/3264] LVwgwBwWEJc — Tier 2 (30s)
+[2026-05-19T22:04:06.684Z] ✅ [UAP 723/3264] o1Lq70TY0iE — Tier 2 (3m 25s)
+[2026-05-19T22:04:07.137Z] ⏭️  [UAP 724/3264] jHRFGBtUU6c — is_short (0s)
+[2026-05-19T22:05:08.520Z] ✅ [UAP 725/3264] ieOQHMcGUuk — Tier 1 (1m 1s)
+[2026-05-19T22:05:17.769Z] ✅ [UAP 726/3264] lCVN_Y0ircM — Tier 1 (1m 10s)
+[2026-05-19T22:05:18.203Z] ⏭️  [UAP 727/3264] clS1FbSQDvE — is_short (0s)
+[2026-05-19T22:05:18.234Z] ⏭️  [UAP 728/3264] -TNYkv9Wsjw — is_short (0s)
+[2026-05-19T22:06:02.513Z] ✅ [UAP 729/3264] t5qSGJn3j9I — Tier 2 (44s)
+[2026-05-19T22:06:02.945Z] ⏭️  [UAP 730/3264] nC8aG3aar2E — is_short (0s)
+[2026-05-19T22:07:33.066Z] ✅ [UAP 731/3264] LQYOp7JxheY — Tier 2 (1m 30s)
+[2026-05-19T22:09:42.806Z] ✅ [UAP 732/3264] CAhiULlKwHI — Tier 1 (3m 40s)
+[2026-05-19T22:09:43.271Z] ⏭️  [UAP 733/3264] vgFo-0KrDUE — is_short (0s)
+[2026-05-19T22:12:00.126Z] ✅ [UAP 734/3264] JW6cJuKDUsU — Tier 2 (2m 17s)
+[2026-05-19T22:12:53.998Z] ✅ [UAP 735/3264] l9DtIdw-eiE — Tier 2 (3m 10s)
+[2026-05-19T22:12:54.439Z] ⏭️  [UAP 736/3264] fj-I6FC-ya8 — is_short (0s)
+[2026-05-19T22:12:54.467Z] ⏭️  [UAP 737/3264] m_lAaCZllx4 — is_short (0s)
+[2026-05-19T22:14:06.331Z] ✅ [UAP 738/3264] DqH9_FpFI9k — Tier 1 (1m 12s)
+[2026-05-19T22:14:06.850Z] ⏭️  [UAP 739/3264] h0iZN_Wri34 — is_short (0s)
+[2026-05-19T22:14:36.966Z] ❌ [UAP 740/3264] tDROoJTxfPA — FAILED: Request timed out after 30s (30s)
+[2026-05-19T22:14:36.966Z] ⚠️  [UAP] Auto-retrying tDROoJTxfPA — caption fetch failed (attempt 1/3)
+[2026-05-19T22:14:36.989Z] ❌ [UAP 741/3264] Aj4ZJmlHf9Q — FAILED: Request timed out after 30s (30s)
+[2026-05-19T22:14:36.989Z] ⚠️  [UAP] Auto-retrying Aj4ZJmlHf9Q — caption fetch failed (attempt 1/3)
+[2026-05-19T22:14:37.455Z] ⏭️  [UAP 742/3264] XZKzuAzJfMo — is_short (0s)
+[2026-05-19T22:15:02.490Z] ❌ [UAP 743/3264] Aj4ZJmlHf9Q — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (25s)
+[2026-05-19T22:15:02.490Z] ⚠️  [UAP] Auto-retrying Aj4ZJmlHf9Q — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:02.547Z] ❌ [UAP 744/3264] tDROoJTxfPA — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (25s)
+[2026-05-19T22:15:02.547Z] ⚠️  [UAP] Auto-retrying tDROoJTxfPA — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:03.225Z] ❌ [UAP 745/3264] tDROoJTxfPA — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (0s)
+[2026-05-19T22:15:03.225Z] ⚠️  [UAP] Auto-retrying tDROoJTxfPA — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:03.226Z] ❌ [UAP 746/3264] Aj4ZJmlHf9Q — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (0s)
+[2026-05-19T22:15:03.226Z] ⚠️  [UAP] Auto-retrying Aj4ZJmlHf9Q — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:03.492Z] ❌ [UAP 747/3264] 6cgeAklr2VM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:03.492Z] ⚠️  [UAP] Auto-retrying 6cgeAklr2VM — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:04.055Z] ❌ [UAP 748/3264] Aj4ZJmlHf9Q — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:04.137Z] ❌ [UAP 749/3264] tDROoJTxfPA — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:04.182Z] ❌ [UAP 750/3264] 6cgeAklr2VM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:04.182Z] ⚠️  [UAP] Auto-retrying 6cgeAklr2VM — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:04.224Z] 📊 ── UAP Progress Report ──
+[2026-05-19T22:15:04.224Z]    Processed: 750/3264 | ✅ 269 | ⏭️ 230 | ❌ 251
+[2026-05-19T22:15:04.224Z]    Elapsed: 5h 7m | Avg: 24s/video | ETA: ~17h 10m
+[2026-05-19T22:15:04.803Z] ❌ [UAP 751/3264] 6cgeAklr2VM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:04.803Z] ⚠️  [UAP] Auto-retrying 6cgeAklr2VM — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:04.859Z] ❌ [UAP 752/3264] 9BTuKLPBtcc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:04.859Z] ⚠️  [UAP] Auto-retrying 9BTuKLPBtcc — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:04.871Z] ❌ [UAP 753/3264] 2KXIpcb8E1g — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:04.872Z] ⚠️  [UAP] Auto-retrying 2KXIpcb8E1g — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:05.459Z] ❌ [UAP 754/3264] 2KXIpcb8E1g — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:05.459Z] ⚠️  [UAP] Auto-retrying 2KXIpcb8E1g — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:05.493Z] ❌ [UAP 755/3264] 6cgeAklr2VM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:05.611Z] ❌ [UAP 756/3264] 9BTuKLPBtcc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:05.611Z] ⚠️  [UAP] Auto-retrying 9BTuKLPBtcc — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:05.985Z] ⏭️  [UAP 757/3264] ykcjm_ahEag — is_short (0s)
+[2026-05-19T22:15:06.143Z] ❌ [UAP 758/3264] 9BTuKLPBtcc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:06.143Z] ⚠️  [UAP] Auto-retrying 9BTuKLPBtcc — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:06.160Z] ❌ [UAP 759/3264] 2KXIpcb8E1g — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:06.160Z] ⚠️  [UAP] Auto-retrying 2KXIpcb8E1g — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:06.705Z] ❌ [UAP 760/3264] 2KXIpcb8E1g — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:06.724Z] ❌ [UAP 761/3264] 9BTuKLPBtcc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:06.837Z] ❌ [UAP 762/3264] LU6ozS9caGI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:06.837Z] ⚠️  [UAP] Auto-retrying LU6ozS9caGI — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:07.161Z] ⏭️  [UAP 763/3264] Iv2saoNWaoU — is_short (0s)
+[2026-05-19T22:15:07.419Z] ❌ [UAP 764/3264] LU6ozS9caGI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:07.419Z] ⚠️  [UAP] Auto-retrying LU6ozS9caGI — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:07.450Z] ❌ [UAP 765/3264] p6HTah_WZG8 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:07.450Z] ⚠️  [UAP] Auto-retrying p6HTah_WZG8 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:07.986Z] ❌ [UAP 766/3264] p6HTah_WZG8 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:07.986Z] ⚠️  [UAP] Auto-retrying p6HTah_WZG8 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:07.986Z] ❌ [UAP 767/3264] LU6ozS9caGI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:07.986Z] ⚠️  [UAP] Auto-retrying LU6ozS9caGI — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:08.080Z] ❌ [UAP 768/3264] PjiP-uSGfoY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:08.080Z] ⚠️  [UAP] Auto-retrying PjiP-uSGfoY — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:13.887Z] ❌ [UAP 769/3264] p6HTah_WZG8 — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (5s)
+[2026-05-19T22:15:13.887Z] ⚠️  [UAP] Auto-retrying p6HTah_WZG8 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:13.931Z] ❌ [UAP 770/3264] LU6ozS9caGI — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (5s)
+[2026-05-19T22:15:14.027Z] ❌ [UAP 771/3264] PjiP-uSGfoY — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (5s)
+[2026-05-19T22:15:14.027Z] ⚠️  [UAP] Auto-retrying PjiP-uSGfoY — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:14.618Z] ❌ [UAP 772/3264] p6HTah_WZG8 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:14.630Z] ❌ [UAP 773/3264] YtfMhIbdc98 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:14.630Z] ⚠️  [UAP] Auto-retrying YtfMhIbdc98 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:14.668Z] ❌ [UAP 774/3264] PjiP-uSGfoY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:14.668Z] ⚠️  [UAP] Auto-retrying PjiP-uSGfoY — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:15.157Z] ❌ [UAP 775/3264] YtfMhIbdc98 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:15.157Z] ⚠️  [UAP] Auto-retrying YtfMhIbdc98 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:15.209Z] ❌ [UAP 776/3264] PjiP-uSGfoY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:15.271Z] ❌ [UAP 777/3264] ItrBOFOVf3Y — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:15.271Z] ⚠️  [UAP] Auto-retrying ItrBOFOVf3Y — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:15.770Z] ❌ [UAP 778/3264] ItrBOFOVf3Y — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:15.771Z] ⚠️  [UAP] Auto-retrying ItrBOFOVf3Y — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:15.813Z] ❌ [UAP 779/3264] YtfMhIbdc98 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:15.813Z] ⚠️  [UAP] Auto-retrying YtfMhIbdc98 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:15.865Z] ❌ [UAP 780/3264] wANK4ZT_LYo — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:15.865Z] ⚠️  [UAP] Auto-retrying wANK4ZT_LYo — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:16.399Z] ❌ [UAP 781/3264] YtfMhIbdc98 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:16.439Z] ❌ [UAP 782/3264] ItrBOFOVf3Y — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:16.439Z] ⚠️  [UAP] Auto-retrying ItrBOFOVf3Y — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:16.637Z] ❌ [UAP 783/3264] wANK4ZT_LYo — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:16.637Z] ⚠️  [UAP] Auto-retrying wANK4ZT_LYo — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:17.194Z] ❌ [UAP 784/3264] ItrBOFOVf3Y — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:17.239Z] ❌ [UAP 785/3264] s_ymJcmeEDc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:17.239Z] ⚠️  [UAP] Auto-retrying s_ymJcmeEDc — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:17.250Z] ❌ [UAP 786/3264] wANK4ZT_LYo — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:17.250Z] ⚠️  [UAP] Auto-retrying wANK4ZT_LYo — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:17.840Z] ❌ [UAP 787/3264] GkqFBqiGRQs — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:17.840Z] ⚠️  [UAP] Auto-retrying GkqFBqiGRQs — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:17.864Z] ❌ [UAP 788/3264] wANK4ZT_LYo — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:17.914Z] ❌ [UAP 789/3264] s_ymJcmeEDc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:17.914Z] ⚠️  [UAP] Auto-retrying s_ymJcmeEDc — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:18.469Z] ❌ [UAP 790/3264] s_ymJcmeEDc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:18.469Z] ⚠️  [UAP] Auto-retrying s_ymJcmeEDc — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:18.487Z] ❌ [UAP 791/3264] mxTtzCt-1lI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:18.487Z] ⚠️  [UAP] Auto-retrying mxTtzCt-1lI — caption fetch failed (attempt 1/3)
+[2026-05-19T22:15:18.595Z] ❌ [UAP 792/3264] GkqFBqiGRQs — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:18.595Z] ⚠️  [UAP] Auto-retrying GkqFBqiGRQs — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:19.139Z] ❌ [UAP 793/3264] GkqFBqiGRQs — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:19.139Z] ⚠️  [UAP] Auto-retrying GkqFBqiGRQs — caption fetch failed (attempt 3/3)
+[2026-05-19T22:15:19.187Z] ❌ [UAP 794/3264] s_ymJcmeEDc — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:19.211Z] ❌ [UAP 795/3264] mxTtzCt-1lI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:15:19.211Z] ⚠️  [UAP] Auto-retrying mxTtzCt-1lI — caption fetch failed (attempt 2/3)
+[2026-05-19T22:15:49.573Z] ❌ [UAP 796/3264] GkqFBqiGRQs — FAILED: Request timed out after 30s (30s)
+[2026-05-19T22:15:49.630Z] ❌ [UAP 797/3264] mxTtzCt-1lI — FAILED: Request timed out after 30s (30s)
+[2026-05-19T22:15:49.630Z] ⚠️  [UAP] Auto-retrying mxTtzCt-1lI — caption fetch failed (attempt 3/3)
+[2026-05-19T22:16:51.086Z] ✅ [UAP 798/3264] iEepxykzeV4 — Tier 1 (1m 31s)
+[2026-05-19T22:17:21.487Z] ❌ [UAP 799/3264] mxTtzCt-1lI — FAILED: Request timed out after 30s (30s)
+[2026-05-19T22:17:21.544Z] ❌ [UAP 800/3264] 69Ha67owbUg — FAILED: Request timed out after 30s (30s)
+[2026-05-19T22:17:21.544Z] ⚠️  [UAP] Auto-retrying 69Ha67owbUg — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:21.566Z] ❌ [UAP 801/3264] WzCNbsKTnIM — FAILED: Request timed out after 30s (30s)
+[2026-05-19T22:17:21.566Z] ⚠️  [UAP] Auto-retrying WzCNbsKTnIM — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:45.438Z] ❌ [UAP 802/3264] WzCNbsKTnIM — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (23s)
+[2026-05-19T22:17:45.438Z] ⚠️  [UAP] Auto-retrying WzCNbsKTnIM — caption fetch failed (attempt 2/3)
+[2026-05-19T22:17:45.442Z] ❌ [UAP 803/3264] xclk0FGj2IM — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (23s)
+[2026-05-19T22:17:45.442Z] ⚠️  [UAP] Auto-retrying xclk0FGj2IM — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:45.448Z] ❌ [UAP 804/3264] 69Ha67owbUg — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (23s)
+[2026-05-19T22:17:45.448Z] ⚠️  [UAP] Auto-retrying 69Ha67owbUg — caption fetch failed (attempt 2/3)
+[2026-05-19T22:17:46.180Z] ❌ [UAP 805/3264] xclk0FGj2IM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:46.180Z] ⚠️  [UAP] Auto-retrying xclk0FGj2IM — caption fetch failed (attempt 2/3)
+[2026-05-19T22:17:46.204Z] ❌ [UAP 806/3264] 69Ha67owbUg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:46.204Z] ⚠️  [UAP] Auto-retrying 69Ha67owbUg — caption fetch failed (attempt 3/3)
+[2026-05-19T22:17:46.206Z] ❌ [UAP 807/3264] WzCNbsKTnIM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:46.206Z] ⚠️  [UAP] Auto-retrying WzCNbsKTnIM — caption fetch failed (attempt 3/3)
+[2026-05-19T22:17:46.841Z] ❌ [UAP 808/3264] WzCNbsKTnIM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:46.856Z] ❌ [UAP 809/3264] xclk0FGj2IM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:46.856Z] ⚠️  [UAP] Auto-retrying xclk0FGj2IM — caption fetch failed (attempt 3/3)
+[2026-05-19T22:17:47.294Z] ❌ [UAP 810/3264] 69Ha67owbUg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:47.813Z] ❌ [UAP 811/3264] xclk0FGj2IM — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:47.870Z] ❌ [UAP 812/3264] 38wEgdJapJ4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:47.870Z] ⚠️  [UAP] Auto-retrying 38wEgdJapJ4 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:47.979Z] ❌ [UAP 813/3264] VDbSTHnHQhg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:47.979Z] ⚠️  [UAP] Auto-retrying VDbSTHnHQhg — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:48.560Z] ❌ [UAP 814/3264] 38wEgdJapJ4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:48.560Z] ⚠️  [UAP] Auto-retrying 38wEgdJapJ4 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:17:48.620Z] ❌ [UAP 815/3264] VDbSTHnHQhg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:48.620Z] ⚠️  [UAP] Auto-retrying VDbSTHnHQhg — caption fetch failed (attempt 2/3)
+[2026-05-19T22:17:48.738Z] ❌ [UAP 816/3264] fadaRPcldXI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:48.738Z] ⚠️  [UAP] Auto-retrying fadaRPcldXI — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:49.332Z] ❌ [UAP 817/3264] VDbSTHnHQhg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:49.332Z] ⚠️  [UAP] Auto-retrying VDbSTHnHQhg — caption fetch failed (attempt 3/3)
+[2026-05-19T22:17:49.336Z] ❌ [UAP 818/3264] 38wEgdJapJ4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:49.336Z] ⚠️  [UAP] Auto-retrying 38wEgdJapJ4 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:17:49.376Z] ❌ [UAP 819/3264] fadaRPcldXI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:49.376Z] ⚠️  [UAP] Auto-retrying fadaRPcldXI — caption fetch failed (attempt 2/3)
+[2026-05-19T22:17:49.957Z] ❌ [UAP 820/3264] VDbSTHnHQhg — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:50.037Z] ❌ [UAP 821/3264] fadaRPcldXI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:50.037Z] ⚠️  [UAP] Auto-retrying fadaRPcldXI — caption fetch failed (attempt 3/3)
+[2026-05-19T22:17:50.051Z] ❌ [UAP 822/3264] 38wEgdJapJ4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:50.411Z] ⏭️  [UAP 823/3264] ZZyemJABdZw — is_short (0s)
+[2026-05-19T22:17:50.614Z] ❌ [UAP 824/3264] fadaRPcldXI — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:50.751Z] ❌ [UAP 825/3264] kc10m6HFbDE — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:50.751Z] ⚠️  [UAP] Auto-retrying kc10m6HFbDE — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:50.797Z] 📊 ── UAP Progress Report ──
+[2026-05-19T22:17:50.797Z]    Processed: 825/3264 | ✅ 270 | ⏭️ 233 | ❌ 322
+[2026-05-19T22:17:50.797Z]    Elapsed: 5h 10m | Avg: 22s/video | ETA: ~15h 17m
+[2026-05-19T22:17:51.313Z] ❌ [UAP 826/3264] kc10m6HFbDE — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:51.313Z] ⚠️  [UAP] Auto-retrying kc10m6HFbDE — caption fetch failed (attempt 2/3)
+[2026-05-19T22:17:51.343Z] ❌ [UAP 827/3264] nfchje15k00 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:51.344Z] ⚠️  [UAP] Auto-retrying nfchje15k00 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:17:51.393Z] ❌ [UAP 828/3264] kJR_pSZjUdk — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:17:51.393Z] ⚠️  [UAP] Auto-retrying kJR_pSZjUdk — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:07.821Z] ❌ [UAP 829/3264] kJR_pSZjUdk — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (16s)
+[2026-05-19T22:18:07.821Z] ⚠️  [UAP] Auto-retrying kJR_pSZjUdk — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:07.831Z] ❌ [UAP 830/3264] nfchje15k00 — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (16s)
+[2026-05-19T22:18:07.831Z] ⚠️  [UAP] Auto-retrying nfchje15k00 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:07.859Z] ❌ [UAP 831/3264] kc10m6HFbDE — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (16s)
+[2026-05-19T22:18:07.859Z] ⚠️  [UAP] Auto-retrying kc10m6HFbDE — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:08.551Z] ❌ [UAP 832/3264] kc10m6HFbDE — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (0s)
+[2026-05-19T22:18:08.553Z] ❌ [UAP 833/3264] nfchje15k00 — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (0s)
+[2026-05-19T22:18:08.553Z] ⚠️  [UAP] Auto-retrying nfchje15k00 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:08.569Z] ❌ [UAP 834/3264] kJR_pSZjUdk — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (0s)
+[2026-05-19T22:18:08.569Z] ⚠️  [UAP] Auto-retrying kJR_pSZjUdk — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:09.246Z] ❌ [UAP 835/3264] nfchje15k00 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:09.289Z] ❌ [UAP 836/3264] kJR_pSZjUdk — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:09.306Z] ❌ [UAP 837/3264] PFRDNlJwJMY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:09.307Z] ⚠️  [UAP] Auto-retrying PFRDNlJwJMY — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:09.630Z] ⏭️  [UAP 838/3264] lovBTbMVLwg — is_short (0s)
+[2026-05-19T22:18:09.875Z] ❌ [UAP 839/3264] PFRDNlJwJMY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:09.875Z] ⚠️  [UAP] Auto-retrying PFRDNlJwJMY — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:09.893Z] ❌ [UAP 840/3264] JoQncIKMo28 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:09.894Z] ⚠️  [UAP] Auto-retrying JoQncIKMo28 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:10.448Z] ❌ [UAP 841/3264] PFRDNlJwJMY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:10.448Z] ⚠️  [UAP] Auto-retrying PFRDNlJwJMY — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:10.498Z] ❌ [UAP 842/3264] JoQncIKMo28 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:10.498Z] ⚠️  [UAP] Auto-retrying JoQncIKMo28 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:10.573Z] ❌ [UAP 843/3264] 5vEIwVK8TC0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:10.573Z] ⚠️  [UAP] Auto-retrying 5vEIwVK8TC0 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:11.148Z] ❌ [UAP 844/3264] JoQncIKMo28 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:11.148Z] ⚠️  [UAP] Auto-retrying JoQncIKMo28 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:11.184Z] ❌ [UAP 845/3264] PFRDNlJwJMY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:11.261Z] ❌ [UAP 846/3264] 5vEIwVK8TC0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:11.261Z] ⚠️  [UAP] Auto-retrying 5vEIwVK8TC0 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:11.795Z] ❌ [UAP 847/3264] JoQncIKMo28 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:11.824Z] ❌ [UAP 848/3264] 5vEIwVK8TC0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:11.824Z] ⚠️  [UAP] Auto-retrying 5vEIwVK8TC0 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:11.861Z] ❌ [UAP 849/3264] JLSKugu5UB0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:11.861Z] ⚠️  [UAP] Auto-retrying JLSKugu5UB0 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:12.459Z] ❌ [UAP 850/3264] 5vEIwVK8TC0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:12.464Z] ❌ [UAP 851/3264] JLSKugu5UB0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:12.464Z] ⚠️  [UAP] Auto-retrying JLSKugu5UB0 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:12.477Z] ❌ [UAP 852/3264] N4iJtUixXBE — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:12.477Z] ⚠️  [UAP] Auto-retrying N4iJtUixXBE — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:13.015Z] ❌ [UAP 853/3264] JLSKugu5UB0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:13.015Z] ⚠️  [UAP] Auto-retrying JLSKugu5UB0 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:13.081Z] ❌ [UAP 854/3264] PtBVAxoHeaY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:13.081Z] ⚠️  [UAP] Auto-retrying PtBVAxoHeaY — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:13.101Z] ❌ [UAP 855/3264] N4iJtUixXBE — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:13.101Z] ⚠️  [UAP] Auto-retrying N4iJtUixXBE — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:13.630Z] ❌ [UAP 856/3264] JLSKugu5UB0 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:13.670Z] ❌ [UAP 857/3264] N4iJtUixXBE — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:13.670Z] ⚠️  [UAP] Auto-retrying N4iJtUixXBE — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:20.472Z] ❌ [UAP 858/3264] PtBVAxoHeaY — FAILED: Supadata server error (502): <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if I (7s)
+[2026-05-19T22:18:20.472Z] ⚠️  [UAP] Auto-retrying PtBVAxoHeaY — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:21.120Z] ❌ [UAP 859/3264] N4iJtUixXBE — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:21.226Z] ❌ [UAP 860/3264] jiIYMF8YVkY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:21.226Z] ⚠️  [UAP] Auto-retrying jiIYMF8YVkY — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:21.304Z] ❌ [UAP 861/3264] PtBVAxoHeaY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:21.304Z] ⚠️  [UAP] Auto-retrying PtBVAxoHeaY — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:21.834Z] ❌ [UAP 862/3264] PtBVAxoHeaY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:21.888Z] ❌ [UAP 863/3264] jiIYMF8YVkY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:21.888Z] ⚠️  [UAP] Auto-retrying jiIYMF8YVkY — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:22.019Z] ❌ [UAP 864/3264] t2xSFMkmWg4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:22.019Z] ⚠️  [UAP] Auto-retrying t2xSFMkmWg4 — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:22.657Z] ❌ [UAP 865/3264] t2xSFMkmWg4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:22.657Z] ⚠️  [UAP] Auto-retrying t2xSFMkmWg4 — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:22.667Z] ❌ [UAP 866/3264] jiIYMF8YVkY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:22.667Z] ⚠️  [UAP] Auto-retrying jiIYMF8YVkY — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:22.719Z] ❌ [UAP 867/3264] Wd4rFSItm5I — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:22.719Z] ⚠️  [UAP] Auto-retrying Wd4rFSItm5I — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:23.246Z] ❌ [UAP 868/3264] jiIYMF8YVkY — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:23.284Z] ❌ [UAP 869/3264] t2xSFMkmWg4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:23.284Z] ⚠️  [UAP] Auto-retrying t2xSFMkmWg4 — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:23.357Z] ❌ [UAP 870/3264] Wd4rFSItm5I — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:23.357Z] ⚠️  [UAP] Auto-retrying Wd4rFSItm5I — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:23.874Z] ❌ [UAP 871/3264] Wd4rFSItm5I — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:23.874Z] ⚠️  [UAP] Auto-retrying Wd4rFSItm5I — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:23.937Z] ❌ [UAP 872/3264] t2xSFMkmWg4 — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:23.972Z] ❌ [UAP 873/3264] EfWzgANPLmw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:23.972Z] ⚠️  [UAP] Auto-retrying EfWzgANPLmw — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:24.546Z] ❌ [UAP 874/3264] EfWzgANPLmw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:24.546Z] ⚠️  [UAP] Auto-retrying EfWzgANPLmw — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:24.560Z] ❌ [UAP 875/3264] Wd4rFSItm5I — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:24.642Z] ❌ [UAP 876/3264] w2-nJ1WUshQ — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:24.642Z] ⚠️  [UAP] Auto-retrying w2-nJ1WUshQ — caption fetch failed (attempt 1/3)
+[2026-05-19T22:18:25.091Z] ⏭️  [UAP 877/3264] 4j1NPoQ576o — is_short (0s)
+[2026-05-19T22:18:25.193Z] ❌ [UAP 878/3264] EfWzgANPLmw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:25.193Z] ⚠️  [UAP] Auto-retrying EfWzgANPLmw — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:25.292Z] ❌ [UAP 879/3264] w2-nJ1WUshQ — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:25.292Z] ⚠️  [UAP] Auto-retrying w2-nJ1WUshQ — caption fetch failed (attempt 2/3)
+[2026-05-19T22:18:25.864Z] ❌ [UAP 880/3264] w2-nJ1WUshQ — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:25.864Z] ⚠️  [UAP] Auto-retrying w2-nJ1WUshQ — caption fetch failed (attempt 3/3)
+[2026-05-19T22:18:25.879Z] ❌ [UAP 881/3264] EfWzgANPLmw — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:25.967Z] ❌ [UAP 882/3264] 4EMO38JUfVE — FAILED: Supadata server error (503): no available server
+ (0s)
+[2026-05-19T22:18:25.968Z] ⚠️  [UAP] Auto-retrying 4EMO38JUfVE — caption fetch failed (attempt 1/3)
+[2026-05-19T22:19:32.294Z] ✅ [UAP 883/3264] MtFyqEDIn_Y — Tier 2 (1m 6s)
+[2026-05-19T22:19:34.362Z] ✅ [UAP 884/3264] w2-nJ1WUshQ — Tier 1 (1m 8s)
+[2026-05-19T22:21:15.945Z] ✅ [UAP 885/3264] 4EMO38JUfVE — Tier 1 (2m 49s)
+[2026-05-19T22:21:16.462Z] ⏭️  [UAP 886/3264] K6iIi5eKypY — is_short (0s)
+[2026-05-19T22:23:10.786Z] ✅ [UAP 887/3264] SnOAnJR3o50 — Tier 2 (1m 54s)
+[2026-05-19T22:23:42.582Z] ✅ [UAP 888/3264] 7hdaW6a9CbY — Tier 1 (2m 26s)
+[2026-05-19T22:24:26.073Z] ✅ [UAP 889/3264] 5Ms8ZDOJT4w — Tier 1 (43s)
+[2026-05-19T22:24:32.183Z] ✅ [UAP 890/3264] DxfA67mRrgU — Tier 2 (49s)
+[2026-05-19T22:24:33.041Z] ✅ [UAP 891/3264] NUQT3FN2DS8 — Tier 1 (50s)
+[2026-05-19T22:24:33.409Z] ⏭️  [UAP 892/3264] nb4bo-elUQY — is_short (0s)
+[2026-05-19T22:25:34.991Z] ✅ [UAP 893/3264] Zdl1nz3t3DE — Tier 2 (1m 1s)

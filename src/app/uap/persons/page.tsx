@@ -10,7 +10,10 @@ import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { Users, ArrowRight, Shield, Film, ArrowDownWideNarrow, MessageSquare } from 'lucide-react';
 import { UapDirectorySearch } from '@/components/uap/UapDirectorySearch';
+import { UapPagination } from '@/components/uap/UapPagination';
 import { Suspense } from 'react';
+
+const PAGE_SIZE = 48;
 
 export const metadata: Metadata = {
   title: 'Persons of Interest | UAP Research | Project Profound',
@@ -67,12 +70,25 @@ async function getPersons() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
 
-  const { data } = await supabase
-    .from('uap_canonical_persons')
-    .select('*')
-    .order('total_mentions', { ascending: false });
+  // Supabase caps at 1000 rows per request — paginate to get all
+  const all: any[] = [];
+  let offset = 0;
+  const PAGE = 1000;
 
-  return data || [];
+  while (true) {
+    const { data } = await supabase
+      .from('uap_canonical_persons')
+      .select('*')
+      .order('total_mentions', { ascending: false })
+      .range(offset, offset + PAGE - 1);
+
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    offset += PAGE;
+    if (data.length < PAGE) break;
+  }
+
+  return all;
 }
 
 // ─── Page ───────────────────────────────────────────────────────────────────
@@ -80,9 +96,9 @@ async function getPersons() {
 export default async function PersonsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; order?: string; q?: string }>;
+  searchParams: Promise<{ sort?: string; order?: string; q?: string; page?: string }>;
 }) {
-  const { sort, order, q: searchQuery } = await searchParams;
+  const { sort, order, q: searchQuery, page: pageParam } = await searchParams;
 
   // Validate sort
   const validSort: SortValue = (SORT_OPTIONS.map((o) => o.value) as string[]).includes(sort ?? '')
@@ -128,6 +144,20 @@ export default async function PersonsPage({
     return ascending ? cmp : -cmp;
   });
 
+  // Pagination
+  const totalCount = persons.length;
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const currentPage = Math.max(1, Math.min(totalPages || 1, parseInt(pageParam || '1', 10) || 1));
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const paginatedPersons = persons.slice(startIdx, startIdx + PAGE_SIZE);
+
+  // Params to preserve across pagination links
+  const preservedParams: Record<string, string | null> = {
+    sort: validSort !== 'mentions' ? validSort : null,
+    order: ascending !== (validSort === 'name') ? (ascending ? 'asc' : 'desc') : null,
+    ...(activeSearch ? { q: activeSearch } : {}),
+  };
+
   const iconMap: Record<string, React.ReactNode> = {
     videos: <Film className="w-3.5 h-3.5" />,
     mentions: <MessageSquare className="w-3.5 h-3.5" />,
@@ -158,7 +188,7 @@ export default async function PersonsPage({
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            {persons.length} key figures extracted from AI analysis of UAP video testimony —
+            {totalCount} key figures extracted from AI analysis of UAP video testimony —
             whistleblowers, military officials, scientists, researchers, and experiencers.
           </p>
         </div>
@@ -172,7 +202,7 @@ export default async function PersonsPage({
             <UapDirectorySearch basePath="/uap/persons" />
           </Suspense>
           <span className="text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap hidden sm:block">
-            {persons.length} persons
+            {totalCount} persons{totalPages > 1 ? ` · Page ${currentPage}/${totalPages}` : ''}
           </span>
         </div>
 
@@ -237,7 +267,7 @@ export default async function PersonsPage({
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {persons.map((person: {
+          {paginatedPersons.map((person: {
             id: string; slug: string; canonical_name: string; role?: string;
             affiliation?: string; linked_video_ids?: string[]; total_mentions: number;
             avg_credibility_score?: number | null; aliases?: string[];
@@ -254,8 +284,8 @@ export default async function PersonsPage({
                 aria-label={`View ${person.canonical_name}`}
               />
 
-              {/* Rank badge for top 10 */}
-              {i < 10 && (
+              {/* Rank badge for top 10 (only on page 1) */}
+              {currentPage === 1 && i < 10 && (
                 <div className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-green-50 dark:bg-green-900/30
                                 flex items-center justify-center text-xs font-bold text-[var(--domain-accent)]">
                   #{i + 1}
@@ -315,7 +345,14 @@ export default async function PersonsPage({
           ))}
         </div>
 
-        {persons.length === 0 && (
+        <UapPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          basePath="/uap/persons"
+          searchParams={preservedParams}
+        />
+
+        {totalCount === 0 && (
           <div className="text-center py-20">
             <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground">

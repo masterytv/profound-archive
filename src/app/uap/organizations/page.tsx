@@ -1,12 +1,15 @@
 /**
- * UAP Organizations Index — Sort & Filter
+ * UAP Organizations Index — Sort, Filter & Paginate
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { Building2, ArrowRight, Film, ArrowDownWideNarrow, MessageSquare } from 'lucide-react';
 import { UapDirectorySearch } from '@/components/uap/UapDirectorySearch';
+import { UapPagination } from '@/components/uap/UapPagination';
 import { Suspense } from 'react';
+
+const PAGE_SIZE = 48;
 
 export const metadata: Metadata = {
   title: 'Organizations | UAP Research | Project Profound',
@@ -30,12 +33,21 @@ function buildUrl(o: Record<string, string | null>): string {
 
 async function getOrgs() {
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const { data } = await sb.from('uap_canonical_orgs').select('*').order('total_mentions', { ascending: false });
-  return data || [];
+  const all: any[] = [];
+  let offset = 0;
+  const PAGE = 1000;
+  while (true) {
+    const { data } = await sb.from('uap_canonical_orgs').select('*').order('total_mentions', { ascending: false }).range(offset, offset + PAGE - 1);
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    offset += PAGE;
+    if (data.length < PAGE) break;
+  }
+  return all;
 }
 
-export default async function OrganizationsPage({ searchParams }: { searchParams: Promise<{ sort?: string; order?: string; q?: string }> }) {
-  const { sort, order, q: searchQuery } = await searchParams;
+export default async function OrganizationsPage({ searchParams }: { searchParams: Promise<{ sort?: string; order?: string; q?: string; page?: string }> }) {
+  const { sort, order, q: searchQuery, page: pageParam } = await searchParams;
   const validSort: SortValue = (SORT_OPTIONS.map(o => o.value) as string[]).includes(sort ?? '') ? (sort as SortValue) : 'mentions';
   const defaultAsc = validSort === 'name';
   const ascending = order === 'asc' ? true : order === 'desc' ? false : defaultAsc;
@@ -61,6 +73,19 @@ export default async function OrganizationsPage({ searchParams }: { searchParams
     return ascending ? cmp : -cmp;
   });
 
+  // Pagination
+  const totalCount = orgs.length;
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const currentPage = Math.max(1, Math.min(totalPages || 1, parseInt(pageParam || '1', 10) || 1));
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const paginatedOrgs = orgs.slice(startIdx, startIdx + PAGE_SIZE);
+
+  const preservedParams: Record<string, string | null> = {
+    sort: validSort !== 'mentions' ? validSort : null,
+    order: ascending !== (validSort === 'name') ? (ascending ? 'asc' : 'desc') : null,
+    ...(activeSearch ? { q: activeSearch } : {}),
+  };
+
   const iconMap: Record<string, React.ReactNode> = {
     videos: <Film className="w-3.5 h-3.5" />,
     mentions: <MessageSquare className="w-3.5 h-3.5" />,
@@ -80,7 +105,7 @@ export default async function OrganizationsPage({ searchParams }: { searchParams
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            {orgs.length} agencies, institutions, and organizations referenced across UAP video testimony.
+            {totalCount} agencies, institutions, and organizations referenced across UAP video testimony.
           </p>
         </div>
       </section>
@@ -88,7 +113,9 @@ export default async function OrganizationsPage({ searchParams }: { searchParams
       <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
         <div className="mb-4 flex items-center gap-4">
           <Suspense><UapDirectorySearch basePath="/uap/organizations" /></Suspense>
-          <span className="text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap hidden sm:block">{orgs.length} organizations</span>
+          <span className="text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap hidden sm:block">
+            {totalCount} organizations{totalPages > 1 ? ` · Page ${currentPage}/${totalPages}` : ''}
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-6">
@@ -116,10 +143,10 @@ export default async function OrganizationsPage({ searchParams }: { searchParams
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {orgs.map((org: { id: string; slug: string; canonical_name: string; linked_video_ids?: string[]; total_mentions?: number; aliases?: string[] }, i: number) => (
+          {paginatedOrgs.map((org: { id: string; slug: string; canonical_name: string; linked_video_ids?: string[]; total_mentions?: number; aliases?: string[] }, i: number) => (
             <Link key={org.id} href={`/uap/organizations/${org.slug}`}
               className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card p-5 hover:shadow-lg hover:border-[var(--domain-accent)]/30 transition-all duration-300">
-              {i < 5 && <div className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-xs font-bold text-[var(--domain-accent)]">#{i + 1}</div>}
+              {currentPage === 1 && i < 5 && <div className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-xs font-bold text-[var(--domain-accent)]">#{i + 1}</div>}
               <h3 className="text-base font-semibold text-foreground group-hover:text-[var(--domain-accent)] transition-colors pr-10">{org.canonical_name}</h3>
               <div className="flex items-center gap-3 mt-3">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground"><Film className="w-3 h-3" />{org.linked_video_ids?.length || 0} video{(org.linked_video_ids?.length || 0) !== 1 ? 's' : ''}</div>
@@ -131,7 +158,14 @@ export default async function OrganizationsPage({ searchParams }: { searchParams
           ))}
         </div>
 
-        {orgs.length === 0 && (
+        <UapPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          basePath="/uap/organizations"
+          searchParams={preservedParams}
+        />
+
+        {totalCount === 0 && (
           <div className="text-center py-20">
             <Building2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground">{activeSearch ? 'No organizations match your search.' : 'No organizations indexed yet.'}</p>

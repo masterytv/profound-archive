@@ -6,7 +6,10 @@ import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { Calendar, MapPin, Play, Users, ChevronRight, Globe, ArrowDownWideNarrow } from "lucide-react";
 import { UapDirectorySearch } from "@/components/uap/UapDirectorySearch";
+import { UapPagination } from "@/components/uap/UapPagination";
 import { Suspense } from "react";
+
+const PAGE_SIZE = 48;
 
 export const revalidate = 86400;
 
@@ -56,11 +59,21 @@ function buildUrl(o: Record<string, string | null>): string {
 
 async function getEvents(): Promise<UapEvent[]> {
   const sb = buildClient();
-  const { data, error } = await sb.from("uap_events")
-    .select("id, slug, name, event_date, year, location, country, description, event_type, source_count, witness_count, contactee_ids")
-    .order("year", { ascending: false, nullsFirst: false });
-  if (error) { console.error("[UAP Events] Fetch error:", error); return []; }
-  return (data || []) as UapEvent[];
+  const all: any[] = [];
+  let offset = 0;
+  const FETCH_PAGE = 1000;
+  while (true) {
+    const { data, error } = await sb.from("uap_events")
+      .select("id, slug, name, event_date, year, location, country, description, event_type, source_count, witness_count, contactee_ids")
+      .order("year", { ascending: false, nullsFirst: false })
+      .range(offset, offset + FETCH_PAGE - 1);
+    if (error) { console.error("[UAP Events] Fetch error:", error); break; }
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    offset += FETCH_PAGE;
+    if (data.length < FETCH_PAGE) break;
+  }
+  return all as UapEvent[];
 }
 
 function EventCard({ event }: { event: UapEvent }) {
@@ -87,8 +100,8 @@ function EventCard({ event }: { event: UapEvent }) {
   );
 }
 
-export default async function EventsPage({ searchParams }: { searchParams: Promise<{ sort?: string; order?: string; q?: string }> }) {
-  const { sort, order, q: searchQuery } = await searchParams;
+export default async function EventsPage({ searchParams }: { searchParams: Promise<{ sort?: string; order?: string; q?: string; page?: string }> }) {
+  const { sort, order, q: searchQuery, page: pageParam } = await searchParams;
   const validSort: SortValue = (SORT_OPTIONS.map(o => o.value) as string[]).includes(sort ?? "") ? (sort as SortValue) : "year";
   const defaultAsc = validSort === "name";
   const ascending = order === "asc" ? true : order === "desc" ? false : defaultAsc;
@@ -124,6 +137,19 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
     year: <Calendar className="w-3.5 h-3.5" />,
   };
 
+  // Pagination
+  const totalCount = events.length;
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const currentPage = Math.max(1, Math.min(totalPages || 1, parseInt(pageParam || '1', 10) || 1));
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const paginatedEvents = events.slice(startIdx, startIdx + PAGE_SIZE);
+
+  const preservedParams: Record<string, string | null> = {
+    sort: validSort !== 'year' ? validSort : null,
+    order: ascending !== (validSort === 'name') ? (ascending ? 'asc' : 'desc') : null,
+    ...(activeSearch ? { q: activeSearch } : {}),
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
       {/* Hero */}
@@ -139,7 +165,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
             A curated index of major UAP events, sightings, and disclosure milestones, cross-referenced with video testimonies and experiencer profiles from the archive.
           </p>
           <div className="flex flex-wrap gap-6 mt-6 text-sm text-slate-500 dark:text-slate-400">
-            <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-green-500" /><strong className="text-slate-700 dark:text-slate-300">{events.length}</strong> events</span>
+            <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-green-500" /><strong className="text-slate-700 dark:text-slate-300">{totalCount}</strong> events</span>
             <span className="flex items-center gap-1.5"><Globe className="w-4 h-4 text-green-500" /><strong className="text-slate-700 dark:text-slate-300">{eventTypes.size}</strong> categories</span>
             {yearRange && <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-green-500" />{yearRange.min} &ndash; {yearRange.max}</span>}
           </div>
@@ -150,7 +176,9 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
       <section className="max-w-5xl mx-auto px-4 pb-16">
         <div className="mb-4 flex items-center gap-4">
           <Suspense><UapDirectorySearch basePath="/uap/events" /></Suspense>
-          <span className="text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap hidden sm:block">{events.length} events</span>
+          <span className="text-sm text-slate-400 dark:text-slate-500 whitespace-nowrap hidden sm:block">
+            {totalCount} events{totalPages > 1 ? ` · Page ${currentPage}/${totalPages}` : ''}
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-6">
@@ -177,11 +205,11 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
           </div>
         )}
 
-        {events.length > 0 ? (
+        {paginatedEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {events.map(event => <EventCard key={event.id} event={event} />)}
+            {paginatedEvents.map(event => <EventCard key={event.id} event={event} />)}
           </div>
-        ) : (
+        ) : totalCount > 0 ? null : (
           <div className="text-center py-16 space-y-4">
             <div className="w-16 h-16 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
               <Calendar className="w-8 h-8 text-slate-400" />
@@ -192,6 +220,13 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
             </p>
           </div>
         )}
+
+        <UapPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          basePath="/uap/events"
+          searchParams={preservedParams}
+        />
       </section>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
