@@ -31,7 +31,15 @@ async function getAnalytics() {
     || 'http://localhost:3000';
 
   try {
+    // Why: Analytics API now requires internal auth to prevent public SERVICE_KEY abuse.
+    // Pass CRON_SECRET as fallback since server-side referer may vary across environments.
+    const headers: HeadersInit = {};
+    if (process.env.CRON_SECRET) {
+      headers['Authorization'] = `Bearer ${process.env.CRON_SECRET}`;
+    }
+
     const res = await fetch(`${baseUrl}/api/uap/analytics`, {
+      headers,
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
 

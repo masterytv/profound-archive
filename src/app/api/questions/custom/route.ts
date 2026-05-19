@@ -9,8 +9,50 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_KEY!
 );
 
+// ── Simple in-memory rate limiter ──────────────────────────────────────────
+// Why: This route triggers OpenAI API calls (via generateHyde). Without rate
+// limiting, any anonymous user can burn API credits by spamming requests.
+// In-memory is sufficient because Cloud Run maxInstances=1 means a single
+// process handles all requests.
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 10; // max 10 requests per IP per minute
+const ipRequestMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+    const now = Date.now();
+    const record = ipRequestMap.get(ip);
+
+    if (!record || now > record.resetAt) {
+        ipRequestMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+        return false;
+    }
+
+    record.count++;
+    return record.count > RATE_LIMIT_MAX;
+}
+
+// Periodic cleanup to prevent memory leak from stale IP entries
+setInterval(() => {
+    const now = Date.now();
+    for (const [ip, record] of ipRequestMap) {
+        if (now > record.resetAt) ipRequestMap.delete(ip);
+    }
+}, RATE_LIMIT_WINDOW_MS * 5);
+
 
 export async function POST(req: NextRequest) {
+    // Rate limit by IP
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+        || req.headers.get('x-real-ip')
+        || 'unknown';
+
+    if (isRateLimited(ip)) {
+        return NextResponse.json(
+            { error: 'Too many requests. Please try again in a minute.' },
+            { status: 429, headers: { 'Retry-After': '60' } }
+        );
+    }
+
     let question: string;
     try {
         const body = await req.json();

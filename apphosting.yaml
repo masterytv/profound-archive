@@ -58,7 +58,7 @@ env:
 
   # YouTube Data API key for channel scanner
   - variable: YOUTUBE_API_KEY
-    secret: projects/432036554831/secrets/YOUTUBE_API_KEY/versions/latest
+    secret: projects/432036554831/secrets/YOUTUBE_API_KEY/versions/1
 
   # Supadata API key for YouTube transcript fetching (active — Mar 2026)
   # Replaced Apify pintostudio actor which was being IP-blocked by YouTube.

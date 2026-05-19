@@ -19,7 +19,24 @@ function getSupabase() {
   return createClient(url, key);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Why: This route uses SERVICE_KEY and exposes detailed analytics data.
+  // Only consumed server-side by /uap/intelligence/page.tsx.
+  // Validate internal access via CRON_SECRET header or referer from same origin.
+  const authHeader = request.headers.get('authorization');
+  const referer = request.headers.get('referer') || '';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const cronSecret = process.env.CRON_SECRET;
+  
+  const isInternalFetch = referer.startsWith(siteUrl) || referer.startsWith('http://localhost');
+  const hasValidSecret = cronSecret && authHeader === `Bearer ${cronSecret}`;
+  
+  // Allow: server-side fetches from same origin (SSR) OR explicit secret
+  // Block: direct external access from browsers/crawlers
+  if (!isInternalFetch && !hasValidSecret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const supabase = getSupabase();
 
   try {

@@ -37,7 +37,10 @@ export async function isAdminUser(): Promise<boolean> {
             .single();
 
         return profile?.role === 'admin' || profile?.role === 'super_admin';
-    } catch {
+    } catch (error) {
+        // Why: Log auth failures for security monitoring instead of swallowing them.
+        // A spike in failures could indicate a brute-force or session-hijacking attempt.
+        console.error('[admin-guard] Auth check failed:', error instanceof Error ? error.message : error);
         return false;
     }
 }
