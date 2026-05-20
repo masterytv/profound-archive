@@ -73,16 +73,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export async function generateStaticParams() {
-  const supabase = getSupabase();
-  const { data } = await supabase
-    .from('uap_canonical_persons')
-    .select('slug')
-    .order('total_mentions', { ascending: false })
-    .limit(50);
-
-  return (data || []).map(p => ({ slug: p.slug }));
-}
+// No generateStaticParams — pages render on-demand with fresh DB data,
+// cached for 24h via ISR (revalidate = 86400 above).
 
 function getCredibilityColor(score: number | null) {
   if (score === null) return 'bg-slate-100 dark:bg-slate-800 text-slate-500';

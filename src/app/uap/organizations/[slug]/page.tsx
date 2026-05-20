@@ -64,15 +64,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export async function generateStaticParams() {
-  const supabase = getSupabase();
-  const { data } = await supabase
-    .from('uap_canonical_orgs')
-    .select('slug')
-    .order('total_mentions', { ascending: false })
-    .limit(50);
-  return (data || []).map(o => ({ slug: o.slug }));
-}
+// No generateStaticParams — pages render on-demand with fresh DB data,
+// cached for 24h via ISR (revalidate = 86400 above).
 
 export default async function OrgDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

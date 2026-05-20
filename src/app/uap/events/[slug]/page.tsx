@@ -152,13 +152,8 @@ export async function generateMetadata({
   };
 }
 
-// ─── Static Params ──────────────────────────────────────────────────────────
-
-export async function generateStaticParams() {
-  const supabase = buildClient();
-  const { data } = await supabase.from("uap_events").select("slug");
-  return (data || []).map((e: { slug: string }) => ({ slug: e.slug }));
-}
+// No generateStaticParams — pages render on-demand with fresh DB data,
+// cached for 24h via ISR (revalidate = 86400 above).
 
 // ─── Page ───────────────────────────────────────────────────────────────────
 

@@ -6,7 +6,6 @@ import Image from "next/image";
 import {
   getContacteeProfile,
   getContacteeVideos,
-  getAllContacteeSlugs,
   type ContacteeProfile,
   type ContacteeVideoWithAnalysis,
 } from "@/lib/data/uap-contactee";
@@ -60,12 +59,8 @@ const SOCIAL_ICONS: Record<string, { label: string; icon: string }> = {
   linkedin: { label: "LinkedIn", icon: "💼" },
 };
 
-// ─── Static Params ──────────────────────────────────────────────────────────
-
-export async function generateStaticParams() {
-  const slugs = await getAllContacteeSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
+// No generateStaticParams — pages render on-demand with fresh DB data,
+// cached for 24h via ISR (revalidate = 86400 above).
 
 // ─── SEO Metadata ───────────────────────────────────────────────────────────
 
