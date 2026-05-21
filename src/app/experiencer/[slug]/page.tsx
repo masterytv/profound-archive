@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, Play, ExternalLink, Heart, Sparkles, Brain, TrendingUp } from "lucide-react";
+import { ArrowLeft, Play, ExternalLink, Heart, Sparkles, Brain, TrendingUp, Globe, Briefcase, Camera, BookMarked, LinkIcon } from "lucide-react";
 import { SocialShareButton } from "@/components/video/ShareButton";
 import Image from "next/image";
 import ExperienceFingerprint from "@/components/experiencer/experience-fingerprint";
@@ -138,10 +138,10 @@ const TRIGGER_LABELS: Record<string, string> = {
     overdose: "Overdose", spontaneous: "Spontaneous", other: "Other", unknown: "Unknown",
 };
 
-const SOCIAL_ICONS: Record<string, { label: string; icon: string }> = {
-    website: { label: "Website", icon: "🌐" }, linkedin: { label: "LinkedIn", icon: "💼" },
-    twitter: { label: "Twitter / X", icon: "𝕏" }, instagram: { label: "Instagram", icon: "📸" },
-    youtube: { label: "YouTube", icon: "▶" }, facebook: { label: "Facebook", icon: "📘" },
+const SOCIAL_ICONS: Record<string, { label: string; icon: React.ReactNode }> = {
+    website: { label: "Website", icon: <Globe className="w-4 h-4" /> }, linkedin: { label: "LinkedIn", icon: <Briefcase className="w-4 h-4" /> },
+    twitter: { label: "Twitter / X", icon: <span className="text-sm font-bold">𝕏</span> }, instagram: { label: "Instagram", icon: <Camera className="w-4 h-4" /> },
+    youtube: { label: "YouTube", icon: <Play className="w-4 h-4" /> }, facebook: { label: "Facebook", icon: <BookMarked className="w-4 h-4" /> },
 };
 
 // ─── Section Heading ────────────────────────────────────────────────────────
@@ -506,7 +506,7 @@ export default async function ExperiencerProfilePage({
                                                 return (
                                                     <a key={key} href={url} target="_blank" rel="noopener noreferrer"
                                                         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-sm text-slate-600 dark:text-slate-400 hover:border-blue-300 dark:hover:border-blue-500/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
-                                                        <span>{social?.icon || "🔗"}</span> {social?.label || key}
+                                                        {social?.icon || <LinkIcon className="w-4 h-4" />} {social?.label || key}
                                                     </a>
                                                 );
                                             })}

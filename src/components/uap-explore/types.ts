@@ -38,9 +38,9 @@ export interface TierFilterDef {
 }
 
 export const TIER_FILTERS: TierFilterDef[] = [
-  { id: "all", label: "All Videos", emoji: "📺", tierValue: 0 },
-  { id: "encounters", label: "Encounters", emoji: "🛸", tierValue: 1 },
-  { id: "research", label: "Research", emoji: "📡", tierValue: 2 },
+  { id: "all", label: "All Videos", emoji: "▣", tierValue: 0 },
+  { id: "encounters", label: "Encounters", emoji: "◎", tierValue: 1 },
+  { id: "research", label: "Research", emoji: "◉", tierValue: 2 },
 ];
 
 // ─── Sort Presets ────────────────────────────────────────────────────────────
@@ -54,10 +54,10 @@ export interface SortPreset {
 }
 
 export const UAP_SORT_PRESETS: SortPreset[] = [
-  { id: "latest", label: "Latest", emoji: "🆕", sort: "date", dir: "desc" },
-  { id: "most_viewed", label: "Most Viewed", emoji: "🔥", sort: "view_count", dir: "desc" },
-  { id: "top_evidence", label: "Top Evidence", emoji: "🏆", sort: "evidence_score", dir: "desc" },
-  { id: "deepest_contact", label: "Deepest Contact", emoji: "🌀", sort: "contact_depth_score", dir: "desc" },
+  { id: "latest", label: "Latest", emoji: "○", sort: "date", dir: "desc" },
+  { id: "most_viewed", label: "Most Viewed", emoji: "↑", sort: "view_count", dir: "desc" },
+  { id: "top_evidence", label: "Top Evidence", emoji: "★", sort: "evidence_score", dir: "desc" },
+  { id: "deepest_contact", label: "Deepest Contact", emoji: "◎", sort: "contact_depth_score", dir: "desc" },
 ];
 
 // ─── Sort Fields ─────────────────────────────────────────────────────────────

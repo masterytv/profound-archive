@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu, Tv, Plus, Users } from "lucide-react";
+import { TrendingUp, Sparkles, Brain, ArrowRight, Search, Cpu, Tv, Plus, Users, BookOpen, Globe, HelpCircle } from "lucide-react";
 import Image from "next/image";
 import {
     CuratedVideoColumn,
@@ -586,7 +586,7 @@ export default async function HomeAlt1() {
                         className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg hover:border-violet-200 dark:hover:border-violet-700/60 transition-all duration-300"
                     >
                         <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center mb-4 group-hover:bg-violet-100 dark:group-hover:bg-violet-900/50 transition-colors">
-                            <span className="text-lg">📚</span>
+                            <BookOpen className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                         </div>
                         <h3
                             className="font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-violet-700 dark:group-hover:text-violet-400 transition-colors"
@@ -610,7 +610,7 @@ export default async function HomeAlt1() {
                         className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg hover:border-amber-200 dark:hover:border-amber-700/60 transition-all duration-300"
                     >
                         <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center mb-4 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/50 transition-colors">
-                            <span className="text-lg">🌍</span>
+                            <Globe className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                         </div>
                         <h3
                             className="font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors"
@@ -634,7 +634,7 @@ export default async function HomeAlt1() {
                         className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 hover:shadow-lg hover:border-teal-200 dark:hover:border-teal-700/60 transition-all duration-300"
                     >
                         <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-4 group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
-                            <span className="text-lg">❓</span>
+                            <HelpCircle className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                         </div>
                         <h3
                             className="font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors"

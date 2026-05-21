@@ -219,7 +219,7 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
 
           {/* ── Standardized Cross-Entity Links (canonical order) ── */}
           <UapEntityLinkSection
-            icon={Radio}
+            icon="Radio"
             title={`Featured on Channels (${linkedChannels.length})`}
             description="Channels that have published videos discussing this person."
             entities={linkedChannels.map((ch) => ({
@@ -232,28 +232,28 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
           />
 
           <UapEntityLinkSection
-            icon={Users}
+            icon="Users"
             title={`Linked Experiencers (${linkedExperiencers.length})`}
             description="These experiencers appear in the same videos where this person is discussed. This reflects topical co-occurrence, not a direct relationship."
             entities={linkedExperiencers}
           />
 
           <UapEntityLinkSection
-            icon={Calendar}
+            icon="Calendar"
             title={`Linked Events (${linkedEvents.length})`}
             description="These events are discussed in the same videos where this person is mentioned. This reflects topical co-occurrence, not confirmed involvement."
             entities={linkedEvents}
           />
 
           <UapEntityLinkSection
-            icon={Building2}
+            icon="Building2"
             title={`Linked Organizations (${linkedOrgs.length})`}
             description="These organizations appear in the same videos where this person is discussed. This reflects topical co-occurrence, not a confirmed affiliation."
             entities={linkedOrgs}
           />
 
           <UapEntityLinkSection
-            icon={FileText}
+            icon="FileText"
             title={`Linked Programs (${linkedPrograms.length})`}
             description="These programs appear in the same videos where this person is discussed. This reflects topical co-occurrence, not a confirmed affiliation."
             entities={linkedPrograms}

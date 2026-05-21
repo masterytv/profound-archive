@@ -48,20 +48,20 @@ export interface SmartTagDef {
 
 export const SMART_TAGS: SmartTagDef[] = [
   // Core element tags
-  { id: "being_of_light", label: "Being of Light", emoji: "✨", category: "element" },
-  { id: "otherworldly_realm", label: "Other Realm", emoji: "🌌", category: "element" },
-  { id: "knowledge_download", label: "Knowledge Download", emoji: "📥", category: "element" },
-  { id: "telepathy", label: "Telepathy", emoji: "🗣️", category: "element" },
-  { id: "life_review", label: "Life Review", emoji: "🌀", category: "element" },
-  { id: "deceased_relatives", label: "Met Deceased", emoji: "👼", category: "element" },
-  { id: "out_of_body", label: "Out-of-Body", emoji: "👁️", category: "element" },
-  { id: "tunnel", label: "Tunnel", emoji: "🕳️", category: "element" },
+  { id: "being_of_light", label: "Being of Light", emoji: "✦", category: "element" },
+  { id: "otherworldly_realm", label: "Other Realm", emoji: "◎", category: "element" },
+  { id: "knowledge_download", label: "Knowledge Download", emoji: "↓", category: "element" },
+  { id: "telepathy", label: "Telepathy", emoji: "◈", category: "element" },
+  { id: "life_review", label: "Life Review", emoji: "◎", category: "element" },
+  { id: "deceased_relatives", label: "Met Deceased", emoji: "♡", category: "element" },
+  { id: "out_of_body", label: "Out-of-Body", emoji: "◇", category: "element" },
+  { id: "tunnel", label: "Tunnel", emoji: "◎", category: "element" },
   // Score-based tags
-  { id: "life_changing", label: "Life-Changing", emoji: "🔄", category: "score" },
-  { id: "strong_evidence", label: "Strong Evidence", emoji: "🧬", category: "score" },
-  { id: "intense", label: "Intense", emoji: "⚡", category: "score" },
+  { id: "life_changing", label: "Life-Changing", emoji: "↻", category: "score" },
+  { id: "strong_evidence", label: "Strong Evidence", emoji: "★", category: "score" },
+  { id: "intense", label: "Intense", emoji: "↑", category: "score" },
   // Tone-based tags
-  { id: "distressing", label: "Distressing", emoji: "💀", category: "tone" },
+  { id: "distressing", label: "Distressing", emoji: "⚠", category: "tone" },
 ];
 
 // Sort presets for quick access buttons
@@ -74,10 +74,10 @@ export interface SortPreset {
 }
 
 export const SORT_PRESETS: SortPreset[] = [
-  { id: "most_viewed", label: "Most Viewed", emoji: "🔥", sort: "viewCount", dir: "desc" },
-  { id: "latest", label: "Latest", emoji: "🆕", sort: "date", dir: "desc" },
-  { id: "top_evidence", label: "Top Evidence", emoji: "🏆", sort: "rvnde_total_score", dir: "desc" },
-  { id: "most_intense", label: "Most Intense", emoji: "⚡", sort: "intensity_rating", dir: "desc" },
+  { id: "most_viewed", label: "Most Viewed", emoji: "↑", sort: "viewCount", dir: "desc" },
+  { id: "latest", label: "Latest", emoji: "○", sort: "date", dir: "desc" },
+  { id: "top_evidence", label: "Top Evidence", emoji: "★", sort: "rvnde_total_score", dir: "desc" },
+  { id: "most_intense", label: "Most Intense", emoji: "↑", sort: "intensity_rating", dir: "desc" },
 ];
 
 // All available sort fields

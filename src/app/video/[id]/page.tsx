@@ -13,6 +13,7 @@ import {
     BookOpen,
     Beaker,
     Heart,
+    Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -360,12 +361,12 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
         : null;
 
     // 1.4 — Tag strip data
-    const tags: { label: string; color?: string }[] = [];
+    const tags: { label: string; color?: string; icon?: string }[] = [];
     if (analysis?.experience_type) tags.push({ label: analysis.experience_type });
     if (analysis?.trigger_category) tags.push({ label: analysis.trigger_category.replace(/_/g, " ") });
     if (analysis?.overall_tone) tags.push({ label: analysis.overall_tone, color: "emerald" });
     if (analysis?.transformation_classification) tags.push({ label: analysis.transformation_classification, color: "rose" });
-    if (analysis?.intensity_rating) tags.push({ label: `⭐ ${analysis.intensity_rating}/10 Intensity` });
+    if (analysis?.intensity_rating) tags.push({ label: `${analysis.intensity_rating}/10 Intensity`, icon: 'star' });
 
     // 1.11 — Timestamped transcript blocks
     const transcriptBlocks = rawSegments ? groupSegmentsIntoBlocks(rawSegments) : null;
@@ -536,7 +537,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                                         : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10"
                                                 }`}
                                             >
-                                                {tag.label}
+                                                {tag.icon === 'star' && <Star className="w-3 h-3 inline" />}{' '}{tag.label}
                                             </span>
                                         ))}
                                     </div>

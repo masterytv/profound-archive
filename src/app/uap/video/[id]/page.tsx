@@ -11,7 +11,9 @@ import {
   Radar,
   Loader2,
   Database,
+  Radio,
 } from "lucide-react";
+import { UfoIcon } from "@/components/icons/UfoIcon";
 import {
   Collapsible,
   CollapsibleContent,
@@ -367,7 +369,7 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
                     ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800"
                     : "bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10"
                 }`}>
-                  {isTier1 ? "🛸" : "📡"} Tier {video.tier} — {tierLabel}
+                  {isTier1 ? <UfoIcon className="w-3 h-3 inline" /> : <Radio className="w-3 h-3 inline" />}{" "}Tier {video.tier} — {tierLabel}
                 </span>
                 {contentLabel && (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">

@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { UapChannelSearch } from "@/components/uap/UapChannelSearch";
+import { ArchetypePill } from "@/components/uap/ChannelIdentity";
 import { Suspense } from "react";
 
 export const revalidate = 86400;
@@ -134,6 +135,15 @@ export default async function UapChannelsPage({
   const supabase = buildClient();
   const { data: channels } = await supabase.rpc("get_uap_channel_stats");
   let allChannels = (channels ?? []) as ChannelStat[];
+
+  // Fetch archetype data from channel_scores
+  const { data: scoreRows } = await supabase
+    .from("uap_channel_scores")
+    .select("channel_id, archetype_primary, personality_code");
+  const archetypeMap: Record<string, { archetype_primary: string | null; personality_code: string | null }> = {};
+  for (const row of scoreRows ?? []) {
+    archetypeMap[row.channel_id] = { archetype_primary: row.archetype_primary, personality_code: row.personality_code };
+  }
 
   // Search filter
   if (activeSearch) {
@@ -413,8 +423,8 @@ export default async function UapChannelsPage({
                         )}
                     </div>
 
-                    {/* Tier breakdown */}
-                    <div className="flex items-center gap-2 mb-3">
+                    {/* Tier breakdown + Archetype */}
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
                       {ch.tier1_count > 0 && (
                         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
                           {ch.tier1_count} encounters
@@ -425,6 +435,7 @@ export default async function UapChannelsPage({
                           {ch.tier2_count} programs
                         </span>
                       )}
+                      <ArchetypePill type={archetypeMap[ch.channel_id]?.archetype_primary ?? null} />
                     </div>
 
                     {/* Average scores */}

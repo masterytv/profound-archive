@@ -133,7 +133,7 @@ function PersonsSection({ persons }: { persons: PersonMention[] }) {
                 <div className="flex flex-wrap gap-1 mt-2">
                   {person.credibility_indicators.map((ind, idx) => (
                     <span key={idx} className="text-[10px] font-medium px-2 py-0.5 rounded-full border bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">
-                      🛡️ {cleanText(ind)}
+                      ✦ {cleanText(ind)}
                     </span>
                   ))}
                 </div>
@@ -222,7 +222,7 @@ function ClaimsSection({ claims }: { claims: ClaimExtraction[] }) {
               </span>
               {claim.under_oath && (
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700">
-                  ⚖️ Under Oath
+                  ✦ Under Oath
                 </span>
               )}
             </div>

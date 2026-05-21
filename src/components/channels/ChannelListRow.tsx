@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Eye, Film, BarChart3, ChevronRight } from 'lucide-react'
+import { Eye, Film, BarChart3, ChevronRight, Zap } from 'lucide-react'
 import { MiniStackedBar, MiniIntensityBar } from './MiniStackedBar'
 import type { ChannelStats } from './ChannelCard'
 export type { ChannelStats } from './ChannelCard'
@@ -145,7 +145,7 @@ export function ChannelListRow({
                     <div className="sm:hidden flex items-center gap-2 mt-1.5 flex-wrap">
                         {channel.avg_intensity != null && (
                             <span className="text-[10px] bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-medium px-1.5 py-0.5 rounded-md">
-                                ⚡ {channel.avg_intensity}/10
+                                <Zap className="w-3 h-3 inline" /> {channel.avg_intensity}/10
                             </span>
                         )}
                         {channel.pct_positive_tone != null && (

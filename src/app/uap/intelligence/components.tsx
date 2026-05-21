@@ -103,7 +103,7 @@ export function DailyFactCard({ fact }: { fact: { text: string; category: string
   if (!fact) return null;
 
   const handleShare = async () => {
-    const shareText = `🛸 UAP Research Fact: ${fact.text}\n\nExplore more at projectprofound.org/uap/intelligence`;
+    const shareText = `UAP Research Fact: ${fact.text}\n\nExplore more at projectprofound.org/uap/intelligence`;
     if (navigator.share) {
       await navigator.share({ text: shareText });
     } else {
@@ -601,9 +601,9 @@ export function HynekBreakdown({ data }: { data: { id: string; label: string; va
 // ── Physical Effects Breakdown ──────────────────────────────────────────────
 
 const EFFECT_ICONS: Record<string, string> = {
-  missing_time: '⏳', paralysis: '🧊', dehydration: '💧', bruises: '🩹',
-  compass_deviation: '🧭', nausea: '🤢', burns: '🔥', electromagnetic_interference: '📡',
-  headaches: '🤕', rash: '⚡', power_outage: '💡', engine_failure: '🚗',
+  missing_time: '⧗', paralysis: '▣', dehydration: '○', bruises: '◎',
+  compass_deviation: '◎', nausea: '◇', burns: '↑', electromagnetic_interference: '◉',
+  headaches: '◆', rash: '↑', power_outage: '●', engine_failure: '▢',
 };
 
 export function PhysicalEffects({ data }: { data: { id: string; label: string; value: number }[] }) {
@@ -629,7 +629,7 @@ export function PhysicalEffects({ data }: { data: { id: string; label: string; v
                        border border-green-200 dark:border-green-700/40 text-green-800 dark:text-green-300
                        hover:shadow-md hover:scale-105 transition-all duration-200"
           >
-            <span className="text-base">{EFFECT_ICONS[effect.id] || '🔬'}</span>
+            <span className="text-base">{EFFECT_ICONS[effect.id] || '◎'}</span>
             <span className="capitalize">{effect.label}</span>
             <span className="text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-800/40 px-1.5 py-0.5 rounded-md">
               {effect.value}

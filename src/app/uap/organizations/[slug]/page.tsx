@@ -152,7 +152,7 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ slug
 
           {/* ── Standardized Cross-Entity Links (canonical order) ── */}
           <UapEntityLinkSection
-            icon={Radio}
+            icon="Radio"
             title={`Featured on Channels (${linkedChannels.length})`}
             description="Channels that have published videos discussing this organization."
             entities={linkedChannels.map((ch) => ({
@@ -165,28 +165,28 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ slug
           />
 
           <UapEntityLinkSection
-            icon={Users}
+            icon="Users"
             title={`Linked Experiencers (${linkedExperiencers.length})`}
             description="These experiencers are discussed in the same videos that mention this organization. This reflects topical co-occurrence, not a confirmed affiliation."
             entities={linkedExperiencers}
           />
 
           <UapEntityLinkSection
-            icon={User}
+            icon="User"
             title={`Linked Persons of Interest (${linkedPersons.length})`}
             description="These individuals are discussed in the same videos that mention this organization. This reflects topical co-occurrence, not a confirmed affiliation."
             entities={linkedPersons}
           />
 
           <UapEntityLinkSection
-            icon={Calendar}
+            icon="Calendar"
             title={`Linked Events (${linkedEvents.length})`}
             description="These events are discussed in the same videos that mention this organization. This reflects topical co-occurrence, not confirmed involvement."
             entities={linkedEvents}
           />
 
           <UapEntityLinkSection
-            icon={Fingerprint}
+            icon="Fingerprint"
             title={`Linked Programs (${linkedPrograms.length})`}
             description="These programs are discussed in the same videos that mention this organization. This reflects topical co-occurrence, not a confirmed partnership."
             entities={linkedPrograms}

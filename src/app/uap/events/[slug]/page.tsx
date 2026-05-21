@@ -338,7 +338,7 @@ export default async function EventDetailPage({
 
         {/* ── Standardized Cross-Entity Links (canonical order) ── */}
         <UapEntityLinkSection
-          icon={Radio}
+          icon="Radio"
           title={`Featured on Channels (${linkedChannels.length})`}
           description="Channels that have published videos discussing this event."
           entities={linkedChannels.map((ch) => ({
@@ -351,28 +351,28 @@ export default async function EventDetailPage({
         />
 
         <UapEntityLinkSection
-          icon={Users}
+          icon="Users"
           title={`Linked Experiencers (${linkedExperiencers.length})`}
           description="These experiencers are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a confirmed involvement."
           entities={linkedExperiencers}
         />
 
         <UapEntityLinkSection
-          icon={User}
+          icon="User"
           title={`Linked Persons of Interest (${linkedPersons.length})`}
           description="These individuals are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a direct connection to the event itself."
           entities={linkedPersons}
         />
 
         <UapEntityLinkSection
-          icon={Building2}
+          icon="Building2"
           title={`Linked Organizations (${linkedOrgs.length})`}
           description="These organizations are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a direct organizational connection."
           entities={linkedOrgs}
         />
 
         <UapEntityLinkSection
-          icon={FileText}
+          icon="FileText"
           title={`Linked Programs (${linkedPrograms.length})`}
           description="These programs are discussed in the same videos that reference this event. This reflects topical co-occurrence, not a direct organizational connection."
           entities={linkedPrograms}

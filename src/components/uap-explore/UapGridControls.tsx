@@ -3,7 +3,8 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ArrowUpDown, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { ArrowUpDown, ChevronLeft, ChevronRight, Search, X, Radio, LayoutGrid } from "lucide-react";
+import { UfoIcon } from "@/components/icons/UfoIcon";
 import { Button } from "@/components/ui/button";
 import { TIER_FILTERS, UAP_SORT_PRESETS, UAP_SORT_FIELDS, type SortPreset } from "./types";
 
@@ -79,6 +80,7 @@ export function UapGridControls({
       <div className="flex flex-wrap items-center gap-2">
         {TIER_FILTERS.map((tier) => {
           const isActive = currentTier === tier.tierValue;
+          const TierIcon = tier.id === "encounters" ? UfoIcon : tier.id === "research" ? Radio : LayoutGrid;
           return (
             <button
               key={tier.id}
@@ -90,7 +92,7 @@ export function UapGridControls({
                   : "bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:border-green-300 dark:hover:border-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
               )}
             >
-              <span>{tier.emoji}</span>
+              <TierIcon className="w-3.5 h-3.5" />
               <span>{tier.label}</span>
             </button>
           );

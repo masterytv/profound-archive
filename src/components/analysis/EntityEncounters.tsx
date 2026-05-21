@@ -198,12 +198,12 @@ export function EntityEncounters({ entities: rawEntities, className }: EntityEnc
                                     <div className="flex flex-wrap gap-1.5 mt-2">
                                         {entity.luminosity && entity.luminosity !== "not_stated" && (
                                             <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-yellow-50 border border-yellow-200 text-yellow-700 text-[10px] font-medium">
-                                                ✨ {formatSnakeCase(entity.luminosity)}
+                                                ✦ {formatSnakeCase(entity.luminosity)}
                                             </span>
                                         )}
                                         {entity.emotional_quality && (
                                             <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-medium">
-                                                💖 {formatSnakeCase(entity.emotional_quality)}
+                                                ♡ {formatSnakeCase(entity.emotional_quality)}
                                             </span>
                                         )}
                                         {entity.confidence != null && (

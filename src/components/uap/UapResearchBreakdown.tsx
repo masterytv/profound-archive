@@ -210,11 +210,11 @@ function EntityList({ entities }: { entities: UapEntityEncounter[] }) {
   if (!entities || entities.length === 0) return <p className="text-xs text-slate-400 p-3 italic">The analysis found no relevant content for this section.</p>;
 
   const typeEmoji: Record<string, string> = {
-    grey: "👽", tall_grey: "👽", mantis: "🦗", insectoid_other: "🦗",
-    reptilian: "🦎", nordic: "👤", tall_white: "👤", humanoid: "🧑",
-    hybrid: "🧬", light_being: "✨", blue_being: "🔵", angelic: "👼",
-    demonic: "😈", shadow_entity: "👤", hooded_cloaked: "🧥",
-    robotic: "🤖", amorphous: "💨", unknown: "❓",
+    grey: "◇", tall_grey: "◇", mantis: "○", insectoid_other: "○",
+    reptilian: "◆", nordic: "◇", tall_white: "◇", humanoid: "◉",
+    hybrid: "◎", light_being: "✦", blue_being: "●", angelic: "♡",
+    demonic: "◆", shadow_entity: "◇", hooded_cloaked: "▢",
+    robotic: "▣", amorphous: "∿", unknown: "?",
   };
 
   return (
@@ -226,7 +226,7 @@ function EntityList({ entities }: { entities: UapEntityEncounter[] }) {
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-lg">{typeEmoji[entity.entity_type] || "❓"}</span>
+              <span className="text-lg">{typeEmoji[entity.entity_type] || "?"}</span>
               <div>
                 <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 capitalize">
                   {entity.entity_type.replace(/_/g, " ")}
@@ -516,13 +516,13 @@ export interface EvidenceBreakdown {
 }
 
 const CRITERIA_LABELS: Record<string, { label: string; icon: string }> = {
-  witness_credibility: { label: "Witness Credibility", icon: "🎖️" },
-  corroboration: { label: "Corroboration", icon: "👥" },
-  physical_effects: { label: "Physical Evidence", icon: "⚡" },
-  specificity: { label: "Detail & Specificity", icon: "🔍" },
-  perceptual_clarity: { label: "Perceptual Clarity", icon: "👁️" },
-  temporal_precedence: { label: "Timely Reporting", icon: "⏱️" },
-  unpredictability: { label: "Unpredictability", icon: "🎲" },
+  witness_credibility: { label: "Witness Credibility", icon: "★" },
+  corroboration: { label: "Corroboration", icon: "≡" },
+  physical_effects: { label: "Physical Evidence", icon: "↑" },
+  specificity: { label: "Detail & Specificity", icon: "◎" },
+  perceptual_clarity: { label: "Perceptual Clarity", icon: "◉" },
+  temporal_precedence: { label: "Timely Reporting", icon: "◷" },
+  unpredictability: { label: "Unpredictability", icon: "◇" },
 };
 
 function scoreTier(score: number): { color: string; label: string } {
@@ -563,7 +563,7 @@ function EvidencePanel({ evidence }: { evidence: EvidenceBreakdown }) {
       {/* Criteria bars */}
       <div className="space-y-1.5">
         {criteriaEntries.map(([key, criterion]) => {
-          const meta = CRITERIA_LABELS[key] || { label: key.replace(/_/g, " "), icon: "📋" };
+          const meta = CRITERIA_LABELS[key] || { label: key.replace(/_/g, " "), icon: "▣" };
           const tier = scoreTier(criterion.score);
           return (
             <div key={key} className="group">

@@ -86,7 +86,7 @@ export default async function UapExperiencerPage({
     name: "name",
   };
 
-  let allProfiles = await getContacteeList({ sort: sortMapping[validSort], limit: 1000 });
+  let allProfiles = await getContacteeList({ sort: sortMapping[validSort], limit: 5000 });
 
   // Apply search filter
   if (activeSearch) {

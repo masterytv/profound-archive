@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronUp, Eye, ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, ExternalLink, Radio } from "lucide-react";
+import { UfoIcon } from "@/components/icons/UfoIcon";
 import type { UapExploreItem } from "./types";
 import { CONTENT_TYPE_LABELS } from "./types";
 
@@ -90,7 +91,7 @@ export function UapVideoCard({
               "text-[10px] font-semibold px-2 py-0.5 rounded-full border backdrop-blur-sm",
               tierColors
             )}>
-              {video.tier === 1 ? "🛸" : "📡"} {tierLabel}
+              {video.tier === 1 ? <UfoIcon className="w-3 h-3 inline" /> : <Radio className="w-3 h-3 inline" />} {tierLabel}
             </span>
           </div>
         </div>

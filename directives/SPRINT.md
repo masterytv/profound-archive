@@ -20,7 +20,9 @@
 | Sprint 9: Engagement & CRM | ✅ Complete | 2026-05-13 |
 | Sprint 10: Site Fixes & Polish | ✅ Complete | 2026-05-14 |
 | Sprint 11: Unified Homepage & Brand Evolution | ✅ Complete | 2026-05-19 |
-| Sprint 12: Security Audit | 🔲 Not Started | — |
+| Sprint 12: Security Audit | ✅ Complete | 2026-05-19 |
+| Sprint 13: Channel Analytics & Identity (Phase 1) | ✅ Complete | 2026-05-20 |
+| Sprint 14: Channel Engagement & Shareability (Phase 2) | 🔄 In Progress | — |
 | Backlog: Revenue & Growth Strategy | 📋 Brainstorm | — |
 
 ## Environment Setup
@@ -984,9 +986,238 @@ For every UAP file you create:
 
 ---
 
+## Sprint 13: Channel Analytics & Identity (Phase 1)
+
+> **Goal:** Transform channel pages from basic video listings into rich analytical profiles that channel owners want to visit and share. Every feature uses data we already have or can compute from existing tables.
+> **Brainstorm source:** `brain/6674573d/channel_page_brainstorm.md`
+> **Copy rule:** All text is written for the general audience ("This channel's videos generate 3.2×..."), not the channel owner ("Your videos generate...").
+
+### Epic 13.1: Channel Universe Map — Very High Impact
+
+> THE signature visualization. Interactive scatter plot positioning ALL channels on two axes.
+> X-axis: Speaker/Source Credibility. Y-axis: Intelligence Value of content.
+> Dot size = subscriber count. Quadrant labels: "The Scholars", "The Authorities", "The Broadcasters", "The Explorers".
+
+- [x] Story 13.1.1: Design computed score formulas — define "Intelligence Value" (evidence_score avg, programs/events density, content_type weighting) and "Speaker Credibility" (linked person prominence, source types, corroboration signals). Write scoring SQL + document the formulas in `docs/channel-scores.md` (1d) ✅ 2026-05-20
+- [x] Story 13.1.2: Create `uap_channel_scores` materialized view or computed table — aggregate Intelligence Value and Speaker Credibility per channel_id. Include rank columns. Schedule daily refresh via pg_cron or GHA (0.5d) ✅ 2026-05-20
+- [x] Story 13.1.3: Build `ChannelUniverseMap` component — interactive scatter plot (recharts ScatterChart or custom canvas). Dot size = subscriber count. Quadrant grid lines + labels. Hover tooltip with channel name + scores. Click navigates to channel page. Current channel pulses/glows (1.5d) ✅ 2026-05-20
+- [x] Story 13.1.4: Integrate into channel detail page — embed map with current channel highlighted. Add "Where This Channel Sits" section heading. Responsive: horizontal scroll on mobile (0.5d) ✅ 2026-05-20
+- [x] Story 13.1.5: Build standalone `/uap/channels/universe` page — full-screen interactive map with all channels. Search/filter overlay. Link from channel index page (0.5d) ✅ 2026-05-20
+- **Done when:** Every channel detail page shows an interactive scatter plot with the channel highlighted; standalone universe page works; scores refresh daily.
+
+---
+
+### Epic 13.2: Channel Scorecard — Very High Impact
+
+> 4-axis diamond/radar chart: Intelligence Value, Speaker Credibility, Encounter Depth, Impact.
+> Overall Channel Authority Score = weighted composite → letter grade (A+, A, B+…).
+
+- [x] Story 13.2.1: Extend `uap_channel_scores` with 4-axis scores — Intelligence Value, Speaker Credibility, avg contact_depth_score, avg transformation_score. Compute letter grade (A+ through C) from weighted composite (0.5d) ✅ 2026-05-20
+- [x] Story 13.2.2: Build `ChannelScorecard` component — 4-axis radar chart (recharts RadarChart) with labeled axes. Letter grade badge prominently displayed. Null-safe: show "Pending" for axes without enough data (1d) ✅ 2026-05-20
+- [x] Story 13.2.3: Integrate into channel detail page — position in hero area or dedicated "Channel Authority" section. Show letter grade badge in channel card on index page too (0.5d) ✅ 2026-05-20
+- **Done when:** Channel detail page shows a 4-axis radar chart + letter grade. Channel index cards show letter grade badge. Graceful fallback when data is sparse.
+
+---
+
+### Epic 13.3: Channel Identity & Classification — Very High Impact
+
+> Classify each channel by its content DNA. Primary / Secondary / Tertiary archetypes.
+> Archetypes: Deep Intelligence, First Person Encounters, Documentary, News & Commentary, Advocacy & Disclosure, Interview Hub.
+
+- [x] Story 13.3.1: Build channel archetype computation — SQL query aggregating `content_type` counts per channel, mapping to archetypes. Write to `uap_channel_scores` or a new `channel_archetype` column. Include primary/secondary/tertiary (0.5d) ✅ 2026-05-20
+- [x] Story 13.3.2: Build `ChannelArchetypeBadges` component — display Primary / Secondary / Tertiary as styled icon+label badges (e.g., 🔬 Deep Intelligence · 🎤 Interviews · 📰 News). Use channel detail page hero area (0.5d) ✅ 2026-05-20
+- [x] Story 13.3.3: Add archetype column to channel index page — show primary archetype as a badge/pill on each channel card for quick scanning (0.25d) ✅ 2026-05-20
+- **Done when:** Channel detail shows 3 archetype badges. Channel index cards show primary archetype. Computed from actual content_type distribution.
+
+---
+
+### Epic 13.4: "What Makes This Channel Unique" — Very High Impact
+
+> Curated section showing stats that set this channel apart. Only renders if at least 1 meaningful unique stat exists.
+> Examples: exclusive experiencers, unique events covered, unique orgs identified, "first to cover" a topic.
+
+- [x] Story 13.4.1: Build uniqueness computation queries — SQL to find: (A) experiencers linked to this channel's videos but no other channel, (B) events only this channel covers, (C) orgs only this channel mentions, (D) "first to cover" based on earliest video date per event/person (1d) ✅ 2026-05-20
+- [x] Story 13.4.2: Build `ChannelUniqueSection` component — renders the applicable unique stats as highlight cards with icons and counts. If zero unique stats → don't render the section at all (0.5d) ✅ 2026-05-20
+- [x] Story 13.4.3: Integrate into channel detail page — place below scorecard/archetype, above video grid (0.25d) ✅ 2026-05-20
+- **Done when:** Channels with unique coverage show a "What Makes This Channel Unique" section. Channels without unique stats show nothing (no empty section). ✅ Complete
+
+---
+
+### Epic 13.5: Comparative Rankings Box — Very High Impact
+
+> Standardized stats box on every channel page. Consistent format users recognize.
+> Metrics: Archive Rank (with Top 5/10/25 badge), Views Rank, Engagement (comments ratio), Volume Intensity, Views-per-Video.
+
+- [x] Story 13.5.1: Build ranking computation — SQL to compute per-channel: archive rank (by video count), views rank (by total views), avg comments/video ratio vs archive avg, posting cadence (videos/month), avg views/video vs archive avg (0.5d) ✅ 2026-05-20
+- [x] Story 13.5.2: Build `ChannelRankingsBox` component — standardized card with 5 metric rows. Archive rank gets a badge (Top 5 green / Top 10 blue / Top 25 bronze). Engagement shown as "X× archive average". Volume intensity as cadence label (daily/weekly/bi-weekly/monthly) (1d) ✅ 2026-05-20
+- [x] Story 13.5.3: Integrate into channel detail page — position as a sidebar card or below-the-fold stats section. Always visible (every channel gets rankings) (0.25d) ✅ 2026-05-20
+- **Done when:** Every channel page shows a rankings box with 5 metrics + appropriate badge tier.
+
+---
+
+### Epic 13.6: Channel Personality Code — High Impact
+
+> 3-letter Myers-Briggs-style code. Dimensions: I(ntelligence) vs E(ncounters), D(eep-dive) vs B(readth), A(nalytical) vs N(arrative).
+> Example: Richard Dolan = IDA. JeffMara = EBN.
+
+- [x] Story 13.6.1: Define personality code algorithm — map content_type ratios to I/E, avg duration to D/B, evidence_score + content_type to A/N. Document thresholds in `docs/channel-scores.md` (0.5d) ✅ 2026-05-20
+- [x] Story 13.6.2: Build `ChannelPersonalityBadge` component — large 3-letter code with hover/click explanation of each dimension. Clean, bold typography (0.5d) ✅ 2026-05-20
+- [x] Story 13.6.3: Integrate into channel detail page hero and channel index cards (0.25d) ✅ 2026-05-20
+- **Done when:** Every channel shows a 3-letter personality code with explanations. Codes are computed from real data.
+
+---
+
+### Epic 13.7: Encounter Taxonomy Visuals — High Impact
+
+> Encounter type donut chart (CE-1 through CE-5). Entity types visual grid. Both derived from analysis data.
+
+- [x] Story 13.7.1: Build encounter type aggregation query — count Hynek CE classifications across channel's analyzed videos. Handle null/sparse data gracefully (0.5d) ✅ 2026-05-20
+- [x] Story 13.7.2: Build `EncounterTypeDonut` component — recharts PieChart showing CE-1/2/3/4/5 distribution with counts and percentages. Label the dominant type (0.5d) ✅ 2026-05-20
+- [x] Story 13.7.3: Build entity type aggregation — extract entity_types from `uap_analysis.entities` or experiencer profiles for channel's videos (0.5d) ✅ 2026-05-20
+- [x] Story 13.7.4: Build `EntityTypeGrid` component — icon grid showing entity types (Humanoid, Grey, Nordic, etc.) with counts per type. Highlight dominant type (0.5d) ✅ 2026-05-20
+- [x] Story 13.7.5: Integrate both into channel detail page — new "Encounter Coverage" section (0.25d) ✅ 2026-05-20
+- **Done when:** Channel pages with encounter data show a donut chart + entity grid. Pages without data show nothing. ✅ Complete
+
+---
+
+### Epic 13.8: Event & Program Coverage Graphs — High Impact
+
+> Horizontal bar charts showing which events and programs this channel covers most.
+> Top 3 most-covered items called out above the graph with names and counts.
+
+- [x] Story 13.8.1: Build event/program aggregation queries — cross-reference channel's video_ids against `uap_canonical_events.linked_video_ids` and `uap_canonical_programs.linked_video_ids` using array overlap (0.5d) ✅ 2026-05-20
+- [x] Story 13.8.2: Build `CoverageBarChart` component — reusable horizontal bar chart with top-3 callout. Accepts data for either events or programs. Sorted by frequency. Clickable bars → entity detail page (1d) ✅ 2026-05-20
+- [x] Story 13.8.3: Integrate into channel detail page — "Event Coverage" and "Program Coverage" sections with shared component (0.25d) ✅ 2026-05-20
+- **Done when:** Channel pages show event and program coverage bar charts with top-3 callouts. Bars link to entity pages. ✅ Complete
+
+---
+
+### Epic 13.9: Encounter Diversity Index — High Impact
+
+> Shannon diversity index across encounter types, entity types, and event coverage.
+> Single score (0-1) displayed as a gauge or badge with rank.
+
+- [x] Story 13.9.1: Compute Shannon diversity index — SQL or server-side function calculating diversity across content_type, entity types, and event coverage. Store in `uap_channel_scores` (0.5d) ✅ 2026-05-20 (already computed in channel scores pipeline)
+- [x] Story 13.9.2: Build `DiversityIndexBadge` component — gauge or badge showing score (0-1) + rank ("Top 15% in content diversity"). Label: high diversity = well-rounded, low = deep specialist (0.5d) ✅ 2026-05-20
+- [x] Story 13.9.3: Integrate into channel scorecard area (0.25d) ✅ 2026-05-20
+- **Done when:** Every channel shows a diversity index score with rank and contextual label. ✅ Complete
+
+---
+
+### Epic 13.10: Content DNA Visuals — Medium Impact
+
+> Content type radar chart (visual fingerprint). Average video length comparison. Content consistency timeline. Content evolution arc.
+
+- [x] Story 13.10.1: Build `ContentTypeRadar` component — recharts RadarChart showing content_type distribution across 8 axes (first_person, interview, research_analysis, etc.). Visual fingerprint unique to each channel (0.5d) ✅ 2026-05-20
+- [x] Story 13.10.2: Build `VideoLengthStats` component — avg duration vs archive average. Bucket breakdown: Quick takes (<15m) / Standard (15-30m) / Deep dives (30-60m) / Marathon (60m+). Horizontal bar (0.5d) ✅ 2026-05-20
+- [x] Story 13.10.3: Build `ContentTimeline` component — GitHub-style activity heatmap or month-by-month bar chart. Show posting cadence, streaks, "Active since [year]" (0.5d) ✅ 2026-05-20
+- [x] Story 13.10.4: Build `ContentEvolutionArc` component — stacked area chart showing content_type proportions by year. Shows editorial maturation over time (0.5d) ✅ 2026-05-20
+- [x] Story 13.10.5: Integrate all into channel detail page — "Content DNA" section with tabs or accordion for each visualization (0.5d) ✅ 2026-05-20
+- **Done when:** Channel pages show content type radar, video length comparison, activity timeline, and content evolution arc. ✅ Complete
+
+---
+
+## Sprint 14: Channel Engagement & Shareability (Phase 2)
+
+> **Goal:** Turn channel analytics into shareable assets and engagement loops. Build features that bring channel owners back and drive them to send traffic to the site.
+> **Prerequisite:** Sprint 13 (Channel Analytics) must be complete — Phase 2 builds on computed scores and visualizations.
+
+### Epic 14.1: Scatter Plot Trajectory Arrow — Very High Impact
+
+> Enhancement to Channel Universe Map: show where channel WAS 12 months ago → where it IS now.
+> "This channel moved 15% higher on the Intelligence axis since last year."
+
+- [ ] Story 14.1.1: Add historical score snapshots — monthly snapshot table `uap_channel_score_history` storing Intelligence Value + Credibility per channel per month. GHA or pg_cron to snapshot monthly (0.5d)
+- [ ] Story 14.1.2: Update `ChannelUniverseMap` — render trajectory arrow from 12-month-ago position to current position. Arrow color: green if improved, neutral if static (0.5d)
+- [ ] Story 14.1.3: Add trajectory narrative to channel detail — "This channel moved X% on Intelligence and Y% on Credibility since [date]" (0.25d)
+- **Done when:** Channel universe map shows trajectory arrows for channels with ≥2 months of history.
+
+---
+
+### Epic 14.2: Shareable OG Stats Card & Badge — Very High Impact
+
+> Auto-generated social preview card + embeddable SVG badge.
+> OG Card: channel name, avatar, archetype, key stats, mini scatter plot.
+> Badge: [Project Profound | 573 Videos | Authority: A+ | Deep Intelligence]
+
+- [x] Story 14.2.1: Build OG image generation API — `/api/og/channel/[id]` using `next/og` ImageResponse. Renders channel stats card as 1200×630 PNG with avatar, name, archetype, letter grade, stats row, and branding (1d) ✅ 2026-05-21
+- [x] Story 14.2.2: Update channel page `generateMetadata` — dynamic OG image + Twitter card meta tags (0.25d) ✅ 2026-05-21
+- [x] Story 14.2.3: Build embeddable SVG badge generator — `/api/badge/channel/[id]` returns shields.io-style flat badge + `BadgeEmbed.tsx` component with copy-to-clipboard for Markdown/HTML embed snippets. Visible to all users (0.5d) ✅ 2026-05-21
+- [x] Story 14.2.4: Fix BadgeEmbed hydration mismatch — always use production URL for embed snippets instead of `window.location.origin` server/client branch. Badge section hidden until Claim Your Channel flow. ✅ 2026-05-21
+- **Done when:** Sharing a channel page link on Twitter/LinkedIn shows a rich stats card. Badge URL can be embedded in YouTube descriptions.
+
+---
+
+### Epic 14.3: "Claim Your Channel" Flow — Very High Impact
+
+> Channel owners verify ownership → unlock editing + dashboard.
+> Creates user account = CRM lead.
+
+- [ ] Story 14.3.1: Design claim verification flow — YouTube channel link verification method (link in description, or OAuth) (0.5d)
+- [ ] Story 14.3.2: Build claim request UI — form on channel detail page, admin approval queue (1d)
+- [ ] Story 14.3.3: Build claimed channel features — edit description, pin featured video, respond to analysis scores (1d)
+- [ ] Story 14.3.4: Build channel owner dashboard — private stats: PP page views, top referrers, most-viewed videos on PP (1d)
+- **Done when:** Channel owners can claim their page, edit it, and see private analytics.
+
+---
+
+### Epic 14.4: Monthly Channel Report (Email) — Very High Impact
+
+> Auto-generated engagement loop. Monthly email to claimed channel owners.
+> "This channel was viewed 1,247 times on Project Profound this month."
+
+- [ ] Story 14.4.1: Build channel analytics tracking — log page views per channel page (could use existing analytics or simple counter table) (0.5d)
+- [ ] Story 14.4.2: Build `ChannelMonthlyReport` React Email template — branded, includes: page views, new videos analyzed, score changes, new entity connections (0.5d)
+- [ ] Story 14.4.3: Build monthly report cron — GHA or pg_cron, sends to claimed channel owners via Resend (0.5d)
+- **Done when:** Claimed channel owners receive a monthly email with their PP analytics.
+
+---
+
+### Epic 14.5: Speaker Rolodex & Guest Network — High Impact
+
+> Who has appeared on this channel? Experiencer count, person of interest count, exclusive guests.
+
+- [x] Story 14.5.1: Build guest aggregation queries — `findCrossChannelOverlap()` in `uap-entity-links.ts`, caps at top 20 persons/experiencers for performance, groups by channel_id (0.5d) ✅ 2026-05-21
+- [x] Story 14.5.2: Build `SpeakerRolodex` component — 3 stat cards (experiencers, persons of interest, exclusive guests) + top 6 speakers grid with links (0.5d) ✅ 2026-05-21
+- [x] Story 14.5.3: Build `CrossChannelOverlap` component — ranked list of channels sharing the most guests, with avatars, shared guest count, and sample names (0.5d) ✅ 2026-05-21
+- [x] Story 14.5.4: Integrate into channel detail page — "Guest Network" section between Universe Map and Video Grid (0.25d) ✅ 2026-05-21
+- [x] Story 14.5.5: Fix `UapEntityLinkSection` icon serialization — convert icon prop from component refs to string names with internal ICON_MAP resolver. Fixes RSC→client boundary error across all 6 entity detail pages. ✅ 2026-05-21
+- [x] Story 14.5.6: Channel detail section reorder and polish — reorder to: Focus+Rankings → Guest Network → Diversity+Unique (combined row) → Universe Map → Content DNA → Encounter Coverage → Program Intelligence Coverage → Cross-Channel Overlap → Videos → Linked entities. Renamed "Coverage Breakdown" → "Program Intelligence Coverage". ✅ 2026-05-21
+- **Done when:** Channel pages show guest network stats, exclusive guests, and cross-channel overlap.
+
+---
+
+### Epic 14.6: Guest Quality Trajectory — High Impact
+
+> Are they attracting more credible guests over time?
+> Requires historical score snapshots from Epic 14.1.
+
+- [ ] Story 14.6.1: Compute guest credibility by time period — avg person prominence score by year for channel's videos (0.5d)
+- [ ] Story 14.6.2: Build `GuestTrajectory` component — line chart showing guest credibility trend over time (0.5d)
+- [ ] Story 14.6.3: Integrate into channel detail page — "Guest Quality" section (0.25d)
+- **Done when:** Channels with multi-year data show a guest credibility trend line.
+
+---
+
+### Epic 14.7: Content Ideas for Channel Owners — High Impact
+
+> Data-driven suggestions: Greatest Hits, "You Covered This First", Suggested Deep Dives, Story Arc.
+> Only visible to claimed channel owners (or all users — TBD).
+
+- [ ] Story 14.7.1: Build "Greatest Hits" query — top 5 videos by evidence score, by views, by transformation score (0.5d)
+- [ ] Story 14.7.2: Build "First to Cover" query — earliest video date per event/person vs all other channels (0.5d)
+- [ ] Story 14.7.3: Build "Suggested Deep Dives" query — topics mentioned ≥3 times but no dedicated video (0.5d)
+- [ ] Story 14.7.4: Build `ContentIdeas` component — tabbed display of all three data-driven suggestion types (0.5d)
+- [ ] Story 14.7.5: Integrate into channel detail page or owner dashboard (0.25d)
+- **Done when:** Channel pages show data-driven content suggestions based on their archive analysis.
+
+---
+
 ## Technical Debt
 
 - [ ] **Video Tone Backfill** — `video_tone` was missing from the merge in `uap-program-intel.ts` (line 563). All 1,528 analyzed videos have `video_tone = 'neutral'` in `uap_video_stats`. Root cause fixed (2026-05-19), but existing data needs re-analysis. Options: (A) re-run only Pass 3 to cheaply extract tones, or (B) full re-analysis via `uap-reanalyze-all.ts`. After backfill, re-enable the Video Tone filter in `UapFilterSidebar.tsx` (currently commented out).
+
+- [ ] **Entity Name Normalization** — Organizations, events, and programs have significant duplicate entries with variant names (e.g. "US Senate" / "U.S. Senate" / "United States Senate" / "Senate" are 4+ separate records). This inflates entity counts and makes "exclusive to this channel" calculations unreliable for non-experiencer entity types. The `ChannelUniqueSection` component currently only shows Exclusive Experiencers because of this issue — events, orgs, and programs are hidden until normalization is complete. **Approach:** Build a normalization pipeline that: (A) identifies candidate duplicates via fuzzy matching / Levenshtein distance, (B) presents merge candidates for manual approval, (C) merges `linked_video_ids` arrays and updates `aka` fields, (D) deletes the duplicate record. Affected tables: `uap_canonical_orgs`, `uap_canonical_events`, `uap_canonical_programs`, `uap_canonical_persons`. After normalization, re-enable all entity types in `ChannelUniqueSection.tsx`.
 
 ---
 

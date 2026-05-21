@@ -52,8 +52,7 @@ export async function findLinkedPersons(
     .from('uap_canonical_persons')
     .select('slug, canonical_name, role, affiliation, total_mentions, linked_video_ids')
     .overlaps('linked_video_ids', videoIds)
-    .order('total_mentions', { ascending: false })
-    .limit(20);
+    .order('total_mentions', { ascending: false });
 
   if (!data) return [];
 
@@ -95,8 +94,7 @@ export async function findLinkedPrograms(
     .from('uap_canonical_programs')
     .select('slug, canonical_name, program_type, total_mentions, linked_video_ids')
     .overlaps('linked_video_ids', videoIds)
-    .order('total_mentions', { ascending: false })
-    .limit(20);
+    .order('total_mentions', { ascending: false });
 
   if (!data) return [];
 
@@ -125,8 +123,7 @@ export async function findLinkedOrgs(
     .from('uap_canonical_orgs')
     .select('slug, canonical_name, org_type, total_mentions, linked_video_ids')
     .overlaps('linked_video_ids', videoIds)
-    .order('total_mentions', { ascending: false })
-    .limit(20);
+    .order('total_mentions', { ascending: false });
 
   if (!data) return [];
 
@@ -155,8 +152,7 @@ export async function findLinkedEvents(
     .from('uap_events')
     .select('slug, name, year, event_type, source_count, video_ids')
     .overlaps('video_ids', videoIds)
-    .order('source_count', { ascending: false })
-    .limit(20);
+    .order('source_count', { ascending: false });
 
   if (!data) return [];
 
@@ -185,8 +181,7 @@ export async function findLinkedExperiencers(
     .from('uap_contactee_profiles')
     .select('slug, display_name, experience_type, video_ids')
     .overlaps('video_ids', videoIds)
-    .order('total_views', { ascending: false })
-    .limit(20);
+    .order('total_views', { ascending: false });
 
   if (!data) return [];
 
@@ -257,4 +252,223 @@ export async function findLinkedChannels(
       };
     })
     .sort((a, b) => b.video_count - a.video_count);
+}
+
+// ─── Exclusive Entity Discovery ─────────────────────────────────────────────
+
+export interface ExclusiveEntities {
+  exclusiveExperiencers: { name: string; slug: string }[];
+  exclusiveEvents: { name: string; slug: string }[];
+  exclusiveOrgs: { name: string; slug: string }[];
+  exclusivePrograms: { name: string; slug: string }[];
+  totalEntitiesCovered: number;
+}
+
+/**
+ * Find entities whose linked_video_ids are entirely within the given channel's
+ * video set — meaning no other channel covers them.
+ */
+export async function findExclusiveEntities(
+  channelVideoIds: string[],
+): Promise<ExclusiveEntities> {
+  if (!channelVideoIds || channelVideoIds.length === 0) {
+    return {
+      exclusiveExperiencers: [],
+      exclusiveEvents: [],
+      exclusiveOrgs: [],
+      exclusivePrograms: [],
+      totalEntitiesCovered: 0,
+    };
+  }
+
+  const supabase = getSupabase();
+  const videoIdSet = new Set(channelVideoIds);
+
+  // Helper: check if ALL of an entity's linked video IDs belong to this channel
+  function isExclusive(linkedIds: string[] | null): boolean {
+    if (!linkedIds || linkedIds.length === 0) return false;
+    return linkedIds.every((id) => videoIdSet.has(id));
+  }
+
+  // Fetch all entities overlapping with channel's videos in parallel
+  const [experiencers, events, orgs, programs] = await Promise.all([
+    supabase
+      .from("uap_contactee_profiles")
+      .select("slug, display_name, video_ids")
+      .overlaps("video_ids", channelVideoIds),
+    supabase
+      .from("uap_events")
+      .select("slug, name, video_ids")
+      .overlaps("video_ids", channelVideoIds),
+    supabase
+      .from("uap_canonical_orgs")
+      .select("slug, canonical_name, linked_video_ids")
+      .overlaps("linked_video_ids", channelVideoIds),
+    supabase
+      .from("uap_canonical_programs")
+      .select("slug, canonical_name, linked_video_ids")
+      .overlaps("linked_video_ids", channelVideoIds),
+  ]);
+
+  const allExperiencers = experiencers.data ?? [];
+  const allEvents = events.data ?? [];
+  const allOrgs = orgs.data ?? [];
+  const allPrograms = programs.data ?? [];
+
+  const totalEntitiesCovered =
+    allExperiencers.length + allEvents.length + allOrgs.length + allPrograms.length;
+
+  return {
+    exclusiveExperiencers: allExperiencers
+      .filter((e) => isExclusive(e.video_ids))
+      .map((e) => ({ name: e.display_name, slug: e.slug })),
+    exclusiveEvents: allEvents
+      .filter((e) => isExclusive(e.video_ids))
+      .map((e) => ({ name: e.name, slug: e.slug })),
+    exclusiveOrgs: allOrgs
+      .filter((o) => isExclusive(o.linked_video_ids))
+      .map((o) => ({ name: o.canonical_name, slug: o.slug })),
+    exclusivePrograms: allPrograms
+      .filter((p) => isExclusive(p.linked_video_ids))
+      .map((p) => ({ name: p.canonical_name, slug: p.slug })),
+    totalEntitiesCovered,
+  };
+}
+
+// ─── Cross-Channel Guest Overlap ────────────────────────────────────────────
+
+export interface CrossChannelOverlapResult {
+  channelId: string;
+  channelName: string;
+  avatarUrl: string | null;
+  sharedGuestCount: number;
+  sharedGuests: { name: string; slug: string; type: 'experiencer' | 'person' }[];
+  href: string;
+}
+
+/**
+ * Find other channels that share the most guests (experiencers + persons)
+ * with the given channel. Caps at top 20 persons/experiencers for performance,
+ * then groups their non-channel videos by channel_id.
+ */
+export async function findCrossChannelOverlap(
+  channelVideoIds: string[],
+  thisChannelId: string,
+): Promise<CrossChannelOverlapResult[]> {
+  if (!channelVideoIds || channelVideoIds.length === 0) return [];
+
+  const supabase = getSupabase();
+  const videoIdSet = new Set(channelVideoIds);
+
+  // Fetch top 20 experiencers + top 20 persons linked to this channel's videos
+  const [experiencerRes, personRes] = await Promise.all([
+    supabase
+      .from('uap_contactee_profiles')
+      .select('slug, display_name, video_ids')
+      .overlaps('video_ids', channelVideoIds)
+      .order('total_views', { ascending: false })
+      .limit(20),
+    supabase
+      .from('uap_canonical_persons')
+      .select('slug, canonical_name, linked_video_ids')
+      .overlaps('linked_video_ids', channelVideoIds)
+      .order('total_mentions', { ascending: false })
+      .limit(20),
+  ]);
+
+  // Collect all video IDs that belong to OTHER channels
+  const otherVideoIds = new Set<string>();
+
+  // Map: otherVideoId → which guests reference it
+  type GuestRef = { name: string; slug: string; type: 'experiencer' | 'person' };
+  const videoToGuests = new Map<string, GuestRef[]>();
+
+  for (const exp of experiencerRes.data ?? []) {
+    for (const vid of exp.video_ids ?? []) {
+      if (!videoIdSet.has(vid)) {
+        otherVideoIds.add(vid);
+        const refs = videoToGuests.get(vid) ?? [];
+        refs.push({ name: exp.display_name, slug: exp.slug, type: 'experiencer' });
+        videoToGuests.set(vid, refs);
+      }
+    }
+  }
+
+  for (const person of personRes.data ?? []) {
+    for (const vid of person.linked_video_ids ?? []) {
+      if (!videoIdSet.has(vid)) {
+        otherVideoIds.add(vid);
+        const refs = videoToGuests.get(vid) ?? [];
+        refs.push({ name: person.canonical_name, slug: person.slug, type: 'person' });
+        videoToGuests.set(vid, refs);
+      }
+    }
+  }
+
+  if (otherVideoIds.size === 0) return [];
+
+  // Fetch channel_id for these other videos (batch, cap at 200 for safety)
+  const otherVidArr = Array.from(otherVideoIds).slice(0, 200);
+  const { data: otherVids } = await supabase
+    .from('uap_vids')
+    .select('video_id, channel_id')
+    .in('video_id', otherVidArr);
+
+  if (!otherVids || otherVids.length === 0) return [];
+
+  // Group by channel_id → unique guests
+  const channelGuestMap = new Map<string, Set<string>>();
+  const channelGuestDetails = new Map<string, Map<string, GuestRef>>();
+
+  for (const vid of otherVids) {
+    if (!vid.channel_id || vid.channel_id === thisChannelId) continue;
+    const guests = videoToGuests.get(vid.video_id) ?? [];
+    for (const guest of guests) {
+      const key = `${guest.type}:${guest.slug}`;
+      if (!channelGuestMap.has(vid.channel_id)) {
+        channelGuestMap.set(vid.channel_id, new Set());
+        channelGuestDetails.set(vid.channel_id, new Map());
+      }
+      channelGuestMap.get(vid.channel_id)!.add(key);
+      channelGuestDetails.get(vid.channel_id)!.set(key, guest);
+    }
+  }
+
+  // Sort by shared guest count, take top 8
+  const ranked = Array.from(channelGuestMap.entries())
+    .map(([chId, guestKeys]) => ({
+      channelId: chId,
+      count: guestKeys.size,
+      guests: Array.from(channelGuestDetails.get(chId)!.values()),
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  if (ranked.length === 0) return [];
+
+  // Fetch channel names + avatars
+  const channelIds = ranked.map((r) => r.channelId);
+  const { data: channels } = await supabase
+    .from('uap_channels')
+    .select('channel_id, channel_name, avatar_url')
+    .in('channel_id', channelIds)
+    .eq('hidden', false);
+
+  const channelInfo = new Map(
+    (channels ?? []).map((c) => [c.channel_id, c]),
+  );
+
+  return ranked
+    .filter((r) => channelInfo.has(r.channelId))
+    .map((r) => {
+      const info = channelInfo.get(r.channelId)!;
+      return {
+        channelId: r.channelId,
+        channelName: info.channel_name,
+        avatarUrl: info.avatar_url ?? null,
+        sharedGuestCount: r.count,
+        sharedGuests: r.guests.slice(0, 5),
+        href: `/uap/channels/${r.channelId}`,
+      };
+    });
 }

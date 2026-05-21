@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, Play, ExternalLink, Eye, Shield, Zap, Radio, Clock, User, Users, Calendar, FileText, Building2 } from "lucide-react";
+import { ArrowLeft, Play, ExternalLink, Eye, Shield, Zap, Radio, Clock, User, Users, Calendar, FileText, Building2, Globe, Briefcase, Camera, BookMarked, LinkIcon } from "lucide-react";
 import Image from "next/image";
 import {
   getContacteeProfile,
@@ -50,13 +50,13 @@ const ENTITY_LABELS: Record<string, string> = {
   other: "Other Entity",
 };
 
-const SOCIAL_ICONS: Record<string, { label: string; icon: string }> = {
-  website: { label: "Website", icon: "🌐" },
-  youtube: { label: "YouTube", icon: "▶" },
-  twitter: { label: "Twitter / X", icon: "𝕏" },
-  instagram: { label: "Instagram", icon: "📸" },
-  facebook: { label: "Facebook", icon: "📘" },
-  linkedin: { label: "LinkedIn", icon: "💼" },
+const SOCIAL_ICONS: Record<string, { label: string; icon: React.ReactNode }> = {
+  website: { label: "Website", icon: <Globe className="w-4 h-4" /> },
+  youtube: { label: "YouTube", icon: <Play className="w-4 h-4" /> },
+  twitter: { label: "Twitter / X", icon: <span className="text-sm font-bold">𝕏</span> },
+  instagram: { label: "Instagram", icon: <Camera className="w-4 h-4" /> },
+  facebook: { label: "Facebook", icon: <BookMarked className="w-4 h-4" /> },
+  linkedin: { label: "LinkedIn", icon: <Briefcase className="w-4 h-4" /> },
 };
 
 // No generateStaticParams — pages render on-demand with fresh DB data,
@@ -385,7 +385,7 @@ export default async function ContacteeProfilePage({
             {/* ── Standardized Cross-Entity Links (canonical order) ── */}
             <div className="bg-white dark:bg-slate-900/60 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-8">
               <UapEntityLinkSection
-                icon={Radio}
+                icon="Radio"
                 title={`Featured on Channels (${linkedChannels.length})`}
                 description="Channels that have published videos featuring this experiencer."
                 entities={linkedChannels.map((ch) => ({
@@ -397,25 +397,25 @@ export default async function ContacteeProfilePage({
                 }))}
               />
               <UapEntityLinkSection
-                icon={User}
+                icon="User"
                 title={`Linked Persons of Interest (${linkedPersons.length})`}
                 description="These individuals are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not a direct relationship."
                 entities={linkedPersons}
               />
               <UapEntityLinkSection
-                icon={Calendar}
+                icon="Calendar"
                 title={`Linked Events (${linkedEvents.length})`}
                 description="These events are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not confirmed involvement."
                 entities={linkedEvents}
               />
               <UapEntityLinkSection
-                icon={Building2}
+                icon="Building2"
                 title={`Linked Organizations (${linkedOrgs.length})`}
                 description="These organizations are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not a confirmed affiliation."
                 entities={linkedOrgs}
               />
               <UapEntityLinkSection
-                icon={FileText}
+                icon="FileText"
                 title={`Linked Programs (${linkedPrograms.length})`}
                 description="These programs are discussed in the same videos featuring this experiencer. This reflects topical co-occurrence, not a confirmed connection."
                 entities={linkedPrograms}
@@ -436,7 +436,7 @@ export default async function ContacteeProfilePage({
                     label="Evidence Strength"
                     score={profile.avg_evidence_score}
                     max={28}
-                    icon={Shield}
+                    icon="Shield"
                     color="bg-green-500"
                     href="/uap/methodology/evidence-strength"
                   />
@@ -444,7 +444,7 @@ export default async function ContacteeProfilePage({
                     label="Contact Depth"
                     score={profile.avg_contact_depth}
                     max={32}
-                    icon={Zap}
+                    icon="Zap"
                     color="bg-emerald-500"
                     href="/uap/methodology/contact-depth"
                   />
@@ -452,7 +452,7 @@ export default async function ContacteeProfilePage({
                     label="Transformation"
                     score={profile.avg_transformation_score}
                     max={50}
-                    icon={Eye}
+                    icon="Eye"
                     color="bg-teal-500"
                     href="/uap/methodology/transformation"
                   />
@@ -544,7 +544,7 @@ export default async function ContacteeProfilePage({
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                           >
-                            <span>{social.icon}</span>
+                            {social.icon}
                             {social.label}
                             <ExternalLink className="w-3 h-3 ml-auto" />
                           </a>

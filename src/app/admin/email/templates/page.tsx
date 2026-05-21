@@ -53,7 +53,7 @@ We'll show you NDE videos that pique your curiosity and sense of exploration. St
 // Extra templates not tied to an NDE archetype
 const EXTRA_TEMPLATES = [
   { id: "newsletter_nde_welcome", icon: "✦", label: "NDE Welcome", note: "Sent when someone subscribes to the NDE Newsletter." },
-  { id: "newsletter_uap_welcome", icon: "🛸", label: "UAP Welcome", note: "Sent when someone subscribes to the UAP Newsletter." },
+  { id: "newsletter_uap_welcome", icon: "◎", label: "UAP Welcome", note: "Sent when someone subscribes to the UAP Newsletter." },
 ];
 
 export default function EmailTemplatesPage() {
@@ -227,7 +227,7 @@ export default function EmailTemplatesPage() {
             <div className="rounded-xl border border-border bg-card p-5 space-y-4">
               {/* Header */}
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-lg">{archData?.icon ?? "✉️"}</span>
+                <span className="text-lg">{archData?.icon ?? "✦"}</span>
                 <div>
                   <div className="font-semibold text-foreground text-sm">
                     {archData?.destinationLabel ?? EXTRA_TEMPLATES.find(t => t.id === selected)?.label ?? selected}

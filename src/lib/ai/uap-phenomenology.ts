@@ -483,7 +483,7 @@ export async function analyzeUapPhenomenology(subtitles: string): Promise<UapPhe
     const raw = JSON.parse(content);
 
     // ── DEBUG: Log raw LLM output before any processing ──
-    console.log('[uap-phenomenology] 🔍 RAW LLM OUTPUT DIAGNOSTICS:');
+    console.log('[uap-phenomenology] [DEBUG] RAW LLM OUTPUT DIAGNOSTICS:');
     console.log('  Top-level keys:', Object.keys(raw));
     console.log('  encounter_flow:', Array.isArray(raw.encounter_flow) ? `${raw.encounter_flow.length} phases` : typeof raw.encounter_flow);
     console.log('  entities:', Array.isArray(raw.entities) ? `${raw.entities.length} entities` : typeof raw.entities);

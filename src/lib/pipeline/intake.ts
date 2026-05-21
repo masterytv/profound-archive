@@ -510,7 +510,7 @@ async function updateIntakeStatus(
     // Fire Telegram alert if processing failed and bot/chat are configured
     if (status === 'failed' && process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
         try {
-            const text = `🚨 *Intake Pipeline Failure*\n\n*Video ID*: [${videoId}](https://youtube.com/watch?v=${videoId})\n*Error*: \`${error}\``;
+            const text = `[ALERT] *Intake Pipeline Failure*\n\n*Video ID*: [${videoId}](https://youtube.com/watch?v=${videoId})\n*Error*: \`${error}\``;
             const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
             await fetch(url, {

@@ -52,13 +52,13 @@ export default async function HomeNewPage() {
               href="/"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-violet-600 text-white font-medium hover:bg-violet-700 transition-colors shadow-lg shadow-violet-600/20"
             >
-              <span className="text-lg">🧠</span> Explore Near-Death Experiences
+              <Brain className="w-5 h-5" /> Explore Near-Death Experiences
             </Link>
             <Link 
               href="/uap"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
             >
-              <span className="text-lg">🔭</span> Explore UAP Encounters
+              <Telescope className="w-5 h-5" /> Explore UAP Encounters
             </Link>
           </div>
 

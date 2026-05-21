@@ -157,7 +157,7 @@ export const ARCHETYPES: Record<ArchetypeId, Archetype> = {
     label: "The Griever",
     destinationLabel: "The Healing Path",
     tagline: "You're here to find the peace you deserve.",
-    icon: "🕊",
+    icon: "♡",
     color: "blue",
     description:
       "You may have come looking for something the world rarely offers: honest, documented accounts that the person you lost didn't simply stop. You're not grasping at comfort. You're seeking something real. We'll email you NDE videos where people reconnect with the ones they love.",
@@ -171,7 +171,7 @@ export const ARCHETYPES: Record<ArchetypeId, Archetype> = {
     label: "The Spiritual Seeker",
     destinationLabel: "The Map of Meaning",
     tagline: "You already sense something vast. These accounts help you add to your map of it.",
-    icon: "🌌",
+    icon: "◎",
     color: "purple",
     description:
       "You likely approach NDEs not as proof you need, but as spiritual data from a territory you already partially know. You're building a coherent picture of consciousness and the afterlife. Each account adds another coordinate to a map you'll spend your life drawing. We'll send you NDE videos that explore the vastness of infinite love and answer the big questions.",
@@ -199,7 +199,7 @@ export const ARCHETYPES: Record<ArchetypeId, Archetype> = {
     label: "The Skeptic / Researcher",
     destinationLabel: "The Evidence Trail",
     tagline: "You're not asking for belief. You're interested in the evidence.",
-    icon: "🔬",
+    icon: "◉",
     color: "emerald",
     description:
       "You may be drawn to NDEs because the data is genuinely anomalous. People perceive events they couldn't have seen, but were later verified to be true. Academics call this Veridical Perception. Blind patients describing surgical instruments. Children describing relatives they never met. The standard explanations don't hold — and you're fascinated by exploring these kinds of NDEs. We'll send you videos with high levels of veridical perception — the evidence that there is something beyond the physical world.",
@@ -213,7 +213,7 @@ export const ARCHETYPES: Record<ArchetypeId, Archetype> = {
     label: "The Curious Bystander",
     destinationLabel: "The Open Door",
     tagline: "Curiosity led you here. You're open to exploring and sharing.",
-    icon: "🪐",
+    icon: "○",
     color: "sky",
     description:
       "You probably didn't arrive with a specific wound or mission. Something caught your attention and refused to let go. That instinct was correct. The archive runs very deep. We'll show you NDE videos that pique your curiosity and sense of exploration.",

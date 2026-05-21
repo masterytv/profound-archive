@@ -1127,7 +1127,7 @@ async function updateUapIntakeStatus(
     // Telegram alert on failure
     if (status === 'failed' && process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
         try {
-            const text = `🚨 *UAP Intake Pipeline Failure*\n\n*Video ID*: [${videoId}](https://youtube.com/watch?v=${videoId})\n*Error*: \`${error}\``;
+            const text = `[ALERT] *UAP Intake Pipeline Failure*\n\n*Video ID*: [${videoId}](https://youtube.com/watch?v=${videoId})\n*Error*: \`${error}\``;
             const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
             await fetch(url, {

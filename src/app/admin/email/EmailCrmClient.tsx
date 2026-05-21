@@ -38,7 +38,7 @@ const FREQ_LABELS: Record<string, string> = {
 // Newsletter archetypes (not in ARCHETYPES const)
 const NEWSLETTER_ENTRIES: { id: string; icon: string; label: string }[] = [
   { id: "newsletter_nde", icon: "✦", label: "NDE Newsletter" },
-  { id: "newsletter_uap", icon: "🛸", label: "UAP Newsletter" },
+  { id: "newsletter_uap", icon: "◎", label: "UAP Newsletter" },
 ];
 
 // ── Stat Card ─────────────────────────────────────────────────────────────
@@ -322,7 +322,7 @@ export function EmailCrmClient() {
             </optgroup>
             <optgroup label="Welcome Emails">
               <option value="newsletter_nde_welcome">✦ NDE Welcome</option>
-              <option value="newsletter_uap_welcome">🛸 UAP Welcome</option>
+              <option value="newsletter_uap_welcome">◎ UAP Welcome</option>
             </optgroup>
           </select>
           <select

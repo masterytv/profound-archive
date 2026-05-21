@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Brain, Heart, Eye, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Table,
@@ -90,7 +90,7 @@ export default function GreysonScalePage() {
                 {/* Cognitive Component */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">🧠 Cognitive Component (Items 1–4)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Brain className="w-5 h-5 text-violet-500" /> Cognitive Component (Items 1–4)</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="mb-4 text-muted-foreground">
@@ -128,7 +128,7 @@ export default function GreysonScalePage() {
                 {/* Affective Component */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">💖 Affective Component (Items 5–8)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Heart className="w-5 h-5 text-rose-500" /> Affective Component (Items 5–8)</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="mb-4 text-muted-foreground">
@@ -166,7 +166,7 @@ export default function GreysonScalePage() {
                 {/* Paranormal Component */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">👁️ Paranormal Component (Items 9–12)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Eye className="w-5 h-5 text-indigo-500" /> Paranormal Component (Items 9–12)</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="mb-4 text-muted-foreground">
@@ -204,7 +204,7 @@ export default function GreysonScalePage() {
                 {/* Transcendental Component */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">✨ Transcendental Component (Items 13–16)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" /> Transcendental Component (Items 13–16)</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="mb-4 text-muted-foreground">

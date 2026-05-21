@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Leaf, PersonStanding, Heart, Gem, Sparkles, Church, Feather, Telescope, Users, Compass } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Table,
@@ -179,7 +179,7 @@ export default function TransformationScalePage() {
                 {/* Domain Cards */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">1. 🌿 Appreciation for Life (AL)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Leaf className="w-5 h-5 text-green-500" /> 1. Appreciation for Life (AL)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -194,7 +194,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">2. 🪞 Self-Perception &amp; Identity (SI)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><PersonStanding className="w-5 h-5 text-sky-500" /> 2. Self-Perception &amp; Identity (SI)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -209,7 +209,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">3. 💛 Compassion &amp; Concern for Others (CC)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Heart className="w-5 h-5 text-amber-500" /> 3. Compassion &amp; Concern for Others (CC)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -224,7 +224,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">4. 💎 Values &amp; Priorities (VP)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Gem className="w-5 h-5 text-cyan-500" /> 4. Values &amp; Priorities (VP)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -239,7 +239,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">5. ✨ Spiritual Awareness (SA)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Sparkles className="w-5 h-5 text-yellow-500" /> 5. Spiritual Awareness (SA)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -254,7 +254,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">6. ⛪ Religious Orientation (RO)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Church className="w-5 h-5 text-stone-500" /> 6. Religious Orientation (RO)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -269,7 +269,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">7. 🕊️ Attitude Toward Death (AD)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Feather className="w-5 h-5 text-sky-400" /> 7. Attitude Toward Death (AD)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -284,7 +284,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">8. 🔮 Psychic &amp; Expanded Perception (PE)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Telescope className="w-5 h-5 text-purple-500" /> 8. Psychic &amp; Expanded Perception (PE)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -299,7 +299,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">9. 🤝 Relationships &amp; Social Dynamics (RS)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Users className="w-5 h-5 text-rose-500" /> 9. Relationships &amp; Social Dynamics (RS)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">
@@ -314,7 +314,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">10. 🧭 Purpose, Meaning &amp; Life Direction (PD)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Compass className="w-5 h-5 text-teal-500" /> 10. Purpose, Meaning &amp; Life Direction (PD)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">

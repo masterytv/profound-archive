@@ -12,10 +12,10 @@ import {
   Zap,
   Shield,
   Eye,
-  Rocket,
   FileText,
   Building2,
 } from "lucide-react";
+import { UfoIcon } from "@/components/icons/UfoIcon";
 
 export const revalidate = 86400;
 
@@ -70,7 +70,7 @@ interface ContacteeRef {
 const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string; bgColor: string; borderColor: string; icon: typeof Zap }> = {
   mass_sighting:      { label: "Mass Sighting",      color: "text-blue-400",    bgColor: "bg-blue-500/10",    borderColor: "border-blue-500/20",    icon: Eye },
   abduction:          { label: "Abduction",           color: "text-violet-400",  bgColor: "bg-violet-500/10",  borderColor: "border-violet-500/20",  icon: Zap },
-  crash_retrieval:    { label: "Crash Retrieval",     color: "text-red-400",     bgColor: "bg-red-500/10",     borderColor: "border-red-500/20",     icon: Rocket },
+  crash_retrieval:    { label: "Crash Retrieval",     color: "text-red-400",     bgColor: "bg-red-500/10",     borderColor: "border-red-500/20",     icon: UfoIcon },
   military_encounter: { label: "Military Encounter",  color: "text-amber-400",   bgColor: "bg-amber-500/10",   borderColor: "border-amber-500/20",   icon: Shield },
   contact:            { label: "Contact",             color: "text-emerald-400", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20", icon: Users },
   disclosure:         { label: "Disclosure",          color: "text-cyan-400",    bgColor: "bg-cyan-500/10",    borderColor: "border-cyan-500/20",    icon: FileText },

@@ -139,7 +139,7 @@ export async function getContacteeList(options?: {
   limit?: number;
 }): Promise<ContacteeListItem[]> {
   const supabase = buildClient();
-  const { sort = 'views', limit = 200 } = options || {};
+  const { sort = 'views', limit = 2000 } = options || {};
 
   // Determine sort column
   let orderCol: string;
@@ -154,16 +154,28 @@ export async function getContacteeList(options?: {
     default: orderCol = 'total_views'; break;
   }
 
-  const { data, error } = await supabase
-    .from('uap_contactee_profiles')
-    .select('id, slug, display_name, photo_url, experience_type, entity_types, recurrence, video_ids, avg_evidence_score, avg_contact_depth, avg_transformation_score, total_views, contribution_label, highlight_quote, first_shared_year')
-    .not('published_at', 'is', null)
-    .order(orderCol, { ascending, nullsFirst: false })
-    .limit(limit);
+  // Supabase PostgREST caps at 1000 rows per request.
+  // Paginate in batches to fetch all published profiles.
+  const BATCH_SIZE = 1000;
+  let allData: any[] = [];
+  let from = 0;
 
-  if (error || !data) return [];
+  while (from < limit) {
+    const to = Math.min(from + BATCH_SIZE - 1, limit - 1);
+    const { data, error } = await supabase
+      .from('uap_contactee_profiles')
+      .select('id, slug, display_name, photo_url, experience_type, entity_types, recurrence, video_ids, avg_evidence_score, avg_contact_depth, avg_transformation_score, total_views, contribution_label, highlight_quote, first_shared_year')
+      .not('published_at', 'is', null)
+      .order(orderCol, { ascending, nullsFirst: false })
+      .range(from, to);
 
-  return data.map((p: any) => ({
+    if (error || !data || data.length === 0) break;
+    allData = allData.concat(data);
+    if (data.length < BATCH_SIZE) break; // Last page
+    from += BATCH_SIZE;
+  }
+
+  return allData.map((p: any) => ({
     id: p.id,
     slug: p.slug,
     display_name: p.display_name,
