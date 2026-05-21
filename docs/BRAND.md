@@ -198,6 +198,15 @@ All icons use [Lucide React](https://lucide.dev/). Standard sizes:
 | Explorer header badges | `w-6 h-6` |
 | Breadcrumb separators | `w-3.5 h-3.5` |
 
+### Banned Icons
+
+The following Lucide icons are **permanently banned** site-wide. Do not use them in any context:
+
+| Banned Icon | Reason | Use Instead |
+|-------------|--------|-------------|
+| `Sparkles` | Overused AI cliché; undermines credibility of a research platform | Context-dependent: `Cpu` (AI/analysis), `Sun` (illumination), `Zap` (energy/power), `FlaskConical` (research) |
+| `Sparkle` | Same as above (singular variant) | Same alternatives as above |
+
 ---
 
 ## 7. Global CSS
