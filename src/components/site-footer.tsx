@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function SiteFooter() {
   return (
@@ -7,14 +8,22 @@ export default function SiteFooter() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-start gap-1.5 mb-2">
-              <h3
-                className="text-lg font-bold text-slate-900 dark:text-slate-100"
-                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-              >
-                Project Profound
-              </h3>
-              <span className="mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
+            <div className="flex items-start gap-2 mb-2">
+              <Image
+                src="/logo-new-dark.png"
+                alt="Project Profound"
+                width={150}
+                height={35}
+                className="h-7 w-auto dark:hidden"
+              />
+              <Image
+                src="/logo-new-light.png"
+                alt="Project Profound"
+                width={150}
+                height={35}
+                className="h-7 w-auto hidden dark:block"
+              />
+              <span className="mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
                 BETA
               </span>
             </div>

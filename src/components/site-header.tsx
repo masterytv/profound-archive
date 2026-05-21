@@ -122,20 +122,24 @@ export default function SiteHeader() {
         <div className="flex items-center justify-between h-16">
           {/* ─── Logo ─── */}
           <Link href="/" className="flex items-center gap-2.5 group">
+            {/* Dark logo for light mode */}
             <Image
-              src="/logo-transparent.png"
+              src="/logo-new-dark.png"
               alt="Project Profound logo"
-              width={36}
-              height={36}
-              className="w-9 h-9"
+              width={180}
+              height={42}
+              className="h-8 w-auto dark:hidden"
               priority
             />
-            <span
-              className="text-xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
-              style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-            >
-              Project Profound
-            </span>
+            {/* Light logo for dark mode */}
+            <Image
+              src="/logo-new-light.png"
+              alt="Project Profound logo"
+              width={180}
+              height={42}
+              className="h-8 w-auto hidden dark:block"
+              priority
+            />
             <span className="self-start mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
               BETA
             </span>
@@ -562,20 +566,23 @@ export default function SiteHeader() {
               <div className="flex flex-col h-full">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-100">
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2">
+                    {/* Dark logo for light mode */}
                     <Image
-                      src="/logo-transparent.png"
+                      src="/logo-new-dark.png"
                       alt="Project Profound logo"
-                      width={32}
-                      height={32}
-                      className="w-8 h-8"
+                      width={140}
+                      height={33}
+                      className="h-7 w-auto dark:hidden"
                     />
-                    <span
-                      className="text-lg font-bold text-slate-900 dark:text-white"
-                      style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-                    >
-                      Project Profound
-                    </span>
+                    {/* Light logo for dark mode */}
+                    <Image
+                      src="/logo-new-light.png"
+                      alt="Project Profound logo"
+                      width={140}
+                      height={33}
+                      className="h-7 w-auto hidden dark:block"
+                    />
                     <span className="self-start mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
                       BETA
                     </span>

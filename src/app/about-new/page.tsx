@@ -143,8 +143,9 @@ export default function AboutNewPage() {
           style={{ backgroundImage: "radial-gradient(circle, #8b5cf6 1px, transparent 1px)", backgroundSize: "32px 32px" }}
         />
         <div className="relative container mx-auto px-4 py-20 md:py-28 max-w-4xl text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/10 shadow-lg flex items-center justify-center mx-auto mb-8 border border-slate-200/60 dark:border-white/10">
-            <Image src="/logo-transparent.png" alt="Project Profound" width={40} height={40} priority />
+          <div className="px-6 py-3 rounded-2xl bg-white dark:bg-white/10 shadow-lg inline-flex items-center justify-center mx-auto mb-8 border border-slate-200/60 dark:border-white/10">
+            <Image src="/logo-new-dark.png" alt="Project Profound" width={200} height={47} className="h-10 w-auto dark:hidden" priority />
+            <Image src="/logo-new-light.png" alt="Project Profound" width={200} height={47} className="h-10 w-auto hidden dark:block" priority />
           </div>
           <h1
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-6 leading-[1.1]"
