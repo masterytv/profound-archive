@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChannelUniverseMapWithLinks } from "@/components/uap/ChannelUniverseMap";
-import type { ChannelScorePoint } from "@/components/uap/ChannelUniverseMap";
+import type { ChannelScorePoint, TrajectoryData } from "@/components/uap/ChannelUniverseMap";
 
 // ─── Quadrant config ────────────────────────────────────────────────────────
 
@@ -45,8 +45,10 @@ const QUADRANTS = [
 
 export function InteractiveUniverseSection({
   channels,
+  trajectories,
 }: {
   channels: ChannelScorePoint[];
+  trajectories?: TrajectoryData;
 }) {
   const [hoveredQuadrant, setHoveredQuadrant] = useState<string | null>(null);
 
@@ -80,6 +82,7 @@ export function InteractiveUniverseSection({
         <ChannelUniverseMapWithLinks
           channels={channels}
           highlightedQuadrant={hoveredQuadrant}
+          trajectories={trajectories}
         />
       </div>
     </>

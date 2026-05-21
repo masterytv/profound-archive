@@ -181,3 +181,63 @@ H = -SUM(p_i * ln(p_i))
 ```
 
 Where `p_i` is the proportion of each content_type in the channel's archive. Higher H = more diverse. Normalize to 0-1 by dividing by ln(N) where N = number of distinct content types in the entire archive.
+
+---
+
+## Guest Prominence Index (GPI)
+
+**Definition:** Composite metric measuring the caliber of guests/persons of interest featured on a channel per year.
+
+**Formula:**
+```
+normalized_cred = (avg_credibility_score / 85) × 100
+normalized_mentions = ln(avg_mentions + 1) / ln(max_mentions + 1) × 100
+
+GPI = normalized_cred × 0.6 + normalized_mentions × 0.4
+```
+
+- `avg_credibility_score` is per-person from `uap_canonical_persons.avg_credibility_score` (0–85 range)
+- `total_mentions` is cross-archive count from `uap_canonical_persons.total_mentions`
+- If no credibility data exists for that year's guests, GPI falls back to 100% normalized_mentions
+- Log normalization prevents high-mention outliers (Elizondo, Grusch) from dominating
+
+**Data Sources:** `uap_canonical_persons.avg_credibility_score`, `uap_canonical_persons.total_mentions`, `uap_canonical_persons.linked_video_ids`, `uap_vids.date`
+
+---
+
+## Score History (Trajectory Tracking)
+
+**Table:** `uap_channel_score_history`
+
+Monthly snapshots of `uap_channel_scores` for trajectory visualization.
+
+| Column | Type | Description |
+|---|---|---|
+| channel_id | TEXT | FK to uap_channels |
+| snapshot_month | DATE | First of month (e.g. 2026-05-01) |
+| intelligence_value | NUMERIC(5,1) | Y-axis score at that month |
+| credibility_score | NUMERIC(5,1) | X-axis score at that month |
+| encounter_depth | NUMERIC(5,1) | Encounter depth at snapshot |
+| impact_score | NUMERIC(5,1) | Impact score at snapshot |
+| authority_score | NUMERIC(5,1) | Composite authority |
+| letter_grade | TEXT | Grade at snapshot |
+
+**Cron:** `POST /api/cron/channel-score-snapshot` — runs 1st of each month via GHA.
+**Trajectory arrows:** Compare current position to 12-month-ago snapshot. Green arrow = improvement, gray = decline. Only rendered if movement ≥2 units on either axis.
+
+---
+
+## Automated Recomputation
+
+Scores are recomputed weekly via pg_cron:
+
+| Schedule | Job | Endpoint |
+|---|---|---|
+| **Sundays 5:00 UTC** | Entity Normalization | `POST /api/cron/normalize-entities` |
+| **Sundays 5:30 UTC** | Channel Score Recomputation | `POST /api/cron/recompute-channel-scores` |
+
+**Entity normalization runs first** so channel scores are computed against deduplicated data.
+
+**Implementation:** `src/lib/pipeline/compute-channel-scores.ts` (scores), `src/lib/pipeline/normalize-entities.ts` (entities).
+
+**pg_cron triggers:** `trigger_recompute_channel_scores()`, `trigger_normalize_entities()` — use Vault secrets `uap_processor_url` + `uap_processor_cron_secret`.

@@ -28,7 +28,7 @@ import { UapVideoCard } from "@/components/uap-explore/UapVideoCard";
 import { UapGridControls } from "@/components/uap-explore/UapGridControls";
 import type { UapExploreItem } from "@/components/uap-explore/types";
 import { ChannelUniverseMap } from "@/components/uap/ChannelUniverseMap";
-import type { ChannelScorePoint } from "@/components/uap/ChannelUniverseMap";
+import type { ChannelScorePoint, TrajectoryData } from "@/components/uap/ChannelUniverseMap";
 import { ChannelFocusChart } from "@/components/uap/ChannelScorecard";
 import { ChannelRankingsBox } from "@/components/uap/ChannelRankingsBox";
 import { ChannelArchetypeBadges, ChannelPersonalityBadge } from "@/components/uap/ChannelIdentity";
@@ -44,6 +44,8 @@ import { SpeakerRolodex } from "@/components/uap/SpeakerRolodex";
 import type { SpeakerRolodexData } from "@/components/uap/SpeakerRolodex";
 import { CrossChannelOverlap } from "@/components/uap/CrossChannelOverlap";
 import { BadgeEmbed } from "@/components/uap/BadgeEmbed";
+import { GuestTrajectory } from "@/components/uap/GuestTrajectory";
+import type { GuestProminencePoint } from "@/components/uap/GuestTrajectory";
 
 export const revalidate = 86400; // ISR: revalidate once per day
 
@@ -156,6 +158,137 @@ async function getAllChannelScoresForMap() {
     subscriber_count: channelMap[d.channel_id as string]?.subscriber_count ?? null,
     avatar_url: channelMap[d.channel_id as string]?.avatar_url ?? null,
   })) as ChannelScorePoint[];
+}
+
+// Fetch trajectory data: 12-month-ago score snapshot for this channel
+async function getChannelTrajectory(channelId: string): Promise<TrajectoryData> {
+  const supabase = buildClient();
+  const now = new Date();
+  // 12 months ago, first of that month
+  const targetDate = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+  const targetMonth = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-01`;
+
+  const { data } = await supabase
+    .from("uap_channel_score_history")
+    .select("channel_id, intelligence_value, credibility_score")
+    .eq("channel_id", channelId)
+    .eq("snapshot_month", targetMonth)
+    .single();
+
+  if (!data) return {};
+
+  return {
+    [channelId]: {
+      prevIntelligence: Number(data.intelligence_value),
+      prevCredibility: Number(data.credibility_score),
+    },
+  };
+}
+
+/**
+ * Compute Guest Prominence Index (GPI) by year.
+ * GPI = weighted composite of avg_credibility_score (0-85, when available) and
+ * total_mentions (cross-archive prominence). Formula:
+ *   GPI = (normalized_credibility * 0.6) + (normalized_mentions * 0.4)
+ * Both components normalized to 0-100 scale.
+ */
+async function getGuestTrajectoryData(
+  channelId: string,
+  allVideoIds: string[],
+): Promise<GuestProminencePoint[]> {
+  if (allVideoIds.length === 0) return [];
+
+  const supabase = buildClient();
+
+  // Get videos with dates for this channel
+  const { data: videos } = await supabase
+    .from("uap_vids")
+    .select("video_id, date")
+    .eq("channel_id", channelId)
+    .in("tier", [1, 2])
+    .not("date", "is", null);
+
+  if (!videos || videos.length === 0) return [];
+
+  // Map video_id -> year
+  const videoYearMap: Record<string, string> = {};
+  for (const v of videos) {
+    const d = new Date(v.date);
+    if (!isNaN(d.getTime())) {
+      videoYearMap[v.video_id] = String(d.getFullYear());
+    }
+  }
+
+  // Get all persons linked to these videos
+  const { data: persons } = await supabase
+    .from("uap_canonical_persons")
+    .select("canonical_name, total_mentions, avg_credibility_score, linked_video_ids")
+    .not("linked_video_ids", "is", null);
+
+  if (!persons || persons.length === 0) return [];
+
+  // For each year, find persons who appeared in that year's videos
+  const channelVideoIdSet = new Set(allVideoIds);
+  const yearlyGuests: Record<string, { credScores: number[]; mentions: number[]; count: number }> = {};
+
+  for (const person of persons) {
+    const linkedIds = person.linked_video_ids as string[] | null;
+    if (!linkedIds) continue;
+
+    // Find which years this person appeared in this channel's videos
+    const yearsAppeared = new Set<string>();
+    for (const vid of linkedIds) {
+      if (channelVideoIdSet.has(vid) && videoYearMap[vid]) {
+        yearsAppeared.add(videoYearMap[vid]);
+      }
+    }
+
+    for (const year of yearsAppeared) {
+      if (!yearlyGuests[year]) yearlyGuests[year] = { credScores: [], mentions: [], count: 0 };
+      yearlyGuests[year].count++;
+      yearlyGuests[year].mentions.push(person.total_mentions ?? 1);
+      if (person.avg_credibility_score != null) {
+        yearlyGuests[year].credScores.push(Number(person.avg_credibility_score));
+      }
+    }
+  }
+
+  // Compute GPI for each year
+  const years = Object.keys(yearlyGuests).sort();
+  if (years.length < 2) return [];
+
+  // Get archive-wide max mentions for normalization
+  const allMentions = persons.map((p) => p.total_mentions ?? 1);
+  const maxMentions = Math.max(...allMentions, 1);
+
+  return years.map((year): GuestProminencePoint => {
+    const yearData = yearlyGuests[year];
+    const avgMentions = yearData.mentions.reduce((a, b) => a + b, 0) / yearData.mentions.length;
+    const avgCred = yearData.credScores.length > 0
+      ? yearData.credScores.reduce((a, b) => a + b, 0) / yearData.credScores.length
+      : null;
+
+    // Normalize mentions to 0-100 (log scale to avoid outlier dominance)
+    const normalizedMentions = (Math.log(avgMentions + 1) / Math.log(maxMentions + 1)) * 100;
+
+    // Normalize credibility (already 0-85 range → scale to 0-100)
+    const normalizedCred = avgCred != null ? (avgCred / 85) * 100 : null;
+
+    // GPI: weighted composite
+    // If credibility data exists: 60% cred + 40% mentions
+    // If no credibility data: 100% mentions
+    const gpi = normalizedCred != null
+      ? normalizedCred * 0.6 + normalizedMentions * 0.4
+      : normalizedMentions;
+
+    return {
+      year,
+      gpi: Math.round(gpi * 10) / 10,
+      guestCount: yearData.count,
+      avgCredibility: avgCred,
+      avgMentions: Math.round(avgMentions * 10) / 10,
+    };
+  });
 }
 
 async function getChannelVideos(
@@ -315,12 +448,13 @@ export default async function UapChannelDetailPage({
   const tier = parseInt((sp.tier as string) || "0", 10);
   const query = ((sp.q as string) || "").trim();
 
-  // Fetch videos, cross-entity links, and channel scores in parallel
+  // Fetch videos, cross-entity links, channel scores, and trajectory in parallel
   const [
     { videos: rawVideos, totalCount },
     allVideosForLinks,
     channelScores,
     allChannelScores,
+    trajectoryData,
   ] = await Promise.all([
     getChannelVideos(handle, sort, direction, page, tier, query),
     // Get ALL video IDs for this channel (for cross-entity link discovery)
@@ -335,6 +469,7 @@ export default async function UapChannelDetailPage({
     })(),
     getChannelScores(handle),
     getAllChannelScoresForMap(),
+    getChannelTrajectory(handle),
   ]);
 
   const totalChannels = allChannelScores.length;
@@ -545,6 +680,9 @@ export default async function UapChannelDetailPage({
     })(),
   ]);
 
+  // Fetch guest trajectory data in parallel (depends on allVideosForLinks)
+  const guestTrajectoryData = await getGuestTrajectoryData(handle, allVideosForLinks);
+
   // Build Speaker Rolodex data from already-fetched entity links
   const topSpeakers: SpeakerRolodexData["topSpeakers"] = [
     ...linkedPersons.slice(0, 5).map((p) => ({
@@ -719,6 +857,9 @@ export default async function UapChannelDetailPage({
             {/* Guest Network */}
             <SpeakerRolodex data={speakerRolodexData} />
 
+            {/* Guest Quality Trajectory */}
+            <GuestTrajectory data={guestTrajectoryData} />
+
             {/* Content Diversity + What Makes This Channel Unique — side by side */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {channelScores.diversity_index != null && (
@@ -746,7 +887,28 @@ export default async function UapChannelDetailPage({
                   channels={allChannelScores}
                   highlightChannelId={channel.channel_id}
                   compact
+                  trajectories={trajectoryData}
                 />
+                {/* Trajectory narrative */}
+                {trajectoryData[channel.channel_id] && channelScores && (
+                  <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/[0.03] rounded-lg p-3 border border-slate-200/40 dark:border-white/5">
+                    <p>
+                      <strong className="text-slate-700 dark:text-slate-300">12-Month Trajectory:</strong>{" "}
+                      {(() => {
+                        const prev = trajectoryData[channel.channel_id];
+                        const currI = Number(channelScores.intelligence_value);
+                        const currC = Number(channelScores.credibility_score);
+                        const deltaI = currI - prev.prevIntelligence;
+                        const deltaC = currC - prev.prevCredibility;
+                        const pctI = prev.prevIntelligence > 0 ? (deltaI / prev.prevIntelligence * 100).toFixed(0) : "N/A";
+                        const pctC = prev.prevCredibility > 0 ? (deltaC / prev.prevCredibility * 100).toFixed(0) : "N/A";
+                        const iDir = deltaI > 0.5 ? "up" : deltaI < -0.5 ? "down" : "stable";
+                        const cDir = deltaC > 0.5 ? "up" : deltaC < -0.5 ? "down" : "stable";
+                        return `Intelligence Value ${iDir === "stable" ? "held steady" : `moved ${iDir} ${Math.abs(Number(pctI))}%`}. Speaker Credibility ${cDir === "stable" ? "held steady" : `moved ${cDir} ${Math.abs(Number(pctC))}%`}.`;
+                      })()}
+                    </p>
+                  </div>
+                )}
                 <div className="mt-3 text-center">
                   <Link
                     href="/uap/channels/universe"

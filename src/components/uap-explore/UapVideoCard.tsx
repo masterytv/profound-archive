@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp, Eye, ExternalLink, Radio } from "lucide-react";
 import { UfoIcon } from "@/components/icons/UfoIcon";
 import type { UapExploreItem } from "./types";
-import { CONTENT_TYPE_LABELS } from "./types";
+import { CONTENT_TYPE_LABELS, formatLabel } from "./types";
 
 interface UapVideoCardProps {
   video: UapExploreItem;
@@ -56,7 +56,7 @@ export function UapVideoCard({
     ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800"
     : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10";
 
-  const contentLabel = CONTENT_TYPE_LABELS[video.content_type ?? ""] ?? video.content_type?.replace(/_/g, " ") ?? "";
+  const contentLabel = formatLabel(video.content_type ?? "", CONTENT_TYPE_LABELS);
 
   return (
     <div
@@ -155,7 +155,7 @@ export function UapVideoCard({
               )}
               {video.experience_type && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
-                  {video.experience_type.replace(/_/g, " ")}
+                  {formatLabel(video.experience_type, {})}
                 </span>
               )}
               {video.hynek_type && (
@@ -165,7 +165,7 @@ export function UapVideoCard({
               )}
               {video.overall_tone && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                  {video.overall_tone.replace(/_/g, " ")}
+                  {formatLabel(video.overall_tone, {})}
                 </span>
               )}
             </div>

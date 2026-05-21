@@ -89,6 +89,8 @@ export const CONTENT_TYPE_LABELS: Record<string, string> = {
   program_disclosure: "Disclosure",
   interview: "Interview",
   documentary_survey: "Documentary",
+  news_commentary: "News & Commentary",
+  investigative_journalism: "Investigative Journalism",
   out_of_scope: "Other",
 };
 
@@ -182,17 +184,37 @@ export const HYNEK_LABELS: Record<string, string> = {
 
 export const ENTITY_TYPE_LABELS: Record<string, string> = {
   grey: "Grey",
+  tall_grey: "Tall Grey",
   mantis: "Mantis",
   reptilian: "Reptilian",
   nordic: "Nordic",
   humanoid: "Humanoid",
   hybrid: "Hybrid",
   light_being: "Light Being",
+  blue_being: "Blue Being",
   shadow_entity: "Shadow Entity",
   robotic: "Robotic/Mechanical",
   insectoid: "Insectoid",
+  insectoid_other: "Insectoid (Other)",
+  tall_white: "Tall White",
+  hooded_cloaked: "Hooded/Cloaked",
+  demonic: "Demonic",
+  angelic: "Angelic",
+  amorphous: "Amorphous",
   unknown: "Unknown",
 };
+
+/**
+ * Auto-format unknown snake_case values as Title Case.
+ * Fallback for any new values the AI generates that aren't in our label maps.
+ */
+export function formatLabel(value: string, labels: Record<string, string>): string {
+  if (labels[value]) return labels[value];
+  // Auto-format: replace underscores with spaces, title-case each word
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export const RECURRENCE_LABELS: Record<string, string> = {
   single_event: "Single Event",

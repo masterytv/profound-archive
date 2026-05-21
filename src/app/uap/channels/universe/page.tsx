@@ -2,7 +2,7 @@ import { createClient as createAnonClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
-import type { ChannelScorePoint } from "@/components/uap/ChannelUniverseMap";
+import type { ChannelScorePoint, TrajectoryData } from "@/components/uap/ChannelUniverseMap";
 import { InteractiveUniverseSection } from "@/components/uap/InteractiveUniverseSection";
 
 export const revalidate = 86400; // ISR: once per day
@@ -56,8 +56,35 @@ async function getAllChannelScores(): Promise<ChannelScorePoint[]> {
     })) as ChannelScorePoint[];
 }
 
+// Fetch 12-month-ago snapshots for ALL channels (for trajectory arrows)
+async function getAllChannelTrajectories(): Promise<TrajectoryData> {
+  const supabase = buildClient();
+  const now = new Date();
+  const targetDate = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+  const targetMonth = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-01`;
+
+  const { data } = await supabase
+    .from("uap_channel_score_history")
+    .select("channel_id, intelligence_value, credibility_score")
+    .eq("snapshot_month", targetMonth);
+
+  if (!data || data.length === 0) return {};
+
+  const result: TrajectoryData = {};
+  for (const row of data) {
+    result[row.channel_id] = {
+      prevIntelligence: Number(row.intelligence_value),
+      prevCredibility: Number(row.credibility_score),
+    };
+  }
+  return result;
+}
+
 export default async function ChannelUniversePage() {
-  const channels = await getAllChannelScores();
+  const [channels, trajectories] = await Promise.all([
+    getAllChannelScores(),
+    getAllChannelTrajectories(),
+  ]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -104,7 +131,7 @@ export default async function ChannelUniversePage() {
           </p>
         </div>
 
-        <InteractiveUniverseSection channels={channels} />
+        <InteractiveUniverseSection channels={channels} trajectories={trajectories} />
 
         {/* Stats */}
         <div className="mt-6 text-center text-xs text-slate-400 dark:text-slate-500">

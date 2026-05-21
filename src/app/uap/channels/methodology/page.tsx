@@ -364,6 +364,85 @@ export default function ChannelMethodologyPage() {
           </p>
         </section>
 
+        {/* ─── Guest Prominence Index ─── */}
+        <section className="mb-12">
+          <h2
+            className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4"
+            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+          >
+            Guest Prominence Index (GPI)
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+            The Guest Quality Over Time chart on each channel page tracks the caliber of guests
+            and persons of interest featured on that channel year by year. It uses a composite
+            metric called the <strong>Guest Prominence Index (GPI)</strong>.
+          </p>
+
+          <h3 className="text-base font-bold text-slate-700 dark:text-slate-300 mb-3">
+            How GPI is Calculated
+          </h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+            For each year, we identify every person of interest who appeared in the channel&apos;s
+            videos that year. Each person contributes two signals:
+          </p>
+          <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-2 ml-4 list-disc mb-4">
+            <li>
+              <strong>Credibility Score (60% weight)</strong> — Each person of interest in our archive
+              has an <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">avg_credibility_score</code>{" "}
+              (0–85) computed from the evidence quality and sourcing standards of videos they appear in.
+              This is normalized to a 0–100 scale. When credibility data is available, it receives
+              60% weight in the GPI calculation.
+            </li>
+            <li>
+              <strong>Cross-Archive Mentions (40% weight)</strong> — How many total videos across the
+              <em> entire archive</em> mention this person (the{" "}
+              <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">total_mentions</code>{" "}
+              field). This is normalized using a logarithmic scale to prevent outliers like frequently
+              discussed figures from dominating. Higher mentions indicate a more prominent figure in
+              the UAP discourse. When credibility data is available, this receives 40% weight.
+            </li>
+          </ul>
+
+          <div className="bg-slate-50 dark:bg-white/5 rounded-lg p-4 border border-slate-200/60 dark:border-white/10 mb-4">
+            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+              Formula
+            </h4>
+            <div className="font-mono text-xs text-slate-600 dark:text-slate-400 space-y-1">
+              <p>normalized_cred = (avg_credibility_score / 85) × 100</p>
+              <p>normalized_mentions = (ln(avg_mentions + 1) / ln(max_mentions + 1)) × 100</p>
+              <p className="pt-2 font-bold">
+                GPI = normalized_cred × 0.6 + normalized_mentions × 0.4
+              </p>
+              <p className="text-slate-400 dark:text-slate-500 pt-1">
+                (If no credibility data exists for that year&apos;s guests: GPI = normalized_mentions)
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 p-4">
+              <h4 className="text-sm font-bold text-green-700 dark:text-green-300 mb-2">
+                Rising GPI
+              </h4>
+              <p className="text-xs text-green-600 dark:text-green-400 leading-relaxed">
+                The channel is increasingly featuring well-known, credible figures in the UAP field.
+                This often correlates with the channel building legitimacy and industry connections
+                over time.
+              </p>
+            </div>
+            <div className="rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4">
+              <h4 className="text-sm font-bold text-amber-700 dark:text-amber-300 mb-2">
+                Declining GPI
+              </h4>
+              <p className="text-xs text-amber-600 dark:text-amber-400 leading-relaxed">
+                The channel may be shifting toward lesser-known guests or new voices. This isn&apos;t
+                inherently negative — it could indicate the channel is platforming emerging
+                experiencers not yet widely discussed elsewhere.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* ─── Data Sources ─── */}
         <section className="mb-12">
           <h2

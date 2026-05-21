@@ -1,0 +1,19 @@
+name: Channel Score Snapshot (Monthly)
+
+on:
+  schedule:
+    # 1st of every month at 3am ET (7am UTC)
+    - cron: "0 7 1 * *"
+  workflow_dispatch: {}
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Snapshot channel scores
+        run: |
+          curl -s -X POST \
+            "${{ secrets.APP_DIRECT_URL }}/api/cron/channel-score-snapshot" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" | jq .

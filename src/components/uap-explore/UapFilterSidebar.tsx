@@ -30,6 +30,7 @@ import {
   CONTENT_TYPE_LABELS,
   RECURRENCE_LABELS,
   DECADE_LABELS,
+  formatLabel,
 } from "./types";
 
 // ─── URL Param Helpers ───────────────────────────────────────────────────────
@@ -109,7 +110,7 @@ function FilterChips({
     <div className="flex flex-wrap gap-1.5">
       {items.map((item) => {
         const isActive = selected.includes(item.value);
-        const label = labels[item.value] || item.value;
+        const label = formatLabel(item.value, labels);
         return (
           <button
             key={item.value}
@@ -348,7 +349,7 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
                       : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
                   )}
                 >
-                  {RECURRENCE_LABELS[item.value] || item.value}
+                  {formatLabel(item.value, RECURRENCE_LABELS)}
                   <span
                     className={cn(
                       "text-[10px]",
@@ -512,7 +513,7 @@ export function UapFilterSidebar({ facets, variant, className }: UapFilterSideba
                     : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
                 )}
               >
-                {DECADE_LABELS[item.value] || item.value}
+                {formatLabel(item.value, DECADE_LABELS)}
                 <span
                   className={cn(
                     "text-[10px]",

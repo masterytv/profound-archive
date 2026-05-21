@@ -1127,9 +1127,9 @@ For every UAP file you create:
 > Enhancement to Channel Universe Map: show where channel WAS 12 months ago → where it IS now.
 > "This channel moved 15% higher on the Intelligence axis since last year."
 
-- [ ] Story 14.1.1: Add historical score snapshots — monthly snapshot table `uap_channel_score_history` storing Intelligence Value + Credibility per channel per month. GHA or pg_cron to snapshot monthly (0.5d)
-- [ ] Story 14.1.2: Update `ChannelUniverseMap` — render trajectory arrow from 12-month-ago position to current position. Arrow color: green if improved, neutral if static (0.5d)
-- [ ] Story 14.1.3: Add trajectory narrative to channel detail — "This channel moved X% on Intelligence and Y% on Credibility since [date]" (0.25d)
+- [x] Story 14.1.1: Add historical score snapshots — monthly snapshot table `uap_channel_score_history` storing Intelligence Value + Credibility per channel per month. GHA cron to snapshot monthly. API route `POST /api/cron/channel-score-snapshot` (0.5d) ✅ 2026-05-21
+- [x] Story 14.1.2: Update `ChannelUniverseMap` — render trajectory arrow from 12-month-ago position to current position via `Customized` SVG layer. Arrow color: green if improved, gray if declined. Only shows for ≥2 unit movement. Forwarded through `InteractiveUniverseSection` and both map variants (0.5d) ✅ 2026-05-21
+- [x] Story 14.1.3: Add trajectory narrative to channel detail — "Intelligence Value moved up X%. Speaker Credibility held steady." Shown below universe map when historical data exists (0.25d) ✅ 2026-05-21
 - **Done when:** Channel universe map shows trajectory arrows for channels with ≥2 months of history.
 
 ---
@@ -1192,9 +1192,9 @@ For every UAP file you create:
 > Are they attracting more credible guests over time?
 > Requires historical score snapshots from Epic 14.1.
 
-- [ ] Story 14.6.1: Compute guest credibility by time period — avg person prominence score by year for channel's videos (0.5d)
-- [ ] Story 14.6.2: Build `GuestTrajectory` component — line chart showing guest credibility trend over time (0.5d)
-- [ ] Story 14.6.3: Integrate into channel detail page — "Guest Quality" section (0.25d)
+- [x] Story 14.6.1: Compute Guest Prominence Index (GPI) by year — composite metric: avg_credibility_score (60% weight, 0-85 → 0-100) + total_mentions (40% weight, log-normalized). Computed per-year from `uap_canonical_persons` linked to channel's videos (0.5d) ✅ 2026-05-21
+- [x] Story 14.6.2: Build `GuestTrajectory` component — recharts LineChart with gradient fill, custom tooltip showing GPI + guest count + avg credibility + avg mentions. TrendIndicator shows up/down/stable label. Requires ≥2 years data (0.5d) ✅ 2026-05-21
+- [x] Story 14.6.3: Integrate into channel detail page after SpeakerRolodex. Added GPI methodology section to `/uap/channels/methodology` page. Updated `docs/channel-scores.md` with GPI formula and score history table documentation (0.25d) ✅ 2026-05-21
 - **Done when:** Channels with multi-year data show a guest credibility trend line.
 
 ---
@@ -1217,7 +1217,7 @@ For every UAP file you create:
 
 - [ ] **Video Tone Backfill** — `video_tone` was missing from the merge in `uap-program-intel.ts` (line 563). All 1,528 analyzed videos have `video_tone = 'neutral'` in `uap_video_stats`. Root cause fixed (2026-05-19), but existing data needs re-analysis. Options: (A) re-run only Pass 3 to cheaply extract tones, or (B) full re-analysis via `uap-reanalyze-all.ts`. After backfill, re-enable the Video Tone filter in `UapFilterSidebar.tsx` (currently commented out).
 
-- [ ] **Entity Name Normalization** — Organizations, events, and programs have significant duplicate entries with variant names (e.g. "US Senate" / "U.S. Senate" / "United States Senate" / "Senate" are 4+ separate records). This inflates entity counts and makes "exclusive to this channel" calculations unreliable for non-experiencer entity types. The `ChannelUniqueSection` component currently only shows Exclusive Experiencers because of this issue — events, orgs, and programs are hidden until normalization is complete. **Approach:** Build a normalization pipeline that: (A) identifies candidate duplicates via fuzzy matching / Levenshtein distance, (B) presents merge candidates for manual approval, (C) merges `linked_video_ids` arrays and updates `aka` fields, (D) deletes the duplicate record. Affected tables: `uap_canonical_orgs`, `uap_canonical_events`, `uap_canonical_programs`, `uap_canonical_persons`. After normalization, re-enable all entity types in `ChannelUniqueSection.tsx`.
+- [x] **Entity Name Normalization** ✅ 2026-05-21 — Built automated weekly normalization pipeline. `src/lib/pipeline/normalize-entities.ts` performs fuzzy dedup (Levenshtein, abbreviation matching, first-name aliases, middle-name variants) across `uap_canonical_persons` (2,984), `uap_canonical_orgs` (1,555), `uap_canonical_programs` (929). Supports dry-run mode for safe review. Also built `src/lib/pipeline/compute-channel-scores.ts` for weekly channel score recomputation. Both triggered by pg_cron (Sundays 5:00/5:30 UTC). API routes: `/api/cron/normalize-entities`, `/api/cron/recompute-channel-scores`.
 
 - [x] **Supadata 429 Quota Exhaustion Fix** ✅ 2026-05-21 — Rapid-process pipeline burned 6,741 failed requests after Supadata monthly credits were exhausted, because `subtitles.ts` treated all 429s as retryable rate limits. **Root cause:** The 429 body contains `{"error":"limit-exceeded"}` for quota exhaustion vs generic rate limiting, but the code didn't parse it. **Fix:** (A) `subtitles.ts` now parses 429 body to distinguish `quota_exceeded` (non-retryable) from `rate_limited` (retryable with 30s→60s→120s exponential backoff), (B) `intake-uap.ts` propagates `quota_exceeded` as a distinct `UapIntakeStatus`, (C) `uap-tick.ts` halts the processing loop immediately on quota exhaustion, (D) `scripts/rapid-process.ts` sets `isShuttingDown=true` on quota hit. Also reset 1,692 failed videos back to pending. **Plan upgrade:** Mega ($47/mo, 30K credits).
 

@@ -14,6 +14,7 @@ import {
   ReferenceLine,
   ReferenceArea,
   Label,
+  Customized,
 } from "recharts";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -30,6 +31,14 @@ export interface ChannelScorePoint {
   avatar_url: string | null;
 }
 
+/** Historical position for trajectory arrows: maps channel_id to its 12-month-ago position */
+export interface TrajectoryData {
+  [channelId: string]: {
+    prevIntelligence: number;
+    prevCredibility: number;
+  };
+}
+
 interface ChannelUniverseMapProps {
   channels: ChannelScorePoint[];
   /** If provided, this channel pulses/glows on the map */
@@ -38,6 +47,8 @@ interface ChannelUniverseMapProps {
   compact?: boolean;
   /** Quadrant to highlight: topLeft, topRight, bottomLeft, bottomRight */
   highlightedQuadrant?: string | null;
+  /** Historical positions for trajectory arrows. Maps channel_id to 12-month-ago position */
+  trajectories?: TrajectoryData;
 }
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -119,6 +130,7 @@ export function ChannelUniverseMap({
   highlightChannelId,
   compact = false,
   highlightedQuadrant = null,
+  trajectories,
 }: ChannelUniverseMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -297,6 +309,85 @@ export function ChannelUniverseMap({
                 );
               })}
             </Scatter>
+
+            {/* Trajectory arrows — rendered as SVG lines from old position to current */}
+            {trajectories && Object.keys(trajectories).length > 0 && (
+              <Customized
+                component={(props: Record<string, unknown>) => {
+                  // Access the recharts internal scale functions
+                  const xAxisMap = props.xAxisMap as Record<string, { scale: (v: number) => number }> | undefined;
+                  const yAxisMap = props.yAxisMap as Record<string, { scale: (v: number) => number }> | undefined;
+                  if (!xAxisMap || !yAxisMap) return null;
+                  const xScale = Object.values(xAxisMap)[0]?.scale;
+                  const yScale = Object.values(yAxisMap)[0]?.scale;
+                  if (!xScale || !yScale) return null;
+
+                  return (
+                    <g>
+                      <defs>
+                        <marker
+                          id="arrowGreen"
+                          markerWidth="6"
+                          markerHeight="6"
+                          refX="5"
+                          refY="3"
+                          orient="auto"
+                          markerUnits="strokeWidth"
+                        >
+                          <path d="M0,0 L0,6 L6,3 z" fill="#22c55e" fillOpacity="0.7" />
+                        </marker>
+                        <marker
+                          id="arrowGray"
+                          markerWidth="6"
+                          markerHeight="6"
+                          refX="5"
+                          refY="3"
+                          orient="auto"
+                          markerUnits="strokeWidth"
+                        >
+                          <path d="M0,0 L0,6 L6,3 z" fill="#94a3b8" fillOpacity="0.5" />
+                        </marker>
+                      </defs>
+                      {data.map((entry) => {
+                        const traj = trajectories[entry.channel_id];
+                        if (!traj) return null;
+
+                        const dx = entry.x - traj.prevCredibility;
+                        const dy = entry.y - traj.prevIntelligence;
+
+                        // Only show arrows for meaningful movement (≥2 units on either axis)
+                        if (Math.abs(dx) < 2 && Math.abs(dy) < 2) return null;
+
+                        const x1 = xScale(traj.prevCredibility);
+                        const y1 = yScale(traj.prevIntelligence);
+                        const x2 = xScale(entry.x);
+                        const y2 = yScale(entry.y);
+
+                        // Green if the Euclidean distance moved in a positive direction
+                        const improved = dx + dy > 0;
+                        const markerId = improved ? "arrowGreen" : "arrowGray";
+                        const strokeColor = improved ? "#22c55e" : "#94a3b8";
+
+                        return (
+                          <line
+                            key={`traj-${entry.channel_id}`}
+                            x1={x1}
+                            y1={y1}
+                            x2={x2}
+                            y2={y2}
+                            stroke={strokeColor}
+                            strokeWidth={1.5}
+                            strokeOpacity={0.6}
+                            strokeDasharray="4 2"
+                            markerEnd={`url(#${markerId})`}
+                          />
+                        );
+                      })}
+                    </g>
+                  );
+                }}
+              />
+            )}
           </ScatterChart>
         </ResponsiveContainer>
       </div>
@@ -323,6 +414,7 @@ export function ChannelUniverseMapWithLinks({
   highlightChannelId,
   compact = false,
   highlightedQuadrant = null,
+  trajectories,
 }: ChannelUniverseMapProps) {
   // For the linked version, we wrap each scatter interaction with navigation
   // Recharts doesn't natively support clicking on scatter points to navigate,
@@ -334,6 +426,7 @@ export function ChannelUniverseMapWithLinks({
         highlightChannelId={highlightChannelId}
         compact={compact}
         highlightedQuadrant={highlightedQuadrant}
+        trajectories={trajectories}
       />
       {/* Channel list below the chart for accessibility and click-through */}
       {!compact && (
