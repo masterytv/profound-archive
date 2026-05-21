@@ -290,10 +290,43 @@ export async function runUapProcessTick(
                 const currentRetries = item.retry_count || 0;
                 const maxRetries = 3;
                 if (currentRetries < maxRetries) {
-                    console.log(`[UAP Scanner/Process] Auto-retrying ${item.video_id} — caption fetch failed (attempt ${currentRetries + 1}/${maxRetries})`);
+                    // Exponential backoff: 30s, 60s, 120s
+                    const backoffMs = 30000 * Math.pow(2, currentRetries);
+                    console.log(`[UAP Scanner/Process] Auto-retrying ${item.video_id} — caption fetch failed (attempt ${currentRetries + 1}/${maxRetries}, backoff ${backoffMs / 1000}s)`);
+                    await new Promise(resolve => setTimeout(resolve, backoffMs));
                     finalStatus = 'pending';  // Re-queue for another attempt
-                    // Note: retry_count is incremented in the queue update below
                 }
+            }
+
+            // CRITICAL: Detect quota exhaustion and halt the entire processing loop
+            if (result.status === 'quota_exceeded') {
+                console.error(`[UAP Scanner/Process] ⛔ QUOTA EXCEEDED — Supadata monthly credits exhausted. Halting pipeline immediately.`);
+                console.error(`[UAP Scanner/Process] Remaining queue items will stay as 'pending' for when credits refill.`);
+                // Mark this specific video as failed (not pending) so we don't re-attempt immediately
+                finalStatus = 'failed';
+                resultError = 'Supadata quota exceeded — pipeline halted';
+
+                // Update the queue item and break out of the loop
+                await supabase
+                    .from('uap_scan_queue')
+                    .update({
+                        status: finalStatus,
+                        processed_at: new Date().toISOString(),
+                        intake_result: intakeStatus,
+                        error: resultError,
+                    })
+                    .eq('id', item.id);
+
+                processed.push({
+                    videoId: item.video_id,
+                    url: item.video_url,
+                    status: intakeStatus,
+                    tier,
+                    error: resultError,
+                });
+
+                // BREAK — stop processing, preserve remaining queue
+                break;
             }
 
         } catch (err: any) {

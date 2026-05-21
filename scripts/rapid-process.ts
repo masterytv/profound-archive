@@ -257,12 +257,23 @@ async function processVideo(
       log(`✅ [${label} ${stats.total}/${totalPending}] ${item.video_id} — Tier ${tier} (${duration})`);
     }
 
-    // Auto-retry for transient caption fetch failures
-    if (result.status === 'caption_fetch_failed') {
+    // CRITICAL: Detect quota exhaustion and halt the ENTIRE batch processor
+    if (result.status === 'quota_exceeded') {
+      log(`⛔ [${label}] SUPADATA QUOTA EXCEEDED — monthly credits exhausted. Halting pipeline immediately.`);
+      log(`⛔ [${label}] Remaining ${totalPending - stats.total} videos will stay as 'pending' for when credits refill.`);
+      finalStatus = 'failed';
+      resultError = 'Supadata quota exceeded — pipeline halted';
+      isShuttingDown = true; // Trigger graceful shutdown of the batch loop
+    }
+
+    // Auto-retry for transient caption fetch failures with exponential backoff
+    if (result.status === 'caption_fetch_failed' && !isShuttingDown) {
       const currentRetries = item.retry_count || 0;
       const maxRetries = 3;
       if (currentRetries < maxRetries) {
-        log(`⚠️  [${label}] Auto-retrying ${item.video_id} — caption fetch failed (attempt ${currentRetries + 1}/${maxRetries})`);
+        const backoffMs = 30000 * Math.pow(2, currentRetries); // 30s, 60s, 120s
+        log(`⚠️  [${label}] Auto-retrying ${item.video_id} — caption fetch failed (attempt ${currentRetries + 1}/${maxRetries}, backoff ${backoffMs / 1000}s)`);
+        await new Promise(resolve => setTimeout(resolve, backoffMs));
         finalStatus = 'pending';
       }
     }

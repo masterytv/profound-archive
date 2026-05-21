@@ -38,7 +38,8 @@ export interface CaptionResult {
  */
 export type CaptionFailureReason =
     | 'no_captions'        // Genuine — 404, 206, or empty content array
-    | 'rate_limited'       // 429 — Supadata throttled the request
+    | 'rate_limited'       // 429 — per-second request rate exceeded (retryable with backoff)
+    | 'quota_exceeded'     // 429 — monthly plan credit quota exhausted (stop pipeline)
     | 'credits_exhausted'  // 402 — monthly credit limit hit
     | 'server_error'       // 500+ — Supadata infrastructure issue
     | 'timeout'            // AbortError — 30s exceeded
@@ -100,8 +101,22 @@ export async function fetchCaptions(videoId: string): Promise<CaptionFetchResult
                 console.error(`[Supadata] PAYMENT REQUIRED (402) for ${videoId} — monthly credits exhausted.`);
                 return { success: false, retryable: true, failureReason: 'credits_exhausted', message: 'Supadata monthly credits exhausted (402)' };
             } else if (res.status === 429) {
-                console.error(`[Supadata] RATE LIMITED (429) for ${videoId} — request rate exceeded.`);
-                return { success: false, retryable: true, failureReason: 'rate_limited', message: `Supadata rate limited (429): ${body.slice(0, 100)}` };
+                // Distinguish quota exhaustion from per-second rate limiting
+                // Supadata returns {"error":"limit-exceeded"} when monthly credits are gone
+                let isQuotaExhausted = false;
+                try {
+                    const parsed = JSON.parse(body);
+                    isQuotaExhausted = parsed?.error === 'limit-exceeded'
+                        || parsed?.details?.toLowerCase().includes('plan usage limit');
+                } catch { /* body wasn't JSON — treat as generic rate limit */ }
+
+                if (isQuotaExhausted) {
+                    console.error(`[Supadata] QUOTA EXCEEDED (429) for ${videoId} — monthly plan credits exhausted. STOP PIPELINE.`);
+                    return { success: false, retryable: false, failureReason: 'quota_exceeded', message: `Supadata quota exceeded: ${body.slice(0, 100)}` };
+                } else {
+                    console.error(`[Supadata] RATE LIMITED (429) for ${videoId} — per-second request rate exceeded.`);
+                    return { success: false, retryable: true, failureReason: 'rate_limited', message: `Supadata rate limited (429): ${body.slice(0, 100)}` };
+                }
             } else if (res.status === 404) {
                 console.log(`[Supadata] No captions available for ${videoId} (404)`);
                 return { success: false, retryable: false, failureReason: 'no_captions', message: 'No captions available (404)' };

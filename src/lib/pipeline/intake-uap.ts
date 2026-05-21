@@ -61,6 +61,7 @@ export type UapIntakeStatus =
     | 'out_of_scope'
     | 'no_captions'
     | 'caption_fetch_failed'  // Transient Supadata failure (rate limit, timeout, etc.) — retryable
+    | 'quota_exceeded'        // Supadata monthly credits exhausted — stop pipeline immediately
     | 'drm_protected'
     | 'already_exists'
     | 'is_short';
@@ -241,6 +242,9 @@ export async function processUapVideoIntake(
             let captionStatus: UapIntakeStatus;
             if (isDrm) {
                 captionStatus = 'drm_protected';
+            } else if (captionFetch.failureReason === 'quota_exceeded') {
+                // Monthly Supadata credits exhausted — STOP the entire pipeline
+                captionStatus = 'quota_exceeded';
             } else if (captionFetch.retryable) {
                 // Transient Supadata failure — mark as failed so it gets retried
                 captionStatus = 'caption_fetch_failed';
