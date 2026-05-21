@@ -6,13 +6,14 @@ import {
     Eye,
     Calendar,
     User,
-    Sparkles,
+    Heart,
     ChevronDown,
     ChevronRight,
     ExternalLink,
     TrendingUp,
     Brain,
     BookOpen,
+    Cpu,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -316,7 +317,7 @@ export default async function VideoPageAlt1({ params, searchParams }: VideoPageP
                                     {hasTransformation && (
                                         <a href="#section-transformation" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 border border-rose-200">
                                             <div className="flex items-center gap-1.5 mb-1">
-                                                <Sparkles className="w-3.5 h-3.5 text-rose-600" />
+                                                <Heart className="w-3.5 h-3.5 text-rose-600" />
                                                 <span className="text-[10px] font-semibold text-slate-700">Transform</span>
                                             </div>
                                             <div className="flex items-baseline gap-1">
@@ -333,7 +334,7 @@ export default async function VideoPageAlt1({ params, searchParams }: VideoPageP
                         {video.analysis_nde_summary && (
                             <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
                                 <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4 text-blue-500" />
+                                    <Cpu className="w-4 h-4 text-blue-500" />
                                     <h2
                                         className="text-lg font-bold text-slate-900"
                                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
@@ -552,7 +553,7 @@ export default async function VideoPageAlt1({ params, searchParams }: VideoPageP
                                     {hasTransformation && (
                                         <a href="#section-transformation-desktop" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 border border-rose-200">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <Sparkles className="w-4 h-4 text-rose-600" />
+                                                <Heart className="w-4 h-4 text-rose-600" />
                                                 <span className="text-xs font-semibold text-slate-700">Transformation</span>
                                             </div>
                                             <div className="flex items-baseline gap-1.5">

@@ -1,0 +1,7 @@
+[2026-05-21T14:39:45.477Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-05-21T14:39:45.477Z] 🚀 Starting UAP rapid processing (concurrency: 5)
+[2026-05-21T14:39:45.477Z] 🔄 Resetting stuck 'processing' videos...
+[2026-05-21T14:39:45.904Z]    Reset 2 stuck videos to pending
+[2026-05-21T14:39:46.030Z] 📊 Found 1763 pending UAP videos to process
+[2026-05-21T14:39:46.030Z]    Log file: /Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/logs/rapid-process_uap_2026-05-21T14-39-45.log
+[2026-05-21T14:39:46.030Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

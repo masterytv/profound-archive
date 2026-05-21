@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Sparkles, CheckCircle2, XCircle, Clock3, Loader2, ChevronDown, BookOpen, User } from "lucide-react";
+import { Cpu, CheckCircle2, XCircle, Clock3, Loader2, ChevronDown, BookOpen, User } from "lucide-react";
 
 type StepStatus = "pending" | "running" | "success" | "failed" | "skipped";
 
@@ -215,7 +215,7 @@ export function BlogGeneratePanel({ questions }: { questions: QuestionOption[] }
                 className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-blue-50/60 dark:hover:bg-blue-500/10 transition-colors"
             >
                 <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
+                    <Cpu className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex-1">
                     <p className="text-sm font-bold text-blue-700 dark:text-blue-300">Generate from Questions</p>
@@ -252,7 +252,7 @@ export function BlogGeneratePanel({ questions }: { questions: QuestionOption[] }
                     >
                         {running
                             ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating...</>
-                            : <><Sparkles className="w-3.5 h-3.5" /> Generate Article</>
+                            : <><Cpu className="w-3.5 h-3.5" /> Generate Article</>
                         }
                     </button>
 

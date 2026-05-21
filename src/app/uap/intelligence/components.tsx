@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import {
   Film, Users, ClipboardList, Brain, AlertTriangle, Shield, Share2,
-  ChevronDown, ChevronUp, Sparkles, TrendingUp, Fingerprint, Atom,
+  ChevronDown, ChevronUp, Lightbulb, TrendingUp, Fingerprint, Atom,
 } from 'lucide-react';
 
 // ─── Color Palette ──────────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ export function DailyFactCard({ fact }: { fact: { text: string; category: string
       />
       <div className="relative flex items-start gap-4">
         <div className="shrink-0 w-10 h-10 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
-          <Sparkles className="w-5 h-5 text-[var(--domain-accent)]" />
+          <Lightbulb className="w-5 h-5 text-[var(--domain-accent)]" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider mb-1.5">

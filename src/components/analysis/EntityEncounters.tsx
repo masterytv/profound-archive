@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import {
     User,
     Users,
-    Sparkles,
+    Sun,
     MessageSquare,
     Eye,
     Radio,
@@ -61,8 +61,8 @@ export function normalizeEntities(
 function getEntityIcon(entity: EntityEncounter) {
     const type = (entity.entity_type || entity.identity || "").toLowerCase();
     if (type.includes("relative") || type.includes("family") || type.includes("deceased")) return Users;
-    if (type.includes("being") || type.includes("light") || type.includes("angel") || type.includes("divine")) return Sparkles;
-    if (type.includes("guide") || type.includes("guardian")) return Sparkles;
+    if (type.includes("being") || type.includes("light") || type.includes("angel") || type.includes("divine")) return Sun;
+    if (type.includes("guide") || type.includes("guardian")) return Sun;
     return User;
 }
 

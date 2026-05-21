@@ -14,7 +14,8 @@ import {
   Calendar,
   Building2,
   Shield,
-  Sparkles,
+  Link2,
+  Heart,
   BookOpen,
   UserPlus,
   TrendingUp,
@@ -263,7 +264,7 @@ export default async function UapLandingPage() {
                     </div>
                   </Link>
                   <Link href="/uap/video-explore?tier=1&sort=transformation_score" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group/link border border-transparent hover:border-slate-200 dark:hover:border-white/10">
-                    <Sparkles className="w-4 h-4 text-rose-400" />
+                    <Heart className="w-4 h-4 text-rose-400" />
                     <div>
                       <div className="text-sm font-semibold text-slate-900 dark:text-white group-hover/link:text-rose-600 dark:group-hover/link:text-rose-400 transition-colors">Life Impact</div>
                       <div className="text-xs text-slate-500">Dramatically changed lives</div>
@@ -375,7 +376,7 @@ export default async function UapLandingPage() {
             {/* Cross-Domain */}
             <Link href="/research/cross-domain" className="group flex flex-col sm:flex-row items-center gap-6 p-6 rounded-3xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 hover:shadow-xl dark:hover:shadow-none hover:border-violet-500/30 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-all">
               <div className="p-5 rounded-2xl bg-violet-500/10 text-violet-400 group-hover:bg-violet-500/20 transition-colors">
-                <Sparkles className="w-8 h-8" />
+                <Link2 className="w-8 h-8" />
               </div>
               <div>
                 <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Cross-Domain Analyses</h4>

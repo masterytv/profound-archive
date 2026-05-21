@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Brain, Telescope, Sparkles, Search, MessageCircle,
+  Brain, Telescope, Zap, Search, MessageCircle,
   Cpu, ChevronRight, BookOpen, Users, Shield,
   Heart, Globe, Lightbulb, Scale, Handshake, ExternalLink,
 } from "lucide-react";
@@ -71,7 +71,7 @@ const PLATFORM_FEATURES = [
       "Conversational AI grounded in real testimony data. Ask questions, explore patterns, and get answers sourced from the full corpus, not general web knowledge.",
   },
   {
-    icon: Sparkles,
+    icon: Zap,
     iconBg: "bg-amber-100 dark:bg-amber-900/30",
     iconColor: "text-amber-600 dark:text-amber-400",
     title: "Cross-Domain Analysis",

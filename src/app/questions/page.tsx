@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-    ArrowLeft, Heart, Sparkles, Baby, AlertTriangle, Radio,
+    ArrowLeft, Heart, Sun, Baby, AlertTriangle, Radio,
     Waves, Eye, Flame, User, Church, Star, HelpCircle,
     Users, Skull, Lightbulb, ChevronRight,
 } from "lucide-react";
@@ -70,7 +70,7 @@ const CATEGORY_META: Record<string, {
         subtitle: "Reunion, recognition, and the bonds that outlast death",
     },
     pets: {
-        iconName: "Sparkles", iconColor: "text-amber-500", accentColor: "border-l-amber-400",
+        iconName: "Sun", iconColor: "text-amber-500", accentColor: "border-l-amber-400",
         partId: "part-1",
         subtitle: "The companions we've lost and hope to find again",
     },

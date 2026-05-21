@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Brain, Sparkles, TrendingUp, Tv, HelpCircle, Search, Video } from "lucide-react";
+import { Brain, Heart, TrendingUp, Tv, HelpCircle, Search, Video } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "Explore NDEs | Project Profound",
@@ -83,7 +83,7 @@ const exploreSections = [
     },
     {
         href: "/explore/transformation",
-        icon: Sparkles,
+        icon: Heart,
         color: "rose",
         bg: "bg-rose-50",
         iconColor: "text-rose-600",

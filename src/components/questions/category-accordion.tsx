@@ -4,14 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import {
     ChevronDown, ArrowRight,
-    Heart, Sparkles, Baby, AlertTriangle, Radio,
+    Heart, Sun, Baby, AlertTriangle, Radio,
     Waves, Eye, Flame, User, Church, Star, HelpCircle,
 } from "lucide-react";
 
 // Map icon name strings → components so the Server Component
 // can pass a plain string across the RSC boundary.
 const ICON_MAP: Record<string, React.ElementType> = {
-    Heart, Sparkles, Baby, AlertTriangle, Radio,
+    Heart, Sun, Baby, AlertTriangle, Radio,
     Waves, Eye, Flame, User, Church, Star, HelpCircle,
 };
 

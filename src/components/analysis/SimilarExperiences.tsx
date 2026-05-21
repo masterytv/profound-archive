@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
+import { Cpu } from "lucide-react";
 
 export interface SimilarExperience {
     video_id: string;
@@ -48,7 +48,7 @@ export function SimilarExperiences({ results }: SimilarExperiencesProps) {
         <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm overflow-hidden">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-500" />
+                <Cpu className="w-4 h-4 text-purple-500" />
                 <h2
                     className="text-lg font-bold text-slate-900 dark:text-slate-100"
                     style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}

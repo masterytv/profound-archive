@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   TrendingUp,
   Brain,
-  Sparkles,
+  Heart,
   ChevronDown,
 } from "lucide-react";
 import { useState } from "react";
@@ -438,7 +438,7 @@ export function TriadScoresPanel({ scores }: TriadScoresPanelProps) {
         />
 
         <ScoreCard
-          icon={Sparkles}
+          icon={Heart}
           label="Transformation"
           score={scores.transformation_score ?? (scores.transformation_breakdown ? getTransformationTotalScore(scores.transformation_breakdown) : null)}
           maxScore={50}

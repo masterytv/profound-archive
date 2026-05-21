@@ -5,7 +5,7 @@ import {
     ChevronRight,
     Eye,
     Calendar,
-    Sparkles,
+    Heart,
     ChevronDown,
     ExternalLink,
     TrendingUp,
@@ -498,7 +498,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     {hasTransformation && (
                                         <a href="#section-transformation" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
                                             <div className="flex items-center gap-1.5 mb-1">
-                                                <Sparkles className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                                                <Heart className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                                                 <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Impact</span>
                                             </div>
                                             <div className="flex items-baseline gap-0.5">
@@ -810,7 +810,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                                     {hasTransformation && (
                                         <a href="#section-transformation-desktop" className="rounded-xl p-3 block cursor-pointer hover:ring-2 hover:ring-rose-300 transition-all bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <Sparkles className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                                                <Heart className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                                                 <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Life Impact</span>
                                             </div>
                                             <div className="flex items-baseline gap-1.5">

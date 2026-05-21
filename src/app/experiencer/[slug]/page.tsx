@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, Play, ExternalLink, Heart, Sparkles, Brain, TrendingUp, Globe, Briefcase, Camera, BookMarked, LinkIcon } from "lucide-react";
+import { ArrowLeft, Play, ExternalLink, Heart, Brain, TrendingUp, Globe, Briefcase, Camera, BookMarked, LinkIcon } from "lucide-react";
 import { SocialShareButton } from "@/components/video/ShareButton";
 import Image from "next/image";
 import ExperienceFingerprint from "@/components/experiencer/experience-fingerprint";
@@ -373,7 +373,7 @@ export default async function ExperiencerProfilePage({
                             {avgTransformation !== null && (
                                 <div className="rounded-xl p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
                                     <div className="flex items-center gap-1.5 mb-1">
-                                        <Sparkles className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                                        <Heart className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                                         <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">Life Impact</span>
                                     </div>
                                     <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{Math.round((avgTransformation / 50) * 100)}%</span>

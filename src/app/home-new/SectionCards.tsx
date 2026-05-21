@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Brain, Telescope, ArrowRight, Sparkles } from "lucide-react";
+import { Brain, Telescope, ArrowRight, FlaskConical } from "lucide-react";
 
 export function ForResearchers() {
   return (
@@ -21,7 +21,7 @@ export function ForResearchers() {
       <Link href="/research/cross-domain" className="group block rounded-2xl border border-slate-200/60 dark:border-white/10 bg-gradient-to-r from-violet-50/50 via-white to-green-50/50 dark:from-violet-900/10 dark:via-white/[0.02] dark:to-green-900/10 p-5 mt-8 hover:shadow-lg border-l-4 border-l-transparent hover:border-l-violet-500 transition-all" style={{ borderImage: 'linear-gradient(to bottom, #8b5cf6, #10b981) 1', borderImageSlice: 1 }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-100 to-green-100 dark:from-violet-900/30 dark:to-green-900/30 flex items-center justify-center shrink-0">
-            <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+            <FlaskConical className="w-4 h-4 text-violet-600 dark:text-violet-400" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">

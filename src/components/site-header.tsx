@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar, Globe, Building2, MessageCircle } from "lucide-react"
+import { Brain, Heart, TrendingUp, ChevronDown, Menu, X, Mail, User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar, Globe, Building2, MessageCircle, Link2 } from "lucide-react"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -281,7 +281,7 @@ export default function SiteHeader() {
                           </div>
                         </Link>
                         <Link href="/research/cross-domain" className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setExploreOpen(false)}>
-                          <Sparkles className="w-4 h-4 text-violet-600 flex-shrink-0" />
+                          <Link2 className="w-4 h-4 text-violet-600 flex-shrink-0" />
                           <div>
                             <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Cross-Domain</div>
                             <div className="text-[11px] text-slate-400">NDE ↔ UAP links</div>
@@ -381,7 +381,7 @@ export default function SiteHeader() {
                           className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md"
                           onClick={() => setExploreOpen(false)}
                         >
-                          <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+                          <Heart className="w-3.5 h-3.5 text-rose-500" />
                           <span className="text-xs font-medium text-slate-600 dark:text-slate-300">By Life Impact</span>
                         </Link>
                       </div>
@@ -773,7 +773,7 @@ export default function SiteHeader() {
                               className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                               onClick={() => setMobileMenuOpen(false)}
                             >
-                              <Sparkles className="w-4 h-4 text-violet-600" />
+                              <Link2 className="w-4 h-4 text-violet-600" />
                               Cross-Domain
                             </Link>
                             <Link
@@ -849,7 +849,7 @@ export default function SiteHeader() {
                                 className="flex items-center gap-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                                 onClick={() => setMobileMenuOpen(false)}
                               >
-                                <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+                                <Heart className="w-3.5 h-3.5 text-rose-500" />
                                 By Life Impact
                               </Link>
                             </div>

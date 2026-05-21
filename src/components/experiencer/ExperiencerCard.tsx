@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Brain, Sparkles, TrendingUp, Eye } from "lucide-react";
+import { ArrowRight, Brain, Heart, TrendingUp, Eye } from "lucide-react";
 
 export type ExperiencerProfile = {
     id: number;
@@ -71,7 +71,7 @@ export function ExperiencerCard({ profile }: { profile: ExperiencerProfile }) {
                     )}
                     {profile.avg_transformation_score !== null && (
                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 dark:text-rose-400">
-                            <Sparkles className="w-3.5 h-3.5" />
+                            <Heart className="w-3.5 h-3.5" />
                             {Math.round((profile.avg_transformation_score / 50) * 100)}%
                         </span>
                     )}

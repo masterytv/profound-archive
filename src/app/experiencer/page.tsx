@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
-import { ArrowRight, Users, Brain, Sparkles, TrendingUp, ArrowDownWideNarrow, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Users, Brain, Heart, TrendingUp, ArrowDownWideNarrow, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { ExperiencerSearch } from "@/components/experiencer/ExperiencerSearch";
 import { Suspense } from "react";
 
@@ -249,7 +249,7 @@ export default async function ExperiencerDirectoryPage({
                             const iconMap: Record<string, React.ReactNode> = {
                                 views: <Eye className="w-3.5 h-3.5" />,
                                 greyson: <Brain className="w-3.5 h-3.5" />,
-                                transformation: <Sparkles className="w-3.5 h-3.5" />,
+                                transformation: <Heart className="w-3.5 h-3.5" />,
                                 veridical: <TrendingUp className="w-3.5 h-3.5" />,
                             };
                             const sortParams: Record<string, string | null> = {

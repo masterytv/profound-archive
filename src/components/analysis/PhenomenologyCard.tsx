@@ -6,7 +6,7 @@ import {
     Ear,
     Hand,
     Wind,
-    Sparkles,
+    Zap,
     ArrowRight,
     Brain,
 } from "lucide-react";
@@ -49,8 +49,8 @@ const SENSORY_ICONS: Record<string, { icon: typeof Eye; label: string }> = {
     auditory: { icon: Ear, label: "Auditory" },
     tactile: { icon: Hand, label: "Tactile" },
     olfactory: { icon: Wind, label: "Smell" },
-    kinesthetic: { icon: Sparkles, label: "Kinesthetic" },
-    gustatory: { icon: Sparkles, label: "Taste" },
+    kinesthetic: { icon: Zap, label: "Kinesthetic" },
+    gustatory: { icon: Zap, label: "Taste" },
 };
 
 // --- Helpers ---
@@ -234,7 +234,7 @@ export function PhenomenologyCard({ phenomenology, className }: PhenomenologyCar
                     <div className="flex flex-wrap gap-2">
                         {sensory.map((mod) => {
                             const config = SENSORY_ICONS[mod.name.toLowerCase()];
-                            const Icon = config?.icon || Sparkles;
+                            const Icon = config?.icon || Zap;
                             const label = config?.label || formatSnakeCase(mod.name);
 
                             return (
@@ -251,7 +251,7 @@ export function PhenomenologyCard({ phenomenology, className }: PhenomenologyCar
                                     <Icon className="w-3.5 h-3.5" />
                                     <span>{label}</span>
                                     {mod.extraordinary && (
-                                        <Sparkles className="w-2.5 h-2.5 text-violet-400" />
+                                        <Zap className="w-2.5 h-2.5 text-violet-400" />
                                     )}
                                 </div>
                             );

@@ -49,7 +49,7 @@ export default async function HomeNewPage() {
 
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             <Link 
-              href="/"
+              href="/nde"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-violet-600 text-white font-medium hover:bg-violet-700 transition-colors shadow-lg shadow-violet-600/20"
             >
               <Brain className="w-5 h-5" /> Explore Near-Death Experiences
@@ -123,7 +123,7 @@ export default async function HomeNewPage() {
               </li>
             </ul>
             <Link 
-              href="/"
+              href="/nde"
               className="inline-flex items-center gap-2 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors"
             >
               Begin Exploring

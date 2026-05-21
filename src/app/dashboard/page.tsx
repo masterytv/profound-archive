@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import { Loader2, Search, Folder, Trash2, ChevronRight, LayoutDashboard, Sparkles, Radio } from 'lucide-react';
+import { Loader2, Search, Folder, Trash2, ChevronRight, LayoutDashboard, Cpu, Radio } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -56,7 +56,7 @@ type Domain = 'nde' | 'uap';
 
 const DOMAIN_CONFIG: Record<Domain, {
   title: string;
-  icon: typeof Sparkles;
+  icon: typeof Cpu;
   accentBg: string;
   accentText: string;
   accentBorder: string;
@@ -72,7 +72,7 @@ const DOMAIN_CONFIG: Record<Domain, {
 }> = {
   nde: {
     title: 'Near-Death Experiences',
-    icon: Sparkles,
+    icon: Cpu,
     accentBg: 'bg-blue-50 dark:bg-blue-900/30',
     accentText: 'text-blue-600 dark:text-blue-400',
     accentBorder: 'border-blue-200/60 dark:border-blue-800/40',

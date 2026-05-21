@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronUp, Sparkles, AlertTriangle, ShieldAlert } from "lucide-react";
+import { ChevronDown, ChevronUp, Cpu, AlertTriangle, ShieldAlert } from "lucide-react";
 import { ExperienceBadges } from "./ExperienceBadges";
 import { JourneyFlowTimeline, type JourneyElement } from "./JourneyFlowTimeline";
 import { CoreElementsGrid, type ElementDetection } from "./CoreElementsGrid";
@@ -125,7 +125,7 @@ export function NderfAnalysisSection({ data, className }: NderfAnalysisSectionPr
         <div className={cn("bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none overflow-hidden", className)}>
             {/* Header */}
             <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-                <Sparkles className="w-4 h-4 text-blue-500" />
+                <Cpu className="w-4 h-4 text-blue-500" />
                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                     Experience Analysis
                 </h3>

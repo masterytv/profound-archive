@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Eye, EyeOff, ExternalLink, CheckCircle, AlertCircle, FileText, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, ExternalLink, CheckCircle, AlertCircle, FileText, Cpu } from 'lucide-react';
 
 interface UapQuestion {
     id: number;
@@ -83,7 +83,7 @@ export default function AdminUapQuestionsPage() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-green-600" />
+                        <Cpu className="w-4 h-4 text-green-600" />
                     </div>
                     <div>
                         <h1

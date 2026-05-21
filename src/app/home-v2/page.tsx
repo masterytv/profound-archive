@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { Search, TrendingUp, Cpu, Compass, FlaskConical, Sparkles } from "lucide-react";
+import { Search, TrendingUp, Cpu, Compass, FlaskConical, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { HeroSearchBar } from "@/components/home/HeroSearchBar";
@@ -171,7 +171,7 @@ export default async function HomeV2() {
                                 className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 bg-white dark:bg-white/5 p-4 text-center hover:border-amber-300 dark:hover:border-amber-500/40 hover:shadow-lg transition-all duration-300"
                             >
                                 <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                    <Zap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                                 </div>
                                 <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
                                     I&apos;m an Experiencer

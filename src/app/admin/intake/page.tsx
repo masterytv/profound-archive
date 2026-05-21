@@ -21,7 +21,7 @@ import {
     RotateCcw,
     ExternalLink,
     AlertTriangle,
-    Sparkles,
+    Cpu,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -333,7 +333,7 @@ export default function IntakePage() {
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4" />
+                                    <Cpu className="w-4 h-4" />
                                     Process Video
                                 </span>
                             )}

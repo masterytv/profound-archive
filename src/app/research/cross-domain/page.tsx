@@ -10,7 +10,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { Sparkles, Brain, Radio, ArrowRight, FlaskConical, AlertTriangle } from 'lucide-react';
+import { Link2, Brain, Radio, ArrowRight, FlaskConical, AlertTriangle } from 'lucide-react';
 import { normalizeEmotion, normalizeCommMethod, normalizeEntityType, incrementNormalized } from '@/lib/research/cross-domain-normalize';
 
 export const metadata: Metadata = {
@@ -464,7 +464,7 @@ export default async function CrossDomainPage() {
         <div className="max-w-5xl mx-auto px-4 py-10 sm:py-16">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-green-500 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+              <Link2 className="w-5 h-5 text-white" />
             </div>
             <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-violet-600 to-green-600 bg-clip-text text-transparent">
               Research

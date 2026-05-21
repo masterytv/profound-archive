@@ -90,7 +90,7 @@ export function IntelligenceDashboard({ analytics }: { analytics: AnalyticsData 
           </div>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
             Cross-video analytics and network intelligence derived from AI analysis of our UAP research dataset.
-            Updated hourly as new videos are processed.
+            Updated daily as new videos are processed.
           </p>
         </div>
       </section>

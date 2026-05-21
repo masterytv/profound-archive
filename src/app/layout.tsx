@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import SiteHeader from '@/components/site-header';
+import SiteHeader from '@/components/unified-site-header';
 import SiteFooter from '@/components/site-footer';
-import Script from 'next/script';
 import AuthConfirmationToast from '@/components/auth-confirmation-toast';
 import ChatPopup from '@/components/chat-popup';
 import CesFeedbackWidget from '@/components/ces-feedback-widget';
 import { Suspense } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
+import CookieConsent from '@/components/cookie-consent';
+import ConsentGatedScripts from '@/components/consent-gated-scripts';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://projectprofound.org'),
@@ -56,22 +57,12 @@ export default function RootLayout({
             <AuthConfirmationToast />
           </Suspense>
           <Toaster />
-          {/* ── Google Analytics 4 ──────────────────────────────────────── */}
-          {/* afterInteractive: loads after hydration — never blocks page render */}
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-FLY0JWVM4X"
-            strategy="afterInteractive"
-          />
-          <Script id="ga4-init" strategy="afterInteractive">{`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-FLY0JWVM4X', { send_page_view: true });
-          `}</Script>
-          <Script strategy="lazyOnload" data-uid="893453eeff" src="https://project-profound.kit.com/893453eeff/index.js" />
+          {/* ── Cookie Consent & Conditional Scripts ────────────────── */}
+          {/* GA4 and ConvertKit now only load AFTER user consent (GDPR) */}
+          <CookieConsent />
+          <ConsentGatedScripts />
         </ThemeProvider>
       </body>
     </html>
   );
 }
-

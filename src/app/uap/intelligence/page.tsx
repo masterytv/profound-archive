@@ -4,11 +4,12 @@
  * Public page at /uap/intelligence showing cross-video analytics,
  * network analysis, and daily facts from the UAP dataset.
  *
- * Server component that fetches analytics and renders client widgets.
+ * Server component — calls analytics computation directly (no self-fetch).
  */
 
 import type { Metadata } from 'next';
 import { IntelligenceDashboard } from './dashboard';
+import { computeAnalytics } from './compute-analytics';
 
 export const metadata: Metadata = {
   title: 'Research Intelligence | UAP & UFO Analysis | Project Profound',
@@ -22,36 +23,15 @@ export const metadata: Metadata = {
   },
 };
 
-// Fetch analytics from our API route
-async function getAnalytics() {
-  // NEXT_PUBLIC_SITE_URL is set in production (e.g., https://projectprofound.org)
-  // VERCEL_URL is set in Vercel deployments (without protocol)
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
-    || 'http://localhost:3000';
-
-  try {
-    // Why: Analytics API now requires internal auth to prevent public SERVICE_KEY abuse.
-    // Pass CRON_SECRET as fallback since server-side referer may vary across environments.
-    const headers: HeadersInit = {};
-    if (process.env.CRON_SECRET) {
-      headers['Authorization'] = `Bearer ${process.env.CRON_SECRET}`;
-    }
-
-    const res = await fetch(`${baseUrl}/api/uap/analytics`, {
-      headers,
-      next: { revalidate: 3600 }, // Cache for 1 hour
-    });
-
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
+export const revalidate = 86400; // ISR: revalidate once per day
 
 export default async function IntelligencePage() {
-  const analytics = await getAnalytics();
+  let analytics = null;
+  try {
+    analytics = await computeAnalytics();
+  } catch (err) {
+    console.error('[Intelligence Page] Failed to compute analytics:', err);
+  }
 
   return <IntelligenceDashboard analytics={analytics} />;
 }

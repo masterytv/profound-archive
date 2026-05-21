@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
-import { Sparkles, ChevronRight } from "lucide-react";
+import { Heart, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ExplorerControls, type SortOption, type FilterOption } from "@/components/explore/ExplorerControls";
@@ -118,7 +118,7 @@ export default async function TransformationExplorerPage({ searchParams }: PageP
 
                     <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
-                            <Sparkles className="w-6 h-6 text-rose-600 dark:text-rose-400" />
+                            <Heart className="w-6 h-6 text-rose-600 dark:text-rose-400" />
                         </div>
                         <div>
                             <p className="text-sm font-semibold uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-1">

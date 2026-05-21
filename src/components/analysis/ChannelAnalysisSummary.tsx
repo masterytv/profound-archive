@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, Zap, Heart, AlertTriangle, ChevronDown, Brain, Sparkles, TrendingUp } from "lucide-react";
+import { BarChart3, Zap, Heart, AlertTriangle, ChevronDown, Brain, TrendingUp } from "lucide-react";
 
 export interface ChannelNderfStats {
     total_analyzed: number;
@@ -205,7 +205,7 @@ export function ChannelAnalysisSummary({ stats, scores }: ChannelAnalysisSummary
                             label="Life Impact"
                             value={scores!.avg_transformation_score}
                             maxValue={TRANSFORMATION_MAX}
-                            icon={Sparkles}
+                            icon={Heart}
                             color="text-blue-600"
                             bgColor="bg-blue-50 dark:bg-blue-900/30"
                         />

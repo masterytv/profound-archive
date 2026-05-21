@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { ArrowLeft, Brain, Heart, Eye, Sparkles } from 'lucide-react';
+import { ArrowLeft, Brain, Heart, Eye, Sun } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Table,
@@ -204,7 +204,7 @@ export default function GreysonScalePage() {
                 {/* Transcendental Component */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" /> Transcendental Component (Items 13–16)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Sun className="w-5 h-5 text-amber-500" /> Transcendental Component (Items 13–16)</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="mb-4 text-muted-foreground">

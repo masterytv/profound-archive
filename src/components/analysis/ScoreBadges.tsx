@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Brain, Sparkles, ClipboardCheck } from "lucide-react";
+import { Brain, Heart, ClipboardCheck } from "lucide-react";
 import {
     Tooltip,
     TooltipContent,
@@ -135,7 +135,7 @@ export function ScoreBadges({
                                         className={cn(pillBase, color.text, color.bg, color.border, color.hover, color.dark)}
                                         aria-label={`Transformation Index: ${transformationScore} out of 50 — ${displayLabel}. Click to find similar.`}
                                     >
-                                        <Sparkles className={iconSize} />
+                                        <Heart className={iconSize} />
                                         {transformationScore}
                                         <span className="opacity-50">/50</span>
                                     </Link>

@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { ArrowLeft, Leaf, PersonStanding, Heart, Gem, Sparkles, Church, Feather, Telescope, Users, Compass } from 'lucide-react';
+import { ArrowLeft, Leaf, PersonStanding, Heart, Gem, Sun, Church, Feather, Telescope, Users, Compass } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Table,
@@ -239,7 +239,7 @@ export default function TransformationScalePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2"><Sparkles className="w-5 h-5 text-yellow-500" /> 5. Spiritual Awareness (SA)</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2"><Sun className="w-5 h-5 text-yellow-500" /> 5. Spiritual Awareness (SA)</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <p className="text-muted-foreground">

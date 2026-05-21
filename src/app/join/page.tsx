@@ -5,7 +5,7 @@ import {
   Bookmark,
   FolderHeart,
   Users,
-  Sparkles,
+  Star,
   Heart,
   ArrowRight,
 } from "lucide-react";
@@ -44,7 +44,7 @@ export default function JoinPage() {
           {/* Badge + heading */}
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold tracking-wide uppercase mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Star className="w-3.5 h-3.5" />
               <span>100% Free</span>
             </div>
             <h1

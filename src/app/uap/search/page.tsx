@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Search,
   X,
-  Sparkles,
+  Cpu,
   Keyboard,
   Filter,
   Bookmark,
@@ -279,7 +279,7 @@ function UapSearchContent() {
                     : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                 }`}
               >
-                <Sparkles className="w-3.5 h-3.5" /> Semantic
+                <Cpu className="w-3.5 h-3.5" /> Semantic
               </button>
             </div>
 

@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Brain, Sparkles, TrendingUp, ChevronDown, Menu, Mail, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Users } from "lucide-react"
+import { Brain, Heart, TrendingUp, ChevronDown, Menu, Mail, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Users } from "lucide-react"
 import { useState } from "react"
 
 /* ─────────────────────────────────────────────────

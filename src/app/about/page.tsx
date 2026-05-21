@@ -1,6 +1,11 @@
 "use client"
 
-import { Brain, Sparkles, TrendingUp, Search, MessageCircle, Cpu, ExternalLink, ChevronRight } from "lucide-react"
+import {
+  Brain, Telescope, Search, MessageCircle, Cpu, ChevronRight,
+  Link2, Heart, Users, BookOpen, FlaskConical, Lightbulb,
+  ArrowRight, Shield, Globe, Zap, HandHeart, GraduationCap,
+  Layers, Eye
+} from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, type FormEvent } from "react"
 
@@ -48,185 +53,468 @@ export default function AboutPage() {
     }
   }
 
-  const projects = [
-    {
-      title: "NDE Video Researcher",
-      status: "available now",
-      statusColor: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400",
-      icon: <Search className="w-5 h-5 text-blue-600" />,
-      iconBg: "bg-blue-50 dark:bg-blue-900/30",
-      description: "Explore a vast archive of Near-Death Experience video moments. Our unique search tool allows you to instantly find what you're looking for, whether it's an exact phrase or a related concept.",
-      buttonText: "Begin Your Search",
-      buttonLink: "/search3",
-    },
-    {
-      title: "NDE Research Chatbot",
-      status: "experimental",
-      statusColor: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400",
-      icon: <MessageCircle className="w-5 h-5 text-indigo-600" />,
-      iconBg: "bg-indigo-50 dark:bg-indigo-900/30",
-      description: "Chat with more than 5500 first person accounts of Near Death Experiences to get a better understanding of the meaning and content of the experience.",
-      buttonText: "Chat with NDEs",
-      buttonLink: "/chat-2",
-    },
-    {
-      title: "NDE Compassionate Chatbot",
-      status: "experimental",
-      statusColor: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400",
-      icon: <Sparkles className="w-5 h-5 text-rose-600" />,
-      iconBg: "bg-rose-50 dark:bg-rose-900/30",
-      description: "Chat with a compassionate companion grounded in real-world NDE accounts. Whether you are a fellow NDEr or a curious observer, you'll speak with someone who understands.",
-      buttonText: "Chat with Compassion",
-      buttonLink: "/chat-compassionate",
-    },
-    {
-      title: "AI Analysis of NDE Testimonies",
-      status: "in development",
-      statusColor: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400",
-      icon: <Cpu className="w-5 h-5 text-amber-600" />,
-      iconBg: "bg-amber-50 dark:bg-amber-900/30",
-      description: "Drop in a YouTube URL and our NDE Expert AI model will determine if the video is a first-person NDE account, summarize it, score it on the Greyson Scale and NDE-C Scale, and deliver a detailed report.",
-    },
-    {
-      title: "Contemporary Validation of NDE Scales",
-      status: "in development",
-      statusColor: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400",
-      icon: <Brain className="w-5 h-5 text-blue-600" />,
-      iconBg: "bg-blue-50 dark:bg-blue-900/30",
-      description: "In collaboration with advisors in psychology and neuroscience, this project aims to validate and refine existing scales for measuring Near-Death Experiences.",
-    },
-    {
-      title: "Other Profound Experiences",
-      status: "in development",
-      statusColor: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400",
-      icon: <TrendingUp className="w-5 h-5 text-emerald-600" />,
-      iconBg: "bg-emerald-50 dark:bg-emerald-900/30",
-      description: "Expanding beyond NDEs to include UAP encounters, Kundalini awakenings, spiritually transformative events, and more — documenting, organizing, and analyzing the full spectrum of consciousness.",
-    },
-  ]
-
-  const values = [
-    { title: "Scientific Curiosity", description: "We champion rigorous, transparent, and evolving methodologies guided by both qualitative and quantitative research." },
-    { title: "Spiritual Inclusivity", description: "We honor all religions, philosophies, and belief systems, acknowledging the sacred and symbolic in all paths." },
-    { title: "Compassionate Inquiry", description: "We approach each testimony and each person's story with empathy, humility, and respect." },
-    { title: "Unity in Diversity", description: "We celebrate human and cultural differences as essential parts of a shared, interconnected whole." },
-    { title: "Courage & Integrity", description: "We explore the unknown with boldness, speak truthfully, and act ethically in all we do." },
-    { title: "Lived Experience", description: "We value subjective personal insight as a valid and meaningful source of knowledge." },
-    { title: "Accessibility & Equity", description: "We are committed to making our findings and tools available to all, regardless of language, background, or education level." },
-    { title: "Collaboration Over Competition", description: "We seek to work with universities, governments, companies, technologists, experiencers, and researchers together." },
-  ]
+  const sectionHeading = "text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3"
+  const sectionSub = "text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed"
+  const card = "bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-200/60 dark:border-white/10 p-6 md:p-8 hover:shadow-lg transition-all duration-300"
+  const fontSerif = { fontFamily: "'Crimson Pro', Georgia, serif" }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <section className="hero-gradient border-b border-slate-200 dark:border-white/10">
-        <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl text-center">
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden consciousness-hero-gradient border-b border-slate-200/60 dark:border-white/10">
+        <div
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{ backgroundImage: "radial-gradient(circle, #8b5cf6 1px, transparent 1px)", backgroundSize: "32px 32px" }}
+        />
+        <div className="relative container mx-auto px-4 py-20 md:py-28 max-w-4xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-4">About Project Profound</p>
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4 leading-tight"
-            style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-6 leading-tight"
+            style={fontSerif}
           >
-            Project Profound
+            Helping Humanity Grasp the{" "}
+            <em className="bg-gradient-to-r from-violet-500 to-emerald-500 bg-clip-text text-transparent not-italic">
+              Extraordinary
+            </em>{" "}
+            Through Data and Compassion
           </h1>
-          <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Explore the frontiers of consciousness and profound experiences through research, data analysis, and compassionate AI.
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+            Something is happening. Across cultures, decades, and domains, people are reporting
+            profound first-person experiences that challenge our understanding of consciousness.
+            We&apos;re building the tools to analyze them with rigor, transparency, and compassion.
           </p>
         </div>
       </section>
 
       <div className="container mx-auto px-4 max-w-6xl">
-        {/* Projects */}
-        <section id="projects" className="py-16 scroll-mt-20">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-              Projects
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400">Tools and research initiatives we&apos;re building.</p>
+
+        {/* ── Why This Matters ── */}
+        <section className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>Why This Matters — Right Now</h2>
+          </div>
+
+          <div className={`${card} max-w-4xl mx-auto`}>
+            <div className="prose prose-lg max-w-none text-slate-600 dark:text-slate-300 space-y-5 leading-relaxed">
+              <p>
+                There is a shift underway. A growing body of testimony is converging on a startling
+                possibility: that consciousness may be more fundamental than we thought, and that our
+                materialist framework may be incomplete.
+              </p>
+              <p>
+                This isn&apos;t fringe. Congressional hearings are discussing non-human intelligence. Peer-reviewed
+                research on NDEs has documented verified perception during clinical death. Millions of people
+                have had experiences they cannot explain within the current paradigm.
+              </p>
+              <p>
+                This isn&apos;t religion. For centuries believers and leaders have pontificated about the unseen
+                world with the command, &quot;you just have to have faith.&quot; But now, there is evidence that
+                may give even the most skeptical a new view of reality itself.
+              </p>
+              <p>
+                For some, this new awareness brings wonder. For others, it brings <strong>uncertainty</strong>,{" "}
+                <strong>ontological shock</strong>, or genuine mental health instability. The ground beneath
+                our collective worldview is shifting, and most people don&apos;t have the resources to make
+                sense of it.
+              </p>
+              <p className="text-slate-800 dark:text-slate-100 font-medium">
+                Project Profound exists to bridge that gap — providing both the <em>research and data</em> to
+                help us understand, and the <em>compassion and connection</em> to help us cope.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── What We Do ── */}
+        <section className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>What We Do</h2>
+            <p className={sectionSub}>
+              We focus on analyzing <strong>first-person, direct experiences</strong>. These are accounts
+              from real people describing what they saw, felt, and understood. This is the hardest
+              data to work with, and the most important.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className={card}>
+              <div className="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mb-5">
+                <Search className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2" style={fontSerif}>
+                Collect &amp; Organize
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                We ingest thousands of video testimonies from YouTube then transcribe, classify, and structure
+                them into searchable, analyzable archives. Every account is preserved with full context.
+              </p>
+            </div>
+
+            <div className={card}>
+              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-5">
+                <Cpu className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2" style={fontSerif}>
+                Analyze with AI
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Our AI models score each testimony on validated research scales — from the Greyson NDE Scale
+                to UAP credibility matrices. We extract entities, themes, patterns, and anomalies
+                that would take human researchers decades to catalog.
+              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-3">
+                AI allows us to do something humans could never do. We&apos;re able to analyze millions of
+                words from tens of thousands of conversations to find unseen patterns. We can validate
+                human intuition about consciousness with real, validated data.
+              </p>
+            </div>
+
+            <div className={card}>
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-5">
+                <Link2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2" style={fontSerif}>
+                Discover Connections
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Our cross-domain analysis reveals startling overlaps between NDEs and UAP encounters:
+                beings of light, time distortion, telepathic communication, life reviews, and a
+                pervading sense of unconditional love and interconnection.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Two Domains ── */}
+        <section className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>Two Domains Analyzed</h2>
+            <p className={sectionSub}>
+              We&apos;ve started with two of the most well-documented categories of anomalous experience.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {projects.map((project, index) => (
-              <div key={index} className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-6 hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-300">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className={`w-10 h-10 rounded-xl ${project.iconBg} flex items-center justify-center shrink-0`}>
-                    {project.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-                      {project.title}
-                    </h3>
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${project.statusColor}`}>
-                      {project.status}
-                    </span>
-                  </div>
+            {/* NDE Card */}
+            <div className={`${card} border-l-[3px] border-l-violet-500/60`}>
+              <div className="flex items-start gap-4 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
+                  <Brain className="w-6 h-6 text-violet-600 dark:text-violet-400" />
                 </div>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5">{project.description}</p>
-                {project.buttonText && project.buttonLink && (
-                  <Link href={project.buttonLink} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                    {project.buttonText}
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
-                )}
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100" style={fontSerif}>
+                    Near-Death Experiences
+                  </h3>
+                  <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400">
+                    5,000+ accounts analyzed
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                First-person testimonies from people who were clinically dead or near death, transcribed
+                and scored on three validated research scales: the <strong>Greyson NDE Scale</strong> (experience depth),{" "}
+                <strong>Veridical Perception</strong> (evidence of out-of-body perception), and the{" "}
+                <strong>Transformation Index</strong> (lasting life impact).
+              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5">
+                Every account has a searchable transcript, AI-generated summary, experiencer profile,
+                and detailed score breakdown making this one of the most comprehensive NDE research
+                tools available anywhere.
+              </p>
+              <Link href="/nde" className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors">
+                Explore NDE Research <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* UAP Card */}
+            <div className={`${card} border-l-[3px] border-l-emerald-500/60`}>
+              <div className="flex items-start gap-4 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                  <Telescope className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100" style={fontSerif}>
+                    UFO/UAP Contact Encounters
+                  </h3>
+                  <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400">
+                    2,000+ videos analyzed
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                First-person accounts and research discussions about unidentified anomalous phenomena,
+                analyzed across <strong>22 research dimensions</strong> — including evidence strength,
+                contact depth taxonomy, entity classification, and phenomenological effects.
+              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5">
+                Our UAP section includes intelligence dashboards, person/event/organization directories,
+                program profiles, channel engagement analytics, and a dedicated AI research assistant
+                trained on the full corpus.
+              </p>
+              <Link href="/uap" className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+                Explore UAP Research <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Cross-Domain Discovery */}
+          <div className={`${card} mt-6 border-t-[3px] border-t-amber-400/60`}>
+            <div className="flex items-start gap-4 mb-5">
+              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                <Link2 className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100" style={fontSerif}>
+                  Cross-Domain Discovery
+                </h3>
+                <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
+                  10+ overlapping phenomena identified
+                </span>
+              </div>
+            </div>
+            <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+              When we analyze NDEs and UAP encounters side by side, striking patterns emerge.
+              There are statistically significant overlaps surfaced by AI analysis across thousands
+              of independent testimonies:
+            </p>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mt-5">
+              {[
+                "Beings of light / luminous entities",
+                "Time distortion & non-linearity",
+                "Telepathic communication",
+                "Life reviews & information downloads",
+                "Boundary/threshold encounters",
+                "Unconditional love & unity",
+                "Enhanced perception & clarity",
+                "Reluctance to return / re-entry trauma",
+                "Lasting worldview transformation",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                  <Zap className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
+                  {item}
+                </div>
+              ))}
+            </div>
+            <div className="mt-6">
+              <Link href="/research/cross-domain" className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors">
+                Explore Cross-Domain Research <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ── What's Coming Next ── */}
+        <section className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>Where We&apos;re Going</h2>
+            <p className={sectionSub}>
+              NDEs and UAP encounters are just the beginning. The same methodology can be applied
+              to any domain of first-person extraordinary experience.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {[
+              { icon: <FlaskConical className="w-5 h-5 text-purple-600" />, bg: "bg-purple-100 dark:bg-purple-900/30", title: "Psychedelic Experiences", desc: "DMT, ayahuasca, psilocybin — first-person reports of entity contact, ego dissolution, and cosmic unity" },
+              { icon: <Eye className="w-5 h-5 text-blue-600" />, bg: "bg-blue-100 dark:bg-blue-900/30", title: "Out-of-Body Experiences", desc: "Spontaneous and induced OBEs — verified perception, astral travel, and consciousness separation" },
+              { icon: <Zap className="w-5 h-5 text-amber-600" />, bg: "bg-amber-100 dark:bg-amber-900/30", title: "Spiritually Transformative Events", desc: "Kundalini awakenings, mystical experiences, and sudden spiritual openings" },
+              { icon: <Layers className="w-5 h-5 text-teal-600" />, bg: "bg-teal-100 dark:bg-teal-900/30", title: "Psi Phenomena", desc: "Telepathy, precognition, remote viewing, and other psi experiences with documented evidence" },
+              { icon: <Globe className="w-5 h-5 text-rose-600" />, bg: "bg-rose-100 dark:bg-rose-900/30", title: "After-Death Communication", desc: "Reports of contact with deceased loved ones — deathbed visions, shared death experiences, and ADCs" },
+              { icon: <GraduationCap className="w-5 h-5 text-indigo-600" />, bg: "bg-indigo-100 dark:bg-indigo-900/30", title: "Academic Integration", desc: "Partnering with universities and research institutions to validate AI-generated scores against clinical data" },
+            ].map((item) => (
+              <div key={item.title} className={`${card} flex items-start gap-4`}>
+                <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center shrink-0`}>
+                  {item.icon}
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1 text-sm">{item.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Mission */}
-        <section id="mission" className="py-16 scroll-mt-20">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-              Mission &amp; Vision
-            </h2>
+        {/* ── Who This Is For ── */}
+        <section className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>Who This Is For</h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-10">
-            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-8">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Our Mission</h3>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                Project Profound exists to expand human understanding of consciousness and life beyond physical death. We aim to open the hearts and minds of intellectually curious, open-minded skeptics by applying cutting-edge artificial intelligence to explore the profound personal testimonies of near-death experiences (NDEs).
-              </p>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
-                We use scientifically grounded methods and ethically guided AI tools to uncover universal patterns, emotional truths, and spiritual insights across cultures, languages, and beliefs.
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className={card}>
+              <div className="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mb-5">
+                <Heart className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3" style={fontSerif}>
+                For You
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Whether you&apos;ve had a profound experience yourself, lost someone you love, or simply
+                wonder what lies beyond — this platform is built for you. Explore the data. Chat with
+                our compassionate AI. Find comfort in the patterns that thousands of people have
+                reported independently.
               </p>
             </div>
 
-            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-8">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Vision</h3>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                We envision a world where the mystery of death inspires curiosity instead of fear—where people of all backgrounds can access compassionate, evidence-based, and inclusive resources to reflect on what it means to be fully alive.
+            <div className={card}>
+              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-5">
+                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3" style={fontSerif}>
+                For Creators
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                If you run a YouTube channel sharing NDE, UAP, or consciousness-related content, we
+                want to work with you. We analyze and amplify your content, connect your audience to
+                deeper research, and provide tools that turn individual stories into part of a larger
+                dataset advancing human understanding.
               </p>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
-                By democratizing access to knowledge, tools, and research, we help individuals and communities find meaning, connection, and a deeper understanding of ourselves and one another.
+            </div>
+
+            <div className={card}>
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-5">
+                <BookOpen className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3" style={fontSerif}>
+                For Researchers
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Academics, clinicians, and independent researchers — we offer access to one of the
+                largest structured datasets of first-person extraordinary experiences. Full-text search,
+                validated scoring, entity extraction, and cross-domain analysis are all available as
+                research tools. We want to collaborate.
               </p>
             </div>
           </div>
+        </section>
 
-          <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-8">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Values</h3>
-            <div className="grid sm:grid-cols-2 gap-x-12 gap-y-6">
-              {values.map((value, index) => (
-                <div key={index}>
-                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-1">{value.title}</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{value.description}</p>
+        {/* ── Values ── */}
+        <section className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>Our Values</h2>
+          </div>
+
+          <div className={`${card} max-w-4xl mx-auto`}>
+            <div className="grid sm:grid-cols-2 gap-x-12 gap-y-7">
+              {[
+                { icon: <FlaskConical className="w-4 h-4 text-blue-600" />, title: "Scientific Rigor", desc: "Transparent methodology, validated scales, reproducible analysis. We show our work." },
+                { icon: <HandHeart className="w-4 h-4 text-rose-600" />, title: "Compassionate Inquiry", desc: "Every testimony represents a person. We approach each story with empathy and respect." },
+                { icon: <Shield className="w-4 h-4 text-emerald-600" />, title: "Intellectual Honesty", desc: "We don't know the answers. We present the data and let you draw your own conclusions." },
+                { icon: <Globe className="w-4 h-4 text-violet-600" />, title: "Spiritual Inclusivity", desc: "All traditions, philosophies, and belief systems are welcome. The data transcends dogma." },
+                { icon: <Lightbulb className="w-4 h-4 text-amber-600" />, title: "Open Access", desc: "Knowledge about consciousness belongs to everyone. Our tools are free and our methodology is documented." },
+                { icon: <Users className="w-4 h-4 text-teal-600" />, title: "Collaboration Over Competition", desc: "We partner with creators, researchers, experiencers, and institutions. Together we go further." },
+              ].map((v) => (
+                <div key={v.title} className="flex items-start gap-3">
+                  <div className="mt-0.5">{v.icon}</div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-1">{v.title}</h4>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{v.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Connect */}
-        <section id="connect" className="py-16 scroll-mt-20">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-              Get In Touch
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-              If you&apos;re interested in participating, partnering, or simply learning more, we&apos;d love to hear from you.
+        {/* ── Support Us ── */}
+        <section className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>We Need Your Support</h2>
+            <p className={sectionSub}>
+              Project Profound is built by a small team with a big mission. Your financial support
+              directly accelerates our work.
             </p>
           </div>
 
+          <div className={`${card} max-w-4xl mx-auto border-t-[3px] border-t-emerald-400/60`}>
+            <div className="grid sm:grid-cols-2 gap-8 mb-8">
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4" style={fontSerif}>What Your Support Enables</h3>
+                <ul className="space-y-3">
+                  {[
+                    "Run full AI re-analysis across all 7,000+ testimonies as models improve",
+                    "Expand into psychedelics, OBEs, STEs, and other experience domains",
+                    "Support academic research partnerships and clinical validation studies",
+                    "Improve our compassionate AI tools for experiencers and their families",
+                    "Build multilingual support to make this research accessible worldwide",
+                    "Keep the platform free and open-access for everyone",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-300">
+                      <ChevronRight className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4" style={fontSerif}>The AI Advantage</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                  As AI models improve we can re-run our entire analysis pipeline
+                  with more accurate, more nuanced models. Every dollar invested today compounds: the same
+                  dataset analyzed by a better model yields deeper insights without collecting a single
+                  new testimony.
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  We can do many things better, and many more things entirely. But we need the resources to
+                  do it. This is a once-in-a-generation opportunity to apply cutting-edge technology to
+                  humanity&apos;s oldest questions.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center pt-4 border-t border-slate-100 dark:border-white/10">
+              <a
+                href="https://www.gofundme.com/f/project-profound"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
+              >
+                <Heart className="w-5 h-5" />
+                Support the Mission
+              </a>
+              <p className="text-xs text-slate-400 mt-3">
+                All contributions go directly to compute, AI model access, and research partnerships.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Get Involved ── */}
+        <section id="connect" className="py-16 md:py-20 scroll-mt-20">
+          <div className="text-center mb-12">
+            <h2 className={sectionHeading} style={fontSerif}>Get Involved</h2>
+            <p className={sectionSub}>
+              We&apos;re looking for feedback, collaboration, and community. Whether you&apos;re a researcher,
+              a creator, an experiencer, or simply someone who cares — we&apos;d love to hear from you.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-10">
+            {[
+              { icon: <MessageCircle className="w-5 h-5 text-blue-600" />, bg: "bg-blue-100 dark:bg-blue-900/30", title: "Share Feedback", desc: "Tell us what's working, what's not, and what you want to see next." },
+              { icon: <Users className="w-5 h-5 text-violet-600" />, bg: "bg-violet-100 dark:bg-violet-900/30", title: "Collaborate", desc: "Researchers, institutions, and content creators — let's work together." },
+              { icon: <Telescope className="w-5 h-5 text-emerald-600" />, bg: "bg-emerald-100 dark:bg-emerald-900/30", title: "Suggest Channels", desc: "Know a YouTube channel with great NDE or UAP testimonies? Let us know." },
+              { icon: <Heart className="w-5 h-5 text-rose-600" />, bg: "bg-rose-100 dark:bg-rose-900/30", title: "Share Your Story", desc: "If you've had a profound experience and want it to be part of the research, reach out." },
+            ].map((item) => (
+              <div key={item.title} className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+                <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center shrink-0`}>
+                  {item.icon}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-sm mb-0.5">{item.title}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Contact Form */}
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-8">
+            <div className={card}>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 text-center" style={fontSerif}>
+                Send Us a Message
+              </h3>
               {isClient && (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
@@ -235,7 +523,7 @@ export default function AboutPage() {
                       type="text" id="fullName" required
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      placeholder="John Doe"
+                      placeholder="Your name"
                       className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
                     />
                   </div>
@@ -245,7 +533,7 @@ export default function AboutPage() {
                       type="email" id="email" required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="john@example.com"
+                      placeholder="you@example.com"
                       className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
                     />
                   </div>
@@ -255,7 +543,7 @@ export default function AboutPage() {
                       id="message" required
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="Type your message..."
+                      placeholder="Feedback, collaboration ideas, channel suggestions, or anything else..."
                       rows={5}
                       className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all resize-none"
                     />
@@ -275,25 +563,6 @@ export default function AboutPage() {
                 </form>
               )}
             </div>
-          </div>
-        </section>
-
-        {/* Blog */}
-        <section id="blog" className="pb-20 scroll-mt-20">
-          <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200/60 dark:border-white/10 p-8 md:p-12 text-center">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>
-              Our Blog
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto mb-6">
-              Explore our latest articles, insights, and stories about near-death experiences and consciousness research.
-            </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-blue-600 text-white font-medium rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-colors"
-            >
-              Visit the Blog
-              <ChevronRight className="w-4 h-4" />
-            </Link>
           </div>
         </section>
       </div>
