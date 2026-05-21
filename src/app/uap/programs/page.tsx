@@ -12,8 +12,8 @@ import { Suspense } from 'react';
 const PAGE_SIZE = 48;
 
 export const metadata: Metadata = {
-  title: 'Programs & Projects | UAP Research | Project Profound',
-  description: 'Browse government programs, research projects, and investigations related to UAP/UFO phenomena — extracted from analyzed video testimony.',
+  title: 'Programs & Projects | UFO/UAP Research | Project Profound',
+  description: 'Browse government programs, research projects, and investigations related to UFO/UAP phenomena — extracted from analyzed video testimony.',
 };
 export const revalidate = 86400; // ISR: revalidate once per day
 
@@ -100,12 +100,12 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
               <Fingerprint className="w-5 h-5 text-[var(--domain-accent)]" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider">UAP Research</p>
+              <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider">UFO/UAP Research</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-serif tracking-tight">Programs &amp; Projects</h1>
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            {totalCount} government programs, research projects, and investigations mentioned across UAP video testimony.
+            {totalCount} government programs, research projects, and investigations mentioned across UFO/UAP video testimony.
           </p>
         </div>
       </section>

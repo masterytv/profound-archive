@@ -29,11 +29,11 @@ import { InlineNewsletterCTA } from "@/components/InlineNewsletterCTA";
 export const metadata: Metadata = {
   title: "UFO & UAP Encounters — AI-Powered Analysis | Project Profound",
   description:
-    "Explore first-person UAP contact accounts, government disclosure analysis, and investigative research. AI-powered evidence scoring, semantic search, and researcher chat across 500+ analyzed encounters.",
+    "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research. AI-powered evidence scoring, semantic search, and researcher chat across 500+ analyzed encounters.",
   openGraph: {
     title: "UFO & UAP Encounters — AI-Powered Analysis | Project Profound",
     description:
-      "Explore first-person UAP contact accounts, government disclosure analysis, and investigative research through AI-powered search and analysis.",
+      "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research through AI-powered search and analysis.",
     type: "website",
     url: "https://projectprofound.org/uap",
   },
@@ -104,7 +104,7 @@ export default async function UapLandingPage() {
             </h1>
             
             <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed max-w-2xl">
-              Explore the world's most advanced AI-analyzed archive of UAP encounters and disclosure research. Discover credible witnesses, track government programs, and find exactly what you're looking for.
+              Explore the world's most advanced AI-analyzed archive of UFO and UAP encounters and disclosure research. Discover credible witnesses, track government programs, and find exactly what you're looking for.
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -346,7 +346,7 @@ export default async function UapLandingPage() {
                 </div>
                 <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Ask the Archive</h4>
                 <p className="text-slate-600 dark:text-slate-400 text-lg mb-6 max-w-sm">
-                  Chat with our AI researcher grounded in real UAP video content for near-instant, cited answers. Every claim is backed by a video timestamp.
+                  Chat with our AI researcher grounded in real UFO/UAP video content for near-instant, cited answers. Every claim is backed by a video timestamp.
                 </p>
                 <span className="inline-flex items-center gap-2 text-slate-900 dark:text-white font-medium">
                   Start Chatting <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -380,7 +380,7 @@ export default async function UapLandingPage() {
               </div>
               <div>
                 <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Cross-Domain Analyses</h4>
-                <p className="text-slate-600 dark:text-slate-400">Explore the profound statistical and narrative links between Near-Death Experiences and UAP encounters.</p>
+                <p className="text-slate-600 dark:text-slate-400">Explore the profound statistical and narrative links between Near-Death Experiences and UFO/UAP encounters.</p>
               </div>
             </Link>
 

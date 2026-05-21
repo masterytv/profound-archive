@@ -16,12 +16,12 @@ import { Suspense } from 'react';
 const PAGE_SIZE = 48;
 
 export const metadata: Metadata = {
-  title: 'Persons of Interest | UAP Research | Project Profound',
+  title: 'Persons of Interest | UFO/UAP Research | Project Profound',
   description:
-    'Browse key figures in UAP/UFO research — whistleblowers, military officials, scientists, and experiencers extracted from analyzed video testimony.',
+    'Browse key figures in UFO/UAP research — whistleblowers, military officials, scientists, and experiencers extracted from analyzed video testimony.',
   openGraph: {
-    title: 'UAP Persons of Interest | Project Profound',
-    description: 'Key figures in UAP/UFO research extracted from analyzed video testimony.',
+    title: 'UFO/UAP Persons of Interest | Project Profound',
+    description: 'Key figures in UFO/UAP research extracted from analyzed video testimony.',
     type: 'website',
   },
 };
@@ -180,7 +180,7 @@ export default async function PersonsPage({
             </div>
             <div>
               <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider">
-                UAP Research
+                UFO/UAP Research
               </p>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-serif tracking-tight">
                 Persons of Interest
@@ -188,7 +188,7 @@ export default async function PersonsPage({
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            {totalCount} key figures extracted from AI analysis of UAP video testimony —
+            {totalCount} key figures extracted from AI analysis of UFO/UAP video testimony —
             whistleblowers, military officials, scientists, researchers, and experiencers.
           </p>
         </div>

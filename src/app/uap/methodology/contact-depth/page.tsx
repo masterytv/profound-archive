@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Layers, ArrowLeft, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Contact Depth Scale (CDS) | UAP Methodology | Project Profound",
+  title: "Contact Depth Scale (CDS) | UFO/UAP Methodology | Project Profound",
   description:
     "The UAP Contact Depth Scale measures the phenomenological depth of UAP contact experiences across 16 items in 4 categories (Observation, Entity Interaction, Consciousness Alteration, Transcendent Elements) each scored 0–2 for a total range of 0–32.",
   openGraph: {

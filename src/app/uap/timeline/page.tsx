@@ -31,12 +31,12 @@ function buildClient() {
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "UAP Timeline | Project Profound",
+  title: "UFO/UAP Timeline | Project Profound",
   description:
-    "A chronological timeline of major UAP events — from Roswell (1947) to Congressional hearings (2023). Sightings, abductions, military encounters, and disclosure milestones.",
+    "A chronological timeline of major UFO and UAP events — from Roswell (1947) to Congressional hearings (2023). Sightings, abductions, military encounters, and disclosure milestones.",
   openGraph: {
-    title: "UAP Timeline | Project Profound",
-    description: "Chronological timeline of major UAP events, sightings, and disclosure milestones.",
+    title: "UFO/UAP Timeline | Project Profound",
+    description: "Chronological timeline of major UFO/UAP events, sightings, and disclosure milestones.",
     type: "website",
   },
 };
@@ -205,13 +205,13 @@ export default async function TimelinePage() {
         <div className="max-w-5xl mx-auto px-4 pt-24 pb-12 relative">
           <div className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-6">
             <Clock className="w-3.5 h-3.5" />
-            UAP Archive
+            UFO/UAP Archive
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-white via-slate-200 to-slate-400 bg-clip-text text-transparent mb-4">
-            UAP Timeline
+            UFO/UAP Timeline
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl leading-relaxed">
-            A chronological record of significant UAP events — from the Roswell crash to modern
+            A chronological record of significant UFO and UAP events — from the Roswell crash to modern
             Congressional hearings — extracted from our analyzed video archive and normalized
             into canonical event records.
           </p>
@@ -440,8 +440,8 @@ export default async function TimelinePage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            name: "UAP Timeline",
-            description: "Chronological timeline of major UAP events, sightings, and disclosure milestones.",
+            name: "UFO/UAP Timeline",
+            description: "Chronological timeline of major UFO/UAP events, sightings, and disclosure milestones.",
             url: "https://projectprofound.org/uap/timeline",
             isPartOf: { "@type": "WebSite", name: "Project Profound", url: "https://projectprofound.org" },
             numberOfItems: totalEvents,

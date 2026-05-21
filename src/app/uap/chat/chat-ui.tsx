@@ -125,10 +125,10 @@ export default function UapChatUI() {
           className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100"
           style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
         >
-          UAP Research Assistant
+          UFO/UAP Research Assistant
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Ask questions grounded in analyzed UAP testimonies
+          Ask questions grounded in analyzed UFO/UAP testimonies
         </p>
       </div>
 
@@ -229,7 +229,7 @@ export default function UapChatUI() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about UAP experiences..."
+            placeholder="Ask about UFO/UAP experiences..."
             rows={1}
             disabled={isLoading}
             className="flex-1 resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-green-400 dark:focus:border-green-600 focus:ring-1 focus:ring-green-400/20 disabled:opacity-50 transition-colors"

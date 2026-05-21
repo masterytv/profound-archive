@@ -59,8 +59,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!result) return { title: 'Program Not Found' };
   const { program } = result;
   return {
-    title: `${program.canonical_name} | UAP Program | Project Profound`,
-    description: program.description || `${program.canonical_name} — mentioned in ${program.linked_video_ids?.length || 0} UAP research videos.`,
+    title: `${program.canonical_name} | UFO/UAP Program | Project Profound`,
+    description: program.description || `${program.canonical_name} — mentioned in ${program.linked_video_ids?.length || 0} UFO/UAP research videos.`,
   };
 }
 
@@ -95,7 +95,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
     '@type': 'Project',
     name: program.canonical_name,
     alternateName: program.aliases,
-    description: program.description || `${program.canonical_name} — UAP research program`,
+    description: program.description || `${program.canonical_name} — UFO/UAP research program`,
   };
 
   return (

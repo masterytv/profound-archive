@@ -97,7 +97,7 @@ export default function AboutUsPage() {
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
                 <li>Near-Death Experiences (NDEs)</li>
                 <li>Out of Body Experiences (OBEs)</li>
-                <li>UAP / UFO / NHI Experiences</li>
+                <li>UFO/UAP / NHI Experiences</li>
                 <li>Spiritual or Etheric Experiences</li>
                 <li>After-Death Communication</li>
                 <li>Psychic Experiences (like telepathy)</li>
@@ -149,7 +149,7 @@ export default function AboutUsPage() {
             <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8">
               <p className="text-muted-foreground leading-relaxed mb-4">Our work is always expanding. We are currently building new tools to serve more communities:</p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                <li><span className="font-semibold">UAP Encounter Database:</span> We're developing a searchable database for people who have had encounters with UAP/UFO/NHI, allowing you to find patterns and connect with similar accounts.</li>
+                <li><span className="font-semibold">UFO/UAP Encounter Database:</span> We're developing a searchable database for people who have had encounters with UFO/UAP/NHI, allowing you to find patterns and connect with similar accounts.</li>
                 <li><span className="font-semibold">The Experience Event:</span> An upcoming in-person event for experiencers and the curious to meet, connect, share, and learn from one another.</li>
               </ul>
             </div>

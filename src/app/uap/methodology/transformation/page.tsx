@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Zap, ArrowLeft, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Contact Transformation Index (CTI) | UAP Methodology | Project Profound",
+  title: "Contact Transformation Index (CTI) | UFO/UAP Methodology | Project Profound",
   description:
     "The UAP Contact Transformation Index measures self-reported aftereffects and life changes across 12 domains (8 shared with NDE-TI + 2 adapted + 2 UAP-specific) each scored 0–5 for a total range of 0–60.",
   openGraph: {

@@ -36,11 +36,11 @@ export function UapDailyFactCard() {
   const handleShare = async () => {
     if (!fact) return;
 
-    const shareText = `${fact.fact_emoji} UAP Daily Fact\n\n${fact.fact_text}\n\n(N=${fact.sample_size}) — via Project Profound`;
+    const shareText = `${fact.fact_emoji} UFO/UAP Daily Fact\n\n${fact.fact_text}\n\n(N=${fact.sample_size}) — via Project Profound`;
     
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'UAP Daily Fact', text: shareText });
+        await navigator.share({ title: 'UFO/UAP Daily Fact', text: shareText });
         return;
       } catch {
         // Fallback to clipboard

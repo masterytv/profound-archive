@@ -29,7 +29,7 @@ const DOMAIN_CONFIG: Record<NewsletterDomain, {
     buttonBg: "bg-blue-600 hover:bg-blue-700",
   },
   uap: {
-    heading: "UAP Intelligence Updates",
+    heading: "UFO/UAP Intelligence Updates",
     description: "Get notified about new analysis, high-credibility encounters, government disclosures, and research insights.",
     archetype: "newsletter_uap",
     accent: "text-teal-400",

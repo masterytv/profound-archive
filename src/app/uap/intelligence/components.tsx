@@ -103,7 +103,7 @@ export function DailyFactCard({ fact }: { fact: { text: string; category: string
   if (!fact) return null;
 
   const handleShare = async () => {
-    const shareText = `UAP Research Fact: ${fact.text}\n\nExplore more at projectprofound.org/uap/intelligence`;
+    const shareText = `UFO/UAP Research Fact: ${fact.text}\n\nExplore more at projectprofound.org/uap/intelligence`;
     if (navigator.share) {
       await navigator.share({ text: shareText });
     } else {
@@ -127,7 +127,7 @@ export function DailyFactCard({ fact }: { fact: { text: string; category: string
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider mb-1.5">
-            Today&apos;s UAP Fact
+            Today&apos;s UFO/UAP Fact
           </p>
           <p className="text-base sm:text-lg text-foreground leading-relaxed font-medium">
             {fact.text}

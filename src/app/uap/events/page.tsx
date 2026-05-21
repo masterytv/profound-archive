@@ -18,9 +18,9 @@ function buildClient() {
 }
 
 export const metadata: Metadata = {
-  title: "UAP Events | Project Profound",
-  description: "A curated index of significant UAP events, sightings, and disclosure milestones — cross-referenced with video testimonies and experiencer profiles.",
-  openGraph: { title: "UAP Events | Project Profound", description: "Curated UAP events cross-referenced with video testimonies and experiencer profiles.", type: "website" },
+  title: "UFO/UAP Events | Project Profound",
+  description: "A curated index of significant UFO and UAP events, sightings, and disclosure milestones — cross-referenced with video testimonies and experiencer profiles.",
+  openGraph: { title: "UFO/UAP Events | Project Profound", description: "Curated UFO/UAP events cross-referenced with video testimonies and experiencer profiles.", type: "website" },
 };
 
 interface UapEvent {
@@ -158,11 +158,11 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
         <div className="max-w-5xl mx-auto px-4 py-12 md:py-16 relative">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2.5 rounded-xl bg-green-100 dark:bg-green-900/40"><Calendar className="w-6 h-6 text-green-600 dark:text-green-400" /></div>
-            <span className="text-sm font-medium text-green-600 dark:text-green-400 tracking-wide uppercase">UAP Event Archive</span>
+            <span className="text-sm font-medium text-green-600 dark:text-green-400 tracking-wide uppercase">UFO/UAP Event Archive</span>
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 dark:text-slate-100 mb-4" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Significant UAP Events</h1>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 dark:text-slate-100 mb-4" style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}>Significant UFO & UAP Events</h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-            A curated index of major UAP events, sightings, and disclosure milestones, cross-referenced with video testimonies and experiencer profiles from the archive.
+            A curated index of major UFO and UAP events, sightings, and disclosure milestones, cross-referenced with video testimonies and experiencer profiles from the archive.
           </p>
           <div className="flex flex-wrap gap-6 mt-6 text-sm text-slate-500 dark:text-slate-400">
             <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-green-500" /><strong className="text-slate-700 dark:text-slate-300">{totalCount}</strong> events</span>
@@ -216,7 +216,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
             </div>
             <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300">{activeSearch ? "No matching events" : "Events Coming Soon"}</h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-              {activeSearch ? "Try a different search term." : "UAP events are being extracted and curated from the analyzed video archive. Check back soon."}
+              {activeSearch ? "Try a different search term." : "UFO/UAP events are being extracted and curated from the analyzed video archive. Check back soon."}
             </p>
           </div>
         )}
@@ -231,7 +231,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org", "@type": "CollectionPage",
-        name: "Significant UAP Events", description: "Curated index of major UAP events cross-referenced with video testimonies",
+        name: "Significant UFO & UAP Events", description: "Curated index of major UFO/UAP events cross-referenced with video testimonies",
         url: "https://projectprofound.org/uap/events", numberOfItems: events.length,
       }) }} />
     </main>

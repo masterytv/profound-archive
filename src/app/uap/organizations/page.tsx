@@ -12,8 +12,8 @@ import { Suspense } from 'react';
 const PAGE_SIZE = 48;
 
 export const metadata: Metadata = {
-  title: 'Organizations | UAP Research | Project Profound',
-  description: 'Browse government agencies, research institutions, and organizations connected to UAP/UFO phenomena.',
+  title: 'Organizations | UFO/UAP Research | Project Profound',
+  description: 'Browse government agencies, research institutions, and organizations connected to UFO/UAP phenomena.',
 };
 export const revalidate = 86400; // ISR: revalidate once per day
 
@@ -100,12 +100,12 @@ export default async function OrganizationsPage({ searchParams }: { searchParams
               <Building2 className="w-5 h-5 text-[var(--domain-accent)]" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider">UAP Research</p>
+              <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider">UFO/UAP Research</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-serif tracking-tight">Organizations</h1>
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            {totalCount} agencies, institutions, and organizations referenced across UAP video testimony.
+            {totalCount} agencies, institutions, and organizations referenced across UFO/UAP video testimony.
           </p>
         </div>
       </section>

@@ -8,9 +8,9 @@ import { UapFilterSidebar } from "@/components/uap-explore/UapFilterSidebar";
 import type { UapExploreItem, ExploreFacets } from "@/components/uap-explore/types";
 
 export const metadata = {
-  title: "Explore UAP Videos | Project Profound",
+  title: "Explore UFO/UAP Videos | Project Profound",
   description:
-    "Browse UAP encounter accounts and research videos. Filter by entity type, evidence strength, contact depth, and more across 350+ analyzed videos.",
+    "Browse UFO/UAP encounter accounts and research videos. Filter by entity type, evidence strength, contact depth, and more across 350+ analyzed videos.",
 };
 
 const PAGE_SIZE = 12;
@@ -180,7 +180,7 @@ export default async function UapVideoExplorePage({ searchParams }: PageProps) {
                 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 mb-2"
                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
               >
-                Explore UAP Videos
+                Explore UFO/UAP Videos
               </h1>
               <p className="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed mb-4">
                 Browse first-person encounter accounts and investigative research.

@@ -226,7 +226,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!result) return { title: "Video Not Found | Project Profound" };
 
   const { video } = result;
-  const tierLabel = video.tier === 1 ? "UAP Encounter" : "UAP Research";
+  const tierLabel = video.tier === 1 ? "UFO/UAP Encounter" : "UFO/UAP Research";
   const title = `${video.title} | ${tierLabel} | Project Profound`;
   const description = video.analysis_uap_summary
     ? video.analysis_uap_summary.slice(0, 160)
@@ -406,8 +406,8 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
 
               <SocialShareButton
                 url={`https://projectprofound.org/uap/video/${video.video_id}`}
-                title={`${video.title} — UAP ${tierLabel} | Project Profound`}
-                description={`Explore this UAP ${tierLabel.toLowerCase()} on Project Profound.`}
+                title={`${video.title} — ${tierLabel} | Project Profound`}
+                description={`Explore this ${tierLabel.toLowerCase()} on Project Profound.`}
               />
             </div>
 
@@ -708,7 +708,7 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
                     Contact Experience Triad
                   </h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                    Analysis pending. This encounter has not yet been processed by our UAP research suite.
+                    Analysis pending. This encounter has not yet been processed by our UFO/UAP research suite.
                   </p>
                 </div>
               )

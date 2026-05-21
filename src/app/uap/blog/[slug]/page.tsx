@@ -95,7 +95,7 @@ export async function generateMetadata({
     const post = await getPost(slug);
     if (!post) return { title: "Article Not Found | Project Profound" };
 
-    const title = post.seo_title ?? `${post.title} | UAP Research — Project Profound`;
+    const title = post.seo_title ?? `${post.title} | UFO/UAP Research — Project Profound`;
     const description = post.seo_description ?? post.lead_paragraph ?? "";
     const ogImageUrl = `https://projectprofound.org/api/og/${post.slug}`;
 
@@ -237,7 +237,7 @@ export default async function UapBlogPostPage({
                             className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                         >
                             <ArrowLeft className="w-3.5 h-3.5" />
-                            UAP Blog
+                            UFO/UAP Blog
                         </Link>
                         <span className="text-slate-300 dark:text-slate-600">/</span>
                         <span
@@ -453,7 +453,7 @@ export default async function UapBlogPostPage({
                             className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            Back to UAP articles
+                            Back to UFO/UAP articles
                         </Link>
                     </div>
                 </article>

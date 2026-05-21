@@ -73,11 +73,11 @@ export async function generateMetadata({
   const profile = await getContacteeProfile(slug);
   if (!profile) return { title: "Profile Not Found | Project Profound" };
 
-  const title = `${profile.display_name} — UAP Contact Experiencer | Project Profound`;
+  const title = `${profile.display_name} — UFO/UAP Contact Experiencer | Project Profound`;
   const description = profile.highlight_quote
-    ? `"${profile.highlight_quote.slice(0, 140)}…" — ${profile.display_name}'s UAP contact experience profiled by Project Profound.`
+    ? `"${profile.highlight_quote.slice(0, 140)}…" — ${profile.display_name}'s UFO/UAP contact experience profiled by Project Profound.`
     : profile.summary?.slice(0, 160) ??
-      `Explore ${profile.display_name}'s UAP contact experience, profiled by Project Profound.`;
+      `Explore ${profile.display_name}'s UFO/UAP contact experience, profiled by Project Profound.`;
 
   return {
     title,
@@ -568,7 +568,7 @@ export default async function ContacteeProfilePage({
             name: profile.display_name,
             description:
               profile.summary ||
-              `UAP contact experiencer profiled by Project Profound`,
+              `UFO/UAP contact experiencer profiled by Project Profound`,
             url: `https://projectprofound.org/uap/experiencer/${profile.slug}`,
             image: profile.photo_url || undefined,
           }),

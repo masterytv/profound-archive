@@ -6,12 +6,12 @@ import { BookOpen, Clock, ArrowRight, Tag } from "lucide-react";
 export const revalidate = 86400; // ISR: revalidate once per day
 
 export const metadata: Metadata = {
-    title: "Blog — UAP Research & Insights | Project Profound",
+    title: "Blog — UFO/UAP Research & Insights | Project Profound",
     description:
-        "In-depth articles on UAP encounters, UFO research, and the contact phenomenon. Data-driven analysis from the Project Profound archive.",
+        "In-depth articles on UFO and UAP encounters, UFO research, and the contact phenomenon. Data-driven analysis from the Project Profound archive.",
     openGraph: {
-        title: "UAP Blog — Project Profound",
-        description: "Research-backed articles on UAP encounters, contact experiences, and the disclosure movement.",
+        title: "UFO/UAP Blog — Project Profound",
+        description: "Research-backed articles on UFO/UAP encounters, contact experiences, and the disclosure movement.",
         type: "website",
     },
 };
@@ -146,14 +146,14 @@ export default async function UapBlogIndexPage({
                     <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 bg-green-50 dark:bg-green-500/20 rounded-full">
                         <BookOpen className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                         <span className="text-xs font-semibold text-green-700 dark:text-green-300 tracking-wide uppercase">
-                            UAP Research Blog
+                            UFO/UAP Research Blog
                         </span>
                     </div>
                     <h1
                         className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-4 leading-[1.1]"
                         style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                     >
-                        What UAP Encounters{" "}
+                        What UFO & UAP Encounters{" "}
                         <span className="text-green-600 dark:text-green-400" style={{ fontStyle: "italic" }}>
                             Tell Us
                         </span>
@@ -212,7 +212,7 @@ export default async function UapBlogIndexPage({
                                     Articles coming soon
                                 </h2>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
-                                    We are building a comprehensive library of research-backed UAP articles.
+                                    We are building a comprehensive library of research-backed UFO/UAP articles.
                                     Check back soon.
                                 </p>
                             </div>

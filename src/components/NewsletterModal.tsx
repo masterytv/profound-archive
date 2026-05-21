@@ -32,7 +32,7 @@ const DOMAIN_CONFIG: Record<NewsletterDomain, {
     },
   },
   uap: {
-    title: "UAP Intelligence Newsletter",
+    title: "UFO/UAP Intelligence Newsletter",
     description: "Updates on UAP encounter research, high-credibility sightings, government programs, and contact reports from our growing archive.",
     successMessage: "You'll receive updates on new UAP analysis, high-credibility sightings, and research insights.",
     archetype: "newsletter_uap",

@@ -111,8 +111,8 @@ const DOMAIN_CONFIG = {
     },
     uap: {
         label: "Chat with UFOs",
-        subtitle: "UAP Research AI",
-        headerTitle: "UAP Guide",
+        subtitle: "UFO/UAP Research AI",
+        headerTitle: "UFO/UAP Guide",
         welcome: "Welcome! I'm an AI research assistant specializing in UFO, UAP, and alien contact experiences. My answers are grounded exclusively in the analyzed video testimonies in our archive. Ask me anything!",
         accentBg: "bg-emerald-600",
         accentHover: "hover:bg-emerald-700",

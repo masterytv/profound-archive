@@ -11,11 +11,11 @@ import { ContactForm } from "./ContactForm";
 export const metadata: Metadata = {
   title: "About | Project Profound",
   description:
-    "Project Profound explores the boundaries of consciousness through AI-powered analysis of 7,000+ near-death experience and UAP contact testimonies. Rigorous methodology, transparent data, compassionate inquiry.",
+    "Project Profound explores the boundaries of consciousness through AI-powered analysis of 7,000+ near-death experience and UFO/UAP contact testimonies. Rigorous methodology, transparent data, compassionate inquiry.",
   openGraph: {
     title: "About Project Profound",
     description:
-      "AI-powered consciousness research across near-death experiences and UAP contact encounters. 7,000+ testimonies. Cross-domain discoveries.",
+      "AI-powered consciousness research across near-death experiences and UFO/UAP contact encounters. 7,000+ testimonies. Cross-domain discoveries.",
     type: "website",
   },
 };
@@ -43,13 +43,13 @@ const RESEARCH_DOMAINS = [
     iconBg: "bg-green-100 dark:bg-green-900/30",
     iconColor: "text-green-600 dark:text-green-400",
     borderColor: "border-l-green-500/50",
-    title: "UAP Contact Encounters",
+    title: "UFO & UAP Contact Encounters",
     stat: "2,000+",
     statLabel: "video testimonies",
     description:
-      "UAP contact and encounter videos are analyzed across 22 research dimensions, including entity taxonomy, evidence strength scoring, phenomenological classification, and a six-factor credibility framework. Every experiencer receives a structured profile.",
+      "UFO and UAP contact and encounter videos are analyzed across 22 research dimensions, including entity taxonomy, evidence strength scoring, phenomenological classification, and a six-factor credibility framework. Every experiencer receives a structured profile.",
     link: "/uap",
-    linkText: "Explore UAP Archive",
+    linkText: "Explore UFO/UAP Archive",
   },
 ];
 
@@ -76,7 +76,7 @@ const PLATFORM_FEATURES = [
     iconColor: "text-amber-600 dark:text-amber-400",
     title: "Cross-Domain Analysis",
     description:
-      "Our original contribution: mapping phenomenological overlaps between NDE and UAP contact experiences. Entity encounters, telepathic communication, time distortion, and ontological shock appear in both.",
+      "Our original contribution: mapping phenomenological overlaps between NDE and UFO/UAP contact experiences. Entity encounters, telepathic communication, time distortion, and ontological shock appear in both.",
   },
   {
     icon: Cpu,
@@ -156,7 +156,7 @@ export default function AboutNewPage() {
           </h1>
           <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Project Profound is an independent research platform applying AI to the
-            largest open archive of near-death experience and UAP contact testimonies
+            largest open archive of near-death experience and UFO/UAP contact testimonies
             ever assembled. We don&apos;t have all the answers. We have 7,000+ first-person
             accounts and the tools to ask better questions.
           </p>
@@ -184,7 +184,7 @@ export default function AboutNewPage() {
                 knowledge downloads, and lasting ontological shifts.
               </p>
               <p>
-                These patterns appear in near-death experiences. They appear in UAP contact
+                These patterns appear in near-death experiences. They appear in UFO and UAP contact
                 encounters. They appear in mystical and meditative states. The overlap is
                 too consistent to ignore, and too complex to study without computational tools.
               </p>

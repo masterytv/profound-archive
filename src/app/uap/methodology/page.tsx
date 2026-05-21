@@ -18,13 +18,13 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "UAP Research Methodology | Project Profound",
+  title: "UFO/UAP Research Methodology | Project Profound",
   description:
-    "Our rigorous, transparent methodology for analyzing UAP encounter testimonies — including AI-assisted phenomenological extraction, the UAP-CET Triad, Hynek & Vallée classification, and credibility scoring.",
+    "Our rigorous, transparent methodology for analyzing UFO and UAP encounter testimonies — including AI-assisted phenomenological extraction, the UAP-CET Triad, Hynek & Vallée classification, and credibility scoring.",
   openGraph: {
-    title: "UAP Research Methodology | Project Profound",
+    title: "UFO/UAP Research Methodology | Project Profound",
     description:
-      "Transparent methodology for analyzing 5,000+ UAP encounter testimonies using AI-assisted phenomenological extraction and standardized scoring scales.",
+      "Transparent methodology for analyzing 5,000+ UFO/UAP encounter testimonies using AI-assisted phenomenological extraction and standardized scoring scales.",
   },
 };
 
@@ -85,7 +85,7 @@ const PIPELINE_STEPS = [
   { step: "4", title: "Phenomenology Extraction", desc: "AI extracts structured data: Hynek/Vallée classification, entity descriptions, physical effects, consciousness phenomena, evidence types." },
   { step: "5", title: "UAP-CET Scoring", desc: "Three independent AI passes score Evidence Strength, Contact Depth, and Transformation Index using calibrated rubrics." },
   { step: "6", title: "Program Intelligence", desc: "Tier 2 content undergoes claims extraction, identifying people, programs, technologies, and institutional assertions." },
-  { step: "7", title: "Event Matching", desc: "Timeline events are fuzzy-matched against canonical UAP events (Roswell, Phoenix Lights, etc.) for cross-video intelligence discovery." },
+  { step: "7", title: "Event Matching", desc: "Timeline events are fuzzy-matched against canonical UFO/UAP events (Roswell, Phoenix Lights, etc.) for cross-video intelligence discovery." },
   { step: "8", title: "Embedding & Indexing", desc: "Transcripts are chunked into passages, embedded via OpenAI text-embedding-3-small, and stored for semantic search." },
 ];
 
@@ -105,10 +105,10 @@ export default function MethodologyPage() {
             Research Methodology
           </div>
           <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight text-foreground mb-4">
-            How We Analyze UAP Encounters
+            How We Analyze UFO & UAP Encounters
           </h1>
           <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">
-            Project Profound applies a rigorous, transparent methodology to the analysis of UAP encounter testimonies.
+            Project Profound applies a rigorous, transparent methodology to the analysis of UFO and UAP encounter testimonies.
             Every video in our corpus undergoes the same standardized pipeline — ensuring comparability, reproducibility,
             and academic credibility across thousands of accounts.
           </p>
@@ -123,7 +123,7 @@ export default function MethodologyPage() {
         </h2>
         <div className="bg-card rounded-2xl border border-border/60 p-6 space-y-4 text-muted-foreground leading-relaxed">
           <p>
-            Our UAP vertical analyzes publicly available YouTube testimonies — first-person encounter accounts,
+            Our UFO/UAP vertical analyzes publicly available YouTube testimonies — first-person encounter accounts,
             researcher presentations, congressional hearings, and documentary content — using a structured AI-assisted pipeline.
           </p>
           <p>
@@ -417,7 +417,7 @@ export default function MethodologyPage() {
             </div>
             <div className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-600 dark:bg-amber-400 mt-1.5 shrink-0" />
-              <span><strong className="text-foreground">Selection Bias:</strong> Our channel corpus skews toward English-language, UFO/UAP-focused YouTube channels. This does not represent the global population of UAP experiences.</span>
+              <span><strong className="text-foreground">Selection Bias:</strong> Our channel corpus skews toward English-language, UFO/UAP-focused YouTube channels. This does not represent the global population of UFO/UAP experiences.</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-600 dark:bg-amber-400 mt-1.5 shrink-0" />
@@ -459,12 +459,12 @@ export default function MethodologyPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            name: "UAP Research Methodology",
-            description: "Rigorous, transparent methodology for analyzing UAP encounter testimonies using AI-assisted phenomenological extraction and standardized scoring scales.",
+            name: "UFO/UAP Research Methodology",
+            description: "Rigorous, transparent methodology for analyzing UFO and UAP encounter testimonies using AI-assisted phenomenological extraction and standardized scoring scales.",
             url: "https://projectprofound.org/uap/methodology",
             isPartOf: { "@type": "WebSite", name: "Project Profound", url: "https://projectprofound.org" },
             about: [
-              { "@type": "Thing", name: "UAP Analysis" },
+              { "@type": "Thing", name: "UFO/UAP Analysis" },
               { "@type": "Thing", name: "Phenomenology" },
               { "@type": "Thing", name: "Hynek Classification" },
             ],

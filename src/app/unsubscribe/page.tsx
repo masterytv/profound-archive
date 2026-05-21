@@ -22,7 +22,7 @@ const ALL_LISTS = [
   {
     id: "newsletter_uap",
     icon: "◎",
-    label: "UAP Intelligence Newsletter",
+    label: "UFO/UAP Intelligence Newsletter",
     desc: "Updates on UAP encounter research, high-credibility sightings, government programs, and contact reports.",
     type: "newsletter" as const,
   },

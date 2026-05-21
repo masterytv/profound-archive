@@ -12,10 +12,10 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Consciousness Research Platform | Project Profound",
-  description: "Exploring the boundaries of human experience through AI-powered analysis of 7,000+ NDE and UAP firsthand testimonies. Cross-domain phenomenology, validated research scales, and transparent methodology.",
+  description: "Exploring the boundaries of human experience through AI-powered analysis of 7,000+ NDE and UFO/UAP firsthand testimonies. Cross-domain phenomenology, validated research scales, and transparent methodology.",
   openGraph: {
     title: "Project Profound — Consciousness Research Platform",
-    description: "AI-powered analysis of Near-Death and UAP contact experiences. 7,000+ testimonies. Cross-domain discoveries.",
+    description: "AI-powered analysis of Near-Death and UFO/UAP contact experiences. 7,000+ testimonies. Cross-domain discoveries.",
     type: "website",
   },
 };
@@ -44,7 +44,7 @@ export default async function HomePage() {
             Research
           </h1>
           <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg md:text-xl mb-10 leading-relaxed">
-            Exploring the boundaries of human experience through AI-powered analysis of {totalVideos.toLocaleString()}+ firsthand testimonies spanning near-death experiences and UAP contact encounters.
+            Exploring the boundaries of human experience through AI-powered analysis of {totalVideos.toLocaleString()}+ firsthand testimonies spanning near-death experiences and UFO and UAP contact encounters.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -58,7 +58,7 @@ export default async function HomePage() {
               href="/uap"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
             >
-              <Telescope className="w-5 h-5" /> Explore UAP Encounters
+              <Telescope className="w-5 h-5" /> Explore UFO/UAP Encounters
             </Link>
           </div>
 
@@ -71,7 +71,7 @@ export default async function HomePage() {
             <div className="flex items-center gap-2">
               <Telescope className="w-5 h-5 text-green-500" />
               <span className="font-bold text-slate-900 dark:text-slate-100">{stats.uapVideos.toLocaleString()}+</span>
-              <span className="text-slate-600 dark:text-slate-400">UAP Videos</span>
+              <span className="text-slate-600 dark:text-slate-400">UFO/UAP Videos</span>
             </div>
             <div className="flex items-center gap-2">
               <Cpu className="w-5 h-5 text-violet-500" />
@@ -139,7 +139,7 @@ export default async function HomePage() {
               className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2"
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
-              UAP Contact Encounters
+              UFO & UAP Contact Encounters
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
               2,000+ videos analyzed across 22 research dimensions

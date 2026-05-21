@@ -63,11 +63,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const { person } = result;
   return {
-    title: `${person.canonical_name} | UAP Person of Interest | Project Profound`,
-    description: person.bio || `Profile of ${person.canonical_name} — ${person.total_mentions} mentions across ${person.linked_video_ids?.length || 0} UAP research videos.`,
+    title: `${person.canonical_name} | UFO/UAP Person of Interest | Project Profound`,
+    description: person.bio || `Profile of ${person.canonical_name} — ${person.total_mentions} mentions across ${person.linked_video_ids?.length || 0} UFO/UAP research videos.`,
     openGraph: {
-      title: `${person.canonical_name} | UAP Research`,
-      description: `${person.total_mentions} mentions across UAP video analysis.`,
+      title: `${person.canonical_name} | UFO/UAP Research`,
+      description: `${person.total_mentions} mentions across UFO/UAP video analysis.`,
       type: 'profile',
     },
   };
@@ -112,7 +112,7 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
     '@type': 'Person',
     name: person.canonical_name,
     alternateName: person.aliases,
-    description: person.bio || `${person.canonical_name} — figure in UAP/UFO research`,
+    description: person.bio || `${person.canonical_name} — figure in UFO/UAP research`,
     ...(person.affiliation && {
       affiliation: { '@type': 'Organization', name: person.affiliation },
     }),

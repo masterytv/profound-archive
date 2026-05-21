@@ -12,7 +12,6 @@ import {
     Brain,
     BookOpen,
     Beaker,
-    Heart,
     Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

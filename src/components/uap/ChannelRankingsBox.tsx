@@ -161,7 +161,7 @@ export function ChannelRankingsBox({ data }: ChannelRankingsBoxProps) {
         ))}
       </div>
       <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-3 leading-relaxed">
-        Rankings are based on UAP-related videos in the Profound Archive, not the channel&apos;s full YouTube catalog. Many channels cover topics beyond UAP, so only relevant content is included.
+        Rankings are based on UFO/UAP-related videos in the Profound Archive, not the channel&apos;s full YouTube catalog. Many channels cover topics beyond UFO/UAP, so only relevant content is included.
       </p>
     </div>
   );

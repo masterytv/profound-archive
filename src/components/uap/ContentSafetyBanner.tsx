@@ -50,9 +50,9 @@ export default function ContentSafetyBanner({
                 AI Research Assistant — Important Notice
               </h3>
               <p className="text-xs leading-relaxed text-amber-700 dark:text-amber-400/80">
-                This AI assistant provides responses based on analyzed UAP testimony transcripts.
+                This AI assistant provides responses based on analyzed UFO/UAP testimony transcripts.
                 It does not verify claims, endorse beliefs, or provide medical/psychological advice.
-                UAP contact experiences are complex and personal — responses may contain
+                UFO/UAP contact experiences are complex and personal — responses may contain
                 unverified assertions from source material. Always evaluate information critically
                 and consult qualified professionals for any health-related concerns.
               </p>

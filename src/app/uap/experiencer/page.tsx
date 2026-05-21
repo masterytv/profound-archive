@@ -11,13 +11,13 @@ export const revalidate = 86400;
 // ─── SEO ────────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "UAP Contact Experiencers | Project Profound",
+  title: "UFO/UAP Contact Experiencers | Project Profound",
   description:
-    "Explore profiles of UAP contact experiencers — first-person accounts of encounters with unidentified aerial phenomena, analyzed with the UAP Contact Triad.",
+    "Explore profiles of UFO/UAP contact experiencers — first-person accounts of encounters with unidentified aerial phenomena, analyzed with the UAP Contact Triad.",
   openGraph: {
-    title: "UAP Contact Experiencers | Project Profound",
+    title: "UFO/UAP Contact Experiencers | Project Profound",
     description:
-      "Explore profiles of UAP contact experiencers — scored with the UAP Contact Experience Triad.",
+      "Explore profiles of UFO/UAP contact experiencers — scored with the UAP Contact Experience Triad.",
     type: "website",
   },
 };
@@ -132,8 +132,8 @@ export default async function UapExperiencerPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "UAP Contact Experiencers",
-    description: "Profiles of UAP contact experiencers analyzed by Project Profound",
+    name: "UFO/UAP Contact Experiencers",
+    description: "Profiles of UFO/UAP contact experiencers analyzed by Project Profound",
     url: "https://projectprofound.org/uap/experiencer",
     numberOfItems: effectiveTotalCount,
   };
@@ -160,7 +160,7 @@ export default async function UapExperiencerPage({
             <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 bg-green-50 dark:bg-green-500/20 rounded-full">
               <Users className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
               <span className="text-xs font-semibold text-green-700 dark:text-green-300 tracking-wide uppercase">
-                UAP Contact Archive
+                UFO/UAP Contact Archive
               </span>
             </div>
             <h1
@@ -173,7 +173,7 @@ export default async function UapExperiencerPage({
               </span>
             </h1>
             <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-              Scored profiles of UAP contact experiencers — each with their Evidence Strength,
+              Scored profiles of UFO/UAP contact experiencers — each with their Evidence Strength,
               Experience Depth, and Life Impact scores from the UAP Contact Experience Triad.
             </p>
 

@@ -59,8 +59,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!result) return { title: 'Organization Not Found' };
   const { org } = result;
   return {
-    title: `${org.canonical_name} | UAP Organization | Project Profound`,
-    description: org.description || `${org.canonical_name} — referenced in ${org.linked_video_ids?.length || 0} UAP research videos.`,
+    title: `${org.canonical_name} | UFO/UAP Organization | Project Profound`,
+    description: org.description || `${org.canonical_name} — referenced in ${org.linked_video_ids?.length || 0} UFO/UAP research videos.`,
   };
 }
 
@@ -95,7 +95,7 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ slug
     '@type': 'Organization',
     name: org.canonical_name,
     alternateName: org.aliases,
-    description: org.description || `${org.canonical_name} — organization referenced in UAP research`,
+    description: org.description || `${org.canonical_name} — organization referenced in UFO/UAP research`,
   };
 
   return (

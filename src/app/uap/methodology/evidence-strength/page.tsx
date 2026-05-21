@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Shield, ArrowLeft, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Evidence Strength Scale (ESS) | UAP Methodology | Project Profound",
+  title: "Evidence Strength Scale (ESS) | UFO/UAP Methodology | Project Profound",
   description:
     "The UAP Evidence Strength Scale evaluates encounter claims across 7 criteria (witness credibility, perceptual clarity, specificity, corroboration, unpredictability, physical effects, temporal precedence) each scored 1–4 for a total range of 7–28.",
   openGraph: {

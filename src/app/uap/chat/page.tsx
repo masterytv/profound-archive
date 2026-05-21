@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import UapChatUI from "./chat-ui";
 
 export const metadata: Metadata = {
-  title: "UAP Research Assistant | Project Profound",
+  title: "UFO/UAP Research Assistant | Project Profound",
   description:
-    "Ask questions about UAP contact experiences, researchers, and phenomena. Answers are grounded in analyzed video testimonies from Project Profound's archive.",
+    "Ask questions about UFO/UAP contact experiences, researchers, and phenomena. Answers are grounded in analyzed video testimonies from Project Profound's archive.",
 };
 
 export default function UapChatPage() {

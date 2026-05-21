@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "UAP & UFO Encounters | Project Profound",
+  title: "UFO & UAP Encounters | Project Profound",
   description:
     "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research through AI-powered search and analysis.",
   openGraph: {
-    title: "UAP & UFO Encounters | Project Profound",
+    title: "UFO & UAP Encounters | Project Profound",
     description:
       "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research.",
     type: "website",

@@ -81,7 +81,7 @@ export function IntelligenceDashboard({ analytics }: { analytics: AnalyticsData 
             </div>
             <div>
               <p className="text-xs font-semibold text-[var(--domain-accent)] uppercase tracking-wider">
-                UAP Research
+                UFO/UAP Research
               </p>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-serif tracking-tight">
                 Intelligence Dashboard
@@ -89,7 +89,7 @@ export function IntelligenceDashboard({ analytics }: { analytics: AnalyticsData 
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            Cross-video analytics and network intelligence derived from AI analysis of our UAP research dataset.
+            Cross-video analytics and network intelligence derived from AI analysis of our UFO/UAP research dataset.
             Updated daily as new videos are processed.
           </p>
         </div>

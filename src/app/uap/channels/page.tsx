@@ -22,13 +22,13 @@ export const revalidate = 86400;
 // ─── SEO ────────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "UAP Channels | Project Profound",
+  title: "UFO/UAP Channels | Project Profound",
   description:
     "Browse YouTube channels covering UFO encounters, UAP disclosure, and consciousness research — analyzed by Project Profound.",
   openGraph: {
-    title: "UAP Channels | Project Profound",
+    title: "UFO/UAP Channels | Project Profound",
     description:
-      "Browse UAP content channels — sorted by subscribers, views, and archive depth.",
+      "Browse UFO/UAP content channels — sorted by subscribers, views, and archive depth.",
     type: "website",
   },
 };
@@ -197,9 +197,9 @@ export default async function UapChannelsPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "UAP Channels",
+    name: "UFO/UAP Channels",
     description:
-      "YouTube channels covering UAP research analyzed by Project Profound",
+      "YouTube channels covering UFO/UAP research analyzed by Project Profound",
     url: "https://projectprofound.org/uap/channels",
     numberOfItems: totalCount,
   };
@@ -227,7 +227,7 @@ export default async function UapChannelsPage({
             <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 bg-green-50 dark:bg-green-500/20 rounded-full">
               <Tv className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
               <span className="text-xs font-semibold text-green-700 dark:text-green-300 tracking-wide uppercase">
-                UAP Channel Archive
+                UFO/UAP Channel Archive
               </span>
             </div>
             <h1
@@ -243,7 +243,7 @@ export default async function UapChannelsPage({
               </span>
             </h1>
             <p className="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-              YouTube channels producing UAP encounter testimonies, government
+              YouTube channels producing UFO and UAP encounter testimonies, government
               disclosure coverage, and research — each with their archive depth
               and analysis scores.
             </p>
@@ -519,7 +519,7 @@ export default async function UapChannelsPage({
                     .
                   </>
                 ) : (
-                  <>Channels will appear as UAP content is analyzed.</>
+                  <>Channels will appear as UFO/UAP content is analyzed.</>
                 )}
               </p>
             </div>

@@ -267,10 +267,10 @@ export async function generateMetadata({
   const channel = await getChannel(handle);
   if (!channel) return { title: "Channel Not Found | Project Profound" };
 
-  const title = `${channel.channel_name} — UAP Channel | Project Profound`;
+  const title = `${channel.channel_name} — UFO/UAP Channel | Project Profound`;
   const description =
     channel.description?.slice(0, 160) ??
-    `Browse ${channel.channel_name}'s UAP content on Project Profound.`;
+    `Browse ${channel.channel_name}'s UFO/UAP content on Project Profound.`;
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://projectprofound.org";
   const ogImage = `${baseUrl}/api/og/channel/${channel.channel_id}`;
@@ -584,7 +584,7 @@ export default async function UapChannelDetailPage({
             name: channel.channel_name,
             description:
               channel.description?.slice(0, 300) ??
-              `UAP research channel: ${channel.channel_name}`,
+              `UFO/UAP research channel: ${channel.channel_name}`,
             ...(channel.avatar_url && { logo: channel.avatar_url }),
             ...(channel.custom_url && {
               url: `https://youtube.com/${channel.custom_url}`,

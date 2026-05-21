@@ -241,7 +241,7 @@ function UapSearchContent() {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Search UAP encounters, research, and disclosure..."
+                placeholder="Search UFO/UAP encounters, research, and disclosure..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
@@ -408,10 +408,10 @@ function UapSearchContent() {
               className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2"
               style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
             >
-              Search UAP Content
+              Search UFO/UAP Content
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-              Search across encounter reports, disclosure research, and UAP analysis.
+              Search across encounter reports, disclosure research, and UFO/UAP analysis.
               Use <strong>keyword</strong> for exact terms or <strong>semantic</strong> for meaning-based search.
             </p>
           </div>

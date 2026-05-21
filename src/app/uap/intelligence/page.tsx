@@ -12,13 +12,13 @@ import { IntelligenceDashboard } from './dashboard';
 import { computeAnalytics } from './compute-analytics';
 
 export const metadata: Metadata = {
-  title: 'Research Intelligence | UAP & UFO Analysis | Project Profound',
+  title: 'Research Intelligence | UFO & UAP Analysis | Project Profound',
   description:
-    'Cross-video analytics and network intelligence from our UAP research dataset. Explore claim distributions, person networks, encounter phenomenology, and daily facts.',
+    'Cross-video analytics and network intelligence from our UFO/UAP research dataset. Explore claim distributions, person networks, encounter phenomenology, and daily facts.',
   openGraph: {
-    title: 'UAP Research Intelligence | Project Profound',
+    title: 'UFO/UAP Research Intelligence | Project Profound',
     description:
-      'Cross-video analytics and network intelligence from our UAP research dataset.',
+      'Cross-video analytics and network intelligence from our UFO/UAP research dataset.',
     type: 'website',
   },
 };
