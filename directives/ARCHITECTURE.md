@@ -756,6 +756,137 @@ POST /api/cron/uap/knowledge      # Batch knowledge extraction
 
 **Specific schedules and batch sizes will be defined in Sprint Planning (Phase 3).** The architecture just defines the API contracts and the Actions that will call them.
 
+### 10.2 Oracle Cloud Always-On Worker (UAP Processing Server)
+
+> **Added 2026-05-25.** The UAP pipeline has a dedicated always-on worker running on Oracle Cloud Free Tier, providing ~40-80 videos/hour throughput 24/7 at $0/month cost.
+
+#### Architecture
+
+```
+┌──────────────────────────────────────────────────┐
+│  Oracle Cloud VM (Always Free, Ubuntu 22.04)     │
+│  Host: profound-worker                           │
+│  IP: 150.230.166.48                              │
+│  Region: US East (Ashburn)                       │
+│                                                  │
+│  pm2 → npx tsx scripts/rapid-process.ts          │
+│  CONCURRENCY=3                                   │
+│  Pulls from uap_scan_queue (same as local script)│
+│  Calls: OpenAI, Supadata, YouTube Data API       │
+│  Writes: Supabase (uap_vids, uap_analysis, etc.) │
+└──────────────────────────────────────────────────┘
+         │
+         ▼
+   Supabase (uap_scan_queue → uap_vids)
+```
+
+**How it works:** The worker runs the same `scripts/rapid-process.ts` that runs locally on the developer's laptop. It pulls pending videos from `uap_scan_queue`, processes them through `processUapVideoIntake()`, and writes results back to Supabase. When the queue empties, the script exits and pm2 restarts it.
+
+#### Server Details
+
+| Property | Value |
+|----------|-------|
+| **Cloud Provider** | Oracle Cloud Infrastructure (OCI), Always Free Tier |
+| **Tenancy** | `masterytv` |
+| **Region** | US East (Ashburn) |
+| **Instance Name** | `profound-worker` |
+| **Shape** | VM.Standard.E2.1.Micro (1 OCPU, 1 GB RAM) — Always Free |
+| **OS** | Ubuntu 22.04 LTS |
+| **Public IP** | `150.230.166.48` |
+| **Internal FQDN** | `profound-worker.publicsubnet.masterytv.oraclevcn.com` |
+| **SSH User** | `ubuntu` |
+| **SSH Key** | `~/.ssh/oracle-profound.key` (on developer's Mac) |
+| **Monthly Cost** | **$0** (Always Free Tier) |
+
+#### SSH Access
+
+```bash
+ssh -i ~/.ssh/oracle-profound.key ubuntu@150.230.166.48
+```
+
+#### Directory Layout (on server)
+
+```
+/home/ubuntu/
+  profound-archive/          # Git clone of the repo
+    .env.local               # API keys (copied from developer's Mac)
+    scripts/rapid-process.ts # The worker script
+    src/lib/pipeline/        # Pipeline code
+```
+
+#### Environment Variables (in `.env.local` on server)
+
+The server's `.env.local` contains the same keys as the developer's local file. Critical keys for the pipeline:
+
+| Variable | Source | Purpose |
+|----------|--------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Settings → API | Database connection |
+| `SUPABASE_SERVICE_KEY` | Supabase Dashboard → Settings → API → `service_role` key | Service-role DB writes |
+| `OPENAI_API_KEY` | platform.openai.com → API keys | LLM analysis + embeddings |
+| `YOUTUBE_API_KEY` | Google Cloud Console → APIs & Services → Credentials | Video metadata scraping |
+| `SUPADATA_API_KEY` | supadata.ai dashboard | YouTube caption fetching |
+
+**To update env vars:** SSH in → `nano ~/profound-archive/.env.local` (install nano first: `sudo apt install nano`) → save → `pm2 restart profound-worker`
+
+#### Service Management (pm2)
+
+```bash
+# View status
+pm2 status
+
+# View live logs
+pm2 logs profound-worker --lines 50
+
+# Interactive monitor (CPU, memory, restarts)
+pm2 monit
+
+# Restart worker (e.g., after env var change)
+pm2 restart profound-worker
+
+# Stop worker
+pm2 stop profound-worker
+
+# Start worker (if stopped)
+cd ~/profound-archive && CONCURRENCY=3 pm2 start "npx tsx scripts/rapid-process.ts" --name profound-worker
+```
+
+**Auto-restart on reboot:** pm2 is configured via `pm2 startup systemd` + `pm2 save` to auto-start on server reboot.
+
+#### Updating the Code
+
+To deploy new pipeline code to the worker:
+
+```bash
+ssh -i ~/.ssh/oracle-profound.key ubuntu@150.230.166.48
+cd ~/profound-archive
+git pull
+npm install  # Only if dependencies changed
+pm2 restart profound-worker
+```
+
+#### Relationship to GHA Cron
+
+| System | Role | Throughput | Status |
+|--------|------|-----------|--------|
+| **Oracle Worker** | Primary processor | ~40-80 videos/hr (CONCURRENCY=3) | Always-on |
+| **GHA `uap-scanner-process.yml`** | Fallback processor | ~18 videos/hr (3/tick × every 10 min) | Active (can disable to save GHA minutes) |
+| **GHA `uap-scanner-discover.yml`** | Queue population | Hourly channel scans | Always active (populates `uap_scan_queue`) |
+
+Both systems pull from the same `uap_scan_queue` table. The queue's `status` field (`pending` → `processing` → `complete`) prevents duplicate processing. If the Oracle worker is down, the GHA cron continues processing at reduced speed.
+
+**To disable GHA processing (save minutes):** GitHub → Actions → "UAP Video Processor" → `...` → Disable workflow. Keep "UAP Channel Discovery" enabled.
+
+#### Monitoring & Troubleshooting
+
+| Issue | Diagnosis | Fix |
+|-------|-----------|-----|
+| Worker not processing | `pm2 status` shows `errored` or `stopped` | `pm2 restart profound-worker` |
+| Out of disk space | `df -h` shows `/` at 100% | Clear logs: `pm2 flush` + `sudo apt autoremove` |
+| Can't SSH in | OCI Security List may have changed | OCI Console → Networking → VCN → Security Lists → verify port 22 ingress |
+| npm install fails | Low memory (1GB) | `sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile` |
+| Pipeline code outdated | Worker running old version | SSH in → `cd ~/profound-archive && git pull && pm2 restart profound-worker` |
+| Queue empty, worker exits | Normal behavior | pm2 auto-restarts, picks up new items when discover cron populates queue |
+
 ---
 
 ## 11. ADRs (Architectural Decision Records)
