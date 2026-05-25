@@ -3,12 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import { runUapProcessTick } from '@/lib/scanner/uap-tick';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 540; // 9 min — 3 sequential videos × ~90s each + overhead
 
 /**
  * GET|POST /api/uap/scanner/process
  *
- * Processes 1 video from the pending uap_scan_queue through the full UAP
- * intake pipeline. Returns the result synchronously.
+ * Processes up to 3 videos (configurable via videosPerTick) from the pending
+ * uap_scan_queue through the full UAP intake pipeline. Returns results
+ * synchronously.
  *
  * Copy-Modify from /api/scanner/process (NDE).
  * Called via APP_DIRECT_URL to bypass Cloudflare's 100s timeout.

@@ -1,31 +1,31 @@
-name: UAP Video Processor (10m, :05 offset)
+name: UAP Video Processor (10m, :05 offset, 3/tick)
 
 on:
   schedule:
-    # Process 1 UAP video from the queue every 10 minutes.
+    # Process 3 UAP videos from the queue every 10 minutes (~18/hr).
     # Offset 5 min from NDE processor to avoid concurrent API calls.
-    # Pipeline timing: 300-465s per video.
+    # Pipeline timing: ~45-90s per video, 3 sequential = ~135-270s typical.
     - cron: '5,15,25,35,45,55 * * * *'
   workflow_dispatch:
     inputs:
       videos_per_tick:
-        description: 'Number of videos to process (keep at 1)'
+        description: 'Number of videos to process per tick'
         required: false
-        default: '1'
+        default: '3'
 
 jobs:
   uap-scanner-process:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - name: Trigger UAP Video Processing
         run: |
           HTTP_CODE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST \
             "https://${{ secrets.APP_DIRECT_URL }}/api/uap/scanner/process" \
             -H "Content-Type: application/json" \
-            -d "{\"secret\": \"${{ secrets.CRON_SECRET }}\", \"videosPerTick\": ${{ github.event.inputs.videos_per_tick || 1 }}}" \
+            -d "{\"secret\": \"${{ secrets.CRON_SECRET }}\", \"videosPerTick\": ${{ github.event.inputs.videos_per_tick || 3 }}}" \
             --connect-timeout 15 \
-            --max-time 540)
+            --max-time 600)
           echo "HTTP Status: $HTTP_CODE"
           cat /tmp/response.txt
           echo ""

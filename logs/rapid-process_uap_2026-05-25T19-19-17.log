@@ -1,0 +1,35 @@
+[2026-05-25T19:19:17.874Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-05-25T19:19:17.874Z] 🚀 Starting UAP rapid processing (concurrency: 3)
+[2026-05-25T19:19:17.874Z] 🔄 Resetting stuck 'processing' videos...
+[2026-05-25T19:19:18.393Z]    Reset 4 stuck videos to pending
+[2026-05-25T19:19:18.559Z] 📊 Found 3909 pending UAP videos to process
+[2026-05-25T19:19:18.559Z]    Log file: /Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/logs/rapid-process_uap_2026-05-25T19-19-17.log
+[2026-05-25T19:19:18.559Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-05-25T19:19:21.418Z] ❌ [UAP 1/3909] GV0uu4bIC6w — FAILED: Unexpected HTTP 403: {"error":"forbidden","message":"Forbidden","details":"This video is age-restricted and requires auth (2s)
+[2026-05-25T19:19:21.418Z] ⚠️  [UAP] Auto-retrying GV0uu4bIC6w — caption fetch failed (attempt 3/3, backoff 120s)
+[2026-05-25T19:20:29.917Z] ✅ [UAP 2/3909] 7Wr-lXLGCxQ — Tier 2 (1m 11s)
+[2026-05-25T19:21:42.987Z] ✅ [UAP 3/3909] Tuo-jQPX8vU — Tier 1 (2m 24s)
+[2026-05-25T19:21:45.215Z] ❌ [UAP 4/3909] GV0uu4bIC6w — FAILED: Unexpected HTTP 403: {"error":"forbidden","message":"Forbidden","details":"This video is age-restricted and requires auth (2s)
+[2026-05-25T19:22:42.141Z] ✅ [UAP 5/3909] sqfwV_tjXKo — Tier 2 (58s)
+[2026-05-25T19:23:15.162Z] ✅ [UAP 6/3909] HBYPKjM3ftw — Tier 2 (1m 31s)
+[2026-05-25T19:24:11.410Z] ✅ [UAP 7/3909] CoKU5Pa6clE — Tier 2 (56s)
+[2026-05-25T19:24:12.227Z] ✅ [UAP 8/3909] YdcsXy2vSXU — Tier 2 (56s)
+[2026-05-25T19:24:16.301Z] ✅ [UAP 9/3909] LR5mW606fH8 — Tier 2 (1m 0s)
+[2026-05-25T19:27:38.452Z] ✅ [UAP 10/3909] NATEMbTKLMY — Tier 2 (3m 21s)
+[2026-05-25T19:31:50.991Z] ✅ [UAP 11/3909] 3NI-LmOGY00 — Tier 2 (7m 34s)
+[2026-05-25T19:33:48.174Z] ✅ [UAP 12/3909] aVGaUHpPXoI — Tier 1 (9m 31s)
+[2026-05-25T19:34:37.318Z] ✅ [UAP 13/3909] 7GKjSazkK9A — Tier 2 (48s)
+[2026-05-25T19:35:30.906Z] ✅ [UAP 14/3909] 4CPhH2DEp74 — Tier 2 (1m 42s)
+[2026-05-25T19:36:22.705Z] ✅ [UAP 15/3909] RrDzEV5dTYc — Tier 1 (2m 34s)
+[2026-05-25T19:37:10.540Z] ✅ [UAP 16/3909] AYR3G599vgk — Tier 2 (47s)
+[2026-05-25T19:37:20.424Z] ✅ [UAP 17/3909] -mrLGBcWR04 — Tier 2 (57s)
+[2026-05-25T19:39:31.337Z] ✅ [UAP 18/3909] f-bCNaiHYM0 — Tier 1 (3m 8s)
+[2026-05-25T19:40:28.700Z] ✅ [UAP 19/3909] n5N99cbmoA8 — Tier 2 (57s)
+[2026-05-25T19:40:38.828Z] ✅ [UAP 20/3909] pvCJReDag48 — Tier 2 (1m 7s)
+[2026-05-25T19:41:56.173Z] ✅ [UAP 21/3909] 5l-LX2y8x1M — Tier 1 (2m 24s)
+[2026-05-25T19:43:12.153Z] ✅ [UAP 22/3909] oKEgjY73F1E — Tier 2 (1m 15s)
+[2026-05-25T19:44:50.318Z] ✅ [UAP 23/3909] RAUTttRk6LU — Tier 2 (2m 53s)
+[2026-05-25T19:44:50.515Z] ✅ [UAP 24/3909] Ok4dz_5_pBw — Tier 1 (2m 54s)
+[2026-05-25T19:45:44.826Z] ✅ [UAP 25/3909] RjBuuT5p9mo — Tier 2 (54s)
+[2026-05-25T19:45:59.798Z] ✅ [UAP 26/3909] tCkmbN0R_Zs — Tier 2 (1m 9s)
+[2026-05-25T19:47:30.110Z] ✅ [UAP 27/3909] pclEBLdd9hQ — Tier 2 (2m 39s)
