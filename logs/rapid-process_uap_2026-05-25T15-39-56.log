@@ -1,0 +1,47 @@
+[2026-05-25T15:39:56.447Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-05-25T15:39:56.447Z] 🚀 Starting UAP rapid processing (concurrency: 3)
+[2026-05-25T15:39:56.447Z] 🔄 Resetting stuck 'processing' videos...
+[2026-05-25T15:39:57.077Z] 📊 Found 2251 pending UAP videos to process
+[2026-05-25T15:39:57.078Z]    Log file: /Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/logs/rapid-process_uap_2026-05-25T15-39-56.log
+[2026-05-25T15:39:57.078Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-05-25T15:40:04.279Z] ⏭️  [UAP 1/2251] ifUJmyyQYNk — no_captions (6s)
+[2026-05-25T15:40:43.958Z] ✅ [UAP 2/2251] ux5a1aGOVhI — Tier 2 (46s)
+[2026-05-25T15:41:42.183Z] ✅ [UAP 3/2251] 50OqD3SZooc — Tier 1 (1m 44s)
+[2026-05-25T15:41:52.673Z] ❌ [UAP 4/2251] FDpKJSG8VWY — FAILED: fetch failed (10s)
+[2026-05-25T15:41:53.744Z] ⏭️  [UAP 5/2251] iqfo8a3Nu1Y — no_captions (11s)
+[2026-05-25T15:44:41.143Z] ✅ [UAP 6/2251] rPWLRbSTP9s — Tier 2 (2m 58s)
+[2026-05-25T15:45:35.015Z] ✅ [UAP 7/2251] 3ZyqV_JafTM — Tier 1 (53s)
+[2026-05-25T15:48:08.998Z] ✅ [UAP 8/2251] ZYcLgi8iJ6g — Tier 2 (3m 27s)
+[2026-05-25T15:48:37.821Z] ✅ [UAP 9/2251] xCD_x7-1Qas — Tier 1 (3m 56s)
+[2026-05-25T15:51:50.724Z] ✅ [UAP 10/2251] y9Y8rz2bIdc — Tier 2 (3m 12s)
+[2026-05-25T15:52:21.161Z] ✅ [UAP 11/2251] MWAwAZBmCVM — Tier 1 (3m 43s)
+[2026-05-25T15:52:22.610Z] ✅ [UAP 12/2251] ESxlz_cX-sg — Tier 1 (3m 44s)
+[2026-05-25T15:53:56.519Z] ✅ [UAP 13/2251] RvKrjsQgglY — Tier 1 (1m 33s)
+[2026-05-25T15:54:00.731Z] ✅ [UAP 14/2251] w0lUTSF8pfw — Tier 2 (1m 37s)
+[2026-05-25T15:55:36.274Z] ✅ [UAP 15/2251] L3q6t9MMgB0 — Tier 2 (3m 13s)
+[2026-05-25T15:56:21.951Z] ✅ [UAP 16/2251] S31JJss5v8E — Tier 2 (45s)
+[2026-05-25T15:56:23.227Z] ✅ [UAP 17/2251] YCW5BnbgvvE — Tier 2 (46s)
+[2026-05-25T15:58:31.259Z] ✅ [UAP 18/2251] JaSKWRD-VD0 — Tier 2 (2m 54s)
+[2026-05-25T15:59:11.414Z] ✅ [UAP 19/2251] EiKDfr2iR30 — Tier 2 (39s)
+[2026-05-25T16:00:05.874Z] ✅ [UAP 20/2251] Jmnuov3sQI4 — Tier 2 (1m 34s)
+[2026-05-25T16:02:03.900Z] ✅ [UAP 21/2251] LYUHEC4RAkM — Tier 2 (3m 32s)
+[2026-05-25T16:02:58.525Z] ✅ [UAP 22/2251] BjpnlX2zg3I — Tier 2 (54s)
+[2026-05-25T16:05:24.665Z] ✅ [UAP 23/2251] KGR_jQsuP1A — Tier 1 (3m 20s)
+[2026-05-25T16:07:06.563Z] ✅ [UAP 24/2251] ezVNXP3RpLk — Tier 2 (5m 2s)
+[2026-05-25T16:07:15.335Z] ⏭️  [UAP 25/2251] 4buJp8SNkME — no_captions (8s)
+[2026-05-25T16:09:20.661Z] ✅ [UAP 26/2251] IdoFAi_hhPQ — Tier 2 (2m 13s)
+[2026-05-25T16:09:51.683Z] ✅ [UAP 27/2251] 1xtO3hjfQUE — Tier 2 (2m 44s)
+[2026-05-25T16:11:16.720Z] ✅ [UAP 28/2251] 0eFWg5WZFgw — Tier 2 (1m 24s)
+[2026-05-25T16:11:37.069Z] ✅ [UAP 29/2251] GWh83KVpDOE — Tier 2 (1m 45s)
+[2026-05-25T16:11:40.589Z] ✅ [UAP 30/2251] avJyOiYQS7k — Tier 2 (1m 48s)
+[2026-05-25T16:12:47.237Z] ✅ [UAP 31/2251] JO_1BTK9EK4 — Tier 2 (1m 6s)
+[2026-05-25T16:12:48.842Z] ✅ [UAP 32/2251] dFynjJE5v0g — Tier 1 (1m 8s)
+[2026-05-25T16:15:13.765Z] ✅ [UAP 33/2251] xdrCZJyXHNw — Tier 2 (3m 33s)
+[2026-05-25T16:15:13.841Z] 
+[2026-05-25T16:15:13.841Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-05-25T16:15:13.841Z] 🏁 UAP Processing Complete
+[2026-05-25T16:15:13.841Z]    Total: 33 | ✅ 29 | ⏭️ 3 | ❌ 1
+[2026-05-25T16:15:13.841Z]    Duration: 35m 16s
+[2026-05-25T16:15:13.841Z]    Log: /Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/logs/rapid-process_uap_2026-05-25T15-39-56.log
+[2026-05-25T16:15:13.841Z] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-05-25T16:15:13.841Z] 👋 Session ended. Full log: /Users/thomaswood/Documents/Antigravity/ProjectProfound/profound-archive/logs/rapid-process_uap_2026-05-25T15-39-56.log
