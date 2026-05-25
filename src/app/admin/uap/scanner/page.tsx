@@ -558,6 +558,18 @@ export default function UapScannerAdminPage() {
                                 </tr>
                             )}
                         </tbody>
+                        {enabledChannels.length > 0 && (
+                            <tfoot>
+                                <tr className="border-t border-white/10 bg-white/[0.03]">
+                                    <td className="p-3 text-foreground font-semibold text-xs uppercase tracking-wider" colSpan={2}>Totals</td>
+                                    <td className="p-3 text-foreground font-semibold">{enabledChannels.reduce((s, c) => s + (c.video_count || 0), 0).toLocaleString()}</td>
+                                    <td className="p-3 text-foreground font-semibold">{enabledChannels.reduce((s, c) => s + (c.pending_count || 0), 0).toLocaleString()}</td>
+                                    <td className="p-3 text-foreground font-semibold">{enabledChannels.reduce((s, c) => s + (c.processed_count || 0), 0).toLocaleString()}</td>
+                                    <td className="p-3 text-foreground font-semibold">{enabledChannels.reduce((s, c) => s + (c.added_count || 0), 0).toLocaleString()}</td>
+                                    <td colSpan={2}></td>
+                                </tr>
+                            </tfoot>
+                        )}
                     </table>
                 </div>
             </div>
@@ -629,6 +641,18 @@ export default function UapScannerAdminPage() {
                                     </tr>
                                 ))}
                             </tbody>
+                            {disabledChannels.length > 0 && (
+                                <tfoot>
+                                    <tr className="border-t border-white/10 bg-white/[0.03]">
+                                        <td className="p-3 text-foreground font-semibold text-xs uppercase tracking-wider" colSpan={2}>Totals</td>
+                                        <td className="p-3 text-foreground font-semibold">{disabledChannels.reduce((s, c) => s + (c.video_count || 0), 0).toLocaleString()}</td>
+                                        <td className="p-3 text-foreground font-semibold">{disabledChannels.reduce((s, c) => s + (c.pending_count || 0), 0).toLocaleString()}</td>
+                                        <td className="p-3 text-foreground font-semibold">{disabledChannels.reduce((s, c) => s + (c.processed_count || 0), 0).toLocaleString()}</td>
+                                        <td className="p-3 text-foreground font-semibold">{disabledChannels.reduce((s, c) => s + (c.added_count || 0), 0).toLocaleString()}</td>
+                                        <td colSpan={2}></td>
+                                    </tr>
+                                </tfoot>
+                            )}
                         </table>
                     </div>
                 </div>
@@ -759,6 +783,18 @@ export default function UapScannerAdminPage() {
                                 <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No playlists added yet. Add a YouTube playlist above.</td></tr>
                             )}
                         </tbody>
+                        {playlists.length > 0 && (
+                            <tfoot>
+                                <tr className="border-t border-white/10 bg-white/[0.03]">
+                                    <td className="p-3 text-foreground font-semibold text-xs uppercase tracking-wider" colSpan={2}>Totals</td>
+                                    <td className="p-3 text-foreground font-semibold">{playlists.reduce((s, p) => s + (p.video_count || 0), 0).toLocaleString()}</td>
+                                    <td className="p-3 text-foreground font-semibold">{playlists.reduce((s, p) => s + (p.pending_count || 0), 0).toLocaleString()}</td>
+                                    <td className="p-3 text-foreground font-semibold">{playlists.reduce((s, p) => s + (p.processed_count || 0), 0).toLocaleString()}</td>
+                                    <td className="p-3 text-foreground font-semibold">{playlists.reduce((s, p) => s + (p.added_count || 0), 0).toLocaleString()}</td>
+                                    <td colSpan={3}></td>
+                                </tr>
+                            </tfoot>
+                        )}
                     </table>
                 </div>
             </div>

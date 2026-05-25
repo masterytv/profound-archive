@@ -224,7 +224,7 @@ export async function GET(req: NextRequest) {
             ] = await Promise.all([
                 supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('status', 'pending'),
                 supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).neq('status', 'pending'),
-                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('intake_result', 'accepted'),
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('intake_result', 'complete'),
             ]);
 
             return {
