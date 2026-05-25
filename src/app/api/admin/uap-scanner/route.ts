@@ -183,25 +183,16 @@ export async function GET(req: NextRequest) {
         .order('started_at', { ascending: false })
         .limit(20);
 
-    // Intake aggregate stats
-    const { data: uapVidCounts } = await supabase
-        .from('uap_vids')
-        .select('channel_id, intake_status')
-        .not('intake_status', 'is', null);
+    // Intake aggregate stats — use RPC to avoid Supabase 1000-row truncation
+    const { data: intakeStatsRows } = await supabase.rpc('get_uap_intake_stats');
+    const intakeTotals = intakeStatsRows?.[0] ?? { accepted: 0, rejected: 0, failed: 0 };
 
-    const intakeTotals = { accepted: 0, rejected: 0, failed: 0 };
+    // Per-channel added counts — aggregated server-side, no row limit
+    const { data: addedRows } = await supabase.rpc('get_uap_channel_added_counts');
     const channelAddedCounts = new Map<string, number>();
-
-    if (uapVidCounts) {
-        for (const row of uapVidCounts) {
-            if (row.intake_status === 'complete') {
-                intakeTotals.accepted++;
-                if (row.channel_id) {
-                    channelAddedCounts.set(row.channel_id, (channelAddedCounts.get(row.channel_id) || 0) + 1);
-                }
-            }
-            else if (row.intake_status === 'out_of_scope') intakeTotals.rejected++;
-            else if (['failed', 'no_captions', 'drm_protected', 'embedding'].includes(row.intake_status)) intakeTotals.failed++;
+    if (addedRows) {
+        for (const row of addedRows) {
+            channelAddedCounts.set(row.channel_id, Number(row.added_count));
         }
     }
 
@@ -223,21 +214,24 @@ export async function GET(req: NextRequest) {
     );
 
     // Sprint 8: Add playlist queue counts
+    // Fixed: playlist added_count now counts only videos that entered through this playlist
     const playlistsWithCounts = await Promise.all(
         (playlists || []).map(async (p: any) => {
             const [
                 { count: pending_count },
-                { count: processed_count }
+                { count: processed_count },
+                { count: playlist_added }
             ] = await Promise.all([
                 supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('status', 'pending'),
-                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).neq('status', 'pending')
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).neq('status', 'pending'),
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('intake_result', 'accepted'),
             ]);
 
             return {
                 ...p,
                 pending_count: pending_count ?? 0,
                 processed_count: processed_count ?? 0,
-                added_count: p.channel_id ? (channelAddedCounts.get(p.channel_id) || 0) : 0,
+                added_count: playlist_added ?? 0,
                 channel_in_scanner: p.channel_id ? enabledChannelIds.has(p.channel_id) : false,
             };
         })
@@ -249,8 +243,8 @@ export async function GET(req: NextRequest) {
                 { count: pending_count },
                 { count: processed_count }
             ] = await Promise.all([
-                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('channel_id', c.channel_id).in('source_type', ['channel', null]).eq('status', 'pending'),
-                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('channel_id', c.channel_id).in('source_type', ['channel', null]).neq('status', 'pending')
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('channel_id', c.channel_id).eq('status', 'pending'),
+                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('channel_id', c.channel_id).neq('status', 'pending')
             ]);
 
             return {

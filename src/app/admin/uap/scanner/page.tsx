@@ -490,10 +490,10 @@ export default function UapScannerAdminPage() {
                             <tr className="border-b border-white/10 bg-white/[0.02]">
                                 <th className="text-left p-3 text-muted-foreground font-medium">Channel</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Priority</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Available</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Pending</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Processed</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Added</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Total videos on this YouTube channel (includes non-UAP content)">On YouTube</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos queued for AI analysis but not yet started">Pending</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos the pipeline has attempted (complete + failed + skipped)">Processed</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos successfully analyzed and in the public archive (tier 1+2)">In Archive</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Last Scanned</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Scanner</th>
                             </tr>
@@ -574,10 +574,10 @@ export default function UapScannerAdminPage() {
                                 <tr className="border-b border-white/10 bg-white/[0.02]">
                                     <th className="text-left p-3 text-muted-foreground font-medium">Channel</th>
                                     <th className="text-left p-3 text-muted-foreground font-medium">Priority</th>
-                                    <th className="text-left p-3 text-muted-foreground font-medium">Available</th>
-                                    <th className="text-left p-3 text-muted-foreground font-medium">Pending</th>
-                                    <th className="text-left p-3 text-muted-foreground font-medium">Processed</th>
-                                    <th className="text-left p-3 text-muted-foreground font-medium">Added</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Total videos on this YouTube channel (includes non-UAP content)">On YouTube</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos queued for AI analysis but not yet started">Pending</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos the pipeline has attempted (complete + failed + skipped)">Processed</th>
+                                    <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos successfully analyzed and in the public archive (tier 1+2)">In Archive</th>
                                     <th className="text-left p-3 text-muted-foreground font-medium">Last Scanned</th>
                                     <th className="text-left p-3 text-muted-foreground font-medium">Scanner</th>
                                 </tr>
@@ -708,10 +708,10 @@ export default function UapScannerAdminPage() {
                             <tr className="border-b border-white/10 bg-white/[0.02]">
                                 <th className="text-left p-3 text-muted-foreground font-medium">Playlist</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Priority</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Available</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Pending</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Processed</th>
-                                <th className="text-left p-3 text-muted-foreground font-medium">Added</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Total videos in this YouTube playlist">On YouTube</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos queued for AI analysis but not yet started">Pending</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos the pipeline has attempted (complete + failed + skipped)">Processed</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos from this playlist that were accepted into the archive">In Archive</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Last Scanned</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Scanner</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium"></th>
