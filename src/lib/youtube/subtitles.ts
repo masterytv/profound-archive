@@ -80,7 +80,7 @@ export async function fetchCaptions(videoId: string): Promise<CaptionFetchResult
 
     try {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        const timer = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
         let res: Response;
         try {
@@ -174,8 +174,8 @@ export async function fetchCaptions(videoId: string): Promise<CaptionFetchResult
         };
     } catch (error: any) {
         if (error?.name === 'AbortError') {
-            console.error(`[Supadata] Timeout (30s) fetching captions for ${videoId}`);
-            return { success: false, retryable: true, failureReason: 'timeout', message: 'Request timed out after 30s' };
+            console.error(`[Supadata] Timeout (60s) fetching captions for ${videoId}`);
+            return { success: false, retryable: true, failureReason: 'timeout', message: 'Request timed out after 60s' };
         } else {
             console.error(`[Supadata] Error fetching captions for ${videoId}:`, error?.message || error);
             return { success: false, retryable: true, failureReason: 'unknown', message: error?.message || String(error) };
