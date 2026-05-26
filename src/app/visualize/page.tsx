@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Network, Globe, Cpu, Waypoints } from 'lucide-react';
+import { ArrowLeft, Network, Globe, Cpu, Waypoints, Sparkles, Radio } from 'lucide-react';
 
 /**
  * Visualize Hub — Landing page with cards for each available 3D visualization.
@@ -57,6 +57,26 @@ const VISUALIZATIONS: VizCard[] = [
     icon: Globe,
     status: 'live',
     nodeCount: '85 locations',
+  },
+  {
+    id: 'hynek-space',
+    title: 'Hynek Classification Space',
+    description: 'Every UAP encounter plotted in 3D. See how evidence quality, contact depth, and transformation correlate across Hynek types.',
+    domain: 'uap',
+    href: '/visualize/hynek-space',
+    icon: Sparkles,
+    status: 'live',
+    nodeCount: '2,286 encounters',
+  },
+  {
+    id: 'channel-constellation',
+    title: 'Channel Constellation',
+    description: 'Every UAP channel positioned by intelligence value, credibility, and encounter depth. Sized by authority, colored by grade.',
+    domain: 'uap',
+    href: '/visualize/channel-constellation',
+    icon: Radio,
+    status: 'live',
+    nodeCount: '52 channels',
   },
 ];
 
