@@ -232,7 +232,10 @@ async function processVideo(
       || result.status === 'already_exists'
       || result.status === 'out_of_scope'
       || result.status === 'is_short'
-      || result.status === 'drm_protected';
+      || result.status === 'drm_protected'
+      || result.status === 'geo_restricted'
+      || result.status === 'members_only'
+      || result.status === 'live_stream';
 
     finalStatus = (result.status === 'complete' || result.status === 'already_exists')
       ? 'complete'

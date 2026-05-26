@@ -130,6 +130,18 @@ const resultBadge: Record<string, {
         cardClass: 'bg-amber-50 border-amber-200',
         iconBgClass: 'bg-amber-100',
     },
+    members_only: {
+        label: 'Members Only (Requires Membership)',
+        icon: <AlertTriangle className="w-5 h-5 text-amber-600" />,
+        cardClass: 'bg-amber-50 border-amber-200',
+        iconBgClass: 'bg-amber-100',
+    },
+    live_stream: {
+        label: 'Live Stream (No Transcript)',
+        icon: <AlertTriangle className="w-5 h-5 text-amber-600" />,
+        cardClass: 'bg-amber-50 border-amber-200',
+        iconBgClass: 'bg-amber-100',
+    },
 };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -206,7 +218,7 @@ export default function UapIntakePage() {
                     const job: JobRecord = await pollRes.json();
                     setCurrentJob(job);
 
-                    if (['complete', 'failed', 'already_exists', 'out_of_scope', 'no_captions', 'drm_protected', 'is_short', 'geo_restricted'].includes(job.status)) {
+                    if (['complete', 'failed', 'already_exists', 'out_of_scope', 'no_captions', 'drm_protected', 'is_short', 'geo_restricted', 'members_only', 'live_stream'].includes(job.status)) {
                         cleanup();
                     }
                 } catch {

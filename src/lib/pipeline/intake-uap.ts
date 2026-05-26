@@ -63,6 +63,8 @@ export type UapIntakeStatus =
     | 'caption_fetch_failed'  // Transient Supadata failure (rate limit, timeout, etc.) — retryable
     | 'quota_exceeded'        // Supadata monthly credits exhausted — stop pipeline immediately
     | 'geo_restricted'        // 403 — video not available in Supadata's region (non-retryable)
+    | 'members_only'          // 403 — video requires channel membership (non-retryable)
+    | 'live_stream'           // 403 — live stream, no transcript (non-retryable)
     | 'drm_protected'
     | 'already_exists'
     | 'is_short';
@@ -141,7 +143,7 @@ export async function processUapVideoIntake(
             .single();
 
         if (existing) {
-            const conclusive: string[] = ['complete', 'out_of_scope', 'is_short', 'geo_restricted'];
+            const conclusive: string[] = ['complete', 'out_of_scope', 'is_short', 'geo_restricted', 'members_only', 'live_stream'];
             if (conclusive.includes(existing.intake_status ?? '')) {
                 const label =
                     existing.intake_status === 'complete' ? `Already processed: "${existing.title}" (Tier ${existing.tier})` :
@@ -249,6 +251,12 @@ export async function processUapVideoIntake(
             } else if (captionFetch.failureReason === 'geo_restricted') {
                 // Video not available in Supadata's region — permanent, don't retry
                 captionStatus = 'geo_restricted';
+            } else if (captionFetch.failureReason === 'members_only') {
+                // Members-only video — permanent, don't retry
+                captionStatus = 'members_only';
+            } else if (captionFetch.failureReason === 'live_stream') {
+                // Live stream — no transcript available, don't retry
+                captionStatus = 'live_stream';
             } else if (captionFetch.retryable) {
                 // Transient Supadata failure — mark as failed so it gets retried
                 captionStatus = 'caption_fetch_failed';
