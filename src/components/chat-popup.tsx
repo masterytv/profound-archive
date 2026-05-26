@@ -107,7 +107,7 @@ const DOMAIN_CONFIG = {
         apiEndpoint: "/api/chat-compassionate",
         questions: NDE_QUESTIONS,
         // Pages where this domain's popup is hidden
-        hiddenPaths: ["/chat-compassionate"],
+        hiddenPaths: ["/chat-compassionate", "/visualize"],
     },
     uap: {
         label: "Chat with UFOs",
@@ -124,7 +124,7 @@ const DOMAIN_CONFIG = {
         chipHover: "hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700",
         apiEndpoint: "/api/uap/chat",
         questions: UAP_QUESTIONS,
-        hiddenPaths: ["/uap/chat"],
+        hiddenPaths: ["/uap/chat", "/visualize"],
     },
 } as const
 
