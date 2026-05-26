@@ -41,8 +41,9 @@ export type CaptionFailureReason =
     | 'rate_limited'       // 429 — per-second request rate exceeded (retryable with backoff)
     | 'quota_exceeded'     // 429 — monthly plan credit quota exhausted (stop pipeline)
     | 'credits_exhausted'  // 402 — monthly credit limit hit
+    | 'geo_restricted'     // 403 — video not available in Supadata's region
     | 'server_error'       // 500+ — Supadata infrastructure issue
-    | 'timeout'            // AbortError — 30s exceeded
+    | 'timeout'            // AbortError — 60s exceeded
     | 'auth_error'         // 401 — bad API key (non-retryable)
     | 'parse_error'        // Non-JSON response body (CDN error page, etc.)
     | 'missing_api_key'    // SUPADATA_API_KEY env var not set
@@ -100,6 +101,10 @@ export async function fetchCaptions(videoId: string): Promise<CaptionFetchResult
             } else if (res.status === 402) {
                 console.error(`[Supadata] PAYMENT REQUIRED (402) for ${videoId} — monthly credits exhausted.`);
                 return { success: false, retryable: true, failureReason: 'credits_exhausted', message: 'Supadata monthly credits exhausted (402)' };
+            } else if (res.status === 403) {
+                // Geo-restricted or otherwise forbidden — non-retryable
+                console.log(`[Supadata] GEO-RESTRICTED (403) for ${videoId} — video not available in Supadata's region.`);
+                return { success: false, retryable: false, failureReason: 'geo_restricted', message: `Geo-restricted (403): ${body.slice(0, 100)}` };
             } else if (res.status === 429) {
                 // Distinguish quota exhaustion from per-second rate limiting
                 // Supadata returns {"error":"limit-exceeded"} when monthly credits are gone

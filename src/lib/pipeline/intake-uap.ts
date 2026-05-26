@@ -62,6 +62,7 @@ export type UapIntakeStatus =
     | 'no_captions'
     | 'caption_fetch_failed'  // Transient Supadata failure (rate limit, timeout, etc.) — retryable
     | 'quota_exceeded'        // Supadata monthly credits exhausted — stop pipeline immediately
+    | 'geo_restricted'        // 403 — video not available in Supadata's region (non-retryable)
     | 'drm_protected'
     | 'already_exists'
     | 'is_short';
@@ -140,7 +141,7 @@ export async function processUapVideoIntake(
             .single();
 
         if (existing) {
-            const conclusive: string[] = ['complete', 'out_of_scope', 'is_short'];
+            const conclusive: string[] = ['complete', 'out_of_scope', 'is_short', 'geo_restricted'];
             if (conclusive.includes(existing.intake_status ?? '')) {
                 const label =
                     existing.intake_status === 'complete' ? `Already processed: "${existing.title}" (Tier ${existing.tier})` :
@@ -245,6 +246,9 @@ export async function processUapVideoIntake(
             } else if (captionFetch.failureReason === 'quota_exceeded') {
                 // Monthly Supadata credits exhausted — STOP the entire pipeline
                 captionStatus = 'quota_exceeded';
+            } else if (captionFetch.failureReason === 'geo_restricted') {
+                // Video not available in Supadata's region — permanent, don't retry
+                captionStatus = 'geo_restricted';
             } else if (captionFetch.retryable) {
                 // Transient Supadata failure — mark as failed so it gets retried
                 captionStatus = 'caption_fetch_failed';
