@@ -14,7 +14,7 @@
 | Sprint V4: Global Geography Globe | ✅ Complete | 2026-05-26 |
 | Sprint V5: Hynek Classification Space | ✅ Complete | 2026-05-26 |
 | Sprint V6: Channel Constellation | ✅ Complete | 2026-05-26 |
-| Sprint V7: UAP Timeline Helix | 📋 Planned | — |
+| Sprint V7: UAP Timeline Helix | ✅ Complete | 2026-05-26 |
 | Sprint V8: Unified Similarity Space (UMAP) | 📋 Planned | — |
 
 ---
@@ -93,3 +93,78 @@
 ## Sprint V4: Global Geography Globe (Phase 1A)
 
 > Planned. Needs geocoding pipeline first. 3D globe with toggleable layers.
+
+---
+
+## Sprint V7: UAP Timeline Helix
+
+**Goal:** Build an interactive 3D timeline visualization showing 2,241 UAP encounters across 350+ years (1670–2026).
+
+### Design Decisions
+- **Layout:** Logarithmic spiral (helix) as default, with Linear and Ribbon modes switchable
+- **Entity types:** Multi-entity category for encounters with 2+ entity types
+- **Time scrubber:** Filter visibility (hide encounters outside range)
+- **Pre-1940:** Included but compressed at bottom of helix
+
+### Epic V7.1: Data Pipeline
+
+#### Story V7.1.1: Cache Timeline Data
+- [x] SQL query extracts 2,241 encounters with event_year from `uap_encounters`
+- [x] Includes: year, date, hynek_type, scores, country, city, entity_type (with multi_entity)
+- [x] Cached in `viz_graph_cache` as `viz_id = 'uap-timeline'`
+
+### Epic V7.2: API Route
+
+#### Story V7.2.1: Timeline API
+- [x] Create `src/app/api/viz/uap-timeline/route.ts`
+- [x] Reads from `viz_graph_cache WHERE viz_id = 'uap-timeline'`
+- [x] `revalidate = 3600`
+
+### Epic V7.3: Page Route
+
+#### Story V7.3.1: Page Scaffold
+- [x] Create `src/app/visualize/uap-timeline/layout.tsx` — metadata
+- [x] Create `src/app/visualize/uap-timeline/page.tsx` — dynamic import
+- [x] Create `src/app/visualize/uap-timeline/uap-timeline-graph.tsx` — client component
+
+### Epic V7.4: 3D Timeline Visualization
+
+#### Story V7.4.1: Layout Engine
+- [x] Logarithmic Y-axis: pre-1940 compressed (4 units), post-1940 expanded (36 units)
+- [x] Helix mode: angular spiral distribution per year
+- [x] Linear mode: horizontal spread per year
+- [x] Ribbon mode: grid-based flat band per year
+- [x] Layout mode selector in control panel
+
+#### Story V7.4.2: Visual Elements
+- [x] Encounter spheres with glow effect (additive blending)
+- [x] Decade ring markers (translucent rings at each decade)
+- [x] Year labels as sprites
+- [x] Central spine line
+- [x] Color by Hynek type (default) or Entity type (toggle)
+
+#### Story V7.4.3: Time Scrubber
+- [x] Floating scrubber bar at bottom of viewport
+- [x] Play/Pause animation (~3 years/second)
+- [x] Manual slider control
+- [x] Reset button (show all)
+- [x] Year range display
+
+#### Story V7.4.4: Interaction
+- [x] Click encounter → VizNodeTooltip with full details
+- [x] Hynek type filter toggles
+- [x] Entity type legend (when in entity color mode)
+- [x] Decade stats bar chart in sidebar
+- [x] Auto-rotation (disabled on interaction)
+- [x] Zoom controls (in/out/fit)
+
+### Epic V7.5: Hub Page
+
+- [x] Add Timeline Helix card to `/visualize` hub page with Clock icon
+
+### Epic V7.6: Polish
+
+- [x] TypeScript build clean (no new errors)
+- [ ] Mobile testing (time scrubber responsive, touch controls)
+- [ ] `prefers-reduced-motion` disables auto-rotation
+- [ ] Visual verification of all three layout modes

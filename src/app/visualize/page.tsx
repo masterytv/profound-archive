@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Network, Globe, Cpu, Waypoints, Sparkles, Radio } from 'lucide-react';
+import { ArrowLeft, Network, Globe, Cpu, Waypoints, Sparkles, Radio, Clock } from 'lucide-react';
 
 /**
  * Visualize Hub — Landing page with cards for each available 3D visualization.
@@ -77,6 +77,16 @@ const VISUALIZATIONS: VizCard[] = [
     icon: Radio,
     status: 'live',
     nodeCount: '52 channels',
+  },
+  {
+    id: 'uap-timeline',
+    title: 'UAP Timeline Helix',
+    description: 'Travel through 350+ years of UAP encounters in an interactive 3D timeline. Watch the history of contact unfold from 1670 to today.',
+    domain: 'uap',
+    href: '/visualize/uap-timeline',
+    icon: Clock,
+    status: 'live',
+    nodeCount: '2,241 encounters',
   },
 ];
 
