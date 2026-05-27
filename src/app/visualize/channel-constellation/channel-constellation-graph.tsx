@@ -176,11 +176,11 @@ export function ChannelConstellationGraph() {
     }
 
     // X-axis: Intelligence (red)
-    makeAxis(new THREE.Vector3(1, 0, 0), 0xff6b6b, 'Intelligence →', '#ff6b6b');
+    makeAxis(new THREE.Vector3(1, 0, 0), 0xff6b6b, 'Intelligence', '#ff6b6b');
     // Y-axis: Credibility (green)
-    makeAxis(new THREE.Vector3(0, 1, 0), 0x51cf66, 'Credibility ↑', '#51cf66');
+    makeAxis(new THREE.Vector3(0, 1, 0), 0x51cf66, 'Credibility', '#51cf66');
     // Z-axis: Encounter Depth (blue)
-    makeAxis(new THREE.Vector3(0, 0, 1), 0x74c0fc, 'Encounter Depth →', '#74c0fc');
+    makeAxis(new THREE.Vector3(0, 0, 1), 0x74c0fc, 'Encounter Depth', '#74c0fc');
 
     // Floor grid
     const gridSize = SCALE * 2;

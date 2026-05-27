@@ -225,11 +225,11 @@ export function HynekSpaceGraph() {
     }
 
     // X-axis: Evidence (red)
-    makeAxis(new THREE.Vector3(1, 0, 0), 0xff6b6b, 'Evidence →', '#ff6b6b');
+    makeAxis(new THREE.Vector3(1, 0, 0), 0xff6b6b, 'Evidence', '#ff6b6b');
     // Y-axis: Contact Depth (green)
-    makeAxis(new THREE.Vector3(0, 1, 0), 0x51cf66, 'Contact Depth ↑', '#51cf66');
+    makeAxis(new THREE.Vector3(0, 1, 0), 0x51cf66, 'Contact Depth', '#51cf66');
     // Z-axis: Transformation (blue)
-    makeAxis(new THREE.Vector3(0, 0, 1), 0x74c0fc, 'Transformation →', '#74c0fc');
+    makeAxis(new THREE.Vector3(0, 0, 1), 0x74c0fc, 'Transformation', '#74c0fc');
 
     // Add subtle grid lines at the base (y = -8.5) for spatial reference
     const gridSize = 17; // covers -8.5 to +8.5
