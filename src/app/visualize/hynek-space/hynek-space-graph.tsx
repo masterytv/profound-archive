@@ -12,6 +12,8 @@ import * as THREE from 'three';
 
 interface EncounterPoint {
   id: string;
+  name: string;
+  slug: string;
   hynek: string;
   evidence: number;
   contact: number;
@@ -108,6 +110,8 @@ export function HynekSpaceGraph() {
       .filter(p => activeHynek.has(p.hynek))
       .map(p => ({
         id: p.id,
+        name: p.name,
+        slug: p.slug,
         hynek: p.hynek,
         evidence: p.evidence,
         contact: p.contact,
@@ -261,7 +265,7 @@ export function HynekSpaceGraph() {
       stats.push({ label: 'Country', value: node.country.replace(/_/g, ' ') });
     }
     const title = node.name || `Encounter #${node.id.slice(-6)}`;
-    const href = node.slug ? `/uap/experiencer/${node.slug}` : undefined;
+    const href = node.slug ? `/uap/persons/${node.slug}` : undefined;
     setTooltip({ type: 'node', title, stats, x: event.clientX, y: event.clientY, href });
   }, [stopRotation]);
 
