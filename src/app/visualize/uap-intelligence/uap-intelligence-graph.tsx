@@ -141,7 +141,7 @@ export function UapIntelligenceGraph() {
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
 
   // ─── Auto-fit + Auto-rotate ───────────────────────────────────────────────
 
@@ -276,6 +276,12 @@ export function UapIntelligenceGraph() {
   };
 
   const handleNodeClick = useCallback((node: IntelNode, event: MouseEvent) => {
+    // Build link: node.id format is "person:lue-elizondo", "org:mufon", "program:project-blue-book"
+    const PATH_MAP: Record<string, string> = { person: 'persons', org: 'organizations', program: 'programs' };
+    const [type, ...slugParts] = node.id.split(':');
+    const slug = slugParts.join(':'); // rejoin in case slug contains colons
+    const href = PATH_MAP[type] ? `/uap/${PATH_MAP[type]}/${slug}` : undefined;
+
     setTooltip({
       type: 'node',
       title: node.label,
@@ -287,6 +293,7 @@ export function UapIntelligenceGraph() {
       ],
       x: event.clientX,
       y: event.clientY,
+      href,
     });
   }, []);
 
@@ -376,22 +383,22 @@ export function UapIntelligenceGraph() {
     <div className="space-y-5">
       {/* ─── Description + Visual Key ─── */}
       <div className="space-y-3 pb-4 border-b border-white/10">
-        <p className="text-xs text-white/60 leading-relaxed">
+        <p className="text-xs text-white/75 leading-relaxed">
           Explore the UAP disclosure landscape — {graphData?.metadata.totalNodes || '…'} key
           entities connected through shared video testimony.
         </p>
-        <div className="space-y-2 text-[11px] text-white/45">
+        <div className="space-y-2 text-[11px] text-white/60">
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-emerald-400/80" />
-            <span><strong className="text-white/65">Node size</strong> — number of mentions</span>
+            <span><strong className="text-white/80">Node size</strong> — number of mentions</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-5 h-[2px] rounded-full bg-white/30" />
-            <span><strong className="text-white/65">Line width</strong> — shared video count</span>
+            <span><strong className="text-white/80">Line width</strong> — shared video count</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full" style={{ background: 'linear-gradient(135deg, #34d399, #f472b6)' }} />
-            <span><strong className="text-white/65">Shape</strong> — ● Person · ● Org · ● Program</span>
+            <span><strong className="text-white/80">Shape</strong> — ● Person · ● Org · ● Program</span>
           </div>
         </div>
       </div>
@@ -405,7 +412,7 @@ export function UapIntelligenceGraph() {
 
       {/* ─── Shared Videos Slider ─── */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Min Shared Videos
         </h3>
         <div className="space-y-1.5">
@@ -418,12 +425,12 @@ export function UapIntelligenceGraph() {
             onChange={e => setMinSharedVideos(Number(e.target.value))}
             className="w-full accent-green-400"
           />
-          <div className="flex justify-between text-xs text-white/40">
+          <div className="flex justify-between text-xs text-white/60">
             <span>1</span>
             <span>≥ {minSharedVideos} shared videos</span>
           </div>
           {graphData && (
-            <p className="text-[10px] text-white/30">
+            <p className="text-[10px] text-white/50">
               Showing {filteredData.links.length} of {graphData.edges.length} connections
             </p>
           )}
@@ -433,23 +440,23 @@ export function UapIntelligenceGraph() {
       {/* ─── Data Summary ─── */}
       {graphData && (
         <div className="space-y-2 pt-2 border-t border-white/10">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Data Summary
           </h3>
           <div className="space-y-1 text-xs">
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Total entities</span>
               <span className="text-white/70 tabular-nums">
                 {graphData.metadata.totalNodes}
               </span>
             </div>
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Visible nodes</span>
               <span className="text-white/70 tabular-nums">
                 {filteredData.nodes.length}
               </span>
             </div>
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Visible connections</span>
               <span className="text-white/70 tabular-nums">
                 {filteredData.links.length}
@@ -460,12 +467,12 @@ export function UapIntelligenceGraph() {
       )}
 
       {/* ─── Interaction Tips ─── */}
-      <div className="text-xs text-white/30 leading-relaxed pt-2 border-t border-white/10">
+      <div className="text-xs text-white/50 leading-relaxed pt-2 border-t border-white/10">
         <p className="mb-1">
-          <strong className="text-white/50">Click</strong> a node or connection for details
+          <strong className="text-white/70">Click</strong> a node or connection for details
         </p>
         <p>
-          <strong className="text-white/50">Drag</strong> to rotate · <strong className="text-white/50">Scroll</strong> to zoom
+          <strong className="text-white/70">Drag</strong> to rotate · <strong className="text-white/70">Scroll</strong> to zoom
         </p>
       </div>
     </div>

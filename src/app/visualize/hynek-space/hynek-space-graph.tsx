@@ -95,7 +95,7 @@ export function HynekSpaceGraph() {
     });
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [loading]);
 
   // ─── Build graph data (nodes only, no links — pure scatter) ───────────────
 
@@ -175,7 +175,9 @@ export function HynekSpaceGraph() {
     if (node.country && node.country !== 'not_stated') {
       stats.push({ label: 'Country', value: node.country.replace(/_/g, ' ') });
     }
-    setTooltip({ type: 'node', title: `Encounter #${node.id.slice(-6)}`, stats, x: event.clientX, y: event.clientY });
+    const title = node.name || `Encounter #${node.id.slice(-6)}`;
+    const href = node.slug ? `/uap/experiencer/${node.slug}` : undefined;
+    setTooltip({ type: 'node', title, stats, x: event.clientX, y: event.clientY, href });
   }, [stopRotation]);
 
   // ─── Toggle Hynek filter ──────────────────────────────────────────────────
@@ -199,21 +201,21 @@ export function HynekSpaceGraph() {
   const controlPanel = (
     <div className="space-y-5">
       <div className="space-y-3 pb-4 border-b border-white/10">
-        <p className="text-xs text-white/60 leading-relaxed">
+        <p className="text-xs text-white/75 leading-relaxed">
           {data?.metadata.totalPoints.toLocaleString() || '…'} encounters plotted in 3D space.
           Each dot is one encounter.
         </p>
-        <div className="space-y-2 text-[11px] text-white/45">
-          <div><strong className="text-white/65">X-axis</strong> — Evidence Score (0–100)</div>
-          <div><strong className="text-white/65">Y-axis</strong> — Contact Depth (0–100)</div>
-          <div><strong className="text-white/65">Z-axis</strong> — Transformation (0–100)</div>
-          <div><strong className="text-white/65">Color</strong> — Hynek Classification</div>
+        <div className="space-y-2 text-[11px] text-white/60">
+          <div><strong className="text-white/80">X-axis</strong> — Evidence Score (0–100)</div>
+          <div><strong className="text-white/80">Y-axis</strong> — Contact Depth (0–100)</div>
+          <div><strong className="text-white/80">Z-axis</strong> — Transformation (0–100)</div>
+          <div><strong className="text-white/80">Color</strong> — Hynek Classification</div>
         </div>
       </div>
 
       {/* Hynek toggles */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Filter by Hynek Type
         </h3>
         <div className="space-y-1.5">
@@ -226,9 +228,9 @@ export function HynekSpaceGraph() {
               }`}
             >
               <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-              <span className="text-white/60">{HYNEK_LABELS[key]}</span>
+              <span className="text-white/75">{HYNEK_LABELS[key]}</span>
               {data && (
-                <span className="ml-auto text-white/30 tabular-nums">
+                <span className="ml-auto text-white/50 tabular-nums">
                   {data.clusters.find(c => c.hynek === key)?.count || 0}
                 </span>
               )}
@@ -240,15 +242,15 @@ export function HynekSpaceGraph() {
       {/* Cluster averages */}
       {data && (
         <div className="space-y-2 pt-2 border-t border-white/10">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Cluster Averages
           </h3>
           <div className="space-y-2">
             {data.clusters.filter(c => HYNEK_LABELS[c.hynek]).map(c => (
-              <div key={c.hynek} className="text-[10px] text-white/40">
+              <div key={c.hynek} className="text-[10px] text-white/60">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: HYNEK_COLORS[c.hynek] }} />
-                  <span className="text-white/60 font-medium">{c.hynek}</span>
+                  <span className="text-white/75 font-medium">{c.hynek}</span>
                 </div>
                 <div className="ml-3.5 grid grid-cols-3 gap-1">
                   <span>Ev: {c.avgEvidence}</span>
@@ -261,9 +263,9 @@ export function HynekSpaceGraph() {
         </div>
       )}
 
-      <div className="text-xs text-white/30 leading-relaxed pt-2 border-t border-white/10">
-        <p className="mb-1"><strong className="text-white/50">Click</strong> a dot for details</p>
-        <p><strong className="text-white/50">Drag</strong> to rotate · <strong className="text-white/50">Scroll</strong> to zoom</p>
+      <div className="text-xs text-white/50 leading-relaxed pt-2 border-t border-white/10">
+        <p className="mb-1"><strong className="text-white/70">Click</strong> a dot for details</p>
+        <p><strong className="text-white/70">Drag</strong> to rotate · <strong className="text-white/70">Scroll</strong> to zoom</p>
       </div>
     </div>
   );

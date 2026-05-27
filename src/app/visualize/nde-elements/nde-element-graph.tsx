@@ -104,7 +104,7 @@ export function NdeElementGraph() {
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
 
   // ─── Auto-fit + Auto-rotate after physics settles ─────────────────────────
 
@@ -230,6 +230,9 @@ export function NdeElementGraph() {
   }, []);
 
   const handleNodeClick = useCallback((node: ElementNode, event: MouseEvent) => {
+    // Link to NDE video explore filtered by this element as a smart tag
+    const href = `/video-explore?tags=${encodeURIComponent(node.id)}&page=1`;
+
     setTooltip({
       type: 'node',
       title: node.label,
@@ -240,6 +243,7 @@ export function NdeElementGraph() {
       ],
       x: event.clientX,
       y: event.clientY,
+      href,
     });
   }, []);
 
@@ -335,28 +339,28 @@ export function NdeElementGraph() {
     <div className="space-y-5">
       {/* ─── Description + Visual Key ─── */}
       <div className="space-y-3 pb-4 border-b border-white/10">
-        <p className="text-xs text-white/60 leading-relaxed">
+        <p className="text-xs text-white/75 leading-relaxed">
           See how the 15 core elements of near-death experiences relate
           across {graphData?.metadata.totalExperiences.toLocaleString() || '…'} documented accounts.
         </p>
-        <div className="space-y-2 text-[11px] text-white/45">
+        <div className="space-y-2 text-[11px] text-white/60">
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-blue-400/80" />
-            <span><strong className="text-white/65">Node size</strong> — frequency of this element</span>
+            <span><strong className="text-white/80">Node size</strong> — frequency of this element</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-5 h-[2px] rounded-full bg-white/30" />
-            <span><strong className="text-white/65">Line width</strong> — co-occurrence strength</span>
+            <span><strong className="text-white/80">Line width</strong> — co-occurrence strength</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 flex items-center justify-center">
               <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
             </span>
-            <span><strong className="text-white/65">Particles</strong> — direction of association</span>
+            <span><strong className="text-white/80">Particles</strong> — direction of association</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-sm" style={{ background: 'linear-gradient(135deg, #60a5fa, #f472b6)' }} />
-            <span><strong className="text-white/65">Color</strong> — element category</span>
+            <span><strong className="text-white/80">Color</strong> — element category</span>
           </div>
         </div>
       </div>
@@ -370,7 +374,7 @@ export function NdeElementGraph() {
 
       {/* ─── Connection Strength ─── */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Min Co-occurrence
         </h3>
         <div className="space-y-1.5">
@@ -383,12 +387,12 @@ export function NdeElementGraph() {
             onChange={e => setMinStrength(Number(e.target.value))}
             className="w-full accent-blue-400"
           />
-          <div className="flex justify-between text-xs text-white/40">
+          <div className="flex justify-between text-xs text-white/60">
             <span>All</span>
             <span>{minStrength > 0 ? `≥ ${minStrength}% of experiences` : 'No filter'}</span>
           </div>
           {minStrength > 0 && (
-            <p className="text-[10px] text-white/30">
+            <p className="text-[10px] text-white/50">
               Showing {filteredData.links.length} of {graphData?.edges.length ?? 0} connections
             </p>
           )}
@@ -398,23 +402,23 @@ export function NdeElementGraph() {
       {/* ─── Data Summary ─── */}
       {graphData && (
         <div className="space-y-2 pt-2 border-t border-white/10">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Data Summary
           </h3>
           <div className="space-y-1 text-xs">
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Total experiences</span>
               <span className="text-white/70 tabular-nums">
                 {graphData.metadata.totalExperiences.toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Visible nodes</span>
               <span className="text-white/70 tabular-nums">
                 {filteredData.nodes.length}
               </span>
             </div>
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Visible connections</span>
               <span className="text-white/70 tabular-nums">
                 {filteredData.links.length}
@@ -425,12 +429,12 @@ export function NdeElementGraph() {
       )}
 
       {/* ─── Interaction Tips ─── */}
-      <div className="text-xs text-white/30 leading-relaxed pt-2 border-t border-white/10">
+      <div className="text-xs text-white/50 leading-relaxed pt-2 border-t border-white/10">
         <p className="mb-1">
-          <strong className="text-white/50">Click</strong> a node or connection for details
+          <strong className="text-white/70">Click</strong> a node or connection for details
         </p>
         <p>
-          <strong className="text-white/50">Drag</strong> to rotate · <strong className="text-white/50">Scroll</strong> to zoom
+          <strong className="text-white/70">Drag</strong> to rotate · <strong className="text-white/70">Scroll</strong> to zoom
         </p>
       </div>
     </div>

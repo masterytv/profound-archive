@@ -107,7 +107,7 @@ export function UapPhenomenologyGraph() {
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
 
   // ─── Auto-fit + Auto-rotate after physics settles ─────────────────────────
 
@@ -223,6 +223,18 @@ export function UapPhenomenologyGraph() {
   }, []);
 
   const handleNodeClick = useCallback((node: PhenomNode, event: MouseEvent) => {
+    // Map category → video-explore filter param
+    const FILTER_MAP: Record<string, (id: string) => string> = {
+      entity: (id) => `/uap/video-explore?entities=${encodeURIComponent(id)}`,
+      craft: (id) => `/uap/video-explore?q=${encodeURIComponent(id.replace(/_/g, ' '))}`,
+      consciousness: (id) => `/uap/video-explore?q=${encodeURIComponent(id.replace(/_/g, ' '))}`,
+      effect: (id) => `/uap/video-explore?q=${encodeURIComponent(id.replace(/_/g, ' '))}`,
+    };
+    // node.id is "entity:grey" — extract just the value part
+    const rawId = node.id.includes(':') ? node.id.split(':').slice(1).join(':') : node.id;
+    const buildHref = FILTER_MAP[node.category];
+    const href = buildHref ? buildHref(rawId) : undefined;
+
     setTooltip({
       type: 'node',
       title: node.label,
@@ -233,6 +245,7 @@ export function UapPhenomenologyGraph() {
       ],
       x: event.clientX,
       y: event.clientY,
+      href,
     });
   }, []);
 
@@ -323,29 +336,29 @@ export function UapPhenomenologyGraph() {
     <div className="space-y-5">
       {/* ─── Description + Visual Key ─── */}
       <div className="space-y-3 pb-4 border-b border-white/10">
-        <p className="text-xs text-white/60 leading-relaxed">
+        <p className="text-xs text-white/75 leading-relaxed">
           Explore how UAP encounter phenomena co-occur
           across {graphData?.metadata.totalEncounters.toLocaleString() || '…'} analyzed encounters.
           Toggle categories to reveal cross-dimensional patterns.
         </p>
-        <div className="space-y-2 text-[11px] text-white/45">
+        <div className="space-y-2 text-[11px] text-white/60">
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-emerald-400/80" />
-            <span><strong className="text-white/65">Node size</strong> — frequency of this phenomenon</span>
+            <span><strong className="text-white/80">Node size</strong> — frequency of this phenomenon</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-5 h-[2px] rounded-full bg-white/30" />
-            <span><strong className="text-white/65">Line width</strong> — co-occurrence strength</span>
+            <span><strong className="text-white/80">Line width</strong> — co-occurrence strength</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 flex items-center justify-center">
               <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
             </span>
-            <span><strong className="text-white/65">Particles</strong> — direction of association</span>
+            <span><strong className="text-white/80">Particles</strong> — direction of association</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-sm" style={{ background: 'linear-gradient(135deg, #34d399, #fb923c, #60a5fa, #c084fc)' }} />
-            <span><strong className="text-white/65">Color</strong> — phenomenon category</span>
+            <span><strong className="text-white/80">Color</strong> — phenomenon category</span>
           </div>
         </div>
       </div>
@@ -359,7 +372,7 @@ export function UapPhenomenologyGraph() {
 
       {/* ─── Connection Strength ─── */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Min Co-occurrence
         </h3>
         <div className="space-y-1.5">
@@ -372,12 +385,12 @@ export function UapPhenomenologyGraph() {
             onChange={e => setMinStrength(Number(e.target.value))}
             className="w-full accent-emerald-400"
           />
-          <div className="flex justify-between text-xs text-white/40">
+          <div className="flex justify-between text-xs text-white/60">
             <span>All</span>
             <span>{minStrength > 0 ? `≥ ${minStrength}% of encounters` : 'No filter'}</span>
           </div>
           {minStrength > 0 && (
-            <p className="text-[10px] text-white/30">
+            <p className="text-[10px] text-white/50">
               Showing {filteredData.links.length} of {graphData?.edges.length ?? 0} connections
             </p>
           )}
@@ -387,23 +400,23 @@ export function UapPhenomenologyGraph() {
       {/* ─── Data Summary ─── */}
       {graphData && (
         <div className="space-y-2 pt-2 border-t border-white/10">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Data Summary
           </h3>
           <div className="space-y-1 text-xs">
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Total encounters</span>
               <span className="text-white/70 tabular-nums">
                 {graphData.metadata.totalEncounters.toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Visible nodes</span>
               <span className="text-white/70 tabular-nums">
                 {filteredData.nodes.length}
               </span>
             </div>
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Visible connections</span>
               <span className="text-white/70 tabular-nums">
                 {filteredData.links.length}
@@ -414,12 +427,12 @@ export function UapPhenomenologyGraph() {
       )}
 
       {/* ─── Interaction Tips ─── */}
-      <div className="text-xs text-white/30 leading-relaxed pt-2 border-t border-white/10">
+      <div className="text-xs text-white/50 leading-relaxed pt-2 border-t border-white/10">
         <p className="mb-1">
-          <strong className="text-white/50">Click</strong> a node or connection for details
+          <strong className="text-white/70">Click</strong> a node or connection for details
         </p>
         <p>
-          <strong className="text-white/50">Drag</strong> to rotate · <strong className="text-white/50">Scroll</strong> to zoom
+          <strong className="text-white/70">Drag</strong> to rotate · <strong className="text-white/70">Scroll</strong> to zoom
         </p>
       </div>
     </div>

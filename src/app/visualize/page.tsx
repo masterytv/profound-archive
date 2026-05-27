@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { ArrowLeft, Network, Globe, Cpu, Waypoints, Sparkles, Radio, Clock } from 'lucide-react';
+import { ArrowLeft, Network, Globe, Cpu, Waypoints, Orbit, Radio, Clock } from 'lucide-react';
 
 /**
  * Visualize Hub — Landing page with cards for each available 3D visualization.
  * Server component, no client-side JS needed.
+ * Organized into UFO/UAP and NDE sections.
  */
 
 interface VizCard {
@@ -17,16 +18,36 @@ interface VizCard {
   nodeCount?: string;
 }
 
-const VISUALIZATIONS: VizCard[] = [
+const UAP_VISUALIZATIONS: VizCard[] = [
   {
-    id: 'nde-elements',
-    title: 'NDE Element Network',
-    description: 'See how the 15 core NDE elements connect. Which experiences appear together most often? Explore the hidden structure of near-death experiences.',
-    domain: 'nde',
-    href: '/visualize/nde-elements',
-    icon: Network,
+    id: 'uap-timeline',
+    title: 'UAP Timeline Helix',
+    description: 'Travel through 350+ years of UAP encounters in an interactive 3D timeline. Watch the history of contact unfold from 1670 to today.',
+    domain: 'uap',
+    href: '/visualize/uap-timeline',
+    icon: Clock,
     status: 'live',
-    nodeCount: '15 elements',
+    nodeCount: '2,241 encounters',
+  },
+  {
+    id: 'geography',
+    title: 'Global Encounter Map',
+    description: 'Where do UAP encounters happen? A 3D globe with encounter hotspots across US states and 50+ countries.',
+    domain: 'uap',
+    href: '/visualize/geography',
+    icon: Globe,
+    status: 'live',
+    nodeCount: '85 locations',
+  },
+  {
+    id: 'hynek-space',
+    title: 'Hynek Classification Space',
+    description: 'Every UAP encounter plotted in 3D. See how evidence quality, contact depth, and transformation correlate across Hynek types.',
+    domain: 'uap',
+    href: '/visualize/hynek-space',
+    icon: Orbit,
+    status: 'live',
+    nodeCount: '2,286 encounters',
   },
   {
     id: 'uap-phenomenology',
@@ -49,26 +70,6 @@ const VISUALIZATIONS: VizCard[] = [
     nodeCount: '110 entities',
   },
   {
-    id: 'geography',
-    title: 'Global Encounter Map',
-    description: 'Where do UAP encounters happen? A 3D globe with encounter hotspots across US states and 50+ countries.',
-    domain: 'uap',
-    href: '/visualize/geography',
-    icon: Globe,
-    status: 'live',
-    nodeCount: '85 locations',
-  },
-  {
-    id: 'hynek-space',
-    title: 'Hynek Classification Space',
-    description: 'Every UAP encounter plotted in 3D. See how evidence quality, contact depth, and transformation correlate across Hynek types.',
-    domain: 'uap',
-    href: '/visualize/hynek-space',
-    icon: Sparkles,
-    status: 'live',
-    nodeCount: '2,286 encounters',
-  },
-  {
     id: 'channel-constellation',
     title: 'Channel Constellation',
     description: 'Every UAP channel positioned by intelligence value, credibility, and encounter depth. Sized by authority, colored by grade.',
@@ -78,15 +79,18 @@ const VISUALIZATIONS: VizCard[] = [
     status: 'live',
     nodeCount: '52 channels',
   },
+];
+
+const NDE_VISUALIZATIONS: VizCard[] = [
   {
-    id: 'uap-timeline',
-    title: 'UAP Timeline Helix',
-    description: 'Travel through 350+ years of UAP encounters in an interactive 3D timeline. Watch the history of contact unfold from 1670 to today.',
-    domain: 'uap',
-    href: '/visualize/uap-timeline',
-    icon: Clock,
+    id: 'nde-elements',
+    title: 'NDE Element Network',
+    description: 'See how the 15 core NDE elements connect. Which experiences appear together most often? Explore the hidden structure of near-death experiences.',
+    domain: 'nde',
+    href: '/visualize/nde-elements',
+    icon: Network,
     status: 'live',
-    nodeCount: '2,241 encounters',
+    nodeCount: '15 elements',
   },
 ];
 
@@ -111,6 +115,72 @@ const domainColors = {
   },
 };
 
+function VizCardGrid({ cards }: { cards: VizCard[] }) {
+  return (
+    <div className="grid gap-6 sm:grid-cols-2">
+      {cards.map((viz) => {
+        const colors = domainColors[viz.domain];
+        const Icon = viz.icon;
+        const isLive = viz.status === 'live';
+
+        const content = (
+          <div
+            className={`group relative rounded-2xl border p-6
+              bg-white/[0.02] backdrop-blur-sm
+              transition-all duration-300
+              ${colors.border}
+              ${isLive ? 'cursor-pointer hover:bg-white/[0.04] hover:shadow-xl' : 'opacity-60'}
+              ${isLive ? colors.glow : ''}`}
+          >
+            {/* Icon + Status */}
+            <div className="flex items-start justify-between mb-4">
+              <div className={`w-11 h-11 rounded-xl ${colors.bg} flex items-center justify-center`}>
+                <Icon className={`w-5 h-5 ${colors.accent}`} />
+              </div>
+              {!isLive && (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full
+                  bg-white/5 text-white/30 border border-white/10">
+                  Coming Soon
+                </span>
+              )}
+            </div>
+
+            {/* Title */}
+            <h3 className="text-lg font-semibold text-white/90 mb-2 
+              group-hover:text-white transition-colors">
+              {viz.title}
+            </h3>
+
+            {/* Description */}
+            <p className="text-sm text-white/40 leading-relaxed mb-4">
+              {viz.description}
+            </p>
+
+            {/* Meta */}
+            <div className="flex items-center gap-3">
+              {viz.nodeCount && (
+                <span className="text-xs text-white/30">
+                  {viz.nodeCount}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+
+        if (isLive) {
+          return (
+            <Link key={viz.id} href={viz.href} className="block">
+              {content}
+            </Link>
+          );
+        }
+
+        return <div key={viz.id}>{content}</div>;
+      })}
+    </div>
+  );
+}
+
 export default function VisualizePage() {
   return (
     <div className="min-h-screen bg-[#030014]">
@@ -133,76 +203,35 @@ export default function VisualizePage() {
         </p>
       </div>
 
-      {/* ─── Cards Grid ─── */}
-      <div className="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
-        <div className="grid gap-6 sm:grid-cols-2">
-          {VISUALIZATIONS.map((viz) => {
-            const colors = domainColors[viz.domain];
-            const Icon = viz.icon;
-            const isLive = viz.status === 'live';
+      {/* ─── Sections ─── */}
+      <div className="mx-auto max-w-5xl px-4 pb-20 sm:px-6 space-y-14">
+        {/* UFO/UAP Section */}
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+              <Globe className="w-4 h-4 text-green-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-white/90">UFO / UAP Visualizations</h2>
+            <span className="text-xs text-green-400/50 bg-green-500/10 px-2 py-0.5 rounded-full">
+              {UAP_VISUALIZATIONS.length} maps
+            </span>
+          </div>
+          <VizCardGrid cards={UAP_VISUALIZATIONS} />
+        </section>
 
-            const content = (
-              <div
-                className={`group relative rounded-2xl border p-6
-                  bg-white/[0.02] backdrop-blur-sm
-                  transition-all duration-300
-                  ${colors.border}
-                  ${isLive ? 'cursor-pointer hover:bg-white/[0.04] hover:shadow-xl' : 'opacity-60'}
-                  ${isLive ? colors.glow : ''}`}
-              >
-                {/* Icon + Status */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-11 h-11 rounded-xl ${colors.bg} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${colors.accent}`} />
-                  </div>
-                  {!isLive && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full
-                      bg-white/5 text-white/30 border border-white/10">
-                      Coming Soon
-                    </span>
-                  )}
-                </div>
-
-                {/* Title */}
-                <h2 className="text-lg font-semibold text-white/90 mb-2 
-                  group-hover:text-white transition-colors">
-                  {viz.title}
-                </h2>
-
-                {/* Description */}
-                <p className="text-sm text-white/40 leading-relaxed mb-4">
-                  {viz.description}
-                </p>
-
-                {/* Meta */}
-                <div className="flex items-center gap-3">
-                  {viz.nodeCount && (
-                    <span className="text-xs text-white/30">
-                      {viz.nodeCount}
-                    </span>
-                  )}
-                  <span className={`text-xs ${
-                    viz.domain === 'nde' ? 'text-blue-400/60' :
-                    viz.domain === 'uap' ? 'text-green-400/60' :
-                    'text-purple-400/60'
-                  }`}>
-                    {viz.domain === 'nde' ? 'NDE' : viz.domain === 'uap' ? 'UAP' : 'Cross-Domain'}
-                  </span>
-                </div>
-              </div>
-            );
-
-            if (isLive) {
-              return (
-                <Link key={viz.id} href={viz.href} className="block">
-                  {content}
-                </Link>
-              );
-            }
-
-            return <div key={viz.id}>{content}</div>;
-          })}
-        </div>
+        {/* NDE Section */}
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+              <Network className="w-4 h-4 text-blue-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-white/90">NDE Visualizations</h2>
+            <span className="text-xs text-blue-400/50 bg-blue-500/10 px-2 py-0.5 rounded-full">
+              {NDE_VISUALIZATIONS.length} map
+            </span>
+          </div>
+          <VizCardGrid cards={NDE_VISUALIZATIONS} />
+        </section>
       </div>
     </div>
   );

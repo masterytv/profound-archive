@@ -83,7 +83,7 @@ export function ChannelConstellationGraph() {
     });
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [loading]);
 
   // ─── Build graph data (scatter — fixed positions, no links) ───────────────
 
@@ -179,7 +179,7 @@ export function ChannelConstellationGraph() {
     if (node.archetype) {
       stats.push({ label: 'Archetype', value: node.archetype });
     }
-    setTooltip({ type: 'node', title: node.name, stats, x: event.clientX, y: event.clientY });
+    setTooltip({ type: 'node', title: node.name, stats, x: event.clientX, y: event.clientY, href: `/uap/channels/${node.id}` });
   }, [stopRotation]);
 
   // ─── Zoom ─────────────────────────────────────────────────────────────────
@@ -193,26 +193,26 @@ export function ChannelConstellationGraph() {
   const controlPanel = (
     <div className="space-y-5">
       <div className="space-y-3 pb-4 border-b border-white/10">
-        <p className="text-xs text-white/60 leading-relaxed">
+        <p className="text-xs text-white/75 leading-relaxed">
           {data?.metadata.totalChannels || '…'} UAP channels positioned by their scores.
         </p>
-        <div className="space-y-2 text-[11px] text-white/45">
-          <div><strong className="text-white/65">X-axis</strong> — Intelligence Value</div>
-          <div><strong className="text-white/65">Y-axis</strong> — Credibility Score</div>
-          <div><strong className="text-white/65">Z-axis</strong> — Encounter Depth</div>
-          <div><strong className="text-white/65">Size</strong> — Authority Score</div>
-          <div><strong className="text-white/65">Color</strong> — Archetype</div>
+        <div className="space-y-2 text-[11px] text-white/60">
+          <div><strong className="text-white/80">X-axis</strong> — Intelligence Value</div>
+          <div><strong className="text-white/80">Y-axis</strong> — Credibility Score</div>
+          <div><strong className="text-white/80">Z-axis</strong> — Encounter Depth</div>
+          <div><strong className="text-white/80">Size</strong> — Authority Score</div>
+          <div><strong className="text-white/80">Color</strong> — Archetype</div>
         </div>
       </div>
 
       {/* Archetype legend */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">Channel Archetype</h3>
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">Channel Archetype</h3>
         <div className="space-y-1.5">
           {Object.entries(ARCHETYPE_COLORS).map(([archetype, color]) => (
             <div key={archetype} className="flex items-center gap-1.5 text-[11px]">
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-              <span className="text-white/50">{archetype}</span>
+              <span className="text-white/70">{archetype}</span>
             </div>
           ))}
         </div>
@@ -221,25 +221,25 @@ export function ChannelConstellationGraph() {
       {/* Top channels */}
       {data && (
         <div className="space-y-2 pt-2 border-t border-white/10">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Top 5 by Authority
           </h3>
           <div className="space-y-1.5">
             {data.channels.slice(0, 5).map((c, i) => (
               <div key={c.id} className="flex items-center gap-2 text-[11px]">
-                <span className="text-white/30 w-3">{i + 1}.</span>
+                <span className="text-white/50 w-3">{i + 1}.</span>
                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ARCHETYPE_COLORS[c.archetype] || '#94a3b8' }} />
-                <span className="text-white/60 truncate flex-1">{c.name}</span>
-                <span className="text-white/40 tabular-nums">{c.authority}</span>
+                <span className="text-white/75 truncate flex-1">{c.name}</span>
+                <span className="text-white/60 tabular-nums">{c.authority}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      <div className="text-xs text-white/30 leading-relaxed pt-2 border-t border-white/10">
-        <p className="mb-1"><strong className="text-white/50">Click</strong> a channel for details</p>
-        <p><strong className="text-white/50">Drag</strong> to rotate · <strong className="text-white/50">Scroll</strong> to zoom</p>
+      <div className="text-xs text-white/50 leading-relaxed pt-2 border-t border-white/10">
+        <p className="mb-1"><strong className="text-white/70">Click</strong> a channel for details</p>
+        <p><strong className="text-white/70">Drag</strong> to rotate · <strong className="text-white/70">Scroll</strong> to zoom</p>
       </div>
     </div>
   );

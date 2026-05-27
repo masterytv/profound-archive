@@ -176,7 +176,7 @@ export function GlobeGraph() {
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
 
   // ─── Filtered Points ─────────────────────────────────────────────────────
 
@@ -253,12 +253,17 @@ export function GlobeGraph() {
       });
     }
 
+    // Build link to video-explore filtered by location
+    const locationQuery = p.state || p.country.replace(/_/g, ' ');
+    const href = `/uap/video-explore?q=${encodeURIComponent(locationQuery)}`;
+
     setTooltip({
       type: 'node',
       title: p.label,
       stats,
       x: event.clientX,
       y: event.clientY,
+      href,
     });
   }, []);
 
@@ -289,29 +294,29 @@ export function GlobeGraph() {
     <div className="space-y-5">
       {/* ─── Description ─── */}
       <div className="space-y-3 pb-4 border-b border-white/10">
-        <p className="text-xs text-white/60 leading-relaxed">
+        <p className="text-xs text-white/75 leading-relaxed">
           {globeData?.metadata.totalEncounters.toLocaleString() || '…'} encounters
           mapped across {globeData?.metadata.totalPoints || '…'} locations worldwide.
         </p>
-        <div className="space-y-2 text-[11px] text-white/45">
+        <div className="space-y-2 text-[11px] text-white/60">
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-blue-400/80" />
-            <span><strong className="text-white/65">Dot size</strong> — number of encounters</span>
+            <span><strong className="text-white/80">Dot size</strong> — number of encounters</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full" style={{ background: 'linear-gradient(135deg, #60a5fa, #f59e0b, #ef4444)' }} />
-            <span><strong className="text-white/65">Color</strong> — Hynek classification</span>
+            <span><strong className="text-white/80">Color</strong> — Hynek classification</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-white/20" />
-            <span><strong className="text-white/65">Height</strong> — encounter density</span>
+            <span><strong className="text-white/80">Height</strong> — encounter density</span>
           </div>
         </div>
       </div>
 
       {/* ─── Hynek Legend ─── */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Hynek Classification
         </h3>
         <div className="space-y-1.5">
@@ -321,7 +326,7 @@ export function GlobeGraph() {
                 className="flex-shrink-0 w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-white/50">{HYNEK_LABELS[key]}</span>
+              <span className="text-white/70">{HYNEK_LABELS[key]}</span>
             </div>
           ))}
         </div>
@@ -329,7 +334,7 @@ export function GlobeGraph() {
 
       {/* ─── Min Encounters Slider ─── */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Min Encounters
         </h3>
         <div className="space-y-1.5">
@@ -342,12 +347,12 @@ export function GlobeGraph() {
             onChange={e => setMinEncounters(Number(e.target.value))}
             className="w-full accent-green-400"
           />
-          <div className="flex justify-between text-xs text-white/40">
+          <div className="flex justify-between text-xs text-white/60">
             <span>All</span>
             <span>{minEncounters > 1 ? `≥ ${minEncounters} encounters` : 'No filter'}</span>
           </div>
           {globeData && (
-            <p className="text-[10px] text-white/30">
+            <p className="text-[10px] text-white/50">
               Showing {filteredPoints.length} of {globeData.points.length} locations
             </p>
           )}
@@ -357,17 +362,17 @@ export function GlobeGraph() {
       {/* ─── Data Summary ─── */}
       {globeData && (
         <div className="space-y-2 pt-2 border-t border-white/10">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Data Summary
           </h3>
           <div className="space-y-1 text-xs">
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Total encounters</span>
               <span className="text-white/70 tabular-nums">
                 {globeData.metadata.totalEncounters.toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between text-white/40">
+            <div className="flex justify-between text-white/60">
               <span>Visible locations</span>
               <span className="text-white/70 tabular-nums">
                 {filteredPoints.length}
@@ -378,12 +383,12 @@ export function GlobeGraph() {
       )}
 
       {/* ─── Interaction Tips ─── */}
-      <div className="text-xs text-white/30 leading-relaxed pt-2 border-t border-white/10">
+      <div className="text-xs text-white/50 leading-relaxed pt-2 border-t border-white/10">
         <p className="mb-1">
-          <strong className="text-white/50">Click</strong> a location for details
+          <strong className="text-white/70">Click</strong> a location for details
         </p>
         <p>
-          <strong className="text-white/50">Drag</strong> to rotate · <strong className="text-white/50">Scroll</strong> to zoom
+          <strong className="text-white/70">Drag</strong> to rotate · <strong className="text-white/70">Scroll</strong> to zoom
         </p>
       </div>
     </div>

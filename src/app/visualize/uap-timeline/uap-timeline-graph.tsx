@@ -221,11 +221,13 @@ export function UapTimelineGraph() {
     const el = containerRef.current;
     if (!el) return;
     const obs = new ResizeObserver(entries => {
-      for (const e of entries) setDimensions({ width: e.contentRect.width, height: e.contentRect.height });
+      for (const e of entries) {
+        setDimensions({ width: e.contentRect.width, height: e.contentRect.height });
+      }
     });
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [loading]);
 
   // ─── Time scrubber animation ────────────────────────────────────────────
 
@@ -341,7 +343,7 @@ export function UapTimelineGraph() {
       canvas.height = 64;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.fillStyle = label === 'Pre-1947' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.55)';
+        ctx.fillStyle = label === 'Pre-1947' ? 'rgba(255,255,255,0.50)' : 'rgba(255,255,255,0.70)';
         ctx.font = label === 'Pre-1947' ? 'italic 38px sans-serif' : 'bold 42px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(label, 256, 48);
@@ -447,7 +449,12 @@ export function UapTimelineGraph() {
     }
 
     const title = node._name || node._label || `Encounter ${node._year}`;
-    setTooltip({ type: 'node', title, stats, x: event.clientX, y: event.clientY });
+    // Build experiencer page link from name
+    const slug = node._name
+      ? node._name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+      : null;
+    const href = slug ? `/uap/experiencer/${slug}` : undefined;
+    setTooltip({ type: 'node', title, stats, x: event.clientX, y: event.clientY, href });
   }, [stopRotation]);
 
   // ─── Toggle helpers ─────────────────────────────────────────────────────
@@ -501,21 +508,70 @@ export function UapTimelineGraph() {
     <div className="space-y-5">
       {/* Description and axis explanation */}
       <div className="space-y-3 pb-4 border-b border-white/10">
-        <p className="text-xs text-white/60 leading-relaxed">
+        <p className="text-xs text-white/75 leading-relaxed">
           {visibleCount.toLocaleString()} of{' '}
           {data?.metadata.totalPoints.toLocaleString() || '…'} encounters plotted across time.
           Each dot is one reported encounter.
         </p>
-        <div className="space-y-2 text-[11px] text-white/45">
-          <div><strong className="text-white/65">Vertical axis</strong> — Time (years). Bottom = earliest, top = most recent.</div>
-          <div><strong className="text-white/65">Horizontal spread</strong> — Distributes encounters within each year for visibility. Dense years (e.g., 1977 with 88 reports) form wider rings.</div>
-          <div><strong className="text-white/65">Color</strong> — Hynek Classification (or Entity Type when toggled)</div>
+        <div className="space-y-2 text-[11px] text-white/60">
+          <div><strong className="text-white/80">Vertical axis</strong> — Time (years). Bottom = earliest, top = most recent.</div>
+          <div><strong className="text-white/80">Horizontal spread</strong> — Distributes encounters within each year for visibility. Dense years (e.g., 1977 with 88 reports) form wider rings.</div>
+          <div><strong className="text-white/80">Color</strong> — Hynek Classification (or Entity Type when toggled)</div>
         </div>
       </div>
 
+      {/* Time scrubber */}
+      {data && (
+        <div className="space-y-2 pb-4 border-b border-white/10">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
+            Time Range
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
+              className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg
+                bg-green-500/20 hover:bg-green-500/30 border border-green-500/30
+                text-green-300 transition-all duration-200 cursor-pointer"
+              aria-label={isPlaying ? 'Pause' : 'Play timeline'}
+            >
+              {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+            </button>
+            <div className="flex-1 flex flex-col gap-1">
+              <input
+                type="range"
+                min={SCRUBBER_MIN}
+                max={data.metadata.yearRange[1]}
+                value={scrubberValue}
+                onChange={e => { setScrubberValue(Number(e.target.value)); setIsPlaying(false); }}
+                className="w-full h-1.5 rounded-full appearance-none bg-white/10 cursor-pointer
+                  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3
+                  [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full
+                  [&::-webkit-slider-thumb]:bg-green-400 [&::-webkit-slider-thumb]:shadow-lg
+                  [&::-webkit-slider-thumb]:shadow-green-500/30"
+              />
+              <div className="flex justify-between text-[10px] text-white/50 tabular-nums">
+                <span>{SCRUBBER_MIN}</span>
+                <span className="text-green-300/70 font-medium text-xs">{scrubberValue}</span>
+                <span>{data.metadata.yearRange[1]}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => { setScrubberValue(data.metadata.yearRange[1]); setIsPlaying(false); }}
+              className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg
+                bg-white/5 hover:bg-white/10 border border-white/10
+                text-white/50 hover:text-white/70 transition-all duration-200 cursor-pointer"
+              aria-label="Reset to show all years"
+              title="Show all"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Layout mode selector */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Layout
         </h3>
         <div className="flex gap-1.5">
@@ -526,7 +582,7 @@ export function UapTimelineGraph() {
               className={`flex-1 text-[11px] py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
                 layout === mode
                   ? 'bg-green-500/20 border-green-500/40 text-green-300'
-                  : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'
+                  : 'bg-white/5 border-white/10 text-white/55 hover:text-white/75'
               }`}
             >
               {label}
@@ -537,7 +593,7 @@ export function UapTimelineGraph() {
 
       {/* Color mode */}
       <div className="space-y-2">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+        <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
           Color By
         </h3>
         <div className="flex gap-1.5">
@@ -548,7 +604,7 @@ export function UapTimelineGraph() {
               className={`flex-1 text-[11px] py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
                 colorMode === mode
                   ? 'bg-green-500/20 border-green-500/40 text-green-300'
-                  : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'
+                  : 'bg-white/5 border-white/10 text-white/55 hover:text-white/75'
               }`}
             >
               {label}
@@ -560,7 +616,7 @@ export function UapTimelineGraph() {
       {/* Hynek / Entity type toggles */}
       {colorMode === 'hynek' ? (
         <div className="space-y-2">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Hynek Type
           </h3>
           <div className="space-y-1.5">
@@ -573,14 +629,14 @@ export function UapTimelineGraph() {
                 }`}
               >
                 <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                <span className="text-white/60">{HYNEK_LABELS[key]}</span>
+                <span className="text-white/75">{HYNEK_LABELS[key]}</span>
               </button>
             ))}
           </div>
         </div>
       ) : (
         <div className="space-y-2">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Entity Types
           </h3>
           <div className="space-y-1 max-h-44 overflow-y-auto">
@@ -589,7 +645,7 @@ export function UapTimelineGraph() {
               .map(([key, color]) => (
                 <div key={key} className="flex items-center gap-2 text-[11px]">
                   <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                  <span className="text-white/50">{ENTITY_LABELS[key] || key}</span>
+                  <span className="text-white/70">{ENTITY_LABELS[key] || key}</span>
                 </div>
               ))}
           </div>
@@ -599,14 +655,14 @@ export function UapTimelineGraph() {
       {/* Top decades */}
       {decadeStats.length > 0 && (
         <div className="space-y-2 pt-2 border-t border-white/10">
-          <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">
             Encounters by Decade
           </h3>
           <div className="space-y-1 max-h-44 overflow-y-auto">
             {decadeStats
               .filter(([, cnt]) => cnt > 0)
               .map(([label, cnt]) => (
-                <div key={label} className="flex items-center justify-between text-[10px] text-white/40">
+                <div key={label} className="flex items-center justify-between text-[10px] text-white/60">
                   <span>{label}</span>
                   <div className="flex items-center gap-2">
                     <div
@@ -621,9 +677,9 @@ export function UapTimelineGraph() {
         </div>
       )}
 
-      <div className="text-xs text-white/30 leading-relaxed pt-2 border-t border-white/10">
-        <p className="mb-1"><strong className="text-white/50">Click</strong> a point for details</p>
-        <p><strong className="text-white/50">Drag</strong> to rotate · <strong className="text-white/50">Scroll</strong> to zoom</p>
+      <div className="text-xs text-white/50 leading-relaxed pt-2 border-t border-white/10">
+        <p className="mb-1"><strong className="text-white/70">Click</strong> a point for details</p>
+        <p><strong className="text-white/70">Drag</strong> to rotate · <strong className="text-white/70">Scroll</strong> to zoom</p>
       </div>
     </div>
   );
@@ -661,59 +717,9 @@ export function UapTimelineGraph() {
             />
           )}
 
-          {/* ─── Time Scrubber Overlay ─── */}
-          {data && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3
-              bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3
-              shadow-2xl w-[min(90vw,500px)]">
-              {/* Play/Pause */}
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
-                  bg-green-500/20 hover:bg-green-500/30 border border-green-500/30
-                  text-green-300 transition-all duration-200 cursor-pointer"
-                aria-label={isPlaying ? 'Pause' : 'Play timeline'}
-              >
-                {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              </button>
-
-              {/* Scrubber */}
-              <div className="flex-1 flex flex-col gap-1">
-                <input
-                  type="range"
-                  min={SCRUBBER_MIN}
-                  max={data.metadata.yearRange[1]}
-                  value={scrubberValue}
-                  onChange={e => { setScrubberValue(Number(e.target.value)); setIsPlaying(false); }}
-                  className="w-full h-1.5 rounded-full appearance-none bg-white/10 cursor-pointer
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5
-                    [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full
-                    [&::-webkit-slider-thumb]:bg-green-400 [&::-webkit-slider-thumb]:shadow-lg
-                    [&::-webkit-slider-thumb]:shadow-green-500/30"
-                />
-                <div className="flex justify-between text-[10px] text-white/30 tabular-nums">
-                  <span>{SCRUBBER_MIN}</span>
-                  <span className="text-green-300/70 font-medium text-xs">{scrubberValue}</span>
-                  <span>{data.metadata.yearRange[1]}</span>
-                </div>
-              </div>
-
-              {/* Reset */}
-              <button
-                onClick={() => { setScrubberValue(data.metadata.yearRange[1]); setIsPlaying(false); }}
-                className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
-                  bg-white/5 hover:bg-white/10 border border-white/10
-                  text-white/40 hover:text-white/60 transition-all duration-200 cursor-pointer"
-                aria-label="Reset to show all years"
-                title="Show all years"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
 
           {/* ─── Zoom Controls ─── */}
-          <div className="absolute bottom-24 sm:bottom-6 left-4 sm:left-6 z-50 flex flex-col gap-1.5">
+          <div className="absolute bottom-6 left-4 sm:left-6 z-50 flex flex-col gap-1.5">
             {[
               { icon: ZoomIn, fn: zoomIn, label: 'Zoom in' },
               { icon: ZoomOut, fn: zoomOut, label: 'Zoom out' },

@@ -1,10 +1,11 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { ExternalLink, X } from 'lucide-react';
 
 /**
  * VizNodeTooltip — Floating tooltip for 3D graph node/edge hover/click.
  * Positioned via absolute coordinates passed from the graph's raycaster.
+ * When `href` is provided, clicking the tooltip opens the link in a new tab.
  */
 
 export interface TooltipData {
@@ -16,6 +17,8 @@ export interface TooltipData {
   stats: Array<{ label: string; value: string | number }>;
   /** Optional description */
   description?: string;
+  /** URL to open when tooltip body is clicked. Opens in a new tab. */
+  href?: string;
   /** Screen position (from graph raycaster) */
   x: number;
   y: number;
@@ -37,11 +40,19 @@ export function VizNodeTooltip({ data, onClose }: VizNodeTooltipProps) {
     zIndex: 60,
   };
 
+  const handleBodyClick = () => {
+    if (data.href) {
+      window.open(data.href, '_blank', 'noopener');
+    }
+  };
+
   return (
     <div
       style={style}
-      className="w-64 bg-black/80 backdrop-blur-xl border border-white/15
-        rounded-xl shadow-2xl p-3 animate-in fade-in duration-150"
+      className={`w-64 bg-black/80 backdrop-blur-xl border border-white/15
+        rounded-xl shadow-2xl p-3 animate-in fade-in duration-150
+        ${data.href ? 'cursor-pointer hover:border-white/30 hover:bg-black/90 transition-colors' : ''}`}
+      onClick={handleBodyClick}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2">
@@ -49,7 +60,7 @@ export function VizNodeTooltip({ data, onClose }: VizNodeTooltipProps) {
           {data.title}
         </h4>
         <button
-          onClick={onClose}
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
           className="shrink-0 w-5 h-5 flex items-center justify-center
             rounded text-white/40 hover:text-white/70 hover:bg-white/10
             transition-colors cursor-pointer"
@@ -77,6 +88,14 @@ export function VizNodeTooltip({ data, onClose }: VizNodeTooltipProps) {
           </div>
         ))}
       </div>
+
+      {/* Link affordance */}
+      {data.href && (
+        <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/10 text-[10px] text-white/40">
+          <ExternalLink className="w-3 h-3" />
+          <span>Click to open</span>
+        </div>
+      )}
     </div>
   );
 }

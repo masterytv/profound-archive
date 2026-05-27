@@ -89,11 +89,13 @@ export function VizPageShell({
       </nav>
 
       {/* ─── 3D Canvas Area ─── */}
-      <div className="absolute inset-0 pt-14">
+      <div className="absolute inset-0 pt-14 flex flex-col">
         {isLoading ? (
           <VizLoadingState />
         ) : (
-          children
+          <div className="flex-1 relative min-h-0">
+            {children}
+          </div>
         )}
       </div>
 
