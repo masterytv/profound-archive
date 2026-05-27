@@ -10,6 +10,12 @@ function buildClient() {
   );
 }
 
+function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3001';
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function formatCount(n: number | null): string {
@@ -254,26 +260,16 @@ export async function GET(
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "10px",
             }}
           >
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, #22c55e, #0ea5e9)",
-              }}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`${getBaseUrl()}/logo-new-light.png`}
+              alt="Project Profound"
+              width={200}
+              height={47}
+              style={{ objectFit: "contain" }}
             />
-            <div
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: "#94a3b8",
-              }}
-            >
-              Project Profound
-            </div>
           </div>
           <div
             style={{

@@ -18,6 +18,15 @@ export const metadata: Metadata = {
   icons: {
     icon: '/icon.png',
   },
+  openGraph: {
+    type: 'website',
+    siteName: 'Project Profound',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    // site: '@ProjectProfound',  // Uncomment after creating the X account
+  },
 };
 
 export default function RootLayout({

@@ -6,17 +6,44 @@
 
 ## 0. Logo
 
-| Variant | File | Usage |
-|---------|------|-------|
-| **Solid** (blue bg) | `public/logo-solid.png` | Favicon (`src/app/icon.png`), social sharing |
-| **Transparent** | `public/logo-transparent.png` | Site header, light backgrounds |
-| **White** | `public/logo-white.png` | Dark backgrounds, overlays |
+### Wordmark (Primary — used in header, footer, OG images)
 
-The header uses the transparent variant at 36×36 via Next.js `Image`:
+| Variant | File | Dimensions | Usage |
+|---------|------|------------|-------|
+| **Dark** (dark blue text) | `public/logo-new-dark.png` | 1024×240 | Site header (light mode), footer (light mode), light backgrounds |
+| **Light** (white text) | `public/logo-new-light.png` | 1024×239 | Site header (dark mode), footer (dark mode), **OG/social images** |
+
+The header swaps between dark/light variants based on theme:
 
 ```tsx
-<Image src="/logo-transparent.png" alt="Project Profound logo" width={36} height={36} priority />
+<Image src="/logo-new-dark.png" alt="Project Profound logo" width={150} height={35} className="dark:hidden" priority />
+<Image src="/logo-new-light.png" alt="Project Profound logo" width={150} height={35} className="hidden dark:block" priority />
 ```
+
+### Icon (Secondary — favicon, app icon)
+
+| Variant | File | Dimensions | Usage |
+|---------|------|------------|-------|
+| **Solid** (blue bg) | `public/logo-solid.png` | 500×500 | Favicon (`src/app/icon.png`) |
+| **Transparent** | `public/logo-transparent.png` | 500×500 | Legacy (replaced by wordmark in header) |
+| **White** | `public/logo-white.png` | 2000×2000 | Legacy (replaced by wordmark light variant) |
+
+### OG / Social Sharing Images
+
+All dynamically generated OG images (via `opengraph-image.tsx` files) **must** include the white wordmark logo. The Satori rendering engine requires an absolute URL:
+
+```tsx
+// In OG image components — Satori fetches this at render time
+<img
+  src="https://projectprofound.org/logo-new-light.png"
+  alt="Project Profound"
+  width={200}
+  height={47}
+  style={{ objectFit: 'contain' }}
+/>
+```
+
+The shared template at `src/lib/og/branded-template.tsx` handles this automatically via the `logoSrc` prop (defaults to the production URL).
 
 ---
 

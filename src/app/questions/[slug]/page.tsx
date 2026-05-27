@@ -216,7 +216,6 @@ export async function generateMetadata({
             url: `https://projectprofound.org/questions/${slug}`,
             type: 'article',
             siteName: 'Project Profound',
-            images: [{ url: 'https://projectprofound.org/og-default.png', width: 1200, height: 630 }],
         },
         twitter: { card: 'summary_large_image', title: question, description },
         alternates: { canonical: `https://projectprofound.org/questions/${slug}` },

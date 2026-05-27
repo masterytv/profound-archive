@@ -453,7 +453,7 @@ export function UapTimelineGraph() {
     const slug = node._name
       ? node._name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
       : null;
-    const href = slug ? `/uap/experiencer/${slug}` : undefined;
+    const href = slug ? `/uap/persons/${slug}` : undefined;
     setTooltip({ type: 'node', title, stats, x: event.clientX, y: event.clientY, href });
   }, [stopRotation]);
 

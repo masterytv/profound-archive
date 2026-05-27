@@ -25,7 +25,7 @@
 
 ### Epic V1.1: Package Installation (User Action)
 
-- [ ] User runs in host terminal: `npm install react-force-graph-3d three && npm install -D @types/three` (**BLOCKING**)
+- [x] User runs in host terminal: `npm install react-force-graph-3d three && npm install -D @types/three` (**BLOCKING**) ✅
 
 ### Epic V1.2: Shared Viz Infrastructure (1d)
 
@@ -73,12 +73,12 @@
 
 ### Epic V1.5: Polish + Testing (1d)
 
-- [ ] Mobile touch testing (rotate, pinch-zoom, tap node)
-- [ ] Dark theme compliance (BRAND.md tokens)
-- [ ] Loading skeleton appears before 3D initializes
-- [ ] prefers-reduced-motion disables auto-animation
-- [ ] NDE pages unaffected (regression check)
-- [ ] `npm run build` clean
+- [x] Mobile touch testing (rotate, pinch-zoom, tap node)
+- [x] Dark theme compliance (BRAND.md tokens)
+- [x] Loading skeleton appears before 3D initializes
+- [x] prefers-reduced-motion disables auto-animation
+- [x] NDE pages unaffected (regression check)
+- [x] `npm run build` clean
 
 ---
 
@@ -165,6 +165,6 @@
 ### Epic V7.6: Polish
 
 - [x] TypeScript build clean (no new errors)
-- [ ] Mobile testing (time scrubber responsive, touch controls)
-- [ ] `prefers-reduced-motion` disables auto-rotation
-- [ ] Visual verification of all three layout modes
+- [x] Mobile testing (time scrubber responsive, touch controls)
+- [x] `prefers-reduced-motion` disables auto-rotation
+- [x] Visual verification of all three layout modes

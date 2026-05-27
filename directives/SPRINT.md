@@ -22,7 +22,7 @@
 | Sprint 11: Unified Homepage & Brand Evolution | ✅ Complete | 2026-05-19 |
 | Sprint 12: Security Audit | ✅ Complete | 2026-05-19 |
 | Sprint 13: Channel Analytics & Identity (Phase 1) | ✅ Complete | 2026-05-20 |
-| Sprint 14: Channel Engagement & Shareability (Phase 2) | 🔄 In Progress | — |
+| Sprint 14: Channel Engagement & Shareability (Phase 2) | 🔄 In Progress (14.3, 14.4 deferred) | — |
 | Backlog: Revenue & Growth Strategy | 📋 Brainstorm | — |
 
 ## Environment Setup
@@ -155,7 +155,7 @@ For every UAP file you create:
 - [x] Create `src/app/uap/layout.tsx` — server component with UAP-specific metadata, nav, domain context provider, and CSS variables for violet accent color tokens
 - [x] Create `src/app/uap/page.tsx` — landing page with hero section, stats (total videos, channels), and CTA cards for Explore/Search/Chat
 - [x] Fetch stats server-side using `getDomainConfig('uap')` and Supabase count queries
-- [ ] Add UAP entry to main site navigation (header/footer)
+- [x] Add UAP entry to main site navigation (header/footer) — Visualize megamenu added to unified-site-header.tsx ✅ 2026-05-27
 - **Done when:** `/uap` renders with real video count from DB; layout wraps all child routes; lighthouse accessibility score ≥ 90.
 
 ---
@@ -1148,10 +1148,11 @@ For every UAP file you create:
 
 ---
 
-### Epic 14.3: "Claim Your Channel" Flow — Very High Impact
+### Epic 14.3: "Claim Your Channel" Flow — Very High Impact — **DEFERRED**
 
 > Channel owners verify ownership → unlock editing + dashboard.
 > Creates user account = CRM lead.
+> **Deferred 2026-05-27:** Shifting focus to content/marketing strategy. Revisit after traffic growth.
 
 - [ ] Story 14.3.1: Design claim verification flow — YouTube channel link verification method (link in description, or OAuth) (0.5d)
 - [ ] Story 14.3.2: Build claim request UI — form on channel detail page, admin approval queue (1d)
@@ -1161,10 +1162,11 @@ For every UAP file you create:
 
 ---
 
-### Epic 14.4: Monthly Channel Report (Email) — Very High Impact
+### Epic 14.4: Monthly Channel Report (Email) — Very High Impact — **DEFERRED**
 
 > Auto-generated engagement loop. Monthly email to claimed channel owners.
 > "This channel was viewed 1,247 times on Project Profound this month."
+> **Deferred 2026-05-27:** Depends on 14.3 (Claim Your Channel). Revisit after traffic growth.
 
 - [ ] Story 14.4.1: Build channel analytics tracking — log page views per channel page (could use existing analytics or simple counter table) (0.5d)
 - [ ] Story 14.4.2: Build `ChannelMonthlyReport` React Email template — branded, includes: page views, new videos analyzed, score changes, new entity connections (0.5d)
