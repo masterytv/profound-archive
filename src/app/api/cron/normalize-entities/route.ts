@@ -22,12 +22,17 @@ export async function POST(request: Request) {
   }
 
   const cronSecret = process.env.CRON_SECRET;
+
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+  }
+
   const bodySecret = body.secret as string | undefined;
   const headerAuth = request.headers.get('authorization');
 
   const authorized =
-    (cronSecret && bodySecret === cronSecret) ||
-    (cronSecret && headerAuth === `Bearer ${cronSecret}`);
+    (bodySecret === cronSecret) ||
+    (headerAuth === `Bearer ${cronSecret}`);
 
   if (!authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
