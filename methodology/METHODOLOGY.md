@@ -59,7 +59,7 @@ By building parallel analytical frameworks for NDE and UAP contact testimony, th
 
 ### 2.1 Source Selection
 
-The NDE corpus is sourced from YouTube channels that primarily or frequently feature first-person NDE testimony. Channels are identified through manual curation and are stored in a persistent channel registry (`channels` table) with enriched metadata including subscriber counts, total video counts, and scanning status. As of this writing, the NDE archive contains analysis of over 1,800 videos, and the UAP archive contains over 3,500 videos across multiple channels.
+The NDE corpus is sourced from YouTube channels that primarily or frequently feature first-person NDE testimony. Channels are identified through manual curation and are stored in a persistent channel registry (`channels` table) with enriched metadata including subscriber counts, total video counts, and scanning status. As of this writing, the NDE archive contains analysis of 4,897 videos, and the UAP archive contains 4,151 videos across multiple channels.
 
 A channel-level scanner periodically audits enabled channels for new uploads, discovers candidate videos, and queues them for intake processing. This scanner architecture ensures the corpus grows continuously without manual intervention.
 

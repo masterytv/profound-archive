@@ -7,7 +7,7 @@ import {
   User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv,
   HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar,
   Globe, Building2, MessageCircle, Home,
-  Network, Cpu, Waypoints, Orbit, Clock, Layers,
+  Network, Cpu, Waypoints, Orbit, Clock, Layers, FlaskConical,
 } from "lucide-react"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -519,12 +519,20 @@ export default function UnifiedSiteHeader() {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${aboutOpen ? "rotate-180" : ""}`} />
                 </button>
                 {aboutOpen && (
-                  <div className="absolute top-full left-0 mt-1.5 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-1.5 w-52 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-2 z-50">
                     <Link href="/about#projects" className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
                       Project
                     </Link>
                     <Link href="/about#connect" className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
                       Connect
+                    </Link>
+                    <div className="mx-3 my-1.5 border-t border-slate-200/60 dark:border-slate-700" />
+                    <p className="px-4 pb-1 pt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Research</p>
+                    <Link href="/research/methodology" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
+                      <FlaskConical className="w-3.5 h-3.5 text-violet-500" /> Methodology
+                    </Link>
+                    <Link href="/research/cross-domain" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
+                      <Link2 className="w-3.5 h-3.5 text-violet-500" /> Cross-Domain
                     </Link>
                   </div>
                 )}
@@ -854,6 +862,14 @@ export default function UnifiedSiteHeader() {
                           </Link>
                           <Link href="/about#connect" className="block py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
                             Connect
+                          </Link>
+                          <div className="mx-1 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
+                          <p className="pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Research</p>
+                          <Link href="/research/methodology" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <FlaskConical className="w-4 h-4 text-violet-600" /> Methodology
+                          </Link>
+                          <Link href="/research/cross-domain" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Link2 className="w-4 h-4 text-violet-600" /> Cross-Domain
                           </Link>
                         </div>
                       )}
