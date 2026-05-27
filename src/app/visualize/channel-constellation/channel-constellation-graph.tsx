@@ -63,6 +63,7 @@ export function ChannelConstellationGraph() {
   const [error, setError] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [activeArchetypes, setActiveArchetypes] = useState<Set<string>>(new Set(Object.keys(ARCHETYPE_COLORS)));
 
   // ─── Fetch ────────────────────────────────────────────────────────────────
 
@@ -92,11 +93,15 @@ export function ChannelConstellationGraph() {
 
     const SCALE = 10;
 
+    // Filter by active archetypes
+    const filtered = data.channels.filter(c => activeArchetypes.has(c.archetype));
+    if (filtered.length === 0) return { nodes: [], links: [] };
+
     // Per-axis min-max so data fills the entire 3D cube
-    const intels = data.channels.map(c => c.intelligence);
-    const creds = data.channels.map(c => c.credibility);
-    const encs = data.channels.map(c => c.encounter || 0);
-    const auths = data.channels.map(c => c.authority);
+    const intels = filtered.map(c => c.intelligence);
+    const creds = filtered.map(c => c.credibility);
+    const encs = filtered.map(c => c.encounter || 0);
+    const auths = filtered.map(c => c.authority);
 
     const minI = Math.min(...intels), maxI = Math.max(...intels);
     const minC = Math.min(...creds), maxC = Math.max(...creds);
@@ -108,7 +113,7 @@ export function ChannelConstellationGraph() {
     const rangeE = maxE - minE || 1;
     const rangeA = maxA - minA || 1;
 
-    const nodes = data.channels.map(c => ({
+    const nodes = filtered.map(c => ({
       ...c,
       // Pre-computed percentages (relative to dataset range)
       intelPct: Math.round(((c.intelligence - minI) / rangeI) * 100),
@@ -121,7 +126,7 @@ export function ChannelConstellationGraph() {
     }));
 
     return { nodes, links: [] };
-  }, [data]);
+  }, [data, activeArchetypes]);
 
   // ─── Configure ────────────────────────────────────────────────────────────
 
@@ -291,16 +296,30 @@ export function ChannelConstellationGraph() {
         </div>
       </div>
 
-      {/* Archetype legend */}
+      {/* Archetype toggles */}
       <div className="space-y-2">
         <h3 className="text-xs font-medium text-white/70 uppercase tracking-wider">Channel Archetype</h3>
         <div className="space-y-1.5">
-          {Object.entries(ARCHETYPE_COLORS).map(([archetype, color]) => (
-            <div key={archetype} className="flex items-center gap-1.5 text-[11px]">
-              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-              <span className="text-white/70">{archetype}</span>
-            </div>
-          ))}
+          {Object.entries(ARCHETYPE_COLORS).map(([archetype, color]) => {
+            const count = data?.channels.filter(c => c.archetype === archetype).length || 0;
+            return (
+              <button
+                key={archetype}
+                onClick={() => setActiveArchetypes(prev => {
+                  const next = new Set(prev);
+                  if (next.has(archetype)) next.delete(archetype); else next.add(archetype);
+                  return next;
+                })}
+                className={`flex items-center gap-2 text-[11px] w-full text-left transition-opacity cursor-pointer ${
+                  activeArchetypes.has(archetype) ? 'opacity-100' : 'opacity-30'
+                }`}
+              >
+                <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                <span className="text-white/75">{archetype}</span>
+                <span className="ml-auto text-white/50 tabular-nums">{count}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
