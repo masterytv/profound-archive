@@ -104,25 +104,44 @@ export function HynekSpaceGraph() {
   const graphData = useMemo(() => {
     if (!data) return { nodes: [], links: [] };
 
-    // Scale encounters into 3D space: evidence (x), contact (y), transform (z)
-    const SCALE = 8; // spread factor
-    const nodes = data.points
-      .filter(p => activeHynek.has(p.hynek))
-      .map(p => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        hynek: p.hynek,
-        evidence: p.evidence,
-        contact: p.contact,
-        transform: p.transform,
-        entity: p.entity,
-        country: p.country,
-        // Position: center at 0, spread by score (0-100 → -SCALE to +SCALE)
-        fx: ((p.evidence / 100) * 2 - 1) * SCALE + (Math.random() - 0.5) * 0.3,
-        fy: ((p.contact / 100) * 2 - 1) * SCALE + (Math.random() - 0.5) * 0.3,
-        fz: ((p.transform / 100) * 2 - 1) * SCALE + (Math.random() - 0.5) * 0.3,
-      }));
+    const filtered = data.points.filter(p => activeHynek.has(p.hynek));
+    if (filtered.length === 0) return { nodes: [], links: [] };
+
+    // Compute per-axis min/max from actual data (not assumed 0-100)
+    // Evidence: 7-26, Contact: 0-32, Transform: 0-42 — all far below 100
+    let evMin = Infinity, evMax = -Infinity;
+    let coMin = Infinity, coMax = -Infinity;
+    let trMin = Infinity, trMax = -Infinity;
+    for (const p of filtered) {
+      if (p.evidence < evMin) evMin = p.evidence;
+      if (p.evidence > evMax) evMax = p.evidence;
+      if (p.contact < coMin) coMin = p.contact;
+      if (p.contact > coMax) coMax = p.contact;
+      if (p.transform < trMin) trMin = p.transform;
+      if (p.transform > trMax) trMax = p.transform;
+    }
+    // Prevent division by zero if all values are identical
+    const evRange = evMax - evMin || 1;
+    const coRange = coMax - coMin || 1;
+    const trRange = trMax - trMin || 1;
+
+    // Normalize: map [min, max] → [-SCALE, +SCALE] to fill entire 3D cube
+    const SCALE = 8;
+    const nodes = filtered.map(p => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      hynek: p.hynek,
+      evidence: p.evidence,
+      contact: p.contact,
+      transform: p.transform,
+      entity: p.entity,
+      country: p.country,
+      // Per-axis min-max normalization to fill full 3D space
+      fx: (((p.evidence - evMin) / evRange) * 2 - 1) * SCALE + (Math.random() - 0.5) * 0.3,
+      fy: (((p.contact - coMin) / coRange) * 2 - 1) * SCALE + (Math.random() - 0.5) * 0.3,
+      fz: (((p.transform - trMin) / trRange) * 2 - 1) * SCALE + (Math.random() - 0.5) * 0.3,
+    }));
 
     return { nodes, links: [] };
   }, [data, activeHynek]);
@@ -295,10 +314,11 @@ export function HynekSpaceGraph() {
           Each dot is one encounter.
         </p>
         <div className="space-y-2 text-[11px] text-white/60">
-          <div><strong className="text-white/80">X-axis</strong> — Evidence Score (0–100)</div>
-          <div><strong className="text-white/80">Y-axis</strong> — Contact Depth (0–100)</div>
-          <div><strong className="text-white/80">Z-axis</strong> — Transformation (0–100)</div>
+          <div><strong className="text-white/80">X-axis</strong> — Evidence Score (normalized)</div>
+          <div><strong className="text-white/80">Y-axis</strong> — Contact Depth (normalized)</div>
+          <div><strong className="text-white/80">Z-axis</strong> — Transformation (normalized)</div>
           <div><strong className="text-white/80">Color</strong> — Hynek Classification</div>
+          <p className="text-[10px] text-white/40 mt-1">Axes auto-scaled to data range for maximum spread.</p>
         </div>
       </div>
 
