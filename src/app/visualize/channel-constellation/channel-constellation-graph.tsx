@@ -96,17 +96,25 @@ export function ChannelConstellationGraph() {
     const intels = data.channels.map(c => c.intelligence);
     const creds = data.channels.map(c => c.credibility);
     const encs = data.channels.map(c => c.encounter || 0);
+    const auths = data.channels.map(c => c.authority);
 
     const minI = Math.min(...intels), maxI = Math.max(...intels);
     const minC = Math.min(...creds), maxC = Math.max(...creds);
     const minE = Math.min(...encs), maxE = Math.max(...encs);
+    const minA = Math.min(...auths), maxA = Math.max(...auths);
 
     const rangeI = maxI - minI || 1;
     const rangeC = maxC - minC || 1;
     const rangeE = maxE - minE || 1;
+    const rangeA = maxA - minA || 1;
 
     const nodes = data.channels.map(c => ({
       ...c,
+      // Pre-computed percentages (relative to dataset range)
+      intelPct: Math.round(((c.intelligence - minI) / rangeI) * 100),
+      credPct: Math.round(((c.credibility - minC) / rangeC) * 100),
+      encPct: Math.round((((c.encounter || 0) - minE) / rangeE) * 100),
+      authPct: Math.round(((c.authority - minA) / rangeA) * 100),
       fx: (((c.intelligence - minI) / rangeI) * 2 - 1) * SCALE,
       fy: (((c.credibility - minC) / rangeC) * 2 - 1) * SCALE,
       fz: ((((c.encounter || 0) - minE) / rangeE) * 2 - 1) * SCALE,
@@ -247,11 +255,10 @@ export function ChannelConstellationGraph() {
   const handleNodeClick = useCallback((node: any, event: MouseEvent) => {
     stopRotation();
     const stats = [
-      { label: 'Grade', value: node.grade },
-      { label: 'Intelligence', value: `${node.intelligence}` },
-      { label: 'Credibility', value: `${node.credibility}` },
-      { label: 'Encounter depth', value: `${node.encounter || 0}` },
-      { label: 'Authority', value: `${node.authority}` },
+      { label: 'Intelligence', value: `${node.intelPct}% (${node.intelligence})` },
+      { label: 'Credibility', value: `${node.credPct}% (${node.credibility})` },
+      { label: 'Encounter depth', value: `${node.encPct}% (${node.encounter || 0})` },
+      { label: 'Authority', value: `${node.authPct}% (${node.authority})` },
       { label: 'Videos', value: node.videoCount?.toLocaleString() || '—' },
       { label: 'Subscribers', value: node.subscribers?.toLocaleString() || '—' },
     ];
