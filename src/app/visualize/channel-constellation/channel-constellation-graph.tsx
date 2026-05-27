@@ -88,18 +88,28 @@ export function ChannelConstellationGraph() {
   // ─── Build graph data (scatter — fixed positions, no links) ───────────────
 
   const graphData = useMemo(() => {
-    if (!data) return { nodes: [], links: [] };
+    if (!data || data.channels.length === 0) return { nodes: [], links: [] };
 
     const SCALE = 10;
-    const maxIntel = Math.max(...data.channels.map(c => c.intelligence));
-    const maxCred = Math.max(...data.channels.map(c => c.credibility));
-    const maxEnc = Math.max(...data.channels.map(c => c.encounter || 1));
+
+    // Per-axis min-max so data fills the entire 3D cube
+    const intels = data.channels.map(c => c.intelligence);
+    const creds = data.channels.map(c => c.credibility);
+    const encs = data.channels.map(c => c.encounter || 0);
+
+    const minI = Math.min(...intels), maxI = Math.max(...intels);
+    const minC = Math.min(...creds), maxC = Math.max(...creds);
+    const minE = Math.min(...encs), maxE = Math.max(...encs);
+
+    const rangeI = maxI - minI || 1;
+    const rangeC = maxC - minC || 1;
+    const rangeE = maxE - minE || 1;
 
     const nodes = data.channels.map(c => ({
       ...c,
-      fx: (c.intelligence / maxIntel) * SCALE * 2 - SCALE,
-      fy: (c.credibility / maxCred) * SCALE * 2 - SCALE,
-      fz: ((c.encounter || 0) / maxEnc) * SCALE * 2 - SCALE,
+      fx: (((c.intelligence - minI) / rangeI) * 2 - 1) * SCALE,
+      fy: (((c.credibility - minC) / rangeC) * 2 - 1) * SCALE,
+      fz: ((((c.encounter || 0) - minE) / rangeE) * 2 - 1) * SCALE,
     }));
 
     return { nodes, links: [] };
