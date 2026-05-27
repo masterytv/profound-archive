@@ -274,7 +274,7 @@ export function ChannelConstellationGraph() {
       { label: 'Credibility', value: `${node.credPct}% (${node.credibility})` },
       { label: 'Encounter depth', value: `${node.encPct}% (${node.encounter || 0})` },
       { label: 'Authority', value: `${node.authPct}% (${node.authority})` },
-      { label: 'Videos', value: node.videoCount?.toLocaleString() || '—' },
+      { label: 'Videos in archive', value: node.videoCount?.toLocaleString() || '—' },
       { label: 'Subscribers', value: node.subscribers?.toLocaleString() || '—' },
     ];
     if (node.archetype) {
