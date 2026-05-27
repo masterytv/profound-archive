@@ -27,9 +27,11 @@
 import { createClient } from '@supabase/supabase-js';
 
 function getClient() {
+  // Use service role key on server if available to bypass RLS and query counts instantly
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    key,
   );
 }
 
@@ -40,24 +42,69 @@ export function formatCount(n: number | null | undefined): string {
   return n.toLocaleString('en-US');
 }
 
+// ─── Caching & Timeout Helpers ──────────────────────────────────────────────
+
+type CachedStats<T> = {
+  data: T;
+  timestamp: number;
+};
+
+const CACHE_TTL = 3600 * 1000; // 1 hour in ms
+const DB_TIMEOUT = 2500; // 2.5 seconds timeout
+
+// In-memory cache variables (persists within server container instances)
+let uapStatsCache: CachedStats<{ videos: number; channels: number; encounters: number }> | null = null;
+let ndeStatsCache: CachedStats<{ videos: number; channels: number; questions: number }> | null = null;
+let blogStatsCache: Record<string, CachedStats<{ posts: number }>> = {};
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timeoutId: NodeJS.Timeout;
+  const timeoutPromise = new Promise<T>((resolve) => {
+    timeoutId = setTimeout(() => {
+      console.warn(`[OG Stats] Database query timed out after ${ms}ms. Using fallback stats.`);
+      resolve(fallback);
+    }, ms);
+  });
+  return Promise.race([
+    promise.then((res) => {
+      clearTimeout(timeoutId);
+      return res;
+    }),
+    timeoutPromise
+  ]);
+}
+
 // ─── UAP Stats ──────────────────────────────────────────────────────────────
 
 const UAP_FALLBACK = { videos: 2000, channels: 60, encounters: 4800 };
 
 export async function getUapStats() {
-  try {
+  const now = Date.now();
+  if (uapStatsCache && now - uapStatsCache.timestamp < CACHE_TTL) {
+    return uapStatsCache.data;
+  }
+
+  const fetchPromise = (async () => {
     const sb = getClient();
     const [vids, channels, encounters] = await Promise.all([
       sb.from('uap_vids').select('*', { count: 'exact', head: true }),
       sb.from('uap_channels').select('*', { count: 'exact', head: true }).eq('hidden', false),
       sb.from('uap_encounters').select('*', { count: 'exact', head: true }),
     ]);
-    return {
+    const data = {
       videos: vids.count ?? UAP_FALLBACK.videos,
       channels: channels.count ?? UAP_FALLBACK.channels,
       encounters: encounters.count ?? UAP_FALLBACK.encounters,
     };
-  } catch {
+    // Update cache
+    uapStatsCache = { data, timestamp: Date.now() };
+    return data;
+  })();
+
+  try {
+    return await withTimeout(fetchPromise, DB_TIMEOUT, UAP_FALLBACK);
+  } catch (error) {
+    console.error('[OG Stats] Error fetching UAP stats:', error);
     return UAP_FALLBACK;
   }
 }
@@ -67,20 +114,32 @@ export async function getUapStats() {
 const NDE_FALLBACK = { videos: 5000, channels: 50, questions: 80 };
 
 export async function getNdeStats() {
-  try {
+  const now = Date.now();
+  if (ndeStatsCache && now - ndeStatsCache.timestamp < CACHE_TTL) {
+    return ndeStatsCache.data;
+  }
+
+  const fetchPromise = (async () => {
     const sb = getClient();
     const [vids, channels, questions] = await Promise.all([
-      // Only count confirmed NDE accounts (isNde = 'clear_nde')
       sb.from('nde_vids').select('*', { count: 'exact', head: true }).eq('isNde', 'clear_nde'),
       sb.from('channels').select('*', { count: 'exact', head: true }).eq('hidden', false),
       sb.from('nde_questions').select('*', { count: 'exact', head: true }).eq('is_active', true),
     ]);
-    return {
+    const data = {
       videos: vids.count ?? NDE_FALLBACK.videos,
       channels: channels.count ?? NDE_FALLBACK.channels,
       questions: questions.count ?? NDE_FALLBACK.questions,
     };
-  } catch {
+    // Update cache
+    ndeStatsCache = { data, timestamp: Date.now() };
+    return data;
+  })();
+
+  try {
+    return await withTimeout(fetchPromise, DB_TIMEOUT, NDE_FALLBACK);
+  } catch (error) {
+    console.error('[OG Stats] Error fetching NDE stats:', error);
     return NDE_FALLBACK;
   }
 }
@@ -88,14 +147,28 @@ export async function getNdeStats() {
 // ─── Blog Stats ─────────────────────────────────────────────────────────────
 
 export async function getBlogStats(domain: 'nde' | 'uap') {
-  try {
+  const now = Date.now();
+  const cached = blogStatsCache[domain];
+  if (cached && now - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  const fallback = { posts: domain === 'nde' ? 130 : 20 };
+
+  const fetchPromise = (async () => {
     const sb = getClient();
-    // Single `blog_posts` table with `domain` column — RLS already filters to published
     const { count } = await sb.from('blog_posts')
       .select('*', { count: 'exact', head: true })
       .eq('domain', domain);
-    return { posts: count ?? (domain === 'nde' ? 130 : 20) };
-  } catch {
-    return { posts: domain === 'nde' ? 130 : 20 };
+    const data = { posts: count ?? fallback.posts };
+    blogStatsCache[domain] = { data, timestamp: Date.now() };
+    return data;
+  })();
+
+  try {
+    return await withTimeout(fetchPromise, DB_TIMEOUT, fallback);
+  } catch (error) {
+    console.error(`[OG Stats] Error fetching blog stats for ${domain}:`, error);
+    return fallback;
   }
 }

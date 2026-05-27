@@ -10,6 +10,8 @@
 import { ImageResponse } from 'next/og';
 import { BrandedOgTemplate } from '@/lib/og/branded-template';
 import { getNdeStats, getUapStats, formatCount } from '@/lib/og/stats';
+import fs from 'fs';
+import path from 'path';
 
 export const runtime = 'nodejs';
 
@@ -317,9 +319,9 @@ async function getPageConfig(path: string): Promise<PageConfig | null> {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const path = searchParams.get('path') || '/';
+  const pathParam = searchParams.get('path') || '/';
 
-  const config = await getPageConfig(path);
+  const config = await getPageConfig(pathParam);
   if (!config) {
     return new Response('Unknown page', { status: 404 });
   }
@@ -327,6 +329,16 @@ export async function GET(req: Request) {
   const stats = config.getStats
     ? await config.getStats()
     : config.staticStats ?? [];
+
+  // Convert local logo to base64 data URL so Satori doesn't need to fetch it over HTTP
+  let logoBase64: string | undefined = undefined;
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'logo-new-light.png');
+    const logoBuffer = fs.readFileSync(logoPath);
+    logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  } catch (err) {
+    console.error('[OG Page Route] Failed to read logo file:', err);
+  }
 
   return new ImageResponse(
     (
@@ -336,6 +348,7 @@ export async function GET(req: Request) {
         theme={config.theme}
         stats={stats}
         footerUrl={config.footerUrl}
+        logoSrc={logoBase64}
       />
     ),
     { width: 1200, height: 630 },

@@ -78,10 +78,42 @@ function getSupabase() {
 
 // ─── Data Fetch (direct Supabase, no self-fetch) ────────────────────────────
 
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timeoutId: NodeJS.Timeout;
+  const timeoutPromise = new Promise<T>((resolve) => {
+    timeoutId = setTimeout(() => {
+      console.warn(`[cross-domain] DB query timed out after ${ms}ms. Using fallback/null.`);
+      resolve(fallback);
+    }, ms);
+  });
+  return Promise.race([
+    promise.then((res) => {
+      clearTimeout(timeoutId);
+      return res;
+    }),
+    timeoutPromise
+  ]);
+}
+
 async function getCrossDomainData(): Promise<CrossDomainResult | null> {
-  try {
+  const fetchPromise = (async () => {
     const supabase = getSupabase();
 
+    // 1. Try to load from viz_graph_cache first
+    try {
+      const { data: cacheRow } = await supabase
+        .from('viz_graph_cache')
+        .select('graph_json')
+        .eq('viz_id', 'cross-domain')
+        .single();
+      if (cacheRow?.graph_json) {
+        return cacheRow.graph_json as unknown as CrossDomainResult;
+      }
+    } catch (err) {
+      console.warn('[cross-domain] Cache read failed or missing. Querying live database...');
+    }
+
+    // 2. Query DB live
     // ── Counts ──────────────────────────────────────────────────────────
     const { count: ndeTotal } = await supabase
       .from('nde_analysis')
@@ -273,7 +305,7 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
         phenomenon: 'Paralysis/Immobility',
         nde_label: 'Inability to move/speak',
         uap_label: 'Witness paralysis',
-        nde_pct: 15, // approximate from NDE literature
+        nde_pct: 15,
         uap_pct: Math.round(((uapPhysicalCounts.get('paralysis') || 0) / Math.max(uapAnalysis?.length || 1, 1)) * 100),
         significance: 80,
         description: 'Involuntary paralysis during the experience, inability to move or speak while mentally alert.',
@@ -307,7 +339,7 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
         phenomenon: 'Ontological Shock',
         nde_label: 'Reality reassessment post-NDE',
         uap_label: 'Ontological shock rating',
-        nde_pct: 65, // well-established in NDE literature
+        nde_pct: 65,
         uap_pct: (() => {
           let count = 0;
           for (const row of uapAnalysis || []) {
@@ -348,7 +380,7 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
 
     overlaps.sort((a, b) => b.significance - a.significance);
 
-    return {
+    const result: CrossDomainResult = {
       generated_at: new Date().toISOString(),
       nde_total: ndeTotal || 0,
       uap_total: uapTotal || 0,
@@ -377,8 +409,27 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
       ],
       overlapping_phenomena: overlaps,
     };
-  } catch (err) {
-    console.error('[cross-domain] Failed to aggregate data:', err);
+
+    // Save to cache asynchronously to speed up future renders
+    supabase
+      .from('viz_graph_cache')
+      .upsert({
+        viz_id: 'cross-domain',
+        graph_json: result,
+        updated_at: new Date().toISOString(),
+      })
+      .then(({ error }) => {
+        if (error) console.error('[cross-domain] Failed to write cache:', error.message);
+        else console.log('[cross-domain] Successfully cached cross-domain data');
+      });
+
+    return result;
+  })();
+
+  try {
+    return await withTimeout(fetchPromise, 4500, null);
+  } catch (error) {
+    console.error('[cross-domain] Failed to load data:', error);
     return null;
   }
 }

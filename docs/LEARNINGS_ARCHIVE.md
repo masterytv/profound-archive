@@ -39,3 +39,8 @@
 ## 6. Known Fixed UI Bugs
 - **Password Recovery:** Supabase PKCE doesn't forward `type=recovery`. Handled via `user.recovery_sent_at` check in the callback route.
 - **Markdown Renderer:** Custom parser now processes links `[text](url)` BEFORE italics `_text_` to prevent URL underscores from breaking into `<em>` tags.
+
+## 7. Archived Rules (May 2026)
+- **Client Singleton (Archived 2026-05-27):** Supabase browser client uses a `globalThis` singleton to survive Turbopack HMR.
+- **Formatting (Archived 2026-05-27):** No Em Dashes (—) in AI outputs. Use parentheses or commas.
+- **Edge Runtime OG on Firebase (Archived 2026-05-27):** The file-convention `opengraph-image.tsx` was replaced by the `/api/og/page` dynamic route. The file convention is not supported on Firebase App Hosting (returns 404), and Edge runtime OG routes fail on Firebase (must use `nodejs` runtime).

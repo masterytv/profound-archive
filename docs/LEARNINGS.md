@@ -5,7 +5,6 @@
 ## 1. Component & Data Architecture
 - **Server-First Fetching:** Fetch Supabase data in Server Components and pass as props. NEVER use `useEffect` for Supabase data fetching in Client Components (causes React Strict Mode `AbortError` loops).
 - **RSC Boundaries:** When passing icons from Server to Client components, pass the string name (`iconName="Heart"`) and map it client-side. Never pass Lucide component objects across the boundary.
-- **Client Singleton:** Supabase browser client uses a `globalThis` singleton to survive Turbopack HMR.
 
 ## 2. Server & API Rules
 - **Admin Security:** ALL `/api/admin/*` routes MUST import and use `isAdminUser()` from `src/lib/auth/admin-guard.ts`.
@@ -32,11 +31,10 @@
 - **Pipeline Model Selection (New Verticals):** When building pipelines for new domain verticals (UAP, psychedelics, OBE, etc.), ALWAYS check the existing NDE pipeline's model choices first — do NOT default to Claude. The proven pattern is: `gpt-4o-mini` + OpenAI `response_format: { type: 'json_object' }` for all classification, scoring, and structured extraction (~$0.001/call). Reserve `claude-sonnet` for long-form generation only (blog writing, deep knowledge extraction). See `src/lib/ai/classify-experience.ts` and `src/lib/ai/greyson.ts` as reference implementations.
 - **Claude JSON Forcing:** To get reliable JSON from Claude, you MUST use Assistant Prefill: `{ role: 'assistant', content: '{' }`. System prompts are not enough. However, prefer OpenAI JSON mode for structured scoring tasks — it's cheaper and proven in the NDE pipeline.
 - **Secrets:** `apphosting.yaml` secrets MUST be pinned to a specific version (e.g., `/versions/1`). Firebase App Hosting will fail builds if set to `/versions/latest`. The Firebase App Hosting service account (`firebase-app-hosting-compute@...`) has **project-level** Secret Manager Secret Accessor — new secrets are automatically accessible. Do NOT recommend per-secret IAM bindings; they are inherited.
-- **Formatting:** No Em Dashes (—) in AI outputs. Use parentheses or commas.
 - **Blog Research Provider:** Research pipeline uses **Tavily Search API** (`TAVILY_API_KEY`, free tier 1K credits/mo). Replaced Perplexity (quota exhausted) May 2026. Calls are in `blog-research.ts` (research) and `blog-verify.ts` (fact-check + link repair).
 
 ## 6. OG Images & Social Sharing
-- **No Edge Runtime on Firebase:** `opengraph-image.tsx` files MUST use `export const runtime = 'nodejs'`, NOT `'edge'`. Firebase App Hosting returns 404 for Edge runtime OG routes. The file-based approach auto-injects `og:image` meta tags.
+- **OG Images on Firebase App Hosting:** The `opengraph-image.tsx` file convention is NOT supported (returns 404). Always use the dynamic `/api/og/page?path=...` API route instead. To avoid loopback timeouts during OG generation, read the logo from the local filesystem as base64 and cache Supabase counts in memory (1 hour TTL) using the service role key.
 - **OG Stats Schema:** `uap_channels` has `hidden` column (not `is_active`). `nde_vids` must filter by `isNde = 'clear_nde'` (9,998 total rows but only ~5,500 confirmed NDEs). `blog_posts` is a single table with `domain` column for NDE/UAP. Stats helper: `src/lib/og/stats.ts`.
 
 ## 7. React Lifecycle

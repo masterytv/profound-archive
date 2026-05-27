@@ -1,12 +1,18 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
+
+export const runtime = "nodejs";
 
 // ─── Client ─────────────────────────────────────────────────────────────────
 
 function buildClient() {
+  // Use service role key on server if available to bypass RLS
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    key,
   );
 }
 
@@ -33,6 +39,16 @@ export async function GET(
 ) {
   const { id } = await params;
   const supabase = buildClient();
+
+  // Convert local logo to base64 data URL so Satori doesn't need to fetch it over HTTP
+  let logoBase64: string | undefined = undefined;
+  try {
+    const logoPath = path.join(process.cwd(), "public", "logo-new-light.png");
+    const logoBuffer = fs.readFileSync(logoPath);
+    logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+  } catch (err) {
+    console.error("[OG Channel Route] Failed to read logo file:", err);
+  }
 
   // Fetch channel + scores in parallel
   const [channelRes, scoresRes] = await Promise.all([
@@ -263,13 +279,15 @@ export async function GET(
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`${getBaseUrl()}/logo-new-light.png`}
-              alt="Project Profound"
-              width={200}
-              height={47}
-              style={{ objectFit: "contain" }}
-            />
+            {logoBase64 && (
+              <img
+                src={logoBase64}
+                alt="Project Profound"
+                width={200}
+                height={47}
+                style={{ objectFit: "contain" }}
+              />
+            )}
           </div>
           <div
             style={{
