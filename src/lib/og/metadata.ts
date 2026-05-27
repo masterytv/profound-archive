@@ -19,10 +19,24 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://projectprofound.or
  * Returns openGraph + twitter metadata with the image pointing to the API route.
  * Spread this into your Metadata export.
  */
-export function ogImage(pagePath: string) {
+export function ogImage(
+  pagePath: string,
+  options?: {
+    title?: string;
+    description?: string;
+    type?: string;
+  }
+) {
   const imageUrl = `${BASE_URL}/api/og/page?path=${encodeURIComponent(pagePath)}`;
+  const title = options?.title;
+  const description = options?.description;
+
   return {
     openGraph: {
+      url: `${BASE_URL}${pagePath === '/' ? '' : pagePath}`,
+      type: options?.type || 'website',
+      ...(title ? { title } : {}),
+      ...(description ? { description } : {}),
       images: [
         {
           url: imageUrl,
@@ -35,6 +49,8 @@ export function ogImage(pagePath: string) {
     twitter: {
       card: 'summary_large_image' as const,
       images: [imageUrl],
+      ...(title ? { title } : {}),
+      ...(description ? { description } : {}),
     },
   };
 }
