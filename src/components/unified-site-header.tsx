@@ -7,7 +7,7 @@ import {
   User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv,
   HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar,
   Globe, Building2, MessageCircle, Home,
-  Network, Cpu, Waypoints, Orbit, Clock, Sparkles,
+  Network, Cpu, Waypoints, Orbit, Clock, Layers,
 } from "lucide-react"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -428,7 +428,6 @@ export default function UnifiedSiteHeader() {
                   onClick={() => { setVizOpen(!vizOpen); setNdeOpen(false); setUapOpen(false); setAboutOpen(false) }}
                   className={navBtn}
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
                   Visualize
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${vizOpen ? "rotate-180" : ""}`} />
                 </button>
@@ -436,7 +435,7 @@ export default function UnifiedSiteHeader() {
                   <div className="absolute top-full -left-20 mt-1.5 w-[540px] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-3 px-2 z-50">
                     {/* Visualizations Home */}
                     <Link href="/visualize" className={`${megaLink} mb-1 bg-gradient-to-r from-purple-50/60 to-blue-50/60 dark:from-purple-900/20 dark:to-blue-900/20`} onClick={() => setVizOpen(false)}>
-                      <Sparkles className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                      <Layers className="w-4 h-4 text-purple-600 flex-shrink-0" />
                       <div>
                         <div className={megaTitle}>Visualizations Home</div>
                         <div className={megaSub}>All 3D interactive maps</div>
@@ -801,7 +800,7 @@ export default function UnifiedSiteHeader() {
                         className="flex items-center justify-between w-full text-base font-semibold text-slate-900 dark:text-white mb-3"
                       >
                         <span className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-purple-600" />
+                          <Layers className="w-4 h-4 text-purple-600" />
                           Visualize
                         </span>
                         <ChevronDown className={`w-4 h-4 transition-transform ${mobileVizOpen ? "rotate-180" : ""}`} />
@@ -809,7 +808,7 @@ export default function UnifiedSiteHeader() {
                       {mobileVizOpen && (
                         <div className="space-y-1 pl-1">
                           <Link href="/visualize" className="flex items-center gap-3 py-2.5 text-purple-700 dark:text-purple-300 font-semibold hover:text-purple-900 dark:hover:text-purple-200 transition-colors" onClick={closeMobile}>
-                            <Sparkles className="w-4 h-4 text-purple-600" /> Visualizations Home
+                            <Layers className="w-4 h-4 text-purple-600" /> Visualizations Home
                           </Link>
                           <div className="mx-1 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
                           <Link href="/visualize/uap-timeline" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
