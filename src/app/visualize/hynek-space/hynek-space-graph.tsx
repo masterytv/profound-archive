@@ -168,7 +168,7 @@ export function HynekSpaceGraph() {
     const axisGroup = new THREE.Group();
     axisGroup.name = 'axisGuides';
 
-    const AXIS_LEN = 9.5; // slightly beyond data range (SCALE=8)
+    const AXIS_LEN = 17; // full data range: -8.5 to +8.5
     const ORIGIN = new THREE.Vector3(-8.5, -8.5, -8.5); // corner origin
 
     // Helper: create a text sprite that always faces the camera

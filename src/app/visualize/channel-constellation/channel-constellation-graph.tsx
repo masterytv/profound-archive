@@ -124,7 +124,7 @@ export function ChannelConstellationGraph() {
     axisGroup.name = 'axisGuides';
 
     const SCALE = 10;
-    const AXIS_LEN = SCALE + 1.5;
+    const AXIS_LEN = SCALE * 2; // full data range: -SCALE to +SCALE
     const ORIGIN = new THREE.Vector3(-SCALE, -SCALE, -SCALE);
 
     // Helper: create a text sprite that always faces the camera
