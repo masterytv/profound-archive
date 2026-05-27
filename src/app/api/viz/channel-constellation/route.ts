@@ -10,38 +10,6 @@ function serviceClient() {
   );
 }
 
-/** Paginate through all channel_id values from uap_vids (tier 1 & 2) */
-async function fetchArchiveCounts(sb: ReturnType<typeof serviceClient>): Promise<Map<string, number>> {
-  const counts = new Map<string, number>();
-  const PAGE = 1000;
-  let offset = 0;
-  let hasMore = true;
-
-  while (hasMore) {
-    const { data } = await sb
-      .from('uap_vids')
-      .select('channel_id')
-      .in('tier', [1, 2])
-      .range(offset, offset + PAGE - 1);
-
-    if (!data || data.length === 0) {
-      hasMore = false;
-      break;
-    }
-
-    for (const v of data) {
-      counts.set(v.channel_id, (counts.get(v.channel_id) || 0) + 1);
-    }
-
-    if (data.length < PAGE) {
-      hasMore = false;
-    }
-    offset += PAGE;
-  }
-
-  return counts;
-}
-
 export async function GET() {
   try {
     const sb = serviceClient();
@@ -59,9 +27,24 @@ export async function GET() {
 
     const json = data.graph_json as { channels: Array<Record<string, unknown>> };
 
-    // Enrich cached channels with actual archived video count (tier 1 & 2)
+    // Enrich with actual archived video counts (tier 1 & 2 only)
+    // Uses per-channel HEAD count queries — only ~52 parallel requests,
+    // each returning just the count (no data), avoiding the 1000-row limit
     if (json.channels) {
-      const archiveCounts = await fetchArchiveCounts(sb);
+      const channelIds = json.channels.map(ch => ch.id as string);
+
+      const results = await Promise.all(
+        channelIds.map(async (channelId) => {
+          const { count } = await sb
+            .from('uap_vids')
+            .select('video_id', { count: 'exact', head: true })
+            .eq('channel_id', channelId)
+            .in('tier', [1, 2]);
+          return { channelId, count: count ?? 0 };
+        }),
+      );
+
+      const archiveCounts = new Map(results.map(r => [r.channelId, r.count]));
       for (const ch of json.channels) {
         ch.videoCount = archiveCounts.get(ch.id as string) ?? 0;
       }
