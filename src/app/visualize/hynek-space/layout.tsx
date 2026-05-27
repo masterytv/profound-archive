@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { ogImage } from '@/lib/og/metadata';
 
 export const metadata: Metadata = {
   title: 'Hynek Classification Space | Project Profound',
-  description:
-    'Explore 2,200+ UAP encounters in a 3D scatter plot. See how evidence quality, contact depth, and transformation correlate across Hynek classifications.',
+  description: '',
+  ...ogImage('/visualize/hynek-space'),
 };
 
-export default function HynekSpaceLayout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return children;
 }

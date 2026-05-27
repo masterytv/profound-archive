@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { ogImage } from '@/lib/og/metadata';
 
 export const metadata: Metadata = {
   title: 'Channel Constellation | Project Profound',
-  description:
-    'Explore 52 UAP channels in 3D space. See how intelligence value, credibility, and encounter depth position each channel in the archive.',
+  description: '',
+  ...ogImage('/visualize/channel-constellation'),
 };
 
-export default function ChannelConstellationLayout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return children;
 }

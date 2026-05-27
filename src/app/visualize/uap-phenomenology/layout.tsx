@@ -1,20 +1,12 @@
 import type { Metadata } from 'next';
+import { ogImage } from '@/lib/og/metadata';
 
 export const metadata: Metadata = {
   title: 'UAP Phenomenology Network | Project Profound',
-  description:
-    'Explore the connections between UAP encounter phenomena — entity types, physical effects, craft shapes, and consciousness states — in an interactive 3D network visualization.',
-  openGraph: {
-    title: 'UAP Phenomenology Network',
-    description:
-      'Interactive 3D visualization of how UFO encounter phenomena co-occur across 3,700+ analyzed encounters.',
-  },
+  description: '',
+  ...ogImage('/visualize/uap-phenomenology'),
 };
 
-export default function UapPhenomenologyLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return children;
 }

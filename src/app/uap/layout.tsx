@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogImage } from '@/lib/og/metadata';
 
 export const metadata: Metadata = {
   title: "UFO & UAP Encounters | Project Profound",
@@ -9,6 +10,11 @@ export const metadata: Metadata = {
     description:
       "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research.",
     type: "website",
+    ...ogImage('/uap').openGraph,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    ...ogImage('/uap').twitter,
   },
 };
 

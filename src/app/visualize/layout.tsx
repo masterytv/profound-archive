@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImage } from '@/lib/og/metadata';
 
 export const metadata: Metadata = {
   title: '3D Visualizations | Project Profound',
@@ -6,6 +7,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: '3D Visualizations | Project Profound',
     description: 'Interactive 3D maps of consciousness research data.',
+    ...ogImage('/visualize').openGraph,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    ...ogImage('/visualize').twitter,
   },
 };
 

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ogImage } from '@/lib/og/metadata';
 import { Toaster } from '@/components/ui/toaster';
 import SiteHeader from '@/components/unified-site-header';
 import SiteFooter from '@/components/site-footer';
@@ -22,10 +23,11 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Project Profound',
     locale: 'en_US',
+    ...ogImage('/').openGraph,
   },
   twitter: {
     card: 'summary_large_image',
-    // site: '@ProjectProfound',  // Uncomment after creating the X account
+    ...ogImage('/').twitter,
   },
 };
 

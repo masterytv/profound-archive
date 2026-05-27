@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogImage } from '@/lib/og/metadata';
 import Link from "next/link";
 import { Brain, Telescope, Search, Cpu, ArrowRight } from "lucide-react";
 import { fetchHomepageStats, fetchOverlapHighlights, fetchLatestPosts } from "@/app/home-new/data";
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
     title: "Project Profound — Consciousness Research Platform",
     description: "AI-powered analysis of Near-Death and UFO/UAP contact experiences. 7,000+ testimonies. Cross-domain discoveries.",
     type: "website",
+    ...ogImage('/').openGraph,
   },
 };
 
