@@ -7,6 +7,7 @@ import {
   User as UserIcon, Users, LogIn, LogOut, Shield, Search, Tv,
   HelpCircle, BookOpen, LayoutGrid, Radio, BarChart3, Calendar,
   Globe, Building2, MessageCircle, Home,
+  Network, Cpu, Waypoints, Orbit, Clock, Sparkles,
 } from "lucide-react"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -76,15 +77,18 @@ export default function UnifiedSiteHeader() {
   // ── Dropdown state ────────────────────────────────────────────────────────
   const [ndeOpen, setNdeOpen] = useState(false)
   const [uapOpen, setUapOpen] = useState(false)
+  const [vizOpen, setVizOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileNdeOpen, setMobileNdeOpen] = useState(false)
   const [mobileUapOpen, setMobileUapOpen] = useState(false)
+  const [mobileVizOpen, setMobileVizOpen] = useState(false)
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
   const [newsletterOpen, setNewsletterOpen] = useState(false)
 
   const ndeRef = useRef<HTMLDivElement>(null)
   const uapRef = useRef<HTMLDivElement>(null)
+  const vizRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
 
   // Auto-detect newsletter domain from current path
@@ -95,15 +99,16 @@ export default function UnifiedSiteHeader() {
     function handleClickOutside(event: MouseEvent) {
       if (ndeRef.current && !ndeRef.current.contains(event.target as Node)) setNdeOpen(false)
       if (uapRef.current && !uapRef.current.contains(event.target as Node)) setUapOpen(false)
+      if (vizRef.current && !vizRef.current.contains(event.target as Node)) setVizOpen(false)
       if (aboutRef.current && !aboutRef.current.contains(event.target as Node)) setAboutOpen(false)
     }
-    if (ndeOpen || uapOpen || aboutOpen) {
+    if (ndeOpen || uapOpen || vizOpen || aboutOpen) {
       document.addEventListener("mousedown", handleClickOutside)
     }
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [ndeOpen, uapOpen, aboutOpen])
+  }, [ndeOpen, uapOpen, vizOpen, aboutOpen])
 
-  const closeAll = () => { setNdeOpen(false); setUapOpen(false); setAboutOpen(false) }
+  const closeAll = () => { setNdeOpen(false); setUapOpen(false); setVizOpen(false); setAboutOpen(false) }
   const closeMobile = () => setMobileMenuOpen(false)
 
   // ── Shared link styling ───────────────────────────────────────────────────
@@ -417,6 +422,92 @@ export default function UnifiedSiteHeader() {
                 )}
               </div>
 
+              {/* ── Visualize ── */}
+              <div className="relative" ref={vizRef}>
+                <button
+                  onClick={() => { setVizOpen(!vizOpen); setNdeOpen(false); setUapOpen(false); setAboutOpen(false) }}
+                  className={navBtn}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Visualize
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${vizOpen ? "rotate-180" : ""}`} />
+                </button>
+                {vizOpen && (
+                  <div className="absolute top-full -left-20 mt-1.5 w-[540px] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 py-3 px-2 z-50">
+                    {/* Visualizations Home */}
+                    <Link href="/visualize" className={`${megaLink} mb-1 bg-gradient-to-r from-purple-50/60 to-blue-50/60 dark:from-purple-900/20 dark:to-blue-900/20`} onClick={() => setVizOpen(false)}>
+                      <Sparkles className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                      <div>
+                        <div className={megaTitle}>Visualizations Home</div>
+                        <div className={megaSub}>All 3D interactive maps</div>
+                      </div>
+                    </Link>
+                    <div className="mx-2 my-1.5 border-t border-slate-200/60 dark:border-slate-700" />
+                    <div className="grid grid-cols-2 gap-1">
+                      {/* Column 1: UFO/UAP */}
+                      <div>
+                        <p className={colHeader}>UFO / UAP</p>
+                        <Link href="/visualize/uap-timeline" className={megaLink} onClick={() => setVizOpen(false)}>
+                          <Clock className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className={megaTitle}>Timeline Helix</div>
+                            <div className={megaSub}>350+ years of encounters</div>
+                          </div>
+                        </Link>
+                        <Link href="/visualize/geography" className={megaLink} onClick={() => setVizOpen(false)}>
+                          <Globe className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className={megaTitle}>Global Encounter Map</div>
+                            <div className={megaSub}>3D globe hotspots</div>
+                          </div>
+                        </Link>
+                        <Link href="/visualize/hynek-space" className={megaLink} onClick={() => setVizOpen(false)}>
+                          <Orbit className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className={megaTitle}>Hynek Space</div>
+                            <div className={megaSub}>Classification in 3D</div>
+                          </div>
+                        </Link>
+                        <Link href="/visualize/uap-phenomenology" className={megaLink} onClick={() => setVizOpen(false)}>
+                          <Waypoints className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className={megaTitle}>Phenomenology Network</div>
+                            <div className={megaSub}>Entity & effect co-occurrence</div>
+                          </div>
+                        </Link>
+                      </div>
+                      {/* Column 2: UAP continued + NDE */}
+                      <div className="border-l border-slate-100 dark:border-slate-700 pl-1">
+                        <p className={colHeader}>UFO / UAP</p>
+                        <Link href="/visualize/uap-intelligence" className={megaLink} onClick={() => setVizOpen(false)}>
+                          <Cpu className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className={megaTitle}>Intelligence Network</div>
+                            <div className={megaSub}>People, orgs & programs</div>
+                          </div>
+                        </Link>
+                        <Link href="/visualize/channel-constellation" className={megaLink} onClick={() => setVizOpen(false)}>
+                          <Radio className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <div>
+                            <div className={megaTitle}>Channel Constellation</div>
+                            <div className={megaSub}>Channel quality in 3D</div>
+                          </div>
+                        </Link>
+                        <div className="my-2 border-t border-dashed border-slate-200 dark:border-slate-700" />
+                        <p className={colHeader}>NDE</p>
+                        <Link href="/visualize/nde-elements" className={megaLink} onClick={() => setVizOpen(false)}>
+                          <Network className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                          <div>
+                            <div className={megaTitle}>NDE Element Network</div>
+                            <div className={megaSub}>15 core elements linked</div>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* ── About ── */}
               <div className="relative flex items-center" ref={aboutRef}>
                 <Link href="/about" className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/10 transition-all">
@@ -698,6 +789,50 @@ export default function UnifiedSiteHeader() {
                           </Link>
                           <Link href="/research/cross-domain" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
                             <Link2 className="w-4 h-4 text-violet-600" /> Cross-Domain
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ── Visualize (accordion) ── */}
+                    <div>
+                      <button
+                        onClick={() => setMobileVizOpen(!mobileVizOpen)}
+                        className="flex items-center justify-between w-full text-base font-semibold text-slate-900 dark:text-white mb-3"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-purple-600" />
+                          Visualize
+                        </span>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${mobileVizOpen ? "rotate-180" : ""}`} />
+                      </button>
+                      {mobileVizOpen && (
+                        <div className="space-y-1 pl-1">
+                          <Link href="/visualize" className="flex items-center gap-3 py-2.5 text-purple-700 dark:text-purple-300 font-semibold hover:text-purple-900 dark:hover:text-purple-200 transition-colors" onClick={closeMobile}>
+                            <Sparkles className="w-4 h-4 text-purple-600" /> Visualizations Home
+                          </Link>
+                          <div className="mx-1 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
+                          <Link href="/visualize/uap-timeline" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Clock className="w-4 h-4 text-green-600" /> Timeline Helix
+                          </Link>
+                          <Link href="/visualize/geography" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Globe className="w-4 h-4 text-green-600" /> Global Encounter Map
+                          </Link>
+                          <Link href="/visualize/hynek-space" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Orbit className="w-4 h-4 text-green-600" /> Hynek Space
+                          </Link>
+                          <Link href="/visualize/uap-phenomenology" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Waypoints className="w-4 h-4 text-green-600" /> Phenomenology Network
+                          </Link>
+                          <Link href="/visualize/uap-intelligence" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Cpu className="w-4 h-4 text-green-600" /> Intelligence Network
+                          </Link>
+                          <Link href="/visualize/channel-constellation" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Radio className="w-4 h-4 text-green-600" /> Channel Constellation
+                          </Link>
+                          <div className="mx-1 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
+                          <Link href="/visualize/nde-elements" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <Network className="w-4 h-4 text-blue-600" /> NDE Element Network
                           </Link>
                         </div>
                       )}
