@@ -10,6 +10,38 @@ function serviceClient() {
   );
 }
 
+/** Paginate through all channel_id values from uap_vids (tier 1 & 2) */
+async function fetchArchiveCounts(sb: ReturnType<typeof serviceClient>): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  const PAGE = 1000;
+  let offset = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data } = await sb
+      .from('uap_vids')
+      .select('channel_id')
+      .in('tier', [1, 2])
+      .range(offset, offset + PAGE - 1);
+
+    if (!data || data.length === 0) {
+      hasMore = false;
+      break;
+    }
+
+    for (const v of data) {
+      counts.set(v.channel_id, (counts.get(v.channel_id) || 0) + 1);
+    }
+
+    if (data.length < PAGE) {
+      hasMore = false;
+    }
+    offset += PAGE;
+  }
+
+  return counts;
+}
+
 export async function GET() {
   try {
     const sb = serviceClient();
@@ -25,19 +57,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Not yet computed' }, { status: 503 });
     }
 
-    // Fetch actual archived video counts per channel from uap_vids
-    // (these are the videos we've actually processed, not YouTube totals)
-    const { data: vids } = await sb
-      .from('uap_vids')
-      .select('channel_id');
-
     const json = data.graph_json as { channels: Array<Record<string, unknown>> };
 
-    if (vids && json.channels) {
-      const archiveCounts = new Map<string, number>();
-      for (const v of vids) {
-        archiveCounts.set(v.channel_id, (archiveCounts.get(v.channel_id) || 0) + 1);
-      }
+    // Enrich cached channels with actual archived video count (tier 1 & 2)
+    if (json.channels) {
+      const archiveCounts = await fetchArchiveCounts(sb);
       for (const ch of json.channels) {
         ch.videoCount = archiveCounts.get(ch.id as string) ?? 0;
       }
