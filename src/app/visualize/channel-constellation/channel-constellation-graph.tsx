@@ -103,23 +103,33 @@ export function ChannelConstellationGraph() {
     const encs = filtered.map(c => c.encounter || 0);
     const auths = filtered.map(c => c.authority);
 
+    // Global maximums (from ALL channels, not just filtered) for absolute percentages
+    const allIntels = data.channels.map(c => c.intelligence);
+    const allCreds = data.channels.map(c => c.credibility);
+    const allEncs = data.channels.map(c => c.encounter || 0);
+    const allAuths = data.channels.map(c => c.authority);
+    const globalMaxI = Math.max(...allIntels) || 1;
+    const globalMaxC = Math.max(...allCreds) || 1;
+    const globalMaxE = Math.max(...allEncs) || 1;
+    const globalMaxA = Math.max(...allAuths) || 1;
+
+    // Per-axis min-max for visual positioning (spread across full 3D cube)
     const minI = Math.min(...intels), maxI = Math.max(...intels);
     const minC = Math.min(...creds), maxC = Math.max(...creds);
     const minE = Math.min(...encs), maxE = Math.max(...encs);
-    const minA = Math.min(...auths), maxA = Math.max(...auths);
 
     const rangeI = maxI - minI || 1;
     const rangeC = maxC - minC || 1;
     const rangeE = maxE - minE || 1;
-    const rangeA = maxA - minA || 1;
 
     const nodes = filtered.map(c => ({
       ...c,
-      // Pre-computed percentages (relative to dataset range)
-      intelPct: Math.round(((c.intelligence - minI) / rangeI) * 100),
-      credPct: Math.round(((c.credibility - minC) / rangeC) * 100),
-      encPct: Math.round((((c.encounter || 0) - minE) / rangeE) * 100),
-      authPct: Math.round(((c.authority - minA) / rangeA) * 100),
+      // Percentages: absolute (value / global max) — shows true relative scale
+      intelPct: Math.round((c.intelligence / globalMaxI) * 100),
+      credPct: Math.round((c.credibility / globalMaxC) * 100),
+      encPct: Math.round(((c.encounter || 0) / globalMaxE) * 100),
+      authPct: Math.round((c.authority / globalMaxA) * 100),
+      // Positions: min-max normalized for visual spread
       fx: (((c.intelligence - minI) / rangeI) * 2 - 1) * SCALE,
       fy: (((c.credibility - minC) / rangeC) * 2 - 1) * SCALE,
       fz: ((((c.encounter || 0) - minE) / rangeE) * 2 - 1) * SCALE,
