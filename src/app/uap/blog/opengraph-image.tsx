@@ -5,7 +5,7 @@ import { ImageResponse } from 'next/og';
 import { BrandedOgTemplate } from '@/lib/og/branded-template';
 import { getBlogStats } from '@/lib/og/stats';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const revalidate = 86400;
 export const alt = 'UAP Blog — In-Depth Articles on UFO Encounters';
 export const size = { width: 1200, height: 630 };

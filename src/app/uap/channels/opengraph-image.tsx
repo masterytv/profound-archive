@@ -5,7 +5,7 @@ import { ImageResponse } from 'next/og';
 import { BrandedOgTemplate } from '@/lib/og/branded-template';
 import { getUapStats, formatCount } from '@/lib/og/stats';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const revalidate = 86400;
 export const alt = 'UAP YouTube Channels — Ranked & Analyzed';
 export const size = { width: 1200, height: 630 };
