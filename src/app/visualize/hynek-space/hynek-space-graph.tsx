@@ -133,6 +133,91 @@ export function HynekSpaceGraph() {
       controls.autoRotateSpeed = 0.3;
     }
     graphRef.current.cameraPosition({ x: 8, y: 5, z: 8 });
+
+    // ─── Inject 3D axis guides into the scene ──────────────────────────
+    const scene = graphRef.current.scene();
+    if (!scene) return;
+
+    // Remove any previously added axis guides (on re-render)
+    const existing = scene.getObjectByName('axisGuides');
+    if (existing) scene.remove(existing);
+
+    const axisGroup = new THREE.Group();
+    axisGroup.name = 'axisGuides';
+
+    const AXIS_LEN = 9.5; // slightly beyond data range (SCALE=8)
+    const ORIGIN = new THREE.Vector3(-8.5, -8.5, -8.5); // corner origin
+
+    // Helper: create a text sprite that always faces the camera
+    function makeLabel(text: string, color: string, position: THREE.Vector3) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      canvas.width = 256;
+      canvas.height = 64;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = 'bold 28px Inter, system-ui, sans-serif';
+      ctx.fillStyle = color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+      const sprite = new THREE.Sprite(material);
+      sprite.position.copy(position);
+      sprite.scale.set(3.5, 0.9, 1);
+      return sprite;
+    }
+
+    // Helper: create axis line + arrowhead + label
+    function makeAxis(
+      dir: THREE.Vector3,
+      color: number,
+      label: string,
+      colorHex: string,
+    ) {
+      // Main line from origin along direction
+      const arrow = new THREE.ArrowHelper(
+        dir.clone().normalize(),
+        ORIGIN,
+        AXIS_LEN,
+        color,
+        0.5,  // head length
+        0.25, // head width
+      );
+      // Make shaft thicker
+      if (arrow.line) {
+        (arrow.line as any).material = new THREE.LineBasicMaterial({ color, linewidth: 2, transparent: true, opacity: 0.7 });
+      }
+      // Make cone semi-transparent
+      if (arrow.cone) {
+        (arrow.cone as any).material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.7 });
+      }
+      axisGroup.add(arrow);
+
+      // Label at arrow tip
+      const labelPos = ORIGIN.clone().add(dir.clone().normalize().multiplyScalar(AXIS_LEN + 0.8));
+      axisGroup.add(makeLabel(label, colorHex, labelPos));
+    }
+
+    // X-axis: Evidence (red)
+    makeAxis(new THREE.Vector3(1, 0, 0), 0xff6b6b, 'Evidence →', '#ff6b6b');
+    // Y-axis: Contact Depth (green)
+    makeAxis(new THREE.Vector3(0, 1, 0), 0x51cf66, 'Contact Depth ↑', '#51cf66');
+    // Z-axis: Transformation (blue)
+    makeAxis(new THREE.Vector3(0, 0, 1), 0x74c0fc, 'Transformation →', '#74c0fc');
+
+    // Add subtle grid lines at the base (y = -8.5) for spatial reference
+    const gridSize = 17; // covers -8.5 to +8.5
+    const gridDivisions = 8;
+    const grid = new THREE.GridHelper(gridSize, gridDivisions, 0xffffff, 0xffffff);
+    grid.position.set(0, -8.5, 0);
+    (grid.material as THREE.Material).transparent = true;
+    (grid.material as THREE.Material).opacity = 0.06;
+    axisGroup.add(grid);
+
+    scene.add(axisGroup);
   }, [data, prefersReduced]);
 
   // Stop rotation on interaction
