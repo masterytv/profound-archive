@@ -35,8 +35,9 @@
 - **Formatting:** No Em Dashes (—) in AI outputs. Use parentheses or commas.
 - **Blog Research Provider:** Research pipeline uses **Tavily Search API** (`TAVILY_API_KEY`, free tier 1K credits/mo). Replaced Perplexity (quota exhausted) May 2026. Calls are in `blog-research.ts` (research) and `blog-verify.ts` (fact-check + link repair).
 
-## 6. Zod & Validation
-- **Zod Strips Unknown Properties:** When adding new fields to TypeScript config interfaces (e.g., `secondary_audio_cue`, `loop`), you MUST also add them to the corresponding Zod schema. Zod's `.parse()` / `.safeParse()` silently drops any properties not defined in the schema. This will cause runtime data loss with zero compile errors.
+## 6. OG Images & Social Sharing
+- **No Edge Runtime on Firebase:** `opengraph-image.tsx` files MUST use `export const runtime = 'nodejs'`, NOT `'edge'`. Firebase App Hosting returns 404 for Edge runtime OG routes. The file-based approach auto-injects `og:image` meta tags.
+- **OG Stats Schema:** `uap_channels` has `hidden` column (not `is_active`). `nde_vids` must filter by `isNde = 'clear_nde'` (9,998 total rows but only ~5,500 confirmed NDEs). `blog_posts` is a single table with `domain` column for NDE/UAP. Stats helper: `src/lib/og/stats.ts`.
 
 ## 7. React Lifecycle
 - **Unstable useEffect Deps:** NEVER put a custom hook's return object in a `useEffect` dependency array (e.g., `useEffect(() => cleanup(), [audio])`). The hook returns a new object reference each render, causing cleanup to fire on EVERY re-render — killing audio, timers, etc. Use `useRef` + empty deps `[]` for unmount-only cleanup.
