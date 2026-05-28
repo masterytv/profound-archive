@@ -184,7 +184,37 @@ function VizCardGrid({ cards }: { cards: VizCard[] }) {
 export default function VisualizePage() {
   return (
     <div className="min-h-screen bg-[#030014]">
-      {/* ─── Header ─── */}
+      {/* JSON-LD: Dataset for Google Dataset Search + AI discoverability */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            name: "Project Profound Consciousness Research Visualizations",
+            description: "Interactive 3D data visualizations of near-death experience (NDE) and UAP encounter research data, including phenomenology networks, geographic distributions, Hynek classification space, and intelligence knowledge graphs. Derived from AI analysis of 7,000+ first-person video accounts.",
+            url: "https://projectprofound.org/visualize",
+            license: "https://projectprofound.org/about",
+            creator: {
+              "@type": "ResearchOrganization",
+              name: "Project Profound",
+              url: "https://projectprofound.org",
+            },
+            keywords: [
+              "near-death experiences", "NDE data", "UAP encounters",
+              "UFO research data", "consciousness research",
+              "Hynek classification", "phenomenology", "UAP timeline",
+            ],
+            distribution: [
+              {
+                "@type": "DataDownload",
+                encodingFormat: "text/html",
+                contentUrl: "https://projectprofound.org/visualize",
+              },
+            ],
+          }),
+        }}
+      />
       <div className="mx-auto max-w-5xl px-4 pt-12 pb-8 sm:px-6">
         <Link
           href="/"

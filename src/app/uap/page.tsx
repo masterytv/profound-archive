@@ -79,7 +79,30 @@ export default async function UapLandingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0a1510] text-slate-900 dark:text-slate-200 uap-domain">
-      {/* ─── HERO SECTION ─── */}
+      {/* JSON-LD: WebPage + Organization for AI discoverability */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: "UFO & UAP Encounters — AI-Powered Analysis",
+            description: `AI-analyzed archive of ${stats.totalVideos.toLocaleString()} UFO and UAP encounter videos with ${stats.totalEncounters.toLocaleString()} individual encounters classified by Hynek type, credibility score, and contact depth.`,
+            url: "https://projectprofound.org/uap",
+            isPartOf: {
+              "@type": "WebSite",
+              name: "Project Profound",
+              url: "https://projectprofound.org",
+            },
+            about: [
+              { "@type": "Thing", name: "Unidentified Anomalous Phenomena" },
+              { "@type": "Thing", name: "UFO Encounters" },
+              { "@type": "Thing", name: "Government UAP Disclosure" },
+              { "@type": "Thing", name: "Hynek Close Encounter Classification" },
+            ],
+          }),
+        }}
+      />
       <section className="relative overflow-hidden border-b border-green-900/40">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.03]" />

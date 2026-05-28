@@ -133,7 +133,29 @@ export default async function BlogIndexPage({
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            {/* Hero */}
+            {/* JSON-LD: CollectionPage + ItemList for AI discoverability */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "CollectionPage",
+                        name: "NDE Research Blog — Project Profound",
+                        description: "Research-backed articles on near-death experiences, consciousness, and what 5,000 first-person accounts reveal about the nature of existence.",
+                        url: "https://projectprofound.org/blog",
+                        mainEntity: {
+                            "@type": "ItemList",
+                            numberOfItems: (posts ?? []).length,
+                            itemListElement: (posts ?? []).slice(0, 30).map((post, i) => ({
+                                "@type": "ListItem",
+                                position: i + 1,
+                                name: (post as BlogPost).title,
+                                url: `https://projectprofound.org/blog/${(post as BlogPost).slug}`,
+                            })),
+                        },
+                    }),
+                }}
+            />
             <section className="relative overflow-hidden py-16 md:py-20 hero-gradient">
                 <div
                     className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"

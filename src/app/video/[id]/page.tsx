@@ -372,7 +372,34 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            {/* ─── Breadcrumb bar ─── */}
+            {/* JSON-LD: VideoObject for AI discoverability */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "VideoObject",
+                        name: video.title ?? "NDE Testimonial Video",
+                        description: (video.analysis_nde_summary ?? "Near-death experience testimonial video analysis").slice(0, 300),
+                        thumbnailUrl: video.thumbnailUrl ?? `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`,
+                        uploadDate: video.date ?? undefined,
+                        contentUrl: video.url ?? `https://www.youtube.com/watch?v=${video.videoId}`,
+                        embedUrl: `https://www.youtube.com/embed/${video.videoId}`,
+                        publisher: {
+                            "@type": "Organization",
+                            name: video.channelName ?? "Unknown Channel",
+                            url: video.channelUrl ?? undefined,
+                        },
+                        ...(analysis?.total_greyson_score ? {
+                            about: {
+                                "@type": "Thing",
+                                name: "Near-Death Experience",
+                                description: `Greyson Scale score: ${analysis.total_greyson_score}/32 (${Math.round((analysis.total_greyson_score / 32) * 100)}% depth)`,
+                            },
+                        } : {}),
+                    }),
+                }}
+            />
             <div className="border-b border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm sticky top-0 z-10">
                 <div className="container mx-auto px-4 max-w-6xl">
                     <nav className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 py-3">

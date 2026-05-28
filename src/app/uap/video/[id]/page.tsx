@@ -305,7 +305,36 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Breadcrumb */}
+      {/* JSON-LD: VideoObject for AI discoverability */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            name: video.title ?? "UAP Encounter Video",
+            description: analysis?.experience_type
+              ? `${analysis.experience_type} — ${(video.analysis_uap_summary ?? "").slice(0, 200)}`
+              : (video.analysis_uap_summary ?? "UAP encounter video analysis").slice(0, 300),
+            thumbnailUrl: video.thumbnail_url ?? `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`,
+            uploadDate: video.date ?? undefined,
+            contentUrl: video.url ?? `https://www.youtube.com/watch?v=${video.video_id}`,
+            embedUrl: `https://www.youtube.com/embed/${video.video_id}`,
+            publisher: {
+              "@type": "Organization",
+              name: video.channel_name ?? "Unknown Channel",
+              url: video.channel_url ?? undefined,
+            },
+            ...(analysis?.hynek_type && analysis.hynek_type !== "not_stated" ? {
+              about: {
+                "@type": "Thing",
+                name: `Hynek ${analysis.hynek_type} Encounter`,
+                description: `Close encounter classified as ${analysis.hynek_type} on the Hynek scale`,
+              },
+            } : {}),
+          }),
+        }}
+      />
       <div className="border-b border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 max-w-6xl">
           <nav className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 py-3">

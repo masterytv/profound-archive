@@ -235,7 +235,29 @@ export default async function QuestionsPage() {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            {/* ── Hero ─────────────────────────────────────────────────── */}
+            {/* JSON-LD: CollectionPage + ItemList for AI discoverability */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "CollectionPage",
+                        name: "Questions — What NDEs Tell Us",
+                        description: "Browse 80+ questions about near-death experiences organized by theme — from reuniting with loved ones, to what dying feels like, to why we're here.",
+                        url: "https://projectprofound.org/questions",
+                        mainEntity: {
+                            "@type": "ItemList",
+                            numberOfItems: (questions ?? []).length,
+                            itemListElement: (questions ?? []).slice(0, 50).map((q, i) => ({
+                                "@type": "ListItem",
+                                position: i + 1,
+                                name: q.consumer_question,
+                                url: `https://projectprofound.org/questions/${q.slug}`,
+                            })),
+                        },
+                    }),
+                }}
+            />
             <section className="relative overflow-visible py-16 md:py-24 hero-gradient">
                 <div
                     className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"

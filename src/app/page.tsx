@@ -31,6 +31,44 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD: WebSite + SearchAction (sitelinks searchbox) + Organization */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Project Profound",
+              url: "https://projectprofound.org",
+              description: "Consciousness research platform studying near-death experiences and UAP encounters through AI analysis of 7,000+ first-person video accounts.",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: "https://projectprofound.org/search3?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
+              },
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "ResearchOrganization",
+              name: "Project Profound",
+              url: "https://projectprofound.org",
+              description: "A consciousness research platform studying near-death experiences (NDEs) and unidentified anomalous phenomena (UAP/UFO encounters) through AI analysis of 7,000+ first-person video accounts.",
+              logo: "https://projectprofound.org/pp-logo-dark.png",
+              knowsAbout: [
+                "Near-death experiences",
+                "Unidentified anomalous phenomena",
+                "Consciousness research",
+                "Greyson NDE Scale",
+                "Close encounter classification",
+              ],
+            },
+          ]),
+        }}
+      />
       {/* Section 1: Hero */}
       <div className="relative overflow-hidden consciousness-hero-gradient">
         <div 
