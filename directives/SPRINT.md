@@ -1260,13 +1260,23 @@ For every UAP file you create:
 
 ### Growth Strategy (Traffic First)
 
-- [ ] Define SEO content strategy — target long-tail keywords around NDE/UAP phenomenology
+- [x] **SEO Infrastructure: Dynamic OG Images & Social Metadata** ✅ 2026-05-28 — Built `/api/og/page?path=...` API route with branded OG image generation for all 32 public routes. Replaced broken Next.js file-convention `opengraph-image.tsx` (unsupported on Firebase App Hosting) with explicit `ogImage()` metadata helper in `src/lib/og/metadata.ts`. All layouts now emit proper `og:title`, `og:description`, `og:url`, `og:type`, `og:image`, `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`. Validated via Facebook Sharing Debugger. Fixed logo 404s in production via static image imports.
+- [/] Define SEO content strategy — target long-tail keywords around NDE/UAP phenomenology
+  - [x] OG metadata + social sharing cards for all pages ✅ 2026-05-28
+  - [x] Page-level descriptions for all visualization pages ✅ 2026-05-28
+  - [x] Research methodology page (`/research/methodology`) ✅ 2026-05-27
+  - [ ] Keyword research — identify top 50 long-tail NDE/UAP search terms to target
+  - [ ] Blog/content calendar — plan monthly articles optimized for target keywords
+  - [ ] Internal linking strategy — cross-link between entity pages, visualizations, and blog posts
+  - [ ] Schema.org structured data (JSON-LD) — add Article, Dataset, FAQPage markup to key pages
+  - [ ] Sitemap optimization — ensure dynamic pages (encounters, persons, channels) are indexed
 - [ ] Build social media presence — automated posting of daily facts, cross-domain discoveries
 - [ ] Launch viral content channel (YouTube Shorts / TikTok) — AI-narrated insights from the data
 - [ ] Community building — Discord/forum for experiencers and researchers
 - [ ] Press/media outreach — unique cross-domain findings as press releases
 - [ ] Academic partnerships — collaborate with consciousness researchers for credibility + citations
 - [ ] Influencer partnerships — guest features with UAP/NDE content creators whose channels we analyze
+
 
 ---
 
