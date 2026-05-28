@@ -51,11 +51,11 @@ const HYNEK_HEX: Record<string, number> = {
 };
 
 const HYNEK_LABELS: Record<string, string> = {
-  CE1: 'Close Encounter I',
-  CE2: 'Close Encounter II',
-  CE3: 'Close Encounter III',
-  CE4: 'Close Encounter IV',
-  CE5: 'Close Encounter V',
+  CE1: 'Close Encounter I (Observation)',
+  CE2: 'Close Encounter II (Physical Effects)',
+  CE3: 'Close Encounter III (Entities)',
+  CE4: 'Close Encounter IV (Abduction)',
+  CE5: 'Close Encounter V (Initiation/Communication)',
   NL: 'Nocturnal Light',
   unknown: 'Unknown',
   not_stated: 'Not Stated',
@@ -467,6 +467,17 @@ export function UapTimelineGraph() {
     });
   }, []);
 
+  // Combined toggle for unknown + not_stated (shown as a single legend entry)
+  const toggleUnknown = useCallback(() => {
+    setActiveHynek(prev => {
+      const next = new Set(prev);
+      const isActive = next.has('unknown') || next.has('not_stated');
+      if (isActive) { next.delete('unknown'); next.delete('not_stated'); }
+      else { next.add('unknown'); next.add('not_stated'); }
+      return next;
+    });
+  }, []);
+
   // ─── Decade stats for sidebar ───────────────────────────────────────────
   // Groups all pre-1947 encounters into one bucket
 
@@ -632,6 +643,16 @@ export function UapTimelineGraph() {
                 <span className="text-white/75">{HYNEK_LABELS[key]}</span>
               </button>
             ))}
+            {/* Combined unknown + not_stated toggle */}
+            <button
+              onClick={toggleUnknown}
+              className={`flex items-center gap-2 text-[11px] w-full text-left transition-opacity cursor-pointer ${
+                activeHynek.has('unknown') || activeHynek.has('not_stated') ? 'opacity-100' : 'opacity-30'
+              }`}
+            >
+              <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#6b7280' }} />
+              <span className="text-white/75">Unknown / Not Stated</span>
+            </button>
           </div>
         </div>
       ) : (

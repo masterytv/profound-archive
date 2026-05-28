@@ -12,22 +12,23 @@ import { ThemeProvider } from '@/components/theme-provider';
 import CookieConsent from '@/components/cookie-consent';
 import ConsentGatedScripts from '@/components/consent-gated-scripts';
 
+const siteTitle = 'Project Profound: Near Death Experiences and Consciousness';
+const siteDescription = 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences.';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://projectprofound.org'),
-  title: 'Project Profound: Near Death Experiences and Consciousness',
-  description: 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences.',
+  title: siteTitle,
+  description: siteDescription,
   icons: {
     icon: '/icon.png',
   },
   openGraph: {
-    type: 'website',
     siteName: 'Project Profound',
     locale: 'en_US',
-    ...ogImage('/').openGraph,
+    ...ogImage('/', { title: siteTitle, description: siteDescription }).openGraph,
   },
   twitter: {
-    card: 'summary_large_image',
-    ...ogImage('/').twitter,
+    ...ogImage('/', { title: siteTitle, description: siteDescription }).twitter,
   },
 };
 

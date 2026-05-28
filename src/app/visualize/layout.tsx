@@ -1,18 +1,13 @@
 import type { Metadata } from 'next';
 import { ogImage } from '@/lib/og/metadata';
 
+const title = '3D Visualizations | Project Profound';
+const description = 'Explore near-death experiences and UAP encounters through interactive 3D visualizations. See how elements connect, where encounters happen, and what patterns emerge.';
+
 export const metadata: Metadata = {
-  title: '3D Visualizations | Project Profound',
-  description: 'Explore near-death experiences and UAP encounters through interactive 3D visualizations. See how elements connect, where encounters happen, and what patterns emerge.',
-  openGraph: {
-    title: '3D Visualizations | Project Profound',
-    description: 'Interactive 3D maps of consciousness research data.',
-    ...ogImage('/visualize').openGraph,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    ...ogImage('/visualize').twitter,
-  },
+  title,
+  description,
+  ...ogImage('/visualize', { title, description }),
 };
 
 /**

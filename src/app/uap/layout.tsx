@@ -1,21 +1,14 @@
 import type { Metadata } from "next";
 import { ogImage } from '@/lib/og/metadata';
 
+const title = "UFO & UAP Encounters | Project Profound";
+const description =
+  "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research through AI-powered search and analysis.";
+
 export const metadata: Metadata = {
-  title: "UFO & UAP Encounters | Project Profound",
-  description:
-    "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research through AI-powered search and analysis.",
-  openGraph: {
-    title: "UFO & UAP Encounters | Project Profound",
-    description:
-      "Explore first-person UFO and UAP contact accounts, government disclosure analysis, and investigative research.",
-    type: "website",
-    ...ogImage('/uap').openGraph,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    ...ogImage('/uap').twitter,
-  },
+  title,
+  description,
+  ...ogImage('/uap', { title, description }),
 };
 
 export default function UapLayout({

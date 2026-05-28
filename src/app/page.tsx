@@ -11,15 +11,13 @@ import { InlineNewsletterCTA } from "@/components/InlineNewsletterCTA";
 
 export const revalidate = 86400;
 
+const ogTitle = "Project Profound — Consciousness Research Platform";
+const ogDescription = "AI-powered analysis of Near-Death and UFO/UAP contact experiences. 7,000+ testimonies. Cross-domain discoveries.";
+
 export const metadata: Metadata = {
   title: "Consciousness Research Platform | Project Profound",
   description: "Exploring the boundaries of human experience through AI-powered analysis of 7,000+ NDE and UFO/UAP firsthand testimonies. Cross-domain phenomenology, validated research scales, and transparent methodology.",
-  openGraph: {
-    title: "Project Profound — Consciousness Research Platform",
-    description: "AI-powered analysis of Near-Death and UFO/UAP contact experiences. 7,000+ testimonies. Cross-domain discoveries.",
-    type: "website",
-    ...ogImage('/').openGraph,
-  },
+  ...ogImage('/', { title: ogTitle, description: ogDescription }),
 };
 
 export default async function HomePage() {
