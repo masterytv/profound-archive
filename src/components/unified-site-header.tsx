@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/theme-toggle"
+import logoNewDark from "../../public/logo-new-dark.png"
+import logoNewLight from "../../public/logo-new-light.png"
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * UnifiedSiteHeader
@@ -129,9 +131,9 @@ export default function UnifiedSiteHeader() {
 
             {/* ─── Logo ─── */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              <Image src="/logo-new-dark.png" alt="Project Profound logo"
+              <Image src={logoNewDark} alt="Project Profound logo"
                 width={180} height={42} className="h-8 w-auto dark:hidden" priority />
-              <Image src="/logo-new-light.png" alt="Project Profound logo"
+              <Image src={logoNewLight} alt="Project Profound logo"
                 width={180} height={42} className="h-8 w-auto hidden dark:block" priority />
               <span className="self-start mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
                 BETA
@@ -621,9 +623,9 @@ export default function UnifiedSiteHeader() {
                   {/* Sheet Header */}
                   <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-700">
                     <div className="flex items-center gap-2">
-                      <Image src="/logo-new-dark.png" alt="Project Profound logo"
+                      <Image src={logoNewDark} alt="Project Profound logo"
                         width={140} height={33} className="h-7 w-auto dark:hidden" />
-                      <Image src="/logo-new-light.png" alt="Project Profound logo"
+                      <Image src={logoNewLight} alt="Project Profound logo"
                         width={140} height={33} className="h-7 w-auto hidden dark:block" />
                       <span className="self-start mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-slate-200/80 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-300/60 dark:border-slate-600/60 leading-none">
                         BETA

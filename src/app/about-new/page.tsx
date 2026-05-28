@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import logoNewDark from "../../../public/logo-new-dark.png";
+import logoNewLight from "../../../public/logo-new-light.png";
 import {
   Brain, Telescope, Zap, Search, MessageCircle,
   Cpu, ChevronRight, BookOpen, Users, Shield,
@@ -144,8 +146,8 @@ export default function AboutNewPage() {
         />
         <div className="relative container mx-auto px-4 py-20 md:py-28 max-w-4xl text-center">
           <div className="px-6 py-3 rounded-2xl bg-white dark:bg-white/10 shadow-lg inline-flex items-center justify-center mx-auto mb-8 border border-slate-200/60 dark:border-white/10">
-            <Image src="/logo-new-dark.png" alt="Project Profound" width={200} height={47} className="h-10 w-auto dark:hidden" priority />
-            <Image src="/logo-new-light.png" alt="Project Profound" width={200} height={47} className="h-10 w-auto hidden dark:block" priority />
+            <Image src={logoNewDark} alt="Project Profound" width={200} height={47} className="h-10 w-auto dark:hidden" priority />
+            <Image src={logoNewLight} alt="Project Profound" width={200} height={47} className="h-10 w-auto hidden dark:block" priority />
           </div>
           <h1
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-6 leading-[1.1]"

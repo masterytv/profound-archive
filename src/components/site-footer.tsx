@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import logoNewDark from "../../public/logo-new-dark.png";
+import logoNewLight from "../../public/logo-new-light.png";
 
 export default function SiteFooter() {
   const linkClass = "block text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors";
@@ -14,14 +16,14 @@ export default function SiteFooter() {
           <div>
             <div className="flex items-start gap-2 mb-3">
               <Image
-                src="/logo-new-dark.png"
+                src={logoNewDark}
                 alt="Project Profound"
                 width={150}
                 height={35}
                 className="h-7 w-auto dark:hidden"
               />
               <Image
-                src="/logo-new-light.png"
+                src={logoNewLight}
                 alt="Project Profound"
                 width={150}
                 height={35}
