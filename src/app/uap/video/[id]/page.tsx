@@ -335,6 +335,21 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
           }),
         }}
       />
+      {/* JSON-LD: BreadcrumbList */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "UAP", item: "https://projectprofound.org/uap" },
+              { "@type": "ListItem", position: 2, name: "Videos", item: "https://projectprofound.org/uap/video-explore" },
+              { "@type": "ListItem", position: 3, name: video.title || "Video" },
+            ],
+          }),
+        }}
+      />
       <div className="border-b border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 max-w-6xl">
           <nav className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 py-3">

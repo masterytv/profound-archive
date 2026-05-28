@@ -218,7 +218,21 @@ export default async function BlogPostPage({
                 />
             )}
 
-            {/* Draft banner — only shown when not published */}
+            {/* BreadcrumbList JSON-LD */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            { "@type": "ListItem", position: 1, name: "Blog", item: "https://projectprofound.org/blog" },
+                            { "@type": "ListItem", position: 2, name: post.category.replace("-", " "), item: `https://projectprofound.org/blog/category/${post.category}` },
+                            { "@type": "ListItem", position: 3, name: post.title },
+                        ],
+                    }),
+                }}
+            />
             {post.status !== "published" && (
                 <div className="bg-amber-400 text-amber-950 px-4 py-2.5 text-sm font-semibold text-center flex items-center justify-center gap-2">
                     <span className="inline-flex items-center gap-1.5 bg-amber-950/10 px-3 py-1 rounded-full">
