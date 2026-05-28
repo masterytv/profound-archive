@@ -23,6 +23,7 @@
 | Sprint 12: Security Audit | ✅ Complete | 2026-05-19 |
 | Sprint 13: Channel Analytics & Identity (Phase 1) | ✅ Complete | 2026-05-20 |
 | Sprint 14: Channel Engagement & Shareability (Phase 2) | 🔄 In Progress (14.3, 14.4 deferred) | — |
+| Sprint 15: GHA → Oracle/Supabase Migration | 📋 Ready | — |
 | Backlog: Revenue & Growth Strategy | 📋 Brainstorm | — |
 
 ## Environment Setup
@@ -1222,6 +1223,90 @@ For every UAP file you create:
 - [x] **Entity Name Normalization** ✅ 2026-05-21 — Built automated weekly normalization pipeline. `src/lib/pipeline/normalize-entities.ts` performs fuzzy dedup (Levenshtein, abbreviation matching, first-name aliases, middle-name variants) across `uap_canonical_persons` (2,984), `uap_canonical_orgs` (1,555), `uap_canonical_programs` (929). Supports dry-run mode for safe review. Also built `src/lib/pipeline/compute-channel-scores.ts` for weekly channel score recomputation. Both triggered by pg_cron (Sundays 5:00/5:30 UTC). API routes: `/api/cron/normalize-entities`, `/api/cron/recompute-channel-scores`.
 
 - [x] **Supadata 429 Quota Exhaustion Fix** ✅ 2026-05-21 — Rapid-process pipeline burned 6,741 failed requests after Supadata monthly credits were exhausted, because `subtitles.ts` treated all 429s as retryable rate limits. **Root cause:** The 429 body contains `{"error":"limit-exceeded"}` for quota exhaustion vs generic rate limiting, but the code didn't parse it. **Fix:** (A) `subtitles.ts` now parses 429 body to distinguish `quota_exceeded` (non-retryable) from `rate_limited` (retryable with 30s→60s→120s exponential backoff), (B) `intake-uap.ts` propagates `quota_exceeded` as a distinct `UapIntakeStatus`, (C) `uap-tick.ts` halts the processing loop immediately on quota exhaustion, (D) `scripts/rapid-process.ts` sets `isShuttingDown=true` on quota hit. Also reset 1,692 failed videos back to pending. **Plan upgrade:** Mega ($47/mo, 30K credits).
+
+---
+
+## Sprint 15: GHA → Oracle/Supabase Migration
+
+> **Goal:** Eliminate GitHub Actions as a runtime dependency. Move all 18 cron workflows to either the Oracle Cloud worker (`profound-worker`, `150.230.166.48`) or Supabase pg_cron. GHA stays only for CI/CD (build, test, deploy) — not for scheduled data processing.
+>
+> **Why:** GHA crons are unreliable (up to 15-min jitter, random skips), expensive in minutes for long-running jobs, and fragile (curl → Firebase → Cloudflare → API route chain fails silently). Direct script execution on Oracle is faster, cheaper, and more observable.
+>
+> **Estimated total:** ~5.5 days
+
+### Audit of All 18 GitHub Actions Workflows
+
+| # | Workflow | Schedule | Mechanism | Target | Status |
+|---|---|---|---|---|---|
+| 1 | `blog-generate-questions.yml` | Daily noon ET | curl → `/api/cron/blog-questions` | Oracle | ✅ Script exists (`scripts/blog-generate.ts`) |
+| 2 | `blog-generate-stories.yml` | Daily 2pm ET | curl → `/api/cron/blog-stories` | Oracle | ✅ Script exists (`scripts/blog-generate.ts`) |
+| 3 | `uap-blog-generate-questions.yml` | Daily 1pm ET | curl → `/api/cron/uap-blog-questions` | Oracle | ✅ Script exists (`scripts/blog-generate.ts`) |
+| 4 | `uap-scanner-process.yml` | Every 10min | curl → `/api/uap/tick` | Oracle | ✅ Already on Oracle (`rapid-process.ts` via pm2) |
+| 5 | `scanner-process.yml` | Every 10min | curl → `/api/process-video` | Oracle | 🔲 Needs `scripts/nde-process.ts` |
+| 6 | `scanner-discover.yml` | Hourly | curl → `/api/channel-discover` | Oracle | 🔲 Needs `scripts/nde-discover.ts` |
+| 7 | `uap-scanner-discover.yml` | Hourly :30 | curl → `/api/uap/discover` | Oracle | 🔲 Needs `scripts/uap-discover.ts` |
+| 8 | `core-elements-cron.yml` | Every 3h :20 | curl loop → `/api/run-core-elements-batch` | Oracle | 🔲 Needs `scripts/nde-batch-core-elements.ts` |
+| 9 | `greyson-cron.yml` | Every 3h :10 | curl loop → `/api/run-greyson-batch` | Oracle | 🔲 Needs `scripts/nde-batch-greyson.ts` |
+| 10 | `journey-flow-cron.yml` | Every 3h :40 | curl loop → `/api/run-journey-flow-batch` | Oracle | 🔲 Needs `scripts/nde-batch-journey-flow.ts` |
+| 11 | `phenomenology-cron.yml` | Every 3h :50 | curl loop → `/api/run-phenomenology-batch` | Oracle | 🔲 Needs `scripts/nde-batch-phenomenology.ts` |
+| 12 | `transformation-cron.yml` | Every 3h offset | curl loop → `/api/run-transformation-batch` | Oracle | 🔲 Needs `scripts/nde-batch-transformation.ts` |
+| 13 | `uap-knowledge-batch.yml` | Weekly Sun 8am | `npx tsx scripts/uap-knowledge-batch.ts` | Oracle | ✅ Already a standalone script |
+| 14 | `uap-triad-batch.yml` | Weekly Sun 6am | `npx tsx scripts/uap-batch-triad.ts` | Oracle | ✅ Already a standalone script |
+| 15 | `weekly-maintenance.yml` | Weekly Sun 5am | curl chain → normalize → scores → viz cache | Supabase + Oracle | 🔲 Split: pg_cron for SQL-only tasks, Oracle for heavy compute |
+| 16 | `channel-score-snapshot.yml` | Monthly 1st 7am | curl → `/api/cron/channel-score-snapshot` | Supabase | 🔲 Pure SQL — move to pg_cron |
+| 17 | `email-cron.yml` | Daily 10am UTC | curl → `/api/cron/dispatch-emails` | Supabase | 🔲 Lightweight — move to pg_cron calling Edge Function |
+| 18 | `feedback-digest.yml` | Weekly Mon 9am | curl → `/api/cron/feedback-digest` | Supabase | 🔲 Lightweight — move to pg_cron calling Edge Function |
+
+### Already Migrated (No Work Needed) — 5 workflows
+
+- [x] `blog-generate-questions.yml` — `scripts/blog-generate.ts --domain nde --type question` ✅ 2026-05-28
+- [x] `blog-generate-stories.yml` — `scripts/blog-generate.ts --domain nde --type story` ✅ 2026-05-28
+- [x] `uap-blog-generate-questions.yml` — `scripts/blog-generate.ts --domain uap --type question` ✅ 2026-05-28
+- [x] `uap-scanner-process.yml` — `scripts/rapid-process.ts` running 24/7 via pm2 on Oracle ✅ 2026-05-13
+- [x] `uap-knowledge-batch.yml` — `scripts/uap-knowledge-batch.ts` (already standalone, just needs crontab) ✅
+- [x] `uap-triad-batch.yml` — `scripts/uap-batch-triad.ts` (already standalone, just needs crontab) ✅
+
+### Epic 15.1: NDE Video Processing Pipeline → Oracle (2d)
+
+Mirror the UAP `rapid-process.ts` pattern for NDE video processing.
+
+- [x] Story 15.1.1: NDE video processor — **already built** into `scripts/rapid-process.ts` (supports `DOMAIN=nde` and `DOMAIN=both`). Just needs pm2 config on Oracle. ✅ 2026-05-28
+- [x] Story 15.1.2: Create `scripts/scanner-discover.ts` — unified channel discovery for NDE+UAP (replaces both `scanner-discover.yml` and `uap-scanner-discover.yml`). Supports `--domain nde|uap|both`. ✅ 2026-05-28
+- [x] Story 15.1.3: UAP discovery — merged into `scanner-discover.ts` above. ✅ 2026-05-28
+- [ ] Story 15.1.4: Deploy NDE processor to Oracle with pm2 alongside existing UAP processor. Add crontab for hourly discovery scripts. (0.25d)
+- [ ] Story 15.1.5: Verify parallel operation for 48h, then disable GHA `scanner-process.yml`, `scanner-discover.yml`, `uap-scanner-discover.yml`. (0.25d)
+- [ ] Story 15.1.6: Update `docs/LEARNINGS.md` and `directives/ARCHITECTURE.md` §10 with NDE processor Oracle docs. (0.25d)
+
+### Epic 15.2: NDE Analysis Pipelines → Oracle (1.5d)
+
+The 5 NDE analysis crons (core-elements, greyson, journey-flow, phenomenology, transformation) all follow the same GHA pattern: a bash `for` loop calling `curl` 50 times with retry logic. Convert each to a standalone script.
+
+- [x] Story 15.2.1: Create `scripts/nde-batch-analysis.ts` — unified batch runner that accepts `--pipeline core-elements|greyson|journey-flow|phenomenology|transformation|all --limit N --loops N`. Calls AI analysis functions directly (no HTTP). ✅ 2026-05-28
+- [ ] Story 15.2.2: Add crontab entries on Oracle for all 5 analysis pipelines, staggered by 10 minutes. (0.25d)
+- [ ] Story 15.2.3: Verify parallel operation for 48h, then disable 5 GHA workflows. (0.25d)
+- [ ] Story 15.2.4: Remove API route middleware auth bypass needed only for GHA (optional cleanup). (0.25d)
+
+### Epic 15.3: Weekly/Monthly Maintenance → Supabase pg_cron (1d)
+
+These are lightweight tasks that are mostly SQL operations — better suited to pg_cron than Oracle.
+
+- [ ] Story 15.3.1: Move `channel-score-snapshot.yml` to pg_cron — pure SQL insert into `channel_score_snapshots`. Write migration with `cron.schedule()`. (0.25d)
+- [ ] Story 15.3.2: Move `weekly-maintenance.yml` normalize-entities step to pg_cron — it already has a pg_cron trigger (`trigger_normalize_entities()`), verify it's active and remove GHA duplicate. (0.25d)
+- [ ] Story 15.3.3: Move `weekly-maintenance.yml` recompute-channel-scores step — already has pg_cron trigger, verify active. (0.1d)
+- [x] Story 15.3.4: Create `scripts/weekly-maintenance.ts` — unified script that chains normalize → scores → viz caches. Supports `--step normalize|scores|viz|all`. Replaces entire `weekly-maintenance.yml` for Oracle crontab. ✅ 2026-05-28
+- [ ] Story 15.3.5: Disable `weekly-maintenance.yml` and `channel-score-snapshot.yml` GHA workflows. (0.1d)
+
+### Epic 15.4: Email & Feedback Crons → Supabase pg_cron (0.5d)
+
+- [ ] Story 15.4.1: Move `email-cron.yml` to pg_cron → Edge Function. Write pg_cron job that calls the Supabase Edge Function `dispatch-emails` (or use `net.http_post` to call the API route). (0.25d)
+- [ ] Story 15.4.2: Move `feedback-digest.yml` to pg_cron → Edge Function. Same pattern. (0.25d)
+
+### Epic 15.5: Cleanup & Documentation (0.5d)
+
+- [ ] Story 15.5.1: Add `.github/workflows/README.md` documenting which workflows are disabled and where they moved. (0.1d)
+- [ ] Story 15.5.2: Update `docs/ENVIRONMENT.md` — add Oracle crontab reference, remove GHA-specific secrets documentation for migrated workflows. (0.15d)
+- [ ] Story 15.5.3: Update `docs/LEARNINGS.md` — add rule about Oracle-first for scheduled tasks. (0.1d)
+- [ ] Story 15.5.4: Add Oracle health check script (`scripts/oracle-health.ts`) — reports pm2 status, crontab entries, disk usage, last log timestamps. (0.25d)
 
 ---
 
