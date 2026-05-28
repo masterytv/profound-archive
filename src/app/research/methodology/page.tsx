@@ -30,6 +30,7 @@ import {
   Users,
   Compass,
   ChevronRight,
+  Lightbulb,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -47,6 +48,7 @@ export const metadata: Metadata = {
 // ─── Table of Contents ──────────────────────────────────────────────────────
 
 const TOC_SECTIONS = [
+  { id: 'genesis', label: 'Genesis' },
   { id: 'abstract', label: 'Abstract' },
   { id: 'philosophical-framing', label: '1. Philosophical Framing' },
   { id: 'data-characteristics', label: '2. Data Characteristics' },
@@ -183,6 +185,156 @@ export default function MethodologyPage() {
           {/* Main content */}
           <article className="space-y-2">
 
+            {/* ═══ Genesis ═══ */}
+            <section id="genesis" className="scroll-mt-24">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 flex items-center justify-center shrink-0">
+                  <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <h2
+                  className="text-2xl font-bold text-slate-800 dark:text-slate-200"
+                  style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                >
+                  Genesis: Why Project Profound Exists
+                </h2>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-gradient-to-br from-amber-50/40 via-white to-violet-50/40 dark:from-amber-900/10 dark:via-slate-900/60 dark:to-violet-900/10 p-6 sm:p-8 mb-8">
+                <Prose>
+                  <h3
+                    className="text-xl font-semibold text-slate-700 dark:text-slate-300 mt-0 mb-3"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                  >
+                    The Hard Problem and the Missing Data
+                  </h3>
+                  <p>
+                    Scientists and philosophers often speak of the &quot;hard problem of
+                    consciousness&quot; — the question of how a physical, biological brain gives rise to
+                    subjective, first-person experience. It is arguably the deepest open question in
+                    science. To investigate the physical universe, we possess a magnificent tool: the
+                    scientific method. This systematic framework of observation, hypothesis,
+                    experimentation, and conclusion has fundamentally transformed human civilization. By
+                    producing objective, physically verifiable evidence, science has mastered the material
+                    world.
+                  </p>
+                  <p>
+                    Yet by its very design, this method possesses a structural limitation when applied to
+                    the interior of human experience. Because it demands that reality be quantifiable,
+                    repeatable, and physically measurable, it inherently prioritizes the average, the
+                    predictable, and the observable. When human anomalies occur in medicine, psychology,
+                    or consciousness research, the analytical machinery smooths them away. Truly
+                    extraordinary, inexplicable results are relegated to a case report: a historical file
+                    of statistical noise, set aside for the sake of the baseline.
+                  </p>
+                  <p>
+                    And yet the history of science demonstrates that our greatest paradigm shifts are born
+                    precisely from the anomalies the baseline tried to suppress. Copernicus tracked the
+                    erratic retrograde motion of Mars and concluded that the Earth revolves around the
+                    Sun. Van Leeuwenhoek observed inexplicable microscopic anomalies through a homemade
+                    lens and revealed that an invisible universe of living organisms exists within and
+                    around us. Both were initially ridiculed. Both were vindicated because the anomalies
+                    they highlighted turned out to be keys to a deeper truth.
+                  </p>
+
+                  <h3
+                    className="text-xl font-semibold text-slate-700 dark:text-slate-300 mt-8 mb-3"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                  >
+                    A Personal Catalyst
+                  </h3>
+                  <p>
+                    Project Profound began with a direct, personal experience that resisted explanation. It
+                    might be described as an awakening — a sudden, overwhelming experience of bliss
+                    followed by a state of knowing. It was more vivid and more true than anything I had
+                    ever experienced in ordinary waking life. And it was completely unprovable. An anomaly
+                    that would never be independently verified by another person.
+                  </p>
+                  <p>
+                    Rather than dismiss it, we began to ask: <em>Has anyone else reported something like
+                    this?</em>
+                  </p>
+                  <p>
+                    We discovered near-death experiences — accounts from people who had been clinically
+                    dead and returned with vivid, structured narratives of what they perceived during that
+                    interval. Some included veridical details: specific, verifiable observations of the
+                    physical world that should have been impossible to perceive. First we found dozens of
+                    these accounts. Then hundreds. Now thousands. Each one spontaneous, uncoached, and
+                    strikingly consistent in its phenomenological architecture.
+                  </p>
+
+                  <h3
+                    className="text-xl font-semibold text-slate-700 dark:text-slate-300 mt-8 mb-3"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                  >
+                    Stories as Empirical Data
+                  </h3>
+                  <p>
+                    We propose that there is an extraordinary repository of human anomalies that modern
+                    science has systematically overlooked: <strong>our stories</strong>. Narrative is the
+                    oldest technology we possess. It is the framework through which humanity has
+                    communicated, learned, healed, and evolved. In medicine, when enough patients describe
+                    their story of the same pain, the same progression, the same inexplicable symptom, we
+                    investigate further. We listen to them, aggregate them, and search for the signal in
+                    the noise.
+                  </p>
+                  <p>
+                    This is why we began to collect and analyze stories of NDEs at computational scale. We
+                    found patterns. We found structures. We found recurring phenomenological elements that
+                    appeared across cultures, age groups, and medical contexts with a consistency that
+                    demanded explanation.
+                  </p>
+                  <p>
+                    Then we discovered similar patterns in an adjacent domain: UAP contact encounters.
+                    These accounts are drawn from entirely different populations, cultural contexts, and
+                    trigger conditions but exhibited overlapping phenomenological architectures. We
+                    wondered: if we analyzed these stories with the same rigor and compared them to our
+                    NDE dataset, would we find evidence of shared underlying structures?
+                  </p>
+                  <p>
+                    We did. Our cross-domain analysis reached a preliminary but interesting conclusion:
+                    many of the same consciousness phenomena appeared in both NDE and UAP contact accounts
+                    (e.g. entity encounters, telepathic communication, time distortion, knowledge
+                    downloads, ontological shock) but the emotional tone diverged. NDEs leaned heavily
+                    toward love, peace, and cosmic unity, while UAP encounters were more ambivalent,
+                    leaning toward awe and fear. The phenomenological overlap was too consistent to be
+                    coincidental.
+                  </p>
+
+                  <h3
+                    className="text-xl font-semibold text-slate-700 dark:text-slate-300 mt-8 mb-3"
+                    style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
+                  >
+                    Turning the Qualitative into the Quantitative
+                  </h3>
+                  <p>
+                    Historically, analyzing thousands of highly complex, unstructured, first-person
+                    narratives was a human impossibility. A researcher could read dozens, perhaps a few
+                    hundred accounts, but their own cognitive biases, cultural filters, and memory limits
+                    would distort the global patterns. This is where traditional clinical research reaches
+                    its ceiling, and where modern computational intelligence begins.
+                  </p>
+                  <p>
+                    Project Profound was founded to bridge this explanatory gap. By deploying a multi-pass
+                    pipeline of advanced large language models, we treat subjective narrative as
+                    high-dimensional data to be mapped. This allows us to extract validated psychometric
+                    features, reconstruct chronological experiential flows, and isolate cross-domain
+                    phenomenological invariants at a scale never before attempted in consciousness
+                    research.
+                  </p>
+                  <p>
+                    We are eager to collaborate with other independent and institutional researchers to
+                    improve these methodologies, expand our domains of inquiry, and contribute to
+                    humanity&apos;s understanding of consciousness through the systematic analysis of the
+                    stories we tell.
+                  </p>
+                  <p>
+                    The following methodology outlines the technical, computational, and architectural
+                    framework we have built to listen to humanity&apos;s most profound stories.
+                  </p>
+                </Prose>
+              </div>
+            </section>
+
             {/* ═══ Abstract ═══ */}
             <SectionHeading id="abstract" icon={BookOpen}>
               Abstract
@@ -234,16 +386,18 @@ export default function MethodologyPage() {
                   <strong>Rich phenomenological detail.</strong> Video accounts frequently contain
                   paralinguistic information (hesitation, emotional inflection, self-correction) that is
                   absent from written questionnaire responses. While the current pipeline operates on text
-                  transcripts, this richness is preserved in the raw data for future multimodal analysis.
+                  transcripts and does not analyze audio or video features, this richness is preserved in
+                  the raw data for future multimodal analysis.
                 </li>
                 <li>
                   <strong>Self-selection bias.</strong> The corpus is composed of individuals who chose to
                   share their experiences publicly. This likely overrepresents dramatic, positive, or
-                  culturally validated experiences.
+                  culturally validated experiences and underrepresents distressing, fragmentary, or
+                  stigmatized accounts. This bias is acknowledged and documented throughout the analysis.
                 </li>
                 <li>
                   <strong>Uncontrolled provenance.</strong> Unlike clinical samples drawn from cardiac arrest
-                  units, the trigger conditions, medical histories, and temporal distances from the experience
+                  units or ICU populations, the trigger conditions, medical histories, and temporal distances from the experience
                   are self-reported within the narrative and cannot be independently verified.
                 </li>
               </ul>
@@ -253,7 +407,7 @@ export default function MethodologyPage() {
             <Prose>
               <p>
                 A foundational insight of Project Profound is that near-death experiences and UAP contact
-                experiences—despite their different phenomenological surfaces—share a common substrate:{' '}
+                experiences, despite their different phenomenological surfaces, share a common substrate:{' '}
                 <strong>first-person reports of anomalous states of consciousness</strong>. Both involve
                 narrative accounts of perceived reality shifts, entity encounters, information acquisition
                 through non-ordinary means, and subsequent psychological transformation.
@@ -263,7 +417,8 @@ export default function MethodologyPage() {
                 enables cross-domain phenomenological comparison at a scale that has never been attempted.
                 The Greyson Scale has its UAP counterpart in the Contact Depth Scale; the NDE Transformation
                 Index mirrors the UAP Contact Transformation Index; and the cvNDE (veridical perception)
-                scale finds its analog in the UAP Evidence Strength Scale.
+                scale finds its analog in the UAP Evidence Strength Scale. This symmetry is deliberate and
+                is discussed in §7.
               </p>
             </Prose>
 
@@ -293,7 +448,7 @@ export default function MethodologyPage() {
               <div className="text-sm text-slate-600 dark:text-slate-400 space-y-2">
                 <p>
                   <strong className="text-green-600 dark:text-green-400">Included:</strong> First-person
-                  accounts of near-death experiences, out-of-body experiences (OBEs), shared death
+                  accounts of near-death experiences (NDEs), out-of-body experiences (OBEs), shared death
                   experiences (SDEs), after-death communications (ADCs), and spiritually transformative
                   experiences (STEs).
                 </p>
@@ -330,9 +485,11 @@ export default function MethodologyPage() {
             <SubHeading>2.3 Transcript Acquisition</SubHeading>
             <Prose>
               <p>
-                For each video, the system retrieves English-language captions via the YouTube subtitle API.
-                Both manual (human-authored) and auto-generated (ASR-produced) captions are accepted, with
-                the source type recorded. Raw caption segments are processed through a transcript processor
+                For each video, the system attempts to retrieve English-language captions via the YouTube
+                subtitle API. Both manual (human-authored) and auto-generated (ASR-produced) captions are
+                accepted, with the source type recorded. When captions are unavailable, the video is marked
+                as <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">no_captions</code> and
+                excluded from analysis. Raw caption segments are processed through a transcript processor
                 that concatenates timed segments, applies punctuation restoration, produces a cleaned version
                 for embedding, and chunks the transcript into overlapping segments for semantic search and
                 RAG applications.
@@ -346,11 +503,42 @@ export default function MethodologyPage() {
             <Prose>
               <p>
                 The intake pipeline is an automated, multi-stage orchestrator that processes a single YouTube
-                video from URL to fully analyzed database record.
+                video from URL to fully analyzed database record. The pipeline is designed as a pure function
+                that can be invoked from an admin interface, a scheduled cron job, or a command-line script.
               </p>
             </Prose>
 
-            <SubHeading>3.1 NDE Intake Pipeline</SubHeading>
+            <SubHeading>3.1 Experience Classification Gate</SubHeading>
+            <Prose>
+              <p>
+                Before running the computationally expensive full analysis suite, a lightweight classification
+                pass screens each video transcript to determine whether it contains a genuine first-person
+                account of a profound experience. This gate uses OpenAI GPT-4o with a focused prompt,
+                examining only the first ~15,000 characters of the transcript at a temperature of 0.1 for
+                maximum consistency.
+              </p>
+              <p>The NDE classifier outputs:</p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li><strong>Experience type:</strong> NDE, OBE, SDE, ADC, STE, or none</li>
+                <li><strong>Confidence score:</strong> 0–100</li>
+                <li>
+                  <strong>NDE classification:</strong>{' '}
+                  <em>clear_nde</em> (confidence ≥ 70), <em>possible_nde</em> (40–69),{' '}
+                  <em>not_nde</em>, or <em>insufficient_info</em> (confidence &lt; 20)
+                </li>
+                <li>
+                  <strong>Experiencer name:</strong> Extracted via prompt rules that distinguish the
+                  experiencer from the interviewer, host, or narrator
+                </li>
+                <li><strong>Justification:</strong> A 1–2 sentence explanation of the classification decision</li>
+              </ul>
+              <p>
+                Videos classified as &quot;not profound&quot; are persisted in the database with their
+                classification metadata but are not subjected to further analysis, conserving API resources.
+              </p>
+            </Prose>
+
+            <SubHeading>3.2 NDE Intake Pipeline</SubHeading>
             <div className="overflow-x-auto my-6">
               <table className="w-full text-sm border-collapse">
                 <thead>
@@ -370,8 +558,8 @@ export default function MethodologyPage() {
                     ['5', 'Caption Retrieval — Fetch and validate English captions', '3–10s'],
                     ['6', 'Transcript Processing — Punctuation, cleaning, chunking', '< 1s'],
                     ['7', 'Record Insertion — Upsert initial video record to database', '< 1s'],
-                    ['8', 'Experience Classification — Lightweight AI gate', '2–5s'],
-                    ['9', 'Full Analysis Suite — Seven parallel LLM passes', '30–90s'],
+                    ['8', 'Experience Classification — Lightweight AI gate (see §3.1)', '2–5s'],
+                    ['9', 'Full Analysis Suite — Seven parallel LLM passes (see §4)', '30–90s'],
                     ['10', 'Result Persistence — Save all analysis results', '1–3s'],
                     ['11', 'Embedding Generation — Search and chat vector embeddings', '10–30s'],
                     ['12', 'Experience Fingerprint — 27-dimension similarity vector', '< 1s'],
@@ -393,7 +581,7 @@ export default function MethodologyPage() {
               </p>
             </Prose>
 
-            <SubHeading>3.2 UAP Intake Pipeline</SubHeading>
+            <SubHeading>3.3 UAP Intake Pipeline</SubHeading>
             <Prose>
               <p>
                 The UAP pipeline follows a structurally similar architecture but with domain-specific differences:
@@ -405,9 +593,18 @@ export default function MethodologyPage() {
                   experiencer names.
                 </li>
                 <li>
+                  <strong>Tier 3 Gate</strong> replaces the NDE &quot;not profound&quot; gate — out-of-scope
+                  content is rejected.
+                </li>
+                <li>
                   <strong>Encounter Segmentation</strong> — For multi-experiencer videos, an LLM pass
                   segments the transcript into per-encounter blocks, enabling independent analysis of each
                   experiencer&apos;s account within a single video.
+                </li>
+                <li>
+                  <strong>Dual Analysis Suite</strong> — Program intelligence analysis runs on all Tier 1+2
+                  videos. Encounter-level phenomenological analysis and CET triad scoring run per encounter
+                  segment.
                 </li>
                 <li>
                   <strong>Name Deduplication</strong> — ASR-induced misspellings of experiencer names are
@@ -419,19 +616,6 @@ export default function MethodologyPage() {
                   Tier 1.
                 </li>
               </ul>
-            </Prose>
-
-            <SubHeading>3.3 Experience Classification Gate</SubHeading>
-            <Prose>
-              <p>
-                Before running the computationally expensive full analysis suite, a lightweight classification
-                pass screens each transcript. This gate uses GPT-4o-mini with a focused prompt, examining only
-                the first ~15,000 characters at a temperature of 0.1 for maximum consistency. It outputs
-                experience type, confidence score (0–100), NDE classification (<em>clear_nde</em>,{' '}
-                <em>possible_nde</em>, <em>not_nde</em>, or <em>insufficient_info</em>), experiencer name,
-                and a justification. Videos classified as &quot;not profound&quot; are persisted but not
-                subjected to further analysis, conserving API resources.
-              </p>
             </Prose>
 
             {/* ═══ §4: NDE Analysis Instruments ═══ */}
@@ -446,7 +630,7 @@ export default function MethodologyPage() {
                 <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                   response_format: {'{'}type: &quot;json_object&quot;{'}'}
                 </code>{' '}
-                at low temperature (0.1–0.3) for scoring consistency.
+                at low temperature (0.2) for scoring consistency.
               </p>
             </Prose>
 
@@ -820,8 +1004,11 @@ export default function MethodologyPage() {
             <Prose>
               <p>
                 Now that the analytical pipeline is built and validated, the team intends to: (1) re-analyze
-                the full corpus with more capable models (GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro) and
-                compare results across models; (2) implement ensemble scoring to reduce model-specific biases.
+                the full corpus with more capable models — the current pipeline uses GPT-4o-mini for cost
+                efficiency, and its text and language skills were deemed viable for these tasks; however,
+                re-analysis with GPT-4o, Claude 3.5 Sonnet, or Gemini 3.1 Pro (or cutting-edge frontier
+                models) would likely improve overall accuracy; (2) implement ensemble scoring to reduce
+                model-specific biases.
               </p>
             </Prose>
 
