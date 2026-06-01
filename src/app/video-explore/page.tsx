@@ -14,6 +14,8 @@ export const metadata = {
     "Browse 5,000+ near-death experience videos. Sort by views, evidence strength, experience depth, and transformation impact. Filter by core elements, tone, and more.",
 };
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 const PAGE_SIZE = 12;
 
 interface PageProps {

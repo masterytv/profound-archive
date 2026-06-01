@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     description: 'Browse all near-death experience channels. Sort by intensity, emotional tone, Greyson score, and more.',
 }
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 const SORT_OPTIONS = [
     // Basic
     { value: 'video_count', label: 'Most Videos' },

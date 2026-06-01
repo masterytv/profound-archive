@@ -11,6 +11,8 @@ export const metadata = {
         "Browse NDE accounts ranked by the NDE Transformation Index — sort by overall score, breadth, depth, or filter by classification.",
 };
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 const PAGE_SIZE = 12;
 
 const SORT_OPTIONS: SortOption[] = [

@@ -28,6 +28,8 @@ import { YouTubePlayer } from "@/components/video/YouTubePlayer";
 import { NderfAnalysisSection } from "@/components/analysis/NderfAnalysisSection";
 import { SimilarExperiences, type SimilarExperience } from "@/components/analysis/SimilarExperiences";
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 interface VideoPageProps {
     params: Promise<{ id: string }>;
     searchParams: Promise<{ t?: string }>;

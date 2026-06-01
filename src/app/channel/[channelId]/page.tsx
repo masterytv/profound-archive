@@ -10,6 +10,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ChannelAnalysisSummary, type ChannelNderfStats, type ChannelScoreSummary } from '@/components/analysis/ChannelAnalysisSummary'
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 const PAGE_SIZE = 12
 
 const SORT_OPTIONS: SortOption[] = [

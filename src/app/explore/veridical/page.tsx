@@ -12,6 +12,8 @@ export const metadata = {
         "Browse NDE accounts ranked by veridical (evidential) perception — sort by total score or individual criteria, filter by evidential strength level.",
 };
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 const PAGE_SIZE = 12;
 
 const SORT_OPTIONS: SortOption[] = [

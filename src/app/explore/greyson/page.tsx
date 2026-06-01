@@ -11,6 +11,8 @@ export const metadata = {
         "Browse NDE accounts ranked by the Greyson NDE Scale — sort by total score or category sub-totals (cognitive, affective, paranormal, transcendental).",
 };
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 const PAGE_SIZE = 12;
 
 const SORT_OPTIONS: SortOption[] = [

@@ -31,6 +31,8 @@ import { SocialShareButton } from "@/components/video/ShareButton";
 import { TimestampLink } from "@/components/video/TimestampLink";
 import MicroFeedback from "@/components/micro-feedback";
 
+export const revalidate = 86400; // ISR: revalidate once per day
+
 interface VideoPageProps {
     params: Promise<{ id: string }>;
     searchParams: Promise<{ t?: string }>;
