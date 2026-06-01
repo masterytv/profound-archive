@@ -1224,6 +1224,8 @@ For every UAP file you create:
 
 - [x] **Supadata 429 Quota Exhaustion Fix** ✅ 2026-05-21 — Rapid-process pipeline burned 6,741 failed requests after Supadata monthly credits were exhausted, because `subtitles.ts` treated all 429s as retryable rate limits. **Root cause:** The 429 body contains `{"error":"limit-exceeded"}` for quota exhaustion vs generic rate limiting, but the code didn't parse it. **Fix:** (A) `subtitles.ts` now parses 429 body to distinguish `quota_exceeded` (non-retryable) from `rate_limited` (retryable with 30s→60s→120s exponential backoff), (B) `intake-uap.ts` propagates `quota_exceeded` as a distinct `UapIntakeStatus`, (C) `uap-tick.ts` halts the processing loop immediately on quota exhaustion, (D) `scripts/rapid-process.ts` sets `isShuttingDown=true` on quota hit. Also reset 1,692 failed videos back to pending. **Plan upgrade:** Mega ($47/mo, 30K credits).
 
+- [x] **`scan_runs` Inserts Silently Failing (NDE)** ✅ 2026-06-01 — **Root cause:** CHECK constraint `scan_runs_run_type_check` only allowed `['tick', 'audit', 'manual']`, but `tick.ts` was refactored to insert `run_type='discover'` and `run_type='process'` after the discover/process split. The constraint silently rejected both. **Fix:** Updated CHECK to include `'discover'` and `'process'`. Migration: `supabase/migrations/20260601_fix_scan_runs_check.sql`. Applied live via Supabase MCP.
+
 ---
 
 ## Sprint 15: GHA → Oracle/Supabase Migration
