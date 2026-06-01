@@ -140,11 +140,6 @@ export async function runUapDiscoverTick(supabase: any): Promise<UapDiscoverResu
                 }
             }
 
-            await supabase
-                .from('uap_channels')
-                .update({ last_scanned_at: new Date().toISOString() })
-                .eq('channel_id', channel.channel_id);
-
         } catch (err: any) {
             console.error(`[UAP Scanner/Discover] Discovery error for ${channel.channel_name}:`, err.message);
             await supabase.from('uap_scan_runs').insert({
@@ -155,6 +150,18 @@ export async function runUapDiscoverTick(supabase: any): Promise<UapDiscoverResu
                 error: err.message,
             });
         }
+    } else if (channel && !channel.uploads_playlist_id) {
+        // Warn about missing playlist ID — don't let it block the queue
+        console.warn(`[UAP Scanner/Discover] ⚠️ Channel "${channel.channel_name}" has no uploads_playlist_id — skipping but advancing queue`);
+    }
+
+    // ALWAYS update last_scanned_at so we don't get stuck on the same channel
+    // (head-of-line blocking fix: even channels without playlist IDs advance the queue)
+    if (channel) {
+        await supabase
+            .from('uap_channels')
+            .update({ last_scanned_at: new Date().toISOString() })
+            .eq('channel_id', channel.channel_id);
     }
 
     await supabase.from('uap_scan_runs').insert({
