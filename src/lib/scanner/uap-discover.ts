@@ -20,6 +20,8 @@ export interface UapDiscoveryResult {
     channelName: string;
     totalFetched: number;
     alreadyInDb: number;
+    /** All video IDs fetched from the playlist/channel (both new and existing) */
+    allVideoIds: string[];
     newVideos: Array<{
         videoId: string;
         title: string;
@@ -53,6 +55,7 @@ export async function discoverNewUapVideos(
     }
 
     const newVideos: UapDiscoveryResult['newVideos'] = [];
+    const allVideoIds: string[] = [];
     let totalFetched = 0;
     let nextPageToken: string | undefined;
     let pages = 0;
@@ -80,6 +83,7 @@ export async function discoverNewUapVideos(
         for (const item of items) {
             const videoId = item.snippet?.resourceId?.videoId;
             if (!videoId) continue;
+            allVideoIds.push(videoId);
 
             if (!existingVideoIds.has(videoId)) {
                 newVideos.push({
@@ -106,6 +110,7 @@ export async function discoverNewUapVideos(
         channelName,
         totalFetched,
         alreadyInDb: totalFetched - filtered.length,
+        allVideoIds,
         newVideos: filtered,
     };
 }

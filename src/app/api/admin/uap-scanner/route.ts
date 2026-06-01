@@ -214,28 +214,29 @@ export async function GET(req: NextRequest) {
     );
 
     // Sprint 8: Add playlist queue counts
-    // Fixed: playlist added_count now counts only videos that entered through this playlist
-    const playlistsWithCounts = await Promise.all(
-        (playlists || []).map(async (p: any) => {
-            const [
-                { count: pending_count },
-                { count: processed_count },
-                { count: playlist_added }
-            ] = await Promise.all([
-                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('status', 'pending'),
-                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).neq('status', 'pending'),
-                supabase.from('uap_scan_queue').select('*', { count: 'exact', head: true }).eq('source_type', 'playlist').eq('source_id', p.playlist_id).eq('intake_result', 'complete'),
-            ]);
+    // Uses junction table + RPC for accurate cross-source stats (1 query instead of 75)
+    const { data: playlistStatsRows } = await supabase.rpc('get_uap_playlist_video_stats');
+    const playlistStatsMap = new Map<string, { pending: number; processed: number; archive: number }>();
+    if (playlistStatsRows) {
+        for (const row of playlistStatsRows) {
+            playlistStatsMap.set(row.playlist_id, {
+                pending: Number(row.pending_count),
+                processed: Number(row.processed_count),
+                archive: Number(row.in_archive_count),
+            });
+        }
+    }
 
-            return {
-                ...p,
-                pending_count: pending_count ?? 0,
-                processed_count: processed_count ?? 0,
-                added_count: playlist_added ?? 0,
-                channel_in_scanner: p.channel_id ? enabledChannelIds.has(p.channel_id) : false,
-            };
-        })
-    );
+    const playlistsWithCounts = (playlists || []).map((p: any) => {
+        const stats = playlistStatsMap.get(p.playlist_id);
+        return {
+            ...p,
+            pending_count: stats?.pending ?? 0,
+            processed_count: stats?.processed ?? 0,
+            added_count: stats?.archive ?? 0,
+            channel_in_scanner: p.channel_id ? enabledChannelIds.has(p.channel_id) : false,
+        };
+    });
 
     const channelsWithCounts = await Promise.all(
         (channels || []).map(async (c: any) => {
@@ -878,10 +879,25 @@ export async function POST(req: NextRequest) {
                             })
                             .eq('playlist_id', pl.playlist_id);
 
+                        // Populate junction table for accurate stats
+                        if (discovery.allVideoIds.length > 0) {
+                            const BATCH = 100;
+                            for (let i = 0; i < discovery.allVideoIds.length; i += BATCH) {
+                                const batch = discovery.allVideoIds.slice(i, i + BATCH).map(vid => ({
+                                    playlist_id: pl.playlist_id,
+                                    video_id: vid,
+                                }));
+                                await supabase
+                                    .from('uap_playlist_videos')
+                                    .upsert(batch, { onConflict: 'playlist_id,video_id', ignoreDuplicates: true });
+                            }
+                        }
+
                         results.push({
                             playlistId: pl.playlist_id,
                             playlistTitle: pl.playlist_title,
                             queued: discovery.newVideos.length,
+                            totalMapped: discovery.allVideoIds.length,
                         });
                     } catch (err: any) {
                         results.push({

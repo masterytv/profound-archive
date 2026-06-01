@@ -96,12 +96,27 @@ export async function runUapPlaylistDiscoverTick(supabase: any): Promise<Playlis
                 }
             }
 
+            // Populate playlist→video junction table for accurate stats
+            // (includes ALL videos in the playlist, not just newly discovered ones)
+            if (discovery.allVideoIds.length > 0) {
+                const BATCH = 100;
+                for (let i = 0; i < discovery.allVideoIds.length; i += BATCH) {
+                    const batch = discovery.allVideoIds.slice(i, i + BATCH).map(vid => ({
+                        playlist_id: playlist.playlist_id,
+                        video_id: vid,
+                    }));
+                    await supabase
+                        .from('uap_playlist_videos')
+                        .upsert(batch, { onConflict: 'playlist_id,video_id', ignoreDuplicates: true });
+                }
+            }
+
             // Update video count + last_scanned_at
             await supabase
                 .from('uap_playlists')
                 .update({
                     last_scanned_at: new Date().toISOString(),
-                    video_count: discovered + (discovery.alreadyInDb || 0),
+                    video_count: discovery.allVideoIds.length,
                 })
                 .eq('playlist_id', playlist.playlist_id);
 
