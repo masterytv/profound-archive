@@ -1273,7 +1273,7 @@ Mirror the UAP `rapid-process.ts` pattern for NDE video processing.
 - [x] Story 15.1.1: NDE video processor — **already built** into `scripts/rapid-process.ts` (supports `DOMAIN=nde` and `DOMAIN=both`). Just needs pm2 config on Oracle. ✅ 2026-05-28
 - [x] Story 15.1.2: Create `scripts/scanner-discover.ts` — unified channel discovery for NDE+UAP (replaces both `scanner-discover.yml` and `uap-scanner-discover.yml`). Supports `--domain nde|uap|both`. ✅ 2026-05-28
 - [x] Story 15.1.3: UAP discovery — merged into `scanner-discover.ts` above. ✅ 2026-05-28
-- [ ] Story 15.1.4: Deploy NDE processor to Oracle with pm2 alongside existing UAP processor. Add crontab for hourly discovery scripts. (0.25d)
+- [x] Story 15.1.4: Deploy to Oracle — pm2 confirmed online, crontab installed with 13 jobs (discover, analysis, maintenance, blog), cron service active. ✅ 2026-05-28
 - [ ] Story 15.1.5: Verify parallel operation for 48h, then disable GHA `scanner-process.yml`, `scanner-discover.yml`, `uap-scanner-discover.yml`. (0.25d)
 - [ ] Story 15.1.6: Update `docs/LEARNINGS.md` and `directives/ARCHITECTURE.md` §10 with NDE processor Oracle docs. (0.25d)
 
@@ -1282,7 +1282,7 @@ Mirror the UAP `rapid-process.ts` pattern for NDE video processing.
 The 5 NDE analysis crons (core-elements, greyson, journey-flow, phenomenology, transformation) all follow the same GHA pattern: a bash `for` loop calling `curl` 50 times with retry logic. Convert each to a standalone script.
 
 - [x] Story 15.2.1: Create `scripts/nde-batch-analysis.ts` — unified batch runner that accepts `--pipeline core-elements|greyson|journey-flow|phenomenology|transformation|all --limit N --loops N`. Calls AI analysis functions directly (no HTTP). ✅ 2026-05-28
-- [ ] Story 15.2.2: Add crontab entries on Oracle for all 5 analysis pipelines, staggered by 10 minutes. (0.25d)
+- [x] Story 15.2.2: Crontab entries added on Oracle for all 5 analysis pipelines, staggered by 10 minutes + UAP triad/knowledge weekly batches. ✅ 2026-05-28
 - [ ] Story 15.2.3: Verify parallel operation for 48h, then disable 5 GHA workflows. (0.25d)
 - [ ] Story 15.2.4: Remove API route middleware auth bypass needed only for GHA (optional cleanup). (0.25d)
 
@@ -1298,8 +1298,8 @@ These are lightweight tasks that are mostly SQL operations — better suited to 
 
 ### Epic 15.4: Email & Feedback Crons → Supabase pg_cron (0.5d)
 
-- [ ] Story 15.4.1: Move `email-cron.yml` to pg_cron → Edge Function. Write pg_cron job that calls the Supabase Edge Function `dispatch-emails` (or use `net.http_post` to call the API route). (0.25d)
-- [ ] Story 15.4.2: Move `feedback-digest.yml` to pg_cron → Edge Function. Same pattern. (0.25d)
+- [x] Story 15.4.1: Email CRM moved to Oracle crontab — `curl` to `/api/email/cron` daily at 10:00 UTC. ✅ 2026-05-28
+- [x] Story 15.4.2: Feedback Digest moved to Oracle crontab — `curl` to `/api/email/feedback-digest` Monday 09:00 UTC. ✅ 2026-05-28
 
 ### Epic 15.5: Cleanup & Documentation (0.5d)
 
