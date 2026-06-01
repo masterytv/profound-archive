@@ -1,21 +1,21 @@
 /**
  * Rapid Scanner Batch Processor
  *
- * Processes ALL pending videos from uap_scan_queue (and optionally scan_queue
- * for NDE) using the local pipeline — no HTTP calls, no APP_DIRECT_URL needed.
+ * Processes pending videos from uap_scan_queue and/or scan_queue (NDE)
+ * using the local pipeline — no HTTP calls, no APP_DIRECT_URL needed.
  *
- * Same pattern as uap-playlist-intake-batch.ts but:
- * - Processes ALL priorities (not just playlist priority 1)
+ * Features:
+ * - Daily credit caps per domain to stay within Supadata Pro plan (3K/mo)
  * - Supports UAP, NDE, or both domains
  * - Adds detailed progress reporting with ETA
  * - Logs to a persistent file in logs/
+ * - Sleeps until midnight UTC when daily cap is reached
  *
  * Usage (run from host terminal, NOT Antigravity sandbox):
- *   npx tsx scripts/rapid-process.ts                  # UAP (default)
+ *   npx tsx scripts/rapid-process.ts                  # Both domains (default)
+ *   DOMAIN=uap npx tsx scripts/rapid-process.ts       # UAP only
  *   DOMAIN=nde npx tsx scripts/rapid-process.ts       # NDE only
- *   DOMAIN=both npx tsx scripts/rapid-process.ts      # UAP then NDE
- *   CONCURRENCY=1 npx tsx scripts/rapid-process.ts    # Sequential (safer)
- *   CONCURRENCY=5 npx tsx scripts/rapid-process.ts    # Aggressive
+ *   MAX_DAILY_UAP=80 MAX_DAILY_NDE=19 npx tsx ...     # Custom caps
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -29,8 +29,13 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
 // ─── Configuration ──────────────────────────────────────────────────────────
 
-const DOMAIN = (process.env.DOMAIN || 'uap').toLowerCase(); // uap | nde | both
-const CONCURRENCY = parseInt(process.env.CONCURRENCY || '3', 10);
+const DOMAIN = (process.env.DOMAIN || 'both').toLowerCase(); // uap | nde | both
+const CONCURRENCY = parseInt(process.env.CONCURRENCY || '1', 10);
+
+// Daily credit caps — Supadata Pro plan = 3,000 credits/month
+// 80 UAP + 19 NDE = 99/day × 30 = 2,970 + ~30 manual = 3,000
+const MAX_DAILY_UAP = parseInt(process.env.MAX_DAILY_UAP || '80', 10);
+const MAX_DAILY_NDE = parseInt(process.env.MAX_DAILY_NDE || '19', 10);
 
 // ─── State ──────────────────────────────────────────────────────────────────
 
@@ -107,11 +112,57 @@ const DOMAIN_CONFIGS: Record<string, DomainConfig> = {
   },
 };
 
+// ─── Daily Cap Helpers ──────────────────────────────────────────────────────
+
+/** Count videos processed today (UTC midnight to now) for a given queue table */
+async function getProcessedTodayCount(supabase: SupabaseClient, queueTable: string): Promise<number> {
+  const todayMidnightUTC = new Date();
+  todayMidnightUTC.setUTCHours(0, 0, 0, 0);
+
+  const { count, error } = await supabase
+    .from(queueTable)
+    .select('*', { count: 'exact', head: true })
+    .gte('processed_at', todayMidnightUTC.toISOString())
+    .neq('status', 'pending');
+
+  if (error) {
+    log(`⚠️ Failed to count today's processed videos: ${error.message}`);
+    return 0;
+  }
+  return count || 0;
+}
+
+/** Milliseconds until next UTC midnight */
+function msUntilMidnightUTC(): number {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setUTCDate(midnight.getUTCDate() + 1);
+  midnight.setUTCHours(0, 0, 0, 0);
+  return midnight.getTime() - now.getTime();
+}
+
+function getDailyCapForDomain(domain: string): number {
+  return domain === 'uap' ? MAX_DAILY_UAP : MAX_DAILY_NDE;
+}
+
 async function processDomain(supabase: SupabaseClient, config: DomainConfig) {
   const { label, queueTable, intakeFn } = config;
+  const domainKey = label.toLowerCase();
+  const dailyCap = getDailyCapForDomain(domainKey);
 
   log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  log(`🚀 Starting ${label} rapid processing (concurrency: ${CONCURRENCY})`);
+  log(`🚀 Starting ${label} rapid processing (concurrency: ${CONCURRENCY}, daily cap: ${dailyCap})`);
+
+  // 0. Check daily cap BEFORE anything else
+  const processedToday = await getProcessedTodayCount(supabase, queueTable);
+  const remainingBudget = Math.max(0, dailyCap - processedToday);
+  log(`📊 Daily cap: ${processedToday}/${dailyCap} used today → ${remainingBudget} remaining`);
+
+  if (remainingBudget === 0) {
+    const sleepMs = msUntilMidnightUTC();
+    log(`⏸️  ${label} daily cap reached (${dailyCap} videos). Sleeping until UTC midnight (~${formatDuration(sleepMs)}).`);
+    return;
+  }
 
   // 1. Reset stuck 'processing' videos from previous killed runs
   log(`🔄 Resetting stuck 'processing' videos...`);
@@ -128,19 +179,19 @@ async function processDomain(supabase: SupabaseClient, config: DomainConfig) {
     if (resetCount > 0) log(`   Reset ${resetCount} stuck videos to pending`);
   }
 
-  // 2. Get total pending count
+  // 2. Get total pending count (capped by daily budget)
   const { count: pendingCount } = await supabase
     .from(queueTable)
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  const totalPending = pendingCount || 0;
-  log(`📊 Found ${totalPending} pending ${label} videos to process`);
+  const totalPending = Math.min(pendingCount || 0, remainingBudget);
+  log(`📊 Will process up to ${totalPending} ${label} videos (${pendingCount || 0} pending, ${remainingBudget} budget)`);
   log(`   Log file: ${logFile}`);
   log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
 
   if (totalPending === 0) {
-    log(`✅ No pending ${label} videos. Done!`);
+    log(`✅ No pending ${label} videos (or daily cap reached). Done!`);
     return;
   }
 
@@ -148,14 +199,25 @@ async function processDomain(supabase: SupabaseClient, config: DomainConfig) {
   const executing = new Set<Promise<void>>();
 
   while (!isShuttingDown) {
+    // Check daily cap mid-loop (in case we started with budget but used it up)
+    if (stats.total >= totalPending) {
+      // Wait for any in-flight work to finish
+      if (executing.size > 0) {
+        await Promise.all(executing);
+      }
+      log(`🎯 ${label} daily cap reached (${stats.total}/${totalPending}). Stopping.`);
+      break;
+    }
+
     // Fetch next batch from queue (ordered by priority then created_at)
+    const batchLimit = Math.min(CONCURRENCY, totalPending - stats.total);
     const { data: items, error: fetchError } = await supabase
       .from(queueTable)
       .select('id, video_url, video_id, channel_id, retry_count')
       .eq('status', 'pending')
       .order('priority', { ascending: true })
       .order('created_at', { ascending: true })
-      .limit(CONCURRENCY);
+      .limit(batchLimit);
 
     if (fetchError) {
       log(`❌ Queue fetch error: ${fetchError.message}`);
@@ -319,28 +381,39 @@ async function main() {
     { auth: { persistSession: false } },
   );
 
-  console.log('');
-  console.log('╔══════════════════════════════════════════════════════════════╗');
-  console.log(`║          🚀 Rapid Scanner Batch Processor                   ║`);
-  console.log(`║          Domain: ${DOMAIN.padEnd(6)} | Concurrency: ${String(CONCURRENCY).padEnd(2)}              ║`);
-  console.log('╚══════════════════════════════════════════════════════════════╝');
-  console.log('');
+  // Continuous loop: process daily cap, sleep until midnight, repeat
+  while (!isShuttingDown) {
+    console.log('');
+    console.log('╔══════════════════════════════════════════════════════════════╗');
+    console.log(`║   🚀 Rapid Scanner — Daily Cap Mode                         ║`);
+    console.log(`║   Domain: ${DOMAIN.padEnd(6)} | Concurrency: ${String(CONCURRENCY).padEnd(2)} | Caps: UAP=${MAX_DAILY_UAP} NDE=${MAX_DAILY_NDE} ║`);
+    console.log('╚══════════════════════════════════════════════════════════════╝');
+    console.log('');
 
-  const domains = DOMAIN === 'both' ? ['uap', 'nde'] : [DOMAIN];
+    const domains = DOMAIN === 'both' ? ['uap', 'nde'] : [DOMAIN];
 
-  for (const d of domains) {
-    const config = DOMAIN_CONFIGS[d];
-    if (!config) {
-      log(`❌ Unknown domain: ${d}. Use: uap | nde | both`);
-      process.exit(1);
+    for (const d of domains) {
+      const config = DOMAIN_CONFIGS[d];
+      if (!config) {
+        log(`❌ Unknown domain: ${d}. Use: uap | nde | both`);
+        process.exit(1);
+      }
+
+      if (isShuttingDown) {
+        log(`🛑 Shutdown requested — skipping ${config.label}`);
+        break;
+      }
+
+      await processDomain(supabase, config);
     }
 
-    if (isShuttingDown) {
-      log(`🛑 Shutdown requested — skipping ${config.label}`);
-      break;
-    }
+    if (isShuttingDown) break;
 
-    await processDomain(supabase, config);
+    // Sleep until midnight UTC, then start a new day's batch
+    const sleepMs = msUntilMidnightUTC();
+    log(`💤 All domains processed for today. Sleeping until UTC midnight (~${formatDuration(sleepMs)})...`);
+    await new Promise(resolve => setTimeout(resolve, sleepMs + 60_000)); // +1min buffer past midnight
+    log(`🌅 New day! Resuming processing...`);
   }
 
   log(`👋 Session ended. Full log: ${logFile}`);
