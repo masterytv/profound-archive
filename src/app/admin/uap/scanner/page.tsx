@@ -12,7 +12,7 @@
  * - Shows UAP-specific tier stats instead of NDE rate
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Radar, Play, RotateCcw, CheckCircle2, XCircle, Clock,
     ToggleLeft, ToggleRight, Loader2, AlertTriangle, Search,
@@ -730,7 +730,7 @@ export default function UapScannerAdminPage() {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-white/10 bg-white/[0.02]">
-                                <th className="text-left p-3 text-muted-foreground font-medium">Playlist</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium">Channel / Playlist</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium">Priority</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Total videos in this YouTube playlist">On YouTube</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium cursor-help" title="Videos queued for AI analysis but not yet started">Pending</th>
@@ -742,47 +742,77 @@ export default function UapScannerAdminPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {playlists.map(pl => (
-                                <tr key={pl.playlist_id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                                    <td className="p-3">
-                                        <div className="text-foreground font-medium">{pl.playlist_title}</div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-muted-foreground text-xs">{pl.channel_name || '—'}</span>
-                                            {pl.channel_in_scanner && (
-                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400" title="This channel is also in the channel scanner">
-                                                    <CheckCircle2 className="w-3 h-3" /> In Scanner
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="p-3 text-muted-foreground">{pl.priority}</td>
-                                    <td className="p-3 text-muted-foreground">{pl.video_count?.toLocaleString() || '—'}</td>
-                                    <td className="p-3">
-                                        {pl.pending_count > 0 ? <span className="text-amber-500 font-medium">{pl.pending_count}</span> : <span className="text-muted-foreground">0</span>}
-                                    </td>
-                                    <td className="p-3 text-muted-foreground">
-                                        {pl.processed_count.toLocaleString()}
-                                    </td>
-                                    <td className="p-3 text-muted-foreground">
-                                        {pl.added_count.toLocaleString()}
-                                    </td>
-                                    <td className="p-3 text-muted-foreground text-xs">{pl.last_scanned_at ? new Date(pl.last_scanned_at).toLocaleString() : 'Never'}</td>
-                                    <td className="p-3">
-                                        <button onClick={() => togglePlaylist(pl.playlist_id, !pl.scanner_enabled)} disabled={actionLoading === pl.playlist_id}>
-                                            {actionLoading === pl.playlist_id ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                                                : pl.scanner_enabled ? <ToggleRight className="w-6 h-6 text-emerald-500" /> : <ToggleLeft className="w-6 h-6 text-slate-400" />}
-                                        </button>
-                                    </td>
-                                    <td className="p-3">
-                                        <button onClick={() => removePlaylist(pl.playlist_id)} disabled={actionLoading === pl.playlist_id}
-                                            className="text-red-400/50 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {(() => {
+                                // Group playlists by channel, sorted alphabetically by channel then playlist
+                                const sorted = [...playlists].sort((a, b) => {
+                                    const chA = (a.channel_name || '—').toLowerCase();
+                                    const chB = (b.channel_name || '—').toLowerCase();
+                                    if (chA !== chB) return chA.localeCompare(chB);
+                                    return (a.playlist_title || '').toLowerCase().localeCompare((b.playlist_title || '').toLowerCase());
+                                });
+                                const groups: Record<string, typeof playlists> = {};
+                                for (const pl of sorted) {
+                                    const key = pl.channel_name || '—';
+                                    if (!groups[key]) groups[key] = [];
+                                    groups[key].push(pl);
+                                }
+                                return Object.entries(groups).map(([channelName, channelPlaylists]) => (
+                                    <React.Fragment key={channelName}>
+                                        {/* Channel group header */}
+                                        <tr className="border-b border-white/5 bg-white/[0.03]">
+                                            <td colSpan={9} className="px-3 py-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-foreground font-semibold text-sm">{channelName}</span>
+                                                    <span className="text-muted-foreground text-xs">({channelPlaylists.length} playlist{channelPlaylists.length !== 1 ? 's' : ''})</span>
+                                                    {channelPlaylists[0].channel_in_scanner && (
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400" title="This channel is also in the channel scanner">
+                                                            <CheckCircle2 className="w-3 h-3" /> In Scanner
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {/* Playlist rows under this channel */}
+                                        {channelPlaylists.map(pl => (
+                                            <tr key={pl.playlist_id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                                                <td className="p-3 pl-6">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-muted-foreground text-xs">—</span>
+                                                        <span className="text-foreground text-sm">{pl.playlist_title}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-3 text-muted-foreground">{pl.priority}</td>
+                                                <td className="p-3 text-muted-foreground">{pl.video_count?.toLocaleString() || '—'}</td>
+                                                <td className="p-3">
+                                                    {pl.pending_count > 0 ? <span className="text-amber-500 font-medium">{pl.pending_count}</span> : <span className="text-muted-foreground">0</span>}
+                                                </td>
+                                                <td className="p-3 text-muted-foreground">
+                                                    {pl.processed_count.toLocaleString()}
+                                                </td>
+                                                <td className="p-3 text-muted-foreground">
+                                                    {pl.added_count.toLocaleString()}
+                                                </td>
+                                                <td className="p-3 text-muted-foreground text-xs">{pl.last_scanned_at ? new Date(pl.last_scanned_at).toLocaleString() : 'Never'}</td>
+                                                <td className="p-3">
+                                                    <button onClick={() => togglePlaylist(pl.playlist_id, !pl.scanner_enabled)} disabled={actionLoading === pl.playlist_id}>
+                                                        {actionLoading === pl.playlist_id ? <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                                                            : pl.scanner_enabled ? <ToggleRight className="w-6 h-6 text-emerald-500" /> : <ToggleLeft className="w-6 h-6 text-slate-400" />}
+                                                    </button>
+                                                </td>
+                                                <td className="p-3">
+                                                    <button onClick={() => removePlaylist(pl.playlist_id)} disabled={actionLoading === pl.playlist_id}
+                                                        className="text-red-400/50 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </React.Fragment>
+                                ));
+                            })()}
                             {playlists.length === 0 && (
                                 <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No playlists added yet. Add a YouTube playlist above.</td></tr>
                             )}
                         </tbody>
+
                         {playlists.length > 0 && (
                             <tfoot>
                                 <tr className="border-t border-white/10 bg-white/[0.03]">

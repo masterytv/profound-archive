@@ -67,6 +67,8 @@ const SORT_OPTIONS = [
   { value: "views", label: "Total Views", key: "total_view_count" },
   { value: "encounters", label: "Encounters", key: "tier1_count" },
   { value: "programs", label: "Programs", key: "tier2_count" },
+  { value: "evidence", label: "Evidence Strength", key: "avg_evidence_score" },
+  { value: "contact", label: "Contact Depth", key: "avg_contact_depth" },
   { value: "name", label: "Name", key: "channel_name" },
 ] as const;
 
@@ -173,6 +175,12 @@ export default async function UapChannelsPage({
         break;
       case "programs":
         cmp = a.tier2_count - b.tier2_count;
+        break;
+      case "evidence":
+        cmp = (a.avg_evidence_score ?? 0) - (b.avg_evidence_score ?? 0);
+        break;
+      case "contact":
+        cmp = (a.avg_contact_depth ?? 0) - (b.avg_contact_depth ?? 0);
         break;
       case "videos":
       default:
@@ -301,6 +309,8 @@ export default async function UapChannelsPage({
                 views: <Eye className="w-3.5 h-3.5" />,
                 encounters: <Radio className="w-3.5 h-3.5" />,
                 programs: <TrendingUp className="w-3.5 h-3.5" />,
+                evidence: <TrendingUp className="w-3.5 h-3.5" />,
+                contact: <Radio className="w-3.5 h-3.5" />,
               };
 
               return (
@@ -441,12 +451,22 @@ export default async function UapChannelsPage({
                     {/* Average scores */}
                     {ch.avg_evidence_score && (
                       <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-white/10">
-                        <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 mr-auto">Avg:</span>
+                        <span
+                          className="flex items-center gap-1 cursor-help"
+                          title="Evidence Strength (UAP-ESS) — 7 criteria scored 1–4 (witness credibility, perceptual clarity, specificity, corroboration, unpredictability, physical effects, temporal precedence). Higher = stronger evidential support."
+                        >
                           <TrendingUp className="w-3 h-3 text-emerald-500" />
-                          <span>Avg ESS: {ch.avg_evidence_score}</span>
-                        </div>
+                          Evidence Strength {Math.round(((ch.avg_evidence_score - 7) / 21) * 100)}%
+                        </span>
                         {ch.avg_contact_depth && (
-                          <span>CDS: {ch.avg_contact_depth}</span>
+                          <span
+                            className="flex items-center gap-1 cursor-help"
+                            title="Contact Depth (UAP-CDS) — 16 items across observation, entity interaction, consciousness alteration, and transcendent elements (each 0–2). Higher = deeper phenomenological contact."
+                          >
+                            <Radio className="w-3 h-3 text-violet-500" />
+                            Contact Depth {Math.round((ch.avg_contact_depth / 32) * 100)}%
+                          </span>
                         )}
                       </div>
                     )}
