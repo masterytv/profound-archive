@@ -25,10 +25,9 @@ Project Profound is a modern web application built on the **T3 Stack** principle
 
 ### 4. Oracle VM Worker
 - **Host:** Oracle Cloud ARM instance (`profound-worker`).
-- **Process Manager:** pm2 (`profound-worker` service).
-- **Processor:** `scripts/rapid-process.ts` — video intake with daily credit caps (80 UAP + 19 NDE = 99/day). Handles backfill and large processing runs.
+- **Process Manager:** pm2 (`profound-worker` service) running `scripts/rapid-process.ts` — UAP batch processor, 80 UAP/day cap, runs overnight then sleeps until UTC midnight.
+- **Crontab:** Single source of truth for all scheduled application automation. See §Scheduled Maintenance Pipeline below.
 - **Supadata API:** Transcript extraction (3,000 credits/month budget).
-- **Note:** Day-to-day discovery and processing is now fully handled by pg_cron → Firebase. The Oracle worker is used for large batch runs and backfill only.
 
 ## Data Flow
 
@@ -74,53 +73,55 @@ Project Profound is a modern web application built on the **T3 Stack** principle
 
 ## Scheduled Maintenance Pipeline
 
-All scheduled jobs run via **pg_cron** inside Supabase PostgreSQL. Jobs that require application logic call Next.js API routes on **Firebase App Hosting** via `net.http_post()`. Auth is via `CRON_SECRET` from Supabase Vault.
+### Architecture
 
-### Daily Pipeline (UTC)
+All scheduled application automation runs via **Oracle VM crontab** (`crontab -l` on `profound-worker`). This is the single source of truth — if you move hosting providers, update `.env.local` on Oracle and nothing else changes.
 
-| Time | Job | Type | What It Does |
-|---|---|---|---|
-| 3:00 | VACUUM nde_vids | SQL-only | Table maintenance |
-| 3:05 | VACUUM nde_chatbot_chunks | SQL-only | Table maintenance |
-| 3:10 | VACUUM nde_punctuated_embeddings | SQL-only | Table maintenance |
-| 3:15 | VACUUM nde_analysis | SQL-only | Table maintenance |
-| 5:00 | `trigger_normalize_entities()` | HTTP → Firebase | Dedup canonical persons/orgs/programs |
-| 5:30 | `trigger_recompute_channel_scores()` | HTTP → Firebase | Refresh `uap_channel_scores` from encounters |
-| 6:00 | `trigger_rebuild_viz_caches()` | HTTP → Firebase | Rebuild all 7 `viz_graph_cache` entries |
-| 6:15 | `REFRESH MATERIALIZED VIEW uap_channel_stats_mv` | SQL-only | Refresh UAP channel stats materialized view |
-| 6:30 | `REFRESH MATERIALIZED VIEW nde_channel_stats_mv` | SQL-only | Refresh NDE channel stats materialized view |
-| 7:00 | `trigger_nde_channel_discovery_all()` | HTTP → Firebase | Scan all NDE channels, queue new videos |
-| 10:00 | `trigger_email_dispatch()` | HTTP → Firebase | Send queued behavioral emails |
-| 16:00 | `trigger_nde_blog_questions()` | HTTP → Firebase | Generate NDE blog Q&A |
-| 17:00 | `trigger_uap_blog_questions()` | HTTP → Firebase | Generate UAP blog Q&A |
-| 18:00 | `trigger_nde_blog_stories()` | HTTP → Firebase | Generate NDE blog stories |
+**pg_cron** (Supabase PostgreSQL) is reserved for SQL-only operations that require no knowledge of the application server:
 
-### NDE Video Pipeline (daily cycle)
+| pg_cron Job | Schedule | What It Does |
+|---|---|---|
+| `vacuum-nde-vids` | 3:00 UTC | VACUUM ANALYZE `nde_vids` |
+| `vacuum-nde-chatbot` | 3:05 UTC | VACUUM ANALYZE `nde_chatbot_chunks` |
+| `vacuum-nde-embeddings` | 3:10 UTC | VACUUM ANALYZE `nde_punctuated_embeddings` |
+| `vacuum-nde-analysis` | 3:15 UTC | VACUUM ANALYZE `nde_analysis` |
+| `refresh-uap-channel-stats-mv` | 6:15 UTC | REFRESH MATERIALIZED VIEW `uap_channel_stats_mv` |
+| `refresh-nde-channel-stats-mv` | 6:30 UTC | REFRESH MATERIALIZED VIEW `nde_channel_stats_mv` |
+| `cron-cleanup` | Sunday 4:00 UTC | DELETE old `cron.job_run_details` (7-day retention) |
+
+### Oracle Crontab (full schedule)
 
 | Time (UTC) | Job | What It Does |
 |---|---|---|
-| 7:00 | `trigger_nde_channel_discovery_all()` | Scan **all** NDE channels at once → queue new videos |
-| :00,:10,...,:50 (every 10 min) | `trigger_nde_video_processor()` | Process 1 queued NDE video through full intake pipeline |
+| 7:00 daily | `scanner-discover.ts --domain nde --all` | Scan all 47 NDE channels, queue new videos |
+| :01,:11,...,:51 every 10 min | `scanner-process.ts` | Process 1 queued NDE video through full intake pipeline |
+| :30 hourly | `scanner-discover.ts --domain uap` | Scan one UAP channel for new uploads (round-robin) |
+| 3:00 every 3h | `nde-batch-analysis.ts --pipeline greyson` | Run Greyson NDE Scale analysis batch |
+| 3:20 every 3h | `nde-batch-analysis.ts --pipeline core-elements` | Run Core Elements analysis batch |
+| 3:30 every 3h | `nde-batch-analysis.ts --pipeline journey-flow` | Run Journey Flow analysis batch |
+| 3:40 every 3h | `nde-batch-analysis.ts --pipeline phenomenology` | Run Phenomenology analysis batch |
+| 5:00 daily | `curl /api/cron/normalize-entities` | Dedup canonical persons/orgs/programs |
+| 5:30 daily | `curl /api/cron/recompute-channel-scores` | Refresh `uap_channel_scores` from encounters |
+| 5:00 Sunday | `weekly-maintenance.ts` | Prune old logs and scan_runs |
+| 6:00 daily | `curl /api/cron/rebuild-viz-caches` | Rebuild all 7 `viz_graph_cache` entries |
+| 6:00 Sunday | `uap-batch-triad.ts` | UAP Triad batch analysis (weekly) |
+| 8:00 Sunday | `uap-knowledge-batch.ts` | UAP knowledge base batch (weekly) |
+| 9:00 Monday | `curl /api/email/feedback-digest` | Send weekly feedback digest to admin |
+| 10:00 daily | `curl /api/email/cron` | Send queued behavioral emails |
+| 16:00 daily | `blog-generate.ts --domain nde --type question` | Generate NDE blog Q&A |
+| 17:00 daily | `blog-generate.ts --domain uap --type question` | Generate UAP blog Q&A |
+| 18:00 daily | `blog-generate.ts --domain nde --type story` | Generate NDE blog stories |
 
-**Daily flow:** Discovery at 7am UTC (3am ET) finds all new videos from the previous day across all 47 channels and queues them. The every-10-min processor drains the queue — 30 videos ≈ done by 9am ET.
+**UAP video processing** is handled by pm2 `profound-worker` running `scripts/rapid-process.ts` — a nightly batch that processes up to 80 UAP videos, then sleeps until UTC midnight. It also checks the NDE queue at midnight as a safety net if the 10-min tick missed anything.
 
-### UAP Video Pipeline (unchanged)
+### NDE Daily Flow
 
-| Schedule | Job | What It Does |
-|---|---|---|
-| Every 10 min (:05,:15,...) | `trigger_uap_video_processor()` | Process queued UAP videos |
-| Hourly :30 | `trigger_uap_channel_discovery()` | Scan one UAP channel per hour for new uploads |
-
-### Weekly
-
-| Schedule | Job | What It Does |
-|---|---|---|
-| Sunday 4:00 | Cron cleanup | Prune `cron.job_run_details` older than 7 days |
-| Monday 9:00 | `trigger_feedback_digest()` | Send weekly feedback digest to admin |
+7:00 UTC — discovery scans all 47 channels → queues new videos  
+7:01 UTC onward — every 10 min tick processes 1 video → typically done within 90 minutes (7 videos = done by ~8:30 UTC)
 
 ### GitHub Actions (active schedules)
 
-All automation has been migrated to pg_cron. Only one scheduled GitHub Actions workflow remains:
+All automation runs on Oracle or pg_cron. Only one scheduled GitHub Actions workflow remains:
 
 | Workflow | Schedule | What It Does |
 |---|---|---|
@@ -128,12 +129,11 @@ All automation has been migrated to pg_cron. Only one scheduled GitHub Actions w
 
 All other workflow files in `.github/workflows/` retain `workflow_dispatch:` for manual triggering but have no active cron schedules.
 
-### Vault Secrets Used
+### Portability Note
 
-| Secret Name | Purpose |
-|---|---|
-| `uap_processor_url` | Firebase App Hosting URL (base for all `/api/cron/*` calls) |
-| `uap_processor_cron_secret` | Shared secret for cron endpoint auth |
+If you move from Firebase App Hosting to another provider (Vercel, Fly.io, self-hosted), only two things change:
+1. Update `BASE_URL` / `APP_URL` in Oracle's `.env.local`
+2. The pg_cron SQL-only jobs have zero coupling to the app server — they don't change
 
 ---
 
