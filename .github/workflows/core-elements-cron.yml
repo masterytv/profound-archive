@@ -1,9 +1,7 @@
 name: Core Elements Analysis Cron
 
 on:
-  schedule:
-    # Run every 3 hours (at minute 20) — offset from Greyson (:10) and Transformation
-    - cron: '20 */3 * * *'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       limit:

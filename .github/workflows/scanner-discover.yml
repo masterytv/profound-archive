@@ -1,9 +1,7 @@
 name: Channel Discovery (Hourly)
 
 on:
-  schedule:
-    # Scan one channel for new videos every hour and queue them
-    - cron: '0 * * * *'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
 
 jobs:

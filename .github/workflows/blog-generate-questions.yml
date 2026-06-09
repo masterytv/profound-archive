@@ -1,8 +1,7 @@
 name: Blog — Daily Big Question Article (noon ET)
 
 on:
-  schedule:
-    - cron: '0 16 * * *'                 # Daily 16:00 UTC = noon ET (EDT)
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:                    # manual trigger for testing
     inputs:
       count:

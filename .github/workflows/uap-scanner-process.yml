@@ -1,11 +1,7 @@
 name: UAP Video Processor (10m, :05 offset, 3/tick)
 
 on:
-  schedule:
-    # Process 3 UAP videos from the queue every 10 minutes (~18/hr).
-    # Offset 5 min from NDE processor to avoid concurrent API calls.
-    # Pipeline timing: ~45-90s per video, 3 sequential = ~135-270s typical.
-    - cron: '5,15,25,35,45,55 * * * *'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       videos_per_tick:

@@ -5,9 +5,7 @@
 name: Greyson Analysis Cron
 
 on:
-  schedule:
-    # Run every 3 hours (at minute 10) — offset 1hr from Transformation
-    - cron: '10 */3 * * *'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       limit:

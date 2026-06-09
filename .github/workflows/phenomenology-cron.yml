@@ -1,9 +1,7 @@
 name: Phenomenology & Entities Analysis Cron
 
 on:
-  schedule:
-    # Run every 3 hours (at minute 50) — offset from Core Elements (:20) and Journey Flow (:40)
-    - cron: '50 */3 * * *'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       limit:

@@ -1,8 +1,7 @@
 name: Blog — Daily Experiencer Story (2pm ET)
 
 on:
-  schedule:
-    - cron: '0 18 * * *'                 # Daily 18:00 UTC = 2pm ET (EDT)
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:                    # manual trigger for testing
     inputs:
       count:

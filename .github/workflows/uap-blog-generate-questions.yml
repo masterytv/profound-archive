@@ -1,8 +1,7 @@
 name: UAP Blog — Daily Question Article (1pm ET)
 
 on:
-  schedule:
-    - cron: '0 17 * * *'                 # Daily 17:00 UTC = 1pm ET (EDT) — offset 1h from NDE
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:                    # manual trigger for testing
     inputs:
       count:

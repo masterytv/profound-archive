@@ -1,9 +1,7 @@
 name: Journey Flow Analysis Cron
 
 on:
-  schedule:
-    # Run every 3 hours (at minute 40) — offset from Greyson (:10), Transformation, and Core Elements (:20)
-    - cron: '40 */3 * * *'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       limit:

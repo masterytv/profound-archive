@@ -1,10 +1,7 @@
 name: UAP Knowledge Extraction (Weekly)
 
 on:
-  schedule:
-    # Run weekly on Sundays at 08:00 UTC (4am ET) — after triad batch completes
-    # Extracts people, claims, events, programs from Tier 2 UAP videos
-    - cron: '0 8 * * 0'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       limit:

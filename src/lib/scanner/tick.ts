@@ -3,11 +3,16 @@
 /**
  * Scanner Tick Orchestrator
  *
- * Provides three exported functions:
+ * Provides four exported functions:
  *
  * - runDiscoverTick(supabase)
  *     Pick the least-recently-scanned channel, discover new videos, and queue
- *     them in scan_queue. Fast (~5-10s). Called hourly.
+ *     them in scan_queue. Fast (~5-10s). Kept for manual/admin use.
+ *
+ * - runDiscoverAllChannels(supabase)
+ *     Scan ALL scanner-enabled channels in one pass and queue new videos.
+ *     Called once daily at 3am ET via pg_cron → /api/scanner/discover-all.
+ *     Takes ~1-3 minutes for 47 channels. Well within Firebase 600s timeout.
  *
  * - runProcessTick(supabase, count)
  *     Pull `count` videos from the pending queue and run each through the full
@@ -327,6 +332,143 @@ export async function runProcessTick(
     return {
         processed,
         durationMs: Date.now() - startTime,
+    };
+}
+
+// ---------------------------------------------------------------------------
+// runDiscoverAllChannels — daily full-sweep discovery (3am ET via pg_cron)
+// ---------------------------------------------------------------------------
+
+export interface DiscoverAllResult {
+    channelsScanned: number;
+    channelsWithNewVideos: number;
+    totalDiscovered: number;
+    totalQueued: number;
+    durationMs: number;
+    perChannel: Array<{ id: string; name: string; discovered: number; queued: number }>;
+}
+
+/**
+ * Scan ALL scanner-enabled channels for new videos and queue them.
+ * Runs sequentially to avoid YouTube API rate limits.
+ * Called once daily at 3am ET via pg_cron → /api/scanner/discover-all.
+ */
+export async function runDiscoverAllChannels(supabase: any): Promise<DiscoverAllResult> {
+    const startTime = Date.now();
+
+    const { data: channels, error: channelError } = await supabase
+        .from('channels')
+        .select('channel_id, name, uploads_playlist_id')
+        .eq('scanner_enabled', true)
+        .order('name');
+
+    if (channelError) throw new Error(`Channel fetch: ${channelError.message}`);
+    if (!channels || channels.length === 0) {
+        return { channelsScanned: 0, channelsWithNewVideos: 0, totalDiscovered: 0, totalQueued: 0, durationMs: 0, perChannel: [] };
+    }
+
+    // Load all existing video IDs + already-queued IDs once (avoids N round-trips)
+    const channelIds = channels.map((c: any) => c.channel_id);
+    const existingIds = await getExistingVideoIds(supabase, channelIds);
+
+    const { data: queuedRows } = await supabase
+        .from('scan_queue')
+        .select('video_id')
+        .in('channel_id', channelIds);
+
+    if (queuedRows) {
+        for (const row of queuedRows) {
+            if (row.video_id) existingIds.add(row.video_id);
+        }
+    }
+
+    const perChannel: DiscoverAllResult['perChannel'] = [];
+    let totalDiscovered = 0;
+    let totalQueued = 0;
+    let channelsWithNewVideos = 0;
+
+    for (const channel of channels) {
+        if (!channel.uploads_playlist_id) {
+            console.warn(`[DiscoverAll] ⚠️ ${channel.name} has no uploads_playlist_id — skipping`);
+            await supabase
+                .from('channels')
+                .update({ last_scanned_at: new Date().toISOString() })
+                .eq('channel_id', channel.channel_id);
+            continue;
+        }
+
+        let discovered = 0;
+        let queued = 0;
+
+        try {
+            const result = await discoverNewVideos(
+                channel.channel_id,
+                channel.uploads_playlist_id,
+                channel.name,
+                existingIds,
+                50,
+                3, // 3 pages = 150 videos — sufficient for daily new-content sweeps
+            );
+
+            discovered = result.newVideos.length;
+
+            if (result.newVideos.length > 0) {
+                channelsWithNewVideos++;
+                const queueItems = result.newVideos.map((v) => ({
+                    video_url: `https://www.youtube.com/watch?v=${v.videoId}`,
+                    video_id: v.videoId,
+                    channel_id: channel.channel_id,
+                    title: v.title || null,
+                    duration_seconds: v.duration_seconds ?? null,
+                    status: 'pending',
+                }));
+
+                for (const item of queueItems) {
+                    const { error: insertError } = await supabase
+                        .from('scan_queue')
+                        .upsert(item, { onConflict: 'video_url', ignoreDuplicates: true });
+                    if (!insertError) {
+                        queued++;
+                        // Add to existingIds so subsequent channels don't double-queue
+                        existingIds.add(item.video_id);
+                    }
+                }
+            }
+        } catch (err: any) {
+            console.error(`[DiscoverAll] Error scanning ${channel.name}:`, err.message);
+        }
+
+        await supabase
+            .from('channels')
+            .update({ last_scanned_at: new Date().toISOString() })
+            .eq('channel_id', channel.channel_id);
+
+        await supabase.from('scan_runs').insert({
+            channel_id: channel.channel_id,
+            run_type: 'discover',
+            completed_at: new Date().toISOString(),
+            videos_discovered: discovered,
+            videos_processed: 0,
+            videos_accepted: 0,
+            videos_rejected: 0,
+            videos_failed: 0,
+        });
+
+        totalDiscovered += discovered;
+        totalQueued += queued;
+        perChannel.push({ id: channel.channel_id, name: channel.name, discovered, queued });
+        console.log(`[DiscoverAll] ${channel.name}: ${discovered} new, ${queued} queued`);
+    }
+
+    console.log(`[DiscoverAll] Complete: ${channels.length} channels, ${totalDiscovered} discovered, ${totalQueued} queued (${Date.now() - startTime}ms)`);
+
+    return {
+        channelsScanned: channels.length,
+        channelsWithNewVideos,
+        totalDiscovered,
+        totalQueued,
+        durationMs: Date.now() - startTime,
+        perChannel,
     };
 }
 

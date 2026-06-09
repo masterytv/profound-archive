@@ -1,11 +1,7 @@
 name: Weekly Maintenance Pipeline
 
 on:
-  schedule:
-    # Sundays at 5:00 AM UTC (1:00 AM ET)
-    # Chains: normalize-entities → recompute-channel-scores → rebuild-viz-caches
-    # Must run BEFORE monthly channel-score-snapshot (1st of month at 7:00 UTC)
-    - cron: '0 5 * * 0'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch: {}
 
 jobs:

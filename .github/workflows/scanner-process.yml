@@ -1,14 +1,7 @@
 name: Video Processor (10m)
 
 on:
-  schedule:
-    # Process 1 video from the queue every 10 minutes.
-    # Calls the Firebase App Hosting DIRECT URL (APP_DIRECT_URL secret) to
-    # bypass Cloudflare's 100s connection limit. Cloud Run timeoutSeconds: 600.
-    #
-    # Pipeline timing (as of Apr 2026): 300-465s per video.
-    # curl --max-time 540 gives headroom within the 10-min cron interval.
-    - cron: '*/10 * * * *'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       videos_per_tick:

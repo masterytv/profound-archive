@@ -26,9 +26,9 @@ Project Profound is a modern web application built on the **T3 Stack** principle
 ### 4. Oracle VM Worker
 - **Host:** Oracle Cloud ARM instance (`profound-worker`).
 - **Process Manager:** pm2 (`profound-worker` service).
-- **Scanner:** `src/lib/scanner/tick.ts` (NDE) + `src/lib/scanner/uap-tick.ts` (UAP) — hourly channel discovery.
-- **Processor:** `scripts/rapid-process.ts` — video intake with daily credit caps (80 UAP + 19 NDE = 99/day).
+- **Processor:** `scripts/rapid-process.ts` — video intake with daily credit caps (80 UAP + 19 NDE = 99/day). Handles backfill and large processing runs.
 - **Supadata API:** Transcript extraction (3,000 credits/month budget).
+- **Note:** Day-to-day discovery and processing is now fully handled by pg_cron → Firebase. The Oracle worker is used for large batch runs and backfill only.
 
 ## Data Flow
 
@@ -87,20 +87,29 @@ All scheduled jobs run via **pg_cron** inside Supabase PostgreSQL. Jobs that req
 | 5:00 | `trigger_normalize_entities()` | HTTP → Firebase | Dedup canonical persons/orgs/programs |
 | 5:30 | `trigger_recompute_channel_scores()` | HTTP → Firebase | Refresh `uap_channel_scores` from encounters |
 | 6:00 | `trigger_rebuild_viz_caches()` | HTTP → Firebase | Rebuild all 7 `viz_graph_cache` entries |
-| 6:15 | `REFRESH MATERIALIZED VIEW uap_channel_stats_mv` | SQL-only | Refresh channel stats materialized view |
+| 6:15 | `REFRESH MATERIALIZED VIEW uap_channel_stats_mv` | SQL-only | Refresh UAP channel stats materialized view |
+| 6:30 | `REFRESH MATERIALIZED VIEW nde_channel_stats_mv` | SQL-only | Refresh NDE channel stats materialized view |
+| 7:00 | `trigger_nde_channel_discovery_all()` | HTTP → Firebase | Scan all NDE channels, queue new videos |
 | 10:00 | `trigger_email_dispatch()` | HTTP → Firebase | Send queued behavioral emails |
 | 16:00 | `trigger_nde_blog_questions()` | HTTP → Firebase | Generate NDE blog Q&A |
 | 17:00 | `trigger_uap_blog_questions()` | HTTP → Firebase | Generate UAP blog Q&A |
 | 18:00 | `trigger_nde_blog_stories()` | HTTP → Firebase | Generate NDE blog stories |
 
-### High-Frequency Pipeline
+### NDE Video Pipeline (daily cycle)
+
+| Time (UTC) | Job | What It Does |
+|---|---|---|
+| 7:00 | `trigger_nde_channel_discovery_all()` | Scan **all** NDE channels at once → queue new videos |
+| :00,:10,...,:50 (every 10 min) | `trigger_nde_video_processor()` | Process 1 queued NDE video through full intake pipeline |
+
+**Daily flow:** Discovery at 7am UTC (3am ET) finds all new videos from the previous day across all 47 channels and queues them. The every-10-min processor drains the queue — 30 videos ≈ done by 9am ET.
+
+### UAP Video Pipeline (unchanged)
 
 | Schedule | Job | What It Does |
 |---|---|---|
-| Every 10 min (:00,:10,...) | `trigger_nde_video_processor()` | Process queued NDE videos |
 | Every 10 min (:05,:15,...) | `trigger_uap_video_processor()` | Process queued UAP videos |
-| Hourly :00 | `trigger_nde_channel_discovery()` | Scan NDE channels for new uploads |
-| Hourly :30 | `trigger_uap_channel_discovery()` | Scan UAP channels for new uploads |
+| Hourly :30 | `trigger_uap_channel_discovery()` | Scan one UAP channel per hour for new uploads |
 
 ### Weekly
 
@@ -108,6 +117,16 @@ All scheduled jobs run via **pg_cron** inside Supabase PostgreSQL. Jobs that req
 |---|---|---|
 | Sunday 4:00 | Cron cleanup | Prune `cron.job_run_details` older than 7 days |
 | Monday 9:00 | `trigger_feedback_digest()` | Send weekly feedback digest to admin |
+
+### GitHub Actions (active schedules)
+
+All automation has been migrated to pg_cron. Only one scheduled GitHub Actions workflow remains:
+
+| Workflow | Schedule | What It Does |
+|---|---|---|
+| `channel-score-snapshot.yml` | 1st of month, 7:00 UTC | Snapshot UAP channel scores to history table |
+
+All other workflow files in `.github/workflows/` retain `workflow_dispatch:` for manual triggering but have no active cron schedules.
 
 ### Vault Secrets Used
 

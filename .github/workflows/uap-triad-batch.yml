@@ -1,10 +1,7 @@
 name: UAP Triad Analysis (Weekly)
 
 on:
-  schedule:
-    # Run weekly on Sundays at 06:00 UTC (2am ET)
-    # Processes unscored Tier 1 videos with all 3 UAP-CET triad modules
-    - cron: '0 6 * * 0'
+  # DISABLED: Moved to pg_cron/Oracle. Use workflow_dispatch to run manually.
   workflow_dispatch:
     inputs:
       limit:
