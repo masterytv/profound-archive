@@ -244,6 +244,17 @@ export async function POST(req: NextRequest) {
                 const channelIds = channels.map((c: any) => c.channel_id);
                 const existingVideoIds = await getExistingVideoIds(supabase, channelIds);
 
+                // Also exclude videos already in scan_queue (any status) so audit matches what discover_all would actually queue
+                const { data: queuedRows } = await supabase
+                    .from('scan_queue')
+                    .select('video_id')
+                    .in('channel_id', channelIds);
+                if (queuedRows) {
+                    for (const row of queuedRows) {
+                        if (row.video_id) existingVideoIds.add(row.video_id);
+                    }
+                }
+
                 const results: any[] = [];
                 for (const channel of channels) {
                     if (!channel.uploads_playlist_id) continue;
@@ -308,6 +319,17 @@ export async function POST(req: NextRequest) {
 
                 const allChannelIds = channels.map((c: any) => c.channel_id);
                 const existingVideoIds = await getExistingVideoIds(supabase, allChannelIds);
+
+                // Also exclude videos already in scan_queue so we don't silently no-op on already-queued items
+                const { data: queuedRows } = await supabase
+                    .from('scan_queue')
+                    .select('video_id')
+                    .in('channel_id', allChannelIds);
+                if (queuedRows) {
+                    for (const row of queuedRows) {
+                        if (row.video_id) existingVideoIds.add(row.video_id);
+                    }
+                }
 
                 let totalQueued = 0;
                 const results: any[] = [];
