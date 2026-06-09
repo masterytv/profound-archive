@@ -320,6 +320,29 @@ export default function ScannerAdminPage() {
                     </div>
                 )}
 
+                {/* Discover All Result */}
+                {discoverAllResult && (
+                    <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10">
+                        {discoverAllResult.error ? (
+                            <p className="text-red-600 text-sm">{discoverAllResult.error}</p>
+                        ) : (
+                            <div className="text-sm space-y-1">
+                                <p className="text-slate-700 font-medium">
+                                    {discoverAllResult.totalQueued > 0
+                                        ? <span className="text-emerald-600">✓ Queued {discoverAllResult.totalQueued} new video{discoverAllResult.totalQueued !== 1 ? 's' : ''} across {discoverAllResult.channels} channels</span>
+                                        : <span className="text-slate-500">No new videos found — all channels are up to date</span>
+                                    }
+                                </p>
+                                {discoverAllResult.results?.filter((r: any) => r.queued > 0).map((r: any) => (
+                                    <p key={r.channelId} className="text-xs text-emerald-600 font-mono">
+                                        📺 {r.channelName}: {r.queued} queued
+                                    </p>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* Tick Result */}
                 {tickResult && (
                     <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10">
