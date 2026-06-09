@@ -244,11 +244,11 @@ export async function POST(req: NextRequest) {
                 const channelIds = channels.map((c: any) => c.channel_id);
                 const existingVideoIds = await getExistingVideoIds(supabase, channelIds);
 
-                // Also exclude videos already in scan_queue (any status) so audit matches what discover_all would actually queue
+                // Exclude ALL scan_queue entries (no channel filter) — matches discover_all
+                // logic so audit count accurately reflects what would actually be inserted
                 const { data: queuedRows } = await supabase
                     .from('scan_queue')
-                    .select('video_id')
-                    .in('channel_id', channelIds);
+                    .select('video_id');
                 if (queuedRows) {
                     for (const row of queuedRows) {
                         if (row.video_id) existingVideoIds.add(row.video_id);
@@ -320,11 +320,12 @@ export async function POST(req: NextRequest) {
                 const allChannelIds = channels.map((c: any) => c.channel_id);
                 const existingVideoIds = await getExistingVideoIds(supabase, allChannelIds);
 
-                // Also exclude videos already in scan_queue so we don't silently no-op on already-queued items
+                // Exclude ALL scan_queue entries (no channel filter) — the UNIQUE constraint on
+                // video_url fires globally, so a video queued under ANY channel (including disabled
+                // ones) would silently no-op our upsert if we only filtered by enabled channels.
                 const { data: queuedRows } = await supabase
                     .from('scan_queue')
-                    .select('video_id')
-                    .in('channel_id', allChannelIds);
+                    .select('video_id');
                 if (queuedRows) {
                     for (const row of queuedRows) {
                         if (row.video_id) existingVideoIds.add(row.video_id);
@@ -346,7 +347,8 @@ export async function POST(req: NextRequest) {
                             50,   // max new videos to queue per channel per run
                         );
 
-                        // Queue discovered videos
+                        // Queue discovered videos — count actual inserts, not discoveries
+                        let channelQueued = 0;
                         if (discovery.newVideos.length > 0) {
                             const queueItems = discovery.newVideos.map(v => ({
                                 video_id: v.videoId,
@@ -356,10 +358,12 @@ export async function POST(req: NextRequest) {
                                 duration_seconds: v.duration_seconds ?? null,
                                 status: 'pending',
                             }));
-                            await supabase
+                            const { data: inserted } = await supabase
                                 .from('scan_queue')
-                                .upsert(queueItems, { onConflict: 'video_url', ignoreDuplicates: true });
-                            totalQueued += discovery.newVideos.length;
+                                .upsert(queueItems, { onConflict: 'video_url', ignoreDuplicates: true })
+                                .select('video_id');
+                            channelQueued = inserted?.length ?? 0;
+                            totalQueued += channelQueued;
                         }
 
                         // Mark channel as scanned
@@ -368,7 +372,7 @@ export async function POST(req: NextRequest) {
                             .update({ last_scanned_at: new Date().toISOString() })
                             .eq('channel_id', channel.channel_id);
 
-                        results.push({ channelId: channel.channel_id, channelName: channel.name, queued: discovery.newVideos.length });
+                        results.push({ channelId: channel.channel_id, channelName: channel.name, queued: channelQueued });
                     } catch (err: any) {
                         results.push({ channelId: channel.channel_id, channelName: channel.name, queued: 0, error: err.message });
                     }
