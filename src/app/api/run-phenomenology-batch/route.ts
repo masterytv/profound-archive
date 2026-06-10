@@ -1,4 +1,5 @@
 
+import { isDebugBypass } from '@/lib/debug-mode';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { analyzePhenomenologyEntities } from '@/lib/ai/phenomenology-entities';
@@ -19,10 +20,10 @@ export async function GET(request: Request) {
         const limitStr = searchParams.get('limit');
         const limit = limitStr ? parseInt(limitStr) : (targetVideoId ? 1 : 3);
 
-        // Security Check — allow IS_DEBUG_MODE to bypass for local dev
+        // Security Check — IS_DEBUG_MODE bypass is non-production only (S-4)
         const authHeader = request.headers.get('authorization');
         const expectedSecret = process.env.CRON_SECRET;
-        const isDebug = !!process.env.IS_DEBUG_MODE;
+        const isDebug = isDebugBypass();
 
         if (!isDebug) {
             if (!expectedSecret) {

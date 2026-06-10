@@ -3,9 +3,9 @@
  * AI batch route (GET /api/run-greyson-batch). The same pattern guards the
  * other run-*-batch routes.
  *
- * Includes a pinned test for the IS_DEBUG_MODE truthiness bypass
- * (docs/IMPROVEMENT_PLAN.md S-4): today, ANY non-empty value — including the
- * string "false" — disables auth entirely. When S-4 is fixed, flip that test.
+ * Pins the S-4 fix (docs/IMPROVEMENT_PLAN.md): the IS_DEBUG_MODE bypass
+ * requires BOTH a non-production NODE_ENV and the exact string "true" —
+ * any other value, or production, leaves auth fully enforced.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -77,10 +77,24 @@ describe('GET /api/run-greyson-batch — auth gate (current behavior)', () => {
         expect(res.status).toBe(500);
     });
 
-    it('documents S-4: IS_DEBUG_MODE="false" (any non-empty value) bypasses auth completely', async () => {
-        // CURRENT (vulnerable) behavior — truthiness check, not === 'true',
-        // and no NODE_ENV gate. After the Phase 1 fix this must become a 401.
+    it('S-4 regression guard: IS_DEBUG_MODE="false" (or any value other than "true") does NOT bypass auth', async () => {
         vi.stubEnv('IS_DEBUG_MODE', 'false');
+        const res = await get(VERIFY_URL, { authorization: 'Bearer totally-wrong' });
+        expect(res.status).toBe(401);
+        expect(h.single).not.toHaveBeenCalled();
+    });
+
+    it('S-4 regression guard: even IS_DEBUG_MODE="true" does NOT bypass auth in production', async () => {
+        vi.stubEnv('NODE_ENV', 'production');
+        vi.stubEnv('IS_DEBUG_MODE', 'true');
+        const res = await get(VERIFY_URL, { authorization: 'Bearer totally-wrong' });
+        expect(res.status).toBe(401);
+        expect(h.single).not.toHaveBeenCalled();
+    });
+
+    it('S-4: IS_DEBUG_MODE="true" still bypasses auth outside production (local dev convenience)', async () => {
+        // NODE_ENV is 'test' under vitest — i.e. not production.
+        vi.stubEnv('IS_DEBUG_MODE', 'true');
         const res = await get(VERIFY_URL, { authorization: 'Bearer totally-wrong' });
         expect(res.status).toBe(200);
         expect(h.single).toHaveBeenCalled();
