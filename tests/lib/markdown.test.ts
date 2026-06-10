@@ -54,8 +54,10 @@ describe('markdownToHtml — sanitization (current behavior)', () => {
             '/\\\\evil.example.com/x',
         ]) {
             const out = markdownToHtml(`[text](${url})`);
-            expect(out, `URL should be neutralized: ${JSON.stringify(url)}`).toContain('href="#"');
-            expect(out).not.toMatch(/href="(?!#)/);
+            // Either the link is neutralized to href="#" or it doesn't parse as
+            // a link at all — but no real href may ever be produced from these.
+            expect(out, `URL should be neutralized: ${JSON.stringify(url)}`).not.toMatch(/href="(?!#")/);
+            expect(out, `no executable scheme may survive: ${JSON.stringify(url)}`).not.toMatch(/(?:href|src)="(?:javascript|data|vbscript)/i);
         }
     });
 
@@ -67,9 +69,35 @@ describe('markdownToHtml — sanitization (current behavior)', () => {
     });
 
     it('S-6 regression guard: quotes in URLs cannot break out of the href attribute', () => {
-        const out = markdownToHtml('[x](https://example.com/" style="position:fixed)');
+        const out = markdownToHtml('[x](https://example.com/"style="position:fixed)');
         expect(out).not.toMatch(/style="/);
         expect(out).toContain('&quot;');
+    });
+
+    it('S-6 follow-up: an unclosed link construct must not swallow paragraphs into the href', () => {
+        // Reproduces the staging blog breakage: AI-generated bodies sometimes
+        // contain `[text](url` with no closing paren. The URL capture must stop
+        // at whitespace so the construct degrades to literal text instead of
+        // shredding the document into a giant escaped href.
+        const md = [
+            '[One account on Project Profound](/video puts it bluntly: "No judgment."',
+            '',
+            '## What Actually Gets Reviewed',
+            '',
+            'More text follows here (with parentheses).',
+        ].join('\n');
+        const out = markdownToHtml(md);
+        // The real heading renders as markup, never as escaped text.
+        expect(out).toContain('<h2 class="text-2xl font-bold mt-10 mb-4">What Actually Gets Reviewed</h2>');
+        expect(out).not.toContain('&lt;h2');
+        // The malformed construct stays as bounded literal text; no link is produced from it.
+        expect(out).toContain('[One account on Project Profound](/video puts it bluntly:');
+        expect(out).not.toMatch(/<a[^>]*href="[^"]*video puts/);
+    });
+
+    it('S-6 follow-up: link text cannot span multiple lines', () => {
+        const out = markdownToHtml('[line one\nline two](https://example.com)');
+        expect(out).not.toContain('<a ');
     });
 
     it('S-6: allowed URL forms still render as real links/images', () => {
