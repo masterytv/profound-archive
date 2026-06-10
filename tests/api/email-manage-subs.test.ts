@@ -64,6 +64,14 @@ describe('POST /api/email/manage-subs (S-2: token or admin required)', () => {
         expect(h.upsert).not.toHaveBeenCalled();
     });
 
+    it('S-12: invalid email, malformed updates, and unknown frequency return 400 with no write', async () => {
+        expect((await post({ email: 'not-an-email', updates: [{ archetype: 'seeker', active: true }] })).status).toBe(400);
+        expect((await post({ email: 'a@b.com', updates: [{ archetype: 'seeker', active: 'yes' }] })).status).toBe(400);
+        expect((await post({ email: 'a@b.com', updates: [{ archetype: 'seeker', active: true, frequency: 'hourly' }] })).status).toBe(400);
+        expect(h.upsert).not.toHaveBeenCalled();
+        expect(h.updateEqEq).not.toHaveBeenCalled();
+    });
+
     it('S-2 regression guard: an unauthenticated POST (no token, no admin) returns 401 and writes nothing', async () => {
         const res = await post({
             email: 'victim@example.org',

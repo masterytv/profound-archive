@@ -179,8 +179,22 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
         expect(body.error).toBe('OpenAI quota exceeded');
     });
 
-    it('documents current behavior: malformed JSON body returns 500 (not 400)', async () => {
+    it('S-12 regression guard: malformed JSON body returns 400 before any side effect', async () => {
         const res = await post('not-json{');
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
+        expect(h.embeddingsCreate).not.toHaveBeenCalled();
+        expect(h.insert).not.toHaveBeenCalled();
+    });
+
+    it('S-12 regression guard: an oversized chatInput returns 400 before any model call', async () => {
+        const res = await post({ sessionId: 's-1', chatInput: 'x'.repeat(4001) });
+        expect(res.status).toBe(400);
+        expect(h.embeddingsCreate).not.toHaveBeenCalled();
+    });
+
+    it('S-12: wrong field types return 400', async () => {
+        const res = await post({ sessionId: 's-1', chatInput: ['not', 'a', 'string'] });
+        expect(res.status).toBe(400);
+        expect(h.embeddingsCreate).not.toHaveBeenCalled();
     });
 });

@@ -121,6 +121,27 @@ describe('POST /api/quiz-lead throttling (S-3)', () => {
         const blocked = await postQuizLead({ ...body, email: 'A@B.COM' }, '203.0.113.99');
         expect(blocked.status).toBe(429);
     });
+
+    it('S-12: an over-long write_in is truncated, not rejected — the lead is still captured', async () => {
+        const res = await postQuizLead({ ...body, archetype: 'seeker', write_in: 'x'.repeat(2000) });
+        expect(res.status).toBe(200);
+        expect(h.upsertSelectSingle).toHaveBeenCalledTimes(1);
+    });
+
+    it('S-12: invalid email, unknown frequency, and malformed JSON return 400 with no write', async () => {
+        expect((await postQuizLead({ ...body, email: 'not-an-email' })).status).toBe(400);
+        expect((await postQuizLead({ ...body, frequency: 'hourly' })).status).toBe(400);
+        const malformed = await quizLeadPost(
+            new NextRequest('https://example.org/api/quiz-lead', {
+                method: 'POST',
+                headers: { 'x-forwarded-for': '198.51.100.1' },
+                body: 'not-json{',
+            })
+        );
+        expect(malformed.status).toBe(400);
+        expect(h.upsertSelectSingle).not.toHaveBeenCalled();
+        expect(h.resendSend).not.toHaveBeenCalled();
+    });
 });
 
 describe('POST /api/contact throttling (S-3)', () => {
@@ -154,5 +175,11 @@ describe('POST /api/contact throttling (S-3)', () => {
         for (let i = 0; i < 3; i++) await postContact(body);
         const res = await postContact({ name: 'Other', email: 'other@example.org', message: 'hi' }, '203.0.113.200');
         expect(res.status).toBe(200);
+    });
+
+    it('S-12: invalid email and oversized message return 400 and send no mail', async () => {
+        expect((await postContact({ ...body, email: 'nope' })).status).toBe(400);
+        expect((await postContact({ ...body, message: 'x'.repeat(5001) })).status).toBe(400);
+        expect(h.resendSend).not.toHaveBeenCalled();
     });
 });

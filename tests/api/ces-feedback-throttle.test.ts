@@ -75,4 +75,18 @@ describe('ces-feedback throttling (S-11)', () => {
         expect(res.status).toBe(400);
         expect(h.insertSelectSingle).not.toHaveBeenCalled();
     });
+
+    it('S-12: malformed JSON and oversized reason return 400 with no write', async () => {
+        const malformed = await POST(
+            new NextRequest('https://example.org/api/ces-feedback', {
+                method: 'POST',
+                headers: { 'x-forwarded-for': '198.51.100.1' },
+                body: 'not-json{',
+            })
+        );
+        expect(malformed.status).toBe(400);
+        expect((await patch({ session_id: 's-1', reason: 'x'.repeat(501) })).status).toBe(400);
+        expect(h.insertSelectSingle).not.toHaveBeenCalled();
+        expect(h.updateEq).not.toHaveBeenCalled();
+    });
 });

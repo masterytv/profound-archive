@@ -4,9 +4,18 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { z } from 'zod';
 
 // Per-IP throttle (S-1): this route bills OpenAI on every request.
 const RATE_LIMIT = { name: 'chat-compassionate', windowMs: 60_000, max: 10 };
+
+// Request shape (S-12). chatInput is capped — it is embedded and fed to the
+// model verbatim, so an unbounded body is unbounded token spend.
+const BodySchema = z.object({
+    sessionId: z.string().min(1).max(200),
+    chatInput: z.string().min(1).max(4000),
+    test: z.boolean().optional(),
+});
 
 // Initialize OpenAI client lazily to avoid build-time errors
 const getOpenAIClient = () => {
@@ -27,14 +36,14 @@ export async function POST(req: NextRequest) {
 
     try {
         const supabase = getServiceClient();
-        const { sessionId, chatInput, test } = await req.json();
-
-        if (!sessionId || !chatInput) {
+        const parsed = BodySchema.safeParse(await req.json().catch(() => null));
+        if (!parsed.success) {
             return NextResponse.json(
                 { message: 'Missing sessionId or chatInput' },
                 { status: 400 }
             );
         }
+        const { sessionId, chatInput, test } = parsed.data;
 
         // --- DYNAMIC PROMPT LOGIC ---
         let systemPrompt = '';
