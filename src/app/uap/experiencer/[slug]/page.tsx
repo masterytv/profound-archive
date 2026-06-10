@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -562,7 +563,7 @@ export default async function ContacteeProfilePage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "Person",
             name: profile.display_name,

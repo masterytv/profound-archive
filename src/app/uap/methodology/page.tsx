@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -456,7 +457,7 @@ export default function MethodologyPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "WebPage",
             name: "UFO/UAP Research Methodology",

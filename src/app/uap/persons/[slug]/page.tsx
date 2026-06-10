@@ -5,6 +5,7 @@
  * cross-entity links, credibility analysis, and JSON-LD structured data.
  */
 
+import { serializeJsonLd } from '@/lib/json-ld';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -122,7 +123,7 @@ export default async function PersonDetailPage({ params }: { params: Promise<{ s
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <div className="min-h-screen">

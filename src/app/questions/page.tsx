@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import Link from "next/link";
 import {
     ArrowLeft, Heart, Sun, Baby, AlertTriangle, Radio,
@@ -239,7 +240,7 @@ export default async function QuestionsPage() {
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
+                    __html: serializeJsonLd({
                         "@context": "https://schema.org",
                         "@type": "CollectionPage",
                         name: "Questions — What NDEs Tell Us",

@@ -5,6 +5,7 @@
  * cross-entity links, and JSON-LD structured data.
  */
 
+import { serializeJsonLd } from '@/lib/json-ld';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -100,7 +101,7 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ slug
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <div className="min-h-screen">
         <section
           className="border-b border-border/60"

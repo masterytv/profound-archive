@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -83,7 +84,7 @@ export default async function UapLandingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "WebPage",
             name: "UFO & UAP Encounters — AI-Powered Analysis",

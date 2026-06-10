@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
@@ -161,7 +162,7 @@ export default async function BlogSeriesPage({
         <>
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+                dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
             />
 
             <div className="min-h-screen bg-background text-foreground">

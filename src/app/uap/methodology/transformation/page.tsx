@@ -5,6 +5,7 @@
  * assessing aftereffects and life changes following UAP contact.
  */
 
+import { serializeJsonLd } from '@/lib/json-ld';
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Zap, ArrowLeft, AlertTriangle } from "lucide-react";
@@ -246,7 +247,7 @@ export default function TransformationPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "WebPage",
             name: "UAP Contact Transformation Index (CTI)",

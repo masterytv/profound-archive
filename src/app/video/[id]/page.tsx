@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -378,7 +379,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
+                    __html: serializeJsonLd({
                         "@context": "https://schema.org",
                         "@type": "VideoObject",
                         name: video.title ?? "NDE Testimonial Video",
@@ -406,7 +407,7 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
+                    __html: serializeJsonLd({
                         "@context": "https://schema.org",
                         "@type": "BreadcrumbList",
                         itemListElement: [
