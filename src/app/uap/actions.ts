@@ -2,6 +2,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { headers } from 'next/headers';
+import { isRateLimited, getClientIpFromHeaders } from '@/lib/rate-limit';
+
+// Per-IP throttle (S-1 addendum): this server action is a publicly invokable
+// POST endpoint that bills OpenAI. It shares the 'uap-chat' bucket with
+// /api/uap/chat so both UAP chat surfaces draw from one per-IP budget.
+const RATE_LIMIT = { name: 'uap-chat', windowMs: 60_000, max: 10 };
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -41,6 +48,14 @@ CRITICAL RULES:
 export async function getUapChatResponse(question: string): Promise<UapChatResponse> {
   if (!question?.trim()) {
     return { success: false, error: 'Question cannot be empty.' };
+  }
+
+  const ip = getClientIpFromHeaders(await headers());
+  if (isRateLimited(RATE_LIMIT, ip)) {
+    return {
+      success: false,
+      error: "You've sent quite a few messages in a short time. Please wait a minute, then try again.",
+    };
   }
 
   try {

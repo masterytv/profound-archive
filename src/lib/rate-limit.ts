@@ -48,12 +48,17 @@ export function isRateLimited({ name, windowMs, max }: RateLimitOptions, key: st
     return bucket.count > max;
 }
 
-export function getClientIp(req: NextRequest): string {
+/** Works with both NextRequest.headers and next/headers' ReadonlyHeaders (server actions). */
+export function getClientIpFromHeaders(headers: { get(name: string): string | null }): string {
     return (
-        req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-        req.headers.get('x-real-ip') ||
+        headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        headers.get('x-real-ip') ||
         'unknown'
     );
+}
+
+export function getClientIp(req: NextRequest): string {
+    return getClientIpFromHeaders(req.headers);
 }
 
 /**
