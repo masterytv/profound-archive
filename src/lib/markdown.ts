@@ -16,6 +16,35 @@
  * If more complex MDX is needed, install `marked` once npm permissions are resolved.
  */
 
+// ── URL + attribute hardening (IMPROVEMENT_PLAN S-6) ────────────────────────
+// Blog bodies come from an AI pipeline fed with scraped transcripts, so link
+// targets are attacker-influenceable. Only these schemes may reach href/src.
+
+const SAFE_SCHEME = /^(?:https?|mailto):/i;
+
+/**
+ * Returns the URL if it uses an allowed scheme or is root-relative, else null.
+ * Scheme detection runs on a copy stripped of whitespace/control characters,
+ * which browsers ignore inside URLs (defeats `java\nscript:`-style smuggling).
+ */
+function sanitizeUrl(url: string): string | null {
+    const cleaned = url.replace(/[\u0000-\u001F\u007F\s]/g, "");
+    // Root-relative only; '//' is protocol-relative (external) so it doesn't
+    // qualify, and browsers treat '\' as '/' so '/\' is protocol-relative too.
+    if (cleaned.startsWith('/') && !/^\/[/\\]/.test(cleaned)) return url.trim();
+    if (SAFE_SCHEME.test(cleaned)) return url.trim();
+    return null;
+}
+
+function escapeAttr(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 export function markdownToHtml(md: string): string {
     if (!md) return '';
 
@@ -94,10 +123,14 @@ export function markdownToHtml(md: string): string {
     html = html.replace(
         /!\[([^\]]*)\]\(([^)]+)\)/g,
         (_match, alt, url) => {
+            const safeUrl = sanitizeUrl(url);
+            // Disallowed scheme: drop the image, keep the alt text as plain text.
+            if (!safeUrl) return escapeAttr(alt || '');
+            const safeAlt = escapeAttr(alt || '');
             const caption = alt && alt.trim()
-                ? `<figcaption class="text-center text-sm text-slate-500 dark:text-slate-400 mt-3 italic">${alt}</figcaption>`
+                ? `<figcaption class="text-center text-sm text-slate-500 dark:text-slate-400 mt-3 italic">${safeAlt}</figcaption>`
                 : '';
-            return `<figure class="my-8"><img src="${url}" alt="${alt || ''}" class="rounded-xl w-full shadow-md" loading="lazy" />${caption}</figure>`;
+            return `<figure class="my-8"><img src="${escapeAttr(safeUrl)}" alt="${safeAlt}" class="rounded-xl w-full shadow-md" loading="lazy" />${caption}</figure>`;
         }
     );
 
@@ -106,11 +139,14 @@ export function markdownToHtml(md: string): string {
     html = html.replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
         (_match, text, url) => {
-            const isInternal = url.startsWith('/');
+            // Disallowed scheme: neutralize to '#' so the text survives but nothing executes.
+            const safeUrl = sanitizeUrl(url) ?? '#';
+            const href = escapeAttr(safeUrl);
+            const isInternal = safeUrl.startsWith('/') || safeUrl === '#';
             if (isInternal) {
-                return `<a href="${url}" class="text-blue-600 dark:text-blue-400 hover:underline">${text}</a>`;
+                return `<a href="${href}" class="text-blue-600 dark:text-blue-400 hover:underline">${text}</a>`;
             }
-            return `<a href="${url}" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
+            return `<a href="${href}" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
         }
     );
 
