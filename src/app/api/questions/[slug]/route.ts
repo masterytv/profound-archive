@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import { generateHyde, slugToQuestion } from '@/lib/questions/question-utils';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,36 +58,49 @@ interface FilteredChunk {
 const MIN_SIMILARITY_CURATED = 0.50;
 const MIN_SIMILARITY_USER    = 0.50;
 
-// ─── Auto-generation rate limiter ─────────────────────────────────────────────
-// Tracks auto-generated questions in a rolling 1-hour window.
-// When the limit is hit, returns 429 and logs a warning for admins.
-const AUTO_GEN_LIMIT = 10; // max per hour
-const autoGenTimestamps: number[] = [];
+// ─── Auto-generation rate limiter (S-13) ──────────────────────────────────────
+// The global cap is enforced against the database, not process memory: every
+// generation inserts a row into user_questions, so counting rows created in the
+// trailing hour IS the shared store. It survives cold starts and is shared
+// across instances under autoscaling. (The count also includes questions
+// submitted via /api/questions/custom — both paths spend AI credits, so one
+// global generation budget is the point.) A cheap per-IP in-memory limiter
+// runs first so a single client can't even reach the DB check repeatedly.
+const AUTO_GEN_LIMIT = 10; // max per hour, global
+const PER_IP_LIMIT = { name: 'questions-autogen', windowMs: 60_000, max: 5 };
 
-/** Check and record an auto-generation event. Returns true if allowed. */
-function checkAutoGenRateLimit(): boolean {
-    const now = Date.now();
-    const oneHourAgo = now - 3600_000;
-    // Prune expired entries
-    while (autoGenTimestamps.length > 0 && autoGenTimestamps[0] < oneHourAgo) {
-        autoGenTimestamps.shift();
+/**
+ * Global persistent cap. Fails CLOSED on query errors — an unknown count must
+ * not open unbounded paid generation.
+ *
+ * Known bounded race: requests that pass this check concurrently (before any
+ * of their inserts land) can overshoot the cap by the number in flight during
+ * one generation's latency; every overshoot still inserts a row, so the
+ * window self-corrects. Acceptable for a 10/hr spend bound.
+ */
+async function checkAutoGenRateLimit(): Promise<{ allowed: boolean; count: number }> {
+    const oneHourAgo = new Date(Date.now() - 3600_000).toISOString();
+    const { count, error } = await supabase
+        .from('user_questions')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', oneHourAgo);
+
+    if (error) {
+        console.error('[Questions API] Auto-gen limit query failed (failing closed):', error.message);
+        return { allowed: false, count: -1 };
     }
-    if (autoGenTimestamps.length >= AUTO_GEN_LIMIT) {
-        return false;
-    }
-    autoGenTimestamps.push(now);
-    return true;
+    return { allowed: (count ?? 0) < AUTO_GEN_LIMIT, count: count ?? 0 };
 }
 
-/** Log rate limit event so admins are notified (Vercel logs + DB row for admin dashboard) */
-async function notifyAdminsRateLimit(slug: string) {
-    console.warn(`[Questions API] ⚠️ AUTO-GEN RATE LIMIT HIT — slug="${slug}", ${autoGenTimestamps.length} auto-gens in the last hour`);
+/** Log rate limit event so admins are notified (App Hosting logs + DB row for admin dashboard) */
+async function notifyAdminsRateLimit(slug: string, countInWindow: number) {
+    console.warn(`[Questions API] ⚠️ AUTO-GEN RATE LIMIT HIT — slug="${slug}", ${countInWindow} generations in the last hour`);
     try {
         await supabase.from('rate_limit_events').insert({
             endpoint: '/api/questions/[slug]',
             slug,
             event_type: 'auto_gen_question',
-            count_in_window: autoGenTimestamps.length,
+            count_in_window: countInWindow,
             window_hours: 1,
         });
     } catch (err) {
@@ -148,7 +162,7 @@ function deduplicateByVideo(chunks: FilteredChunk[]): VideoGroup[] {
 // ─── GET handler ──────────────────────────────────────────────────────────────
 
 export async function GET(
-    _req: NextRequest,
+    req: NextRequest,
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params;
@@ -197,9 +211,14 @@ export async function GET(
                 // This makes internal links from blog posts "self-healing" — any
                 // /questions/some-slug URL will auto-generate an answer on first visit.
 
-                // Rate limit check — prevent abuse
-                if (!checkAutoGenRateLimit()) {
-                    await notifyAdminsRateLimit(slug);
+                // Rate limit checks — per-IP first (cheap, in-memory), then the
+                // global persistent cap counted from user_questions (S-13).
+                const ipLimited = checkRateLimit(req, PER_IP_LIMIT);
+                if (ipLimited) return ipLimited;
+
+                const autoGen = await checkAutoGenRateLimit();
+                if (!autoGen.allowed) {
+                    await notifyAdminsRateLimit(slug, autoGen.count);
                     return NextResponse.json(
                         { error: 'Too many questions generated recently. Please try again later.' },
                         { status: 429 }
