@@ -18,7 +18,8 @@ jobs:
             HTTP_CODE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST \
               "https://${{ secrets.APP_DIRECT_URL }}/api/scanner/discover" \
               -H "Content-Type: application/json" \
-              -d "{\"secret\": \"${{ secrets.CRON_SECRET }}\"}" \
+              -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+              -d "{}" \
               --max-time 300)
             echo "HTTP Status: $HTTP_CODE"
             cat /tmp/response.txt
