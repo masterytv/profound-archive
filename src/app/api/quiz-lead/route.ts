@@ -13,15 +13,21 @@
 //
 // Uses the service role key to bypass RLS.
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { resend } from "@/lib/email/resend";
 import { WelcomeEmail } from "@/lib/email/templates/WelcomeEmail";
 import { sendFirstStory } from "@/lib/email/sendFirstStory";
 import { render } from "@react-email/render";
+import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
 
 const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
+
+// Throttles (S-3): this route writes rows and sends mail to a caller-supplied
+// address — limit per IP and per target email before any side effect.
+const IP_LIMIT = { name: "quiz-lead-ip", windowMs: 60_000, max: 5 };
+const EMAIL_LIMIT = { name: "quiz-lead-email", windowMs: 3600_000, max: 5 };
 
 function adminClient() {
   return createClient(
@@ -30,12 +36,19 @@ function adminClient() {
   );
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const ipLimited = checkRateLimit(req, IP_LIMIT);
+  if (ipLimited) return ipLimited;
+
   try {
     const { email, archetype, frequency, write_in } = await req.json();
 
     if (!email || !archetype || !frequency) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    if (isRateLimited(EMAIL_LIMIT, String(email).trim().toLowerCase())) {
+      return rateLimitResponse(EMAIL_LIMIT.windowMs);
     }
 
     const supabase = adminClient();

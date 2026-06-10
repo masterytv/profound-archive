@@ -201,7 +201,7 @@ Vitest, in blast-radius order (these run unattended nightly with service-role ke
 ### Phase 8 — Accessibility & UX polish (≈1 day) · fixes U-2, U-3, rest of Q-3
 Form-label pass, axe/Lighthouse audit on live surface, contrast fixes, console.log sweep + lint rule.
 
-**Deliberately deferred (post-launch):** CSP nonces (S-8), monster-file refactors (Q-4), AI-layer robustness backfill on the 9 NDE modules (AI-1, fold into Phase 6 if time), blog-pipeline link-syntax validation + one-time repair of the 112 affected articles (AI-6 — the repair is a bulk prod-DB write, owner-scheduled), `experiencers` page fate (D-3 — needs your call on whether that marketing page has a future, and it gates dropping the last webhook env var).
+**Deliberately deferred (post-launch):** tokenless unsubscribe links — `api/email/send/route.ts:118,168` builds `/unsubscribe?email=…` links that cannot pass the manage-subs GET/POST guards (S-2), so recipients of those sends have a broken unsubscribe path (compliance concern; fix by resolving/generating the lead's `unsubscribe_token` at send time); CSP nonces (S-8), monster-file refactors (Q-4), AI-layer robustness backfill on the 9 NDE modules (AI-1, fold into Phase 6 if time), blog-pipeline link-syntax validation + one-time repair of the 112 affected articles (AI-6 — the repair is a bulk prod-DB write, owner-scheduled), `experiencers` page fate (D-3 — needs your call on whether that marketing page has a future, and it gates dropping the last webhook env var).
 
 ---
 
