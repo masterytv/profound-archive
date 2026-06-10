@@ -100,10 +100,16 @@ describe('GET /api/run-greyson-batch — auth gate (current behavior)', () => {
         expect(h.single).toHaveBeenCalled();
     });
 
-    it('documents current behavior: the 401 body leaks the expected secret length', async () => {
+    it('S-14 regression guard: the 401 body is generic — no credential length or other metadata', async () => {
         const res = await get(VERIFY_URL, { authorization: 'Bearer wrong' });
-        const body = await res.json();
-        expect(body.error).toContain('Expected');
-        expect(body.error).toContain('chars');
+        expect(res.status).toBe(401);
+        expect(await res.json()).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('S-14: the misconfiguration 500 body does not reveal that the secret is missing', async () => {
+        vi.stubEnv('CRON_SECRET', '');
+        const res = await get(VERIFY_URL, { authorization: 'Bearer anything' });
+        expect(res.status).toBe(500);
+        expect(await res.json()).toEqual({ error: 'Server configuration error' });
     });
 });

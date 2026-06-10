@@ -28,11 +28,11 @@ export async function GET(request: Request) {
         if (!isDebug) {
             if (!expectedSecret) {
                 console.error('CRON_SECRET is not set on the server!');
-                return NextResponse.json({ error: 'Unauthorized: Server configuration error (Secret missing)' }, { status: 500 });
+                return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
             }
             if (authHeader !== `Bearer ${expectedSecret}`) {
                 console.warn('Auth token mismatch.');
-                return NextResponse.json({ error: 'Unauthorized: Token mismatch' }, { status: 401 });
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
             }
         }
 
