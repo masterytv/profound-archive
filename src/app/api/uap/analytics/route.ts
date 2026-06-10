@@ -2,27 +2,21 @@
  * UAP Analytics API
  *
  * GET /api/uap/analytics — Returns cross-video analytics JSON.
- * Delegates to shared computeAnalytics() module.
+ * Delegates to shared computeAnalytics() module (the public /uap/intelligence
+ * page calls that module directly and does not go through this route).
  *
- * Auth: requires internal referer or CRON_SECRET.
+ * Auth: CRON_SECRET header only (S-7 — the old Referer branch was
+ * client-spoofable and is not an access control).
  */
 
 import { NextResponse } from 'next/server';
 import { computeAnalytics } from '@/app/uap/intelligence/compute-analytics';
+import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 
 export const revalidate = 86400; // ISR: revalidate once per day
 
 export async function GET(request: Request) {
-  // Auth check — only allow server-side or authorized access
-  const authHeader = request.headers.get('authorization');
-  const referer = request.headers.get('referer') || '';
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  const cronSecret = process.env.CRON_SECRET;
-
-  const isInternalFetch = referer.startsWith(siteUrl) || referer.startsWith('http://localhost');
-  const hasValidSecret = cronSecret && authHeader === `Bearer ${cronSecret}`;
-
-  if (!isInternalFetch && !hasValidSecret) {
+  if (!hasValidCronSecret(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
