@@ -21,6 +21,7 @@ import { researchQuestion, researchGuideTopic, filterOverusedCitations, getCitat
 import { searchNoeticMap } from './blog-research-noeticmap';
 import { generateHeroImage } from './blog-image';
 import { verifyArticle, type ArticleReference } from './blog-verify';
+import { gatePublishStatus } from './content-quality';
 import {
     buildDraftSystemPrompt,
     buildDraftUserPrompt,
@@ -419,11 +420,27 @@ export function sanitizeMarkdownLinks(mdx: string): string {
     // This swallows entire paragraphs into a single broken link.
     // Strategy: detect [text](/known-route followed by space, comma, period, colon,
     // or end-of-string — meaning no actual ID/slug was provided.
+    // Routes cover both domains; optional trailing segments catch stubs like
+    // "(/video/" or "(/video/PARTIAL" left by generation truncation. The
+    // lookahead deliberately excludes ')' so well-formed links never match.
     result = result.replace(
-        /\[([^\]]+)\]\(\/(video|questions|experiencer)(?=[\s,.:;'"]|$)/g,
+        /\[([^\]\n]+)\]\(\/(video|questions|experiencer|uap|blog)((?:\/[\w-]*)*)(?=[\s,.:;!'"]|$)/g,
         (_match, text: string, _route: string) => {
             console.log(`[sanitize-links] Stripped unclosed stub link: [${text}](/${_route}...)`);
             return text;
+        }
+    );
+
+    // ═══ PRE-PASS A2: dangling "](/route..." tails with NO opening bracket ═══
+    // Generation truncation can cut an article mid-link, leaving e.g.
+    // "...deal with this](/video/" with the [text] part absent entirely.
+    // Valid links never match: their target is always followed by ')',
+    // which the lookahead excludes.
+    result = result.replace(
+        /\]\(\/(video|questions|experiencer|uap|blog)(?:\/[\w-]*)*(?=[\s,.:;!'"]|$)/g,
+        () => {
+            console.log(`[sanitize-links] Removed dangling bracketless link tail`);
+            return '';
         }
     );
 
@@ -431,19 +448,24 @@ export function sanitizeMarkdownLinks(mdx: string): string {
     // Claude produces: [text](https://domain.com rest of sentence...
     // The URL has a space, so the ( never properly closes.
     // We capture the URL (up to first space) and the trailing text separately.
+    // Trailing capture is bounded to the same line so a missing ')' can never
+    // swallow a later paragraph's legitimate closing paren. Trailing
+    // punctuation is shaved off the URL before judging it (the model often
+    // welds a comma/period onto the domain: "https://pmc.ncbi.nlm.nih.gov,").
     result = result.replace(
-        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\s([^)]*?)(?:\)|$)/g,
+        /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\s([^)\n]*?)(?:\)|(?=\n)|(?=\s\[[^\]\n]+\]\()|$)/g,
         (_match, text: string, url: string, trailingText: string) => {
+            const cleanUrl = url.replace(/[.,;:]+$/, '');
             // If the URL itself looks complete (has a path), rescue as proper link + trailing text
             try {
-                const parsed = new URL(url);
+                const parsed = new URL(cleanUrl);
                 if (parsed.pathname !== '/' && parsed.pathname !== '') {
-                    console.log(`[sanitize-links] Rescued truncated link, kept URL: [${text}](${url})`);
-                    return `[${text}](${url})${trailingText ? ' ' + trailingText.trim() : ''}`;
+                    console.log(`[sanitize-links] Rescued truncated link, kept URL: [${text}](${cleanUrl})`);
+                    return `[${text}](${cleanUrl})${trailingText ? ' ' + trailingText.trim() : ''}`;
                 }
             } catch { /* fall through to strip */ }
             // Domain-only or malformed — strip link, keep all text
-            console.log(`[sanitize-links] Stripped unclosed external link: [${text}](${url}...)`);
+            console.log(`[sanitize-links] Stripped unclosed external link: [${text}](${cleanUrl}...)`);
             return `${text} ${trailingText}`.trim();
         }
     );
@@ -452,10 +474,11 @@ export function sanitizeMarkdownLinks(mdx: string): string {
     // LLMs sometimes produce hybrid markdown/HTML like:
     //   [quote text](/video/ID?t=33" class="text-blue-600 dark:text-blue-400 hover:underline">Anchor Text
     // This regex matches [text](url" followed by HTML attributes and strips them,
-    // keeping only [text](clean-url). The leaked ">Anchor Text" tail is also removed.
+    // keeping only [text](clean-url). Handles both the closed variant ...url")
+    // and the unclosed one that ends at ">" or end-of-line (observed in prod).
     result = result.replace(
-        /\[([^\]]+)\]\(([^")\s]+)"[^)]*\)(?:>([^,.\n]*?)(?=[,.\s]|$))?/g,
-        (_match, linkText: string, cleanUrl: string, _leakedTail: string) => {
+        /\[([^\]\n]+)\]\(([^")\s\n]+)"[^)>\n]*(?:\)>?|>|(?=\n)|$)/g,
+        (_match, linkText: string, cleanUrl: string) => {
             console.log(`[sanitize-links] Stripped HTML attributes from link URL: "${cleanUrl}"`);
             return `[${linkText}](${cleanUrl.trim()})`;
         }
@@ -487,6 +510,20 @@ export function sanitizeMarkdownLinks(mdx: string): string {
         }
     );
 
+    // ═══ Protect well-formed links from the lossy passes below ═══
+    // Pass 2 historically matched paths INSIDE valid URLs — it stripped the
+    // slug out of [text](/questions/real-slug), leaving "](/questions." litter
+    // (observed across published articles). Tokenize valid links first; the
+    // lossy passes then operate only on genuinely broken constructs.
+    const protectedLinks: string[] = [];
+    result = result.replace(
+        /\[[^\]\n]+\]\((?:https?:\/\/[^\s)]+|\/[^\s)]+|#[^\s)]*|mailto:[^\s)]+)\)/g,
+        (wholeLink) => {
+            protectedLinks.push(wholeLink);
+            return `\u0000L${protectedLinks.length - 1}\u0000`;
+        }
+    );
+
     // Pass 2: Detect URL fragments leaked into anchor text.
     // Pattern: text immediately followed by a URL-path fragment like
     // "07100-8/fulltext)" or "articles/PMC123456)"
@@ -502,6 +539,11 @@ export function sanitizeMarkdownLinks(mdx: string): string {
             return _match;
         }
     );
+
+    // Restore protected links — Passes 3-5 must see them again (Pass 4 converts
+    // YouTube URLs, Pass 5 strips stub/domain-only targets), and none of those
+    // passes corrupt well-formed constructs the way Pass 2 did.
+    result = result.replace(/\u0000L(\d+)\u0000/g, (_m, i: string) => protectedLinks[Number(i)]);
 
     // Pass 3: Remove any remaining markdown links with clearly broken URLs
     // (URLs not starting with http, /, or #)
@@ -602,6 +644,9 @@ async function publishDraft(
 ): Promise<{ id: number; slug: string }> {
     const supabase = getSupabaseAdmin();
 
+    // Quality gate (AI-6): damaged bodies are held as drafts, never published.
+    const gate = gatePublishStatus(draft.body_mdx, draft.slug);
+
     const { data, error } = await supabase
         .from('blog_posts')
         .insert({
@@ -610,7 +655,7 @@ async function publishDraft(
             subtitle: draft.subtitle,
             category: 'big-question',
             author_name: context.authorName,
-            status: 'published',
+            status: gate.status,
             published_at: new Date().toISOString(),  // prevent Unix epoch 1969 default
             lead_paragraph: stripMarkdownLinks(draft.lead_paragraph),
             body_mdx: draft.body_mdx,

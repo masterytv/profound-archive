@@ -17,6 +17,7 @@ import { researchQuestion, filterOverusedCitations, getCitationUsageCounts, type
 import { generateHeroImage } from './blog-image';
 import { verifyArticle, type ArticleReference } from './blog-verify';
 import { sanitizeMarkdownLinks, stripMarkdownLinks } from './blog-article';
+import { gatePublishStatus } from './content-quality';
 import {
     buildUapDraftSystemPrompt,
     buildUapDraftUserPrompt,
@@ -324,6 +325,9 @@ async function publishUapDraft(
 ): Promise<{ id: number; slug: string }> {
     const supabase = getSupabaseAdmin();
 
+    // Quality gate (AI-6): damaged bodies are held as drafts, never published.
+    const gate = gatePublishStatus(draft.body_mdx, draft.slug);
+
     const { data, error } = await supabase
         .from('blog_posts')
         .insert({
@@ -332,7 +336,7 @@ async function publishUapDraft(
             subtitle: draft.subtitle,
             category: 'big-question',
             author_name: context.authorName,
-            status: 'published',
+            status: gate.status,
             published_at: new Date().toISOString(),
             lead_paragraph: stripMarkdownLinks(draft.lead_paragraph),
             body_mdx: draft.body_mdx,
