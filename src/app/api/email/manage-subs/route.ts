@@ -63,9 +63,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { email, updates } = await req.json() as {
+  const { email, updates, token } = await req.json() as {
     email: string;
     updates: { archetype: string; active: boolean; frequency?: string }[];
+    token?: string;
   };
 
   if (!email || !updates?.length) {
@@ -73,6 +74,23 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = adminClient();
+
+  // Security (S-2): mutating subscription state requires proof of control over
+  // the target email — an unsubscribe token belonging to it (mirrors the GET
+  // guard) — or an authenticated admin session.
+  let authorized = false;
+  if (token) {
+    const { data: verify } = await supabase
+      .from("quiz_leads")
+      .select("email")
+      .eq("unsubscribe_token", token)
+      .eq("email", email)
+      .maybeSingle();
+    authorized = !!verify;
+  }
+  if (!authorized && !(await isAdminUser())) {
+    return NextResponse.json({ error: "Unauthorized — token or admin session required" }, { status: 401 });
+  }
 
   // Apply each update using service role (bypasses RLS)
   const results = await Promise.all(
