@@ -140,6 +140,7 @@ The pipeline calls are all OpenAI via a lazy `getOpenAIClient()`. The newer UAP 
 | AI-3 | Medium | JSON "repair" can publish a semantically-truncated story | `src/lib/pipeline/blog-story.ts:438-458` | On parse failure a regex appends braces/quotes and re-parses, still cast unvalidated → a draft cut mid-sentence (missing fields, truncated body) can reach a published public blog story. | Validate required fields + minimum body length after any repair; reject instead of publishing. |
 | AI-4 | Low | No timeout / AbortController / explicit retry on any `src/lib/ai/` call | all of `src/lib/ai/` | Only the OpenAI SDK defaults apply (≈10-min timeout); a hung call stalls an unattended nightly batch for minutes. | Set per-call `timeout` / `maxRetries` at client init. |
 | AI-5 | Low | UAP system prompt duplicated in two files | `api/uap/chat/route.ts:19`, `src/app/uap/actions.ts:26` | Drift between the popup chat and the `/uap/chat` page chat behavior. | Extract a single shared constant. |
+| AI-6 | Medium | Blog pipeline emits malformed link constructs; **112 of 174** stored `blog_posts.body_mdx` rows contain at least one (found 2026-06-10 during the S-6 fix, via a read-only render sweep of all bodies) | generator: `src/lib/pipeline/blog-story.ts` / `blog-article.ts` link+citation handling (relates to AI-2/AI-3); data: `blog_posts.body_mdx` | Constructs like `[text](/video puts it bluntly:` (missing closing paren / spaces in URL) render as visible literal text in published articles — bounded and harmless since the S-6 follow-up fix in `src/lib/markdown.ts`, but unprofessional. Pre-existing on production too. | Two-part follow-up, post-Phase-1: ① validate/repair link syntax in the pipeline before saving so new articles can't ship malformed links (fold into the AI-2/AI-3 zod work); ② one-time content-repair pass over the 112 affected rows — **bulk write to the shared prod DB; owner schedules and supervises it deliberately**. |
 
 **Model exposure (for context, ties to S-1/S-13):** the repo's highest-cost model `gpt-5-chat-latest` sits on the unauthenticated `api/chat-compassionate` POST (S-1); `anthropic/claude-sonnet-4-5` is reachable from the public `questions/[slug]` GET (S-13). No stale/nonexistent model IDs were found.
 
@@ -200,7 +201,7 @@ Vitest, in blast-radius order (these run unattended nightly with service-role ke
 ### Phase 8 — Accessibility & UX polish (≈1 day) · fixes U-2, U-3, rest of Q-3
 Form-label pass, axe/Lighthouse audit on live surface, contrast fixes, console.log sweep + lint rule.
 
-**Deliberately deferred (post-launch):** CSP nonces (S-8), monster-file refactors (Q-4), AI-layer robustness backfill on the 9 NDE modules (AI-1, fold into Phase 6 if time), `experiencers` page fate (D-3 — needs your call on whether that marketing page has a future, and it gates dropping the last webhook env var).
+**Deliberately deferred (post-launch):** CSP nonces (S-8), monster-file refactors (Q-4), AI-layer robustness backfill on the 9 NDE modules (AI-1, fold into Phase 6 if time), blog-pipeline link-syntax validation + one-time repair of the 112 affected articles (AI-6 — the repair is a bulk prod-DB write, owner-scheduled), `experiencers` page fate (D-3 — needs your call on whether that marketing page has a future, and it gates dropping the last webhook env var).
 
 ---
 
