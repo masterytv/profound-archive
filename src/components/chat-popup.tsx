@@ -215,6 +215,14 @@ export default function ChatPopup() {
             })
 
             if (!response.ok) {
+                // Rate limited (S-1): tell the user to slow down instead of showing a generic error.
+                if (response.status === 429) {
+                    setMessages((prev) => [
+                        ...prev,
+                        { role: "assistant", content: "You've sent quite a few messages in a short time. Please wait a minute, then try again." },
+                    ])
+                    return
+                }
                 const errorText = await response.text()
                 throw new Error(`HTTP ${response.status}: ${errorText}`)
             }
