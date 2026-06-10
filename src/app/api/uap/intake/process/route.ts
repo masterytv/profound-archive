@@ -11,6 +11,7 @@
  * Auth: Admin session (cookie) OR CRON_SECRET bearer token.
  */
 
+import { isDebugBypass } from '@/lib/debug-mode';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
@@ -36,7 +37,7 @@ async function checkAuth(request: Request): Promise<boolean> {
     }
 
     // Method 2: Debug mode bypass
-    if (process.env.IS_DEBUG_MODE) {
+    if (isDebugBypass()) {
         return true;
     }
 

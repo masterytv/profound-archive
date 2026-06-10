@@ -13,6 +13,7 @@
  * Auth: CRON_SECRET bearer token
  */
 
+import { isDebugBypass } from '@/lib/debug-mode';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
   // Auth check — CRON_SECRET only
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  const isDebug = process.env.IS_DEBUG_MODE;
+  const isDebug = isDebugBypass();
 
   if (!isDebug && (!cronSecret || authHeader !== `Bearer ${cronSecret}`)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

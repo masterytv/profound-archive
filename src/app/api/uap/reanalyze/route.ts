@@ -10,6 +10,7 @@
  * This bypasses the tsx EPERM issue by running inside the Next.js dev server process.
  */
 
+import { isDebugBypass } from '@/lib/debug-mode';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
@@ -38,7 +39,7 @@ async function checkAuth(request: Request): Promise<boolean> {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret && authHeader === `Bearer ${cronSecret}`) return true;
-  if (process.env.IS_DEBUG_MODE) return true;
+  if (isDebugBypass()) return true;
 
   try {
     const cookieStore = await cookies();
