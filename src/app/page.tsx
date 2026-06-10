@@ -77,7 +77,7 @@ export default async function HomePage() {
         />
         <div className="relative container mx-auto px-4 pt-20 pb-12 max-w-5xl text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-6 leading-[1.1]">
-            The Next Frontier in<br />
+            A New Frontier in<br />
             <span className="bg-gradient-to-r from-violet-500 to-emerald-500 bg-clip-text text-transparent">Consciousness</span><br />
             Research
           </h1>
