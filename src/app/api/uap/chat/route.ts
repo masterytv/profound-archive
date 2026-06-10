@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit } from '@/lib/rate-limit';
+
+// Per-IP throttle (S-1): this route bills OpenAI on every request.
+const RATE_LIMIT = { name: 'uap-chat', windowMs: 60_000, max: 10 };
 
 // Initialize OpenAI client lazily to avoid build-time errors
 const getOpenAIClient = () => {
@@ -50,6 +54,9 @@ Here are excerpts from UAP video testimonies and research content relevant to th
 `;
 
 export async function POST(req: NextRequest) {
+    const limited = checkRateLimit(req, RATE_LIMIT);
+    if (limited) return limited;
+
     try {
         const supabase = getServiceClient();
         const { sessionId, chatInput } = await req.json();
