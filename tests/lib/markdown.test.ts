@@ -29,22 +29,55 @@ describe('markdownToHtml — sanitization (current behavior)', () => {
         expect(out).not.toContain('onerror');
     });
 
-    it('documents S-6: the javascript: URL scheme passes into link hrefs unsanitized', () => {
-        // CURRENT (vulnerable) behavior — the renderer does not validate URL schemes.
-        // Quirk: the URL regex stops at the first ')', so 'javascript:alert(1)' is
-        // truncated to 'javascript:alert(1' — but the scheme itself still lands in
-        // href, and payloads without parens (e.g. 'javascript:alert`1`') survive
-        // intact. After the Phase 1 fix these must expect the link to be neutralized.
+    it('S-6 regression guard: javascript: links are neutralized to href="#" but keep their text', () => {
         const truncated = markdownToHtml('[click me](javascript:alert(1))');
-        expect(truncated).toContain('href="javascript:alert(1"');
+        expect(truncated).not.toContain('javascript:');
+        expect(truncated).toContain('href="#"');
+        expect(truncated).toContain('click me');
 
         const intact = markdownToHtml('[click me](javascript:window.location=document.cookie)');
-        expect(intact).toContain('href="javascript:window.location=document.cookie"');
+        expect(intact).not.toContain('javascript:');
+        expect(intact).toContain('href="#"');
     });
 
-    it('documents S-6: the javascript: URL scheme passes into image srcs unsanitized', () => {
+    it('S-6 regression guard: disallowed schemes and smuggled variants are all neutralized', () => {
+        for (const url of [
+            'javascript:alert`1`',
+            'JaVaScRiPt:alert`1`',
+            'java\nscript:alert`1`',
+            'java\tscript:alert`1`',
+            'data:text/html,<script>alert(1)</script>',
+            'vbscript:msgbox',
+            '//evil.example.com/x',
+            // Browsers normalize '\' to '/' in URLs, so these are protocol-relative.
+            '/\\evil.example.com/x',
+            '/\\\\evil.example.com/x',
+        ]) {
+            const out = markdownToHtml(`[text](${url})`);
+            expect(out, `URL should be neutralized: ${JSON.stringify(url)}`).toContain('href="#"');
+            expect(out).not.toMatch(/href="(?!#)/);
+        }
+    });
+
+    it('S-6 regression guard: javascript: image srcs are dropped, keeping alt as plain text', () => {
         const out = markdownToHtml('![alt text](javascript:window.location=document.cookie)');
-        expect(out).toContain('src="javascript:window.location=document.cookie"');
+        expect(out).not.toContain('javascript:');
+        expect(out).not.toContain('<img');
+        expect(out).toContain('alt text');
+    });
+
+    it('S-6 regression guard: quotes in URLs cannot break out of the href attribute', () => {
+        const out = markdownToHtml('[x](https://example.com/" style="position:fixed)');
+        expect(out).not.toMatch(/style="/);
+        expect(out).toContain('&quot;');
+    });
+
+    it('S-6: allowed URL forms still render as real links/images', () => {
+        expect(markdownToHtml('[a](https://example.com/page)')).toContain('href="https://example.com/page"');
+        expect(markdownToHtml('[a](http://example.com)')).toContain('href="http://example.com"');
+        expect(markdownToHtml('[a](mailto:hi@example.com)')).toContain('href="mailto:hi@example.com"');
+        expect(markdownToHtml('[a](/blog/post)')).toContain('href="/blog/post"');
+        expect(markdownToHtml('![pic](https://example.com/i.png)')).toContain('src="https://example.com/i.png"');
     });
 });
 
