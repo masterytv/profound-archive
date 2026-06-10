@@ -1,3 +1,4 @@
+import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { runProcessTick } from '@/lib/scanner/tick';
@@ -20,11 +21,9 @@ import { runProcessTick } from '@/lib/scanner/tick';
  * Secured with CRON_SECRET.
  */
 async function handleProcess(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
     const body = await req.json().catch(() => ({}));
-    const secret = searchParams.get('secret') || body.secret;
-
-    if (secret !== process.env.CRON_SECRET) {
+    // Header-only credential (S-5): never via query string or body.
+    if (!hasValidCronSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

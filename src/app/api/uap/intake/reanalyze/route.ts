@@ -1,3 +1,4 @@
+import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { analyzeUapPhenomenology } from '@/lib/ai/uap-phenomenology';
@@ -13,16 +14,17 @@ export const dynamic = 'force-dynamic';
  * Re-runs selected analysis passes without full pipeline reset.
  * Timestamps are added deterministically via caption segment matching (not LLM).
  *
- * Body: { videoId: string, secret: string, passes?: ('phenomenology' | 'encounter_context' | 'program_intel')[] }
+ * Auth: x-cron-secret or Authorization Bearer header (S-5)
+ * Body: { videoId: string, passes?: ('phenomenology' | 'encounter_context' | 'program_intel')[] }
  * Default passes: ['phenomenology', 'encounter_context', 'program_intel']
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { videoId, secret, passes = ['phenomenology', 'encounter_context', 'program_intel'] } = body;
+    const { videoId, passes = ['phenomenology', 'encounter_context', 'program_intel'] } = body;
 
-    // Auth check
-    if (secret !== process.env.CRON_SECRET) {
+    // Auth check — header-only credential (S-5)
+    if (!hasValidCronSecret(request)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
