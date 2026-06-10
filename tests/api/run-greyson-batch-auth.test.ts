@@ -1,0 +1,95 @@
+/**
+ * Characterization tests for the CRON_SECRET auth gate on a representative
+ * AI batch route (GET /api/run-greyson-batch). The same pattern guards the
+ * other run-*-batch routes.
+ *
+ * Includes a pinned test for the IS_DEBUG_MODE truthiness bypass
+ * (docs/IMPROVEMENT_PLAN.md S-4): today, ANY non-empty value — including the
+ * string "false" — disables auth entirely. When S-4 is fixed, flip that test.
+ */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+const h = vi.hoisted(() => ({
+    single: vi.fn(),
+}));
+
+vi.mock('@/lib/ai/greyson', () => ({
+    analyzeGreysonScore: vi.fn(),
+}));
+
+vi.mock('@supabase/supabase-js', () => ({
+    createClient: vi.fn(() => ({
+        from: vi.fn(() => ({
+            select: vi.fn(() => ({
+                eq: vi.fn(() => ({ single: h.single })),
+            })),
+        })),
+    })),
+}));
+
+import { GET } from '@/app/api/run-greyson-batch/route';
+
+// verify=true short-circuits into a single read — lets us prove the auth gate's
+// pass/fail behavior without executing the whole batch pipeline.
+const VERIFY_URL = 'https://example.org/api/run-greyson-batch?verify=true&videoId=vid-1';
+
+const get = (url: string, headers: Record<string, string> = {}) =>
+    GET(new Request(url, { headers }));
+
+beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.stubEnv('CRON_SECRET', 'test-cron-secret');
+    delete process.env.IS_DEBUG_MODE;
+    h.single.mockResolvedValue({ data: { video_id: 'vid-1', greyson_score: 17 }, error: null });
+});
+
+afterEach(() => {
+    vi.unstubAllEnvs();
+    delete process.env.IS_DEBUG_MODE;
+});
+
+describe('GET /api/run-greyson-batch — auth gate (current behavior)', () => {
+    it('rejects requests with no Authorization header (401)', async () => {
+        const res = await get(VERIFY_URL);
+        expect(res.status).toBe(401);
+        expect(h.single).not.toHaveBeenCalled();
+    });
+
+    it('rejects requests with a wrong bearer token (401)', async () => {
+        const res = await get(VERIFY_URL, { authorization: 'Bearer wrong-secret' });
+        expect(res.status).toBe(401);
+        expect(h.single).not.toHaveBeenCalled();
+    });
+
+    it('accepts the correct Bearer CRON_SECRET', async () => {
+        const res = await get(VERIFY_URL, { authorization: 'Bearer test-cron-secret' });
+        expect(res.status).toBe(200);
+        expect((await res.json()).message).toBe('Verification Fetch');
+        expect(h.single).toHaveBeenCalled();
+    });
+
+    it('returns 500 when CRON_SECRET is not configured on the server', async () => {
+        vi.stubEnv('CRON_SECRET', '');
+        const res = await get(VERIFY_URL, { authorization: 'Bearer anything' });
+        expect(res.status).toBe(500);
+    });
+
+    it('documents S-4: IS_DEBUG_MODE="false" (any non-empty value) bypasses auth completely', async () => {
+        // CURRENT (vulnerable) behavior — truthiness check, not === 'true',
+        // and no NODE_ENV gate. After the Phase 1 fix this must become a 401.
+        vi.stubEnv('IS_DEBUG_MODE', 'false');
+        const res = await get(VERIFY_URL, { authorization: 'Bearer totally-wrong' });
+        expect(res.status).toBe(200);
+        expect(h.single).toHaveBeenCalled();
+    });
+
+    it('documents current behavior: the 401 body leaks the expected secret length', async () => {
+        const res = await get(VERIFY_URL, { authorization: 'Bearer wrong' });
+        const body = await res.json();
+        expect(body.error).toContain('Expected');
+        expect(body.error).toContain('chars');
+    });
+});
