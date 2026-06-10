@@ -5,6 +5,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resend, EMAIL_FROM } from "@/lib/email/resend";
 import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
+import { z } from "zod";
+
+// Request shape (S-12). Field caps bound the forwarded email's size.
+const BodySchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  email: z.string().trim().email().max(320),
+  message: z.string().trim().min(1).max(5000),
+});
 
 const CONTACT_TO = "tom@projectprofound.org";
 
@@ -17,13 +25,13 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
 
   try {
-    const { name, email, message } = await req.json();
-
-    if (!name || !email || !message) {
+    const parsed = BodySchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
+    const { name, email, message } = parsed.data;
 
-    if (isRateLimited(EMAIL_LIMIT, String(email).trim().toLowerCase())) {
+    if (isRateLimited(EMAIL_LIMIT, email.toLowerCase())) {
       return rateLimitResponse(EMAIL_LIMIT.windowMs);
     }
 

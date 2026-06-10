@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isAdminUser } from "@/lib/auth/admin-guard";
+import { z } from "zod";
+
+// POST request shape (S-12).
+const PostSchema = z.object({
+  email: z.string().trim().email().max(320),
+  token: z.string().min(1).max(200).optional(),
+  updates: z
+    .array(
+      z.object({
+        archetype: z.string().min(1).max(100),
+        active: z.boolean(),
+        frequency: z.enum(["daily", "3day", "weekly", "monthly"]).optional(),
+      })
+    )
+    .min(1)
+    .max(50),
+});
 
 function adminClient() {
   return createClient(
@@ -63,15 +80,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { email, updates, token } = await req.json() as {
-    email: string;
-    updates: { archetype: string; active: boolean; frequency?: string }[];
-    token?: string;
-  };
-
-  if (!email || !updates?.length) {
+  const parsed = PostSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
+  const { email, updates, token } = parsed.data;
 
   const supabase = adminClient();
 

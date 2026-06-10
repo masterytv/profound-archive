@@ -21,6 +21,18 @@ import { WelcomeEmail } from "@/lib/email/templates/WelcomeEmail";
 import { sendFirstStory } from "@/lib/email/sendFirstStory";
 import { render } from "@react-email/render";
 import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
+import { z } from "zod";
+
+// Request shape (S-12). archetype stays a bounded string (compass archetypes,
+// newsletter_* lists, and admin test sends all flow through here).
+const BodySchema = z.object({
+  email: z.string().trim().email().max(320),
+  archetype: z.string().min(1).max(100),
+  frequency: z.enum(["daily", "3day", "weekly", "monthly"]),
+  // Truncate rather than reject: the quiz UI invites unbounded write-ins, and
+  // an over-long optional note must never cost us the email capture.
+  write_in: z.string().transform((s) => s.slice(0, 500)).optional(),
+});
 
 const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
 
@@ -41,13 +53,13 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
 
   try {
-    const { email, archetype, frequency, write_in } = await req.json();
-
-    if (!email || !archetype || !frequency) {
+    const parsed = BodySchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
+    const { email, archetype, frequency, write_in } = parsed.data;
 
-    if (isRateLimited(EMAIL_LIMIT, String(email).trim().toLowerCase())) {
+    if (isRateLimited(EMAIL_LIMIT, email.toLowerCase())) {
       return rateLimitResponse(EMAIL_LIMIT.windowMs);
     }
 
