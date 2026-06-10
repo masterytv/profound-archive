@@ -28,6 +28,9 @@ const SAFE_SCHEME = /^(?:https?|mailto):/i;
  * which browsers ignore inside URLs (defeats `java\nscript:`-style smuggling).
  */
 function sanitizeUrl(url: string): string | null {
+    // A URL with interior whitespace is malformed source, not a URL. Rejecting
+    // it here keeps multi-paragraph text from ever becoming an href/src value.
+    if (/\s/.test(url.trim())) return null;
     const cleaned = url.replace(/[\u0000-\u001F\u007F\s]/g, "");
     // Root-relative only; '//' is protocol-relative (external) so it doesn't
     // qualify, and browsers treat '\' as '/' so '/\' is protocol-relative too.
@@ -120,8 +123,12 @@ export function markdownToHtml(md: string): string {
     html = html.replace(/`([^`]+)`/g, '<code class="bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-slate-800 dark:text-slate-200">$1</code>');
 
     // Images ![alt](url) — MUST come before links to avoid matching as broken link with stray `!`
+    // Alt must not span lines and the URL must not contain whitespace: AI-generated
+    // bodies sometimes contain unclosed `](` constructs, and a greedy match would
+    // swallow whole paragraphs into the attribute (S-6 follow-up). Malformed
+    // constructs are left as literal text instead.
     html = html.replace(
-        /!\[([^\]]*)\]\(([^)]+)\)/g,
+        /!\[([^\]\n]*)\]\(([^)\s]+)\)/g,
         (_match, alt, url) => {
             const safeUrl = sanitizeUrl(url);
             // Disallowed scheme: drop the image, keep the alt text as plain text.
@@ -136,8 +143,9 @@ export function markdownToHtml(md: string): string {
 
     // Links [text](url) — MUST come before bold/italic to protect underscores in URLs
     // Internal links (starting with /) stay in same tab; external links open in new tab
+    // Text must not span lines and the URL must not contain whitespace (see image note).
     html = html.replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
+        /\[([^\]\n]+)\]\(([^)\s]+)\)/g,
         (_match, text, url) => {
             // Disallowed scheme: neutralize to '#' so the text survives but nothing executes.
             const safeUrl = sanitizeUrl(url) ?? '#';
