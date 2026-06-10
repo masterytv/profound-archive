@@ -2,17 +2,29 @@
 // POST /api/contact  { name, email, message }
 // Forwards the message to tom@projectprofound.org via Resend.
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { resend, EMAIL_FROM } from "@/lib/email/resend";
+import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
 
 const CONTACT_TO = "tom@projectprofound.org";
 
-export async function POST(req: Request) {
+// Throttles (S-3): every accepted request sends real mail via Resend.
+const IP_LIMIT = { name: "contact-ip", windowMs: 60_000, max: 3 };
+const EMAIL_LIMIT = { name: "contact-email", windowMs: 3600_000, max: 5 };
+
+export async function POST(req: NextRequest) {
+  const ipLimited = checkRateLimit(req, IP_LIMIT);
+  if (ipLimited) return ipLimited;
+
   try {
     const { name, email, message } = await req.json();
 
     if (!name || !email || !message) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    if (isRateLimited(EMAIL_LIMIT, String(email).trim().toLowerCase())) {
+      return rateLimitResponse(EMAIL_LIMIT.windowMs);
     }
 
     // Security: escape HTML entities to prevent XSS in email HTML

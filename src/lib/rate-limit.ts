@@ -61,16 +61,21 @@ export function getClientIp(req: NextRequest): string {
     return getClientIpFromHeaders(req.headers);
 }
 
+/** Generic 429 response shared by all limiter checks. */
+export function rateLimitResponse(windowMs: number): NextResponse {
+    return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(windowMs / 1000)) } }
+    );
+}
+
 /**
  * Convenience guard for route handlers: returns a generic 429 response when
  * the caller's IP is over the limit, or null to let the request proceed.
  */
 export function checkRateLimit(req: NextRequest, options: RateLimitOptions): NextResponse | null {
     if (!isRateLimited(options, getClientIp(req))) return null;
-    return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429, headers: { 'Retry-After': String(Math.ceil(options.windowMs / 1000)) } }
-    );
+    return rateLimitResponse(options.windowMs);
 }
 
 /** Test-only: clear counters so test files are order-independent. */
