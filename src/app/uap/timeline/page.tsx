@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
@@ -437,7 +438,7 @@ export default async function TimelinePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
             name: "UFO/UAP Timeline",

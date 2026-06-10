@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isAdminUser } from "@/lib/auth/admin-guard";
+import { z } from "zod";
+
+// POST request shape (S-12).
+const PostSchema = z.object({
+  email: z.string().trim().email().max(320),
+  token: z.string().min(1).max(200).optional(),
+  updates: z
+    .array(
+      z.object({
+        archetype: z.string().min(1).max(100),
+        active: z.boolean(),
+        frequency: z.enum(["daily", "3day", "weekly", "monthly"]).optional(),
+      })
+    )
+    .min(1)
+    .max(50),
+});
 
 function adminClient() {
   return createClient(
@@ -63,16 +80,30 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { email, updates } = await req.json() as {
-    email: string;
-    updates: { archetype: string; active: boolean; frequency?: string }[];
-  };
-
-  if (!email || !updates?.length) {
+  const parsed = PostSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
+  const { email, updates, token } = parsed.data;
 
   const supabase = adminClient();
+
+  // Security (S-2): mutating subscription state requires proof of control over
+  // the target email — an unsubscribe token belonging to it (mirrors the GET
+  // guard) — or an authenticated admin session.
+  let authorized = false;
+  if (token) {
+    const { data: verify } = await supabase
+      .from("quiz_leads")
+      .select("email")
+      .eq("unsubscribe_token", token)
+      .eq("email", email)
+      .maybeSingle();
+    authorized = !!verify;
+  }
+  if (!authorized && !(await isAdminUser())) {
+    return NextResponse.json({ error: "Unauthorized — token or admin session required" }, { status: 401 });
+  }
 
   // Apply each update using service role (bypasses RLS)
   const results = await Promise.all(

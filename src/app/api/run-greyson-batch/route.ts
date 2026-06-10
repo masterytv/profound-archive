@@ -1,4 +1,5 @@
 
+import { isDebugBypass } from '@/lib/debug-mode';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { analyzeGreysonScore } from '@/lib/ai/greyson';
@@ -32,12 +33,12 @@ export async function GET(request: Request) {
 
         if (!expectedSecret) {
             console.error('CRON_SECRET is not set on the server!');
-            return NextResponse.json({ error: 'Unauthorized: Server configuration error (Secret missing)' }, { status: 500 });
+            return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
         }
 
-        if (authHeader !== `Bearer ${expectedSecret}` && !process.env.IS_DEBUG_MODE) {
+        if (authHeader !== `Bearer ${expectedSecret}` && !isDebugBypass()) {
             console.warn('Auth token mismatch.');
-            return NextResponse.json({ error: `Unauthorized: Token mismatch (Received ${authHeader?.length || 0} chars, Expected ${expectedSecret.length + 7} chars)` }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         console.log(`Starting Greyson Analysis Batch via API... (Limit: ${limit}, Target: ${targetVideoId || 'None'})`);

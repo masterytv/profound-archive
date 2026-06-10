@@ -1,5 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { z } from 'zod'
+
+// Throttle (S-11): unauthenticated service-role writes — bound junk-data spam.
+// One bucket for POST+PATCH; a normal interaction is one of each.
+const RATE_LIMIT = { name: 'ces-feedback', windowMs: 60_000, max: 10 }
+
+// Request shapes (S-12).
+const PostSchema = z.object({
+  score: z.number().min(0).max(7),
+  session_id: z.string().min(1).max(200),
+  user_id: z.string().max(200).nullish(),
+  path: z.string().max(500).nullish(),
+  source: z.string().max(100).nullish(),
+  feature: z.string().max(100).nullish(),
+  context_id: z.string().max(200).nullish(),
+})
+
+const PatchSchema = z.object({
+  session_id: z.string().min(1).max(200),
+  reason: z.string().max(500).nullish(),
+})
 
 // CES Feedback API — POST to insert score, PATCH to add reason.
 // Uses service client for writes from this server-side API route.
@@ -15,17 +37,15 @@ function getServiceClient() {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = checkRateLimit(req, RATE_LIMIT)
+  if (limited) return limited
+
   try {
-    const body = await req.json()
-    const { score, path, session_id, user_id, source, feature, context_id } = body
-
-    if (typeof score !== 'number' || score < 0 || score > 7) {
-      return NextResponse.json({ error: 'score must be an integer between 0 and 7' }, { status: 400 })
+    const parsed = PostSchema.safeParse(await req.json().catch(() => null))
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
-
-    if (!session_id || typeof session_id !== 'string') {
-      return NextResponse.json({ error: 'session_id is required' }, { status: 400 })
-    }
+    const { score, path, session_id, user_id, source, feature, context_id } = parsed.data
 
     const supabase = getServiceClient()
 
@@ -33,13 +53,13 @@ export async function POST(req: NextRequest) {
       .from('ces_feedback')
       .insert({
         score: Math.round(score),
-        path: typeof path === 'string' ? path.slice(0, 500) : null,
+        path: path ?? null,
         session_id,
         user_id: user_id ?? null,
         phase: 'score_only',
-        source: typeof source === 'string' ? source : 'ces_widget',
-        feature: typeof feature === 'string' ? feature : null,
-        context_id: typeof context_id === 'string' ? context_id : null,
+        source: source ?? 'ces_widget',
+        feature: feature ?? null,
+        context_id: context_id ?? null,
       })
       .select('id, session_id')
       .single()
@@ -57,21 +77,15 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  const limited = checkRateLimit(req, RATE_LIMIT)
+  if (limited) return limited
+
   try {
-    const body = await req.json()
-    const { session_id, reason } = body
-
-    if (!session_id || typeof session_id !== 'string') {
-      return NextResponse.json({ error: 'session_id is required' }, { status: 400 })
+    const parsed = PatchSchema.safeParse(await req.json().catch(() => null))
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
-
-    if (reason !== null && reason !== undefined && typeof reason !== 'string') {
-      return NextResponse.json({ error: 'reason must be a string or null' }, { status: 400 })
-    }
-
-    if (typeof reason === 'string' && reason.length > 500) {
-      return NextResponse.json({ error: 'reason must be 500 characters or fewer' }, { status: 400 })
-    }
+    const { session_id, reason } = parsed.data
 
     const supabase = getServiceClient()
 

@@ -13,15 +13,33 @@
 //
 // Uses the service role key to bypass RLS.
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { resend } from "@/lib/email/resend";
 import { WelcomeEmail } from "@/lib/email/templates/WelcomeEmail";
 import { sendFirstStory } from "@/lib/email/sendFirstStory";
 import { render } from "@react-email/render";
+import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
+import { z } from "zod";
+
+// Request shape (S-12). archetype stays a bounded string (compass archetypes,
+// newsletter_* lists, and admin test sends all flow through here).
+const BodySchema = z.object({
+  email: z.string().trim().email().max(320),
+  archetype: z.string().min(1).max(100),
+  frequency: z.enum(["daily", "3day", "weekly", "monthly"]),
+  // Truncate rather than reject: the quiz UI invites unbounded write-ins, and
+  // an over-long optional note must never cost us the email capture.
+  write_in: z.string().transform((s) => s.slice(0, 500)).optional(),
+});
 
 const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
+
+// Throttles (S-3): this route writes rows and sends mail to a caller-supplied
+// address — limit per IP and per target email before any side effect.
+const IP_LIMIT = { name: "quiz-lead-ip", windowMs: 60_000, max: 5 };
+const EMAIL_LIMIT = { name: "quiz-lead-email", windowMs: 3600_000, max: 5 };
 
 function adminClient() {
   return createClient(
@@ -30,12 +48,19 @@ function adminClient() {
   );
 }
 
-export async function POST(req: Request) {
-  try {
-    const { email, archetype, frequency, write_in } = await req.json();
+export async function POST(req: NextRequest) {
+  const ipLimited = checkRateLimit(req, IP_LIMIT);
+  if (ipLimited) return ipLimited;
 
-    if (!email || !archetype || !frequency) {
+  try {
+    const parsed = BodySchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+    const { email, archetype, frequency, write_in } = parsed.data;
+
+    if (isRateLimited(EMAIL_LIMIT, email.toLowerCase())) {
+      return rateLimitResponse(EMAIL_LIMIT.windowMs);
     }
 
     const supabase = adminClient();

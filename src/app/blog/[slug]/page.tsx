@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
@@ -194,7 +195,7 @@ export default async function BlogPostPage({
             {/* JSON-LD */}
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
             />
 
             {/* FAQPage JSON-LD for guide posts with FAQ data */}
@@ -202,7 +203,7 @@ export default async function BlogPostPage({
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
+                        __html: serializeJsonLd({
                             "@context": "https://schema.org",
                             "@type": "FAQPage",
                             "mainEntity": post.faq_data.map((faq) => ({
@@ -222,7 +223,7 @@ export default async function BlogPostPage({
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
+                    __html: serializeJsonLd({
                         "@context": "https://schema.org",
                         "@type": "BreadcrumbList",
                         itemListElement: [

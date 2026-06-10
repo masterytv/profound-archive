@@ -71,6 +71,7 @@ function UnsubscribeContent() {
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [saving, setSaving]           = useState(false);
   const [saved, setSaved]             = useState(false);
+  const [saveError, setSaveError]     = useState<string | null>(null);
 
   // Local state for all lists, keyed by id
   const [local, setLocal] = useState<Record<string, ListState>>(() =>
@@ -126,18 +127,35 @@ function UnsubscribeContent() {
   async function handleSave() {
     if (!activeEmail) return;
     setSaving(true);
+    setSaveError(null);
     const updates = ALL_LISTS.map(l => ({
       archetype: l.id,
       active: local[l.id]?.active ?? false,
       frequency: local[l.id]?.frequency ?? "weekly",
     }));
-    await fetch("/api/email/manage-subs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: activeEmail, updates }),
-    });
+    try {
+      // The API requires proof of control over the email (S-2): the token from
+      // the email link authorizes the write. Without it, only admins can save.
+      const res = await fetch("/api/email/manage-subs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: activeEmail, updates, token: tokenParam }),
+      });
+      if (res.ok) {
+        setSaved(true);
+      } else {
+        setSaved(false);
+        setSaveError(
+          res.status === 401
+            ? "We couldn't verify this request. Please use the unsubscribe link from one of our emails to manage your subscriptions."
+            : "Something went wrong saving your preferences. Please try again."
+        );
+      }
+    } catch {
+      setSaved(false);
+      setSaveError("Something went wrong saving your preferences. Please try again.");
+    }
     setSaving(false);
-    setSaved(true);
   }
 
   function toggle(id: string) {
@@ -341,7 +359,10 @@ function UnsubscribeContent() {
         </div>
 
         {/* Save */}
-        <div className="sticky bottom-6">
+        <div className="sticky bottom-6 space-y-2">
+          {saveError && (
+            <p className="text-center text-sm text-destructive bg-background/95 rounded-xl px-4 py-2">{saveError}</p>
+          )}
           <button
             onClick={handleSave}
             disabled={saving}

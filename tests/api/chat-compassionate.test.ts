@@ -55,6 +55,7 @@ vi.mock('@supabase/supabase-js', () => ({
 }));
 
 import { POST } from '@/app/api/chat-compassionate/route';
+import { resetRateLimit } from '@/lib/rate-limit';
 
 const post = (body: unknown) =>
     POST(
@@ -66,6 +67,7 @@ const post = (body: unknown) =>
 
 beforeEach(() => {
     vi.clearAllMocks();
+    resetRateLimit();
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
     // Defaults: no DB prompt config (hardcoded fallback), empty history, one RAG hit.
@@ -129,11 +131,42 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
         expect(messages[2]).toEqual({ role: 'assistant', content: 'earlier bot reply' });
     });
 
-    it('documents current behavior: requires NO auth — an anonymous request reaches the paid OpenAI calls (IMPROVEMENT_PLAN S-1)', async () => {
+    it('requires NO auth — a single anonymous request reaches the paid OpenAI calls (rate-limited, not auth-gated; S-1)', async () => {
         const res = await post({ sessionId: 'anon', chatInput: 'anything' });
         expect(res.status).toBe(200);
         expect(h.embeddingsCreate).toHaveBeenCalled();
         expect(h.completionsCreate).toHaveBeenCalled();
+    });
+
+    it('S-1 regression guard: requests beyond the per-IP limit return 429 and never reach the model client', async () => {
+        const LIMIT = 10; // matches RATE_LIMIT.max in the route
+        for (let i = 0; i < LIMIT; i++) {
+            const res = await post({ sessionId: 's-1', chatInput: `msg ${i}` });
+            expect(res.status).toBe(200);
+        }
+        expect(h.completionsCreate).toHaveBeenCalledTimes(LIMIT);
+
+        const blocked = await post({ sessionId: 's-1', chatInput: 'one too many' });
+        expect(blocked.status).toBe(429);
+        expect(blocked.headers.get('Retry-After')).toBe('60');
+        // Generic body — no internal detail.
+        expect(await blocked.json()).toEqual({ error: 'Too many requests. Please try again later.' });
+        // The blocked request must not incur OpenAI spend.
+        expect(h.embeddingsCreate).toHaveBeenCalledTimes(LIMIT);
+        expect(h.completionsCreate).toHaveBeenCalledTimes(LIMIT);
+    });
+
+    it('S-1: the limit is per-IP — a request from a different IP is not blocked by another IP\'s exhausted bucket', async () => {
+        for (let i = 0; i < 11; i++) await post({ sessionId: 's-1', chatInput: `msg ${i}` });
+
+        const res = await POST(
+            new NextRequest('https://example.org/api/chat-compassionate', {
+                method: 'POST',
+                headers: { 'x-forwarded-for': '203.0.113.7' },
+                body: JSON.stringify({ sessionId: 'other', chatInput: 'hello' }),
+            })
+        );
+        expect(res.status).toBe(200);
     });
 
     it('documents current behavior: upstream errors return 500 with the internal error message in the body', async () => {
@@ -146,8 +179,22 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
         expect(body.error).toBe('OpenAI quota exceeded');
     });
 
-    it('documents current behavior: malformed JSON body returns 500 (not 400)', async () => {
+    it('S-12 regression guard: malformed JSON body returns 400 before any side effect', async () => {
         const res = await post('not-json{');
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
+        expect(h.embeddingsCreate).not.toHaveBeenCalled();
+        expect(h.insert).not.toHaveBeenCalled();
+    });
+
+    it('S-12 regression guard: an oversized chatInput returns 400 before any model call', async () => {
+        const res = await post({ sessionId: 's-1', chatInput: 'x'.repeat(4001) });
+        expect(res.status).toBe(400);
+        expect(h.embeddingsCreate).not.toHaveBeenCalled();
+    });
+
+    it('S-12: wrong field types return 400', async () => {
+        const res = await post({ sessionId: 's-1', chatInput: ['not', 'a', 'string'] });
+        expect(res.status).toBe(400);
+        expect(h.embeddingsCreate).not.toHaveBeenCalled();
     });
 });

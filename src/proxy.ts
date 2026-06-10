@@ -2,10 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-    // Debug: log what cookies middleware sees
-    const authCookies = request.cookies.getAll().filter(c => c.name.startsWith('sb-'));
-    console.log(`[proxy] ${request.method} ${request.nextUrl.pathname} | auth cookies: ${authCookies.length > 0 ? authCookies.map(c => `${c.name}=${c.value.substring(0, 20)}...`).join(', ') : 'NONE'}`);
-
+    // S-9: no per-request logging here — session-cookie fragments and user
+    // emails must never be written to hosting logs.
     let supabaseResponse = NextResponse.next({
         request,
     });
@@ -39,8 +37,6 @@ export async function proxy(request: NextRequest) {
     const {
         data: { user },
     } = await supabase.auth.getUser();
-
-    console.log(`[proxy] ${request.nextUrl.pathname} | user: ${user ? user.email : 'NULL'} | response cookies being set: ${supabaseResponse.cookies.getAll().map(c => c.name).join(', ') || 'none'}`);
 
     // Protect Admin Routes
     if (request.nextUrl.pathname.startsWith("/admin")) {

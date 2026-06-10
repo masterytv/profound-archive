@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
@@ -248,8 +249,8 @@ export default async function ExperiencerProfilePage({
 
     return (
         <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
 
             <div className="min-h-screen bg-background text-foreground">
                 {/* Breadcrumb */}

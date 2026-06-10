@@ -2,17 +2,37 @@
 // POST /api/contact  { name, email, message }
 // Forwards the message to tom@projectprofound.org via Resend.
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { resend, EMAIL_FROM } from "@/lib/email/resend";
+import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
+import { z } from "zod";
+
+// Request shape (S-12). Field caps bound the forwarded email's size.
+const BodySchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  email: z.string().trim().email().max(320),
+  message: z.string().trim().min(1).max(5000),
+});
 
 const CONTACT_TO = "tom@projectprofound.org";
 
-export async function POST(req: Request) {
-  try {
-    const { name, email, message } = await req.json();
+// Throttles (S-3): every accepted request sends real mail via Resend.
+const IP_LIMIT = { name: "contact-ip", windowMs: 60_000, max: 3 };
+const EMAIL_LIMIT = { name: "contact-email", windowMs: 3600_000, max: 5 };
 
-    if (!name || !email || !message) {
+export async function POST(req: NextRequest) {
+  const ipLimited = checkRateLimit(req, IP_LIMIT);
+  if (ipLimited) return ipLimited;
+
+  try {
+    const parsed = BodySchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+    const { name, email, message } = parsed.data;
+
+    if (isRateLimited(EMAIL_LIMIT, email.toLowerCase())) {
+      return rateLimitResponse(EMAIL_LIMIT.windowMs);
     }
 
     // Security: escape HTML entities to prevent XSS in email HTML

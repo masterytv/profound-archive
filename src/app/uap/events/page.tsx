@@ -1,6 +1,7 @@
 /**
  * UAP Events Index — Sort & Filter
  */
+import { serializeJsonLd } from '@/lib/json-ld';
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
@@ -229,7 +230,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
         />
       </section>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
         "@context": "https://schema.org", "@type": "CollectionPage",
         name: "Significant UFO & UAP Events", description: "Curated index of major UFO/UAP events cross-referenced with video testimonies",
         url: "https://projectprofound.org/uap/events", numberOfItems: events.length,

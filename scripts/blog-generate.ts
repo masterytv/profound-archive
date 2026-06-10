@@ -22,11 +22,16 @@ import { generateBlogArticle } from '../src/lib/pipeline/blog-article';
 import { generateUapBlogArticle } from '../src/lib/pipeline/uap-blog-article';
 import { generateStoryArticle } from '../src/lib/pipeline/blog-story';
 
-// ── Load .env if not already set ────────────────────────────────────────────
-// tsx doesn't load .env by default — require dotenv if available
+// ── Load env ─────────────────────────────────────────────────────────────────
+// tsx doesn't load env files by default. Like the other Oracle-run scripts
+// (scanner-discover.ts, nde-batch-analysis.ts), load .env.local first — that's
+// the file that exists on the VM. The previous bare config() read only .env,
+// silently loaded nothing, and took nightly blog generation down (2026-05/06).
 try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('dotenv').config();
+    const dotenv = require('dotenv');
+    dotenv.config({ path: require('path').join(process.cwd(), '.env.local') });
+    dotenv.config(); // .env fallback; already-set vars are not overridden
 } catch {
     // dotenv not installed — env vars must be set externally
 }

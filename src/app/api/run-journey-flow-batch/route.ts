@@ -1,4 +1,5 @@
 
+import { isDebugBypass } from '@/lib/debug-mode';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { analyzeJourneyFlow } from '@/lib/ai/journey-flow';
@@ -19,19 +20,19 @@ export async function GET(request: Request) {
         const limitStr = searchParams.get('limit');
         const limit = limitStr ? parseInt(limitStr) : (targetVideoId ? 1 : 3);
 
-        // Security Check — allow IS_DEBUG_MODE to bypass for local dev
+        // Security Check — IS_DEBUG_MODE bypass is non-production only (S-4)
         const authHeader = request.headers.get('authorization');
         const expectedSecret = process.env.CRON_SECRET;
-        const isDebug = !!process.env.IS_DEBUG_MODE;
+        const isDebug = isDebugBypass();
 
         if (!isDebug) {
             if (!expectedSecret) {
                 console.error('CRON_SECRET is not set on the server!');
-                return NextResponse.json({ error: 'Unauthorized: Server configuration error (Secret missing)' }, { status: 500 });
+                return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
             }
             if (authHeader !== `Bearer ${expectedSecret}`) {
                 console.warn('Auth token mismatch.');
-                return NextResponse.json({ error: 'Unauthorized: Token mismatch' }, { status: 401 });
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
             }
         }
 

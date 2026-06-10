@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+// Per-IP throttle (S-1): semantic searches bill OpenAI embeddings.
+const RATE_LIMIT = { name: "uap-search", windowMs: 60_000, max: 30 };
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -20,6 +24,9 @@ function getOpenAIClient() {
 // ─── POST /api/uap/search ───────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const limited = checkRateLimit(req, RATE_LIMIT);
+  if (limited) return limited;
+
   try {
     const {
       searchTerm,

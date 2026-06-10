@@ -24,6 +24,7 @@ import {
     buildAfterlifeEncounterImagePrompt,
 } from './blog-story-prompts';
 import { sanitizeMarkdownLinks, stripMarkdownLinks } from './blog-article';
+import { gatePublishStatus } from './content-quality';
 import { SEO_REFRESH_PROMPT } from './blog-prompts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -639,6 +640,10 @@ async function publishStory(
         }
     }
 
+    const finalBody = sanitizeMarkdownLinks(body);
+    // Quality gate (AI-6): damaged bodies are held as drafts, never published.
+    const gate = gatePublishStatus(finalBody, draft.slug);
+
     const { data, error } = await supabase
         .from('blog_posts')
         .insert({
@@ -647,10 +652,10 @@ async function publishStory(
             subtitle: draft.subtitle,
             category: 'story',
             author_name: 'Thomas Wood',
-            status: 'published',
+            status: gate.status,
             published_at: new Date().toISOString(),
             lead_paragraph: stripMarkdownLinks(draft.lead_paragraph),
-            body_mdx: sanitizeMarkdownLinks(body),
+            body_mdx: finalBody,
             read_time_mins: draft.read_time_mins,
             word_count: draft.word_count,
             tags: draft.tags,

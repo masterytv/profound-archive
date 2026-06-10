@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -457,11 +458,11 @@ export default async function QuestionResultPage({
             {/* ── JSON-LD: FAQPage + BreadcrumbList ────────────────────── */}
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+                dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
             />
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+                dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
             />
 
             {/* ── Breadcrumb ───────────────────────────────────────────── */}

@@ -1,3 +1,4 @@
+import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { buildFingerprint } from "@/lib/ai/fingerprint";
@@ -13,11 +14,8 @@ const supabase = createClient(
  * Protected by CRON_SECRET.
  */
 export async function POST(req: Request) {
-    // Auth check — CRON_SECRET only (no debug bypass)
-    const { searchParams } = new URL(req.url);
-    const secret = searchParams.get("secret") || req.headers.get("x-cron-secret");
-
-    if (secret !== process.env.CRON_SECRET) {
+    // Auth check — CRON_SECRET only, header-only (S-5; no debug bypass)
+    if (!hasValidCronSecret(req)) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

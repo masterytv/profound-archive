@@ -24,15 +24,18 @@ vi.mock('@supabase/ssr', () => ({
 
 import { proxy } from '@/proxy';
 
-// The proxy logs cookies/emails on every request (IMPROVEMENT_PLAN S-9);
-// silence it so test output stays readable. Remove when S-9 is fixed.
-vi.spyOn(console, 'log').mockImplementation(() => {});
+const req = (path: string, headers: Record<string, string> = {}) =>
+    new NextRequest(`https://example.org${path}`, { headers });
 
-const req = (path: string) => new NextRequest(`https://example.org${path}`);
+let logSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
     h.getUser.mockReset();
     h.single.mockReset();
+    // spyOn returns the same mock instance if already spied — clear so call
+    // history never leaks across tests regardless of execution order.
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy.mockClear();
 });
 
 describe('proxy — non-admin paths', () => {
@@ -42,6 +45,23 @@ describe('proxy — non-admin paths', () => {
         expect(res.status).toBe(200);
         expect(res.headers.get('location')).toBeNull();
         expect(h.single).not.toHaveBeenCalled();
+    });
+});
+
+describe('proxy — no PII logging (S-9)', () => {
+    it('S-9 regression guard: a normal request logs no cookie fragment and no user email', async () => {
+        const COOKIE_VALUE = 'super-secret-session-token-fragment';
+        const EMAIL = 'private.person@example.org';
+        h.getUser.mockResolvedValue({ data: { user: { id: 'u1', email: EMAIL } } });
+
+        await proxy(req('/blog', { cookie: `sb-access-token=${COOKIE_VALUE}` }));
+
+        const logged = logSpy.mock.calls.map(args => args.map(String).join(' ')).join('\n');
+        expect(logged).not.toContain(COOKIE_VALUE);
+        expect(logged).not.toContain(COOKIE_VALUE.substring(0, 20));
+        expect(logged).not.toContain(EMAIL);
+        // Nothing at all should be logged on the happy path.
+        expect(logSpy).not.toHaveBeenCalled();
     });
 });
 

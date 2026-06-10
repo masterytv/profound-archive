@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import type { Metadata } from "next";
 import { ogImage } from '@/lib/og/metadata';
 import Link from "next/link";
@@ -35,7 +36,7 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([
+          __html: serializeJsonLd([
             {
               "@context": "https://schema.org",
               "@type": "WebSite",

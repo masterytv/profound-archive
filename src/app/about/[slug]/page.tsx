@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import Link from "next/link";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 import type { Metadata } from "next";
@@ -126,8 +127,8 @@ export default async function AuthorPage({
 
     return (
         <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(personJsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
 
             <div className="min-h-screen bg-background text-foreground">
                 <div className="container mx-auto px-4 max-w-3xl py-14">

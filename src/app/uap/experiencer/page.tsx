@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Users, Shield, Zap, Eye, Play, ArrowDownWideNarrow, ChevronLeft, ChevronRight } from "lucide-react";
@@ -142,7 +143,7 @@ export default async function UapExperiencerPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <div className="min-h-screen bg-background text-foreground">
