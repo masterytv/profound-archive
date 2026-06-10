@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import Image from "next/image";
@@ -216,7 +217,7 @@ export default async function UapChannelsPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <div className="min-h-screen bg-background text-foreground">

@@ -1,3 +1,4 @@
+import { serializeJsonLd } from '@/lib/json-ld';
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -309,7 +310,7 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "VideoObject",
             name: video.title ?? "UAP Encounter Video",
@@ -339,7 +340,7 @@ export default async function UapVideoDetailPage({ params, searchParams }: PageP
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
