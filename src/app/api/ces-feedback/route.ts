@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkRateLimit } from '@/lib/rate-limit'
+
+// Throttle (S-11): unauthenticated service-role writes — bound junk-data spam.
+// One bucket for POST+PATCH; a normal interaction is one of each.
+const RATE_LIMIT = { name: 'ces-feedback', windowMs: 60_000, max: 10 }
 
 // CES Feedback API — POST to insert score, PATCH to add reason.
 // Uses service client for writes from this server-side API route.
@@ -15,6 +20,9 @@ function getServiceClient() {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = checkRateLimit(req, RATE_LIMIT)
+  if (limited) return limited
+
   try {
     const body = await req.json()
     const { score, path, session_id, user_id, source, feature, context_id } = body
@@ -57,6 +65,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  const limited = checkRateLimit(req, RATE_LIMIT)
+  if (limited) return limited
+
   try {
     const body = await req.json()
     const { session_id, reason } = body
