@@ -14,6 +14,7 @@
 import { NextResponse } from 'next/server';
 import { generateUapBlogArticle } from '@/lib/pipeline/uap-blog-article';
 import { createClient } from '@supabase/supabase-js';
+import { getBudgetStatus } from '@/lib/ai/budget';
 
 export const maxDuration = 540; // 9 min — matches curl --max-time in GHA workflow
 
@@ -28,6 +29,11 @@ export async function POST(req: Request) {
 
     if (authHeader !== `Bearer ${cronSecret}`) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const budget = await getBudgetStatus();
+    if (!budget.allowed) {
+        return NextResponse.json({ error: `AI budget reached — ${budget.reason}` }, { status: 503 });
     }
 
     // Parse params

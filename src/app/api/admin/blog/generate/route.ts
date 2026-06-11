@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isAdminUser } from '@/lib/auth/admin-guard';
+import { getBudgetStatus } from '@/lib/ai/budget';
 import { generateBlogArticle, generateGuideArticle, type ArticleStep } from '@/lib/pipeline/blog-article';
 import { generateStoryArticle, type StoryStep } from '@/lib/pipeline/blog-story';
 
@@ -19,6 +20,13 @@ export async function POST(req: Request) {
     // Auth check — admin or super_admin only
     if (!(await isAdminUser())) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Budget guard (cost protection): refuse generation when the AI spend
+    // ceiling is reached, with a clear message instead of a provider 403.
+    const budget = await getBudgetStatus();
+    if (!budget.allowed) {
+        return NextResponse.json({ error: `AI budget reached — ${budget.reason}. Raise the cap in env (AI_BUDGET_*) or wait for the window to reset.` }, { status: 503 });
     }
 
     const body = await req.json().catch(() => ({}));

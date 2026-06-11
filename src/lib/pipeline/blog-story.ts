@@ -25,6 +25,7 @@ import {
 } from './blog-story-prompts';
 import { sanitizeMarkdownLinks, stripMarkdownLinks } from './blog-article';
 import { gatePublishStatus } from './content-quality';
+import { wrapAiClient } from '../ai/usage-tracker';
 import { SEO_REFRESH_PROMPT } from './blog-prompts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -68,7 +69,7 @@ function getSupabaseAdmin() {
 function getOpenRouter() {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable');
-    return new OpenAI({
+    return wrapAiClient(new OpenAI({
         apiKey,
         baseURL: 'https://openrouter.ai/api/v1',
         timeout: 6 * 60 * 1000, // 6-minute timeout — drafts with 24K max_tokens can take 3-4 minutes
@@ -76,7 +77,7 @@ function getOpenRouter() {
             'HTTP-Referer': 'https://projectprofound.org',
             'X-Title': 'Project Profound Story Pipeline',
         },
-    });
+    }), { provider: 'openrouter', operation: 'blog-story' });
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
