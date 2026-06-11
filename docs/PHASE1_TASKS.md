@@ -1,5 +1,11 @@
 # Phase 1 — Hardening Task Checklist
 
+> ## ✅ STATUS: Phase 1 COMPLETE — all 13 tasks (S-1…S-14) shipped to `staging` 2026-06-11.
+> Test suite grew 41 → 99+; typecheck/lint held at the BASELINE.md baseline throughout; every
+> fix has a regression test and passed fresh-context review. **Not yet promoted to production
+> (`main`)** — that staging→main release is the owner's call. See "Follow-on work" at the bottom
+> for everything still open (deployment docs, later phases, and the API-key cleanup).
+
 Working checklist for the application-correctness/hardening pass. Each task is a concrete
 engineering change: add an authorization check, throttle a request, validate and restrict input,
 gate a debug override, escape rendered output, or remove debug logging. Full context for each
@@ -116,3 +122,40 @@ the in-memory helper if a store isn't wired yet, and note the limitation.
 - Anything requiring a new table/column (possibly Task 3) is a **production schema change** because
   staging and prod share one database — describe it and stop; the owner runs migrations.
 - The Oracle crontab credential move (Task 7) is the only task with an external coordination step.
+
+---
+
+# Follow-on work (after Phase 1) — the remaining task list
+
+Phase 1 (security) is done. These are the next concerns, ordered. Run them the same way:
+one branch → PR into `staging` → test on staging → owner promotes `staging`→`main`. Defensive
+find-and-fix only. Read [LEARNINGS.md](./LEARNINGS.md) before any deploy/infra change
+(esp. §5: `apphosting.yaml` secrets need a **numeric** version, never `versions/latest`).
+
+### A. Owner actions (human-run; the model must not do these)
+- [ ] **Promote `staging` → `main`** to ship Phase 1 + the blog-pipeline fix + the usage dashboard to production.
+- [ ] **Run the usage-tracking migration** `supabase/migrations/20260611_api_usage_log.sql` (shared prod DB) to light up `/admin/usage` + the budget guard. Until run, both fail safe (logging no-ops, guard allows).
+- [ ] Triage **GitHub dependabot** (8 vulnerabilities, 5 high).
+
+### B. Finish the production pipeline (Pass 2.5 of the production guide — repo-side, not yet done)
+- [ ] `apphosting.staging.yaml` — per-environment config: `minInstances: 0`, an env flag that emits `noindex` on staging so `staging.projectprofound.org` is never indexed; secrets stay as references.
+- [ ] `docs/DEPLOYMENT.md` — branch flow, how to promote, how to roll back, shared-DB rules.
+- [ ] `docs/DEPLOYMENT_SETUP_STEPS.md` — the console steps that are the owner's (refresh `staging`, set staging backend live branch = `staging`, protect `main` with required CI, etc.).
+
+### C. API key / secrets cleanup (started — see [SECRETS_INVENTORY.md](./SECRETS_INVENTORY.md))
+Post-leak rotation. **OpenRouter is done** (rotated, $25 cap, verified). Remaining, in priority order:
+- [ ] OpenRouter finish: revoke old `antigravity-tom` key + disable Secret Manager `OPENROUTER_API_KEY` v1.
+- [ ] Rotate **`OPENAI_API_KEY`** (+ hard cap; confirm the Feb-2026 leaked key is dead).
+- [ ] Rotate **`SUPABASE_SERVICE_KEY`** — highest impact (full DB, bypasses RLS; ~30 routes + 50 scripts).
+- [ ] Work down the inventory table: `CRON_SECRET`, `YOUTUBE_API_KEY`, `APIFY_API_TOKEN` (recreate — leaked one removed), `FAL_API_KEY`, `RESEND_API_KEY`, `TAVILY_API_KEY`, `TELEGRAM_*`, `GA_*` (service-account key).
+- [ ] Resolve dead refs: `TYPESENSE_API_KEY` (Typesense removed), `ELEVENLABS_API_KEY` (subscription cancelled — re-key or delete the code path).
+- [ ] Prevention: gitleaks pre-commit hook, CI secret-scan step, commit `.env.example` (names only), make `masterytv/soulwisdomnetwork` repo private/deleted.
+
+### D. Later IMPROVEMENT_PLAN phases (full context in [IMPROVEMENT_PLAN.md](./IMPROVEMENT_PLAN.md) §3)
+- [ ] **Phase 3** — Dead code & route cleanup (D-1…D-8, A-3/A-5/A-6). **Destructive — explicit approval per item.**
+- [ ] **Phase 4** — Type-safety burn-down (Q-1/Q-2): remove `ignoreBuildErrors`, wire the generated `Database` types, then flip CI typecheck to blocking.
+- [ ] **Phase 5** — Performance (P-1…P-6, U-1): restore real ISR, `Promise.all` waterfalls, `next/font`, dynamic-import recharts, error/loading boundaries.
+- [ ] **Phase 6** — Full test suite (T-2) in blast-radius order; includes the AI-layer fixture tests (AI-1) and blog-pipeline link validation (AI-6, generator side).
+- [ ] **Phase 7** — Data-layer reproducibility & doc accuracy (T-4/T-5/A-4): baseline migration + `config.toml`, commit the Oracle crontab, doc pass.
+- [ ] **Phase 8** — Accessibility & UX polish (U-2/U-3, rest of Q-3).
+- [ ] **Deferred (post-launch):** CSP nonces (S-8), monster-file refactors (Q-4).
