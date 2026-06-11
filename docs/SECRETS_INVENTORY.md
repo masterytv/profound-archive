@@ -13,7 +13,7 @@
 ## Where secrets live (environments)
 | Env | Store | How to update |
 |---|---|---|
-| Project Profound — **prod** (Firebase App Hosting) | Google **Secret Manager** (project `432036554831`), referenced in `apphosting.yaml` | `firebase apphosting:secrets:set NAME` → repoint yaml to `versions/latest` → redeploy |
+| Project Profound — **prod** (Firebase App Hosting) | Google **Secret Manager** (project `432036554831`), referenced in `apphosting.yaml` | add a new secret version (Console or `firebase apphosting:secrets:set NAME`) → bump the yaml to the new **numeric** version (⚠️ NOT `versions/latest` — App Hosting fails builds on it, see LEARNINGS.md §5) → redeploy |
 | Project Profound — **Oracle VM** (nightly automation) | `~/profound-archive/.env.local` on `150.230.166.48` | SSH, edit `.env.local` (cron reads it fresh each run) |
 | Project Profound — **local** | `.env.local` on the Mac | edit file |
 | MasteryTV — **Vercel** | Vercel → Settings → Environment Variables | dashboard → redeploy |
@@ -69,7 +69,7 @@ Not wired into `profound-archive`, but live accounts that can issue keys. Delete
 - [ ] **gitleaks pre-commit hook** — block secrets before they're committed
 - [ ] **CI secret-scan step** in `ci.yml` — catch anything pushed
 - [ ] Commit complete `.env.example` (names only) as the canonical variable list
-- [ ] Switch `apphosting.yaml` secret refs from pinned `versions/N` → `versions/latest`
+- [x] **Keep `apphosting.yaml` secret refs pinned to a NUMERIC version** — `versions/latest` **fails App Hosting builds** (LEARNINGS.md §5, confirmed again 2026-06-11). On each rotation: add the new version, bump the number in the yaml, redeploy.
 - [ ] (Optional) Purge `.next.old` from `profound-archive` git history with `git-filter-repo`
 - [ ] Make/keep `masterytv/soulwisdomnetwork` repo private or deleted
 
