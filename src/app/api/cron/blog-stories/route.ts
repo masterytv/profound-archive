@@ -16,6 +16,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { generateStoryArticle } from '@/lib/pipeline/blog-story';
+import { getBudgetStatus } from '@/lib/ai/budget';
 
 export const maxDuration = 600; // 10 min — pipeline: draft + voice + parallel fal.ai images
 
@@ -26,6 +27,11 @@ export async function GET(request: NextRequest) {
         const authHeader = request.headers.get('authorization');
         if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const budget = await getBudgetStatus();
+        if (!budget.allowed) {
+            return NextResponse.json({ error: `AI budget reached — ${budget.reason}` }, { status: 503 });
         }
 
         const { searchParams } = request.nextUrl;

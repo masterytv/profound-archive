@@ -3,6 +3,8 @@ import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import { generateHyde, slugToQuestion } from '@/lib/questions/question-utils';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { wrapAiClient } from '@/lib/ai/usage-tracker';
+import { assertWithinBudget } from '@/lib/ai/budget';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,15 +15,16 @@ const supabase = createClient(
 );
 
 // OpenRouter client — OpenAI SDK-compatible, just different baseURL + key.
-// Switch model here to change the synthesis model.
-const getOpenRouter = () => new OpenAI({
+// Switch model here to change the synthesis model. Wrapped so every call is
+// recorded under the 'questions-autogen' operation (S-13 cost driver).
+const getOpenRouter = () => wrapAiClient(new OpenAI({
     apiKey: process.env.OPENROUTER_API_KEY!,
     baseURL: 'https://openrouter.ai/api/v1',
     defaultHeaders: {
         'HTTP-Referer': 'https://projectprofound.org',
         'X-Title': 'Project Profound',
     },
-});
+}), { provider: 'openrouter', operation: 'questions-autogen' });
 
 /** Format large view counts as readable strings like "1.2M" */
 function formatViewCount(count: number | null | bigint): string {
@@ -222,6 +225,17 @@ export async function GET(
                     return NextResponse.json(
                         { error: 'Too many questions generated recently. Please try again later.' },
                         { status: 429 }
+                    );
+                }
+
+                // Budget guard (cost protection): refuse paid generation when
+                // the AI spend ceiling is reached. Fails open if untracked.
+                try {
+                    await assertWithinBudget('questions-autogen');
+                } catch (e) {
+                    return NextResponse.json(
+                        { error: 'Question generation is temporarily unavailable. Please try again later.' },
+                        { status: 503 }
                     );
                 }
 

@@ -22,6 +22,7 @@ import { searchNoeticMap } from './blog-research-noeticmap';
 import { generateHeroImage } from './blog-image';
 import { verifyArticle, type ArticleReference } from './blog-verify';
 import { gatePublishStatus } from './content-quality';
+import { wrapAiClient } from '../ai/usage-tracker';
 import {
     buildDraftSystemPrompt,
     buildDraftUserPrompt,
@@ -78,14 +79,14 @@ function getSupabaseAdmin() {
 function getOpenRouter() {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable');
-    return new OpenAI({
+    return wrapAiClient(new OpenAI({
         apiKey,
         baseURL: 'https://openrouter.ai/api/v1',
         defaultHeaders: {
             'HTTP-Referer': 'https://projectprofound.org',
             'X-Title': 'Project Profound Blog Pipeline',
         },
-    });
+    }), { provider: 'openrouter', operation: 'blog-article' });
 }
 
 // ─── Timeout Wrapper ──────────────────────────────────────────────────────────
