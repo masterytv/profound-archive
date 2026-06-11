@@ -8,10 +8,20 @@ export async function GET(request: Request) {
   // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/'
 
-  // Always redirect to the canonical production URL, not the request origin.
-  // This prevents users from being stranded on staging if the OAuth callback
-  // lands on the wrong host.
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  // Redirect back to the SAME host that received this callback (staging or
+  // prod), so the session cookie set during the code exchange matches the
+  // redirect target. Derive the public host from the proxy's forwarded header,
+  // validated against an allowlist to prevent host-header spoofing.
+  const ALLOWED_HOSTS = new Set([
+    'projectprofound.org',
+    'www.projectprofound.org',
+    'staging.projectprofound.org',
+    'localhost:3000',
+  ])
+  const forwardedHost =
+    request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? ''
+  const host = ALLOWED_HOSTS.has(forwardedHost) ? forwardedHost : 'projectprofound.org'
+  const siteUrl = `${host.startsWith('localhost') ? 'http' : 'https'}://${host}`
 
   if (code) {
     const supabase = await createClient()

@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: [
+          // Staging only (NOINDEX_SITE=true in apphosting.staging.yaml): block
+          // indexing of every response. Inline env check — next.config can't
+          // import from src/, see src/lib/seo/indexing.ts for the shared helper.
+          ...(process.env.NOINDEX_SITE === 'true'
+            ? [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
+            : []),
           {
             key: 'Content-Security-Policy',
             value: [

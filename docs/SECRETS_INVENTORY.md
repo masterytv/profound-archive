@@ -5,6 +5,7 @@
 > Started 2026-06-11 during the post-leak rotation pass.
 
 ## Rules of the road
+0. **⚠️ Google-issued keys have non-obvious env names.** After deleting/shutting-down ANY GCP project or API key, re-test the app's Google creds: `YOUTUBE_API_KEY` (a Google `AIza…` key) and `GA_CLIENT_EMAIL`/`GA_PRIVATE_KEY` (a service account) — neither contains "GOOGLE" in the name. Deleting the leaked "API key 2" on 2026-06-11 silently broke `YOUTUBE_API_KEY` (it WAS that key). When auditing "is this Google key used?", grep for `YOUTUBE`/`GA_`/`MAPS`, not just `GOOGLE`/`GEMINI`/`FIREBASE`.
 1. **Rotate additively:** create new key → update every environment → verify → *then* revoke old. Never delete-first.
 2. **Never commit a value.** `.env*`, `.next*`, `*.pem` are gitignored. Build artifacts (`.next.old`) were the original leak vector — keep them out.
 3. **Cap every paid provider** (provider-side spend limit) AND rely on the in-app budget guard (`AI_BUDGET_*`) as defense-in-depth.
@@ -38,12 +39,12 @@ Priority order = blast radius × likely exposure. Rotate top-down.
 
 | # | Env var | Provider | Used by | Stored in | Provider cap? | Rotated | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | `OPENROUTER_API_KEY` | OpenRouter | Blog pipeline + questions autogen (PP) | SM `v1`→`latest`, VM, local | ⬜ set on new key | 🔄 in progress | **Rotating now** |
+| 1 | `OPENROUTER_API_KEY` | OpenRouter | Blog pipeline + questions autogen (PP) | SM `v2`, VM, local | ✅ $25/mo | ✅ 2026-06-11 | ✅ verified local+VM+staging. **TODO:** revoke old `antigravity-tom` key · disable SM v1 · promote to prod (main) |
 | 2 | `OPENAI_API_KEY` | OpenAI | Embeddings + chat (PP, both apps?) | SM, VM, local | ⬜ hard cap | ⬜ | Pending — confirm Feb leak dead |
 | 3 | `SUPABASE_SERVICE_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Supabase | ⚠️ **~30 routes + ~50 scripts — full DB, bypasses RLS** | SM, VM, local | n/a | ⬜ | Pending — **highest impact**, do carefully |
 | 4 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase | Client auth | SM, VM, local | n/a | ⬜ | Rotate with #3 (RLS-bound, lower risk) |
 | 5 | `CRON_SECRET` | self | Automation auth (header-only now, S-5) | SM, VM, GitHub Actions | n/a | ⬜ | Pending — coordinate with Oracle crontab |
-| 6 | `YOUTUBE_API_KEY` | Google (YouTube Data) | NDE/UAP scanner | SM, VM | ⬜ restrict | ⬜ | Pending — **find which GCP project owns it before deleting YouTube projects** |
+| 6 | `YOUTUBE_API_KEY` | Google (YouTube Data) | NDE/UAP scanner | SM `v2`, VM, local | ✅ restricted to YouTube Data API v3 | ✅ 2026-06-11 | ✅ rotated + verified — **was an accidental casualty**: the deleted leaked "API key 2" (`AIza…IhAU`) WAS this key. Recreated restricted. TODO: disable SM v1, promote to prod |
 | 7 | `APIFY_API_TOKEN` | Apify | Transcript scrapers | SM, VM | ⬜ | ⚠️ removed | **Recreate if scanner active** |
 | 8 | `FAL_API_KEY` | fal.ai | Hero/scene image gen | SM, VM | ⬜ | ⬜ | Pending |
 | 9 | `RESEND_API_KEY` | Resend | Transactional email | SM | ⬜ | ⬜ | Pending — account under `coachapp@` too |
