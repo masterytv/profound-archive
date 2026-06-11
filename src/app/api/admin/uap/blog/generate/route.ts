@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isAdminUser } from '@/lib/auth/admin-guard';
+import { getBudgetStatus } from '@/lib/ai/budget';
 import { generateUapBlogArticle, type ArticleStep } from '@/lib/pipeline/uap-blog-article';
 
 export const maxDuration = 600; // 10-min timeout
@@ -14,6 +15,11 @@ export const maxDuration = 600; // 10-min timeout
 export async function POST(req: Request) {
     if (!(await isAdminUser())) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const budget = await getBudgetStatus();
+    if (!budget.allowed) {
+        return NextResponse.json({ error: `AI budget reached — ${budget.reason}. Raise the cap in env (AI_BUDGET_*) or wait for the window to reset.` }, { status: 503 });
     }
 
     const body = await req.json().catch(() => ({}));

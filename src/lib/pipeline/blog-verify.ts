@@ -12,6 +12,7 @@
  */
 
 import OpenAI from 'openai';
+import { wrapAiClient } from '../ai/usage-tracker';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -52,14 +53,14 @@ interface VerifyResult {
 function getOpenRouter() {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY');
-    return new OpenAI({
+    return wrapAiClient(new OpenAI({
         apiKey,
         baseURL: 'https://openrouter.ai/api/v1',
         defaultHeaders: {
             'HTTP-Referer': 'https://projectprofound.org',
             'X-Title': 'Project Profound Blog Pipeline',
         },
-    });
+    }), { provider: 'openrouter', operation: 'blog-verify' });
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────

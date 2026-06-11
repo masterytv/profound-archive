@@ -16,6 +16,7 @@ import {
   Mail,
   BarChart3,
   TrendingUp,
+  DollarSign,
   FileText,
   UserCheck,
   Radio,
@@ -72,6 +73,7 @@ const NDE_NAV: NavSection[] = [
     title: "Insights",
     items: [
       { label: "Analytics", href: "/admin/analytics", icon: TrendingUp, iconColor: "text-emerald-500" },
+      { label: "API Usage & Cost", href: "/admin/usage", icon: DollarSign, iconColor: "text-amber-500" },
     ],
   },
   {
