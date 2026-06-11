@@ -1,0 +1,21 @@
+# Staging-only overrides for Firebase App Hosting.
+#
+# This file applies to backends whose Environment name is set to "staging"
+# in the Firebase console (App Hosting -> backend -> Settings -> Environment).
+# Values here override the same keys in apphosting.yaml; everything not listed
+# (all secret references, webhook URLs, Supabase config) is inherited from the
+# base file. Per docs/LEARNINGS.md §5, never add a secret here with
+# /versions/latest — only numeric versions work on App Hosting.
+
+runConfig:
+  # Staging can scale to zero — no need to keep a warm instance.
+  minInstances: 0
+  maxInstances: 1
+
+env:
+  # Emits "X-Robots-Tag: noindex, nofollow" on every response, a robots
+  # noindex meta tag, and a disallow-all robots.txt so the staging site
+  # (staging.projectprofound.org) is never indexed by search engines.
+  # Wired in next.config.ts, src/app/layout.tsx, and src/app/robots.ts.
+  - variable: NOINDEX_SITE
+    value: "true"

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ogImage } from '@/lib/og/metadata';
+import { shouldNoindex } from '@/lib/seo/indexing';
 import { Toaster } from '@/components/ui/toaster';
 import SiteHeader from '@/components/unified-site-header';
 import SiteFooter from '@/components/site-footer';
@@ -19,6 +20,8 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://projectprofound.org'),
   title: siteTitle,
   description: siteDescription,
+  // Staging only (NOINDEX_SITE=true): keep the staging site out of search indexes.
+  ...(shouldNoindex() ? { robots: { index: false, follow: false } } : {}),
   icons: {
     icon: '/icon.png',
   },
