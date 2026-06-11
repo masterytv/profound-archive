@@ -38,7 +38,7 @@ Priority order = blast radius × likely exposure. Rotate top-down.
 
 | # | Env var | Provider | Used by | Stored in | Provider cap? | Rotated | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | `OPENROUTER_API_KEY` | OpenRouter | Blog pipeline + questions autogen (PP) | SM `v1`→`latest`, VM, local | ⬜ set on new key | 🔄 in progress | **Rotating now** |
+| 1 | `OPENROUTER_API_KEY` | OpenRouter | Blog pipeline + questions autogen (PP) | SM `v2`, VM, local | ✅ $25/mo | ✅ 2026-06-11 | ✅ verified local+VM+staging. **TODO:** revoke old `antigravity-tom` key · disable SM v1 · promote to prod (main) |
 | 2 | `OPENAI_API_KEY` | OpenAI | Embeddings + chat (PP, both apps?) | SM, VM, local | ⬜ hard cap | ⬜ | Pending — confirm Feb leak dead |
 | 3 | `SUPABASE_SERVICE_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Supabase | ⚠️ **~30 routes + ~50 scripts — full DB, bypasses RLS** | SM, VM, local | n/a | ⬜ | Pending — **highest impact**, do carefully |
 | 4 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase | Client auth | SM, VM, local | n/a | ⬜ | Rotate with #3 (RLS-bound, lower risk) |
