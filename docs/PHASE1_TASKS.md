@@ -135,12 +135,12 @@ find-and-fix only. Read [LEARNINGS.md](./LEARNINGS.md) before any deploy/infra c
 ### A. Owner actions (human-run; the model must not do these)
 - [ ] **Promote `staging` → `main`** to ship Phase 1 + the blog-pipeline fix + the usage dashboard to production.
 - [ ] **Run the usage-tracking migration** `supabase/migrations/20260611_api_usage_log.sql` (shared prod DB) to light up `/admin/usage` + the budget guard. Until run, both fail safe (logging no-ops, guard allows).
-- [ ] Triage **GitHub dependabot** (8 vulnerabilities, 5 high).
+- [ ] Triage **GitHub dependabot** (10 vulnerabilities, 7 high as of 2026-06-11).
 
-### B. Finish the production pipeline (Pass 2.5 of the production guide — repo-side, not yet done)
-- [ ] `apphosting.staging.yaml` — per-environment config: `minInstances: 0`, an env flag that emits `noindex` on staging so `staging.projectprofound.org` is never indexed; secrets stay as references.
-- [ ] `docs/DEPLOYMENT.md` — branch flow, how to promote, how to roll back, shared-DB rules.
-- [ ] `docs/DEPLOYMENT_SETUP_STEPS.md` — the console steps that are the owner's (refresh `staging`, set staging backend live branch = `staging`, protect `main` with required CI, etc.).
+### B. Finish the production pipeline (Pass 2.5 of the production guide — repo-side) ✅ DONE 2026-06-12
+- [x] `apphosting.staging.yaml` — per-environment config: `minInstances: 0`, `NOINDEX_SITE=true` (noindex header/meta/robots.txt — verified live on staging), staging `NEXT_PUBLIC_SITE_URL`; secrets stay as references.
+- [x] `docs/DEPLOYMENT.md` — branch flow, how to promote, how to roll back, shared-DB rules.
+- [x] `docs/DEPLOYMENT_SETUP_STEPS.md` — the owner's console/GitHub checklist (current state verified; open items: require-CI branch protection on `main`, Secret Manager v1 disables).
 
 ### C. API key / secrets cleanup (started — see [SECRETS_INVENTORY.md](./SECRETS_INVENTORY.md))
 Post-leak rotation. **OpenRouter is done** (rotated, $25 cap, verified). Remaining, in priority order:

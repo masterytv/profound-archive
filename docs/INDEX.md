@@ -11,6 +11,8 @@
 | Technical Debt | Known issues to fix later | [TECH_DEBT.md](./TECH_DEBT.md) |
 | Getting Started | Setup & onboarding | [GETTING_STARTED.md](./GETTING_STARTED.md) |
 | Environment Variables | All env vars & secrets | [ENVIRONMENT.md](./ENVIRONMENT.md) |
+| Deployment | **Branch flow, promote, roll back, shared-DB rules** | [DEPLOYMENT.md](./DEPLOYMENT.md) |
+| Deployment Setup | Owner-only console/GitHub setup checklist | [DEPLOYMENT_SETUP_STEPS.md](./DEPLOYMENT_SETUP_STEPS.md) |
 
 ## Database
 | Document | Description | Path |
