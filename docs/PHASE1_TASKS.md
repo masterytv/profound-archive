@@ -135,7 +135,7 @@ find-and-fix only. Read [LEARNINGS.md](./LEARNINGS.md) before any deploy/infra c
 ### A. Owner actions (human-run; the model must not do these)
 - [ ] **Promote `staging` → `main`** to ship Phase 1 + the blog-pipeline fix + the usage dashboard to production.
 - [ ] **Run the usage-tracking migration** `supabase/migrations/20260611_api_usage_log.sql` (shared prod DB) to light up `/admin/usage` + the budget guard. Until run, both fail safe (logging no-ops, guard allows).
-- [ ] Triage **GitHub dependabot** (8 vulnerabilities, 5 high).
+- [ ] Triage **GitHub dependabot** (10 vulnerabilities, 7 high as of 2026-06-11).
 
 ### B. Finish the production pipeline (Pass 2.5 of the production guide — repo-side) ✅ DONE 2026-06-12
 - [x] `apphosting.staging.yaml` — per-environment config: `minInstances: 0`, `NOINDEX_SITE=true` (noindex header/meta/robots.txt — verified live on staging), staging `NEXT_PUBLIC_SITE_URL`; secrets stay as references.

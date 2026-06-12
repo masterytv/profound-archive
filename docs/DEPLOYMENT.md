@@ -74,8 +74,8 @@ undo database changes (shared DB — see below).
   overrides, applied because the staging backend's console "Environment name"
   is `staging`. Overrides merge **per key / per env variable**; everything not
   listed is inherited from the base file. Currently: `minInstances: 0`,
-  `NOINDEX_SITE=true` (emits noindex header/meta/robots.txt), and staging's
-  own `NEXT_PUBLIC_SITE_URL`.
+  `maxInstances: 1`, `NOINDEX_SITE=true` (emits noindex header/meta/robots.txt),
+  and staging's own `NEXT_PUBLIC_SITE_URL`.
 - **Secrets are Secret Manager references pinned to a NUMERIC version**
   (e.g. `.../versions/3`). `versions/latest` FAILS the App Hosting build
   (LEARNINGS.md §5). Rotation: add a new secret version → bump the number in

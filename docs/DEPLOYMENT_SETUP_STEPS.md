@@ -2,7 +2,7 @@
 
 One-time setup in the Firebase console and GitHub that agents cannot (and must
 not) do. Day-to-day flow is in [DEPLOYMENT.md](./DEPLOYMENT.md). Status as of
-**2026-06-12** — keep the checkboxes current when you change anything.
+**2026-06-11** — keep the checkboxes current when you change anything.
 
 ## Firebase console — App Hosting
 
