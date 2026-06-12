@@ -23,9 +23,13 @@ Console path: console.firebase.google.com → project `studio-9638832619-7f197`
       production does not.*
 - [x] **Staging custom domain** `staging.projectprofound.org` connected and
       serving (returns 200).
-- [ ] **Leave production Environment name EMPTY** (or anything other than
-      `staging`) — production must use the base `apphosting.yaml` only.
-      Verify once: backend `profound-archive` → Settings → Environment.
+- [x] **Production Environment name = `production`** (verified by owner
+      2026-06-11). Harmless and self-documenting: no
+      `apphosting.production.yaml` exists, so production uses the base
+      `apphosting.yaml` only. The one value that must NEVER be set here is
+      `staging` (it would apply the noindex staging config to production).
+      If an `apphosting.production.yaml` is ever committed, it will start
+      applying to this backend.
 - Keep **environment variable overrides in the console at zero** (both
   backends). All config belongs in the committed yaml files so it's
   version-controlled. The Environment settings page should keep showing
