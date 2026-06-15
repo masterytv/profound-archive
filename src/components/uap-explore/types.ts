@@ -69,7 +69,8 @@ export interface SortField {
 }
 
 export const UAP_SORT_FIELDS: SortField[] = [
-  { value: "date", label: "Date Published", description: "When the video was published on YouTube" },
+  { value: "date", label: "Date Published (YT)", description: "When the video was published on YouTube" },
+  { value: "added", label: "Date Added (PP)", description: "When the video was added to Project Profound" },
   { value: "view_count", label: "Views", description: "Total YouTube view count" },
   { value: "evidence_score", label: "Evidence Strength", description: "UAP Evidence Strength Scale (UAP-ESS): radar data, physical traces, corroborating witnesses, documentation quality (0-35)" },
   { value: "contact_depth_score", label: "Contact Depth", description: "How deep and detailed the encounter was — proximity, duration, communication, entity interaction (0-35)" },
