@@ -145,6 +145,19 @@ function getDailyCapForDomain(domain: string): number {
   return domain === 'uap' ? MAX_DAILY_UAP : MAX_DAILY_NDE;
 }
 
+/**
+ * True when an intake error is a fatal YouTube Data API key problem (expired, revoked,
+ * or invalid) rather than a per-video issue. The error string bubbles up verbatim from
+ * fetchVideoMetadata() → both intake pipelines' catch blocks → result.error, e.g.
+ * "YouTube Videos API error 400: { ... "message": "API key expired. ..." }".
+ * Deliberately narrow — matches only auth phrases, never a generic 400 (a single bad
+ * video shouldn't halt the whole batch).
+ */
+function isFatalYouTubeKeyError(error: string | null): boolean {
+  if (!error) return false;
+  return /api key expired|api key not valid|keyinvalid/i.test(error);
+}
+
 async function processDomain(supabase: SupabaseClient, config: DomainConfig) {
   const { label, queueTable, intakeFn } = config;
   const domainKey = label.toLowerCase();
@@ -351,6 +364,19 @@ async function processVideo(
     finalStatus = 'failed';
     intakeStatus = 'failed';
     resultError = errorMsg;
+  }
+
+  // CRITICAL: Detect a dead/expired/invalid YouTube Data API key and halt the ENTIRE batch.
+  // The key is the very first call in the pipeline (metadata scrape), so once it's bad EVERY
+  // video fails identically — without this guard the loop silently burns the whole queue into
+  // 'failed' (this is exactly what happened: 320 videos marked failed before anyone noticed).
+  // Mirrors the Supadata quota_exceeded halt above. We requeue the triggering item as 'pending'
+  // so nothing is lost — it'll reprocess once the key is renewed and the process is restarted.
+  if (isFatalYouTubeKeyError(resultError)) {
+    log(`⛔ [${label}] YOUTUBE API KEY EXPIRED/INVALID — every video will fail at metadata scrape. Halting pipeline.`);
+    log(`⛔ [${label}] Fix: renew YOUTUBE_API_KEY in Google Cloud Console, update this host's .env.local, then restart.`);
+    finalStatus = 'pending';
+    isShuttingDown = true; // Trigger graceful shutdown of the batch loop
   }
 
   // Update queue

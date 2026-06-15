@@ -19,3 +19,10 @@ env:
   # Wired in next.config.ts, src/app/layout.tsx, and src/app/robots.ts.
   - variable: NOINDEX_SITE
     value: "true"
+
+  # Staging's own canonical/OG base URL, so metadata, canonical tags, and OG
+  # image URLs reflect the staging domain instead of production. Auth does NOT
+  # depend on this (login uses the current origin; the callback uses the
+  # forwarded host). Staging is noindexed, so this has no SEO impact.
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: "https://staging.projectprofound.org"
