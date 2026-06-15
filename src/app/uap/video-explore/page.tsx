@@ -13,7 +13,7 @@ export const metadata = {
     "Browse UFO/UAP encounter accounts and research videos. Filter by entity type, evidence strength, contact depth, and more across 350+ analyzed videos.",
 };
 
-export const revalidate = 86400; // ISR: revalidate once per day
+export const revalidate = 3600; // ISR: revalidate hourly so newly-added videos surface within ~1h (was 86400/daily)
 
 const PAGE_SIZE = 12;
 

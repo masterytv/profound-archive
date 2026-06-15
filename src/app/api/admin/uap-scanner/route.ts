@@ -59,13 +59,14 @@ export async function GET(req: NextRequest) {
         const errorFilter = searchParams.get('errorFilter');   // error ILIKE pattern
         const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
         const pageSize = Math.min(100, Math.max(10, parseInt(searchParams.get('pageSize') || '50', 10)));
+        const sortAsc = searchParams.get('sortDir') === 'asc'; // default desc (newest first)
         const from = (page - 1) * pageSize;
         const to = from + pageSize - 1;
 
         let query = supabase
             .from('uap_scan_queue')
             .select('*', { count: 'exact' })
-            .order('created_at', { ascending: false })
+            .order('created_at', { ascending: sortAsc })
             .range(from, to);
 
         if (filterStatus && filterStatus !== 'all') {

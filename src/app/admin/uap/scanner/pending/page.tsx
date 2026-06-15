@@ -8,6 +8,8 @@ import {
   Eye,
   AlertTriangle,
   XCircle,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -29,6 +31,9 @@ export default function UapScannerPendingPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("failed");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  // Sort by Age (classified date). 'desc' = newest first (default), 'asc' = oldest first.
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const toggleSort = () => setSortDir((d) => (d === "desc" ? "asc" : "desc"));
 
   const fetchPending = useCallback(async () => {
     setLoading(true);
@@ -81,6 +86,13 @@ export default function UapScannerPendingPage() {
     }
   };
 
+  // Client-side sort by classified date (all rows are already in memory)
+  const sortedVideos = [...videos].sort((a, b) => {
+    const ta = a.date ? new Date(a.date).getTime() : 0;
+    const tb = b.date ? new Date(b.date).getTime() : 0;
+    return sortDir === "desc" ? tb - ta : ta - tb;
+  });
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -131,24 +143,34 @@ export default function UapScannerPendingPage() {
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Status</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Tier</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left">Error</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">
+                  <button
+                    onClick={toggleSort}
+                    className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                    title={sortDir === "desc" ? "Newest first — click for oldest first" : "Oldest first — click for newest first"}
+                  >
+                    Age
+                    {sortDir === "desc" ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />}
+                  </button>
+                </th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12">
+                  <td colSpan={7} className="text-center py-12">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-slate-400" />
                   </td>
                 </tr>
               ) : videos.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-slate-400">
+                  <td colSpan={7} className="text-center py-12 text-slate-400">
                     No matching videos
                   </td>
                 </tr>
               ) : (
-                videos.map((v) => (
+                sortedVideos.map((v) => (
                   <tr key={v.video_id} className="border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5">
                     <td className="px-4 py-3 max-w-[250px]">
                       <p className="font-medium text-slate-900 dark:text-slate-100 truncate text-xs">
@@ -171,6 +193,9 @@ export default function UapScannerPendingPage() {
                     <td className="px-4 py-3 text-center text-xs text-slate-500">{v.tier}</td>
                     <td className="px-4 py-3 text-xs text-red-400 max-w-[200px] truncate" title={v.error_message ?? ""}>
                       {v.error_message || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-center text-xs text-slate-400">
+                      {v.date ? new Date(v.date).toLocaleDateString() : "—"}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button

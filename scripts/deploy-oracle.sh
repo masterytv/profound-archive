@@ -48,7 +48,13 @@ if [ "$BEFORE" = "$AFTER" ]; then
 fi
 
 if [ "$DEPS_CHANGED" -eq 1 ]; then
-  echo "▶ Dependencies changed — running npm ci ..."
+  # Stop the worker BEFORE npm ci. This box is a 1 GB VM; running npm ci while the
+  # worker is processing AI-heavy videos exhausts RAM and wedges the host (a hard
+  # OOM lockup needing a forced reboot — happened June 2026). A 2 GB swapfile is
+  # configured as a safety net, but stopping the worker keeps the install fast and
+  # off swap. The pm2 restart below brings it back up afterwards.
+  echo "▶ Dependencies changed — stopping worker, then running npm ci ..."
+  pm2 stop profound-worker || true
   npm ci
 else
   echo "✓ No dependency changes — skipping npm ci."

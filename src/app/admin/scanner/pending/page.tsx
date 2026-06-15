@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     ListVideo, ChevronLeft, ChevronRight, ExternalLink,
-    Youtube, RefreshCcw, Loader2, AlertTriangle, Clock, Filter
+    Youtube, RefreshCcw, Loader2, AlertTriangle, Clock, Filter,
+    ArrowUp, ArrowDown
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -43,11 +44,13 @@ export default function PendingQueuePage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [shortsOnly, setShortsOnly] = useState(false);
+    // Sort by Queued date (created_at). 'desc' = newest first (default), 'asc' = oldest first.
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-    const fetchPage = useCallback(async (p: number, onlyShorts: boolean) => {
+    const fetchPage = useCallback(async (p: number, onlyShorts: boolean, dir: 'asc' | 'desc') => {
         setLoading(true);
         try {
-            const params = new URLSearchParams({ page: String(p), per_page: '50' });
+            const params = new URLSearchParams({ page: String(p), per_page: '50', sortDir: dir });
             if (onlyShorts) params.set('max_duration', '180');
             const res = await fetch(`/api/admin/scanner/pending?${params}`);
             const data = await res.json();
@@ -61,12 +64,18 @@ export default function PendingQueuePage() {
     }, []);
 
     useEffect(() => {
-        fetchPage(page, shortsOnly);
-    }, [fetchPage, page, shortsOnly]);
+        fetchPage(page, shortsOnly, sortDir);
+    }, [fetchPage, page, shortsOnly, sortDir]);
 
     const toggleShortsFilter = () => {
         setPage(1);
         setShortsOnly(prev => !prev);
+    };
+
+    // Toggle Queued-date sort direction and jump back to page 1 (re-fetch is automatic)
+    const toggleSort = () => {
+        setPage(1);
+        setSortDir(d => (d === 'desc' ? 'asc' : 'desc'));
     };
 
     const goTo = (p: number) => {
@@ -108,7 +117,7 @@ export default function PendingQueuePage() {
                     </button>
 
                     <button
-                        onClick={() => fetchPage(page, shortsOnly)}
+                        onClick={() => fetchPage(page, shortsOnly, sortDir)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                     >
                         <RefreshCcw className="w-4 h-4" />
@@ -158,7 +167,16 @@ export default function PendingQueuePage() {
                                         <Clock className="w-3 h-3" /> Duration
                                     </span>
                                 </th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wide">Queued</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                    <button
+                                        onClick={toggleSort}
+                                        className="inline-flex items-center gap-1 ml-auto uppercase tracking-wide hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                                        title={sortDir === 'desc' ? 'Newest first — click for oldest first' : 'Oldest first — click for newest first'}
+                                    >
+                                        Queued
+                                        {sortDir === 'desc' ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />}
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/10">
