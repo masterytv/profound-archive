@@ -10,6 +10,8 @@ import {
   ChevronRight,
   Filter,
   X,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -81,6 +83,8 @@ export default function NdeScannerQueuePage() {
   const [errorFilter, setErrorFilter] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [batchLoading, setBatchLoading] = useState(false);
+  // Sort by Age (created_at). 'desc' = newest first (default), 'asc' = oldest first.
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const fetchQueue = useCallback(async () => {
     setLoading(true);
@@ -90,6 +94,7 @@ export default function NdeScannerQueuePage() {
         filter,
         page: String(page),
         pageSize: String(pageSize),
+        sortDir,
       });
       if (subFilter) params.set("subFilter", subFilter);
       if (errorFilter) params.set("errorFilter", errorFilter);
@@ -105,7 +110,13 @@ export default function NdeScannerQueuePage() {
     } finally {
       setLoading(false);
     }
-  }, [filter, page, pageSize, subFilter, errorFilter]);
+  }, [filter, page, pageSize, subFilter, errorFilter, sortDir]);
+
+  // Toggle Age sort direction and jump back to page 1 (re-fetch is automatic)
+  const toggleSort = () => {
+    setSortDir((d) => (d === "desc" ? "asc" : "desc"));
+    setPage(1);
+  };
 
   useEffect(() => {
     fetchQueue();
@@ -326,7 +337,16 @@ export default function NdeScannerQueuePage() {
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Status</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left">Result</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left">Error</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Age</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">
+                  <button
+                    onClick={toggleSort}
+                    className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                    title={sortDir === "desc" ? "Newest first — click for oldest first" : "Oldest first — click for newest first"}
+                  >
+                    Age
+                    {sortDir === "desc" ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />}
+                  </button>
+                </th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Actions</th>
               </tr>
             </thead>

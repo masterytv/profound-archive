@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
     const perPage = Math.min(100, Math.max(1, parseInt(searchParams.get('per_page') || '50', 10)));
     const channelId = searchParams.get('channel_id') || null;
     const maxDuration = searchParams.get('max_duration') ? parseInt(searchParams.get('max_duration')!, 10) : null;
+    const sortAsc = searchParams.get('sortDir') === 'asc'; // default desc (newest first)
 
     const from = (page - 1) * perPage;
     const to = from + perPage - 1;
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
         .from('scan_queue')
         .select('id, video_id, video_url, channel_id, title, duration_seconds, created_at')
         .eq('status', 'pending')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: sortAsc })
         .range(from, to);
     if (channelId) dataQuery = dataQuery.eq('channel_id', channelId);
     if (maxDuration !== null) dataQuery = dataQuery.lte('duration_seconds', maxDuration);
