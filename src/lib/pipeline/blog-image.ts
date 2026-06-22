@@ -11,6 +11,8 @@
  * Requires: FAL_API_KEY in environment
  */
 
+import { logQuota } from '@/lib/ai/usage-tracker';
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface HeroImageResult {
@@ -132,6 +134,7 @@ async function generateWithFal(prompt: string): Promise<{ url: string; width: nu
         }),
     });
 
+    void logQuota({ provider: 'fal', operation: 'blog-image.fal', quantity: 1, status: submitRes.ok ? 'success' : 'error' });
     if (!submitRes.ok) {
         throw new Error(`fal.ai submit error ${submitRes.status}: ${await submitRes.text()}`);
     }

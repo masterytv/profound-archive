@@ -18,6 +18,8 @@
  * Docs: https://docs.supadata.ai
  */
 
+import { logQuota } from '@/lib/ai/usage-tracker';
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface CaptionSegment {
@@ -181,6 +183,9 @@ export async function fetchCaptions(videoId: string): Promise<CaptionFetchResult
             .filter(seg => seg.text.length > 0);
 
         console.log(`[Supadata] ✅ ${segments.length} segments for ${videoId} (lang: ${data.lang})`);
+
+        // 1 credit consumed per successful transcript fetch.
+        void logQuota({ provider: 'supadata', operation: 'supadata.transcript', quantity: 1, metadata: { videoId } });
 
         return {
             success: true,

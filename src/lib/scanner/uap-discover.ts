@@ -14,6 +14,7 @@
 // Re-export shared types and helpers from the NDE discover module
 // Why: parseIsoDuration and filterOutShorts are domain-agnostic
 export { parseIsoDuration } from './discover';
+import { logQuota } from '@/lib/ai/usage-tracker';
 
 export interface UapDiscoveryResult {
     channelId: string;
@@ -71,6 +72,7 @@ export async function discoverNewUapVideos(
         }
 
         const response = await fetch(url.toString());
+        void logQuota({ provider: 'youtube', operation: 'youtube.playlistItems', quantity: 1, status: response.ok ? 'success' : 'error', metadata: { op: 'uap.discover' } });
         if (!response.ok) {
             const errorBody = await response.text();
             throw new Error(`YouTube API error (${response.status}): ${errorBody}`);
@@ -153,6 +155,7 @@ async function filterOutShorts(
 
         try {
             const res = await fetch(url.toString());
+            void logQuota({ provider: 'youtube', operation: 'youtube.videos', quantity: 1, status: res.ok ? 'success' : 'error', metadata: { op: 'uap.discover.shorts' } });
             if (!res.ok) {
                 console.warn(`[UAP Discovery/Shorts] API error ${res.status} — skipping filter for this batch`);
                 continue;

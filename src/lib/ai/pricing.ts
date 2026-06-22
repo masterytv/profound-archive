@@ -27,6 +27,32 @@ export const MODEL_PRICES: Record<string, ModelPrice> = {
     'text-embedding-3-large': { inputPerM: 0.13, outputPerM: 0 },
 };
 
+/**
+ * Per-unit USD cost for quota / credit / flat services that aren't metered by
+ * tokens. Keyed by provider. KEEP CURRENT — these drift. Used by logQuota() to
+ * turn a quantity (units, credits, images, emails) into an estimated cost_usd.
+ *
+ * Notes:
+ * - youtube: the Data API is free up to the daily quota; marginal $ cost is 0.
+ *   We still log quantity (units) so the dashboard can show "32 / 10,000 today".
+ * - resend: first 100/day are free; the blended estimate (~$0.0003/email) is a
+ *   ceiling so spend is never undercounted once past the free tier.
+ */
+export const UNIT_PRICES: Record<string, { perUnitUsd: number; unit: string }> = {
+    youtube:  { perUnitUsd: 0,       unit: 'units' },   // free within quota
+    supadata: { perUnitUsd: 0.01,    unit: 'credits' }, // $10 / 1,000 credits past free 100/mo
+    tavily:   { perUnitUsd: 0.008,   unit: 'credits' }, // ~$8 / 1,000 queries on paid tier
+    fal:      { perUnitUsd: 0.025,   unit: 'images' },  // FLUX.1 [dev] ~$0.025 / 1024x576 image
+    resend:   { perUnitUsd: 0.0003,  unit: 'emails' },  // $0.30 / 1,000 past free tier
+};
+
+/** Estimate cost for a non-token quota call. Unknown providers cost 0. */
+export function estimateQuotaCost(provider: string, quantity: number): { costUsd: number; unit: string } {
+    const p = UNIT_PRICES[provider];
+    if (!p) return { costUsd: 0, unit: 'units' };
+    return { costUsd: Math.round(quantity * p.perUnitUsd * 1e6) / 1e6, unit: p.unit };
+}
+
 export interface TokenUsage {
     prompt_tokens?: number | null;
     completion_tokens?: number | null;

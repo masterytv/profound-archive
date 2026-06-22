@@ -8,6 +8,8 @@
  * scripts/enrich-channels.ts and ad-hoc API calls.
  */
 
+import { logQuota } from '@/lib/ai/usage-tracker';
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface VideoMetadata {
@@ -100,6 +102,7 @@ export async function fetchVideoMetadata(videoId: string): Promise<VideoMetadata
     url.searchParams.set('key', apiKey);
 
     const response = await fetch(url.toString());
+    void logQuota({ provider: 'youtube', operation: 'youtube.videos', quantity: 1, status: response.ok ? 'success' : 'error', metadata: { videoId } });
     if (!response.ok) {
         const body = await response.text();
         throw new Error(`YouTube Videos API error ${response.status}: ${body}`);
@@ -183,6 +186,7 @@ export async function resolveChannelId(input: string): Promise<string | null> {
         url.searchParams.set('key', apiKey);
 
         const response = await fetch(url.toString());
+        void logQuota({ provider: 'youtube', operation: 'youtube.channels', quantity: 1, status: response.ok ? 'success' : 'error', metadata: { resolve: 'handle' } });
         if (response.ok) {
             const data = await response.json();
             if (data.items?.length > 0) {
@@ -204,6 +208,7 @@ export async function resolveChannelId(input: string): Promise<string | null> {
         url.searchParams.set('key', apiKey);
 
         const response = await fetch(url.toString());
+        void logQuota({ provider: 'youtube', operation: 'youtube.search', quantity: 100, status: response.ok ? 'success' : 'error', metadata: { resolve: 'customUrl' } });
         if (response.ok) {
             const data = await response.json();
             if (data.items?.length > 0) {
@@ -221,6 +226,7 @@ export async function resolveChannelId(input: string): Promise<string | null> {
         url.searchParams.set('key', apiKey);
 
         const response = await fetch(url.toString());
+        void logQuota({ provider: 'youtube', operation: 'youtube.channels', quantity: 1, status: response.ok ? 'success' : 'error', metadata: { resolve: 'bareHandle' } });
         if (response.ok) {
             const data = await response.json();
             if (data.items?.length > 0) {
@@ -246,6 +252,7 @@ export async function fetchChannelMetadata(channelId: string): Promise<ChannelMe
     url.searchParams.set('key', apiKey);
 
     const response = await fetch(url.toString());
+    void logQuota({ provider: 'youtube', operation: 'youtube.channels', quantity: 1, status: response.ok ? 'success' : 'error', metadata: { channelId } });
     if (!response.ok) {
         const body = await response.text();
         throw new Error(`YouTube Channels API error ${response.status}: ${body}`);

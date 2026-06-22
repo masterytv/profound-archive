@@ -44,3 +44,28 @@ export async function isAdminUser(): Promise<boolean> {
         return false;
     }
 }
+
+/**
+ * Returns the current authenticated user's email, or null. Used to attribute
+ * admin actions (e.g. who toggled a pause switch). Does NOT verify role —
+ * call isAdminUser() first.
+ */
+export async function getCurrentAdminEmail(): Promise<string | null> {
+    try {
+        const cookieStore = await cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                cookies: {
+                    getAll() { return cookieStore.getAll(); },
+                    setAll() { /* read-only in API routes */ },
+                },
+            }
+        );
+        const { data: { user } } = await supabase.auth.getUser();
+        return user?.email ?? null;
+    } catch {
+        return null;
+    }
+}

@@ -14,6 +14,7 @@
 
 import { buildResearchPrompt } from './blog-prompts';
 import { createClient } from '@supabase/supabase-js';
+import { logQuota } from '@/lib/ai/usage-tracker';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -125,6 +126,8 @@ async function tavilySearch(params: {
         }),
     });
 
+    // Basic = 1 credit, Advanced = 2.
+    void logQuota({ provider: 'tavily', operation: 'blog-research.tavily', quantity: (params.searchDepth ?? 'basic') === 'advanced' ? 2 : 1, status: response.ok ? 'success' : 'error' });
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Tavily API error ${response.status}: ${errorText}`);

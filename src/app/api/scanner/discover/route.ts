@@ -2,6 +2,7 @@ import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { runDiscoverTick } from '@/lib/scanner/tick';
+import { pauseGate } from '@/lib/ops/gate';
 
 /**
  * GET|POST /api/scanner/discover
@@ -18,6 +19,9 @@ async function handleDiscover(req: NextRequest) {
     if (!hasValidCronSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const gated = await pauseGate('video_ingestion');
+    if (gated) return gated;
 
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -16,6 +16,8 @@
  * quota on content that will never be an NDE account.
  */
 
+import { logQuota } from '@/lib/ai/usage-tracker';
+
 export interface DiscoveryResult {
     channelId: string;
     channelName: string;
@@ -69,6 +71,7 @@ export async function discoverNewVideos(
         }
 
         const response = await fetch(url.toString());
+        void logQuota({ provider: 'youtube', operation: 'youtube.playlistItems', quantity: 1, status: response.ok ? 'success' : 'error', metadata: { op: 'scanner.discover', channelName } });
         if (!response.ok) {
             const errorBody = await response.text();
             throw new Error(`YouTube API error (${response.status}): ${errorBody}`);
@@ -168,6 +171,7 @@ async function filterOutShorts(
 
         try {
             const res = await fetch(url.toString());
+            void logQuota({ provider: 'youtube', operation: 'youtube.videos', quantity: 1, status: res.ok ? 'success' : 'error', metadata: { op: 'scanner.discover.shorts', label } });
             if (!res.ok) {
                 console.warn(`[Discovery/Shorts] API error ${res.status} — skipping filter for this batch`);
                 continue;

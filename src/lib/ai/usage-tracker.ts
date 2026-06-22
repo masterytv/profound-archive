@@ -10,9 +10,9 @@
  *   response unchanged so call sites only change the function they call.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { estimateCost, type TokenUsage } from './pricing';
+import { estimateCost, estimateQuotaCost, type TokenUsage } from './pricing';
 
-export type Provider = 'openrouter' | 'openai' | 'tavily' | 'fal' | 'resend';
+export type Provider = 'openrouter' | 'openai' | 'tavily' | 'fal' | 'resend' | 'youtube' | 'supadata';
 
 export interface UsageContext {
     provider: Provider;
@@ -61,6 +61,40 @@ export async function logUsage(row: LogRow): Promise<void> {
         // Table-missing (pre-migration) or any write error: degrade quietly.
         if (error && process.env.NODE_ENV !== 'production') {
             console.warn('[usage-tracker] log skipped:', error.message);
+        }
+    } catch {
+        /* never break the caller */
+    }
+}
+
+/**
+ * Record one NON-token (quota / credit / flat) usage row — YouTube units,
+ * Supadata credits, Tavily queries, fal images, Resend emails. Cost is
+ * estimated from the per-unit price table. Never throws (fire-and-forget).
+ */
+export async function logQuota(args: {
+    provider: Provider;
+    operation: string;
+    quantity: number;
+    status?: 'success' | 'error';
+    metadata?: Record<string, unknown>;
+}): Promise<void> {
+    try {
+        const supabase = serviceClient();
+        if (!supabase) return;
+        const { costUsd, unit } = estimateQuotaCost(args.provider, args.quantity);
+        const { error } = await supabase.from('api_usage_log').insert({
+            provider: args.provider,
+            operation: args.operation,
+            quantity: args.quantity,
+            unit,
+            cost_usd: costUsd,
+            cost_is_estimate: true,
+            status: args.status ?? 'success',
+            metadata: args.metadata ?? null,
+        });
+        if (error && process.env.NODE_ENV !== 'production') {
+            console.warn('[usage-tracker] quota log skipped:', error.message);
         }
     } catch {
         /* never break the caller */

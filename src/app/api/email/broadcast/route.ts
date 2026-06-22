@@ -11,6 +11,7 @@ import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { resend } from "@/lib/email/resend";
 import { BroadcastEmail } from "@/lib/email/templates/BroadcastEmail";
 import { render } from "@react-email/render";
+import { pauseGate } from "@/lib/ops/gate";
 
 const EMAIL_FROM = process.env.RESEND_FROM ?? "onboarding@resend.dev";
 
@@ -29,6 +30,9 @@ export async function POST(req: NextRequest) {
   if (profile?.role !== "admin" && profile?.role !== "super_admin") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const gated = await pauseGate("email");
+  if (gated) return gated;
 
   const { archetype, subject, bodyText, ctaText, ctaHref } = await req.json();
   if (!archetype || typeof archetype !== "string") {

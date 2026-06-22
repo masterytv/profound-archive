@@ -24,6 +24,7 @@ import {
   Tv,
   UserCircle,
   ArrowLeft,
+  Power,
 } from "lucide-react";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -73,7 +74,8 @@ const NDE_NAV: NavSection[] = [
     title: "Insights",
     items: [
       { label: "Analytics", href: "/admin/analytics", icon: TrendingUp, iconColor: "text-emerald-500" },
-      { label: "API Usage & Cost", href: "/admin/usage", icon: DollarSign, iconColor: "text-amber-500" },
+      { label: "Operations & Cost", href: "/admin/operations", icon: Power, iconColor: "text-amber-500" },
+      { label: "API Usage Detail", href: "/admin/usage", icon: DollarSign, iconColor: "text-amber-500", indent: true },
     ],
   },
   {
