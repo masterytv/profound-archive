@@ -13,6 +13,7 @@
  */
 
 import { discoverNewUapVideos, getExistingUapVideoIds } from './uap-discover';
+import { logQuota } from '@/lib/ai/usage-tracker';
 
 export interface PlaylistDiscoverResult {
     playlist: { id: string; title: string; channelName: string | null } | null;
@@ -175,6 +176,7 @@ export async function resolvePlaylistMetadata(playlistId: string): Promise<{
     url.searchParams.set('key', apiKey);
 
     const res = await fetch(url.toString());
+    void logQuota({ provider: 'youtube', operation: 'youtube.playlists', quantity: 1, status: res.ok ? 'success' : 'error', metadata: { op: 'uap.playlist.meta' } });
     if (!res.ok) {
         const body = await res.text();
         throw new Error(`YouTube playlists.list error (${res.status}): ${body}`);

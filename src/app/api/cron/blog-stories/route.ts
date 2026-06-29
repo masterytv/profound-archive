@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateStoryArticle } from '@/lib/pipeline/blog-story';
 import { getBudgetStatus } from '@/lib/ai/budget';
+import { pauseGate } from '@/lib/ops/gate';
 
 export const maxDuration = 600; // 10 min — pipeline: draft + voice + parallel fal.ai images
 
@@ -28,6 +29,9 @@ export async function GET(request: NextRequest) {
         if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+
+        const gated = await pauseGate('blog_generation');
+        if (gated) return gated;
 
         const budget = await getBudgetStatus();
         if (!budget.allowed) {

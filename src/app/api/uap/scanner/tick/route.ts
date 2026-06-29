@@ -2,6 +2,7 @@ import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { runUapScannerTick } from '@/lib/scanner/uap-tick';
+import { pauseGate } from '@/lib/ops/gate';
 
 /**
  * GET|POST /api/uap/scanner/tick
@@ -18,6 +19,12 @@ async function handleTick(req: NextRequest) {
     if (!hasValidCronSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Combined tick spans discovery + analysis — skip if either half is paused.
+    const gatedIngest = await pauseGate('video_ingestion');
+    if (gatedIngest) return gatedIngest;
+    const gatedAnalysis = await pauseGate('video_analysis');
+    if (gatedAnalysis) return gatedAnalysis;
 
     const videosPerTick = body.videosPerTick || 5;
 

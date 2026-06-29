@@ -2,6 +2,7 @@ import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { runProcessTick } from '@/lib/scanner/tick';
+import { pauseGate } from '@/lib/ops/gate';
 
 /**
  * GET|POST /api/scanner/process
@@ -26,6 +27,9 @@ async function handleProcess(req: NextRequest) {
     if (!hasValidCronSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const gated = await pauseGate('video_analysis');
+    if (gated) return gated;
 
     // Keep at 1 — Apify alone can take 100s, full pipeline is 140-180s.
     const videosPerTick = body.videosPerTick ?? 1;

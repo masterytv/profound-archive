@@ -10,6 +10,7 @@ import { VideoEmail } from "@/lib/email/templates/VideoEmail";
 import { ARCHETYPES } from "@/lib/quiz/archetypes";
 import { render } from "@react-email/render";
 import type { ArchetypeId } from "@/lib/quiz/archetypes";
+import { pauseGate } from "@/lib/ops/gate";
 
 const MAX_BATCH = 50; // Stay well within Resend's free 100/day limit
 
@@ -56,6 +57,9 @@ export async function GET(req: NextRequest) {
   if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const gated = await pauseGate("email");
+  if (gated) return gated;
 
   // Use service-role client to bypass RLS
   const supabase = adminClient();
