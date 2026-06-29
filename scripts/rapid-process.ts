@@ -21,6 +21,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { processUapVideoIntake } from '../src/lib/pipeline/intake-uap';
 import { processVideoIntake } from '../src/lib/pipeline/intake';
+import { isPaused } from '../src/lib/ops/switches';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -163,6 +164,13 @@ async function processDomain(supabase: SupabaseClient, config: DomainConfig) {
   const domainKey = label.toLowerCase();
   const dailyCap = getDailyCapForDomain(domainKey);
 
+  // Cost kill-switch: this worker IS the analysis pipeline, so honor the same
+  // admin pause as the HTTP routes. Checked again mid-loop below.
+  if (await isPaused('video_analysis')) {
+    log(`⏸️  ${label} processing paused via admin cost control (video_analysis). Skipping.`);
+    return;
+  }
+
   log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   log(`🚀 Starting ${label} rapid processing (concurrency: ${CONCURRENCY}, daily cap: ${dailyCap})`);
 
@@ -212,6 +220,14 @@ async function processDomain(supabase: SupabaseClient, config: DomainConfig) {
   const executing = new Set<Promise<void>>();
 
   while (!isShuttingDown) {
+    // Honor a mid-run admin pause (cheap — isPaused is cached ~5s). Lets an
+    // in-flight daily batch stop within one wave instead of running to the cap.
+    if (await isPaused('video_analysis')) {
+      if (executing.size > 0) await Promise.all(executing);
+      log(`⏸️  ${label} paused mid-run via admin cost control. Stopping (${stats.total}/${totalPending} done).`);
+      break;
+    }
+
     // Check daily cap mid-loop (in case we started with budget but used it up)
     if (stats.total >= totalPending) {
       // Wait for any in-flight work to finish

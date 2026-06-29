@@ -26,6 +26,7 @@
 
 import { discoverNewVideos, getExistingVideoIds } from './discover';
 import { processVideoIntake } from '../pipeline/intake';
+import { isPaused } from '../ops/switches';
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -69,6 +70,12 @@ export interface TickResult {
  */
 export async function runDiscoverTick(supabase: any): Promise<DiscoverResult> {
     const startTime = Date.now();
+
+    // Cost kill-switch: honored by every caller (HTTP route, Oracle cron, pm2).
+    if (await isPaused('video_ingestion')) {
+        console.log('[scanner] runDiscoverTick skipped — video_ingestion paused');
+        return { channel: null, discovered: 0, queued: 0, durationMs: 0 };
+    }
 
     // Pick the next channel to scan (least recently scanned)
     const { data: channels, error: channelError } = await supabase
@@ -200,6 +207,12 @@ export async function runProcessTick(
     videosPerTick: number = 1,
 ): Promise<ProcessResult> {
     const startTime = Date.now();
+
+    // Cost kill-switch: honored by every caller (HTTP route, Oracle cron, pm2).
+    if (await isPaused('video_analysis')) {
+        console.log('[scanner] runProcessTick skipped — video_analysis paused');
+        return { processed: [], durationMs: 0 };
+    }
 
     const processed: ProcessedVideo[] = [];
     let meaningfulCount = 0;
@@ -355,6 +368,12 @@ export interface DiscoverAllResult {
  */
 export async function runDiscoverAllChannels(supabase: any): Promise<DiscoverAllResult> {
     const startTime = Date.now();
+
+    // Cost kill-switch: honored by every caller (HTTP route, Oracle cron, pm2).
+    if (await isPaused('video_ingestion')) {
+        console.log('[scanner] runDiscoverAllChannels skipped — video_ingestion paused');
+        return { channelsScanned: 0, channelsWithNewVideos: 0, totalDiscovered: 0, totalQueued: 0, durationMs: 0, perChannel: [] };
+    }
 
     const { data: channels, error: channelError } = await supabase
         .from('channels')
