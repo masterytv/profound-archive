@@ -28,6 +28,7 @@
 import { discoverNewUapVideos, getExistingUapVideoIds } from './uap-discover';
 import { runUapPlaylistDiscoverTick, PlaylistDiscoverResult } from './uap-playlist-discover';
 import { processUapVideoIntake } from '../pipeline/intake-uap';
+import { isPaused } from '../ops/switches';
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -72,6 +73,12 @@ export interface UapTickResult {
  */
 export async function runUapDiscoverTick(supabase: any): Promise<UapDiscoverResult> {
     const startTime = Date.now();
+
+    // Cost kill-switch: honored by every caller (HTTP route, Oracle cron, pm2).
+    if (await isPaused('video_ingestion')) {
+        console.log('[uap-scanner] runUapDiscoverTick skipped — video_ingestion paused');
+        return { channel: null, discovered: 0, queued: 0, durationMs: 0 };
+    }
 
     // Pick the next channel to scan (least recently scanned)
     const { data: channels, error: channelError } = await supabase
@@ -204,6 +211,12 @@ export async function runUapProcessTick(
     videosPerTick: number = 1,
 ): Promise<UapProcessResult> {
     const startTime = Date.now();
+
+    // Cost kill-switch: honored by every caller (HTTP route, Oracle cron, pm2).
+    if (await isPaused('video_analysis')) {
+        console.log('[uap-scanner] runUapProcessTick skipped — video_analysis paused');
+        return { processed: [], durationMs: 0 };
+    }
 
     const processed: UapProcessedVideo[] = [];
     let meaningfulCount = 0;

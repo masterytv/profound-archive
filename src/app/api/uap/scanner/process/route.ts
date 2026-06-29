@@ -2,6 +2,7 @@ import { hasValidCronSecret } from '@/lib/auth/cron-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { runUapProcessTick } from '@/lib/scanner/uap-tick';
+import { pauseGate } from '@/lib/ops/gate';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 540; // 9 min — 3 sequential videos × ~90s each + overhead
@@ -23,6 +24,11 @@ async function handleProcess(req: NextRequest) {
     if (!hasValidCronSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Cost kill-switch (mirrors NDE /api/scanner/process). The lib gates too;
+    // this returns a clean 200 "skipped" so cron callers don't retry-storm.
+    const gated = await pauseGate('video_analysis');
+    if (gated) return gated;
 
     const videosPerTick = body.videosPerTick ?? 1;
 
