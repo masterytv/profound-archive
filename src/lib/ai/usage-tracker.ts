@@ -12,7 +12,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { estimateCost, estimateQuotaCost, type TokenUsage } from './pricing';
 
-export type Provider = 'openrouter' | 'openai' | 'tavily' | 'fal' | 'resend' | 'youtube' | 'supadata';
+export type Provider = 'openrouter' | 'openai' | 'tavily' | 'fal' | 'resend' | 'youtube' | 'supadata' | 'brightdata';
 
 export interface UsageContext {
     provider: Provider;
