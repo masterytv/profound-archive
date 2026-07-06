@@ -64,7 +64,8 @@ export const PROCESS_REGISTRY: ProcessSpec[] = [
         schedule: 'Every 10 min (pg_cron → /process); Oracle crontab',
         operationPrefixes: ['scanner.process', 'uap.process', 'intake', 'intake-uap', 'classify', 'core-elements', 'transformation', 'journey-flow', 'greyson', 'phenomenology', 'uap-evidence', 'uap-program', 'uap-summary', 'embed', 'supadata'],
         services: [
-            { provider: 'supadata', label: 'Supadata (transcripts)', envVar: 'SUPADATA_API_KEY', costModel: 'quota', quotaLimit: 3000, quotaPeriod: 'month', unit: 'credits', pricingNote: '1 credit/transcript. 100 free/mo, then ~$0.01 each.' },
+            { provider: 'brightdata', label: 'Bright Data (transcripts)', envVar: 'BRIGHTDATA_API_KEY', costModel: 'quota', quotaLimit: 5000, quotaPeriod: 'month', unit: 'records', pricingNote: 'Primary transcript source. ~$0.75–1.50 / 1,000 records after free allowance.' },
+            { provider: 'supadata', label: 'Supadata (transcript fallback)', envVar: 'SUPADATA_API_KEY', costModel: 'quota', quotaLimit: 100, quotaPeriod: 'month', unit: 'credits', pricingNote: 'Free tier — fallback only when Bright Data errors.' },
             { provider: 'openai', label: 'OpenAI (classify / extract / embed)', envVar: 'OPENAI_API_KEY', costModel: 'tokens', pricingNote: 'gpt-4o, gpt-4o-mini, text-embedding-3-small.' },
         ],
     },

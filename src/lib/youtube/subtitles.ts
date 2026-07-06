@@ -19,6 +19,7 @@
  */
 
 import { logQuota } from '@/lib/ai/usage-tracker';
+import { fetchCaptionsBrightData } from './subtitles-brightdata';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -64,16 +65,51 @@ export interface CaptionFetchResult {
 // ─── Caption Fetching ─────────────────────────────────────────────────────────
 
 /**
- * Fetch timestamped captions for a YouTube video via Supadata.
+ * Fetch timestamped captions for a YouTube video.
  *
- * Single HTTP call — no polling, no actor warm-up delays.
- * Typical response time: 3–7 seconds.
+ * Provider routing (2026-07, after Supadata cut its free tier to 100/mo):
+ *   1. Bright Data (BRIGHTDATA_API_KEY set) — primary. Scrape-job API,
+ *      ~2–8 min/video, ~$0.75–1.50 per 1,000 records.
+ *   2. Supadata free tier — fallback ONLY on Bright Data infra failures
+ *      (timeout/server_error/auth), never on a genuine "no captions".
+ *      If the fallback itself fails, the ORIGINAL Bright Data failure is
+ *      returned — so Supadata's quota_exceeded can never halt the pipeline
+ *      now that it's just a 100/mo safety net.
+ *
+ * CAPTION_PROVIDER=supadata forces the fast direct path. Set on Firebase App
+ * Hosting (interactive host): manual admin intakes run inside a 300–600s
+ * request window that can't absorb a multi-minute Bright Data job, and the
+ * occasional manual video fits easily in Supadata's free 100/month. The
+ * Oracle batch pipelines leave it unset and get the cheap provider.
  *
  * @returns CaptionFetchResult indicating success/failure with a reason code.
  *          Callers should check `.retryable` to decide whether to retry or
  *          permanently mark the video as caption-less.
  */
 export async function fetchCaptions(videoId: string): Promise<CaptionFetchResult> {
+    if (process.env.CAPTION_PROVIDER !== 'supadata' && process.env.BRIGHTDATA_API_KEY) {
+        const bd = await fetchCaptionsBrightData(videoId);
+        // Trust Bright Data on success AND on a definitive "no captions".
+        if (bd.success || bd.failureReason === 'no_captions') return bd;
+
+        if (process.env.SUPADATA_API_KEY) {
+            console.warn(`[Captions] Bright Data failed (${bd.failureReason}) for ${videoId} — trying Supadata fallback`);
+            const sd = await fetchCaptionsSupadata(videoId);
+            if (sd.success) return sd;
+            return bd; // fallback failed too — report the primary provider's failure
+        }
+        return bd;
+    }
+    return fetchCaptionsSupadata(videoId);
+}
+
+/**
+ * Fetch timestamped captions via Supadata (legacy primary, now the fallback).
+ *
+ * Single HTTP call — no polling. Typical response time: 3–7 seconds.
+ * Pricing: 1 credit per transcript, 100 free/month.
+ */
+export async function fetchCaptionsSupadata(videoId: string): Promise<CaptionFetchResult> {
     const apiKey = process.env.SUPADATA_API_KEY;
     if (!apiKey) {
         console.error('[Supadata] Missing SUPADATA_API_KEY environment variable');
