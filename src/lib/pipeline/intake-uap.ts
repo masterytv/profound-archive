@@ -33,6 +33,7 @@ import { fetchCaptions } from '@/lib/youtube/subtitles';
 import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/transcript-processor';
 import { parseIsoDuration } from '@/lib/scanner/discover';
 import { syncContacteeProfile } from '@/lib/pipeline/contactee-sync';
+import { insertEmbeddingRows } from '@/lib/pipeline/insert-embedding-rows';
 import { classifyUapContent } from '@/lib/ai/classify-uap';
 import { analyzeUapEvidenceScore } from '@/lib/ai/uap-evidence';
 import { analyzeUapContactDepthScore } from '@/lib/ai/uap-contact-depth';
@@ -1179,24 +1180,15 @@ async function generateUapEmbeddings(
         const searchTexts = transcripts.searchChunks.map(c => c.content);
         const searchEmbeddings = await batchEmbed(openai, searchTexts);
 
-        for (let i = 0; i < transcripts.searchChunks.length; i++) {
-            const chunk = transcripts.searchChunks[i];
-            const { error: searchError } = await supabase
-                .from('uap_punctuated_embeddings')
-                .insert({
-                    video_id: videoId,
-                    content: chunk.content,
-                    start_time: chunk.start_time,
-                    embedding: searchEmbeddings[i] ? `[${searchEmbeddings[i]!.join(',')}]` : null,
-                });
+        const searchRows = transcripts.searchChunks.map((chunk, i) => ({
+            video_id: videoId,
+            content: chunk.content,
+            start_time: chunk.start_time,
+            embedding: searchEmbeddings[i] ? `[${searchEmbeddings[i]!.join(',')}]` : null,
+        }));
 
-            if (searchError) {
-                const msg = (searchError.message || '').replace(/\s+/g, ' ').slice(0, 200);
-                throw new Error(`Failed to insert UAP search embedding ${i}: ${msg}`);
-            }
-            if (i < transcripts.searchChunks.length - 1) await new Promise(r => setTimeout(r, 100));
-        }
-        console.log(`[UAP Intake] Inserted ${transcripts.searchChunks.length} search embedding chunks for ${videoId}`);
+        const searchInserted = await insertEmbeddingRows(supabase, 'uap_punctuated_embeddings', searchRows);
+        console.log(`[UAP Intake] Inserted ${searchInserted} search embedding chunks for ${videoId}`);
     }
 
     // 2. Chat embeddings (uap_chatbot_chunks) — clean text chunks
@@ -1204,23 +1196,15 @@ async function generateUapEmbeddings(
         const chatTexts = transcripts.chatChunks.map(c => c.content);
         const chatEmbeddings = await batchEmbed(openai, chatTexts);
 
-        for (let i = 0; i < transcripts.chatChunks.length; i++) {
-            const chunk = transcripts.chatChunks[i];
-            const { error: chatError } = await supabase
-                .from('uap_chatbot_chunks')
-                .insert({
-                    video_id: videoId,
-                    content: chunk.content,
-                    embedding: chatEmbeddings[i] ? `[${chatEmbeddings[i]!.join(',')}]` : null,
-                    metadata: chunk.metadata,
-                });
+        const chatRows = transcripts.chatChunks.map((chunk, i) => ({
+            video_id: videoId,
+            content: chunk.content,
+            embedding: chatEmbeddings[i] ? `[${chatEmbeddings[i]!.join(',')}]` : null,
+            metadata: chunk.metadata,
+        }));
 
-            if (chatError) {
-                throw new Error(`Failed to insert UAP chat embedding ${i}: ${chatError.message}`);
-            }
-            if (i < transcripts.chatChunks.length - 1) await new Promise(r => setTimeout(r, 100));
-        }
-        console.log(`[UAP Intake] Inserted ${transcripts.chatChunks.length} chat embedding chunks for ${videoId}`);
+        const chatInserted = await insertEmbeddingRows(supabase, 'uap_chatbot_chunks', chatRows);
+        console.log(`[UAP Intake] Inserted ${chatInserted} chat embedding chunks for ${videoId}`);
     }
 }
 

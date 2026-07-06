@@ -22,6 +22,7 @@ import OpenAI from 'openai';
 
 import { parseYouTubeUrl, fetchVideoMetadata, fetchChannelMetadata, type VideoMetadata } from '@/lib/youtube/scraper';
 import { fetchCaptions } from '@/lib/youtube/subtitles';
+import { insertEmbeddingRows } from '@/lib/pipeline/insert-embedding-rows';
 import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/transcript-processor';
 import { classifyExperience, type ClassificationResult } from '@/lib/ai/classify-experience';
 import { parseIsoDuration } from '@/lib/scanner/discover';
@@ -691,20 +692,8 @@ async function generateEmbeddings(
             embedding: searchEmbeddings[i] ? `[${searchEmbeddings[i].join(',')}]` : null,
         }));
 
-        // Insert 1 row at a time — pgvector rows are ~6KB each; batching triggers Supabase statement timeouts
-        for (let i = 0; i < searchRows.length; i++) {
-            const { error: searchError } = await supabase
-                .from('nde_punctuated_embeddings')
-                .insert(searchRows[i]);
-
-            if (searchError) {
-                const msg = (searchError.message || '').replace(/\s+/g, ' ').slice(0, 200);
-                throw new Error(`Failed to insert search embeddings batch ${i}: ${msg}`);
-            }
-            // Brief pause to avoid overwhelming the connection pool
-            if (i < searchRows.length - 1) await new Promise(r => setTimeout(r, 100));
-        }
-        console.log(`[Intake] Inserted ${searchRows.length} search embedding chunks for ${videoId}`);
+        const searchInserted = await insertEmbeddingRows(supabase, 'nde_punctuated_embeddings', searchRows);
+        console.log(`[Intake] Inserted ${searchInserted} search embedding chunks for ${videoId}`);
     }
 
     // 2. Chat embeddings (nde_chatbot_chunks) — clean text chunks
@@ -719,18 +708,8 @@ async function generateEmbeddings(
             metadata: chunk.metadata,
         }));
 
-        // Insert 1 row at a time — same reason as search embeddings above
-        for (let i = 0; i < chatRows.length; i++) {
-            const { error: chatError } = await supabase
-                .from('nde_chatbot_chunks')
-                .insert(chatRows[i]);
-
-            if (chatError) {
-                throw new Error(`Failed to insert chat embeddings batch ${i}: ${chatError.message}`);
-            }
-            if (i < chatRows.length - 1) await new Promise(r => setTimeout(r, 100));
-        }
-        console.log(`[Intake] Inserted ${chatRows.length} chat embedding chunks for ${videoId}`);
+        const chatInserted = await insertEmbeddingRows(supabase, 'nde_chatbot_chunks', chatRows);
+        console.log(`[Intake] Inserted ${chatInserted} chat embedding chunks for ${videoId}`);
     }
 
     // 3. Full text embedding for the video itself

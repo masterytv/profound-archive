@@ -9,11 +9,12 @@
  *
  * Design: Pure function, called from batch script.
  * Tier 3 gate: refuses to process out_of_scope videos.
- * Insert pattern: 1 row at a time (pgvector rows are ~6KB; batching triggers Supabase timeouts).
+ * Insert pattern: batched via insertEmbeddingRows (see that module for the IO rationale).
  */
 
 import OpenAI from 'openai';
 import type { UapSearchChunk, UapChatChunk } from './punctuate-uap';
+import { insertEmbeddingRows } from './insert-embedding-rows';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -31,7 +32,7 @@ export interface EmbedUapResult {
  * Mirrors the NDE intake.ts generateEmbeddings pattern:
  * - Deletes existing embeddings first (supports re-processing)
  * - Embeds via OpenAI text-embedding-3-small
- * - Inserts 1 row at a time with 100ms delay (avoids connection pool exhaustion)
+ * - Inserts in batches (skips chunks whose embedding failed)
  *
  * @param supabase - Supabase admin client (service_role)
  * @param openai - OpenAI client
@@ -58,30 +59,17 @@ export async function embedUapVideo(
     const searchTexts = searchChunks.map(c => c.content);
     const searchEmbeddings = await batchEmbed(openai, searchTexts);
 
-    for (let i = 0; i < searchChunks.length; i++) {
-      const embedding = searchEmbeddings[i];
-      if (!embedding) continue;
+    const searchRows = searchChunks
+      .map((chunk, i) => ({ chunk, embedding: searchEmbeddings[i] }))
+      .filter(({ embedding }) => embedding)
+      .map(({ chunk, embedding }) => ({
+        video_id: videoId,
+        content: chunk.content,
+        start_time: chunk.start_time,
+        embedding: `[${embedding!.join(',')}]`,
+      }));
 
-      const { error } = await supabase
-        .from('uap_punctuated_embeddings')
-        .insert({
-          video_id: videoId,
-          content: searchChunks[i].content,
-          start_time: searchChunks[i].start_time,
-          embedding: `[${embedding.join(',')}]`,
-        });
-
-      if (error) {
-        const msg = (error.message || '').replace(/\s+/g, ' ').slice(0, 200);
-        throw new Error(`Failed to insert search embedding ${i} for ${videoId}: ${msg}`);
-      }
-      searchInserted++;
-
-      // Brief pause to avoid overwhelming the connection pool
-      if (i < searchChunks.length - 1) {
-        await new Promise(r => setTimeout(r, 100));
-      }
-    }
+    searchInserted = await insertEmbeddingRows(supabase, 'uap_punctuated_embeddings', searchRows);
     console.log(`[UAP-Embed] Inserted ${searchInserted} search chunks for ${videoId}`);
   }
 
@@ -90,28 +78,17 @@ export async function embedUapVideo(
     const chatTexts = chatChunks.map(c => c.content);
     const chatEmbeddings = await batchEmbed(openai, chatTexts);
 
-    for (let i = 0; i < chatChunks.length; i++) {
-      const embedding = chatEmbeddings[i];
-      if (!embedding) continue;
+    const chatRows = chatChunks
+      .map((chunk, i) => ({ chunk, embedding: chatEmbeddings[i] }))
+      .filter(({ embedding }) => embedding)
+      .map(({ chunk, embedding }) => ({
+        video_id: videoId,
+        content: chunk.content,
+        embedding: `[${embedding!.join(',')}]`,
+        metadata: chunk.metadata,
+      }));
 
-      const { error } = await supabase
-        .from('uap_chatbot_chunks')
-        .insert({
-          video_id: videoId,
-          content: chatChunks[i].content,
-          embedding: `[${embedding.join(',')}]`,
-          metadata: chatChunks[i].metadata,
-        });
-
-      if (error) {
-        throw new Error(`Failed to insert chat chunk ${i} for ${videoId}: ${error.message}`);
-      }
-      chatInserted++;
-
-      if (i < chatChunks.length - 1) {
-        await new Promise(r => setTimeout(r, 100));
-      }
-    }
+    chatInserted = await insertEmbeddingRows(supabase, 'uap_chatbot_chunks', chatRows);
     console.log(`[UAP-Embed] Inserted ${chatInserted} chat chunks for ${videoId}`);
   }
 
