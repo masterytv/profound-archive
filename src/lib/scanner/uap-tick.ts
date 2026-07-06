@@ -283,7 +283,8 @@ export async function runUapProcessTick(
                 || result.status === 'already_exists'
                 || result.status === 'out_of_scope'
                 || result.status === 'is_short'
-                || result.status === 'drm_protected';
+                || result.status === 'drm_protected'
+                || result.status === 'deferred_tier2';
             // Note: caption_fetch_failed is NOT in isSkipped — it's a retryable failure
 
             finalStatus = (result.status === 'complete' || result.status === 'already_exists')

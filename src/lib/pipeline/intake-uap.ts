@@ -33,6 +33,8 @@ import { fetchCaptions } from '@/lib/youtube/subtitles';
 import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/transcript-processor';
 import { parseIsoDuration } from '@/lib/scanner/discover';
 import { syncContacteeProfile } from '@/lib/pipeline/contactee-sync';
+import { insertEmbeddingRows } from '@/lib/pipeline/insert-embedding-rows';
+import { isPaused } from '@/lib/ops/switches';
 import { classifyUapContent } from '@/lib/ai/classify-uap';
 import { analyzeUapEvidenceScore } from '@/lib/ai/uap-evidence';
 import { analyzeUapContactDepthScore } from '@/lib/ai/uap-contact-depth';
@@ -67,7 +69,8 @@ export type UapIntakeStatus =
     | 'live_stream'           // 403 — live stream, no transcript (non-retryable)
     | 'drm_protected'
     | 'already_exists'
-    | 'is_short';
+    | 'is_short'
+    | 'deferred_tier2';       // Tier-2 video parked after classification (uap_tier2_intake switch paused) — backfillable
 
 export interface UapIntakeResult {
     status: UapIntakeStatus;
@@ -341,6 +344,34 @@ export async function processUapVideoIntake(
                 videoId,
                 title: metadata.title || undefined,
                 tier: 3,
+                track: classification.track,
+                content_type: classification.content_type,
+                steps,
+            };
+        }
+
+        // ─── Step 9.5: Tier-2 deferral gate (uap_tier2_intake switch) ─
+        // When the switch is paused, tier-2 videos (research/commentary/news)
+        // park here after classification: transcript kept (no Supadata re-spend
+        // on backfill), but no analysis suite and no embeddings, so they add no
+        // vector-index weight. Tradeoff: tier-2→1 promotion happens during
+        // encounter extraction, so promotable videos also wait in this pool.
+        if (classification.tier === 2 && await isPaused('uap_tier2_intake')) {
+            await supabase
+                .from('uap_vids')
+                .update({
+                    subtitles_punctuated: transcripts.punctuated,
+                    subtitles_cleaned: transcripts.cleaned,
+                    intake_status: 'deferred_tier2',
+                })
+                .eq('video_id', videoId);
+            logStep('Tier 2 Deferral Gate', 'skipped',
+                'uap_tier2_intake switch paused — classification saved, analysis + embeddings deferred');
+            return {
+                status: 'deferred_tier2',
+                videoId,
+                title: metadata.title || undefined,
+                tier: 2,
                 track: classification.track,
                 content_type: classification.content_type,
                 steps,
@@ -1179,24 +1210,15 @@ async function generateUapEmbeddings(
         const searchTexts = transcripts.searchChunks.map(c => c.content);
         const searchEmbeddings = await batchEmbed(openai, searchTexts);
 
-        for (let i = 0; i < transcripts.searchChunks.length; i++) {
-            const chunk = transcripts.searchChunks[i];
-            const { error: searchError } = await supabase
-                .from('uap_punctuated_embeddings')
-                .insert({
-                    video_id: videoId,
-                    content: chunk.content,
-                    start_time: chunk.start_time,
-                    embedding: searchEmbeddings[i] ? `[${searchEmbeddings[i]!.join(',')}]` : null,
-                });
+        const searchRows = transcripts.searchChunks.map((chunk, i) => ({
+            video_id: videoId,
+            content: chunk.content,
+            start_time: chunk.start_time,
+            embedding: searchEmbeddings[i] ? `[${searchEmbeddings[i]!.join(',')}]` : null,
+        }));
 
-            if (searchError) {
-                const msg = (searchError.message || '').replace(/\s+/g, ' ').slice(0, 200);
-                throw new Error(`Failed to insert UAP search embedding ${i}: ${msg}`);
-            }
-            if (i < transcripts.searchChunks.length - 1) await new Promise(r => setTimeout(r, 100));
-        }
-        console.log(`[UAP Intake] Inserted ${transcripts.searchChunks.length} search embedding chunks for ${videoId}`);
+        const searchInserted = await insertEmbeddingRows(supabase, 'uap_punctuated_embeddings', searchRows);
+        console.log(`[UAP Intake] Inserted ${searchInserted} search embedding chunks for ${videoId}`);
     }
 
     // 2. Chat embeddings (uap_chatbot_chunks) — clean text chunks
@@ -1204,23 +1226,15 @@ async function generateUapEmbeddings(
         const chatTexts = transcripts.chatChunks.map(c => c.content);
         const chatEmbeddings = await batchEmbed(openai, chatTexts);
 
-        for (let i = 0; i < transcripts.chatChunks.length; i++) {
-            const chunk = transcripts.chatChunks[i];
-            const { error: chatError } = await supabase
-                .from('uap_chatbot_chunks')
-                .insert({
-                    video_id: videoId,
-                    content: chunk.content,
-                    embedding: chatEmbeddings[i] ? `[${chatEmbeddings[i]!.join(',')}]` : null,
-                    metadata: chunk.metadata,
-                });
+        const chatRows = transcripts.chatChunks.map((chunk, i) => ({
+            video_id: videoId,
+            content: chunk.content,
+            embedding: chatEmbeddings[i] ? `[${chatEmbeddings[i]!.join(',')}]` : null,
+            metadata: chunk.metadata,
+        }));
 
-            if (chatError) {
-                throw new Error(`Failed to insert UAP chat embedding ${i}: ${chatError.message}`);
-            }
-            if (i < transcripts.chatChunks.length - 1) await new Promise(r => setTimeout(r, 100));
-        }
-        console.log(`[UAP Intake] Inserted ${transcripts.chatChunks.length} chat embedding chunks for ${videoId}`);
+        const chatInserted = await insertEmbeddingRows(supabase, 'uap_chatbot_chunks', chatRows);
+        console.log(`[UAP Intake] Inserted ${chatInserted} chat embedding chunks for ${videoId}`);
     }
 }
 

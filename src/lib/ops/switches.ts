@@ -24,7 +24,8 @@ export type SwitchKey =
     | 'video_analysis'
     | 'blog_generation'
     | 'image_generation'
-    | 'email';
+    | 'email'
+    | 'uap_tier2_intake';
 
 export interface SwitchRow {
     key: SwitchKey;

@@ -69,6 +69,15 @@ export const PROCESS_REGISTRY: ProcessSpec[] = [
         ],
     },
     {
+        key: 'uap_tier2_intake',
+        label: 'UAP Tier-2 Full Processing',
+        description: 'When paused, UAP intake stops tier-2 videos (research, commentary, news, documentaries) after classification — no analysis suite, no embeddings — to limit database growth. Tier-1 experiencer videos still process fully. Deferred videos are marked deferred_tier2 for later backfill.',
+        switchKey: 'uap_tier2_intake',
+        schedule: 'Gate inside UAP intake (rapid-process + scanner)',
+        operationPrefixes: [],
+        services: [],
+    },
+    {
         key: 'blog_generation',
         label: 'Blog & Story Generation',
         description: 'Generates blog articles and experiencer stories — Claude drafting + Tavily research + fact-check passes.',

@@ -326,7 +326,8 @@ async function processVideo(
       || result.status === 'drm_protected'
       || result.status === 'geo_restricted'
       || result.status === 'members_only'
-      || result.status === 'live_stream';
+      || result.status === 'live_stream'
+      || result.status === 'deferred_tier2';
 
     finalStatus = (result.status === 'complete' || result.status === 'already_exists')
       ? 'complete'

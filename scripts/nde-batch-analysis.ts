@@ -15,13 +15,14 @@
  *   npx tsx scripts/nde-batch-analysis.ts --pipeline transformation --limit 3 --loops 50
  *   npx tsx scripts/nde-batch-analysis.ts --pipeline all             # Run all 5 sequentially
  *
- * Oracle Crontab (staggered every 3 hours, offset by 10 minutes):
- *   10 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline greyson >> logs/nde-greyson.log 2>&1
- *   20 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline core-elements >> logs/nde-core-elements.log 2>&1
- *   30 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline journey-flow >> logs/nde-journey-flow.log 2>&1
- *   40 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline phenomenology >> logs/nde-phenomenology.log 2>&1
- *   50 1/3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline transformation >> logs/nde-transformation.log 2>&1
  */
+// Oracle Crontab (staggered every 3 hours, offset by 10 minutes).
+// NOTE: kept as line comments — the "*/3" cron syntax terminates a block comment.
+//   10 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline greyson >> logs/nde-greyson.log 2>&1
+//   20 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline core-elements >> logs/nde-core-elements.log 2>&1
+//   30 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline journey-flow >> logs/nde-journey-flow.log 2>&1
+//   40 */3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline phenomenology >> logs/nde-phenomenology.log 2>&1
+//   50 1/3 * * * cd ~/profound-archive && npx tsx scripts/nde-batch-analysis.ts --pipeline transformation >> logs/nde-transformation.log 2>&1
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { analyzeCoreElements } from '../src/lib/ai/core-elements';
