@@ -34,6 +34,7 @@ import { processTranscripts, type ProcessedTranscripts } from '@/lib/youtube/tra
 import { parseIsoDuration } from '@/lib/scanner/discover';
 import { syncContacteeProfile } from '@/lib/pipeline/contactee-sync';
 import { insertEmbeddingRows } from '@/lib/pipeline/insert-embedding-rows';
+import { isPaused } from '@/lib/ops/switches';
 import { classifyUapContent } from '@/lib/ai/classify-uap';
 import { analyzeUapEvidenceScore } from '@/lib/ai/uap-evidence';
 import { analyzeUapContactDepthScore } from '@/lib/ai/uap-contact-depth';
@@ -68,7 +69,8 @@ export type UapIntakeStatus =
     | 'live_stream'           // 403 — live stream, no transcript (non-retryable)
     | 'drm_protected'
     | 'already_exists'
-    | 'is_short';
+    | 'is_short'
+    | 'deferred_tier2';       // Tier-2 video parked after classification (uap_tier2_intake switch paused) — backfillable
 
 export interface UapIntakeResult {
     status: UapIntakeStatus;
@@ -342,6 +344,34 @@ export async function processUapVideoIntake(
                 videoId,
                 title: metadata.title || undefined,
                 tier: 3,
+                track: classification.track,
+                content_type: classification.content_type,
+                steps,
+            };
+        }
+
+        // ─── Step 9.5: Tier-2 deferral gate (uap_tier2_intake switch) ─
+        // When the switch is paused, tier-2 videos (research/commentary/news)
+        // park here after classification: transcript kept (no Supadata re-spend
+        // on backfill), but no analysis suite and no embeddings, so they add no
+        // vector-index weight. Tradeoff: tier-2→1 promotion happens during
+        // encounter extraction, so promotable videos also wait in this pool.
+        if (classification.tier === 2 && await isPaused('uap_tier2_intake')) {
+            await supabase
+                .from('uap_vids')
+                .update({
+                    subtitles_punctuated: transcripts.punctuated,
+                    subtitles_cleaned: transcripts.cleaned,
+                    intake_status: 'deferred_tier2',
+                })
+                .eq('video_id', videoId);
+            logStep('Tier 2 Deferral Gate', 'skipped',
+                'uap_tier2_intake switch paused — classification saved, analysis + embeddings deferred');
+            return {
+                status: 'deferred_tier2',
+                videoId,
+                title: metadata.title || undefined,
+                tier: 2,
                 track: classification.track,
                 content_type: classification.content_type,
                 steps,
