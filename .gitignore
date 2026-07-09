@@ -56,3 +56,6 @@ mcp-config.json
 .vscode/settings.json
 tmp-pg/
 triad-output.log
+
+# pipeline runtime state + logs (Oracle VM writes these into the repo dir)
+logs/
