@@ -69,12 +69,16 @@ export interface CaptionFetchResult {
  *
  * Provider routing (2026-07, after Supadata cut its free tier to 100/mo):
  *   1. Bright Data (BRIGHTDATA_API_KEY set) — primary. Scrape-job API,
- *      ~2–8 min/video, ~$0.75–1.50 per 1,000 records.
- *   2. Supadata free tier — fallback ONLY on Bright Data infra failures
- *      (timeout/server_error/auth), never on a genuine "no captions".
- *      If the fallback itself fails, the ORIGINAL Bright Data failure is
- *      returned — so Supadata's quota_exceeded can never halt the pipeline
- *      now that it's just a 100/mo safety net.
+ *      ~$0.75–1.50 per 1,000 records.
+ *   2. Supadata free tier — fallback ONLY on hard Bright Data infra failures
+ *      (server_error/auth/parse), never on a genuine "no captions" and never
+ *      on a TIMEOUT: a Bright Data timeout means the job is still queued on
+ *      their side and the next attempt resumes the same snapshot (see
+ *      subtitles-brightdata.ts) — falling back there was draining the free
+ *      100/mo in days (measured 2026-07-09: 28% of jobs "timed out" while
+ *      every one of them later completed). If the fallback itself fails,
+ *      the ORIGINAL Bright Data failure is returned — so Supadata's
+ *      quota_exceeded can never halt the pipeline.
  *
  * CAPTION_PROVIDER=supadata forces the fast direct path. Set on Firebase App
  * Hosting (interactive host): manual admin intakes run inside a 300–600s
@@ -91,6 +95,9 @@ export async function fetchCaptions(videoId: string): Promise<CaptionFetchResult
         const bd = await fetchCaptionsBrightData(videoId);
         // Trust Bright Data on success AND on a definitive "no captions".
         if (bd.success || bd.failureReason === 'no_captions') return bd;
+        // Timeout = job still cooking at Bright Data; the retry resumes the
+        // same snapshot. Don't spend a Supadata credit on it.
+        if (bd.failureReason === 'timeout') return bd;
 
         if (process.env.SUPADATA_API_KEY) {
             console.warn(`[Captions] Bright Data failed (${bd.failureReason}) for ${videoId} — trying Supadata fallback`);

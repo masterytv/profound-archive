@@ -6,13 +6,16 @@
  * pipelines, that drained the Supabase disk-IO budget and wedged the
  * database on 2026-07-06. Batches amortize that overhead ~25x.
  *
- * Batch size is capped at 25 because embedding rows are large (a 1536-dim
- * vector serializes to ~20KB), keeping each PostgREST payload ~500KB.
- * If a batch fails (e.g. statement timeout on a cold index), it retries
- * that batch row-by-row so one bad row can't sink the other 24.
+ * Batch size: PostgREST requests run under the AUTHENTICATOR login role's
+ * statement_timeout=8s unless the impersonated role overrides it. Batches of
+ * 25 needed ~10-15s on a cold HNSW index and timed out constantly (measured
+ * 2026-07-09: 32 batch timeouts). Two-part fix: service_role now carries
+ * statement_timeout=60s (ALTER ROLE, 2026-07-09), and batches of 10 fit
+ * under even the 8s window if that override is ever lost. If a batch still
+ * fails, it retries row-by-row so one bad row can't sink the others.
  */
 
-const BATCH_SIZE = 25;
+const BATCH_SIZE = 10;
 const BATCH_DELAY_MS = 250;
 const ROW_RETRY_DELAY_MS = 100;
 

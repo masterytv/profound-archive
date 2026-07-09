@@ -279,7 +279,12 @@ export async function runProcessTick(
                 ? 'complete'
                 : (result.status === 'not_profound' || result.status === 'no_captions')
                     ? 'skipped'
-                    : 'failed';
+                    // Transient caption failure (e.g. Bright Data job still queued —
+                    // the next tick resumes its snapshot). Requeue instead of dead-ending;
+                    // rapid-process does the same via its retry loop.
+                    : result.status === 'caption_fetch_failed'
+                        ? 'pending'
+                        : 'failed';
 
             resultError = result.error
                 || (finalStatus === 'failed' ? `Intake returned status: ${result.status}` : null);
