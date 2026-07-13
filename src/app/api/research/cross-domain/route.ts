@@ -70,23 +70,36 @@ export async function GET() {
   const supabase = getSupabase();
 
   // ── Counts ──────────────────────────────────────────────────────────────
-  const { count: ndeTotal } = await supabase
+  const { count: ndeTotal, error: countError } = await supabase
     .from('nde_analysis')
     .select('*', { count: 'exact', head: true });
 
   // ── 1. Entity Types ────────────────────────────────────────────────────
   // Aggregate in JS since exec_sql is unavailable — query and process server-side
-  const { data: ndeAnalysis } = await supabase
+  const { data: ndeAnalysis, error: ndeError } = await supabase
     .from('nde_analysis')
     .select('entities, core_elements, experience_type, overall_tone')
     .not('entities', 'is', null)
     .limit(6000);
 
-  const { data: uapAnalysis } = await supabase
+  const { data: uapAnalysis, error: uapError } = await supabase
     .from('uap_encounters')
     .select('video_id, phenomenology_breakdown')
     .not('phenomenology_breakdown', 'is', null)
     .limit(5000);
+
+  // A failed or empty read must be a 503, not a 200 full of zeros that
+  // downstream consumers (and CDN caches) would treat as real data.
+  if (countError || ndeError || uapError || !ndeAnalysis?.length) {
+    console.error(
+      '[cross-domain] DB queries failed:',
+      countError?.message || ndeError?.message || uapError?.message || 'nde_analysis returned no rows',
+    );
+    return NextResponse.json(
+      { error: 'Cross-domain data temporarily unavailable' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
 
   // Compute unique UAP videos for total count
   const uniqueUapVideos = new Set(uapAnalysis?.map(row => row.video_id) || []);
