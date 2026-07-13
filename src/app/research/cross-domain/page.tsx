@@ -107,8 +107,12 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
         .select('graph_json')
         .eq('viz_id', 'cross-domain')
         .single();
-      if (cacheRow?.graph_json) {
-        return cacheRow.graph_json as unknown as CrossDomainResult;
+      const cached = cacheRow?.graph_json as unknown as CrossDomainResult | undefined;
+      // A zeroed cache row is a poisoned write from a failed render (all-zero
+      // aggregates cached on 2026-05-28 blanked this page for weeks) — ignore
+      // it and recompute rather than serving it forever.
+      if (cached && cached.nde_total > 0) {
+        return cached;
       }
     } catch (err) {
       console.warn('[cross-domain] Cache read failed or missing. Querying live database...');
@@ -116,22 +120,32 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
 
     // 2. Query DB live
     // ── Counts ──────────────────────────────────────────────────────────
-    const { count: ndeTotal } = await supabase
+    const { count: ndeTotal, error: countError } = await supabase
       .from('nde_analysis')
       .select('*', { count: 'exact', head: true });
 
     // ── Raw data ────────────────────────────────────────────────────────
-    const { data: ndeAnalysis } = await supabase
+    const { data: ndeAnalysis, error: ndeError } = await supabase
       .from('nde_analysis')
       .select('entities, core_elements, experience_type, overall_tone')
       .not('entities', 'is', null)
       .limit(6000);
 
-    const { data: uapAnalysis } = await supabase
+    const { data: uapAnalysis, error: uapError } = await supabase
       .from('uap_encounters')
       .select('video_id, phenomenology_breakdown')
       .not('phenomenology_breakdown', 'is', null)
       .limit(5000);
+
+    // A failed or empty read must surface as "unable to load", never as a
+    // page full of zeros — and must never reach the cache write below.
+    if (countError || ndeError || uapError || !ndeAnalysis?.length) {
+      console.error(
+        '[cross-domain] DB queries failed:',
+        countError?.message || ndeError?.message || uapError?.message || 'nde_analysis returned no rows',
+      );
+      return null;
+    }
 
     // Compute unique UAP videos for total count
     const uniqueUapVideos = new Set(uapAnalysis?.map(row => row.video_id) || []);
@@ -411,24 +425,31 @@ async function getCrossDomainData(): Promise<CrossDomainResult | null> {
       overlapping_phenomena: overlaps,
     };
 
-    // Save to cache asynchronously to speed up future renders
-    supabase
-      .from('viz_graph_cache')
-      .upsert({
-        viz_id: 'cross-domain',
-        graph_json: result,
-        updated_at: new Date().toISOString(),
-      })
-      .then(({ error }) => {
-        if (error) console.error('[cross-domain] Failed to write cache:', error.message);
-        else console.log('[cross-domain] Successfully cached cross-domain data');
-      });
+    // Save to cache asynchronously to speed up future renders. Guarded so an
+    // empty result can never poison the cache — the cache-first read above
+    // would then serve zeros on every render until manually cleared.
+    if (result.nde_total > 0) {
+      supabase
+        .from('viz_graph_cache')
+        .upsert({
+          viz_id: 'cross-domain',
+          graph_json: result,
+          updated_at: new Date().toISOString(),
+        })
+        .then(({ error }) => {
+          if (error) console.error('[cross-domain] Failed to write cache:', error.message);
+          else console.log('[cross-domain] Successfully cached cross-domain data');
+        });
+    }
 
     return result;
   })();
 
   try {
-    return await withTimeout(fetchPromise, 4500, null);
+    // 9s budget: a cold recompute scans ~12k rows and can exceed the old 4.5s
+    // on the Micro tier. With ISR (revalidate 3600) a slow render is rare, and
+    // even on timeout fetchPromise keeps running and still warms the cache.
+    return await withTimeout(fetchPromise, 9000, null);
   } catch (error) {
     console.error('[cross-domain] Failed to load data:', error);
     return null;
