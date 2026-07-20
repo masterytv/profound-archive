@@ -20,14 +20,13 @@ The header swaps between dark/light variants based on theme:
 <Image src="/logo-new-light.png" alt="Project Profound logo" width={150} height={35} className="hidden dark:block" priority />
 ```
 
-### Icon & Emblem (Secondary)
+### Icon (Secondary)
 
 | Variant | File | Dimensions | Usage |
 |---------|------|------------|-------|
 | **Favicon** ("O" mark) | `src/app/icon.png` | 100×100 | Browser tab / app icon — served automatically at `/icon.png` |
-| **Emblem** (dome with stars, white) | `public/logo-white.png` | 2000×2000 | Opaque dark surfaces, hero imagery |
 
-> The original star-in-circle logo (solid and transparent 500×500 PNGs) was retired in July 2026 and removed from the repo. Do not reference those files.
+> The original star-in-circle logo (solid and transparent 500×500 PNGs) and the white dome-with-stars emblem were retired in July 2026 and removed from the repo. Do not reference those files. On dark or image surfaces, use the light wordmark.
 
 ### OG / Social Sharing Images
 
@@ -276,7 +275,6 @@ Body class: `font-body antialiased flex flex-col min-h-screen bg-background`
 | Favicon / icon | `src/app/icon.png` |
 | Logo (wordmark, dark) | `public/logo-new-dark.png` |
 | Logo (wordmark, light) | `public/logo-new-light.png` |
-| Logo (emblem, white) | `public/logo-white.png` |
 
 ---
 
@@ -378,8 +376,7 @@ The selected preference is persisted in `localStorage` under the key `theme`.
 | Theme | Logo variant to use |
 |-------|---------------------|
 | Light | `public/logo-new-dark.png` (dark wordmark) |
-| Dark | `public/logo-new-light.png` (white wordmark) |
-| Dark overlay | `public/logo-white.png` emblem for opaque dark surfaces or hero images |
+| Dark | `public/logo-new-light.png` (white wordmark) — also for opaque dark surfaces and hero images |
 
 The header renders both wordmark variants and swaps them with `dark:hidden` / `hidden dark:block` — see §0 for the snippet.
 

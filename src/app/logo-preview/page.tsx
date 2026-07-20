@@ -470,20 +470,6 @@ export default function LogoPreviewPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Emblem */}
-          <div className="space-y-3 p-6 rounded-xl border border-slate-700 bg-slate-900">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Emblem — dome with stars · /logo-white.png · 2000×2000
-            </p>
-            <Image
-              src="/logo-white.png"
-              alt="Project Profound emblem — dome with stars"
-              width={96}
-              height={96}
-              className="w-24 h-24"
-            />
-            <p className="text-xs text-slate-500">Opaque dark surfaces and hero imagery.</p>
-          </div>
           {/* Favicon */}
           <div className="space-y-3 p-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -517,7 +503,7 @@ export default function LogoPreviewPage() {
             Email templates use the dark wordmark at 192×45 on the cream (#FDFAF6) background.
           </li>
           <li>
-            The original star-in-circle logo (solid and transparent variants) was retired in July 2026 and removed from the repo.
+            The original star-in-circle logo (solid and transparent variants) and the white dome emblem were retired in July 2026 and removed from the repo.
           </li>
         </ul>
       </section>
