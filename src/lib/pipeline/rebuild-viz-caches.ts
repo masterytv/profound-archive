@@ -8,6 +8,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { computeCrossDomainResult } from '@/lib/research/cross-domain-data';
 
 // ── Shared Helpers ──────────────────────────────────────────────────────────
 
@@ -724,6 +725,16 @@ export async function rebuildUapIntelligence(sb: SupabaseClient): Promise<{ node
   return { nodes: nodes.length, edges: edges.length };
 }
 
+// ── 7. Cross-Domain Phenomenology (NDE ↔ UAP) ───────────────────────────────
+
+export async function rebuildCrossDomain(sb: SupabaseClient): Promise<number> {
+  const result = await computeCrossDomainResult(sb);
+  // computeCrossDomainResult returns null on any failure — never cache that.
+  if (!result) throw new Error('compute returned empty result, cache left untouched');
+  await upsertVizCache(sb, 'cross-domain', result);
+  return result.nde_total;
+}
+
 // ── Orchestrator ────────────────────────────────────────────────────────────
 
 export interface VizCacheResult {
@@ -733,6 +744,7 @@ export interface VizCacheResult {
   phenomenology: { nodes: number; edges: number };
   globe: number;
   intelligence: { nodes: number; edges: number };
+  crossDomain: number;
   duration_ms: number;
   errors: string[];
 }
@@ -744,6 +756,7 @@ export async function rebuildAllVizCaches(sb: SupabaseClient): Promise<VizCacheR
     constellation: 0, hynekSpace: 0, timeline: 0,
     phenomenology: { nodes: 0, edges: 0 }, globe: 0,
     intelligence: { nodes: 0, edges: 0 },
+    crossDomain: 0,
     duration_ms: 0, errors: [],
   };
 
@@ -755,6 +768,7 @@ export async function rebuildAllVizCaches(sb: SupabaseClient): Promise<VizCacheR
     { name: 'uap-phenomenology', fn: async () => { result.phenomenology = await rebuildUapPhenomenology(sb); } },
     { name: 'uap-globe', fn: async () => { result.globe = await rebuildUapGlobe(sb); } },
     { name: 'uap-intelligence', fn: async () => { result.intelligence = await rebuildUapIntelligence(sb); } },
+    { name: 'cross-domain', fn: async () => { result.crossDomain = await rebuildCrossDomain(sb); } },
   ];
 
   for (const task of tasks) {
