@@ -30,22 +30,15 @@ export function BroadcastEmail({
       <Body style={styles.body}>
         <Container style={styles.container}>
 
-          {/* Logo / Brand — consistent with other emails */}
+          {/* Logo / Brand — dark wordmark on the light background; 192×45 keeps the 1024×240 source ratio */}
           <Section style={{ marginBottom: 32 }}>
             <Img
-              src="https://projectprofound.org/logo-transparent.png"
+              src="https://projectprofound.org/logo-new-dark.png"
               alt="Project Profound"
-              width={36}
-              height={36}
-              style={{ display: "inline-block", verticalAlign: "middle" }}
+              width={192}
+              height={45}
+              style={{ display: "block" }}
             />
-            <Text style={{
-              display: "inline-block", verticalAlign: "middle", marginLeft: 10,
-              fontSize: 18, fontWeight: 700, color: "#1E293B",
-              fontFamily: "Georgia, serif", margin: "0 0 0 10px",
-            }}>
-              Project Profound
-            </Text>
           </Section>
 
           {/* Subject as headline */}

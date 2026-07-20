@@ -20,13 +20,14 @@ The header swaps between dark/light variants based on theme:
 <Image src="/logo-new-light.png" alt="Project Profound logo" width={150} height={35} className="hidden dark:block" priority />
 ```
 
-### Icon (Secondary — favicon, app icon)
+### Icon & Emblem (Secondary)
 
 | Variant | File | Dimensions | Usage |
 |---------|------|------------|-------|
-| **Solid** (blue bg) | `public/logo-solid.png` | 500×500 | Favicon (`src/app/icon.png`) |
-| **Transparent** | `public/logo-transparent.png` | 500×500 | Legacy (replaced by wordmark in header) |
-| **White** | `public/logo-white.png` | 2000×2000 | Legacy (replaced by wordmark light variant) |
+| **Favicon** ("O" mark) | `src/app/icon.png` | 100×100 | Browser tab / app icon — served automatically at `/icon.png` |
+| **Emblem** (dome with stars, white) | `public/logo-white.png` | 2000×2000 | Opaque dark surfaces, hero imagery |
+
+> The original star-in-circle logo (solid and transparent 500×500 PNGs) was retired in July 2026 and removed from the repo. Do not reference those files.
 
 ### OG / Social Sharing Images
 
@@ -273,9 +274,9 @@ Body class: `font-body antialiased flex flex-col min-h-screen bg-background`
 | Admin users | `src/app/admin/users/page.tsx` |
 | Admin user row | `src/app/admin/users/user-row.tsx` |
 | Favicon / icon | `src/app/icon.png` |
-| Logo (transparent) | `public/logo-transparent.png` |
-| Logo (solid) | `public/logo-solid.png` |
-| Logo (white) | `public/logo-white.png` |
+| Logo (wordmark, dark) | `public/logo-new-dark.png` |
+| Logo (wordmark, light) | `public/logo-new-light.png` |
+| Logo (emblem, white) | `public/logo-white.png` |
 
 ---
 
@@ -376,11 +377,11 @@ The selected preference is persisted in `localStorage` under the key `theme`.
 
 | Theme | Logo variant to use |
 |-------|---------------------|
-| Light | `public/logo-transparent.png` (36×36 in nav) |
-| Dark | `public/logo-transparent.png` also works on dark backgrounds |
-| Dark overlay | Use `public/logo-white.png` for opaque dark surfaces or hero images |
+| Light | `public/logo-new-dark.png` (dark wordmark) |
+| Dark | `public/logo-new-light.png` (white wordmark) |
+| Dark overlay | `public/logo-white.png` emblem for opaque dark surfaces or hero images |
 
-The transparent PNG renders well on both the light `bg-white/80` and the dark `bg-slate-900/80` header — no conditional swap needed for the nav.
+The header renders both wordmark variants and swaps them with `dark:hidden` / `hidden dark:block` — see §0 for the snippet.
 
 ### Files
 

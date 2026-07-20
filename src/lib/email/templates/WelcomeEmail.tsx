@@ -27,18 +27,15 @@ export function WelcomeEmail({
       <Body style={{ backgroundColor: "#FDFAF6", fontFamily: "Georgia, serif", margin: 0 }}>
         <Container style={{ maxWidth: 560, margin: "0 auto", padding: "48px 24px" }}>
 
-          {/* Logo / Brand — matches VideoEmail header */}
+          {/* Logo / Brand — dark wordmark on the light background; 192×45 keeps the 1024×240 source ratio */}
           <Section style={{ marginBottom: 32 }}>
             <Img
-              src="https://projectprofound.org/logo-transparent.png"
+              src="https://projectprofound.org/logo-new-dark.png"
               alt="Project Profound"
-              width={36}
-              height={36}
-              style={{ display: "inline-block", verticalAlign: "middle" }}
+              width={192}
+              height={45}
+              style={{ display: "block" }}
             />
-            <Text style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 10, fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#94a3b8", margin: "0 0 0 10px" }}>
-              Project Profound
-            </Text>
           </Section>
 
           {/* Headline */}

@@ -114,7 +114,7 @@ See [Environment Variables Doc](./docs/ENVIRONMENT.md).
 | Batch API Routes | `src/app/api/batch/` |
 | Resources Page | `src/app/resources/page.tsx` |
 | Brand Guidelines | `docs/BRAND.md` |
-| Logo (transparent) | `public/logo-transparent.png` |
+| Logo (wordmarks) | `public/logo-new-dark.png`, `public/logo-new-light.png` |
 | Intake Pipeline | `src/lib/pipeline/intake.ts` |
 | Pipeline Modules | `src/lib/pipeline/` (scraper, classifier, embeddings, etc.) |
 | Admin Intake Page | `src/app/admin/intake/page.tsx` |

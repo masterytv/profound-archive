@@ -3,13 +3,12 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Brain, Heart, TrendingUp, ChevronDown, Menu, Mail, Search, Tv, HelpCircle, BookOpen, LayoutGrid, Users } from "lucide-react"
-import { useState } from "react"
 
 /* ─────────────────────────────────────────────────
- * Logo Preview Page
- * Shows exactly how the new wordmark logo will look
- * in the header and footer, in both light and dark mode.
- * This page does NOT modify any live components.
+ * Logo Reference Page (internal)
+ * Shows the current logo assets — wordmarks, emblem,
+ * favicon — and how they appear in the header and
+ * footer, in both light and dark mode.
  * ───────────────────────────────────────────────── */
 
 function PreviewHeader({ mode }: { mode: "light" | "dark" }) {
@@ -338,18 +337,16 @@ function PreviewFooter({ mode }: { mode: "light" | "dark" }) {
 }
 
 export default function LogoPreviewPage() {
-  const [showUap, setShowUap] = useState(false)
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       {/* Page title */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-          🔍 Logo Preview — Internal Only
+          Logo Reference — Internal Only
         </h1>
         <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-          This page shows how the new wordmark logo will look in the header and
-          footer. Nothing on the live site has changed.
+          The current Project Profound logo assets, and how they appear in the
+          header and footer in light and dark mode.
         </p>
       </div>
 
@@ -437,79 +434,69 @@ export default function LogoPreviewPage() {
         </div>
       </section>
 
-      {/* ── SECTION: Raw logo comparison ────────────── */}
+      {/* ── SECTION: Current logo assets ────────────── */}
       <section className="space-y-6">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 border-b pb-2 border-slate-200 dark:border-slate-700">
-          Logo Assets — Raw Comparison
+          Logo Assets — Current
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Current */}
-          <div className="space-y-3 p-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+          {/* Wordmark, dark variant */}
+          <div className="space-y-3 p-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-white">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Current (icon + type)
-            </p>
-            <div className="flex items-center gap-2.5">
-              <Image
-                src="/logo-transparent.png"
-                alt="Current logo"
-                width={36}
-                height={36}
-                className="w-9 h-9"
-              />
-              <span
-                className="text-xl font-bold text-slate-900 dark:text-white tracking-tight"
-                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-              >
-                Project Profound
-              </span>
-            </div>
-          </div>
-          {/* New */}
-          <div className="space-y-3 p-6 rounded-xl border-2 border-blue-400 dark:border-blue-600 bg-white dark:bg-slate-800">
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-500">
-              New (wordmark)
+              Wordmark — dark · /logo-new-dark.png · 1024×240
             </p>
             <Image
               src="/logo-new-dark.png"
-              alt="New logo dark"
+              alt="Project Profound wordmark, dark variant"
               width={200}
               height={47}
               className="h-9 w-auto"
             />
+            <p className="text-xs text-slate-500">Light backgrounds: header/footer light mode, emails.</p>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Wordmark, light variant */}
           <div className="space-y-3 p-6 rounded-xl border border-slate-700 bg-slate-900">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Current on dark
-            </p>
-            <div className="flex items-center gap-2.5">
-              <Image
-                src="/logo-transparent.png"
-                alt="Current logo"
-                width={36}
-                height={36}
-                className="w-9 h-9"
-              />
-              <span
-                className="text-xl font-bold text-white tracking-tight"
-                style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
-              >
-                Project Profound
-              </span>
-            </div>
-          </div>
-          <div className="space-y-3 p-6 rounded-xl border-2 border-blue-600 bg-slate-900">
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-400">
-              New on dark
+              Wordmark — light · /logo-new-light.png · 1024×239
             </p>
             <Image
               src="/logo-new-light.png"
-              alt="New logo light"
+              alt="Project Profound wordmark, light variant"
               width={200}
               height={47}
               className="h-9 w-auto"
             />
+            <p className="text-xs text-slate-500">Dark backgrounds: header/footer dark mode, OG/social images.</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Emblem */}
+          <div className="space-y-3 p-6 rounded-xl border border-slate-700 bg-slate-900">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Emblem — dome with stars · /logo-white.png · 2000×2000
+            </p>
+            <Image
+              src="/logo-white.png"
+              alt="Project Profound emblem — dome with stars"
+              width={96}
+              height={96}
+              className="w-24 h-24"
+            />
+            <p className="text-xs text-slate-500">Opaque dark surfaces and hero imagery.</p>
+          </div>
+          {/* Favicon */}
+          <div className="space-y-3 p-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Favicon — &quot;O&quot; mark · src/app/icon.png · 100×100
+            </p>
+            <Image
+              src="/icon.png"
+              alt="Project Profound favicon"
+              width={48}
+              height={48}
+              className="w-12 h-12"
+            />
+            <p className="text-xs text-slate-500">Browser tab / app icon, served automatically at /icon.png.</p>
           </div>
         </div>
       </section>
@@ -517,23 +504,20 @@ export default function LogoPreviewPage() {
       {/* Notes for reviewer */}
       <section className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-6 space-y-2">
         <h3 className="font-semibold text-amber-800 dark:text-amber-300">
-          📝 Key Differences
+          Asset Notes
         </h3>
         <ul className="text-sm text-amber-700 dark:text-amber-400 space-y-1 list-disc list-inside">
           <li>
-            <strong>Current:</strong> Square icon (36×36) + separate &quot;Project Profound&quot; text in Crimson Pro serif
+            Wordmarks are 1024×240 (~4.27:1). Always size width/height in that ratio — e.g. 192×45, 200×47.
           </li>
           <li>
-            <strong>New:</strong> Single wordmark image (~300×70 ratio) — no separate text needed
+            Dark wordmark on light backgrounds, light wordmark on dark backgrounds — the header swaps them with the theme.
           </li>
           <li>
-            Two versions: dark navy (for light bg) and white (for dark bg) — auto-switches with theme
+            Email templates use the dark wordmark at 192×45 on the cream (#FDFAF6) background.
           </li>
           <li>
-            The BETA badge remains alongside the logo
-          </li>
-          <li>
-            Footer brand section also updated from text-only to the new wordmark
+            The original star-in-circle logo (solid and transparent variants) was retired in July 2026 and removed from the repo.
           </li>
         </ul>
       </section>
