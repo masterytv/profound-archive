@@ -98,6 +98,46 @@ Staging and production share ONE Supabase database. Therefore:
 - Rolling back a deploy does not roll back data or schema. Plan migrations to
   be backwards-compatible with the previous app version when possible.
 
+## One-off batch scripts (`scripts/*-compiled.mjs`)
+
+A couple of manual backfill scripts are run as esbuild bundles rather than
+through `npx tsx`:
+
+```bash
+npx esbuild scripts/uap-batch-phenomenology.ts --bundle --platform=node \
+  --outfile=scripts/batch-phenom-compiled.mjs --format=esm
+node --env-file=.env.local scripts/batch-phenom-compiled.mjs --dry-run
+```
+
+(Same shape for `uap-batch-context.ts` → `batch-context-compiled.mjs`; each
+script's header comment carries its own exact command.)
+
+**The bundles are gitignored — build them on demand, don't commit them.**
+`scripts/batch-phenom-compiled.mjs` was tracked until 2026-07-22 (902 KB /
+~24k lines, inlining the whole OpenAI SDK, Zod and supabase-js). It was
+committed once, in the same commit as its `.ts` source, and never regenerated.
+Reasons not to bring it back:
+
+- **It drifts.** Nothing regenerates the bundle when the `.ts` source or
+  `src/lib/ai/uap-phenomenology.ts` changes, so a stale bundle runs old
+  analysis code against live data. This is [IMPROVEMENT_PLAN.md](./IMPROVEMENT_PLAN.md)
+  item A-1.
+- **Nothing consumes it.** The Oracle VM's 17 crontab jobs and the pm2
+  `profound-worker` all run `.ts` sources via `npx tsx`
+  ([LEARNINGS.md](./LEARNINGS.md) §Oracle Cloud Worker), and
+  [`scripts/deploy-oracle.sh`](../scripts/deploy-oracle.sh) does `git pull` →
+  conditional `npm ci` → `pm2 restart` with no bundling step. These are manual
+  laptop-run backfills.
+- **The sibling proves the convention.** `uap-batch-context.ts` documents the
+  identical esbuild command and its `batch-context-compiled.mjs` was never
+  tracked.
+
+Building requires no new dependency — `npx esbuild` fetches it if it isn't
+already present transitively. It is deliberately *not* wired into a
+`package.json` script: `deploy-oracle.sh` triggers a full `npm ci` on any
+`package.json` change, which stops the worker and is slow on the 1 GB VM, and
+this build never runs there.
+
 ## Post-deploy verification
 
 Staging (after any push to `staging`):

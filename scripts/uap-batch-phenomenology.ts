@@ -4,10 +4,17 @@
  * Backfills phenomenology_breakdown for all Tier 1 videos that have
  * punctuated subtitles but no phenomenology breakdown yet.
  * 
- * Usage:
+ * Usage (from a dev laptop — this is a manual backfill, not a cron job):
  *   1. Build: npx esbuild scripts/uap-batch-phenomenology.ts --bundle --platform=node --outfile=scripts/batch-phenom-compiled.mjs --format=esm
  *   2. Run:   node --env-file=.env.local scripts/batch-phenom-compiled.mjs [--dry-run]
- * 
+ *
+ * The build output (scripts/batch-phenom-compiled.mjs) is gitignored — rebuild it
+ * on demand rather than committing it. A committed bundle inlines openai/zod/
+ * supabase-js and silently drifts from this source once either side is edited
+ * (docs/IMPROVEMENT_PLAN.md A-1). Nothing on the Oracle VM consumes the bundle:
+ * the crontab jobs run .ts sources through `npx tsx`, and scripts/deploy-oracle.sh
+ * has no bundling step.
+ *
  * Options:
  *   --dry-run    Show what would be processed without running analysis
  *   --limit=N    Process at most N videos (default: all)

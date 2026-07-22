@@ -59,3 +59,8 @@ triad-output.log
 
 # pipeline runtime state + logs (Oracle VM writes these into the repo dir)
 logs/
+
+# esbuild output for the one-off backfill scripts. Rebuild locally when needed —
+# see docs/DEPLOYMENT.md "One-off batch scripts". Never commit these: a stale
+# bundle silently diverges from its .ts source (IMPROVEMENT_PLAN.md A-1).
+scripts/*-compiled.mjs

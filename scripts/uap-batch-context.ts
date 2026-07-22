@@ -4,10 +4,13 @@
  * Runs the encounter context extraction on all Tier 1 videos that
  * don't yet have encounter_context populated.
  * 
- * Usage:
+ * Usage (from a dev laptop — this is a manual backfill, not a cron job):
  *   npx esbuild scripts/uap-batch-context.ts --bundle --platform=node --outfile=scripts/batch-context-compiled.mjs --format=esm
  *   node --env-file=.env.local scripts/batch-context-compiled.mjs --dry-run
  *   node --env-file=.env.local scripts/batch-context-compiled.mjs
+ *
+ * The build output is gitignored (scripts/*-compiled.mjs) — rebuild on demand,
+ * never commit it. See docs/DEPLOYMENT.md "One-off batch scripts".
  */
 
 import { createClient } from '@supabase/supabase-js';
