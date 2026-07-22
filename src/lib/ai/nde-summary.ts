@@ -12,7 +12,6 @@ const getOpenAIClient = () => {
 
 /**
  * NDE Summary Generator — produces a concise, factual summary of an NDE account.
- * Replicates the n8n NDE_Summary_Creator workflow natively.
  *
  * Output: 80-150 word summary structured as Trigger → Experience → Aftermath.
  * Grade 8 reading level, factual and objective tone.

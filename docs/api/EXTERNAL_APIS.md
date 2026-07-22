@@ -12,15 +12,6 @@
 - **Key Locations:**
   - `src/app/api/chat-compassionate/route.ts`
 
-## n8n (Awetomatic)
-- **Service:** n8n Workflow Automation
-- **Purpose:** Handles complex search logic (currently being migrated to native code).
-- **Auth:** URL-based webhook (no explicit auth header in current proxy).
-- **Webhooks:**
-  - Search: `https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c`
-- **Key Locations:**
-  - `src/app/api/search/route.ts`
-
 ## Supabase
 - **Service:** Supabase (Database, Auth, Vector Store)
 - **Purpose:** Primary backend.

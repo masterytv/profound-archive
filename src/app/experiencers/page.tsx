@@ -25,21 +25,18 @@ export default function AboutUsPage() {
     setSubmitStatus("idle")
 
     try {
-      const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL
-
-      if (!webhookUrl || webhookUrl === 'YOUR_N8N_WEBHOOK_URL_HERE') {
-        console.error("[v0] Webhook URL not configured")
-        setSubmitStatus("error")
-        setIsSubmitting(false)
-        return
-      }
-
-      const response = await fetch(webhookUrl, {
+      // Posts to the native Resend-backed contact route. /api/contact expects
+      // `name`, not the `fullName` this form's local state uses.
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          message: formData.message,
+        }),
       })
 
       if (response.ok) {
@@ -49,7 +46,7 @@ export default function AboutUsPage() {
         setSubmitStatus("error")
       }
     } catch (error) {
-      console.error("[v0] Form submission error:", error)
+      console.error("[contact] Form submission error:", error)
       setSubmitStatus("error")
     } finally {
       setIsSubmitting(false)
@@ -123,7 +120,7 @@ export default function AboutUsPage() {
             <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8 flex flex-col">
               <h3 className="text-xl font-bold text-foreground mb-2">For Those Seeking Answers in Other Stories:</h3>
               <p className="text-muted-foreground leading-relaxed mb-4">Find specific answers, patterns, and insights from thousands of people who have been there.</p>
-              <p className="text-muted-foreground leading-relaxed">Our <Link href="/search3" className="text-primary hover:underline">Near Death Experience Database</Link> is a searchable library of more than 5,000 NDE video accounts from YouTube, paired with an <Link href="/chat-2" className="text-primary hover:underline">NDE Research Chatbot</Link> to help you query the data.</p>
+              <p className="text-muted-foreground leading-relaxed">Our <Link href="/search3" className="text-primary hover:underline">Near Death Experience Database</Link> is a searchable library of more than 5,000 NDE video accounts from YouTube, with keyword and semantic search to help you query the data.</p>
             </div>
             {/* For Those Needing to Talk */}
             <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-none border border-transparent dark:border-white/10 p-8 flex flex-col">

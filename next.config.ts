@@ -42,7 +42,11 @@ const nextConfig: NextConfig = {
     return [
       { source: "/quiz", destination: "/compass", permanent: true },
       { source: "/quiz/types", destination: "/compass/types", permanent: true },
+      // The old webhook-backed chat pages were removed; every inbound link
+      // (footer, header, video page, EndCard) lands on the native chat instead.
       { source: "/chat", destination: "/chat-compassionate", permanent: true },
+      { source: "/chat-2", destination: "/chat-compassionate", permanent: true },
+      { source: "/chat-test", destination: "/chat-compassionate", permanent: true },
     ];
   },
   typescript: {

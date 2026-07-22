@@ -21,10 +21,10 @@
 **Pattern:**
 > "Fix the bug in [File]. It fails when [Condition]. Refer to `docs/database/SCHEMA.md` to check relations."
 
-### 3. Workflow Migration
+### 3. New Pipeline Stage
 **Pattern:**
-> "I am migrating the n8n workflow `docs/workflows/nde_summary_creator.md`.
-> Write a Next.js API route that implements the 'Summarize' step using LangChain/OpenAI."
+> "Add a summarisation stage to the intake pipeline. Follow the shape of
+> `src/lib/ai/nde-summary.ts` and wire it into `src/lib/pipeline/intake.ts`."
 
 ## Dos and Don'ts
 

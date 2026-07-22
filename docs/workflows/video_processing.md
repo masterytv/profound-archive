@@ -1,45 +1,42 @@
-# Video Processing & Analysis Workflows
+# Video Processing & Analysis Pipelines
 
 > This document covers the backend data pipelines for processing videos.
 
-## Workflows
+These are long-running processes and deliberately do **not** run in Next.js API
+routes, which sit behind Cloudflare's 100s timeout. They run on the Oracle VM
+worker, driven by crontab. See `docs/ARCHITECTURE.md`.
 
-### 1. NDE Video Verification
-**File:** `docs/n8n/NDE_Video_Verification.json`
-**Purpose:** Verifies if a crawled video is actually an NDE.
-**Logic:**
-- Takes a video URL/ID.
-- Fetches transcript/metadata.
-- Uses LLM to check against NDE criteria (Greyson scale).
-- Updates `isNde` status in `nde_vids`.
+## Pipelines
 
-### 2. NDE Summary Creator
-**File:** `docs/n8n/nde_summary_creator.json`
-**Purpose:** Generates the HTML analysis report and summary.
-**Logic:**
-- Reads transcript.
-- Generates summary, phenomenology list, and Greyson score breakdown.
-- Writes to `nde_analysis`.
+### 1. Video Intake
+**Code:** `src/lib/pipeline/intake.ts` (NDE), `src/lib/pipeline/intake-uap.ts` (UAP)
+**Purpose:** Scrape → classify → analyse → embed a newly discovered video.
+Classification decides whether a crawled video actually qualifies, before any
+expensive analysis passes run.
 
-### 3. NDE Video Researcher 2
-**File:** `docs/n8n/nde_video_researcher_2.json`
-**Purpose:** Advanced research/crawling logic.
+### 2. Analysis Passes
+**Code:** `src/lib/ai/` — `greyson.ts`, `cvnde.ts`, `core-elements.ts`,
+`journey-flow.ts`, `phenomenology-entities.ts`, `transformation.ts`
+**Driver:** `scripts/nde-batch-analysis.ts`
+**Purpose:** Produce the scored breakdowns written to `nde_analysis`.
 
-### 4. Punctuation & Embedding Pipelines
-**Files:**
-- `Punctuate_Transcripts_to_be_Vectorized...json`
-- `Punctuate_and_Embed_TIMESTAMPED_subtitles.json`
-- `Vector_Subtitles_for_NDE_Chatbot.json`
-- `prepare_subtitles_to_be_vectorized.json`
+### 3. Summary Generation
+**Code:** `src/lib/ai/nde-summary.ts`
+**Purpose:** 80–150 word summary structured as Trigger → Experience → Aftermath.
 
-**Purpose:**
-These workflows form the ETL pipeline:
-1. **Punctuate:** restore punctuation to raw YouTube auto-caps captions using an LLM or formatting tool.
-2. **Chunk:** Split text into semantic chunks.
-3. **Embed:** Generate vectors (OpenAI).
-4. **Store:** Save to `nde_punctuated_embeddings` or `nde_chatbot_chunks`.
+### 4. Punctuation & Embedding
+**Code:** `src/lib/pipeline/punctuate-uap.ts`, `src/lib/pipeline/embed-uap.ts`,
+`src/lib/pipeline/insert-embedding-rows.ts`
+**Drivers:** `scripts/uap-batch-punctuate.ts`, `scripts/uap-batch-embed.ts`
+**Purpose:** The ETL chain:
+1. **Punctuate:** restore punctuation to raw YouTube auto-caption text via an LLM.
+2. **Chunk:** split text into semantic chunks.
+3. **Embed:** generate vectors (OpenAI).
+4. **Store:** write to `nde_punctuated_embeddings` or `nde_chatbot_chunks`.
 
-## Migration Plan
-These are long-running processes. Attempting to run them in a standard Next.js API route (Serverless function) might timeout (10s-60s limit).
+## Gap
 
-**Recommended Target:** **Supabase Edge Functions** (longer timeout) or a dedicated background worker (e.g., Inngest, Trigger.dev, or keeping them in n8n for now).
+**NDE Video Verification** — a standalone verification pass that updated `isNde`
+on `nde_vids` previously ran on the retired automation platform. Classification
+now happens inside intake, but no direct replacement for the standalone
+verification pass was identified. Confirm before assuming it runs.

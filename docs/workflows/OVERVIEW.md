@@ -1,23 +1,35 @@
 # Workflow Overview
 
-> This document tracks the status of n8n workflows and their migration to native code.
+> All workflow automation now runs as native code in this repo. The external
+> automation platform that previously hosted these workflows was retired, along
+> with its webhook environment variables and the `/api/search` proxy.
 
-## Migration Status
+## Where the logic lives now
 
-| Workflow Name | Status | Type | Code Location |
-|---|---|---|---|
-| **NDE Compassionate Chatbot** | 🔄 Hybrid | Chat | `src/app/api/chat-compassionate` (Logic moved, maybe n8n used for backup?) |
-| **NDE Research Chatbot** | ⬜ Not Started | Chat | - |
-| **Search Logic** | ✅ Native | Search | `src/app/api/search3` (Integrated) |
-| **NDE Video Verification** | ⬜ Not Started | Data Pipeline | - |
-| **NDE Summary Creator** | ⬜ Not Started | Data Pipeline | - |
-| **NDE Video Researcher 2** | ⬜ Not Started | Research | - |
-| **Punctuate & Embed (Timestamped)** | ⬜ Not Started | Data Pipeline | - |
-| **Vector Subtitles for Chatbot** | ⬜ Not Started | Data Pipeline | - |
-| **Prepare Subtitles to be Vectorized** | ⬜ Not Started | Data Pipeline | - |
+| Capability | Code Location |
+|---|---|
+| Compassionate chat | `src/app/api/chat-compassionate/route.ts` |
+| Search (keyword + semantic) | `src/app/api/search3/route.ts` |
+| Video intake | `src/lib/pipeline/intake.ts`, `intake-uap.ts` |
+| NDE summary generation | `src/lib/ai/nde-summary.ts` |
+| Transcript punctuation | `src/lib/pipeline/punctuate-uap.ts`, `scripts/uap-batch-punctuate.ts` |
+| Embedding generation | `src/lib/pipeline/embed-uap.ts`, `insert-embedding-rows.ts`, `scripts/uap-batch-embed.ts` |
 
-## Strategy
-The goal is to migrate all logic from n8n into Next.js API routes or Supabase Edge Functions to reduce dependency on external automation platforms and improve version control/testing.
+Batch analysis passes live in `src/lib/ai/` (greyson, cvnde, core-elements,
+journey-flow, phenomenology-entities, transformation) and are driven by
+`scripts/nde-batch-analysis.ts`.
 
-## Webhooks
-- **Search:** `https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c`
+## Scheduling
+
+Scheduling is owned by the Oracle VM crontab, not by any hosted automation
+platform. See `docs/ARCHITECTURE.md` for the scheduling model and
+`docs/DEPLOYMENT.md` for how the worker is deployed.
+
+## Not carried over
+
+Two workflows were never rebuilt natively and have no current equivalent:
+
+- **NDE Research Chatbot** — never implemented. The compassionate chatbot is the
+  only chat surface in production.
+- **NDE Video Verification** — no native replacement was identified when the
+  platform was retired. Confirm before assuming verification runs anywhere.

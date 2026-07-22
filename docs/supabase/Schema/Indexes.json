@@ -1,11 +1,6 @@
 
 [
     {
-      "tablename": "n8n_chat_histories",
-      "indexname": "n8n_chat_histories_pkey",
-      "definition": "CREATE UNIQUE INDEX n8n_chat_histories_pkey ON public.n8n_chat_histories USING btree (id)"
-    },
-    {
       "tablename": "nde_analysis",
       "indexname": "nde_analysis_pkey",
       "definition": "CREATE UNIQUE INDEX nde_analysis_pkey ON public.nde_analysis USING btree (video_id)"

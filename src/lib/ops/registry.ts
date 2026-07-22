@@ -133,7 +133,6 @@ export const PROCESS_REGISTRY: ProcessSpec[] = [
         services: [
             { provider: 'supabase', label: 'Supabase (database + storage)', costModel: 'flat', flatMonthlyUsd: 25, pricingNote: 'Paid plan — shared by staging & production. EDIT in registry.ts to match the real bill.' },
             { provider: 'firebase', label: 'Firebase App Hosting', costModel: 'flat', flatMonthlyUsd: 5, pricingNote: 'Cloud Run hosting + build minutes (estimate).' },
-            { provider: 'n8n', label: 'n8n (awetomatic) automation', costModel: 'flat', flatMonthlyUsd: 0, pricingNote: 'Webhook automation host (set if billed).' },
         ],
     },
 ];
