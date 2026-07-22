@@ -58,8 +58,6 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "embla-carousel-react": "^8.6.0",
-    "firebase": "^12.6.0",
-    "firebase-admin": "^13.7.0",
     "genkit": "^1.25.0",
     "gsap": "^3.14.2",
     "howler": "^2.2.4",
@@ -76,7 +74,7 @@
     "react-hook-form": "^7.68.0",
     "react-is": "^19.2.4",
     "recharts": "^3.5.1",
-    "resend": "^6.9.3",
+    "resend": "^6.17.2",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.184.0",
@@ -95,5 +93,8 @@
     "ts-node": "^10.9.2",
     "typescript": "5.9.3",
     "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "websocket-driver": "^0.7.5"
   }
 }
