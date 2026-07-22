@@ -48,15 +48,6 @@ The UAP Video Processor runs via `pg_cron` inside Supabase (replaces unreliable 
 **Full docs:** See migration file `supabase/migrations/20260513_001_pg_cron_uap_processor.sql`
 
 
-### n8n Webhooks (Legacy — being phased out)
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_SEARCH_WEBHOOK_URL` | n8n search webhook (legacy) |
-| `NEXT_PUBLIC_CHAT_WEBHOOK_URL` | n8n chat webhook (legacy) |
-| `NEXT_PUBLIC_CHAT_2_WEBHOOK_URL` | n8n chat v2 webhook (legacy) |
-| `NEXT_PUBLIC_N8N_WEBHOOK_URL` | n8n general webhook (legacy) |
-| `NEXT_PUBLIC_CHAT_TEST_WEBHOOK_URL` | n8n test webhook (legacy) |
-
 ### Blog Pipeline
 | Variable | Description | Scope |
 |---|---|---|

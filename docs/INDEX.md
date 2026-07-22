@@ -33,7 +33,7 @@
 ## Workflows
 | Document | Description | Path |
 |---|---|---|
-| Workflow Overview | n8n migration status & mapping | [workflows/OVERVIEW.md](./workflows/OVERVIEW.md) |
+| Workflow Overview | Where each pipeline's logic lives | [workflows/OVERVIEW.md](./workflows/OVERVIEW.md) |
 | Workflow Details | Individual workflow documentation | [workflows/](./workflows/) |
 
 ## Frontend
@@ -50,4 +50,3 @@
 | AI Vibecoding Guide | How to prompt AI effectively | [guides/VIBECODING_GUIDE.md](./guides/VIBECODING_GUIDE.md) |
 | Adding a New Feature | Step-by-step feature workflow | [guides/NEW_FEATURE.md](./guides/NEW_FEATURE.md) |
 | Adding an API Integration | How to add new external API | [guides/NEW_API_INTEGRATION.md](./guides/NEW_API_INTEGRATION.md) |
-| Migrating an n8n Workflow | How to convert n8n to code | [guides/MIGRATE_WORKFLOW.md](./guides/MIGRATE_WORKFLOW.md) |

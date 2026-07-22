@@ -33,8 +33,9 @@ Project Profound is a modern web application built on the **T3 Stack** principle
 
 ### User Search
 1. User types query in Frontend.
-2. Request sent to `/api/search` (or `/api/search3`).
-3. Endpoint proxies to n8n OR calls Supabase `search_nde_moments` RPC.
+2. Request sent to `/api/search3`.
+3. Endpoint calls a Supabase RPC — `keyword_search_videos` (Postgres FTS) or the
+   semantic vector search, depending on the request's `type`.
 4. Results returned to UI.
 
 ### Compassionate Chat

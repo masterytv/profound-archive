@@ -37,23 +37,26 @@
 
 ---
 
-## Search Proxy
-### `POST /api/search`
-**Purpose:** Proxies search requests to an external n8n workflow.
-**Auth Required:** No.
+## Search
+### `POST /api/search3`
+**Purpose:** Keyword and semantic search over the video corpus, served directly
+from Supabase. (The former `/api/search` webhook proxy has been retired.)
+**Auth Required:** No. Rate limited to 30 requests/minute per IP — semantic
+searches bill OpenAI embeddings.
 
 **Request Body:**
 ```json
 {
-  "query": "string",
+  "searchTerm": "string",
   "filters": "object",
-  ... (passed through to n8n)
+  "sortBy": "object",
+  "page": 1,
+  "type": "keyword | semantic",
+  "similarity": 0.50
 }
 ```
 
 **Response:**
-Returns the JSON response directly from the n8n webhook.
+Grouped video hits with facet counts.
 
-**Upstream URL:** `https://n8n.awetomatic.com/webhook/4e993b0f-a3be-42ba-925d-4c5f78b3381c`
-
-**File:** `src/app/api/search/route.ts`
+**File:** `src/app/api/search3/route.ts`

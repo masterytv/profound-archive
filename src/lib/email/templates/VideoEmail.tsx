@@ -68,16 +68,15 @@ export function VideoEmail({
       <Body style={styles.body}>
         <Container style={styles.container}>
 
-          {/* Logo / Brand */}
+          {/* Logo / Brand — dark wordmark on the light background; 192×45 keeps the 1024×240 source ratio */}
           <Section style={styles.headerSection}>
             <Img
-              src={`${BASE_URL}/logo-transparent.png`}
+              src={`${BASE_URL}/logo-new-dark.png`}
               alt="Project Profound"
-              width={36}
-              height={36}
-              style={{ display: "inline-block", verticalAlign: "middle" }}
+              width={192}
+              height={45}
+              style={{ display: "block" }}
             />
-            <Text style={styles.brandName}>Project Profound</Text>
           </Section>
 
           {/* Profile Report — only in first email when set */}
@@ -170,15 +169,6 @@ const styles = {
   },
   headerSection: {
     marginBottom: "8px",
-  },
-  brandName: {
-    display: "inline",
-    verticalAlign: "middle",
-    fontSize: "18px",
-    fontWeight: "700",
-    color: "#1E293B",
-    marginLeft: "8px",
-    fontFamily: "Georgia, serif",
   },
   archetypeLabel: {
     fontSize: "13px",

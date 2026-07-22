@@ -86,17 +86,6 @@ Used by `/channels` list page (11 sort options) and homepage. Migration: `202603
 
 ---
 
-### `n8n_chat_histories`
-**Purpose:** Stores chat history for n8n workflows.
-
-| Column | Type | Nullable | Description |
-|---|---|---|---|
-| id | number | NO | Primary Key |
-| session_id | string | NO | Session identifier |
-| message | Json | NO | The message object |
-
----
-
 ### `nde_analysis`
 **Purpose:** Stores detailed analysis of NDE videos.
 

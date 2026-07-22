@@ -25,7 +25,7 @@
 
 ### AI layer
 - **Live chat**: [src/app/api/chat-compassionate/route.ts](../src/app/api/chat-compassionate/route.ts) — direct OpenAI: `text-embedding-3-small` for retrieval + `gpt-5-chat-latest` for generation, RAG over Supabase pgvector embeddings. `/uap/chat` → `api/uap/chat` is the UAP twin. `/search3` and `/uap/search` call embedding-backed search routes.
-- **Legacy chat**: the one remaining Genkit flow ([src/ai/flows/compassionate-chatbot-answers.ts](../src/ai/flows/compassionate-chatbot-answers.ts), Gemini 2.5 Flash via [src/ai/genkit.ts](../src/ai/genkit.ts)) is reachable through `getChatResponse` in [src/app/actions.ts](../src/app/actions.ts). The dead chat pages (`chat-2`, `chat-test`, old `chat`) post to external **n8n webhooks** baked in as `NEXT_PUBLIC_*_WEBHOOK_URL` ([apphosting.yaml](../apphosting.yaml)).
+- **Legacy chat**: ~~the one remaining Genkit flow (`src/ai/flows/compassionate-chatbot-answers.ts`, Gemini 2.5 Flash via `src/ai/genkit.ts`) is reachable through `getChatResponse` in [src/app/actions.ts](../src/app/actions.ts).~~ **Update:** the dead chat pages (`chat-2`, `chat-test`, old `chat`) and their webhook env vars have been deleted; all three routes now redirect to `/chat-compassionate`. That left `getChatResponse` with no callers, and the whole Genkit path has since been **deleted** — `src/ai/`, `getChatResponse`, the `genkit:*` scripts and all 4 genkit deps are gone (see A-6). The site's live AI layer is `src/lib/ai/` (Anthropic + OpenAI), which is unaffected.
 - **Analysis pipeline** (the bulk of AI code): 19 modules in `src/lib/ai/` (greyson, core-elements, journey-flow, phenomenology, transformation, uap-* etc.) called by `src/lib/pipeline/` intake code and by batch API routes / Oracle scripts. Uses OpenAI + OpenRouter (Claude) + Tavily + fal.ai.
 
 ### Automation (load-bearing — do not break)
@@ -72,7 +72,7 @@ Severity scale: **Critical** = exploitable/cost-incurring today or ships broken 
 | A-3 | Medium | Root homepage's building blocks live inside a dead route's folder | `src/app/page.tsx:5-9` imports data + 4 section components from `src/app/home-new/` | Confusing; blocks deleting `home-new`; route folders shouldn't export shared modules | Move to `src/components/home/` + `src/lib/data/` first, then delete the route |
 | A-4 | Medium | Oracle crontab schedule exists only as a markdown table | `docs/ARCHITECTURE.md` §automation; no crontab file in repo | The system's entire scheduling layer is unversioned; drift between doc and VM is invisible | Commit the actual crontab (e.g. `infra/oracle-crontab`) + a `scripts/README.md` mapping entry → script |
 | A-5 | Low | `execution/` dir is dead (CLAUDE.md "Layer 3" convention unused; real automation is `scripts/`) | `execution/` (only test outputs: `anon_test_output.json`, `greyson_test_run.*`) | Misleading structure | Delete or repurpose; update CLAUDE.md if convention is abandoned |
-| A-6 | Medium | Entire Genkit/Gemini stack is dead code (confirmed by AI-layer audit) | `src/ai/` (genkit.ts, dev.ts, flows/compassionate-chatbot-answers.ts), `src/app/chat/chat-ui.tsx`, `getChatResponse` in `src/app/actions.ts:73` | Only `actions.ts` imports `src/ai/`; its `getChatResponse` is called only by `chat-ui.tsx:44`, which **nothing imports** (the rendered `/chat` page uses an n8n webhook, not this flow). So the whole Genkit path is unreachable. | **Deletable:** `src/ai/` entirely, `chat-ui.tsx`, the `getChatResponse` export, the 4 genkit deps (`genkit`, `genkit-cli`, `@genkit-ai/google-genai`, `@genkit-ai/next`) and the two `genkit:*` npm scripts. (Caveat: grep-based; no dynamic imports detected.) Bundle into Phase 3. |
+| A-6 | ~~Medium~~ | ~~Entire Genkit/Gemini stack is dead code (confirmed by AI-layer audit)~~ | ~~`src/ai/` (genkit.ts, dev.ts, flows/compassionate-chatbot-answers.ts), `src/app/chat/chat-ui.tsx`, `getChatResponse` in `src/app/actions.ts:73`~~ | — | ✅ **Done** — deleted `src/ai/` (all 3 files), the `getChatResponse` export and its `@/ai/flows/...` import from `src/app/actions.ts`, the two `genkit:*` npm scripts, and all 4 genkit deps (`genkit`, `genkit-cli`, `@genkit-ai/google-genai`, `@genkit-ai/next`). `chat-ui.tsx` was already deleted by the n8n retirement. Also removed the unrelated dead `addVideoToFavorites` action from the same file (zero callers; the live star button is `src/components/favorite-button.tsx`, which writes to Supabase directly from the client — it never used this action). `actions.ts` itself stays: `sendContactMessage` is still used by `src/app/about/contact-form.tsx`. |
 
 ### 2.3 Dead code & duplicate routes
 
@@ -169,10 +169,10 @@ The only phase addressing money-losing/exploitable-today issues. Highest-severit
 ### Phase 3 — Dead code & route cleanup (≈1–2 days) · fixes D-1…D-8, A-3, A-5, A-6 — **destructive, see §4**
 1. Relocate `home-new` shared modules (A-3) → then delete dead route folders (D-1). (Dead-code audit confirmed no other cross-imports block deletion.)
 2. Delete dead components (D-2 — note the corrected list: `search-result-card.tsx` is dead, `-v4` is **live**), tracked junk (D-7), disabled workflow stubs (D-6), `execution/` (A-5).
-3. Delete the dead Genkit stack (A-6): `src/ai/`, `chat-ui.tsx`, `getChatResponse`, the 4 genkit deps + `genkit:*` scripts.
+3. ✅ **Done.** Deleted the dead Genkit stack (A-6): `src/ai/`, `getChatResponse`, the 4 genkit deps + `genkit:*` scripts. (`chat-ui.tsx` had already gone with the n8n retirement.)
 4. `scripts/` → move one-offs to `scripts/archive/` (D-5); add `scripts/README.md`.
 5. Uninstall `firebase`, `firebase-admin`, `howler`, `@types/howler` (D-4).
-6. Webhook env vars in `apphosting.yaml`: drop `NEXT_PUBLIC_SEARCH_WEBHOOK_URL` **now** (read by nothing); drop `CHAT`/`CHAT_2`/`CHAT_TEST` webhook vars together with their dead routes; **keep `NEXT_PUBLIC_N8N_WEBHOOK_URL`** until the `/experiencers` page fate (D-3) is decided — it's the sole reader.
+6. ✅ **Done.** All five `NEXT_PUBLIC_*_WEBHOOK_URL` vars removed from `apphosting.yaml`; the `/chat`, `/chat-2` and `/chat-test` routes deleted and redirected to `/chat-compassionate`; the `/experiencers` form repointed to the native `/api/contact`.
 7. Untracked junk (D-8): owner reviews list, then delete; extend `.gitignore`.
 - *Verify:* `next build` green; `npm test` green; click through nav; one Oracle tick (scanner-process) confirmed working post-archive.
 
@@ -214,7 +214,7 @@ Form-label pass, axe/Lighthouse audit on live surface, contrast fixes, console.l
 | Move ~35 one-off scripts to `scripts/archive/` (incl. `uap-reset-analysis.ts`, which can wipe prod analysis data if ever run) | 3 | ✅ (git mv) |
 | **Delete untracked files** (`test_*.mjs`, `test.py`, `tmp-pg/`, `triad-output.log`, `get_errors.js`, `middleware.ts.bak`, …) | 3 | ❌ **Permanent — not in git.** I'll present the exact list for sign-off before deleting |
 | Remove `?secret=` auth path | 1 | ✅ code-wise, but **breaks Oracle crontab curls until they're updated** — must be coordinated |
-| Drop `NEXT_PUBLIC_*_WEBHOOK_URL` from `apphosting.yaml` (SEARCH now; CHAT/CHAT_2/CHAT_TEST with their routes; **N8N kept** until `/experiencers` decided) | 3 | ✅ (values restorable from Firebase console history; the n8n workflows themselves are untouched) |
+| ~~Drop `NEXT_PUBLIC_*_WEBHOOK_URL` from `apphosting.yaml`~~ | 3 | ✅ **Done** — all five removed; routes deleted and redirected; `/experiencers` form moved to `/api/contact` |
 | Remove `ignoreBuildErrors` | 4 | ✅ — but blocks deploys until errors are fixed (that's the point) |
 | Branch protection on `main` | 2 | ✅ (GitHub setting) |
 

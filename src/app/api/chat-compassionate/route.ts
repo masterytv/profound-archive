@@ -197,7 +197,8 @@ Here are videos from first-person NDE accounts that are relevant to the user's c
         const finalSystemPrompt = systemPrompt + `\n${videosContext}\n`;
 
         // 5. Build Messages Array
-        // Match n8n's prompt structure exactly for the final user message
+        // The trailing instruction after the user's message is load-bearing:
+        // it re-asserts the rules after the injected video context.
         const userMessageContent = `The user's latest message is: "${chatInput}"
 
 Now, following all your rules and using the context provided, generate your compassionate response.`;
