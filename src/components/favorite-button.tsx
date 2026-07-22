@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { getSharedSession } from '@/lib/supabase/session';
 import type { User } from '@supabase/supabase-js';
 import { Star, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
@@ -32,9 +33,9 @@ export default function FavoriteButton({ videoId, videoTitle, videoThumbnailUrl,
       try {
         let currentUser = initialUser;
         if (!currentUser) {
-          // Use getSession() instead of getUser() to avoid navigator.lock contention
-          // when many buttons mount simultaneously. Session check is sufficient for UI gating.
-          const { data: { session } } = await supabase.auth.getSession();
+          // Shared single-flight lookup: one lock acquisition for the whole page,
+          // however many buttons mount. Session check is sufficient for UI gating.
+          const session = await getSharedSession();
           currentUser = session?.user ?? null;
         }
 
