@@ -59,3 +59,6 @@ triad-output.log
 
 # pipeline runtime state + logs (Oracle VM writes these into the repo dir)
 logs/
+
+# Claude Code local state: worktrees, machine-specific hook paths, personal settings
+.claude/
