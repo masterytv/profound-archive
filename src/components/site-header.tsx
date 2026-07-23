@@ -46,40 +46,45 @@ export default function SiteHeader() {
   const loginHref = mounted ? `/login?returnTo=${encodeURIComponent(pathname)}` : "/login";
   const isUap = pathname.startsWith('/uap');
 
+  // DEADLOCK RULE: onAuthStateChange callbacks must stay SYNCHRONOUS —
+  // auth-js awaits them while holding its navigator lock, so an awaited
+  // supabase call in here deadlocks the whole client (2026-07-23).
+  // Role lookup lives in the separate effect below.
   useEffect(() => {
-    // Fetch initial session and role
-    async function fetchUserAndRole() {
+    // Fetch initial session
+    async function fetchUser() {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        setUserRole(profile?.role ?? null);
-      }
     }
-    fetchUserAndRole();
+    fetchUser();
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: string, session: import('@supabase/supabase-js').Session | null) => {
+    // Listen for auth state changes — synchronous callback only
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: import('@supabase/supabase-js').Session | null) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        setUserRole(profile?.role ?? null);
-      } else {
-        setUserRole(null);
-      }
     });
 
     return () => subscription.unsubscribe();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // supabase is stable (useMemo) — empty dep array is correct here
+
+  // Role lookup kept OUT of the auth callback (see deadlock note above).
+  useEffect(() => {
+    if (!user) {
+      setUserRole(null);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+      .then(({ data: profile }: { data: { role: string | null } | null }) => {
+        if (!cancelled) setUserRole(profile?.role ?? null);
+      });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
 
   useEffect(() => {
