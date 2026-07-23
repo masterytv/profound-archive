@@ -8,6 +8,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getSharedSession } from "@/lib/supabase/session";
 import { EyeOff, Eye, Loader2, RefreshCw } from "lucide-react";
 
 export default function AdminProfileActions({
@@ -23,54 +24,54 @@ export default function AdminProfileActions({
     const [refreshing, setRefreshing] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
 
+    // DEADLOCK RULE: onAuthStateChange callbacks must stay SYNCHRONOUS —
+    // auth-js awaits them while holding its navigator lock, so an awaited
+    // supabase call in here deadlocks the whole client (2026-07-23).
+    // The callback only records the user id; the role query runs in the
+    // effect below, outside the lock.
+    const [authUserId, setAuthUserId] = useState<string | null>(null);
+
     useEffect(() => {
         const supabase = createClient();
+        let cancelled = false;
 
-        async function checkAdmin() {
-            try {
-                // First try getSession (reads from storage, no network call)
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session?.user) return;
+        // Shared single-flight lookup with an 8s stall guard, instead of an
+        // unbounded getSession().
+        getSharedSession().then((session) => {
+            if (!cancelled) setAuthUserId(session?.user?.id ?? null);
+        });
 
-                // Then check role in profiles table
-                const { data: profile } = await supabase
-                    .from("profiles")
-                    .select("role")
-                    .eq("id", session.user.id)
-                    .single();
-
-                if (profile?.role === "admin" || profile?.role === "super_admin") {
-                    setIsAdmin(true);
-                }
-            } catch {
-                // Not logged in or error — don't show admin controls
-            }
-        }
-
-        checkAdmin();
-
-        // Also listen for auth state changes (e.g., user just logged in)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_event: string, session: { user: { id: string } } | null) => {
-                if (!session?.user) {
-                    setIsAdmin(false);
-                    return;
-                }
-                const { data: profile } = await supabase
-                    .from("profiles")
-                    .select("role")
-                    .eq("id", session.user.id)
-                    .single();
-                if (profile?.role === "admin" || profile?.role === "super_admin") {
-                    setIsAdmin(true);
-                } else {
-                    setIsAdmin(false);
-                }
+            (_event: string, session: { user: { id: string } } | null) => {
+                setAuthUserId(session?.user?.id ?? null);
             }
         );
 
-        return () => subscription.unsubscribe();
+        return () => {
+            cancelled = true;
+            subscription.unsubscribe();
+        };
     }, []);
+
+    // Role lookup kept OUT of the auth callback (see deadlock note above).
+    useEffect(() => {
+        if (!authUserId) {
+            setIsAdmin(false);
+            return;
+        }
+        const supabase = createClient();
+        let cancelled = false;
+        supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", authUserId)
+            .single()
+            .then(({ data: profile }: { data: { role: string | null } | null }) => {
+                if (cancelled) return;
+                setIsAdmin(profile?.role === "admin" || profile?.role === "super_admin");
+            });
+        return () => { cancelled = true; };
+    }, [authUserId]);
 
     if (!isAdmin) return null;
 

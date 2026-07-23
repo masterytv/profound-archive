@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { getSharedSession } from '@/lib/supabase/session';
 import type { User } from '@supabase/supabase-js';
 import { Loader2, ChevronRight, UserIcon, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -44,8 +45,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const checkUserAndFetchProfile = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      // Bounded, single-flight session lookup (8s stall guard) — a wedged
+      // auth client redirects to login instead of spinning forever.
+      const session = await getSharedSession();
       if (!session) {
+        setLoading(false);
         router.push('/login');
       } else {
         setUser(session.user);
@@ -54,7 +58,7 @@ export default function ProfilePage() {
     };
 
     checkUserAndFetchProfile();
-  }, [router, supabase.auth, getProfile]);
+  }, [router, getProfile]);
 
   const handleUpdateProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

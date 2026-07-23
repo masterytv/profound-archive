@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { getSharedSession } from '@/lib/supabase/session';
 import type { User } from '@supabase/supabase-js';
 import { Loader2, Search, Folder, Trash2, ChevronRight, LayoutDashboard, Cpu, Radio } from 'lucide-react';
 import Link from 'next/link';
@@ -286,13 +287,10 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkUserAndFetchData = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError) {
-          console.warn("[dashboard] Session error:", sessionError.message);
-          router.push('/login');
-          return;
-        }
+        // Bounded, single-flight session lookup (8s stall guard). The old
+        // direct getSession() call could hang forever if the auth client was
+        // wedged, and this page's spinner had no other way to clear.
+        const session = await getSharedSession();
 
         if (!session) {
           router.push('/login');
@@ -364,11 +362,14 @@ export default function DashboardPage() {
 
         setNdeSearches(ndeSearchData.data || []);
         setUapSearches(uapSearchData.data || []);
-        setLoading(false);
       } catch (err) {
         // AbortError from Supabase auth locks
         console.warn("[dashboard] Auth check failed:", err);
         router.push('/login');
+      } finally {
+        // Always clear the spinner — a hang anywhere above must never strand
+        // the page on the loader (the redirect paths render null instead).
+        setLoading(false);
       }
     };
 

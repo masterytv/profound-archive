@@ -13,6 +13,7 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { createClient } from "@/lib/supabase/client"
+import { getSharedSession } from "@/lib/supabase/session"
 import type { User } from "@supabase/supabase-js"
 import { useRouter, usePathname } from "next/navigation"
 import { NewsletterModal } from "@/components/NewsletterModal"
@@ -43,32 +44,46 @@ export default function UnifiedSiteHeader() {
   useEffect(() => setMounted(true), [])
   const loginHref = mounted ? `/login?returnTo=${encodeURIComponent(pathname)}` : "/login"
 
+  // DEADLOCK RULE: onAuthStateChange callbacks must stay SYNCHRONOUS.
+  // auth-js emits events while holding its exclusive navigator lock and
+  // AWAITS these callbacks; any awaited supabase call in here needs that
+  // same lock for its access token, so the client deadlocks itself —
+  // every page spinner hangs and logout silently dies (2026-07-23).
+  // The profiles role lookup therefore lives in its own effect below.
   useEffect(() => {
-    async function fetchUserAndRole() {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles").select("role").eq("id", session.user.id).single()
-        setUserRole(profile?.role ?? null)
-      }
-    }
-    fetchUserAndRole()
+    let cancelled = false
+    // Shared single-flight lookup with an 8s stall guard, instead of an
+    // unbounded getSession() — a wedged client degrades to signed-out UI.
+    getSharedSession().then((session) => {
+      if (!cancelled) setUser(session?.user ?? null)
+    })
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event: string, session: import("@supabase/supabase-js").Session | null) => {
+      (_event: string, session: import("@supabase/supabase-js").Session | null) => {
         setUser(session?.user ?? null)
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from("profiles").select("role").eq("id", session.user.id).single()
-          setUserRole(profile?.role ?? null)
-        } else {
-          setUserRole(null)
-        }
       },
     )
-    return () => subscription.unsubscribe()
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Role lookup kept OUT of the auth callback (see deadlock note above).
+  useEffect(() => {
+    if (!user) {
+      setUserRole(null)
+      return
+    }
+    let cancelled = false
+    supabase
+      .from("profiles").select("role").eq("id", user.id).single()
+      .then(({ data: profile }: { data: { role: string | null } | null }) => {
+        if (!cancelled) setUserRole(profile?.role ?? null)
+      })
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
 
   const handleLogout = async () => {
     await supabase.auth.signOut({ scope: "global" })
