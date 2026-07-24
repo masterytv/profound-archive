@@ -1,0 +1,736 @@
+{
+  "places": [
+    {
+      "id": "city-of-light",
+      "name": "The City of Light",
+      "category": "structure",
+      "parent": null,
+      "journey_position": 0.5,
+      "description": "A vast inhabited city seen either from a distance (glowing on the horizon, across a valley, beyond a doorway of cloud) or entered and walked through. People describe wide avenues, towers and buildings so tall they vanish into cloud, and a light that comes from the material of the city itself rather than from any sun. Several say it is 'made of light' though it looks like gold, crystal or white stone. Many arrive at it after the tunnel or after meeting a guide, and it is usually the largest single made thing they see.",
+      "aliases": [
+        { "term": "city of light", "tradition": "none", "note": "the most common phrasing; frequently paired with 'city of God' by the same speaker" },
+        { "term": "golden city", "tradition": "Christian", "note": null },
+        { "term": "crystal city", "tradition": "none", "note": "used by Dannion Brinkley and repeated by many later experiencers" },
+        { "term": "crystalline city", "tradition": "none", "note": null },
+        { "term": "celestial city", "tradition": "Christian", "note": null },
+        { "term": "holy city", "tradition": "Christian", "note": null },
+        { "term": "the New Jerusalem", "tradition": "Christian", "note": "explicitly tied to Revelation 21 by biblically-framed narrators" },
+        { "term": "the city of heaven", "tradition": "Christian", "note": null },
+        { "term": "cities of light", "tradition": "secular", "note": "plural form used by Monroe-influenced narrators; more than one city" },
+        { "term": "a city with flat ground", "tradition": "none", "note": "rare non-ornate variant: featureless box-like buildings, no windows or doors" }
+      ],
+      "regex": "\\bcit(y|ies) of (light|gold|god)\\b|golden cit(y|ies)|crystal(line)? cit(y|ies)|shining city|celestial city|holy city|cit(y|ies) of heaven|heavenly city|new jerusalem",
+      "negative_regex": "velocity|new york city|kansas city|salt lake city|mexico city|city council|inner city|city of santee",
+      "measured": { "all_pct": 2.56, "all_docs": 158, "cv13_pct": 3.44, "cv18_pct": 3.87, "cv23_pct": 6.08 },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 14,
+      "sensory": [
+        "wide avenues",
+        "buildings so tall and shining they look like white gold and are transparent",
+        "a glow visible from far off, before the city itself is visible",
+        "waterfalls at the edge of the city",
+        "no sun anywhere, yet total illumination",
+        "sky an intense blue with no light source"
+      ],
+      "quotes": [
+        { "videoId": "dveGOpoSVGo", "cvnde": 9, "text": "I saw this other realm that was like a, a city of light." },
+        { "videoId": "gxSWiG2rasI", "cvnde": 10, "text": "a crystal city, celestial city, magnificent place. There, I, I could see wide avenues, and also buildings that were so tall" },
+        { "videoId": "zwzmK-JEGKo", "cvnde": 7, "text": "And beyond it was this beautiful crystal city. I'll never forget it with the waterfalls on the side." },
+        { "videoId": "yXhlAg6Dx6I", "cvnde": 10, "text": "And I saw this golden city way in the distance." },
+        { "videoId": "nsc0Z2N-HJE", "cvnde": 10, "text": "there in front of me was the celestial city, the crystal city." },
+        { "videoId": "eZ3e57uSExc", "cvnde": 14, "text": "I was in some sort of city with flat ground; there were buildings with no windows nor doors, just like big boxes." }
+      ],
+      "notes": "Strongly enriched among the best-evidenced accounts: 2.56% of all docs but 6.08% at cv>=23 - roughly 2.4x. Most speakers see the city rather than enter it; the commonest verb is 'saw ... in the distance'. A minority explicitly reject it ('I thought heaven was streets of gold and pearly gates - it wasn't like that'), which the regex still catches; those are counted as false positives in the precision estimate above only when the speaker never saw a city at all."
+    },
+    {
+      "id": "buildings-of-the-other-side",
+      "name": "The Buildings",
+      "category": "structure",
+      "parent": null,
+      "journey_position": 0.5,
+      "description": "Constructed edifices in the otherworld, described generically before the speaker knows what any of them is for. People repeatedly say they 'noticed a building' and then somehow knew, without signage or being told, what it was: a university, a library, a nursery, a place of healing. Buildings are often walked through rather than into - one experiencer says each building he entered opened into a different realm. Several note that the buildings shape-shift or reconfigure themselves to the needs of whoever is inside.",
+      "aliases": [
+        { "term": "buildings", "tradition": "none", "note": "by far the commonest word" },
+        { "term": "structures", "tradition": "none", "note": null },
+        { "term": "training buildings", "tradition": "secular", "note": "where souls prepare for a lifetime" },
+        { "term": "buildings with information", "tradition": "none", "note": null },
+        { "term": "the architecture", "tradition": "none", "note": null },
+        { "term": "a cityscape", "tradition": "none", "note": null }
+      ],
+      "regex": "(a|the|this|huge|beautiful|enormous|magnificent|large|white|golden|shining) building\\b|buildings? (there|in heaven|everywhere)|(saw|see|were) buildings",
+      "negative_regex": "hospital building|apartment building|office building|school building on|building up|pressure was building|building a case|the building was on fire|out of the building|in the building where",
+      "measured": { "all_pct": 11.32, "all_docs": 699, "cv13_pct": 14.72, "cv18_pct": 15.61, "cv23_pct": 21.55 },
+      "precision_estimate": 0.72,
+      "precision_sample_n": 28,
+      "sensory": [
+        "buildings that get higher and higher until they disappear into the clouds",
+        "shape-shifting: buildings that change size and form for their inhabitants",
+        "no doors or windows - entry by a 'special way'",
+        "no technology inside: stairs between floors but no elevators, roads but no cars",
+        "you can feel God's presence in the buildings the same way you feel it in the grass",
+        "the building is one single unbroken piece of marble"
+      ],
+      "quotes": [
+        { "videoId": "iHwwozUcby4", "cvnde": 10, "text": "there were buildings there. I remember going through the buildings, the different buildings." },
+        { "videoId": "SV712eZNI3o", "cvnde": 24, "text": "I could see that it was this huge vast building. It was built out of one piece of marble" },
+        { "videoId": "6I7yqPe3wDo", "cvnde": 10, "text": "I remember seeing sort of buildings, is what I could describe them in human terms, in the background." },
+        { "videoId": "HnzPjPT77PQ", "cvnde": 19, "text": "In these buildings, I saw stairs leading from floor to floor, but there was no elevator. I saw roads, but there were no cars." },
+        { "videoId": "HpgDfdWT6LA", "cvnde": 23, "text": "And then I noticed this building. And I had so many questions about the building." },
+        { "videoId": "O0A0Fr1-AN8", "cvnde": 27, "text": "I woke up inside of a beautiful building." }
+      ],
+      "notes": "The clearest cvNDE gradient in this region: 11.32% overall rising monotonically to 21.55% at cv>=23. Precision losses are almost entirely earthly buildings seen during the out-of-body phase (hospital, apartment block, city skyline seen while floating), which is itself an interesting confound because those OBE sightings are what earn the high cvNDE scores."
+    },
+    {
+      "id": "building-substance",
+      "name": "What the Buildings Are Made Of",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.5,
+      "description": "A recurring, unusually concrete detail: the material of the built world. Marble, crystal, glass, pure gold, and - most distinctively - 'living stone', a white quartz-like substance with swirling markings that people insist is alive and conscious. Several say the buildings are hewn from blocks of light rather than stone, which is why they have warmth. Furniture inside is the same stuff: marble tables, marble benches, crystal tablets, a glass door with glass hinge pins that could not stand up under earthly physics.",
+      "aliases": [
+        { "term": "living stone", "tradition": "none", "note": "white quartz-like, with visibly moving markings; described as alive and praising God" },
+        { "term": "made of marble", "tradition": "none", "note": null },
+        { "term": "made of crystal", "tradition": "none", "note": null },
+        { "term": "hewn from blocks of light", "tradition": "none", "note": "used where a speaker compares the building to the Parthenon but insists it is not stone" },
+        { "term": "transparent gold", "tradition": "Christian", "note": null },
+        { "term": "pearlescent white", "tradition": "none", "note": null },
+        { "term": "made of light", "tradition": "none", "note": null }
+      ],
+      "regex": "(made|built) (of|out of) (marble|crystal|living stone|pure gold)|buildings? (made|built|hewn) (of|out of|from) light|(marble|alabaster|crystal|living stone|white stone) (floor|floors|building|buildings|steps|walls|columns|pillars|tables)",
+      "negative_regex": "marble cake|shooting marbles|lost his marbles",
+      "measured": { "all_pct": 1.23, "all_docs": 76, "cv13_pct": 1.21, "cv18_pct": 1.38, "cv23_pct": 0.55 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "sensory": [
+        "white quartz with white swirls moving inside it - you can see the life in the stone",
+        "marble that is warm rather than cold",
+        "crystal with lines of symbols running through it in ultraviolet light",
+        "glass hinges that could not bear weight on earth but do there",
+        "everything transparent yet still coloured"
+      ],
+      "quotes": [
+        { "videoId": "dzZmsROv3Gg", "cvnde": 10, "text": "The other buildings were made out of living stone." },
+        { "videoId": "u-_bkoxO0uM", "cvnde": 10, "text": "these columns, beautiful, tall white marble, maybe 30 feet high" },
+        { "videoId": "NShobnW5Rds", "cvnde": 7, "text": "Everything was made of a very clear glowing crystal." },
+        { "videoId": "KxgkceMHyxE", "cvnde": 13, "text": "it appeared that all the buildings, they appeared to be as if they were made of gold" }
+      ],
+      "notes": "Rare (1.23%) and flat across strata, with a single cv>=23 hit, so treat the stratum comparison as noise. Included because it is the single most concrete and most cross-culturally repeated physical claim in the built region: the material of heaven is alive."
+    },
+    {
+      "id": "great-columned-hall",
+      "name": "The Great White Building with Columns",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.55,
+      "description": "A specific, repeatedly described edifice: an enormous glowing white or pearlescent building fronted by tall columns, approached up a long flight of stairs, with a huge doorway at the top. Spirit-beings in white robes are milling around outside, going in and coming out. Speakers who have no vocabulary for it reach for 'Greek or Roman temple'. Inside, it usually opens into the library or hall of records - the columns and the books belong to the same structure.",
+      "aliases": [
+        { "term": "like a Greek or Roman temple", "tradition": "secular", "note": "the single most common comparison; the speakers stress they are only borrowing the shape" },
+        { "term": "white marble columns", "tradition": "none", "note": null },
+        { "term": "pillars", "tradition": "none", "note": null },
+        { "term": "the Parthenon, but hewn from blocks of light", "tradition": "none", "note": null },
+        { "term": "a hall open with pillars", "tradition": "none", "note": null },
+        { "term": "the entry doorway", "tradition": "none", "note": null }
+      ],
+      "regex": "(greek|roman|grecian) (or roman )?(temple|architecture|column|building)|(white|marble|huge|enormous|tall|big) columns (in front|along|on)|columns in front|building with (huge |big |white |marble )?columns",
+      "negative_regex": null,
+      "measured": { "all_pct": 0.71, "all_docs": 44, "cv13_pct": 0.97, "cv18_pct": 1.24, "cv23_pct": 3.31 },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 12,
+      "sensory": [
+        "columns roughly 20-30 feet high, about six feet apart, running further than sight",
+        "a long line of stairs going up to the entrance",
+        "the whole building glowing white from within, pearlescent",
+        "doors that open by themselves as the guide approaches",
+        "beings in vibrant white robes going in and coming out",
+        "marble tables with benches on all four sides, receding to no visible end"
+      ],
+      "quotes": [
+        { "videoId": "oXrxmJ3ci5U", "cvnde": 23, "text": "the closest thing I could compare it to would be like a Greek or a Roman temple, but it was pearlescent white." },
+        { "videoId": "l_pQ9Cxi-6A", "cvnde": 23, "text": "an enormous gorgeous pearlescent glowing white building that looked like it was a Greek or Roman Temple" },
+        { "videoId": "pjxqvZQNFWY", "cvnde": 10, "text": "off to my right, all the way down as far as I could see, were these beautiful white marble columns." },
+        { "videoId": "J5PhPHmQa4M", "cvnde": 21, "text": "it had the huge white columns in front and a and a huge number of stairs, just so many stairs" },
+        { "videoId": "uGMtd3YN3B0", "cvnde": 24, "text": "vibrantly white with many steps leading up to it and huge columns in front." }
+      ],
+      "notes": "The most strongly cv-enriched item in this region: 0.71% overall but 3.31% at cv>=23, a 4.7x enrichment. Part of that is one experiencer (Karen Thomas) retelling the same NDE in several interviews, all of which score high, so the enrichment is inflated; but independent accounts (pjxqvZQNFWY / u-_bkoxO0uM, uGMtd3YN3B0, g2QgPL2Q06w) describe the same columned white hall with steps."
+    },
+    {
+      "id": "hall-of-records",
+      "name": "The Library / Hall of Records",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.62,
+      "description": "A building whose interior is shelves, scrolls and books rising past the limit of sight, with long tables where spirits sit and study. Reading is not reading: you think of what you want to know and it downloads. Some are told this hall holds the Book of Life; others call it the Akashic Records and say every event past and future is stored there. A recurring detail is that the ceiling cannot be found - the shelves just keep going up.",
+      "aliases": [
+        { "term": "the library", "tradition": "none", "note": "the plainest and most common word" },
+        { "term": "the Hall of Records", "tradition": "secular", "note": null },
+        { "term": "the Akashic Records", "tradition": "secular", "note": "often described as a building, not an abstraction: 'a big building up in heaven'" },
+        { "term": "the Akashic Hall of Records", "tradition": "secular", "note": null },
+        { "term": "the Book of Life", "tradition": "Christian", "note": "sometimes a single enormous book on a stand or table rather than a room" },
+        { "term": "the Hall of Knowledge", "tradition": "none", "note": "one speaker coins it herself and says she isn't sure that's its real name" },
+        { "term": "the Hall of Events", "tradition": "none", "note": "one speaker's own name for the same thing, described as a crystallized theatre" },
+        { "term": "a circular library", "tradition": "none", "note": "with long corridors of books and scrolls radiating out" },
+        { "term": "the scrolls", "tradition": "none", "note": null }
+      ],
+      "regex": "hall[s]? of records|akashic|book of life|room (full|filled) (of|with) books|librar(y|ies) (full of|filled with|lined with|of light|there|in heaven|of all)|(enormous|huge|vast|great|celestial|cosmic|infinite|universal|massive|giant|circular|spiritual) librar(y|ies)|(shelves|walls) (of|full of|lined with) (books|scrolls)",
+      "negative_regex": "NDE Radio library|public library|school library|went to the library|library book|story library|library card|university library",
+      "measured": { "all_pct": 5.57, "all_docs": 344, "cv13_pct": 5.43, "cv18_pct": 5.11, "cv23_pct": 9.39 },
+      "precision_estimate": 0.62,
+      "precision_sample_n": 26,
+      "sensory": [
+        "bookshelves going up further than you can see - no visible ceiling",
+        "marble and dark wood, ladders you can slide along to reach high shelves",
+        "scrolls: some rolled, some cloth, some rasping paper, some etched flat",
+        "long tables down the centre with beings quietly studying",
+        "you don't read the book, the book downloads into you"
+      ],
+      "quotes": [
+        { "videoId": "uGMtd3YN3B0", "cvnde": 24, "text": "My guide took me inside where it opened into an enormous library full of tables and lined with books." },
+        { "videoId": "3b7HhWuIL3Q", "cvnde": 22, "text": "Inside this building turned into an enormous library." },
+        { "videoId": "BED6rta6c6w", "cvnde": 15, "text": "We entered into what looked like a library of sorts. It had multiple levels" },
+        { "videoId": "8uqlP7qsk50", "cvnde": 18, "text": "it felt as if I was in sort of like a circular library" },
+        { "videoId": "YqShRo4lk5E", "cvnde": 18, "text": "I was asked to return to the library, as we were, as I was to start my studies. As in reading the scrolls." },
+        { "videoId": "Ot_oAFw1Qfw", "cvnde": 11, "text": "And I called it the Hall of Knowledge, but I'm not sure if that's what it was really called." },
+        { "videoId": "U4YZgofjIYk", "cvnde": 26, "text": "There was a wooden table in front of me with a book on it." }
+      ],
+      "notes": "Precision is only fair (0.62). The word 'akashic' pulls in a lot of post-NDE spiritual practice ('I became an Akashic record reader') rather than in-experience description, and 'book of life' is sometimes purely scriptural citation. The in-experience core - a building full of books and scrolls entered with a guide - is smaller than the 5.57% headline but is present in some of the highest-cvNDE documents in the corpus."
+    },
+    {
+      "id": "halls-of-learning",
+      "name": "The Halls of Learning",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.6,
+      "description": "A building or complex of buildings understood, without being told, to be a university or school. Souls go there between lives to study anything - other planets, other galaxies, the mechanics of a coming lifetime. Some see actual classrooms with chairs and desks and a teacher explaining. One speaker was told he could not go in yet. Another describes rooms that open an aperture in the wall as you approach and close behind you.",
+      "aliases": [
+        { "term": "the halls of learning", "tradition": "none", "note": "usually plural, and usually listed alongside halls of knowledge, healing and music" },
+        { "term": "the halls of knowledge", "tradition": "none", "note": null },
+        { "term": "the Hall of Learning", "tradition": "secular", "note": "'almost like, just like school'" },
+        { "term": "a place of learning", "tradition": "none", "note": "the phrase people use when they have no name for it" },
+        { "term": "the university", "tradition": "none", "note": null },
+        { "term": "a classroom", "tradition": "none", "note": null },
+        { "term": "schools", "tradition": "none", "note": null },
+        { "term": "training buildings", "tradition": "secular", "note": null }
+      ],
+      "regex": "hall[s]? of (learning|knowledge)|(place|places|center|centre|building) (of|for) learning|school[s]? (of learning|there|in heaven)|(a|the|this) (university|school|classroom) (building|there|in heaven)|(was|were|like) (a|an) (university|school|classroom)\\b|celestial (university|school)",
+      "negative_regex": "earth school|earth is a school|high school|elementary school|medical school|law school|school teacher|school shooting|school counselor|school of fish",
+      "measured": { "all_pct": 3.38, "all_docs": 209, "cv13_pct": 3.92, "cv18_pct": 4.28, "cv23_pct": 4.42 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 22,
+      "sensory": [
+        "no signage - you simply know the building is a place of learning",
+        "rooms that form an opening as you approach and seal behind you",
+        "colours that are 'alive', not like the purple here",
+        "people ecstatic to be going in, like children on the first day",
+        "a round room with aisles radiating from all sides and open sky and stars above"
+      ],
+      "quotes": [
+        { "videoId": "_vE37Q0HqtQ", "cvnde": 18, "text": "And I saw this building, this great building, that I was shown to be the university or a place of learning." },
+        { "videoId": "4DhnSOcS9IU", "cvnde": 23, "text": "I then noticed a building, a beautiful building. And I just somehow knew that that building was a university." },
+        { "videoId": "0ISQ4ejRkXU", "cvnde": 17, "text": "I'm looking at the halls of knowledge, the halls of learning, the halls of music." },
+        { "videoId": "8p7y58V6sMM", "cvnde": 14, "text": "The hall of knowledge is a wonderful place, where one can listen to spiritual teachers." },
+        { "videoId": "Ja8UafoCDo4", "cvnde": 13, "text": "There's also the Hall of Learning. The Hall of Learning is almost like, just like school." },
+        { "videoId": "S14VrsILt6U", "cvnde": 10, "text": "It was like a classroom. People were sitting down in chairs and desk chairs." },
+        { "videoId": "HpgDfdWT6LA", "cvnde": 23, "text": "I knew it was some type of university or some type o" }
+      ],
+      "notes": "Main precision loss is the near-universal metaphor 'Earth is a school / a classroom', which is a doctrine drawn FROM the experience rather than a place inside it; the negative_regex targets it. The literal halls (a building you can approach, enter, be refused entry to) are a smaller but robust subset. Mildly enriched with cvNDE (3.38% -> 4.42%)."
+    },
+    {
+      "id": "temple-and-cathedral",
+      "name": "The Temple / Cathedral",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.55,
+      "description": "A place of worship in the otherworld, distinct from the library and the school. Descriptions cluster into two shapes: a cathedral with spires going up thousands of feet, pews and a long central corridor scaled far beyond human size; and a crystal temple of light that radiates more brightly than the sun and appears as you approach. A third variant, the healing temple, is where the imprints and traumas carried in the soul are dissolved.",
+      "aliases": [
+        { "term": "a cathedral", "tradition": "Christian", "note": "used even by non-religious speakers as a size-and-shape comparison" },
+        { "term": "a crystal temple of light", "tradition": "none", "note": null },
+        { "term": "the healing temple", "tradition": "none", "note": "overlaps with the healing place; the same structure named devotionally" },
+        { "term": "the chapel", "tradition": "Christian", "note": null },
+        { "term": "the sanctuary", "tradition": "Christian", "note": null },
+        { "term": "the vestibule / the nave", "tradition": "Christian", "note": "used by one speaker to say she got only as far as heaven's entryway" }
+      ],
+      "regex": "healing temple|temple of (light|healing|knowledge|wisdom|god)|(a|the|this|huge|magnificent|enormous|beautiful|great) cathedral|cathedral[- ]like|(a|the) chapel\\b|church (in heaven|there)|(temple|sanctuary) (there|in heaven|of light)",
+      "negative_regex": "your body is a temple|you are the temple of god|right temple|left temple|his temple|hit my temple|sphinx temple|vedanta temple|buddhist temple|cathedral high school|national cathedral|durham cathedral",
+      "measured": { "all_pct": 2.70, "all_docs": 167, "cv13_pct": 3.32, "cv18_pct": 2.49, "cv23_pct": 2.21 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 24,
+      "sensory": [
+        "spires rising thousands of feet",
+        "pews whose seats are single 30-foot pieces of timber",
+        "a light from the temple so strong the viewer bows their head to avert their eyes",
+        "soft edges, translucent space, everything alive",
+        "sandstone and carved wood melded into one another rather than joined"
+      ],
+      "quotes": [
+        { "videoId": "gbakJ4HkuKE", "cvnde": 19, "text": "I find myself at the doorway of a magnificent cathedral. We're talking spires that go up thousands of feet." },
+        { "videoId": "S1E02DuC3R4", "cvnde": 10, "text": "A crystal temple of light that shone more radiant than the sun began to appear before me." },
+        { "videoId": "G_sB7xrRpd4", "cvnde": 20, "text": "I went to this city, there's a crystalline city, and I went into this cathedral" },
+        { "videoId": "RmzxdSURNwc", "cvnde": 13, "text": "I would call it like into the Healing Temple." }
+      ],
+      "notes": "Weakest precision in this region (~0.5): 'temple' is heavily polluted by the anatomical temple, earthly Buddhist and Hindu temples visited in biography, and the Pauline 'your body is a temple'. Also the only structure here that is LESS common among the best-evidenced accounts (3.32% at cv>=13 falling to 2.21% at cv>=23), which is worth flagging - explicitly religious architecture may be more expectation-shaped than the generic columned hall."
+    },
+    {
+      "id": "throne-room",
+      "name": "The Throne Room",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.55,
+      "description": "A chamber containing a seat of authority. Reports split sharply: a minority describe arriving at a real room - steps up to a platform, a huge throne, sometimes two identical white thrones cut from marble, translucent carved artwork like emeralds and diamonds set into the tiles - while a large number invoke the throne only to deny it ('it was not an old man with a beard on a throne judging me'). Both usages are counted here because both are the corpus reasoning about the same structure.",
+      "aliases": [
+        { "term": "the throne room", "tradition": "Christian", "note": null },
+        { "term": "the throne of God", "tradition": "Christian", "note": null },
+        { "term": "a big chair like a king", "tradition": "none", "note": "a small child's wording, corrected to 'throne' by the adult interviewer" },
+        { "term": "two identical white thrones", "tradition": "none", "note": "cut from pure white marble, square and angular" },
+        { "term": "a platform with three steps", "tradition": "none", "note": null }
+      ],
+      "regex": "throne room|throne of god|(saw|there was|sitting on|seated on|sat on|upon) (a|the|this|his|huge|big|great|golden|white) throne",
+      "negative_regex": "not an old man|old man with a long white beard|beard sitting on a throne|game of thrones",
+      "measured": { "all_pct": 2.46, "all_docs": 152, "cv13_pct": 2.47, "cv18_pct": 2.35, "cv23_pct": 1.66 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 12,
+      "sensory": [
+        "three steps up to a platform, throne on the third step",
+        "thrones square and angular, cut from pure white marble",
+        "carved translucent artwork in every floor tile, like emeralds and diamonds",
+        "a river running out from under the chair, and inside it stars and galaxies instead of water",
+        "the viewer shielded from the face of whoever sits there"
+      ],
+      "quotes": [
+        { "videoId": "7XvpEI_loZE", "cvnde": 13, "text": "what I now know was the throne room that I got to see at this point" },
+        { "videoId": "FRz3o-u4mIg", "cvnde": 18, "text": "There I saw three steps and on the third step I saw there was a huge throne" },
+        { "videoId": "nKDYqzBTfIs", "cvnde": 14, "text": "I looked up and I saw two men sitting on big white thrones." }
+      ],
+      "notes": "Roughly half the matches are the negation formula ('God was NOT an old man on a throne'), which is itself one of the most stereotyped sentences in the whole corpus. Slightly LESS common among the best-evidenced accounts. Use negative_regex to isolate the affirmative subset."
+    },
+    {
+      "id": "the-garden",
+      "name": "The Garden",
+      "category": "structure",
+      "parent": null,
+      "journey_position": 0.42,
+      "description": "A cultivated, tended place rather than wild landscape: flowers in beds, pavers and paving stones, arbours, a stone archway to enter through, sometimes a fence or gate around it. It is very often the first thing seen on arrival, and it is where deceased relatives are waiting. What makes it a place rather than scenery is that the plants are conscious - flowers greet the visitor by name, a sunflower speaks, the grass is aware of being walked on.",
+      "aliases": [
+        { "term": "a beautiful garden", "tradition": "none", "note": "by far the most common phrasing" },
+        { "term": "a magnificent garden", "tradition": "none", "note": null },
+        { "term": "the Garden", "tradition": "secular", "note": "spoken as a known destination: 'everybody talks about the garden'" },
+        { "term": "an English cottage garden", "tradition": "none", "note": "picket fence, rose arbour, golden light from the windows of the house behind" },
+        { "term": "rose gardens", "tradition": "none", "note": null },
+        { "term": "the Garden of Eden", "tradition": "Christian", "note": "used as comparison, sometimes as the place one is expelled FROM on return" },
+        { "term": "a garden-like place", "tradition": "none", "note": "used by congenitally blind experiencers who stress it was 'a place full of light'" }
+      ],
+      "regex": "garden[s]? (there|in heaven|of light)|(beautiful|magnificent|glorious|lush|amazing|incredible|huge|gorgeous|walled|english|rose) garden|garden[s]? (with|full of|filled with) (flower|the most)|(walked|walking|walk|standing|stood|found myself) (in|into|through) (a|the|this) garden",
+      "negative_regex": "garden center|garden centre|flower nursery|working in the garden|garden hose|botanical garden|olive garden|garden of eden in maui|beer garden",
+      "measured": { "all_pct": 3.40, "all_docs": 210, "cv13_pct": 4.89, "cv18_pct": 3.59, "cv23_pct": 3.87 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 26,
+      "sensory": [
+        "a stone archway as the entrance",
+        "pavers and paving stones between the beds",
+        "flowers with colours that do not exist here, in constant motion",
+        "flowers that talk: 'Hi, how are you? We're so happy you're here'",
+        "birds singing and water running somewhere just out of sight",
+        "the air crisp and sweet, like the most beautiful spring day",
+        "pagoda-like structures made of clear glowing crystal that are actually beds"
+      ],
+      "quotes": [
+        { "videoId": "kfDl0i4Z2sQ", "cvnde": 20, "text": "And at the end of the clouds, there was a magnificent garden." },
+        { "videoId": "LzQkPvwnqpQ", "cvnde": 15, "text": "they led me out of the clouds into a beautiful garden that was to the left of a huge glorious city" },
+        { "videoId": "LD_yaNwszKc", "cvnde": 13, "text": "I entered through this stone archway, and it was just a beautiful garden in there." },
+        { "videoId": "g2QgPL2Q06w", "cvnde": 15, "text": "I emerged at the entrance of a beautiful garden at the center of which was a hall, open with pillars" },
+        { "videoId": "bzHOWmXH8OE", "cvnde": 10, "text": "A mass of sparkling crystal structures stood in the middle of a lush green garden." }
+      ],
+      "notes": "Overlaps the natural-landscape region; kept here because the corpus consistently frames it as designed - entrances, paths, pavers, a hall at its centre, a city to one side. Precision loss is mostly earthly gardening biography and speakers listing the garden as an expectation they did NOT get."
+    },
+    {
+      "id": "gate-of-heaven",
+      "name": "The Gate",
+      "category": "threshold",
+      "parent": "city-of-light",
+      "journey_position": 0.45,
+      "description": "The entrance structure to the city or to heaven, and the point at which the question of whether you may enter is decided. Some see many gates of which only one is open; some see a narrow gate beside a wide one; some are set down just inside it. A recurring reinterpretation: the gate is not a barrier keeping people out but an energetic threshold that cleanses whoever passes through. A large minority mention gates specifically to say they expected them and did not find any.",
+      "aliases": [
+        { "term": "the pearly gates", "tradition": "Christian", "note": "far more often invoked as an expectation than as something seen" },
+        { "term": "the gates of heaven", "tradition": "Christian", "note": null },
+        { "term": "the gates to the city", "tradition": "none", "note": null },
+        { "term": "the twelve gates", "tradition": "Christian", "note": "Revelation-framed; eleven closed, one open" },
+        { "term": "a narrow gate", "tradition": "Christian", "note": null },
+        { "term": "an energetic gate", "tradition": "secular", "note": "explicitly not a fence - a cleansing threshold" },
+        { "term": "an archway", "tradition": "none", "note": "used when the shape has no hinges or bars" },
+        { "term": "the gateway", "tradition": "none", "note": null }
+      ],
+      "regex": "pearly gates|gates? (of|to) (heaven|the kingdom|paradise|the city)|(through|beyond|at|toward|towards|approached|opened|reached) the gate\\b|(a|this|huge|enormous|beautiful|large|white|golden|ornate) gate(?!way)\\b(?! bridge)|gateway (of|to) (heaven|light|the)",
+      "negative_regex": "golden gate bridge|out of the gate|off the gate|boarding.{0,25}gate|gate agent|panther's gate|bill gates",
+      "measured": { "all_pct": 4.47, "all_docs": 276, "cv13_pct": 5.25, "cv18_pct": 5.11, "cv23_pct": 3.31 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 14,
+      "sensory": [
+        "gates described as simply massive, out of scale with anything earthly",
+        "a multi-coloured archway with colours the speaker cannot name",
+        "only one gate open among many closed ones",
+        "a welcoming committee standing at the gate",
+        "the gate as the exact point past which there is no coming back"
+      ],
+      "quotes": [
+        { "videoId": "sBwxNJTpGkM", "cvnde": 16, "text": "I saw a huge crowd of people standing in front of the Gates of Heaven." },
+        { "videoId": "hDhYK1ipR4M", "cvnde": 12, "text": "And then there was these huge gates. They were massive." },
+        { "videoId": "x8QUi2hhOkQ", "cvnde": 13, "text": "the only one open is a narrow door and a narrow gate that in front of me" },
+        { "videoId": "qXpMDacWGe0", "cvnde": 15, "text": "there was a city behind her, and there were these gates to the city" }
+      ],
+      "notes": "The gate is the most culturally pre-loaded structure in the region, and its frequency DROPS at the highest cvNDE stratum (5.25% at cv>=13 down to 3.31% at cv>=23) - the opposite of the city and the columned hall. That is a meaningful negative signal worth preserving."
+    },
+    {
+      "id": "the-great-door",
+      "name": "The Door",
+      "category": "threshold",
+      "parent": null,
+      "journey_position": 0.55,
+      "description": "A single door, usually oversized, standing where a decision has to be made. It is white, or golden, or glass, or three metres tall, and it is explained to the visitor that passing through it is irreversible. Sometimes there is not one door but thousands - golden doors receding down a corridor without end, each opening onto something different. A few insist it was an entirely ordinary wooden door with light coming through, and that the ordinariness is the point.",
+      "aliases": [
+        { "term": "a big white door", "tradition": "none", "note": null },
+        { "term": "a huge door", "tradition": "none", "note": "'those doors must have been about 3m tall'" },
+        { "term": "a gigantic door", "tradition": "none", "note": "in front of the golden city" },
+        { "term": "thousands of golden doors", "tradition": "none", "note": "down a corridor that never ends" },
+        { "term": "a doorway made with clouds", "tradition": "none", "note": null },
+        { "term": "the entry doorway", "tradition": "none", "note": null },
+        { "term": "a massive door made out of glass", "tradition": "none", "note": "with glass hinge pins that could not work on earth" }
+      ],
+      "regex": "(door|doorway|doors) (of|made of) (light|gold)|(huge|enormous|giant|golden|gold|massive|beautiful|white|ornate|great big|tall) door|thousands of (doors|golden doors)|(many|countless|endless|rows of) doors",
+      "negative_regex": "front door|back door|car door|bedroom door|opened so many doors|doors are opening|open doors for|closing doors to evil|knock and the door",
+      "measured": { "all_pct": 1.72, "all_docs": 106, "cv13_pct": 1.99, "cv18_pct": 2.07, "cv23_pct": 3.87 },
+      "precision_estimate": 0.65,
+      "precision_sample_n": 14,
+      "sensory": [
+        "roughly three metres tall and very wide",
+        "glass, with glass hinge pins",
+        "cloud instead of timber",
+        "opening by itself as the guide approaches",
+        "you can see light through it but not what is behind it",
+        "a row of golden doors receding past the limit of sight"
+      ],
+      "quotes": [
+        { "videoId": "hBVoA0vkbrs", "cvnde": 22, "text": "And then there was this big white door." },
+        { "videoId": "hbHXkWBVdRE", "cvnde": 7, "text": "there was like thousands of golden doors down this corridor that it's like it would never end" },
+        { "videoId": "Ck2bpBt8874", "cvnde": 22, "text": "When I get to this door, a huge door, which looked like this church" },
+        { "videoId": "EPxtAnjvTKE", "cvnde": 8, "text": "I was looking at this massive door, and it was made out of glass." },
+        { "videoId": "Fc7kaWNIcRo", "cvnde": 7, "text": "it was a huge door those doors must have been about 3m tall and very wide" }
+      ],
+      "notes": "Rises steadily with evidential strength (1.72% -> 3.87% at cv>=23). Distinct from the gate: the gate belongs to the city and is public, the door is private and personal, and the irreversibility warning is nearly always attached to the door rather than the gate."
+    },
+    {
+      "id": "portal-and-archway",
+      "name": "The Portal / Archway",
+      "category": "threshold",
+      "parent": null,
+      "journey_position": 0.3,
+      "description": "An opening that is not a door and not a tunnel: an aperture that appears in the air, spins open, or simply is, and through which another world is directly visible. People reach for 'portal' when the thing has no frame, no hinges and no length. Some see a forest or a green field through it as though through a window; others go through it and arrive somewhere instantly. The archway variant has a definite arch shape and colours the speaker cannot name.",
+      "aliases": [
+        { "term": "a portal", "tradition": "none", "note": "the corpus's own preferred word for a frameless opening" },
+        { "term": "an archway", "tradition": "none", "note": "'a huge doorway without a door, because it's just this huge archway'" },
+        { "term": "the arch of life", "tradition": "none", "note": "one speaker's name for a simple, unornamented arch that opened to show the meaning of life" },
+        { "term": "a portal of light", "tradition": "none", "note": null },
+        { "term": "an opening like a wormhole", "tradition": "secular", "note": null },
+        { "term": "a slowly spinning white light, up and open like a portal", "tradition": "none", "note": null }
+      ],
+      "regex": "\\bportal\\b|(an|the|this|a) (arch|archway) (of|made of|that|opened|was)|through (an|the|this|a huge|a giant) archway",
+      "negative_regex": "student portal|patient portal|web portal|portal page|portal vein|customer portal",
+      "measured": { "all_pct": 8.89, "all_docs": 549, "cv13_pct": 8.20, "cv18_pct": 9.39, "cv23_pct": 8.84 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 12,
+      "sensory": [
+        "round, and moving, and gold at the rim",
+        "a blue inside it the speaker has since failed to reproduce with paint",
+        "made of crystal or glass, with a whole forest visible inside it",
+        "opens with a perfect musical melody inside the light",
+        "not a tunnel - the transit is instantaneous"
+      ],
+      "quotes": [
+        { "videoId": "HbQ1XkMrniQ", "cvnde": 7, "text": "in front of me there was this huge doorway without a door, because it's just this huge archway." },
+        { "videoId": "E_MuhBgw2es", "cvnde": 25, "text": "I saw a portal that was like an arch. I felt that it was the arch of life." },
+        { "videoId": "lofSGRSqFeg", "cvnde": 22, "text": "I was right in front of a portal, a portal that I don't know if it was made of crystal, glass" },
+        { "videoId": "ZBgTl0ezybY", "cvnde": 16, "text": "I was standing just beyond the portal, and I began to look" }
+      ],
+      "notes": "Flat across cvNDE strata. Speakers are unusually explicit that a portal is NOT a tunnel ('it wasn't a tunnel per se but it was like a portal of energy'), which makes this a genuinely separate structure from the tunnel region rather than a synonym. Precision loss is overwhelmingly the modern web sense of 'portal'."
+    },
+    {
+      "id": "the-staircase",
+      "name": "The Staircase",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.35,
+      "description": "Steps that must be climbed. Two distinct forms: a brilliant white staircase rising out of the ground into the sky with no visible top, which the dying person crawls toward hoping to be found; and a long flight of stone steps leading up to the entrance of a great building, worn hollow in the centre by everyone who has walked them before. The second form is often accompanied by other spirits going up and coming down.",
+      "aliases": [
+        { "term": "a beautiful white staircase", "tradition": "none", "note": "going up as far as the eye can see, into the clouds" },
+        { "term": "the Stairway to Heaven", "tradition": "none", "note": "several speakers use the phrase self-consciously, calling it 'the proverbial'" },
+        { "term": "a stone stairway", "tradition": "none", "note": "ancient, mossy, cold, slippery, worn down in the middle" },
+        { "term": "a high endless staircase", "tradition": "none", "note": "with huge steps, no visible end" },
+        { "term": "steps leading up to it", "tradition": "none", "note": "the approach to the columned hall" },
+        { "term": "a crystal stairway", "tradition": "none", "note": null }
+      ],
+      "regex": "stairway to heaven|(white|beautiful|crystal|golden|marble|stone|huge|enormous|grand|spiral|endless|long|ancient) (staircase|stairway|stairwell|stairs)|(stairs|steps) (leading|going|that led) (up )?(to|into)",
+      "negative_regex": "basement stairs|stairs to my room|down the stairs to|fell down the stairs|led zeppelin",
+      "measured": { "all_pct": 1.67, "all_docs": 103, "cv13_pct": 2.83, "cv18_pct": 3.59, "cv23_pct": 8.84 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 12,
+      "sensory": [
+        "steps so worn in the centre that you know how many have come before",
+        "cold, moist stone with moss on it",
+        "steps bigger than a human stride",
+        "the top of the stair disappearing into cloud",
+        "other spirits ascending and descending on the same flight"
+      ],
+      "quotes": [
+        { "videoId": "QgFtJYYOHEU", "cvnde": 27, "text": "this beautiful staircase going up into the sky." },
+        { "videoId": "CJ4hQMqfjL0", "cvnde": 14, "text": "I was in a stone stairway, a very old stone stairway" },
+        { "videoId": "uGMtd3YN3B0", "cvnde": 24, "text": "vibrantly white with many steps leading up to it and huge columns in front." },
+        { "videoId": "J5PhPHmQa4M", "cvnde": 21, "text": "it had the huge white columns in front and a and a huge number of stairs, just so many stairs" }
+      ],
+      "notes": "Very strong cvNDE enrichment: 1.67% overall, 8.84% at cv>=23 - a 5.3x rise, the steepest gradient of any place in this region. Some of that comes from the same high-scoring narrators who describe the columned hall (the stairs are its approach), so the two should be treated as partially the same finding."
+    },
+    {
+      "id": "the-nursery",
+      "name": "The Nursery",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.6,
+      "description": "A building, or an area with a large green space around it, where infants are. Speakers are told - usually because they ask what that beautiful building is - that this is where babies who died before or at birth, including the unborn, are raised and taught until they understand. There are attendants: angels, family members, people specifically trained for it. Children are seen running, playing and growing there, and some describe wanting to come back after death to work in it.",
+      "aliases": [
+        { "term": "the nursery", "tradition": "Christian", "note": "the word given to the experiencer by a guide, not chosen by them" },
+        { "term": "a place where babies go", "tradition": "none", "note": null },
+        { "term": "an area where the babies and the unborn fetuses are brought", "tradition": "Christian", "note": null },
+        { "term": "a place where souls were born and nurtured and grown", "tradition": "secular", "note": "pre-birth framing rather than post-death" },
+        { "term": "a larval nursery", "tradition": "secular", "note": "one speaker's term for Earth itself, by analogy" }
+      ],
+      "regex": "(?<!flower |the flower )\\bnursery\\b(?! rhym| school)|place where (the )?babies|area where (the )?(babies|unborn)|where the babies (go|are)",
+      "negative_regex": "nursery rhyme|nursery rhyming|flower nursery|nursery school|hospital nursery|worked in a nursery|to nursery in the morning|children's nursery song",
+      "measured": { "all_pct": 1.23, "all_docs": 76, "cv13_pct": 1.81, "cv18_pct": 2.35, "cv23_pct": 2.21 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 10,
+      "sensory": [
+        "a large green space around the building",
+        "thousands of children playing outside with birds, dogs and cats",
+        "children at every age and stage, running and laughing",
+        "beings of light acting as nurses, rocking the babies",
+        "children who died as infants appearing as adults in their thirties"
+      ],
+      "quotes": [
+        { "videoId": "pgkLqJX5q1g", "cvnde": 19, "text": "And he said, that, James, is the nursery." },
+        { "videoId": "jvhSmwTQ4-E", "cvnde": 15, "text": "I saw a place where babies and children go and it was magnificent." },
+        { "videoId": "jc_A_BJXlMw", "cvnde": 8, "text": "I did see a place where babies go, and they're attended to by, um, angels" },
+        { "videoId": "2AQ74T5PF20", "cvnde": 7, "text": "I remember what I like to describe as a nursery. And it seemed to be a place where souls were born and or nurtured and grown." }
+      ],
+      "notes": "Doubles in prevalence between the whole corpus and the cv>=18 stratum (1.23% -> 2.35%). Remaining precision loss after the lookarounds is hospital nurseries recalled from infancy and earthly childcare biography. Note the split between the post-death nursery (children who died) and the pre-birth nursery (souls not yet incarnated) - same building, opposite direction of travel."
+    },
+    {
+      "id": "the-healing-place",
+      "name": "The Healing Place",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.5,
+      "description": "A building or chamber where souls are repaired. Descriptions include pools of living water that people are lowered into, a curved room with a defined curvature that guides call a healing chamber, and 'a spiritual hospital' where those who died traumatically or by suicide are brought gently to awareness of what has happened. The work done there is described as being at the atomic or energetic level - stitching, repairing, flushing damage out with light.",
+      "aliases": [
+        { "term": "the healing temple", "tradition": "none", "note": null },
+        { "term": "healing pools", "tradition": "none", "note": "filled with living water - 'the water was alive'" },
+        { "term": "a healing room", "tradition": "none", "note": null },
+        { "term": "a healing chamber", "tradition": "none", "note": "curved, no physical representation, but a defined curvature" },
+        { "term": "a healing building", "tradition": "none", "note": null },
+        { "term": "the halls of healing", "tradition": "none", "note": "listed alongside halls of learning and knowledge" },
+        { "term": "a spiritual hospital", "tradition": "none", "note": null },
+        { "term": "healing centers in the spirit world", "tradition": "secular", "note": null }
+      ],
+      "regex": "healing (temple|pool|pools|chamber|building|centers|center|centres|centre)|halls of healing|(a|the|this|like a) healing room|place of healing for|(room|place) where (people|souls|they) (are|were|go to be|could be) healed",
+      "negative_regex": "reiki|sweat lodge|healing center in california|drug program",
+      "measured": { "all_pct": 1.07, "all_docs": 66, "cv13_pct": 1.09, "cv18_pct": 1.10, "cv23_pct": 0.55 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 10,
+      "sensory": [
+        "water that is alive - 'living water' rather than water",
+        "an acidic, purest life-force quality that strips imprints away",
+        "everything marble",
+        "a defined curvature to the room, felt rather than seen",
+        "three other beings present, working while you lie down",
+        "feeling stitching and repair happening at the atomic level"
+      ],
+      "quotes": [
+        { "videoId": "_rYzoRGUXP0", "cvnde": 17, "text": "there was a healing building that had these beautiful healing pools, um, with water." },
+        { "videoId": "P2bz4Q9uIaQ", "cvnde": 21, "text": "was like a healing room. I, I guess I call it a healing chamber." },
+        { "videoId": "iWs1MPjwYxI", "cvnde": 8, "text": "I was shown the place of healing for souls who have done their their lifetime" },
+        { "videoId": "RmzxdSURNwc", "cvnde": 13, "text": "I would call it like into the Healing Temple." }
+      ],
+      "notes": "Genuinely rare (1.07%) and flat to slightly declining across strata. Precision ~0.5 because 'place of healing' is also common as a metaphor for a therapeutic setting in the speaker's earthly life. Kept because when it is literal it is unusually specific and physically detailed."
+    },
+    {
+      "id": "many-mansions",
+      "name": "The Mansion / My Father's House",
+      "category": "structure",
+      "parent": "buildings-of-the-other-side",
+      "journey_position": 0.5,
+      "description": "A dwelling: a house, a mansion, a home that is recognisably yours. Some are shown a specific house on a bluff or a cottage with a rose arbour and told, or decide, that it is theirs. Others enter a white mansion whose corridor holds thousands of golden doors, each room a different world. The Johannine 'in my Father's house are many rooms' is quoted constantly, but usually to explain something the speaker saw, not to substitute for it - the rooms are read as levels or realms, not bedrooms.",
+      "aliases": [
+        { "term": "a mansion", "tradition": "none", "note": null },
+        { "term": "many mansions", "tradition": "Christian", "note": "quoted from John 14:2, glossed as many levels or many worlds" },
+        { "term": "in my Father's house are many rooms", "tradition": "Christian", "note": null },
+        { "term": "little rooms of heaven", "tradition": "none", "note": "described as entry points to more of the beyond, thresholds that are alive" },
+        { "term": "houses", "tradition": "none", "note": "'there were houses, but we don't need houses because we don't sleep'" },
+        { "term": "my house / that's my house", "tradition": "none", "note": "recognition of a dwelling as one's own" },
+        { "term": "an English cottage", "tradition": "none", "note": "golden light streaming from the windows at dusk; God is inside" }
+      ],
+      "regex": "many mansions|(in )?my father'?s house|(a|the|this|my|huge|beautiful|big|white|gorgeous) mansion|houses (there|in heaven)|(a|the|my) (house|home) in heaven",
+      "negative_regex": "mansion style house|beverly hills|haunted mansion|playboy mansion",
+      "measured": { "all_pct": 1.78, "all_docs": 110, "cv13_pct": 1.75, "cv18_pct": 1.93, "cv23_pct": 0.55 },
+      "precision_estimate": 0.65,
+      "precision_sample_n": 12,
+      "sensory": [
+        "a round room with gold candles on the walls and robin's-egg-blue walls with gold trim",
+        "a corridor of golden doors that never ends",
+        "stone walls with an ocean below and rose gardens behind",
+        "golden light streaming from the windows at late dusk",
+        "the mansion is not big enough to contain God - the point of showing it"
+      ],
+      "quotes": [
+        { "videoId": "hbHXkWBVdRE", "cvnde": 7, "text": "this beautiful white mansion. And as soon as I looked at this beautiful white mansion, I was within the mansion." },
+        { "videoId": "W0zDzZsDRX0", "cvnde": 10, "text": "we were taken to a mansion, that's the only way I can describe it, and into a very large room with people of all ages" },
+        { "videoId": "-u88UFdM3-w", "cvnde": 7, "text": "in my father's house are many rooms and I go there to prepare place for you" }
+      ],
+      "notes": "Only one hit at cv>=23, so the apparent collapse in the top stratum is not reliable. A recurring rhetorical move worth noting: several speakers are shown a mansion specifically so that a guide can ask 'can you contain God in that mansion?' and then dissolve it into trees, clouds and earths - the building exists to be outgrown."
+    },
+    {
+      "id": "room-of-light",
+      "name": "The Room",
+      "category": "structure",
+      "parent": null,
+      "journey_position": 0.45,
+      "description": "A bounded interior with no discernible architecture: you know you are in a room because there is an inside, but the walls may be cloud, atmosphere, or nothing at all. Most often white or brilliantly bright; sometimes round, with aisles radiating from all sides and open sky and stars overhead. It has no reference points, so people cannot say whether it is small or vast. This is frequently where a being of light appears, or where a life review is presented.",
+      "aliases": [
+        { "term": "a white room", "tradition": "none", "note": "the commonest form; often the whole of what was seen" },
+        { "term": "a room of light", "tradition": "none", "note": null },
+        { "term": "a room with cloud walls", "tradition": "none", "note": null },
+        { "term": "a room without walls - the walls were made out of the atmosphere", "tradition": "none", "note": null },
+        { "term": "a round room", "tradition": "none", "note": "aisles from all sides; sky and stars visible above" },
+        { "term": "a very, very tall room", "tradition": "none", "note": null }
+      ],
+      "regex": "(a|the|this) (white|bright|round|circular|golden) room\\b|room (of|made of) light|room (full|filled) (of|with) light",
+      "negative_regex": "operating room|emergency room|hospital room|living room|recovery room|delivery room|waiting room|dark room|locker room|break room|dining room|white jacket in a white room",
+      "measured": { "all_pct": 3.29, "all_docs": 203, "cv13_pct": 4.52, "cv18_pct": 4.83, "cv23_pct": 5.52 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 10,
+      "sensory": [
+        "no reference points at all - 'I don't know if it was an igloo or an airplane hangar'",
+        "walls of cloud, or of atmosphere",
+        "an architect's table with a huge open book in it",
+        "a bench ten feet up in the air",
+        "beings filling the room like amoebae seen under a microscope"
+      ],
+      "quotes": [
+        { "videoId": "E7OAcX3AKCA", "cvnde": 23, "text": "in this big room of light. And there were a ton of beings in this room." },
+        { "videoId": "8p7y58V6sMM", "cvnde": 14, "text": "It is a round room where multiple aisle, from all sides, lead to" },
+        { "videoId": "MJLRrehMztU", "cvnde": 22, "text": "I found myself in this room that was very, very tall." }
+      ],
+      "notes": "Rises steadily with cvNDE (3.29% -> 5.52%). The 'white room' is the minimal built structure in the corpus - the least furnished thing that still counts as being somewhere rather than nowhere, and it sits right at the boundary with the void/darkness region."
+    },
+    {
+      "id": "golden-road",
+      "name": "The Golden Road / Streets of Gold",
+      "category": "structure",
+      "parent": "city-of-light",
+      "journey_position": 0.45,
+      "description": "The paved surfaces of the built world: streets of gold, golden roads, cobbled roads with guttering, a path of light laid across water toward the sun. Some walk on gold and say everything underfoot was gold; one describes cobbled pathways followed for what she estimates as thousands of kilometres, through valleys and past lakes, into a city. A large share of mentions are people naming 'streets of gold' as the cliche they expected and did not receive.",
+      "aliases": [
+        { "term": "streets of gold", "tradition": "Christian", "note": "the single most quoted expectation about heaven in the corpus" },
+        { "term": "golden streets", "tradition": "Christian", "note": null },
+        { "term": "golden roads", "tradition": "none", "note": "'crystal cities and golden roads with diamonds reflecting the universe'" },
+        { "term": "a golden path", "tradition": "none", "note": "laid across the ocean toward the setting sun" },
+        { "term": "cobbled roads / cobbled pathways", "tradition": "none", "note": "with guttering, 'like we have here'" },
+        { "term": "wide avenues", "tradition": "none", "note": null },
+        { "term": "transparent gold", "tradition": "Christian", "note": null }
+      ],
+      "regex": "(golden|gold|crystal|shimmering|luminous|glowing|cobble(d|stone)|paved|white marble) (road|roads|path|paths|pathway|street|streets)|(path|road|pathway) (of|made of) (light|gold)|(a|the) path (that )?(led|leading) (to|toward|towards) (the light|a light|heaven|the city)",
+      "negative_regex": "spiritual path|path of life|career path|path of darkness|down the road|golden gate|road trip|yellow brick road",
+      "measured": { "all_pct": 1.12, "all_docs": 69, "cv13_pct": 1.45, "cv18_pct": 1.24, "cv23_pct": 0.55 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 10,
+      "sensory": [
+        "gold underfoot and gold in every direction at once",
+        "cobbles with guttering at the kerb",
+        "diamonds set into the surface reflecting the universe back",
+        "a path of light on water that you travel along at enormous speed",
+        "roads with no cars on them"
+      ],
+      "quotes": [
+        { "videoId": "Vaguv6RgddY", "cvnde": 13, "text": "that's when I walked in, steeped into this golden streets. Everything was gold." },
+        { "videoId": "W2ts1LDmbCU", "cvnde": 7, "text": "It's understand it as crystal cities and golden roads and with diamonds reflecting the universe off there." },
+        { "videoId": "wQYBrn_sUwU", "cvnde": 10, "text": "There was golden houses and golden streets and it was just pretty everywhere." },
+        { "videoId": "kiHW1mmCoB0", "cvnde": 13, "text": "there were roads, cobbled roads with guttering like we have here." },
+        { "videoId": "gbakJ4HkuKE", "cvnde": 19, "text": "I followed this lady down through cobbled pathways, through the valleys, along past lakes and rivers." }
+      ],
+      "notes": "Precision ~0.5 and the number falls at the top stratum (one hit at cv>=23). Roughly half of all 'streets of gold' mentions in the corpus are explicit denials: 'I saw nothing like that', 'no streets paved with gold', 'no gold streets, nothing like that'. That negative pattern is itself the finding - the golden street is the corpus's canonical example of an expectation the experience does not honour."
+    },
+    {
+      "id": "the-barrier-wall",
+      "name": "The Wall / Fence / Barrier",
+      "category": "boundary",
+      "parent": null,
+      "journey_position": 0.8,
+      "description": "A built or quasi-built limit that cannot be crossed. It appears as a white fence in the distance across a meadow, a low wooden fence approached step by step, a picket fence, or - most often - an invisible barrier with no material at all which nevertheless stops both the visitor and the dead who are waiting on the other side. Everyone understands the same rule without being told: cross it and there is no return.",
+      "aliases": [
+        { "term": "an invisible barrier", "tradition": "none", "note": "the commonest form; nobody can come through it in either direction" },
+        { "term": "a white fence", "tradition": "none", "note": "seen at a distance across a meadow, with low shrubbery beyond" },
+        { "term": "a wooden fence", "tradition": "none", "note": "understood afterwards as the symbol of passing over for good" },
+        { "term": "a white picket fence", "tradition": "none", "note": null },
+        { "term": "a luminous wall", "tradition": "none", "note": "something is behind it, and you cannot go behind it" },
+        { "term": "a demarcation line", "tradition": "none", "note": null },
+        { "term": "the barrier I could not get past", "tradition": "none", "note": null }
+      ],
+      "regex": "(fence|wall|hedge|barrier) (that|which)? ?(i|you|we) (could|couldn'?t|can'?t|must not|cannot)|(if|once) (i|you) (cross|crossed|go|went|pass|passed) (over |beyond |past )?(the|that) (fence|wall|line|barrier)|(a|the|this) (white|picket|wooden|stone|low) fence",
+      "negative_regex": "on the fence|sitting on the fence|over the fence a little|fence in front of our house|broke the fence|privacy fence",
+      "measured": { "all_pct": 0.53, "all_docs": 33, "cv13_pct": 0.60, "cv18_pct": 0.83, "cv23_pct": 1.10 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 8,
+      "sensory": [
+        "the fence is always in the distance, never close up",
+        "the barrier has no substance and no visible edge",
+        "the dead cannot come through it either - they stop at it too",
+        "a foot lifted for one more step, and then you are back in your body",
+        "beyond it: low shrubbery, trees, 'it looked like Kentucky'"
+      ],
+      "quotes": [
+        { "videoId": "4fzw9Bgms5o", "cvnde": 13, "text": "It was like there was like some kind of invisible barrier that I couldn't cross and she couldn't cross." },
+        { "videoId": "W3o28Zw3-D8", "cvnde": 26, "text": "And off in the distance, sort of a white fence thing and some beyond that, low shrubbery or trees or something." },
+        { "videoId": "syIfnCJX3_c", "cvnde": 22, "text": "As I took some further steps towards this fence, this wooden fence" }
+      ],
+      "notes": "Deliberately narrow regex - the unconstrained forms of 'wall' and 'fence' match 25% of the corpus and are almost entirely earthly. At this tightness it is genuinely rare (0.53%) but doubles by cv>=23. Overlaps the border/boundary region; included here only for the constructed forms (fence, wall, gate-as-limit), not the river or line-of-light forms."
+    },
+    {
+      "id": "the-bridge",
+      "name": "The Bridge",
+      "category": "threshold",
+      "parent": null,
+      "journey_position": 0.72,
+      "description": "A crossing over water. Small, often stone or wooden, sometimes described as ornamental rather than structural - 'like a garden ornament'. What happens on it matters more than what it is made of: people are seen walking across, and the moment they reach the far side they stop walking and simply float away. Several experiencers get to the point where the bridge begins and are turned back there, making it the exact place where the decision to return is taken.",
+      "aliases": [
+        { "term": "a small bridge", "tradition": "none", "note": null },
+        { "term": "a stone bridge over a rippling brook", "tradition": "none", "note": null },
+        { "term": "the point where the bridge starts", "tradition": "none", "note": "the return decision point" },
+        { "term": "a bridge like a garden ornament", "tradition": "none", "note": "raised, decorative, with no water underneath it" },
+        { "term": "this bridge between us", "tradition": "none", "note": "used where a deceased relative stands on the far side" }
+      ],
+      "regex": "(cross|crossed|crossing|over|across) (a|the|this) (small |stone |wooden |narrow |golden |beautiful |little |long )?bridge\\b|bridge (over|across) (a|the|this) (river|stream|water|brook|chasm|creek)|(a|the) (golden|crystal|rainbow|light) bridge",
+      "negative_regex": "bridge of my nose|bridge the gap|golden gate bridge|bridge between these two beliefs|it's a bridge|bridge device|heart pump",
+      "measured": { "all_pct": 1.72, "all_docs": 106, "cv13_pct": 1.81, "cv18_pct": 1.80, "cv23_pct": 1.66 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 12,
+      "sensory": [
+        "crystal-clear water running beyond the bridge, not under it",
+        "sometimes no water under it at all",
+        "everyone on the far side dressed in white",
+        "people stop walking the moment they cross and begin to float",
+        "an old man with a book on a stand watching the crossing"
+      ],
+      "quotes": [
+        { "videoId": "vjt-VgrOn7E", "cvnde": 14, "text": "a small bridge, and many people were passing over this bridge." },
+        { "videoId": "hh1qNojDFFA", "cvnde": 16, "text": "there was a little like a stone bridge over a rippling brook, and I went over that" },
+        { "videoId": "6Mwo20rDISo", "cvnde": 14, "text": "So I didn't go across the bridge in this particular NDE experience, but I went to the point where the bridge starts." }
+      ],
+      "notes": "Flat across strata. Precision losses are the medical 'bridge' device, the metaphorical bridge between beliefs, and the bridge of the nose. Distinct from the wall/fence barrier: the bridge is a boundary you are permitted to approach and even step onto, which is why it shows up in return-decision narratives rather than in 'I was stopped' narratives."
+    }
+  ]
+}

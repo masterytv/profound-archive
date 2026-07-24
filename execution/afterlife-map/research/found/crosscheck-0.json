@@ -1,0 +1,401 @@
+{
+  "places": [
+    {
+      "id": "the-music",
+      "name": "The Music",
+      "category": "state",
+      "description": "Sound arrives before or alongside the light: singing, choirs, chords, a symphony with no instruments and no source. Experiencers insist it is unlike any earthly music and that they have never been able to reproduce it since; several describe being inside the sound rather than listening to it. It is often the last thing to fade as they are pulled back.",
+      "aliases": [
+        {"term": "the singing", "tradition": null, "note": "often described as many voices in unison"},
+        {"term": "the choir / choirs of angels", "tradition": "Christian", "note": "angelic chorus, seraphim singing"},
+        {"term": "the most beautiful music you've ever heard", "tradition": "secular", "note": "the commonest phrasing"},
+        {"term": "the sounds of the universe", "tradition": null, "note": null},
+        {"term": "cosmic music / an ocean of sound", "tradition": null, "note": null},
+        {"term": "harmonies / a tune no human being could write", "tradition": null, "note": null}
+      ],
+      "regex": "(most beautiful|heavenly|celestial|angelic|indescribable|glorious|incredible|beautiful) (music|singing|song|choir|chorus|harmon)|(music|singing|choir|chorus) (like|that) (i|you) (had |have )?(never|ever) heard|angels (were |was )?singing",
+      "negative_regex": "karaoke|choir practice|music (industry|career|teacher|lessons)",
+      "quotes": [
+        {"videoId": "Of24mWpF8S0", "cvnde": 14, "text": "But then I hear the most beautiful music that you can't make on on the Earth plane"},
+        {"videoId": "OMr1ntfvwgg", "cvnde": 22, "text": "And I hear this glorious music."},
+        {"videoId": "CEo_b-a8XUA", "cvnde": 14, "text": "None of it was as beautiful as what I call the sounds of the universe or angelic chorus."},
+        {"videoId": "yaha2ShFho4", "cvnde": 7, "text": "beautiful colors and this beautiful choir"}
+      ],
+      "sensory": [
+        "many voices in unison, no words",
+        "getting louder and louder as you approach the light",
+        "a symphony with no instruments; every note a colour",
+        "the experiencer is inside the sound, not in front of it",
+        "unreproducible afterwards - people try synthesisers and fail"
+      ],
+      "journey_position": 0.5,
+      "parent": null,
+      "precision_estimate": 0.65,
+      "precision_sample_n": 14,
+      "measured": {"all_pct": 5.55, "all_docs": 343, "cv13_pct": 6.94, "cv18_pct": 7.32, "cv23_pct": 9.39},
+      "notes": "MORE common among the best-evidenced accounts: 5.55% overall rising monotonically to 9.39% at cvNDE>=23. The catalogued map has 'the-singing-landscape' (the landscape itself sings) but not the music as a heard event on arrival - which is far commoner. False positives come from interviewers discussing music research and from post-NDE musical gifts; roughly a third of sampled hits were not in-NDE hearing."
+    },
+    {
+      "id": "the-silence",
+      "name": "The Silence",
+      "category": "state",
+      "description": "The other extreme of the same axis: an absolute quiet with no sound at all, arriving the instant the body's noise (heartbeat, breathing, sirens, the code team) stops. Experiencers stress that no earthly place is ever truly silent, and describe craving that silence for the rest of their lives. Several report it coexisting with music without contradiction.",
+      "aliases": [
+        {"term": "perfect silence", "tradition": null, "note": null},
+        {"term": "the silence behind the silence", "tradition": null, "note": "one experiencer's coinage, repeated across her interviews"},
+        {"term": "total stillness", "tradition": null, "note": null},
+        {"term": "dead quiet", "tradition": null, "note": null},
+        {"term": "no sound at all", "tradition": "secular", "note": null}
+      ],
+      "regex": "(complete|total|absolute|utter|dead|profound|perfect) (silence|stillness|quiet)|silence behind the silence",
+      "negative_regex": "silence (of|about) (the|his|her|their) (family|abuse|church)|code of silence",
+      "quotes": [
+        {"videoId": "QVu5KezIsFw", "cvnde": 13, "text": "Not there! It was perfect silence."},
+        {"videoId": "m8lqk4fS4cA", "cvnde": 18, "text": "And it's what I call the silence behind the silence."},
+        {"videoId": "6ImfADVYCIw", "cvnde": 23, "text": "there was absolute silence and that there was a beautiful tune no human being could write"},
+        {"videoId": "Kj8dqzqpXw4", "cvnde": 16, "text": "All the noise was gone, and I experienced this profound, profound silence."}
+      ],
+      "sensory": [
+        "the heartbeat/drumming in the ears cuts out first",
+        "silence that is full rather than empty",
+        "coexists with the music - both reported at once",
+        "afterwards the person hides in closets and chapels trying to find it again"
+      ],
+      "journey_position": 0.25,
+      "parent": null,
+      "precision_estimate": 0.8,
+      "precision_sample_n": 10,
+      "measured": {"all_pct": 2.3, "all_docs": 142, "cv13_pct": 3.08, "cv18_pct": 4.14, "cv23_pct": 5.52},
+      "notes": "Strongly MORE common in the best-evidenced accounts - 2.30% overall but 5.52% at cvNDE>=23, a 2.4x enrichment. Nobody catalogued it because the themed briefs were all about sound as event (the rushing sound, the music); the silence is its opposite and equally reported. A few false positives are the 'family silence' about abuse."
+    },
+    {
+      "id": "the-clouds",
+      "name": "The Clouds",
+      "category": "landscape",
+      "description": "Between the roof and wherever they end up, many experiencers pass through, stand on, or jump between clouds. Some treat the cloud layer as the floor of the next place; others pass through it like a ceiling and come out into space or into a blue that is not our blue. A minority explicitly reject it as cliché, which is itself evidence they were expecting it and did not see it.",
+      "aliases": [
+        {"term": "up through the clouds", "tradition": null, "note": null},
+        {"term": "standing on clouds", "tradition": null, "note": null},
+        {"term": "above the cloud layer", "tradition": null, "note": null},
+        {"term": "a hole in the clouds", "tradition": null, "note": "looking down through an opening"},
+        {"term": "walking through iridescent bubbles, not clouds", "tradition": "secular", "note": "explicit denial of the cliché"}
+      ],
+      "regex": "(walking|standing|sitting|jumping|floating|flying|rising|rose|went|going|travel\\w+|came|carried|lifted|up) (up )?(on|onto|through|above|among|amongst|into) (the |these |those |big |white |fluffy |soft )*clouds|clouds (below|beneath|under) (me|my)|made (out )?of clouds",
+      "negative_regex": "clouds (of|in) (doubt|smoke|dust)|storm clouds|head in the clouds",
+      "quotes": [
+        {"videoId": "ASfXZHniI8A", "cvnde": 15, "text": "I'm up above the clouds. I can see the land masses of the earth as they go away."},
+        {"videoId": "zGGTJ-dj0OY", "cvnde": 7, "text": "And then I went to clouds. I started jumping on clouds."},
+        {"videoId": "gERlqFtDBmY", "cvnde": 19, "text": "was this beautiful white staircase. And it just went up into the clouds."}
+      ],
+      "sensory": [
+        "solid enough to stand or jump on",
+        "seen from above, like from an aeroplane window",
+        "sometimes the boundary where a bubble or capsule stops, 'like it hit a hard barrier'",
+        "the sky above them is a blue 'that wasn't our blue'"
+      ],
+      "journey_position": 0.3,
+      "parent": null,
+      "precision_estimate": 0.7,
+      "precision_sample_n": 20,
+      "measured": {"all_pct": 1.36, "all_docs": 84, "cv13_pct": 1.81, "cv18_pct": 1.93, "cv23_pct": 1.66},
+      "notes": "Slightly MORE common in mid-strength accounts, flat at the top (1.36% -> 1.66%). The catalogued map has the roof/ceiling and the ascent but nothing about what is passed through afterwards. The looser pattern /clouds/ hits 4.24% but is heavily contaminated by metaphor ('heels in the clouds', 'clouds in the sky' teaching analogies) - the tight pattern above is what I measured."
+    },
+    {
+      "id": "the-family-waiting-room",
+      "name": "The Waiting Room Where the Family Sits",
+      "category": "structure",
+      "description": "Out of the body, a large number of experiencers do not stay at the ceiling: they go looking for their family and find them in the hospital waiting room, the corridor, or the relatives' room. They report what was said, who bought a candy bar, who was praying, what people were wearing. Because these details are checkable, this is the room that most often becomes the verified detail of the case.",
+      "aliases": [
+        {"term": "the waiting room", "tradition": "secular", "note": null},
+        {"term": "the waiting area", "tradition": null, "note": null},
+        {"term": "the relatives' room / the little room outside the operating room", "tradition": null, "note": null},
+        {"term": "where my family was", "tradition": null, "note": "many name the people rather than the room"}
+      ],
+      "regex": "(saw|see|seeing|watched|watching|went (in)?to|found myself in|floated|drifted|was in|over (in|to)|down (in)?to|visit\\w*) [^.?!]{0,45}waiting (room|area)|waiting (room|area)[^.?!]{0,70}(praying|prayed|crying|cried|my family|my mother|my mom|my husband|my wife|my parents|my dad|my father|my sister|my brother|sitting there)",
+      "negative_regex": "waiting room (of|at) (the|my) (dentist|office) ",
+      "quotes": [
+        {"videoId": "Xw39iEvZcM8", "cvnde": 22, "text": "I saw them sitting in a little waiting room outside the operating room, holding each other's hands, hoping and praying that I was going to make it"},
+        {"videoId": "wIOZaQsRrMM", "cvnde": 19, "text": "I went into the waiting room, where I saw my stepdad get a candy bar."},
+        {"videoId": "Vzmb0txOCKM", "cvnde": 23, "text": "of my sisters in the waiting room while my parents were elsewhere"}
+      ],
+      "sensory": [
+        "hands passing through a relative who is standing there",
+        "hearing conversations and jokes verbatim",
+        "seeing people praying, holding hands, pacing",
+        "arriving simply by thinking of the person"
+      ],
+      "journey_position": 0.1,
+      "parent": null,
+      "precision_estimate": 0.75,
+      "precision_sample_n": 20,
+      "measured": {"all_pct": 1.28, "all_docs": 79, "cv13_pct": 3.02, "cv18_pct": 4.28, "cv23_pct": 6.63},
+      "notes": "The single steepest cvNDE gradient I found: 1.28% overall but 6.63% at cvNDE>=23, a 5.2x enrichment - unsurprising, since this room is where the corroborating evidence lives. Entirely absent from the catalogued map, which covers the ceiling vantage and passing through the roof but never the tour of the rest of the building. The bare pattern /waiting room/ hits 4.74% overall and 16.02% at cv>=23, but includes the family's own later account, so I used the OBE-constrained pattern."
+    },
+    {
+      "id": "panoramic-sight",
+      "name": "Seeing in Every Direction at Once",
+      "category": "state",
+      "description": "Repeatedly and independently described: vision stops being a cone in front of the face. Experiencers see behind and above and below simultaneously, without turning a head they no longer have, and often notice this before they notice anything else. Several use the same number - 360 degrees - without prompting, and some add that it was 'more than that'.",
+      "aliases": [
+        {"term": "360 degree vision", "tradition": "secular", "note": "the commonest phrasing, used spontaneously"},
+        {"term": "panoramic vision", "tradition": null, "note": null},
+        {"term": "seeing in every direction at once", "tradition": null, "note": null},
+        {"term": "360 awareness", "tradition": null, "note": "some say awareness rather than sight"},
+        {"term": "seeing without eyes", "tradition": null, "note": null}
+      ],
+      "regex": "360[- ]?(degree|°)?\\s?(awareness|vision|view|perspective|sight|around)|(see|saw|seeing|vision|aware) [^.?!]{0,25}(in )?(all|every) direction",
+      "negative_regex": "360 (joules|volts|dollars|days|degrees fahrenheit)",
+      "quotes": [
+        {"videoId": "kfDl0i4Z2sQ", "cvnde": 20, "text": "I was so aware that I could see 360 degrees without even turning my head."},
+        {"videoId": "PK7PTC3Qw4s", "cvnde": 21, "text": "I could see in every direction at once with a panoramic 360° vision."},
+        {"videoId": "QPDI1zRNMQw", "cvnde": 18, "text": "I could see all around me in 360 degrees, but a lot more than that."},
+        {"videoId": "OzAHPfAx2zM", "cvnde": 26, "text": "it's almost like you can see 360 degrees around you"}
+      ],
+      "sensory": [
+        "no head-turning required; the view simply includes everything",
+        "often paired with seeing through walls or into the next room",
+        "often paired with feeling what other people in the building feel",
+        "noticed as strange before the person realises they have died"
+      ],
+      "journey_position": 0.08,
+      "parent": null,
+      "precision_estimate": 0.85,
+      "precision_sample_n": 16,
+      "measured": {"all_pct": 3.29, "all_docs": 203, "cv13_pct": 4.58, "cv18_pct": 6.22, "cv23_pct": 4.42},
+      "notes": "MORE common in well-evidenced accounts (3.29% -> 6.22% at cv>=18, easing to 4.42% at cv>=23 where n=181 makes the estimate noisy). The catalogued map has the ceiling vantage and looking down, but not the geometry of the seeing itself. Main false positive: 360 joules on a defibrillator."
+    },
+    {
+      "id": "the-place-that-is-home",
+      "name": "Home",
+      "category": "realm",
+      "description": "Not a location so much as a recognition: on arriving, experiencers say the place is home and that earth was the trip away. It is stated flatly and often as the first thought - 'I'm home' - before any being, landscape or light is described, and it is frequently the reason they did not want to return. Several are greeted with the words 'welcome home'.",
+      "aliases": [
+        {"term": "I was home", "tradition": "secular", "note": "the flat declarative is the commonest form"},
+        {"term": "welcome home", "tradition": null, "note": "spoken by the greeter"},
+        {"term": "coming home / back home again", "tradition": null, "note": null},
+        {"term": "my real home / that is home, this is not", "tradition": null, "note": "earth reframed as the temporary place"},
+        {"term": "familiar - like I had been there many times before", "tradition": null, "note": null}
+      ],
+      "regex": "(felt|feel|feels|feeling|knew) [^.?!]{0,20}\\bhome\\b|i was home[,.]|i.m home[,.]|welcome home|(this|that) (is|was) (my |our )?(real |true )?home\\b",
+      "negative_regex": "(went|came|drove|got|sent|came back|discharged) home from (the )?(hospital|school|work)|home (health|care|nurse|town|work)",
+      "quotes": [
+        {"videoId": "cTxeWzL_9sY", "cvnde": 15, "text": "for the first time in the, in these three years of my life, I felt that I was home"},
+        {"videoId": "X48Xzb7KfbY", "cvnde": 18, "text": "And the first thing that I thought it was, I'm home. Oh my god, I'm home."},
+        {"videoId": "5l_68PqP_DQ", "cvnde": 17, "text": "Incredibly safe and felt at home. I'd come back home. It was a very strong feeling like I've come back home."},
+        {"videoId": "7dSr7oNXY44", "cvnde": 13, "text": "I was in total bliss and happiness. I was home. I didn't want to go back."}
+      ],
+      "sensory": [
+        "recognition without memory - familiar though never seen",
+        "a sense of belonging that precedes seeing anything",
+        "often accompanied by 'I felt like a child again'",
+        "the body and earth are afterwards described as the away-place"
+      ],
+      "journey_position": 0.45,
+      "parent": null,
+      "precision_estimate": 0.6,
+      "precision_sample_n": 18,
+      "measured": {"all_pct": 19.67, "all_docs": 1215, "cv13_pct": 21.95, "cv18_pct": 21.55, "cv23_pct": 23.76},
+      "notes": "Mildly MORE common in the best-evidenced accounts (19.67% -> 23.76%). This is the largest gap in the catalogued map: 'home' is how experiencers name the destination more often than they name heaven, and no themed brief covered it. Precision is the weak point - the word is unavoidably biographical ('I was home when it happened'), so treat ~20% as an upper bound and the direction of the cvNDE gradient as the reliable part."
+    },
+    {
+      "id": "earth-from-out-there",
+      "name": "Looking Back at the Earth",
+      "category": "landscape",
+      "description": "A distinct waypoint reported by people who keep going up: the planet is seen whole and from outside, curved, shrinking, spinning, with land masses recognisable, and then space itself - stars, planets, galaxies moving past. Some describe it matter-of-factly as looking like NASA footage, which they had not seen before their experience.",
+      "aliases": [
+        {"term": "out into space", "tradition": "secular", "note": null},
+        {"term": "the curvature of the earth", "tradition": null, "note": null},
+        {"term": "seeing the planet from the outside", "tradition": null, "note": null},
+        {"term": "the earth getting smaller / going away", "tradition": null, "note": null},
+        {"term": "among the stars / the star-forming region", "tradition": null, "note": null}
+      ],
+      "regex": "curvature of the earth|earth (getting )?(smaller|shrink)|(saw|see|seeing|looking at|looked at|looked back at|viewed|watching) (the )?(earth|planet|world) (from|below|beneath|down|getting|shrink|spinning|curv)|out into (space|the universe)|into outer space",
+      "negative_regex": "(space|planet) (documentary|program|movie|film)|save the planet",
+      "quotes": [
+        {"videoId": "ASfXZHniI8A", "cvnde": 15, "text": "I can see the curvature of the earth and everything as I go out."},
+        {"videoId": "LvnHIC8Csdg", "cvnde": 13, "text": "And I remember going into outer space, and it was really fast."},
+        {"videoId": "LScZyTjERO8", "cvnde": 13, "text": "I was up above the earth, and I could see the earth spinning around real fast."},
+        {"videoId": "igtnQwP6FYI", "cvnde": 13, "text": "settling on the threshold of a doorway that looked into outer space. Pieces of rock floated by, and in the distance, planets and galaxies spun and whirled."}
+      ],
+      "sensory": [
+        "land masses recognisable as the planet recedes",
+        "silence out there, despite the movement",
+        "stars that turn out to be moving, or to be other beings",
+        "sometimes reached through a doorway rather than by flying"
+      ],
+      "journey_position": 0.2,
+      "parent": null,
+      "precision_estimate": 0.85,
+      "precision_sample_n": 9,
+      "measured": {"all_pct": 3.16, "all_docs": 195, "cv13_pct": 3.74, "cv18_pct": 2.9, "cv23_pct": 1.66},
+      "notes": "LESS common among the best-evidenced accounts: 3.16% overall, falling to 1.66% at cvNDE>=23 - the opposite direction from the waiting room, which is worth noting since both are OBE-phase perceptions but only one is checkable. Not represented in the catalogued map, which stops at the roof."
+    },
+    {
+      "id": "the-levels",
+      "name": "The Levels",
+      "category": "realm",
+      "description": "The other world is repeatedly described as tiered rather than flat: levels, planes, layers or spheres stacked above and below, with beings and places belonging to particular ones and movement between them being upward or downward. People describe knowing there were floors above and below them the way you know it in a building, and some ascend through several before being stopped.",
+      "aliases": [
+        {"term": "different levels", "tradition": "secular", "note": "the commonest phrasing"},
+        {"term": "planes / other planes", "tradition": "spiritualist", "note": null},
+        {"term": "layers", "tradition": null, "note": null},
+        {"term": "higher and higher levels", "tradition": null, "note": "ascent through several"},
+        {"term": "realms / the lower realms", "tradition": null, "note": null},
+        {"term": "spheres", "tradition": null, "note": "less common, older vocabulary"}
+      ],
+      "regex": "(different|higher|lower|many|multiple|several|various|other|next|seven) (levels|planes|realms|layers|spheres)\\b",
+      "negative_regex": "(sugar|blood|oxygen|energy|stress|pain|noise|water) levels|different levels of (care|training|education|management)",
+      "quotes": [
+        {"videoId": "B7Io3sTwp2k", "cvnde": 22, "text": "I could see that there were different levels to things where people were coming and going from and such."},
+        {"videoId": "c0VNuCwunDM", "cvnde": 26, "text": "those angelic choirs above provided yet another portal into higher and higher levels"},
+        {"videoId": "lapfn1TeMZw", "cvnde": 19, "text": "Because I would go through these spiritual levels, but then spontaneously fall back down to that earthworm eye view."}
+      ],
+      "sensory": [
+        "an awareness of things above you and things below you, like floors in a building",
+        "portals or music opening the way to the next level up",
+        "falling back down a level involuntarily",
+        "different levels populated by different kinds of being"
+      ],
+      "journey_position": 0.55,
+      "parent": null,
+      "precision_estimate": 0.6,
+      "precision_sample_n": 16,
+      "measured": {"all_pct": 15.27, "all_docs": 943, "cv13_pct": 14.05, "cv18_pct": 13.26, "cv23_pct": 14.92},
+      "notes": "Essentially FLAT across cvNDE strata (15.27% -> 14.92%), i.e. no evidential gradient. The catalogued map treats the other world as a set of named places but never as a vertical stack, which is how a sixth of the corpus describes it. Precision is limited by 'levels' used medically (blood levels, levels of care); the negative regex removes the commonest of those."
+    },
+    {
+      "id": "the-web-of-light",
+      "name": "The Web of Light",
+      "category": "landscape",
+      "description": "A minority but strikingly consistent image: the fabric of the place is visible as a mesh - a spiderweb, matrix or lattice of light with everything strung on it, and the experiencer embedded inside it rather than looking at it. The lights in the web are alive. Some see the same structure while still at the ceiling, as threads running out of the heads of the living.",
+      "aliases": [
+        {"term": "spiderweb of light", "tradition": "secular", "note": "recurs almost verbatim across unrelated accounts"},
+        {"term": "matrix of light", "tradition": null, "note": null},
+        {"term": "web of energy", "tradition": null, "note": null},
+        {"term": "threads of light", "tradition": null, "note": "seen attached to living people"},
+        {"term": "the grid", "tradition": null, "note": null}
+      ],
+      "regex": "(spider ?web|web|grid|network|matrix|lattice|threads|strands|filaments) of (light|energy)",
+      "negative_regex": "world wide web|web of lies|(power|electrical|cell|phone|social) network",
+      "quotes": [
+        {"videoId": "rp2bkltjlLs", "cvnde": 16, "text": "I started moving into what I would describe as a spiderweb of light, just a beautiful matrix of light that was just streaming everywhere, and I was embedded in it."},
+        {"videoId": "wzJQaceCsDU", "cvnde": 15, "text": "what appeared to be almost a very intricately woven spiderweb of light, it's the only way I can describe it"},
+        {"videoId": "eH3-WZWEMqY", "cvnde": 25, "text": "Vivid rays of light, and what appeared to be almost a very intricately woven spiderweb of light."}
+      ],
+      "sensory": [
+        "woven, intricate, streaming in every direction",
+        "you are inside it, not observing it",
+        "the lights in the mesh are alive",
+        "initially mistaken for constellations"
+      ],
+      "journey_position": 0.5,
+      "parent": null,
+      "precision_estimate": 0.6,
+      "precision_sample_n": 14,
+      "measured": {"all_pct": 0.47, "all_docs": 29, "cv13_pct": 0.54, "cv18_pct": 0.28, "cv23_pct": 1.1},
+      "notes": "Rare - 29 documents - and the strata are too thin to read a gradient (0.47% overall, 1.10% at cv>=23 on n=181). Reported here because it is entirely absent from the catalogued map and because the phrasing 'spiderweb of light' recurs near-verbatim in unrelated accounts, which is the signature of a shared percept rather than a shared metaphor. Broadening to include 'beams of light' triples the count but captures beings, not structure."
+    },
+    {
+      "id": "the-life-you-agreed-to",
+      "name": "The Life You Agreed To",
+      "category": "process",
+      "description": "Not the life review of what you did, but the recovered memory of what you chose before you came: a plan, an agreement, sometimes a contract, made with guides or a council, including the choice of parents and of the hard parts. It is usually remembered as already-known rather than newly told, and it reframes the life just reviewed as something volunteered for.",
+      "aliases": [
+        {"term": "pre-birth choices / pre-birth memories", "tradition": "secular", "note": null},
+        {"term": "soul contract", "tradition": "new age", "note": null},
+        {"term": "the plan for this life", "tradition": null, "note": "often 'they helped me plan this life'"},
+        {"term": "I chose this life / I chose my parents", "tradition": null, "note": null},
+        {"term": "I signed up for this", "tradition": "secular", "note": null}
+      ],
+      "regex": "soul contract|pre-?birth|(chose|chosen|choose|picked|planned|agreed to) (this|my) (life|lifetime|body|parents|path)|(plan|planned|planning) (this|my) (life|lifetime)|before (i|we) (was|were) born[^.?!]{0,60}(chose|planned|agreed|decided|knew|contract|plan)",
+      "negative_regex": "life (insurance|plan) (policy|premium)|birth (certificate|control|canal)",
+      "quotes": [
+        {"videoId": "PpY5ltV78gQ", "cvnde": 21, "text": "then I recalled the choices I made pre-birth, which sort of solidified"},
+        {"videoId": "EHwBXZXzByM", "cvnde": 23, "text": "I just had this feeling that they had helped me plan this life that I was living."},
+        {"videoId": "_IOp2JvZVns", "cvnde": 20, "text": "I had some beautiful friendships and it seemed like soul contracts with certain people."},
+        {"videoId": "V9V1H_iKbj0", "cvnde": 21, "text": "I actually have some pre-birth memories."}
+      ],
+      "sensory": [
+        "remembered rather than learned - 'I recalled'",
+        "guides sent in to argue you out of taking on too much",
+        "the choice of parents and of specific hardships",
+        "arrives adjacent to the life review and reframes it"
+      ],
+      "journey_position": 0.65,
+      "parent": null,
+      "precision_estimate": 0.65,
+      "precision_sample_n": 16,
+      "measured": {"all_pct": 6.53, "all_docs": 403, "cv13_pct": 5.37, "cv18_pct": 4.42, "cv23_pct": 5.52},
+      "notes": "Slightly LESS common in the well-evidenced strata (6.53% -> 5.52%; lowest at cv>=18). The catalogued map covers the life review, the preview and the veil of forgetting, but not the pre-birth agreement that several experiencers say the veil was drawn over. A looser pattern including 'before I was born' unqualified reaches 12.89% but is dominated by biographical use ('my grandfather died before I was born')."
+    },
+    {
+      "id": "the-form-you-wear",
+      "name": "The Form You Have There",
+      "category": "state",
+      "description": "What the experiencer is, once out: sometimes nothing at all - no body, no hands, pure awareness - sometimes a ball or point of light or energy, sometimes a transparent or outlined figure, and sometimes a form that changes as needed. People report watching their own legs dissolve, or reaching for something and realising there is nothing to reach with, and are frequently more struck by this than by the surroundings.",
+      "aliases": [
+        {"term": "I had no body", "tradition": "secular", "note": "the commonest formulation"},
+        {"term": "a ball of energy / ball of light", "tradition": null, "note": null},
+        {"term": "my spirit body", "tradition": null, "note": null},
+        {"term": "the astral body", "tradition": "esoteric", "note": null},
+        {"term": "pure consciousness / just awareness", "tradition": null, "note": null},
+        {"term": "a sphere of consciousness", "tradition": null, "note": "some report its colour"},
+        {"term": "an orb of light that became a translucent figure", "tradition": null, "note": "form change reported"}
+      ],
+      "regex": "i (had|have) no (physical )?(body|form)|i (didn.t|did not) have a (physical )?body|(lost|had lost) all form|i was (just )?(a |an )?(ball|point|orb|sphere|speck) of (light|energy|consciousness)|(my|the) (spirit|astral|light|energy) body|my (hands|arms|body) (was|were) transparent|i could see through (my|myself)",
+      "negative_regex": "no body (reflexes|movement|found)|nobody",
+      "quotes": [
+        {"videoId": "fCV7ayCLA1A", "cvnde": 20, "text": "I had lost all form. I was just a ball of energy."},
+        {"videoId": "wjDMKRFbf-A", "cvnde": 20, "text": "I had no body. It stayed back down in that damp room."},
+        {"videoId": "qR7s0sRW130", "cvnde": 21, "text": "I don't have a body to physically look down."},
+        {"videoId": "5F36rA2kKYs", "cvnde": 18, "text": "because I did not have a body, I was, was just a substance at this point."}
+      ],
+      "sensory": [
+        "watching your own legs dissolve as you climb stairs",
+        "passing through a wall once form is lost",
+        "having a colour as a sphere of consciousness",
+        "the form changing to a human shape when meeting others",
+        "'my soul was now my body'"
+      ],
+      "journey_position": 0.15,
+      "parent": null,
+      "precision_estimate": 0.75,
+      "precision_sample_n": 9,
+      "measured": {"all_pct": 8.24, "all_docs": 509, "cv13_pct": 6.88, "cv18_pct": 8.15, "cv23_pct": 9.39},
+      "notes": "MORE common among the best-evidenced accounts (8.24% -> 9.39% at cv>=23, with a dip at cv>=13). The catalogued map covers how the DEAD appear (restored bodies) but never what the experiencer themself is made of, which is a separate and frequently-volunteered observation. Main false positive: 'there was no body in the bed' and clinicians saying 'no body reflexes'."
+    },
+    {
+      "id": "more-real-than-real",
+      "name": "More Real Than This",
+      "category": "state",
+      "description": "The most uniform claim in the corpus and the one experiencers most insist on: the place was not dreamlike but hyper-real, more solid and more vivid than waking life, so that ordinary reality afterwards feels like the lesser copy. It is offered unprompted as the reason they reject the hallucination explanation, and it is often the framing device for the whole account.",
+      "aliases": [
+        {"term": "more real than this", "tradition": "secular", "note": "the standard phrase"},
+        {"term": "realer than real", "tradition": null, "note": null},
+        {"term": "the realest thing I have ever experienced", "tradition": null, "note": null},
+        {"term": "this life is the dream, that was awake", "tradition": null, "note": "inversion of which world is real"},
+        {"term": "hyper-real", "tradition": null, "note": "used by more analytical narrators"}
+      ],
+      "regex": "more real than|realer than|real(er)? than (this|that|anything|life|here|reality|being here)|hyper-?real",
+      "negative_regex": "more real estate|real than fake news",
+      "quotes": [
+        {"videoId": "urnNTJaWSzo", "cvnde": 19, "text": "This dream seemed real, realer than real, wetter than wet, the realest thing I had encountered in my life."},
+        {"videoId": "ragcEDleVcU", "cvnde": 21, "text": "More real. Much more real than I feel at this moment or any other time in my life on this earth."},
+        {"videoId": "FHLJmn0f46o", "cvnde": 25, "text": "I know that that reality is more real than this reality."},
+        {"videoId": "iF5y_pL6fDw", "cvnde": 24, "text": "It felt more real than being here, to be honest with you."}
+      ],
+      "sensory": [
+        "colours and textures denser than earthly ones",
+        "'wetter than wet' - qualities exceeding their earthly maxima",
+        "memory of it stays sharper than memory of yesterday, decades later",
+        "the body on the table becomes the less interesting object"
+      ],
+      "journey_position": 0.5,
+      "parent": null,
+      "precision_estimate": 0.85,
+      "precision_sample_n": 8,
+      "measured": {"all_pct": 6.61, "all_docs": 408, "cv13_pct": 7.42, "cv18_pct": 7.6, "cv23_pct": 7.73},
+      "notes": "MORE common in the best-evidenced accounts, rising smoothly 6.61% -> 7.73%. Note the structured corpus metadata records reality_comparison=more_real for 5863 of 6176 accounts (95%), so my 6.61% measures only the explicit comparative phrasing, not the underlying claim - the real prevalence is near-universal. It is the biggest thing the themed briefs left uncatalogued, because it is a property of every place rather than a place."
+    }
+  ]
+}

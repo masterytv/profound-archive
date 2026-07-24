@@ -1,0 +1,248 @@
+{
+  "auditor": 7,
+  "audits": [
+    {
+      "id": "the-creatures-of-the-country",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.458,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Post-NDE aftereffect passages: 'now the birds sing more vividly to me', playing with butterflies/cats back on earth (4 passages)",
+        "Ordinary-life birds: birds on the way to the hospital, birds singing on a spring drive, ravens on a real mountain during an OBE over the physical world",
+        "Metaphor and commentary: Plato using 'birds flying' as an analogy for out-of-body travel; Eben-Alexander-style philosophy about 'the trees, the birds, the sky' as an internal construct",
+        "Passages with no animal at all that matched on garden/paradise vocabulary (flowers filling a room; a waterfall of stars; 'lint particles')"
+      ],
+      "suggested_regex": "\\b(?:animals?|birds?|butterfl(?:y|ies)|dogs?|cats?|horses?|deer|lions?|squirrels?|rabbits?)\\b[^.]{0,120}\\b(?:meadow|garden|the other side|over there|heaven|paradise|that place|that realm)\\b|\\b(?:meadow|garden|heaven|paradise|that realm)\\b[^.]{0,120}\\b(?:animals?|birds?|butterfl(?:y|ies)|dogs?|cats?|horses?|lions?)\\b",
+      "best_quote": {
+        "doc": "A4m8xYkPcp0",
+        "text": "There were no people there. There were only animals, birds singing, little animals chirping, and squirrels and chipmunks and rabbits."
+      }
+    },
+    {
+      "id": "the-path-through-the-country",
+      "judged": 24,
+      "true_positives": 7,
+      "precision": 0.292,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Dominant junk: ordinary biography 'walking down the path to my car' / 'walking down the road' before the accident — 8 of 24 passages, including three near-duplicate retellings of the same car-crash prologue",
+        "Metaphorical paths: 'that path led me to plant medicine', 'the path is unwinding', 'mankind is on a path of destruction'",
+        "Real-world trails: a mountaineering route, a jungle clinic path, a watchmaker errand",
+        "Secondhand: an angel-escorted 'pathway through the meadows of heaven' narrated about a third party (Jim), and a hospice nurse's story of a dying boy seen walking a path"
+      ],
+      "suggested_regex": "\\b(?:path|pathway|walkway|trail|cobblestone|road)\\b[^.]{0,100}\\b(?:meadow|garden|golden|heaven|the light|city|gate|angel|guide|the other side)\\b|\\b(?:meadow|garden|heaven|city of light|gate|the other side)\\b[^.]{0,100}\\b(?:path|pathway|walkway|trail|cobblestone)\\b",
+      "best_quote": {
+        "doc": "m9IWFNoqXXw",
+        "text": "as I'm walking down the paths, and I'm walking towards this city, by the size of the buildings being this big over in the distance"
+      }
+    },
+    {
+      "id": "the-belonging",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary social belonging: not fitting in at school/neighbourhood, 'I don't belong here' said at an IANDS meeting",
+        "Interviewer-supplied wording: two passages where 'sense of belonging' appears only in the question and the answer describes joy/well-being instead",
+        "Book-plug and facilitator commentary about shared-death work giving people 'a sense of belonging'",
+        "Opposite sense of the same phrase: 'I don't belong here' spoken IN heaven out of unworthiness (he's made a terrible mistake), which is the inverse of earth-exile",
+        "Belonging in hell ('this is where I belonged, this is what I deserved') — same word, different place"
+      ],
+      "suggested_regex": "\\b(?:I|we)\\s+(?:really\\s+|truly\\s+)?belonged?\\s+(?:there|here|in that place|in heaven)\\b|\\b(?:don't|didn't|do not)\\s+belong\\s+(?:here|on (?:this )?earth|in this world)\\b|\\bwhere (?:I|we) belong(?:ed)?\\b",
+      "best_quote": {
+        "doc": "GmMvszHb1Ww",
+        "text": "It was, it was being home. This is where I fit. This is where I belong. This is where I was totally loved."
+      }
+    },
+    {
+      "id": "the-restored-body",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Recurring junk: the experiencer's OWN restored/young spirit body ('I looked 25 at 40', 'my hands looked like I was 18', looking younger in the mirror afterwards) — 4 passages. That is a real feature but a different one; it should not be counted as 'how the dead appear'",
+        "Descriptions of Jesus's appearance (healthy, in his prime, not battered) and of an unidentified old-bearded being with young skin — beings, not deceased loved ones",
+        "Pure biography (a dinner shift with stomach pain) and post-NDE self-talk about 'the Alyssa that was no longer sick'",
+        "Channel commentary generalising that 'loved ones look like they're in the prime of their life' rather than a firsthand sighting",
+        "One passage framed explicitly as a dream in a hospital room"
+      ],
+      "suggested_regex": "\\b(?:grandmother|grandfather|grandma|grandpa|mother|mom|father|dad|sister|brother|aunt|uncle|wife|husband|son|daughter|friend|cousin)\\b[^.]{0,120}\\b(?:looked|appeared|was)\\b[^.]{0,60}\\b(?:young(?:er)?|about 3\\d|in (?:his|her|their) (?:20s|30s|twenties|thirties|prime)|healthy|whole|healed|restored|no longer sick)\\b",
+      "best_quote": {
+        "doc": "hXt0PLubKHs",
+        "text": "My father was also standing. I had never in my life seen him stand or walk. He looked vibrant and in the prime of his life, and I was ecstatic. He was healed."
+      }
+    },
+    {
+      "id": "the-garden",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.792,
+      "verdict": "solid",
+      "failure_modes": [
+        "Garden as metaphor: 'the Earth is a giant garden and we all live in it'; a prayer asking God to 'turn my soul into a garden'; a grief poem's 'you're in the kitchen, you're in the garden'",
+        "Ordinary gardening/meditation advice ('sit with a cup of coffee looking out into your garden')",
+        "Generalisation about what other people see ('some people see beautiful gardens with flowers, others go to the beach')"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "xcp0YrPiu_g",
+        "text": "If you can picture the most perfect English garden, perfectly manicured, perfect grass, trees, flowers, I mean, absolutely gorgeous."
+      },
+      "note": "This id appears twice in the manifest slice (matched 206 and matched 166) but only one packet file exists at audit/the-garden.txt; audited once."
+    },
+    {
+      "id": "panoramic-sight",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "'360' in ordinary use: giant photographs placed 360 around a courtroom",
+        "'360-degree viewpoint' as a metaphor for perspective-taking (walking in another's shoes; being poor and being rich)",
+        "Generalised teaching that 'when we are out of our bodies we have that 360 degree perspective' — meaning complete understanding, not literal vision",
+        "Light 'spreading out in all directions' — a description of the light's extent, not of an omnidirectional visual field (2 near-duplicate passages)",
+        "A 360-degree vision event that happened while driving a car, days after a funeral — an after-death-communication, not the NDE"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "m46vcdcNiQ8",
+        "text": "I have 360-degree vision. Like, I can see everything around me, behind me, below me, above me."
+      }
+    },
+    {
+      "id": "the-screen",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Passages that mention 'life review' with no screen, movie or projector at all — the regex appears to match the review itself rather than its staging",
+        "Explicit denials of the cinema frame: 'it's often described as a film, but for me it wasn't a film, it was all the information at once'",
+        "Generalised teaching about what everyone does after death ('you go with your team of guides and you watch the movie of your life')",
+        "Pop-culture jokes ('like that movie Defending Your Life', 'a Netflix documentary about your life')",
+        "'Movies/films' as ordinary-life content inside the review — school Duck-and-Cover films, 'teachers, schools, movies, media'",
+        "A film reel of the whole earth's history that the experiencer explicitly says was NOT a life review"
+      ],
+      "suggested_regex": "\\b(?:screens?|movie|film|projector|reel|cinema|theat(?:re|er))\\b[^.]{0,80}\\b(?:of my life|my (?:whole )?life|life review|playing|played|watching)\\b|\\b(?:life review|my life)\\b[^.]{0,60}\\b(?:screens?|movie|film reel|projector|like a movie)\\b",
+      "best_quote": {
+        "doc": "QgnCz4WvgRA",
+        "text": "instead of having the screen in the front, the movie screens were all on the top in a big circle. There must have been maybe 15 or, or 20 of these screens."
+      }
+    },
+    {
+      "id": "the-mist",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Haze' as metaphor: 'a red haze of pain' at the office (2 near-duplicate passages), 'the details were very hazy', 'like you're in a haze'",
+        "'Foggy lens' as a metaphor for pre-NDE perception",
+        "Real weather: fog on the New York Thruway before the crash; and one simile that explicitly denies the medium ('it was all made of light instead of fog')",
+        "'Gray space' as an emotional/energetic state in coaching-style advice",
+        "A misty appearance attributed to a BEING (a transparent, misty-cloud angel) rather than to the surrounding medium"
+      ],
+      "suggested_regex": "\\b(?:in|into|through|inside)\\s+(?:a|this|the)\\s+(?:white|gr[ae]y|dense|thick|beautiful)?\\s?(?:mist|misty (?:area|place|space)|fog)\\b|\\b(?:mist|fog|mistiness)\\b[^.]{0,60}\\b(?:around me|surrounded me|all around|standing in|I was in|enveloped|cleared|lifted)\\b",
+      "best_quote": {
+        "doc": "Nj6IFvWtlqM",
+        "text": "I found myself standing in a kind of gray mist, and then I knew. I knew that I had died."
+      }
+    },
+    {
+      "id": "earth-from-out-there",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Dominant junk: the idiom 'out into the universe' / 'into outer space' used figuratively — thoughts going out into the universe, 'kick the word should out into outer space', signs that 'go out into the universe', souls who will 'go out into the universe and do good', meditation to 'get out into the universe at large'. Six passages, all of them pure figure of speech",
+        "Commentary about NASA spacecraft and planetary frequencies",
+        "Trance-journey and dream travel to space that the speaker frames as neither an NDE nor an OBE",
+        "Passages where 'space' is only the setting of the life review (bubbles of lifetimes) with no planet, stars or recession described"
+      ],
+      "suggested_regex": "\\b(?:saw|seeing|looking (?:back )?(?:at|down (?:on|at)))\\b[^.]{0,40}\\b(?:the )?(?:[Ee]arth|planet|globe)\\b[^.]{0,50}\\b(?:from (?:above|outside|space)|below me|beneath me|getting smaller|shrink|small|round ball)\\b|\\b(?:[Ee]arth|planet)\\b[^.]{0,30}\\b(?:getting smaller|fell away|receding)\\b",
+      "best_quote": {
+        "doc": "oYOKSioBjl4",
+        "text": "My spirit was traveling very fast, and I saw the Earth below me, and I seemed to be amidst the stars."
+      }
+    },
+    {
+      "id": "the-ascent",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Dominant junk: plain out-of-body ceiling hovering ('I floated up to the corner of the ceiling and looked down at my body') — 7 passages. That is the leaving-the-body feature, which has its own packet; it is not the ascent past the room into sky and starfield that this claim describes",
+        "Secondhand narration of someone else's rise (a host recounting Robert's drowning, a daughter quoting her father, a third-person retelling of a woman floating up a stairway)",
+        "A nitrous-oxide float out of a dentist's chair and a meditative OBE — lift, but not during a near-death event",
+        "Hovering with no upward motion (suspended 20 feet over a desert scene)",
+        "One passage where the lift is immediately followed by entering a cylinder/tunnel, which contradicts the 'without a tunnel' qualifier the claim rests on"
+      ],
+      "suggested_regex": "\\b(?:rose|rising|floated|floating|shot|flew|flying|lifted|drawn|soared|ascend(?:ed|ing))\\b[^.]{0,60}\\b(?:up|upward|upwards)\\b[^.]{0,70}\\b(?:above the (?:trees|house|roof|building|hospital|city|clouds|water|[Ee]arth)|out of the (?:room|building)|into the (?:sky|clouds|stars|heavens|air)|through the (?:roof|ceiling and roof|clouds))\\b",
+      "best_quote": {
+        "doc": "FFOPXWsQYPo",
+        "text": "Slowly I floated upward, out of the room and building, above the trees, and up into a black, star-filled sky."
+      }
+    },
+    {
+      "id": "painless-brightness",
+      "judged": 24,
+      "true_positives": 22,
+      "precision": 0.917,
+      "verdict": "solid",
+      "failure_modes": [
+        "Host intro boilerplate summarising the guest's story in the third person ('he found himself carried towards what he thought was a star brighter than ten thousand suns')",
+        "A second-person literary/generalised passage ('The light beckons you... brighter than a million suns, and yet it does not blind or burn you') which reads as a written set piece about what happens rather than a firsthand report"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "2n1Jae9btVM",
+        "text": "The light was brighter than hundreds of suns, but it did not hurt my eyes."
+      }
+    },
+    {
+      "id": "past-lives-in-the-review",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary reincarnation talk with no NDE content: children who remember being murdered in a past life, a six-year-old who can fly a plane, a mother's account of her son's memories",
+        "Post-NDE healing practice: 'I help them clear past lives', reading whether a client's illness comes from a past life",
+        "Past-life memories that arrived AFTER the experience ('I've seen a few of my past lives since this experience', 'I sat on my couch and I saw it')",
+        "Researcher and interviewer commentary about how often a 'past life review' occurs in NDE typologies",
+        "Explicit denials: 'I didn't have a real past life review', 'some people say they have past life reviews — for me it was more like a glass of water'",
+        "'My past life' used to mean simply this life up to now ('visions of my life, my past life... scenes of my life going before me')",
+        "Seeing ANOTHER person's past lives (a bus driver's) rather than one's own review — 2 passages",
+        "One textbook-perfect match for the claim (an arena with sections showing several simultaneous lifetimes) that is a retelling of Andy Petro's NDE by someone else"
+      ],
+      "suggested_regex": "\\b(?:showed me|shown me|they showed|I saw|I was shown)\\b[^.]{0,60}\\b(?:past|previous|other|another) (?:life|lives|lifetime|lifetimes)\\b|\\b(?:life review|the review)\\b[^.]{0,80}\\b(?:past|previous|other) (?:lives|lifetimes)\\b",
+      "best_quote": {
+        "doc": "aTTAHpqfcXQ",
+        "text": "And they gave me this cinema-like an upload into my mind of multiple past life reviews."
+      }
+    },
+    {
+      "id": "the-singing-landscape",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Overwhelming junk: the free-floating new-age/physics slogan 'everything is vibration' / 'everything is frequency' used in ordinary conversation — bioresonance and Rife machines, quantum-physics asides, 'everything is mathematics' interviews, capitalism 'keeping everything in that vibration', book promotion about 'vibrational alignment', coaching advice about raising your vibration. Roughly 14 of 24 passages are this one pattern and none of them describe a landscape",
+        "Personal vibration: the experiencer's own body shaking at a high vibration, or 'my vibration changed' as an aftereffect",
+        "Post-NDE perception of ordinary objects (a chair, a cat) having energy",
+        "A third-person narrative of an unborn baby sensing vibrations"
+      ],
+      "suggested_regex": "\\b(?:trees?|leaves|grass|rocks?|flowers?|water|colou?rs|blade of grass)\\b[^.]{0,60}\\b(?:had|has|have)\\b[^.]{0,25}\\b(?:its |their |a |her |his )?(?:own )?(?:sound|pitch|note|tone|vibration|frequency)\\b",
+      "best_quote": {
+        "doc": "N6R7jO3sEpw",
+        "text": "The trees had a sound; the leaves on the trees had their own sound; the grass had a sound; the rocks had a sound; the water had yet another sound"
+      }
+    }
+  ]
+}

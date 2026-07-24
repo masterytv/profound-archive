@@ -1,0 +1,733 @@
+{
+  "places": [
+    {
+      "id": "the-welcoming-party",
+      "name": "The welcoming party",
+      "category": "being",
+      "parent": null,
+      "description": "People are almost never arrived-at alone. A group is already assembled and already knows you are coming; experiencers say they were expected. The corpus's own name for it is the 'welcoming committee' or 'welcome party'. It ranges from a triangle of three to eighty figures at a distance to 'thousands and thousands'. The dominant emotion reported is not awe but recognition and hilarity — they are delighted, joyous, glad to see you.",
+      "aliases": [
+        {"term": "welcoming committee", "tradition": "secular", "note": "the single most common self-coined phrase in the corpus for this"},
+        {"term": "welcome party", "tradition": null},
+        {"term": "greeting party", "tradition": null},
+        {"term": "graduation party", "tradition": "Christian", "note": "Betty Eadie's term"},
+        {"term": "fan club", "tradition": null},
+        {"term": "they were waiting for me", "tradition": null},
+        {"term": "my soul group / soul family", "tradition": "secular/New Age"},
+        {"term": "they knew I was coming", "tradition": null}
+      ],
+      "regex": "(welcoming|welcome|greeting) (party|committee)|(greeted|welcomed) (me|us)[^.]{0,80}(heaven|the light|arrived|home|family|relatives|loved ones|other side|there)|(they|people|family|relatives|everyone|loved ones|souls|beings|angels) (were|was)[^.]{0,25}waiting for me|(there|were there) to (greet|welcome) me",
+      "negative_regex": "(welcomed me (in|into) (his|her|their) (home|church|house)|welcomed me with open arms)",
+      "sensory": [
+        "a triangle or wedge formation with the closest relative at the point",
+        "the crowd extending back into shadow — 'shadows in the back' you still recognise",
+        "arms out, hands extended, embracing",
+        "joy and laughter rather than solemnity",
+        "no surprise on their side: 'I didn't show up and surprise anyone'"
+      ],
+      "quotes": [
+        {"videoId": "rv796CkLXBE", "cvnde": 20, "text": "I did see many, many, many people there waiting for me, and they were all very joyous and very happy to see me. It was a huge welcoming party."},
+        {"videoId": "76NofxoLQK0", "cvnde": 19, "text": "My welcoming committee, I called them. And at the very point of the triangle was my beautiful Grandad Sam"},
+        {"videoId": "9eP53HVrU9g", "cvnde": 16, "text": "About 80 people were behind her a short distance off, and I could not see them clearly, but I knew they were there to welcome me."},
+        {"videoId": "WlAIPM-Citw", "cvnde": 10, "text": "it just felt like I was home, I was there, and they were my welcome party. And there were thousands and thousands of, I'm going to say beings"}
+      ],
+      "journey_position": 0.38,
+      "measured": {"all_pct": 3.71, "all_docs": 229, "cv13_pct": 4.70, "cv18_pct": 5.11, "cv23_pct": 3.87},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 18,
+      "notes": "Slightly MORE common among strongly-evidenced accounts (3.71% all vs 5.11% cv>=18), though the cv>=23 stratum is small (n=181) and drops back to 3.87%. An earlier draft of this regex included 'on the other side' and precision collapsed to ~50% because that phrase is a generic idiom for the afterlife in interview chatter; it was removed. Note the negative case is also reported: Howard Storm's welcoming committee turns out to be deceptive and leads toward hell — the welcome is not always benign."
+    },
+    {
+      "id": "deceased-relatives",
+      "name": "The dead of your own family",
+      "category": "being",
+      "parent": null,
+      "description": "The people met are overwhelmingly your own dead: mother, father, brothers, sisters, uncles, aunts, cousins, spouses. They are recognised instantly, often before being seen clearly — recognition is by 'energy' or by knowing rather than by face. They typically do not explain themselves; they reassure, they say it is not your time, and several accounts note they are noticeably busy and involved, not idle.",
+      "aliases": [
+        {"term": "deceased relatives", "tradition": "secular"},
+        {"term": "loved ones", "tradition": null},
+        {"term": "family members on the other side", "tradition": null},
+        {"term": "my people in spirit", "tradition": "spiritualist"},
+        {"term": "ancestors", "tradition": null},
+        {"term": "those who had crossed over", "tradition": null},
+        {"term": "my soul family", "tradition": "secular/New Age", "note": "sometimes used interchangeably, sometimes distinguished from blood family"}
+      ],
+      "regex": "(deceased|dead|departed|passed|late) (relatives|loved ones|family|friends|grandmother|grandfather|mother|father|brother|sister)|(relatives|loved ones|family members|ancestors) (who|that) (had )?(died|passed)|(saw|met|there (was|were)|greeted by) (my|his|her) (mother|father|dad|mom|brother|sister|uncle|aunt|cousin|son|daughter|husband|wife)[^.]{0,60}(who (had )?(died|passed)|had (died|passed)|was dead|standing|waiting|there)",
+      "negative_regex": "(after (my|his|her) \\w+ (died|passed)[^.]{0,60}(funeral|hospice|inherit|estate|grief counsel))",
+      "sensory": [
+        "recognised by energy or knowing rather than by sight",
+        "no aging or illness carried over",
+        "period clothing from the era each of them lived in",
+        "they hug, take your hand, put a hand out",
+        "communication is soundless (see telepathic-speech)"
+      ],
+      "quotes": [
+        {"videoId": "0qJESVJi3tw", "cvnde": 20, "text": "I was greeted by people I had known in the past. Um, relatives, my, uh, a grandpa was there, um, an aunt that had died just previous to this."},
+        {"videoId": "hPUPIs0ZLpg", "cvnde": 20, "text": "I saw thousands of people there, including my mom, grandmothers, and aunt, and an uncle. Everyone looked 25 to 30 years old."},
+        {"videoId": "XRPbQQY8aLY", "cvnde": 10, "text": "there was no speech, it was all telepathic, I recognized instantly as my ICU patient"}
+      ],
+      "journey_position": 0.43,
+      "measured": {"all_pct": 8.73, "all_docs": 539, "cv13_pct": 13.69, "cv18_pct": 16.57, "cv23_pct": 19.89},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 20,
+      "notes": "This is the strongest evidential gradient in my whole region: 8.73% of all accounts, 19.89% of the best-evidenced (cv>=23) — a 2.3x enrichment, monotone across all four strata. The corpus's own structured coding agrees independently (deceased_relatives present in 39.9% all vs 58.6% cv>=23). Whatever produces high veridical-perception scores also produces encounters with the family dead. My regex is far more conservative than the structured coder's, so treat 8.73% as a floor, not a prevalence."
+    },
+    {
+      "id": "grandparents-waiting",
+      "name": "The grandparent at the front",
+      "category": "being",
+      "parent": "deceased-relatives",
+      "description": "Grandmothers and grandfathers are the single most frequently named individual greeters in the corpus — more often named than parents. They are usually described as standing at the front of the group, or as the first face resolved out of the light. The grandmother in particular is often the one who does the talking and the reassuring; several experiencers met a grandmother or great-grandmother they had never met in life and later identified her from family photographs.",
+      "aliases": [
+        {"term": "grandma", "tradition": null},
+        {"term": "grandmother", "tradition": null},
+        {"term": "nana", "tradition": null},
+        {"term": "granny", "tradition": null},
+        {"term": "granddad / grandad", "tradition": null},
+        {"term": "grandpa", "tradition": null},
+        {"term": "Papa", "tradition": null},
+        {"term": "Uma", "tradition": null, "note": "one family's word for great-grandmother"},
+        {"term": "great-grandmother", "tradition": null},
+        {"term": "a grandmotherly feeling", "tradition": null, "note": "used when the being is unidentified but feels like a grandmother"}
+      ],
+      "regex": "(my (grandmother|grandma|grandmom|granny|nana|grandfather|grandpa|granddad|grandad|grandparents|great-grandmother|great-grandma))[^.]{0,90}(was|were) (there|waiting|standing|coming)|(saw|met|greeted by|there (was|were)) (my |his |her )?(grandmother|grandma|granny|nana|grandfather|grandpa|granddad|grandparents)",
+      "negative_regex": "(grandmother|grandma|grandpa|granddad)[^.]{0,40}(raised me|babysat|farm|kitchen|house when I was|took me to (church|school))",
+      "sensory": [
+        "restored to their thirties or fifties, not the age at which they died",
+        "'he looked so well' / 'she was youthful'",
+        "very large hands remembered from childhood",
+        "hair 'of fire' in one account; an angelic rather than elderly appearance",
+        "recognised from photographs only afterwards"
+      ],
+      "quotes": [
+        {"videoId": "opcQONTQHXQ", "cvnde": 19, "text": "And my grandfather was there. And he looked great. He had died at 71, but he looked about 35 or 40."},
+        {"videoId": "x0sMVJWiQv8", "cvnde": 10, "text": "My grandma was waiting for me, my guardian angel was waiting for me."},
+        {"videoId": "22ge3Qp6sS8", "cvnde": 16, "text": "they all looked younger than I even remembered them being, and you know, healthy and vibrant"}
+      ],
+      "journey_position": 0.43,
+      "measured": {"all_pct": 4.50, "all_docs": 278, "cv13_pct": 7.84, "cv18_pct": 8.70, "cv23_pct": 8.29},
+      "precision_estimate": 0.7,
+      "precision_sample_n": 20,
+      "notes": "Nearly doubles in the well-evidenced strata (4.50% -> 8.70% at cv>=18). The bare noun 'grandmother' occurs in 36.66% of all transcripts, almost all of it biography — that is why this regex demands a meeting/waiting verb. Residual false positives are mostly childhood-memory sentences that happen to contain 'was there'."
+    },
+    {
+      "id": "the-one-not-known-to-be-dead",
+      "name": "Meeting someone you did not know had died",
+      "category": "being",
+      "parent": "deceased-relatives",
+      "description": "The veridical signature of this whole region: the experiencer meets a specific person on the other side, comes back, and only then learns that the person had died — sometimes hours or days earlier, sometimes decades. Experiencers who tell this rarely dwell on it; they report it flatly as the thing that convinced them. Several report the converse formula from the other direction: a being says 'what are you doing here, you're not dead'.",
+      "aliases": [
+        {"term": "I didn't know she had died", "tradition": null},
+        {"term": "I had no idea he had passed", "tradition": null},
+        {"term": "nobody had told me", "tradition": null},
+        {"term": "a relative I'd never met", "tradition": null},
+        {"term": "the child no one had told me about", "tradition": null},
+        {"term": "no one ever meets someone who isn't dead", "tradition": "secular", "note": "the researcher's formulation, quoted back by experiencers"}
+      ],
+      "regex": "(saw|met|there was|recognized|encountered)[^.]{0,70}(who|whom|that) I (didn'?t|did not) know (had )?(had )?(died|passed|was dead)|(didn'?t know|did not know|had no idea|wasn'?t aware|never knew|nobody (had )?told me|no one (had )?told me|didn'?t even know)( that)? (he|she|they|my [a-z-]+)[^.]{0,45}(had )?(just )?(died|passed|passed away|was dead|were dead)|(people|someone|somebody|a (person|man|woman|boy|girl))[^.]{0,50}(I|they) (didn'?t|did not) know (had )?(died|passed|was dead)",
+      "negative_regex": "(didn'?t know|did not know|had no idea)( that)? (I|i) (was dead|had died)",
+      "sensory": [
+        "the person appears at the age they would recognisably be, or younger",
+        "often a sibling who died before the experiencer was born",
+        "sometimes a name is given that the family later confirms",
+        "the recognition arrives before the reasoning does"
+      ],
+      "quotes": [
+        {"videoId": "GKszbvqzplg", "cvnde": 7, "text": "I didn't know she had died, but I knew that was her there."},
+        {"videoId": "DYnh3F093i0", "cvnde": 23, "text": "Well, I have met people in the Hereafter. I didn't know had died, among them young people."},
+        {"videoId": "pIoIhgfDpVc", "cvnde": 19, "text": "My sister had a stillborn baby boy. What I didn't know is that they named him Steven."}
+      ],
+      "journey_position": 0.44,
+      "measured": {"all_pct": 0.57, "all_docs": 35, "cv13_pct": 1.15, "cv18_pct": 1.10, "cv23_pct": 0.55},
+      "precision_estimate": 0.45,
+      "precision_sample_n": 20,
+      "notes": "Genuinely rare and I am reporting the precision honestly as poor: roughly half the matches are after-death-communication dreams or waking visitations rather than during-NDE meetings, and a few are interviewers describing the phenomenon in the abstract. Doubles at cv>=13 (0.57% -> 1.15%), which is the direction you would expect if it is real, but n=35 total means these percentages are fragile. I deliberately excluded the far more common self-referential 'I didn't know I was dead' (which alone matches ~3.2% of the corpus) because that is a different phenomenon."
+    },
+    {
+      "id": "children-and-babies",
+      "name": "The children who were never born",
+      "category": "being",
+      "parent": "deceased-relatives",
+      "description": "A small but very consistent cluster: experiencers meet a miscarried, stillborn or aborted child, or a sibling who died as a baby before they were born. The child is not an infant — it is described as a fully developed soul, often aged forward to the years elapsed since the loss, and it initiates the contact ('hi, Mommy'). Separately, many accounts describe children simply playing in the landscape, not as anyone's dead in particular.",
+      "aliases": [
+        {"term": "the baby I miscarried", "tradition": null},
+        {"term": "my stillborn brother/sister", "tradition": null},
+        {"term": "the child I aborted", "tradition": null},
+        {"term": "the child I never knew on Earth", "tradition": null},
+        {"term": "a little boy / a little girl", "tradition": null},
+        {"term": "babies in heaven", "tradition": "Christian"},
+        {"term": "children playing", "tradition": null}
+      ],
+      "regex": "(my|the) (baby|babies|child|children|son|daughter|sister|brother|twin)[^.]{0,90}(miscar\\w+|stillborn|abort\\w+|never born|died as a (baby|child|infant)|i never (met|knew))|(met|saw|there was) (my|the|a) (baby|little (boy|girl)|child)[^.]{0,60}(i (had )?(lost|miscarried)|(who|that) (i|we) (lost|miscarried|never))",
+      "negative_regex": null,
+      "sensory": [
+        "aged forward to match the years since the loss",
+        "carried by another dead relative and handed over",
+        "named — and the name matches one the family chose but never spoke aloud",
+        "children playing at what looks like school recess, with animals among them"
+      ],
+      "quotes": [
+        {"videoId": "FWZkPwiWJDE", "cvnde": 11, "text": "I saw my sister who died as a baby. Now she was walking down to me and carrying my son."},
+        {"videoId": "ZWDokZczIfs", "cvnde": 7, "text": "the little girl says, yes, yes, you are. Uh, you know, I'm, I'm the child you aborted."}
+      ],
+      "journey_position": 0.45,
+      "measured": {"all_pct": 0.42, "all_docs": 26, "cv13_pct": 0.66, "cv18_pct": 0.69, "cv23_pct": 1.10},
+      "precision_estimate": 0.65,
+      "precision_sample_n": 20,
+      "notes": "Rare but rises monotonically with evidential strength (0.42% -> 1.10%). Some matches are the experiencer's own obstetric history rather than a meeting; I kept the regex tight rather than inflate the count. The broader pattern 'children playing / babies in heaven' matches 226 docs (3.66%) but with much lower specificity, so I did not use it as the measured figure."
+    },
+    {
+      "id": "pets-and-animals",
+      "name": "Pets and animals",
+      "category": "being",
+      "parent": null,
+      "description": "Dogs above all, then cats and horses. The pet is usually simply present rather than central — 'they were just there in support' — and several experiencers note the animal does not have its earthly body: one describes his childhood dog as a floating sphere of awareness that he merged with. Animals are also reported en masse in the landscape, unafraid and mixed in with children.",
+      "aliases": [
+        {"term": "my dog", "tradition": null},
+        {"term": "my cat", "tradition": null},
+        {"term": "my pets", "tradition": null},
+        {"term": "our animals", "tradition": null},
+        {"term": "pets in heaven", "tradition": "Christian"},
+        {"term": "animals on the other side", "tradition": null},
+        {"term": "a floating sphere of awareness", "tradition": "secular", "note": "one experiencer's description of his dog's form"}
+      ],
+      "regex": "(my|our|the|his|her) (dog|dogs|cat|cats|pet|pets|horse|horses|puppy|kitten)[^.]{0,60}(was|were) (there|waiting|with me|running|greeted)|(pets|animals|dogs|our animals)[^.]{0,40}(in heaven|on the other side|were there|waiting for)|(saw|met) my (dog|cat|pet|horse)",
+      "negative_regex": "(dog|horse) (bit|barked|barking|bolted|threw me|kicked me)",
+      "sensory": [
+        "no fur or legs — awareness without an animal body",
+        "recognised instantly anyway, by name",
+        "greeting is wordless and mutual absorption rather than licking or jumping",
+        "animals unafraid, mixed with children, in the landscape"
+      ],
+      "quotes": [
+        {"videoId": "uwVw8M4uRTo", "cvnde": 10, "text": "I was nine years old, and my dog Skippy was there. My dog was there."},
+        {"videoId": "zoq0jfCN_8Q", "cvnde": 23, "text": "Especially my dog was there in the afterlife. They have souls."},
+        {"videoId": "5a-7MPBvvRM", "cvnde": 12, "text": "Some of my pets were there. I didn't talk to any of them. I didn't need to."}
+      ],
+      "journey_position": 0.45,
+      "measured": {"all_pct": 2.14, "all_docs": 132, "cv13_pct": 2.71, "cv18_pct": 1.93, "cv23_pct": 2.76},
+      "precision_estimate": 0.6,
+      "precision_sample_n": 20,
+      "notes": "Essentially flat across strata — no evidential enrichment, unlike the human dead. Precision is limited because 'my dog was there' also occurs in ordinary accident narratives (a dog present at the scene, a rescue dog). The corpus's own entity census records only 191 'animal' and 11 'deceased_pet' encounters across 11,885 entity records, consistent with genuine rarity."
+    },
+    {
+      "id": "angels",
+      "name": "Angels",
+      "category": "being",
+      "parent": null,
+      "description": "The most-named non-human category in the corpus after God and Jesus. Wings are the contested detail: roughly as many experiencers say the angels had no wings as say they did, and several explicitly correct the expectation ('they didn't have wings — they were dressed in ornate gowns', 'they really were these orbs of light'). Where wings are reported they are large, soft, feather-bed-like, and used to enfold rather than to fly. Angels are frequently taller and more luminous than the human dead, and are described as escorts and protectors rather than as conversationalists.",
+      "aliases": [
+        {"term": "angel", "tradition": "Christian/Jewish/Muslim/secular"},
+        {"term": "guardian angel", "tradition": "Christian"},
+        {"term": "archangel Michael / Gabriel / Raphael / Metatron", "tradition": "Christian/Jewish"},
+        {"term": "angelic being", "tradition": null},
+        {"term": "ministering angels", "tradition": "Christian"},
+        {"term": "the light beings", "tradition": "secular", "note": "some experiencers use this instead of 'angel' for the same figures"},
+        {"term": "white orbs", "tradition": null},
+        {"term": "heavenly host", "tradition": "Christian"}
+      ],
+      "regex": "(angels?|archangel\\w*|angelic (being|figure|presence)s?)[^.]{0,60}(appeared|came|were there|was there|around me|beside me|greeted|took me|wings|carried|standing|surrounded)|(two|three|four|many|thousands of|several) angels|(saw|met|there (was|were)) (an? )?angel",
+      "negative_regex": "(you'?re an angel|she was an angel|like an angel|angel investor|Angel(s)? (baseball|stadium))",
+      "sensory": [
+        "taller and more illuminated than the human dead",
+        "wings 'like big soft beds', 'like a down comforter'",
+        "light blue sashes over white robes",
+        "no wings at all in many accounts — ornate gowns, or pure orbs of colour",
+        "touch feels like a light socket, but pleasant",
+        "singing described as 'mighty streams of living water'"
+      ],
+      "quotes": [
+        {"videoId": "ufRMkuswZR8", "cvnde": 15, "text": "these two angels, um, they didn't have wings. They were dressed in these ornate, beautiful dresses or gowns."},
+        {"videoId": "5pGK4h-WcdQ", "cvnde": 12, "text": "So I know we depict angels in very much this human form with these wings, but they really were these orbs of light."},
+        {"videoId": "bm8edJOUQu4", "cvnde": 13, "text": "They had brown robes on and they had golden belts around their waist, and they introduced themselves as my ministering angels"}
+      ],
+      "journey_position": 0.40,
+      "measured": {"all_pct": 15.04, "all_docs": 929, "cv13_pct": 17.97, "cv18_pct": 16.02, "cv23_pct": 17.13},
+      "precision_estimate": 0.75,
+      "precision_sample_n": 20,
+      "notes": "Only mildly enriched in better-evidenced accounts (15.04% -> 17.13%), far less than the deceased relatives. False positives come from post-NDE angel beliefs and from the idiomatic 'you're an angel'. The corpus entity census logs 1,068 angel encounters plus 191 'angel' and 83 'guardian angel' raw identities, so this is a genuinely large category, not an artefact."
+    },
+    {
+      "id": "guides-guardians-escorts",
+      "name": "Guides, guardians and the one who comes to fetch you",
+      "category": "being",
+      "parent": null,
+      "description": "A being whose role is transit and instruction rather than reunion. It introduces itself ('I'm Allan, I'm your spirit guide'; 'my name is Elizabeth, I am your guardian angel and I'm here to help you'), takes the experiencer by the hand, and leads them into the light, along a path, up a staircase or into a building. Guides are far more often described as functionally helpful than as adored. Many experiencers report the same guide continuing to speak to them for decades afterwards.",
+      "aliases": [
+        {"term": "spirit guide", "tradition": "secular/New Age"},
+        {"term": "guardian angel", "tradition": "Christian"},
+        {"term": "my guide", "tradition": null},
+        {"term": "guardian", "tradition": null},
+        {"term": "teacher", "tradition": null},
+        {"term": "escort", "tradition": null},
+        {"term": "the monitors", "tradition": "secular", "note": "one experiencer's word for seven robed overseers"},
+        {"term": "akashic agents", "tradition": "secular/New Age"},
+        {"term": "helper", "tradition": null},
+        {"term": "the gentleman there to greet me", "tradition": null}
+      ],
+      "regex": "(spirit guides?|guardian angels?|my guides?( |,|\\.)|the guide|a guide|spiritual guide|my (teacher|escort|helper))|(took (my|me by the) hand|held my hand|by the hand|took hold of my hand)[^.]{0,80}(led|walked|took|guided|brought|and we)|(escort\\w*|accompan\\w+|led me|guided me|took me) (to|through|into|up|along)[^.]{0,50}(light|tunnel|garden|city|realm|place|heaven|gate)",
+      "negative_regex": "(guidebook|guided (tour|meditation) (app|class)|tour guide|guidelines|guidance counselor)",
+      "sensory": [
+        "gives a personal name, which the experiencer usually cannot later trace",
+        "takes the hand — after which the unstable ground becomes walkable",
+        "vaguely human shape, sometimes deliberately made human-ish 'to make it easier for me to relate'",
+        "walks slightly ahead or slightly behind, never in front of the light",
+        "sometimes multiple: 'three original light beings that greeted me'"
+      ],
+      "quotes": [
+        {"videoId": "0qJESVJi3tw", "cvnde": 20, "text": "my name is Elizabeth. I am your guardian angel and I'm here to help you."},
+        {"videoId": "3j7YqTZkRuE", "cvnde": 23, "text": "there's a jump from being in this room with this group of people to being in a much smaller room with only my guide."},
+        {"videoId": "bnkb7lEzT7Y", "cvnde": 9, "text": "And she takes me to a park bench where I see these two elderly people."}
+      ],
+      "journey_position": 0.32,
+      "measured": {"all_pct": 32.51, "all_docs": 2008, "cv13_pct": 36.73, "cv18_pct": 36.33, "cv23_pct": 35.36},
+      "precision_estimate": 0.6,
+      "precision_sample_n": 20,
+      "notes": "The broadest place in my region and the one whose precision I trust least. Roughly 40% of matches are post-NDE ongoing guide relationships, general belief statements about guides, or interviewers using the term — not a guide encountered during the experience. The 'took my hand and led me' and 'led me to the light' sub-patterns are far cleaner (1.17% and 4.63% respectively, ~90% precision) and could be split out downstream if a tighter measure is wanted."
+    },
+    {
+      "id": "the-council",
+      "name": "The council of elders",
+      "category": "being",
+      "parent": null,
+      "description": "A seated, deliberative body — usually a semicircle or a long table, usually numbered (twelve, eleven, thirteen, three) — that reviews the life, lays out lessons, and rules on whether the experiencer returns. It is distinguished from the welcoming party by furniture and by procedure: there are tables, podiums, a chair in the centre, an order of speaking. Experiencers report humour rather than severity: the council chuckles, and knows what you are thinking before you say it.",
+      "aliases": [
+        {"term": "council of elders", "tradition": "secular/New Age"},
+        {"term": "the Council of 12 / Council of 11", "tradition": null},
+        {"term": "the Council of men", "tradition": null},
+        {"term": "a council of high spiritual beings", "tradition": null},
+        {"term": "the elders", "tradition": null},
+        {"term": "the council meeting", "tradition": null},
+        {"term": "the monitors", "tradition": null},
+        {"term": "the counselor", "tradition": null}
+      ],
+      "regex": "(council of (elders|light|(the )?(twelve|12|11|nine|9|men))|council of (high )?(spiritual )?beings|(the|a) council[^.]{0,30}(elders|beings|souls|wise|met|sitting|table)|(12|twelve|thirteen|13) elders|elders (were|sat|sitting|around)|(a|the) (group|panel|circle) of elders)",
+      "negative_regex": "(Council of (Nicaea|NAA|Trent|Biomedicine)|student council|city council|whole council of God|tribal elders|church elders|native elders)",
+      "sensory": [
+        "a semicircular or very long table; podiums; benches on four sides",
+        "the experiencer seated or standing in the centre facing them",
+        "a fixed number, most often twelve",
+        "they laugh — and the laughter reveals that they have heard your thoughts",
+        "one account: seven robed 'monitors' with light pouring from their palms"
+      ],
+      "quotes": [
+        {"videoId": "EWKEVABuDBI", "cvnde": 13, "text": "There were 12 elders sitting at the table beside him."},
+        {"videoId": "8p7y58V6sMM", "cvnde": 14, "text": "What I have also experienced was the presence of a council of elders."},
+        {"videoId": "i81ICyhu6R8", "cvnde": 20, "text": "And I met the Council of 12."}
+      ],
+      "journey_position": 0.55,
+      "measured": {"all_pct": 1.26, "all_docs": 78, "cv13_pct": 1.21, "cv18_pct": 1.24, "cv23_pct": 1.66},
+      "precision_estimate": 0.75,
+      "precision_sample_n": 20,
+      "notes": "Flat across strata. The bare word 'council' matches 341 docs (5.5%) but most of that is the Council of Nicaea, student council, or tribal/church elders, which is why the negative_regex is long. Almost entirely absent from Christian-framed accounts and concentrated in secular/New Age framings — a clear case of cultural patterning of the same slot in the narrative (Christians describe standing before Jesus at the same journey position)."
+    },
+    {
+      "id": "robed-figures",
+      "name": "Robed figures",
+      "category": "being",
+      "parent": null,
+      "description": "Beings identified chiefly by their clothing: white robes, brown robes with golden belts, tunics of loose-weave sack material, robes of many colours, dark hooded robes. Some are named (angels, Jesus), many are not — 'a strange robe figure who led me down a path'. The robe is often the only detail given, and several experiencers say the faces were deliberately indistinct or grey: 'our faces don't matter, it's our presence'.",
+      "aliases": [
+        {"term": "white robe", "tradition": "Christian/secular"},
+        {"term": "robed figure", "tradition": null},
+        {"term": "man in a white robe", "tradition": null},
+        {"term": "beings in robes", "tradition": null},
+        {"term": "hooded figures", "tradition": null},
+        {"term": "tunic", "tradition": null},
+        {"term": "gown", "tradition": null},
+        {"term": "sash", "tradition": null},
+        {"term": "monk-like", "tradition": "Buddhist/Christian"}
+      ],
+      "regex": "(robe|robes|robed)[^.]{0,50}(being|beings|figure|figures|man|men|woman|women|people|angel|angels|monk)|(being|beings|figure|figures|man|men|woman|women|people|angel|angels)[^.]{0,50}(in|wearing|wore|dressed in) (a |the |white |long |flowing )*(robe|robes|tunic|gown)|(hooded|cowl)",
+      "negative_regex": "(bathrobe|robe (from|in) the (bathroom|closet)|graduation robe|judge'?s robe)",
+      "sensory": [
+        "white, but also brown with golden belts, and 'robes of many colours'",
+        "light blue sashes",
+        "dark robes with dark hoods — smiling, giggling, bouncing (not menacing)",
+        "faces grey or featureless, neither male nor female",
+        "the robes are said to be worn because they are the most comfortable, not required"
+      ],
+      "quotes": [
+        {"videoId": "bm8edJOUQu4", "cvnde": 13, "text": "They had brown robes on and they had golden belts around their waist, and they introduced themselves as my ministering angels"},
+        {"videoId": "neuciWsQxp4", "cvnde": 19, "text": "I was greeted by a strange robe figure who led me down a path to the field."},
+        {"videoId": "D7sTQKcelxQ", "cvnde": 14, "text": "They were in white robes, their faces kind of looked like gray, like they weren't male or female"},
+        {"videoId": "7xO_VqpgIt4", "cvnde": 9, "text": "They had dark robes and dark hoods, and they were right in front of me. And they were smiling and giggling"}
+      ],
+      "journey_position": 0.42,
+      "measured": {"all_pct": 4.19, "all_docs": 259, "cv13_pct": 4.95, "cv18_pct": 5.94, "cv23_pct": 7.18},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 12,
+      "notes": "Rises steadily with evidential strength (4.19% -> 7.18%). Note the corpus contradicts the stock iconography twice over: hooded figures are cheerful rather than sinister, and at least one experiencer complains that dramatised reconstructions with robes and 'little tiny wings' are cheesy."
+    },
+    {
+      "id": "light-beings",
+      "name": "Beings of light without form",
+      "category": "being",
+      "parent": null,
+      "description": "Beings that have no body at all — orbs, spheres, balls of light, energy fields, 'light fragments', figures shining in different colours. Experiencers stress that they had no faces and yet were unmistakably individual and unmistakably known. Some accounts say the experiencer was one of these too: 'we're beings of light, really, is what we are'. This category shades into and often merges with angels, guides and the crowd of souls; the corpus does not police the boundary.",
+      "aliases": [
+        {"term": "beings of light", "tradition": "secular"},
+        {"term": "light beings", "tradition": "secular"},
+        {"term": "orbs of light", "tradition": null},
+        {"term": "balls of light", "tradition": null},
+        {"term": "light energies", "tradition": null},
+        {"term": "light fragments", "tradition": null},
+        {"term": "spheres of awareness", "tradition": null},
+        {"term": "glowing golden lights", "tradition": null},
+        {"term": "a light matrix", "tradition": null},
+        {"term": "figures that were shining in all different colors", "tradition": null}
+      ],
+      "regex": "(beings? of (light|pure light)|light beings?|luminous beings?|orbs? of light|balls? of light|(beings|figures) (made )?of (pure )?(light|energy))",
+      "negative_regex": "(human beings? of|being of (age|service|use)|light being (turned|switched) on)",
+      "sensory": [
+        "no faces, but the outline of a body",
+        "colours 'more vibrant than you can imagine' — blues, yellows, purples",
+        "moving at speed through a matrix of connected lights",
+        "each one unique yet with no separation between them",
+        "they beam love at you as a felt force, not a message"
+      ],
+      "quotes": [
+        {"videoId": "KeDgsLZuNiU", "cvnde": 8, "text": "they didn't have faces, they were just light, but they had almost like the shape of a body"},
+        {"videoId": "EVIgSM1v0I0", "cvnde": 14, "text": "And the three original light beings that greeted me were with me."},
+        {"videoId": "JryK770qlBE", "cvnde": 7, "text": "they're glowing golden lights that that I knew them, but I didn't know them in this lifetime."}
+      ],
+      "journey_position": 0.46,
+      "measured": {"all_pct": 16.56, "all_docs": 1023, "cv13_pct": 17.67, "cv18_pct": 16.44, "cv23_pct": 16.02},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "notes": "Flat to very slightly declining across strata. Overlaps heavily with whatever the singular 'being of light' place captures elsewhere in the map — my interest here is the PLURAL, formless, non-divine population, which is what the plural aliases pick up. The main false-positive source is post-NDE philosophising ('we're all beings of light trapped inside these meat sacks')."
+    },
+    {
+      "id": "the-crowd-of-souls",
+      "name": "The crowd",
+      "category": "being",
+      "parent": null,
+      "description": "Beyond the named greeters there is very often a mass — dozens, hundreds, thousands, 'a huge group of people, dozens and dozens and dozens', a kingdom 'populated by tremendous numbers of people'. The crowd is busy: working, learning, involved with the living. Experiencers report loving all of them and knowing all of them individually, which is one of the most reliably strange claims in the corpus.",
+      "aliases": [
+        {"term": "a huge group of people", "tradition": null},
+        {"term": "crowd", "tradition": null},
+        {"term": "thousands of people", "tradition": null},
+        {"term": "a multitude of beings", "tradition": null},
+        {"term": "soul family", "tradition": "secular/New Age"},
+        {"term": "soul group", "tradition": "secular/New Age"},
+        {"term": "kindred spirits", "tradition": null},
+        {"term": "an endless array of angels", "tradition": null},
+        {"term": "the whole crowd extended far into the distance", "tradition": null}
+      ],
+      "regex": "(group|crowd|thousands|hundreds|multitude|host|sea|army|circle) of (beings|souls|angels|spirits|entities|light beings)|(a|the) (group|crowd|circle) of (people|figures|beings)[^.]{0,70}(light|white|robe|waiting|greet|welcom|around me|surround|energ)",
+      "negative_regex": "(group of people (at|in) (church|the office|work|school)|thousands of people (died|were killed|watched))",
+      "sensory": [
+        "extends back into shadow — you know who each shadow is anyway",
+        "people from visibly different time periods, in period dress",
+        "no one old, no one sick, no one crying",
+        "they are working and learning, not idle",
+        "in some accounts they are past lives of the experiencer, not other people"
+      ],
+      "quotes": [
+        {"videoId": "smfyC9T4-SE", "cvnde": 13, "text": "there was a huge group of people, dozens and dozens and dozens, maybe even hundreds."},
+        {"videoId": "yXhlAg6Dx6I", "cvnde": 10, "text": "And I could see that there were many people, as populated by tremendous numbers of people. And I knew each and every one of them intimately."}
+      ],
+      "journey_position": 0.42,
+      "measured": {"all_pct": 3.74, "all_docs": 231, "cv13_pct": 4.76, "cv18_pct": 5.11, "cv23_pct": 7.18},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "notes": "Nearly doubles from all accounts to the best-evidenced (3.74% -> 7.18%). An earlier unconstrained version ('group of people') matched 924 docs at ~30% precision — almost all ordinary biography — so the context clause is load-bearing. 'Soul family / soul group' alone matches 283 docs (4.58%) but is a New Age framing that runs the OTHER way across strata (5.26% all vs 2.76% cv>=23), so I kept it out of the measured regex and listed it only as an alias."
+    },
+    {
+      "id": "the-unseen-presence",
+      "name": "The presence you cannot see",
+      "category": "being",
+      "parent": null,
+      "description": "Someone is there, usually behind or beside the experiencer, never looked at directly and often never seen at all — yet its identity is felt with certainty and its emotional quality (gentle, non-judging, patient) is the strongest thing about it. The corpus's own entity coder records 'presence_only' as a communication method 2,149 times. Several experiencers say they deliberately did not turn around.",
+      "aliases": [
+        {"term": "a presence", "tradition": null},
+        {"term": "presence behind me", "tradition": null},
+        {"term": "presence next to me", "tradition": null},
+        {"term": "an entity", "tradition": null},
+        {"term": "somebody was standing next to me", "tradition": null},
+        {"term": "unknown presence", "tradition": null},
+        {"term": "the presence of my creator", "tradition": "Christian"},
+        {"term": "a male presence", "tradition": null},
+        {"term": "an energy field with a presence", "tradition": null}
+      ],
+      "regex": "(a|this|the|his|her|some) presence[^.]{0,70}(beside|next to|behind|with me|there|felt|sensed|loving|comforting)|(felt|sensed) (a|the|this|some) presence|presence (of (someone|somebody|a being)|behind me|next to me|beside me)|(someone|somebody|a being) (was )?(standing )?(behind|next to|beside) me[^.]{0,50}(couldn'?t see|never saw|didn'?t see|but I knew)",
+      "negative_regex": "(in the presence of (the )?(press|media|company|management)|presence of mind|online presence|stage presence)",
+      "sensory": [
+        "always slightly behind, or just at the shoulder",
+        "light emanating from behind you so the scene ahead looks black and white by comparison",
+        "no face is ever resolved",
+        "non-judging is the adjective used most often",
+        "communicates by prompting, not by asking"
+      ],
+      "quotes": [
+        {"videoId": "OzAHPfAx2zM", "cvnde": 26, "text": "Somebody was standing next to me. I never saw them, I couldn't see them, but I felt that they were standing there"},
+        {"videoId": "tKCP3dUZYzs", "cvnde": 23, "text": "there was the presence next to me of what I felt was God."},
+        {"videoId": "h_8VG5a_0eU", "cvnde": 9, "text": "it was an immediate feeling of, um, there is somebody"}
+      ],
+      "journey_position": 0.30,
+      "measured": {"all_pct": 12.18, "all_docs": 752, "cv13_pct": 12.55, "cv18_pct": 14.64, "cv23_pct": 15.47},
+      "precision_estimate": 0.7,
+      "precision_sample_n": 12,
+      "notes": "Rises with evidential strength (12.18% -> 15.47%). Roughly 30% of matches are the devotional idiom 'the presence of God' used outside the experience, or post-NDE sensing of presences; I left them in rather than over-tune, since the phrase is genuinely continuous between the two uses in these narratives."
+    },
+    {
+      "id": "the-restored-body",
+      "name": "How the dead appear: restored",
+      "category": "state",
+      "parent": null,
+      "description": "Uniformly, the dead are not as they died. Amputations, cancer, dementia, wheelchairs and old age are gone. The most commonly cited apparent age is the mid-twenties to mid-thirties regardless of the age at death, and several experiencers were unable to recognise a parent for that reason until afterwards. A recurring refinement: the being first appears at the age you would recognise, then visibly changes to its restored age once recognition has happened.",
+      "aliases": [
+        {"term": "young again", "tradition": null},
+        {"term": "in the prime of their life", "tradition": null},
+        {"term": "he looked about 30", "tradition": null},
+        {"term": "everyone looked 25 to 30 years old", "tradition": null},
+        {"term": "no one was sick", "tradition": null},
+        {"term": "whole again", "tradition": null},
+        {"term": "healthy and vibrant", "tradition": null},
+        {"term": "radiant", "tradition": null},
+        {"term": "the best version of me", "tradition": null}
+      ],
+      "regex": "(young again|in (his|her|their) prime|prime of (his|her|their) life|no longer (sick|ill|in pain|had cancer|in a wheelchair)|(looked|appeared|seemed) (so |really |very )?(healthy|young|whole|perfect|radiant|vibrant)|(looked|appeared) (to be )?(about |around )?(in (his|her|their) (20s|30s|twenties|thirties)|25|30|35)( years old)?|(he|she|they) (was|were) (whole|healed|restored|perfect) again|everyone looked young|no ?one (was|looked) (sick|old))",
+      "negative_regex": "(when I was young|younger than I (was|am)|my younger (sister|brother)|looked young for (his|her) age)",
+      "sensory": [
+        "mid-twenties to mid-thirties is the modal apparent age",
+        "eyes 'more light than eyes'",
+        "no wrinkles, no weight, no heaviness, no pain",
+        "period-appropriate clothing but a restored body inside it",
+        "the being may deliberately appear old first so you can identify them, then shift younger"
+      ],
+      "quotes": [
+        {"videoId": "boYK5c9eGys", "cvnde": 7, "text": "the reason I didn't recognize him was because he was younger. He looked like my husband's age. He looked about 30 years old."},
+        {"videoId": "Wa2I8IVAoQk", "cvnde": 7, "text": "He appeared as an old man so he could be easily recognized, then changed to look younger, about thirty."},
+        {"videoId": "hPUPIs0ZLpg", "cvnde": 20, "text": "I saw thousands of people there, including my mom, grandmothers, and aunt, and an uncle. Everyone looked 25 to 30 years old."}
+      ],
+      "journey_position": 0.45,
+      "measured": {"all_pct": 3.79, "all_docs": 234, "cv13_pct": 5.49, "cv18_pct": 5.66, "cv23_pct": 5.52},
+      "precision_estimate": 0.75,
+      "precision_sample_n": 14,
+      "notes": "Clearly enriched in better-evidenced accounts (3.79% -> 5.66%). This regex is the third draft; the first two were swamped by 'when I was younger', which is why that phrase is in the negative_regex. Residual false positives are mostly the experiencer describing their OWN restored body rather than a greeter's, which is arguably the same phenomenon."
+    },
+    {
+      "id": "strangers-who-are-known",
+      "name": "Strangers you already know",
+      "category": "state",
+      "parent": "the-crowd-of-souls",
+      "description": "A distinct and very consistently worded experience: the experiencer meets beings they have certainly never met in this life, and knows them anyway — 'I knew them, but I didn't know where I knew them from'. The knowing is described as older than the lifetime ('we had known each other for eons'), and the inability to place them is reported as mildly frustrating rather than frightening. This is the strongest formal argument the corpus itself makes against the 'expectation fulfilment' explanation.",
+      "aliases": [
+        {"term": "I knew them but I didn't know them", "tradition": null},
+        {"term": "I felt like I knew her, though we'd never met", "tradition": null},
+        {"term": "I knew each and every one of them intimately", "tradition": null},
+        {"term": "known each other for eons", "tradition": null},
+        {"term": "familiar beings", "tradition": null},
+        {"term": "recognised by their energy", "tradition": null},
+        {"term": "I didn't know them in this lifetime", "tradition": null}
+      ],
+      "regex": "((knew|recognized) (them|him|her|everyone|every one|each)[^.]{0,80}(never met|didn'?t know|hadn'?t met|not in this life|from before|soul level|eons|always known|couldn'?t place)|knew (them|him|her) but (I )?didn'?t know|(felt|felt like) I knew (them|him|her)[^.]{0,40}(but|though|even though)|knew (each|every one) of them)",
+      "negative_regex": null,
+      "sensory": [
+        "recognition arrives before any face is seen",
+        "people dressed from many different eras all recognised equally",
+        "no names attached to the recognition",
+        "the feeling is of resumed acquaintance, not introduction"
+      ],
+      "quotes": [
+        {"videoId": "tBctJJH_ZUY", "cvnde": 10, "text": "they knew me and I knew that I knew them, but I just didn't know where I knew them from."},
+        {"videoId": "JryK770qlBE", "cvnde": 7, "text": "they're glowing golden lights that that I knew them, but I didn't know them in this lifetime."}
+      ],
+      "journey_position": 0.44,
+      "measured": {"all_pct": 0.65, "all_docs": 40, "cv13_pct": 0.84, "cv18_pct": 1.38, "cv23_pct": 1.10},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 10,
+      "notes": "Rare but the wording is remarkably stereotyped, which is why precision is high despite the small n. Doubles at cv>=18 (0.65% -> 1.38%). Note two of the 40 matching documents are near-duplicate uploads of the same narrator (Sharon Milliman), so the true independent count is slightly lower."
+    },
+    {
+      "id": "telepathic-speech",
+      "name": "Speaking without speaking",
+      "category": "process",
+      "parent": null,
+      "description": "How the inhabitants communicate. Experiencers are near-unanimous that no mouths moved and no sound travelled, yet the exchange was complete and instant. Many stress it is faster and more complete than words — whole understandings arrive at once, and questions are answered before they are finished. Several bilingual experiencers note that language ceased to be a barrier. A minority report an additional audible voice that 'went through my bones' alongside the silent exchange.",
+      "aliases": [
+        {"term": "telepathy / telepathically", "tradition": "secular"},
+        {"term": "mind to mind", "tradition": null},
+        {"term": "thought to thought", "tradition": null},
+        {"term": "we just talked without talking", "tradition": null},
+        {"term": "no words were spoken", "tradition": null},
+        {"term": "soul to soul", "tradition": null},
+        {"term": "knowing to knowing", "tradition": null},
+        {"term": "thought transference", "tradition": null},
+        {"term": "download", "tradition": "secular"},
+        {"term": "without moving his mouth", "tradition": null}
+      ],
+      "regex": "(telepath\\w+|mind to mind|thought to thought|mind-to-mind|soul to soul|communicat\\w+ (with|by|through) (thought|thoughts|our minds)|(spoke|speak|spoken|talked|communicated) without (words|speaking|(his|her|their|our|my) (mouth|lips))|no words were (spoken|needed|necessary)|didn'?t (use|need) (any )?words|without (moving|opening) (his|her|their|my) (mouth|lips))",
+      "negative_regex": null,
+      "sensory": [
+        "no mouths move; some beings have no mouths at all",
+        "the answer arrives simultaneously with the question",
+        "thoughts are transparent in both directions — they laugh at what you have not said",
+        "one account describes it as communication in mathematics and music",
+        "an audible voice, when it occurs, is felt in the bones rather than the ears"
+      ],
+      "quotes": [
+        {"videoId": "cdeX_9-XRMk", "cvnde": 11, "text": "I remember having a quick thought about we just talked without talking"},
+        {"videoId": "8Sq1CKnfaKs", "cvnde": 10, "text": "she telepathically said to me to calm myself down she did not speak but I was listening to her"},
+        {"videoId": "XRPbQQY8aLY", "cvnde": 10, "text": "there was no speech, it was all telepathic, I recognized instantly as my ICU patient"}
+      ],
+      "journey_position": 0.50,
+      "measured": {"all_pct": 26.88, "all_docs": 1660, "cv13_pct": 31.06, "cv18_pct": 32.46, "cv23_pct": 34.81},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 12,
+      "notes": "Monotone increase across every stratum (26.88% -> 34.81%), matching the corpus's own structured coding (telepathy 60.0% all vs 70.2% cv>=23) at a stricter threshold. Interesting tension: the corpus entity census records 'verbal' (3,900) MORE often than 'telepathy' (2,942) as the communication method, so silent exchange is dominant but not universal — a substantial minority of experiencers insist they heard an actual voice."
+    },
+    {
+      "id": "the-order-to-return",
+      "name": "It is not your time",
+      "category": "process",
+      "parent": null,
+      "description": "The near-formulaic sentence that ends the visit. It is delivered by a relative, a guide, an unseen voice or a religious figure, and is almost always some variant of 'it's not your time' or 'you have to go back'. Frequently it is repeated two or three times against the experiencer's protest. Reasons given are usually a task, a child, or unfinished purpose — rarely anything doctrinal.",
+      "aliases": [
+        {"term": "it's not your time", "tradition": "universal", "note": "the single most reproduced sentence in the whole corpus"},
+        {"term": "it wasn't my time", "tradition": null},
+        {"term": "you have to go back", "tradition": null},
+        {"term": "you must return", "tradition": null},
+        {"term": "you cannot stay", "tradition": null},
+        {"term": "it's not time to go yet", "tradition": null},
+        {"term": "sent back", "tradition": null},
+        {"term": "I do not wish to have you home yet", "tradition": "Christian"},
+        {"term": "you're not finished", "tradition": null}
+      ],
+      "regex": "(it'?s not your time|it was not (my|your) time|not yet your time|it wasn'?t (my|your|his|her) time|you have to go back|you must go back|you need to go back|you'?re going back|(told|said)[^.]{0,25}(I|you) (had|have) to go back|(sent|send) me back|being sent back|not your time (to (die|go|be here))?)",
+      "negative_regex": "(sent me back (the|a) (email|form|package|order|refund)|sent back to (school|prison|work|the office))",
+      "sensory": [
+        "repeated, often three times, against protest",
+        "delivered without explanation or with a single reason: a child, a task, a message",
+        "sometimes pointed rather than spoken — a hand indicating the way out",
+        "sometimes a hand held up 'like a stop sign'",
+        "the experiencer usually argues, and loses"
+      ],
+      "quotes": [
+        {"videoId": "9miac9B9XCo", "cvnde": 9, "text": "And then I hear this voice saying, \"You have to go back. It's not your time.\""},
+        {"videoId": "cDbEkJeWuAI", "cvnde": 10, "text": "I turned around, and I saw that it was my stepdad, and he says to me, he says, it's not your time."}
+      ],
+      "journey_position": 0.87,
+      "measured": {"all_pct": 23.25, "all_docs": 1436, "cv13_pct": 27.02, "cv18_pct": 27.07, "cv23_pct": 25.97},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 12,
+      "notes": "Mildly enriched in better-evidenced accounts and then flat. The corpus's own journey coding puts 'forced_return' at mean relative position 0.893 and 'choice_to_return' at 0.867, so this sits right at the hinge of the narrative. A small but striking counter-case exists: at least one experiencer (Venia Hill) was told the opposite — 'it WAS my time' — and returned anyway."
+    },
+    {
+      "id": "the-refusal-to-return",
+      "name": "Not wanting to come back",
+      "category": "state",
+      "parent": null,
+      "description": "The most emotionally loaded thing in this region and, in raw prevalence, one of the largest. Experiencers say plainly that they did not want to return, that they begged and pleaded to stay, that they grabbed hold of the being's legs, that they screamed no. The reason given is almost never fear of pain — it is that the place felt like home in a way earth never had. Many are still visibly upset about it decades later during the interview.",
+      "aliases": [
+        {"term": "I didn't want to come back", "tradition": null},
+        {"term": "I didn't want to go back", "tradition": null},
+        {"term": "I didn't want to leave", "tradition": null},
+        {"term": "please let me stay", "tradition": null},
+        {"term": "don't send me back", "tradition": null},
+        {"term": "I was begging", "tradition": null},
+        {"term": "I pleaded with them to let me stay", "tradition": null},
+        {"term": "wild horses couldn't drag me there", "tradition": null},
+        {"term": "I screamed no", "tradition": null}
+      ],
+      "regex": "(didn'?t want to (go|come) back|did not want to (go|come) back|didn'?t want to return|did not want to return|didn'?t want to leave|not want to go back|never want\\w* to (go|come) back|wanted to stay (there|here|so)|(begg\\w+|plead\\w+)[^.]{0,55}(let me stay|to stay|don'?t (make|send) me|not to (go|send)|to let me))",
+      "negative_regex": "(didn'?t want to (go|come) back to (work|school|prison|that job|my ex))",
+      "sensory": [
+        "the word used over and over is 'home' — not heaven, home",
+        "grabbing, clinging, holding onto legs",
+        "screaming 'no' while being pushed backwards",
+        "still weeping about it in the interview, decades later",
+        "a minority report the opposite: an easy, almost comic acceptance ('yeah, I know, I've got to go back')"
+      ],
+      "quotes": [
+        {"videoId": "XPc7dfJv5OA", "cvnde": 10, "text": "I didn't want to go back to my body. I wanted to go higher. I wanted to go to the next level."},
+        {"videoId": "it1xNG55isI", "cvnde": 13, "text": "I grabbed hold of his legs, and I grabbed hold of him tight, and I was begging him, \"Please don't send me back. I don't want to go back.\""},
+        {"videoId": "AW8YdHHiDzk", "cvnde": 15, "text": "There's a sense of being home like you will never have here. It was total home. And I didn't want to leave."},
+        {"videoId": "3yu0alwRjig", "cvnde": 10, "text": "I remember this force pushing me backwards and I remember screaming no."}
+      ],
+      "journey_position": 0.88,
+      "measured": {"all_pct": 14.64, "all_docs": 904, "cv13_pct": 18.40, "cv18_pct": 17.68, "cv23_pct": 19.34},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 24,
+      "notes": "Consistently ~25% more common in the well-evidenced strata. The explicit begging/pleading sub-pattern alone matches 98 docs (1.59% all, 3.31% cv>=23) — doubling in the best-evidenced accounts, the sharpest gradient of any sub-pattern I measured. Note the reciprocal grief: several accounts describe the being apologising, promising to meet again, or sending someone back WITH them."
+    },
+    {
+      "id": "the-snap-back",
+      "name": "The snap back",
+      "category": "process",
+      "parent": null,
+      "description": "Re-entry is overwhelmingly violent and instantaneous, not gradual. The verbs are consistent across hundreds of accounts: slammed, snapped, sucked, shot, yanked, thrown, catapulted, whooshed, shoved, kicked. Several describe being drawn back down the tunnel the way they came; one describes it as 'the opposite of a cork getting pulled out of a bottle of wine'. Entry is usually through the top of the head, occasionally feet-first. Gentle descents exist but are rare (33 docs, 0.53%).",
+      "aliases": [
+        {"term": "slammed back into my body", "tradition": null},
+        {"term": "snapped back", "tradition": null},
+        {"term": "sucked back", "tradition": null},
+        {"term": "shot back into my body", "tradition": null},
+        {"term": "catapulted back", "tradition": null},
+        {"term": "whooshed right back", "tradition": null},
+        {"term": "shoved back in my body", "tradition": null},
+        {"term": "like a rubber band", "tradition": null},
+        {"term": "a jolt", "tradition": null},
+        {"term": "boom, I was back", "tradition": null}
+      ],
+      "regex": "(snapped|slammed|sucked|shot|yanked|jerked|thrown|thrust|catapult\\w*|whooshed|zoomed|slam|snap|plopped|shoved|pushed|hurled|rammed|kicked|dropped|plunged|whoosh) (right )?back (down )?(in ?to|into|in) (my|the) (physical )?body|(sucked|pulled|yanked|snapped) back (down )?(through|into) the (tunnel|light)|like a (rubber ?band|bungee|slingshot)",
+      "negative_regex": null,
+      "sensory": [
+        "entry through the top of the head; sometimes feet first",
+        "an audible ringing or a loud crack at the moment of impact",
+        "the opposite of a cork leaving a bottle",
+        "a hard 'thud' — one experiencer got 'the biggest headache you can imagine'",
+        "the trigger is often a single thought (concern for a child, a partner, the body)"
+      ],
+      "quotes": [
+        {"videoId": "cdI8vchu_PI", "cvnde": 12, "text": "And then I just slammed back into my body, and I woke up, and I was crying, and everything hurt."},
+        {"videoId": "SbS5av5qWPU", "cvnde": 12, "text": "the next thing I know, I'm shoved back in my body, and my body feels so heavy and so dense"},
+        {"videoId": "4usIhdeYU1w", "cvnde": 13, "text": "And as I was getting sucked back into my body, it's like, um, the opposite of a cork getting pulled out of a bottle of wine."},
+        {"videoId": "1qfP8Vid4Y8", "cvnde": 7, "text": "slammed back into my body, like a jolt right."}
+      ],
+      "journey_position": 0.96,
+      "measured": {"all_pct": 4.11, "all_docs": 254, "cv13_pct": 4.16, "cv18_pct": 4.28, "cv23_pct": 1.10},
+      "precision_estimate": 0.95,
+      "precision_sample_n": 12,
+      "notes": "Precision is essentially perfect — this idiom has no other use. Flat to cv>=18, then drops sharply at cv>=23 (2 of 181 docs). I would not over-read that: the cv>=23 stratum is small and skews toward accounts whose evidential weight comes from out-of-body veridical detail near the body, where the return is often described as gentle re-merging rather than a snap. The corpus's own coding puts 'sudden_return' at 56.4% of sequenced accounts with a mean journey position of 0.978, so the underlying phenomenon is far more common than my strict lexical measure."
+    },
+    {
+      "id": "the-heaviness-of-re-entry",
+      "name": "The weight of the body",
+      "category": "state",
+      "parent": null,
+      "description": "The immediate aftermath of return: pain floods back, and the body is experienced as intolerably heavy, dense, small, dull and slow after weightlessness. The recurring similes are clothing and confinement — a heavy wet diving suit, wet clothes, clay, a glove, a tent, a prison. Several experiencers say the grief and guilt they had been free of returns in the same instant as the physical pain.",
+      "aliases": [
+        {"term": "it was so heavy to be back in the body", "tradition": null},
+        {"term": "excruciatingly painful", "tradition": null},
+        {"term": "heavy and clay-like", "tradition": null},
+        {"term": "like donning a heavy, tight diving suit", "tradition": null},
+        {"term": "like putting on wet clothes", "tradition": null},
+        {"term": "constricted", "tradition": null},
+        {"term": "raking pain head to toe", "tradition": null},
+        {"term": "a little pup tent or prison", "tradition": null},
+        {"term": "I felt like I was wearing my body", "tradition": null}
+      ],
+      "regex": "(back in ?to (my|the) (physical )?body|re-?enter\\w+ (my|the) body|returned to (my|the) body)[^.]{0,130}(pain|painful|heavy|heaviness|hurt|wet suit|wetsuit|suit of|prison|cage|too small|clay|agony|excruciat|sick|awful|horrible)|(hurt|painful|agony|excruciating|heavy) (to (be|come|get) back|coming back|to re-?enter)|(coming|came|getting|got) back (in ?to (my|the) body )?(was|is|felt) (so |very |really )?(painful|excruciating|awful|horrible|heavy)",
+      "negative_regex": null,
+      "sensory": [
+        "gravity felt as a novel sensation, in the joints",
+        "the body as wet, heavy clothing you must put back on",
+        "slow, dull, dense — 'the physical here, it seems dead'",
+        "emotional pain returns simultaneously with physical pain",
+        "a small number report no pain at all: 'I popped back into my body, and it didn't hurt'"
+      ],
+      "quotes": [
+        {"videoId": "Xna-HGgLytk", "cvnde": 14, "text": "It was so heavy to be back in the body."},
+        {"videoId": "zlF0HAYvNMg", "cvnde": 7, "text": "When she finally put me back into my body, the transition felt like donning a heavy, tight diving suit."},
+        {"videoId": "cs3iq5rkBXo", "cvnde": 8, "text": "So I snapped back into my body and coming back to my form was excruciatingly painful."},
+        {"videoId": "9fPYQtRlHC8", "cvnde": 7, "text": "it brought me back into my body and it was just I have to say it was just horrible because I felt from this expanded state of consciousness back into this constricted"}
+      ],
+      "journey_position": 0.98,
+      "measured": {"all_pct": 1.60, "all_docs": 99, "cv13_pct": 2.17, "cv18_pct": 2.49, "cv23_pct": 3.31},
+      "precision_estimate": 0.93,
+      "precision_sample_n": 14,
+      "notes": "Doubles across the strata (1.60% -> 3.31%), monotone. Very high precision. This is the quietest and least-discussed part of the arc, but it is the emotional inverse of the peace that opens the experience, and experiencers reach for the same small set of clothing metaphors independently of one another, which is worth flagging to whoever builds the alias graph."
+    }
+  ]
+}

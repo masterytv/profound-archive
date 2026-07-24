@@ -62,3 +62,7 @@ logs/
 
 # Claude Code local state: worktrees, machine-specific hook paths, personal settings
 .claude/
+
+# Afterlife-map working data: 200MB+ of corpus dumps and sampled audit packets pulled from
+# the shared DB. Regenerable with execution/afterlife-map/00-dump-corpus.mjs — never commit.
+/scratch/

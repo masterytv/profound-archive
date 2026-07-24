@@ -1,0 +1,611 @@
+# Clear-NDE accounts with analysis: 6176
+# stratum all: 6176
+# stratum cv13: 1658
+# stratum cv18: 724
+# stratum cv23: 181
+
+## CORE ELEMENT PREVALENCE (present & conf>=50)
+element                       all   cv>=13   cv>=18   cv>=23    n(all)
+feelings_of_peace           93.0%    95.8%    95.0%    94.5%     5729
+out_of_body                 83.7%    93.3%    95.4%    97.2%     5157
+choice_to_return            78.3%    85.3%    86.0%    85.1%     4827
+otherworldly_realm          74.7%    76.9%    78.0%    72.4%     4603
+enhanced_senses             74.0%    82.4%    83.1%    82.9%     4560
+knowledge_download          61.4%    61.8%    59.3%    54.1%     3783
+cosmic_unity                60.9%    58.5%    55.7%    49.2%     3754
+bright_light                60.5%    67.8%    65.3%    68.0%     3726
+telepathy                   60.0%    68.0%    70.0%    70.2%     3696
+time_distortion             58.8%    62.6%    63.1%    56.9%     3621
+being_of_light              54.8%    59.6%    58.8%    54.7%     3376
+life_review                 49.3%    54.4%    53.4%    56.4%     3035
+deceased_relatives          39.9%    51.4%    56.9%    58.6%     2458
+border_boundary             37.5%    43.4%    42.3%    38.7%     2311
+tunnel                      23.9%    28.8%    29.6%    33.1%     1472
+other                        0.0%     0.0%     0.0%     0.0%        0
+
+## JOURNEY SEQUENCES: 5445 accounts, 40441 transitions
+
+### Journey element vocabulary (share of sequenced accounts)
+choice_to_return             4400   80.8%
+peace_calm                   3265   60.0%
+life_review                  3190   58.6%
+void_darkness                3107   57.1%
+sudden_return                3072   56.4%
+observing_body               2915   53.5%
+knowledge_download           2830   52.0%
+being_of_light               2782   51.1%
+cosmic_unity                 2709   49.8%
+bright_light                 1928   35.4%
+otherworldly_realm           1730   31.8%
+love_unconditional           1602   29.4%
+forced_return                1475   27.1%
+deceased_relatives           1451   26.6%
+return_unclear               1423   26.1%
+beings_entities              1245   22.9%
+tunnel                        987   18.1%
+fear_distress                 877   16.1%
+future_visions                701   12.9%
+joy_bliss                     606   11.1%
+telepathy                     556   10.2%
+celestial_music               530    9.7%
+enhanced_senses               516    9.5%
+unknown_presence              415    7.6%
+border_boundary               365    6.7%
+nature_landscapes             255    4.7%
+hellish_realm                 239    4.4%
+time_distortion               238    4.4%
+religious_figure              139    2.6%
+cities_structures              42    0.8%
+transformative_experiences     14    0.3%
+transformative_experience       6    0.1%
+earthworm_eye_view              4    0.1%
+pain_suffering                  3    0.1%
+surrender                       3    0.1%
+sparkles                        2    0.0%
+silence                         2    0.0%
+expansion                       2    0.0%
+angelic_encounter               2    0.0%
+call_for_help                   2    0.0%
+drowning                        2    0.0%
+inner_click                     2    0.0%
+forgiveness                     2    0.0%
+mental_torment                  2    0.0%
+anger_fight                     1    0.0%
+fifth_dimension                 1    0.0%
+hemorrhage                      1    0.0%
+outof_body                      1    0.0%
+vibration_out_of_body           1    0.0%
+tingling                        1    0.0%
+floating                        1    0.0%
+dark_cave                       1    0.0%
+pain_experience                 1    0.0%
+hallucinations                  1    0.0%
+golden_liquid_love              1    0.0%
+portal                          1    0.0%
+superconsciousness              1    0.0%
+nervous_system_shutdown         1    0.0%
+pain_distress                   1    0.0%
+healing                         1    0.0%
+chaos                           1    0.0%
+vortex                          1    0.0%
+realization_death               1    0.0%
+lightning_event                 1    0.0%
+multi_locate                    1    0.0%
+healing_environment             1    0.0%
+prayer                          1    0.0%
+curiosity                       1    0.0%
+lightning_bolt                  1    0.0%
+message_to_deliver              1    0.0%
+flatline                        1    0.0%
+over observing_body             1    0.0%
+whoosh_sound                    1    0.0%
+drowning_process                1    0.0%
+golden_sphere                   1    0.0%
+pain_intense                    1    0.0%
+out_of_body_experience          1    0.0%
+regret                          1    0.0%
+heart_attack                    1    0.0%
+nightmares                      1    0.0%
+buzzing_sound                   1    0.0%
+noise                           1    0.0%
+past_life_experiences           1    0.0%
+raft                            1    0.0%
+remorse                         1    0.0%
+gasping_for_air                 1    0.0%
+demons_entities                 1    0.0%
+water_healing                   1    0.0%
+call_out                        1    0.0%
+fire_experience                 1    0.0%
+general_anesthesia              1    0.0%
+black                           1    0.0%
+noises_sound                    1    0.0%
+vibrational_state               1    0.0%
+spontaneous_mediumship          1    0.0%
+screams_agony                   1    0.0%
+screams                         1    0.0%
+acceptance                      1    0.0%
+urge_to_merge                   1    0.0%
+emotional_states                1    0.0%
+healing_temple                  1    0.0%
+hallucination                   1    0.0%
+grotesque_demons                1    0.0%
+paralysis                       1    0.0%
+whooshing                       1    0.0%
+lightness                       1    0.0%
+anaphylactic_shock              1    0.0%
+dream_visit                     1    0.0%
+sparkling_light                 1    0.0%
+cardiac_arrest                  1    0.0%
+split_consciousness             1    0.0%
+colors                          1    0.0%
+gnashing_teeth                  1    0.0%
+dark_place                      1    0.0%
+buzzing_noise                   1    0.0%
+earthworm_view                  1    0.0%
+golden_egg_beings               1    0.0%
+
+### Top 45 transitions
+choice_to_return>sudden_return                    2087   38.3%
+life_review>knowledge_download                    1072   19.7%
+observing_body>peace_calm                         1012   18.6%
+knowledge_download>choice_to_return                949   17.4%
+life_review>choice_to_return                       800   14.7%
+void_darkness>peace_calm                           780   14.3%
+cosmic_unity>choice_to_return                      743   13.6%
+knowledge_download>cosmic_unity                    702   12.9%
+choice_to_return>forced_return                     676   12.4%
+peace_calm>being_of_light                          646   11.9%
+observing_body>void_darkness                       587   10.8%
+choice_to_return>return_unclear                    545   10.0%
+void_darkness>bright_light                         544   10.0%
+forced_return>sudden_return                        531    9.8%
+being_of_light>cosmic_unity                        513    9.4%
+bright_light>peace_calm                            502    9.2%
+cosmic_unity>life_review                           499    9.2%
+cosmic_unity>knowledge_download                    475    8.7%
+being_of_light>life_review                         439    8.1%
+void_darkness>fear_distress                        379    7.0%
+peace_calm>deceased_relatives                      374    6.9%
+future_visions>choice_to_return                    344    6.3%
+knowledge_download>life_review                     343    6.3%
+being_of_light>knowledge_download                  334    6.1%
+bright_light>love_unconditional                    330    6.1%
+being_of_light>choice_to_return                    315    5.8%
+being_of_light>love_unconditional                  307    5.6%
+tunnel>bright_light                                301    5.5%
+life_review>cosmic_unity                           292    5.4%
+deceased_relatives>life_review                     272    5.0%
+observing_body>bright_light                        270    5.0%
+deceased_relatives>being_of_light                  262    4.8%
+peace_calm>life_review                             256    4.7%
+void_darkness>tunnel                               244    4.5%
+bright_light>being_of_light                        242    4.4%
+peace_calm>love_unconditional                      231    4.2%
+knowledge_download>future_visions                  228    4.2%
+otherworldly_realm>beings_entities                 223    4.1%
+void_darkness>otherworldly_realm                   217    4.0%
+being_of_light>otherworldly_realm                  210    3.9%
+forced_return>return_unclear                       208    3.8%
+love_unconditional>being_of_light                  207    3.8%
+observing_body>tunnel                              203    3.7%
+void_darkness>observing_body                       202    3.7%
+peace_calm>beings_entities                         197    3.6%
+
+### Mean relative position in journey (0=start, 1=end)
+anger_fight                 0.000      1
+hemorrhage                  0.000      1
+vibration_out_of_body       0.000      1
+tingling                    0.000      1
+drowning                    0.000      2
+inner_click                 0.000      2
+portal                      0.000      1
+nervous_system_shutdown     0.000      1
+lightning_event             0.000      1
+over observing_body         0.000      1
+whoosh_sound                0.000      1
+drowning_process            0.000      1
+out_of_body_experience      0.000      1
+heart_attack                0.000      1
+raft                        0.000      1
+gasping_for_air             0.000      1
+general_anesthesia          0.000      1
+black                       0.000      1
+noises_sound                0.000      1
+vibrational_state           0.000      1
+acceptance                  0.000      1
+paralysis                   0.000      1
+whooshing                   0.000      1
+anaphylactic_shock          0.000      1
+observing_body              0.042   2932
+angelic_encounter           0.056      2
+void_darkness               0.056   3136
+hallucinations              0.091      1
+lightness                   0.100      1
+earthworm_view              0.100      1
+earthworm_eye_view          0.101      4
+realization_death           0.111      1
+expansion                   0.134      2
+floating                    0.143      1
+hallucination               0.143      1
+sparkles                    0.155      2
+outof_body                  0.167      1
+chaos                       0.167      1
+fifth_dimension             0.200      1
+multi_locate                0.200      1
+prayer                      0.200      1
+golden_sphere               0.200      1
+fire_experience             0.200      1
+tunnel                      0.222    995
+emotional_states            0.222      1
+surrender                   0.225      3
+bright_light                0.229   1932
+flatline                    0.250      1
+past_life_experiences       0.250      1
+peace_calm                  0.257   3284
+fear_distress               0.263    943
+superconsciousness          0.286      1
+noise                       0.286      1
+enhanced_senses             0.300    517
+curiosity                   0.333      1
+buzzing_sound               0.333      1
+sparkling_light             0.333      1
+cardiac_arrest              0.333      1
+hellish_realm               0.337    243
+call_out                    0.364      1
+dark_cave                   0.375      1
+time_distortion             0.379    238
+beings_entities             0.384   1249
+otherworldly_realm          0.394   1733
+pain_intense                0.400      1
+nightmares                  0.400      1
+colors                      0.400      1
+joy_bliss                   0.414    607
+love_unconditional          0.420   1605
+screams                     0.429      1
+deceased_relatives          0.430   1467
+nature_landscapes           0.435    256
+call_for_help               0.438      2
+being_of_light              0.455   2786
+silence                     0.483      2
+unknown_presence            0.489    416
+pain_experience             0.500      1
+golden_liquid_love          0.500      1
+remorse                     0.500      1
+dream_visit                 0.500      1
+gnashing_teeth              0.500      1
+golden_egg_beings           0.500      1
+pain_suffering              0.510      3
+celestial_music             0.520    530
+religious_figure            0.530    139
+mental_torment              0.536      2
+cities_structures           0.550     42
+telepathy                   0.565    557
+life_review                 0.566   3220
+healing_temple              0.571      1
+cosmic_unity                0.600   2713
+screams_agony               0.600      1
+grotesque_demons            0.600      1
+forgiveness                 0.618      2
+lightning_bolt              0.625      1
+water_healing               0.625      1
+knowledge_download          0.629   2831
+split_consciousness         0.636      1
+healing                     0.667      1
+healing_environment         0.667      1
+demons_entities             0.667      1
+spontaneous_mediumship      0.700      1
+future_visions              0.714    716
+urge_to_merge               0.714      1
+transformative_experience   0.725      6
+buzzing_noise               0.750      1
+pain_distress               0.778      1
+transformative_experiences  0.783     14
+dark_place                  0.800      1
+border_boundary             0.818    365
+vortex                      0.833      1
+message_to_deliver          0.857      1
+choice_to_return            0.867   4404
+forced_return               0.893   1479
+return_unclear              0.962   1427
+sudden_return               0.978   3081
+regret                      1.000      1
+
+## ENTITY CENSUS: 6176 accounts, 11885 encounters
+
+### entity_type
+religious_figure           2970   48.1%
+deceased_relative          2548   41.3%
+unknown                    1701   27.5%
+group                      1391   22.5%
+angel                      1068   17.3%
+guide                       966   15.6%
+being_of_light              476    7.7%
+deceased_friend             381    6.2%
+animal                      191    3.1%
+shadow_figure                72    1.2%
+demon                        39    0.6%
+guardian                     16    0.3%
+deceased_pet                 11    0.2%
+demonic                       6    0.1%
+unidentified                  6    0.1%
+guardian_angel                5    0.1%
+demonic_figure                4    0.1%
+historical_figure             3    0.0%
+angels                        3    0.0%
+deity                         3    0.0%
+living_relative               3    0.0%
+none                          2    0.0%
+unborn_relative               2    0.0%
+scientist                     2    0.0%
+political_figure              2    0.0%
+child                         1    0.0%
+medium                        1    0.0%
+spirit                        1    0.0%
+deceased_friends              1    0.0%
+demonic beings                1    0.0%
+ghost                         1    0.0%
+friend                        1    0.0%
+guardian angel                1    0.0%
+demonic_entity                1    0.0%
+androgynous being             1    0.0%
+nurse                         1    0.0%
+spirit guides                 1    0.0%
+spirit_teacher                1    0.0%
+earth_bound_spirit            1    0.0%
+
+### communication_method
+verbal                     3900
+telepathy                  2942
+presence_only              2149
+emotional                  1274
+not_stated                  844
+not stated                  324
+none                        124
+auditory                    109
+gesture                      63
+thought                      29
+non-verbal                   18
+singing                       6
+mental                        6
+dream                         5
+visual                        4
+vision                        4
+thoughts                      4
+feeling                       4
+intellectual                  3
+screaming                     3
+vibrational                   3
+unison voice                  3
+soul_to_soul                  3
+mind talk                     2
+thought transference          2
+screams                       2
+conceptual                    2
+understanding and knowing      2
+internal voice                2
+eye contact                   1
+download                      1
+various                       1
+energy transfer               1
+recognition                   1
+perception                    1
+thought to thought            1
+visions                       1
+non_physical                  1
+inner knowing                 1
+thought transmission          1
+voice                         1
+various signs and messages      1
+soul-to-soul communication      1
+intellectual sharing          1
+thought and pictures          1
+chanting                      1
+thought wave                  1
+pulses of light               1
+murmurs                       1
+dreams                        1
+gestural                      1
+audible                       1
+non-verbal joy and laughter      1
+discussion                    1
+beyond telepathy              1
+thought exchange              1
+thought talk                  1
+guidance                      1
+heart-to-heart                1
+intuitive                     1
+broken English                1
+intuition                     1
+mental communication          1
+light communication           1
+verbal and telepathy          1
+vibration                     1
+thoughts audible              1
+mutual acknowledgment         1
+various signs                 1
+collective presence           1
+nonlinguistic                 1
+downloading information       1
+inner voice                   1
+telepathy and verbal          1
+non_verbal                    1
+non-linguistic data download      1
+non-linguistic                1
+verbal and mental             1
+
+### luminosity
+not_stated                 4547
+radiant                    4155
+not stated                 1289
+normal                      719
+glowing                     459
+not described               364
+dark                        310
+bright                        5
+brilliant light               3
+light                         3
+golden                        2
+bright light                  2
+dimmed down                   2
+gold                          2
+faded                         1
+purple light                  1
+shimmering                    1
+illuminated                   1
+surrounded by light           1
+angelic                       1
+purest of light               1
+white                         1
+lighter than the gray background      1
+brighter than light           1
+brilliant white light         1
+pure energy                   1
+shiny                         1
+bright lights                 1
+glow                          1
+luminous                      1
+dim                           1
+bluish                        1
+pure                          1
+strong light                  1
+neutral                       1
+silverish blue green          1
+lit up from the inside        1
+
+### Top 90 raw identities
+god                                          935
+jesus                                        923
+angels                                       427
+unknown being                                286
+grandmother                                  280
+mother                                       279
+father                                       245
+grandfather                                  201
+angel                                        191
+unknown beings                               132
+jesus christ                                 121
+archangel michael                            101
+being of light                                97
+guardian angel                                83
+guide                                         81
+light beings                                  70
+unknown man                                   69
+christ                                        58
+unknown woman                                 54
+mother mary                                   53
+spirit guides                                 52
+guides                                        52
+unidentified                                  50
+beings of light                               50
+sister                                        48
+brother                                       48
+demon                                         46
+demons                                        45
+holy spirit                                   44
+uncle                                         39
+soul family                                   38
+grandparents                                  38
+friend                                        38
+unknown voice                                 36
+satan                                         35
+dad                                           34
+voice                                         33
+husband                                       33
+family members                                33
+ancestors                                     32
+light being                                   32
+presence                                      31
+group of beings                               31
+the light                                     30
+angelic being                                 30
+michael                                       30
+peter                                         29
+light                                         28
+nurse                                         27
+tamara                                        27
+unknown presence                              27
+angelic beings                                26
+great-grandmother                             26
+wife                                          26
+god the father                                25
+doctor                                        25
+drake                                         24
+archangel gabriel                             24
+creator                                       23
+spirit guide                                  23
+guardian angels                               23
+buddha                                        23
+children                                      22
+the lord                                      22
+griffin                                       22
+unknown                                       22
+three beings                                  22
+archangel raphael                             21
+aunt                                          21
+mom                                           20
+female voice                                  19
+source                                        19
+group of people                               18
+mary                                          18
+spiritual beings                              18
+antonia                                       17
+mother-in-law                                 17
+maria                                         17
+yeshua                                        17
+unknown figure                                16
+john                                          15
+grandpa                                       15
+higher self                                   15
+muhammad                                      15
+little boy                                    15
+deceased relatives                            14
+little girl                                   14
+best friend                                   14
+dog                                           14
+two beings                                    14
+
+## overall_tone
+very_positive            3983 64.5%
+positive                 1666 27.0%
+mixed                     382 6.2%
+very_negative              96 1.6%
+neutral                    48 0.8%
+negative                    1 0.0%
+
+## journey_nde_type
+positive                 4907 79.5%
+neutral                   730 11.8%
+mixed                     286 4.6%
+distressing               243 3.9%
+analysis_failed            10 0.2%
+
+## reality_comparison
+more_real                5863
+not_stated                217
+surreal                    53
+dreamlike                  25
+equally_real                6
+
+## trigger_category
+accident                         1287
+unknown                          1071
+medical_crisis                    803
+illness                           676
+surgery                           658
+cardiac_arrest                    426
+near_drowning                     337
+childbirth                        222
+overdose                          208
+other                             170
+suicide_attempt                   164
+allergic_reaction                  52
+combat                             40
+meditation                         17
+child_death                         8
+car_accident                        5
+gunshot                             4
+childhood_abuse                     4
+fire                                4
+car accident                        4
+
+-> structured-stats.json written

@@ -1,0 +1,469 @@
+{
+  "places": [
+    {
+      "id": "language-fails",
+      "name": "There Are No Words for It",
+      "category": "state",
+      "description": "The most common single feature of the whole corpus after peace: the narrator stopping mid-sentence to say that what they are describing cannot be described. It is not modesty or a figure of speech — experiencers repeatedly say they searched for years for the right words and gave up, that the words they are using are the wrong size, that language was built for a world where things have edges and this had none. Almost half of all 6,176 accounts contain an explicit statement that description has failed. It attaches to everything: the light, the love, the colours, the speed, the knowing, and above all the place itself.",
+      "aliases": [
+        { "term": "indescribable", "tradition": null, "note": "the single commonest word; 7.04% of all docs contain it" },
+        { "term": "beyond words", "tradition": null, "note": null },
+        { "term": "there are no words", "tradition": null, "note": null },
+        { "term": "ineffable", "tradition": null, "note": "rarer, used by more literary or educated narrators" },
+        { "term": "I can't describe it", "tradition": null, "note": null },
+        { "term": "words fall short", "tradition": null, "note": null },
+        { "term": "no earthly words", "tradition": null, "note": null },
+        { "term": "defies description", "tradition": null, "note": null },
+        { "term": "our language doesn't have a word for it", "tradition": "secular", "note": null }
+      ],
+      "regex": "indescribable|ineffable|beyond (words|description|any description)|defies description|(can'?t|cannot|couldn'?t|could not|impossible to|hard to|difficult to|no way to|there'?s no way to|there is no way to) (really |even |truly |fully |begin to |adequately |properly )*(describe|explain|put into words|express|convey)|(no|not enough|don'?t have|there (are|were|is|was) no) (the )?(right |proper |adequate |human |earthly |english )*words (to|that|for|in|which)|words (can'?t|cannot|do not|don'?t|fail|failed|couldn'?t|could not) (describe|express|convey|do)",
+      "negative_regex": "no words (came|come) out|no words were (spoken|exchanged|needed)|without words",
+      "quotes": [
+        { "videoId": "PK7PTC3Qw4s", "cvnde": 21, "text": "For years I searched for the right words to explain it, but I eventually gave up. No words are sufficient." },
+        { "videoId": "jD4tADRGKkk", "cvnde": 23, "text": "Hard as it was to leave this place of overwhelming unconditional love and indescribable peace, I knew I had to return to my life." },
+        { "videoId": "ImlDBZqP7aY", "cvnde": 13, "text": "there are no words for her to be able to articulate" },
+        { "videoId": "uSPfynI-JfI", "cvnde": 21, "text": "There's no words to really describe." }
+      ],
+      "sensory": [
+        "the sentence breaking off",
+        "reaching for a word and taking a worse one",
+        "crying while trying to say it",
+        "saying the same inadequate word three times"
+      ],
+      "journey_position": 0.55,
+      "parent": null,
+      "measured": { "all_pct": 42.58, "all_docs": 2630, "cv13_pct": 45.48, "cv18_pct": 45.58, "cv23_pct": 43.09 },
+      "precision_estimate": 0.9,
+      "precision_sample_n": 18,
+      "notes": "This is the single largest finding of this pass. 42.58% of the corpus contains an explicit statement that language failed; the rate is slightly HIGHER among the best-evidenced accounts (45.58% at cv>=18) than in the corpus as a whole, so ineffability is not a marker of vague or weak testimony — it rises with evidential strength. Loosening the pattern to include bare 'no words' pushes it to 45.19%, but that catches 'no words came out of my mouth' (paralysis during OBE) and 'no words were spoken' (telepathy), which are different phenomena; both are excluded by the negative_regex. Precision on the tight pattern was near-perfect in the sample: every one of ten cv>=18 snippets was a genuine ineffability claim about the experience."
+    },
+    {
+      "id": "the-unnamed-place",
+      "name": "A Place — Just 'A Place'",
+      "category": "realm",
+      "description": "The commonest way the otherworld is introduced is with no name at all: 'I found myself in a place.' The indefinite article does the work — it is a place, not the place, not heaven, not anywhere the narrator can situate. What follows the phrase varies enormously (a meadow, a whiteness, a butchery, a cloud, pure unconditional love), which is the point: 'a place' is the empty container people reach for before they have decided what to call what they saw. Many narrators use it repeatedly and never upgrade it to a name.",
+      "aliases": [
+        { "term": "a place", "tradition": "none", "note": "bare, indefinite" },
+        { "term": "this place", "tradition": "none", "note": null },
+        { "term": "some kind of place", "tradition": null, "note": null },
+        { "term": "a place where...", "tradition": null, "note": "named only by what happened there" },
+        { "term": "an environment", "tradition": null, "note": null },
+        { "term": "an atmosphere", "tradition": null, "note": null },
+        { "term": "where I was", "tradition": null, "note": null }
+      ],
+      "regex": "(i (was|found myself|ended up|woke up|arrived|got|came to) (in|at|to) (a|this|some|another) (kind of )?place)|((in|into|to) (a|this|another) place (where|that|of) )",
+      "negative_regex": "a place (to (live|stay|work|park|sit|eat|sleep)|in (my )?(heart|life)|of business|like (that|this) (job|company))",
+      "quotes": [
+        { "videoId": "cA_xqhwR_NU", "cvnde": 15, "text": "So I found myself in this place and I knew I was there because I was dead." },
+        { "videoId": "XjHJ4olBuRs", "cvnde": 15, "text": "I knew I was at a place where I didn't know what was next." },
+        { "videoId": "GQi_jHowQ5Y", "cvnde": 15, "text": "there was no time in this place. Time and I were the same thing, and everything was one in this place." },
+        { "videoId": "vFINxFxEbQs", "cvnde": 22, "text": "And then all of a sudden, I was in this place of just pure unconditional love." }
+      ],
+      "sensory": [
+        "no horizon the narrator can place themselves against",
+        "described only by what it lacked (no time, no ceiling, no shadows)",
+        "the narrator's certainty that they were somewhere, coupled with total inability to say where"
+      ],
+      "journey_position": 0.5,
+      "parent": null,
+      "measured": { "all_pct": 20.03, "all_docs": 1237, "cv13_pct": 19.18, "cv18_pct": 20.3, "cv23_pct": 16.57 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 10,
+      "notes": "Flat across cvNDE strata (20.03% all, 20.30% at cv>=18) — this is neutral vocabulary, not a signal of testimony quality. In eight of ten sampled snippets the phrase introduced the otherworld directly; the false positives were mundane ('I was in a place of awe' about a walk on Earth). Note that 'a place' is often used ALONGSIDE a name later in the same account — people say 'a place' first and 'heaven' second, which suggests the indefinite phrase is closer to the raw memory."
+    },
+    {
+      "id": "wherever-i-was",
+      "name": "Wherever I Was",
+      "category": "state",
+      "description": "A distinct construction from 'a place': here the narrator explicitly flags that they do not know, and cannot find out, where they were. They are certain of the experience and uncertain of its address. It is often used as an aside in the middle of a confident sentence — 'a tremendous sense of peace wherever I was' — and sometimes hedges a religious name the narrator is not willing to commit to ('heaven, or wherever I was at'). Some go further and say there is no name for it at all.",
+      "aliases": [
+        { "term": "wherever I was", "tradition": "none", "note": null },
+        { "term": "I don't know where I was", "tradition": null, "note": null },
+        { "term": "whatever that place was", "tradition": null, "note": null },
+        { "term": "there's no name for it", "tradition": null, "note": null },
+        { "term": "heaven or wherever", "tradition": "Christian", "note": "used by narrators who won't fully claim the name" },
+        { "term": "I don't have a word for it", "tradition": null, "note": null }
+      ],
+      "regex": "wherever i was|whatever (that )?place (was|it was)|i (don'?t|didn'?t|do not|did not) know (where i was|what to call (it|that|this)|what (that|this) place (was|is))|(there'?s |there is )?no name for (it|this|that)|i (don'?t|didn'?t) (have|know) a (name|word) for",
+      "negative_regex": "wherever i was (invited|going|working|living|staying|sitting|at the time)|didn'?t know where i was going (to (school|work|live))",
+      "quotes": [
+        { "videoId": "eH3-WZWEMqY", "cvnde": 25, "text": "I felt both a tremendous sense of peace wherever I was, which I didn't really understand" },
+        { "videoId": "9m77ID3wC6s", "cvnde": 19, "text": "it wasn't the the fullness of of heaven or or wherever I was at, right?" },
+        { "videoId": "98VNA_ja3sM", "cvnde": 15, "text": "wherever I was started to fill with fog." },
+        { "videoId": "XjHJ4olBuRs", "cvnde": 15, "text": "I knew I was at a place where I didn't know what was next." }
+      ],
+      "sensory": [
+        "certainty of being somewhere without any spatial cue",
+        "no landmarks to fix position against",
+        "the sense of an address that cannot be given"
+      ],
+      "journey_position": 0.45,
+      "parent": "the-unnamed-place",
+      "measured": { "all_pct": 6.38, "all_docs": 394, "cv13_pct": 6.76, "cv18_pct": 7.46, "cv23_pct": 8.84 },
+      "precision_estimate": 0.62,
+      "precision_sample_n": 8,
+      "notes": "Rises monotonically with evidential strength: 6.38% overall, 7.46% at cv>=18, 8.84% at cv>=23. Better-evidenced narrators are MORE likely to admit they do not know where they were — the opposite of what you would expect if confident naming were a sign of a stronger account. Precision is only moderate (5/8 in sample): 'wherever I was' also appears biographically ('uninvite me wherever I was invited to speak', 'wherever I was, I'd fall asleep'), which the negative_regex partly catches."
+    },
+    {
+      "id": "somewhere",
+      "name": "Somewhere — 'I Had Been Somewhere'",
+      "category": "realm",
+      "description": "Weaker even than 'a place': the destination reduced to a bare adverb. Narrators use it to insist on the fact of location while refusing all content — 'I knew I had been somewhere for two weeks', 'I wasn't in a grave, I was here, I was somewhere.' It often carries an argumentative edge, used against the suggestion that nothing happened: the claim is not that the place was beautiful but simply that there WAS a there.",
+      "aliases": [
+        { "term": "somewhere", "tradition": "none", "note": null },
+        { "term": "somewhere else", "tradition": "none", "note": null },
+        { "term": "I had been somewhere", "tradition": null, "note": null },
+        { "term": "I went somewhere", "tradition": null, "note": null },
+        { "term": "not here", "tradition": null, "note": null }
+      ],
+      "regex": "i (was|had been|went|ended up|found myself|knew i had been) somewhere",
+      "negative_regex": "somewhere (in|around|near|between|about) (the|my|his|her|a) (house|town|city|country|state|hospital|room|kansas|texas|america)|somewhere else to (live|go|stay|work)",
+      "quotes": [
+        { "videoId": "BUXGvtJjip0", "cvnde": 18, "text": "I knew it was somewhere else. I wasn't in a grave. It wasn't maggot meat. I was here. I was somewhere." },
+        { "videoId": "XiLk2qjfmCY", "cvnde": 19, "text": "I knew I had been somewhere for two weeks." },
+        { "videoId": "4usIhdeYU1w", "cvnde": 13, "text": "I knew that I was not in, um, the physical world anymore. I knew that I was somewhere else." }
+      ],
+      "sensory": [
+        "displacement without destination",
+        "duration felt in a place with no duration (two weeks in two minutes)",
+        "the body seen from 'not here'"
+      ],
+      "journey_position": 0.35,
+      "parent": "the-unnamed-place",
+      "measured": { "all_pct": 6.01, "all_docs": 371, "cv13_pct": 5.67, "cv18_pct": 5.11, "cv23_pct": 4.42 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 10,
+      "notes": "CAVEAT — corpus artifact: several docs in the sample share an identical podcast intro ('...because I was somewhere else. The only thing that I could feel, if you could imagine, absolute love and peace...'). That boilerplate appears verbatim in at least five different videos and inflates the count for the looser pattern 'somewhere else' (14.31% all). The tighter first-person pattern reported here is less contaminated but not clean. Unlike 'wherever I was', this one DECLINES with evidential strength (6.01% -> 4.42%)."
+    },
+    {
+      "id": "the-space",
+      "name": "The Space",
+      "category": "realm",
+      "description": "Many experiencers reach not for 'place' but for 'space' — a word that carries volume without ground, scenery or edges. The space is usually described by its light behaviour rather than its contents: it is lit from within, it is bright white, it has no visible source of illumination. Where 'a place' implies somewhere you stand, 'this space' implies something you are suspended inside. Several narrators use the two words in the same breath and then correct themselves toward 'space'.",
+      "aliases": [
+        { "term": "this space", "tradition": "none", "note": null },
+        { "term": "that space", "tradition": null, "note": null },
+        { "term": "a white space", "tradition": null, "note": null },
+        { "term": "a dark space", "tradition": null, "note": null },
+        { "term": "the void space", "tradition": null, "note": "used interchangeably with the void by some" },
+        { "term": "an environment", "tradition": null, "note": null }
+      ],
+      "regex": "(this|that|the) space (where|that|i was|i found|was)|(in|into) (a|this|that) (vast |dark |white |black |huge |open |empty )?space (where|that|and|,)",
+      "negative_regex": "outer space|space (shuttle|station|ship|suit|program|between (the|my))|parking space|office space|breathing space|space of (a few|two|three|several) (minutes|seconds|days|weeks|years)",
+      "quotes": [
+        { "videoId": "UYBGm_rDvso", "cvnde": 22, "text": "Drake led me to know that this this space was lit from within." },
+        { "videoId": "1I73Mqr0Kn8", "cvnde": 15, "text": "And I came to this space that was bright white light." },
+        { "videoId": "fvX6CtKocvk", "cvnde": 14, "text": "And this space, this space, it was very bright, as bright as you could imagine heaven to be" }
+      ],
+      "sensory": [
+        "light with no source",
+        "everything glowing from inside itself",
+        "no floor, no ceiling, no walls",
+        "brightness without glare"
+      ],
+      "journey_position": 0.4,
+      "parent": "the-unnamed-place",
+      "measured": { "all_pct": 6.98, "all_docs": 431, "cv13_pct": 5.55, "cv18_pct": 6.35, "cv23_pct": 4.42 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 10,
+      "notes": "Precision is the weakest of the core entries: 'this space' has drifted into New Age therapeutic idiom ('holding space', 'coming from that space of love'), and roughly four in ten sampled hits were post-NDE metaphor rather than a location during the experience. The negative_regex catches the literal astronomical and architectural senses but not the therapeutic one. Slightly below-average in the best-evidenced stratum."
+    },
+    {
+      "id": "the-vastness",
+      "name": "The Vastness",
+      "category": "landscape",
+      "description": "Where the unnamed place is given any dimension at all, the dimension is size without limit. Narrators describe an expanse that keeps opening, an emptiness with no far wall, a vastness they perceive rather than see. Frequently the vastness is not empty but full of something they cannot count — stars, gases, beings, knowledge — and several describe looking INTO the light and finding the vastness inside it, so that the expanse is a property of the light rather than a landscape around it.",
+      "aliases": [
+        { "term": "the vastness", "tradition": "none", "note": null },
+        { "term": "an infinite expanse", "tradition": null, "note": null },
+        { "term": "vast emptiness", "tradition": null, "note": null },
+        { "term": "endless space", "tradition": null, "note": null },
+        { "term": "boundless", "tradition": null, "note": null },
+        { "term": "the vastness of the universe", "tradition": "secular", "note": "commonest single collocation" }
+      ],
+      "regex": "(the )?vastness|(vast|infinite|endless|limitless|boundless) (space|expanse|void|openness|nothingness|emptiness)",
+      "negative_regex": "vastness of (the (problem|task|subject|internet|data|difference)|human (suffering|knowledge))",
+      "quotes": [
+        { "videoId": "DOKX9bqOBvA", "cvnde": 16, "text": "I really saw a vastness in this light." },
+        { "videoId": "OizX472ycCw", "cvnde": 17, "text": "I felt a vastness and a knowledge that I describe as omniscient." },
+        { "videoId": "YvR17Qx5dUM", "cvnde": 18, "text": "I cried out into that infinite expanse that I never want to leave this place." },
+        { "videoId": "1A_ehqvWZ_w", "cvnde": 25, "text": "toward this vast emptiness beyond" }
+      ],
+      "sensory": [
+        "size felt rather than seen",
+        "no far edge however long you look",
+        "vastness perceived as knowledge, not distance",
+        "the expanse found inside the light rather than around it"
+      ],
+      "journey_position": 0.45,
+      "parent": "the-unnamed-place",
+      "measured": { "all_pct": 5.41, "all_docs": 334, "cv13_pct": 6.15, "cv18_pct": 5.8, "cv23_pct": 5.52 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 8,
+      "notes": "About a third of hits are 'the vastness of the universe' shown to the experiencer as a cosmological display (stars, planets, gases) rather than the unnamed realm itself; whether these are the same place is genuinely unclear from the accounts. Two narrators (Sharon Milliman, twice recorded) supply near-identical wording in different interviews, so the doc count slightly overstates the number of distinct witnesses."
+    },
+    {
+      "id": "another-dimension",
+      "name": "Another Dimension",
+      "category": "realm",
+      "description": "When narrators want to say the place was not merely elsewhere but organised on different principles, the loan-word they reach for is 'dimension'. It is used to mean roughly 'a reality overlapping this one that you look into rather than travel to' — several describe looking through the light 'as if into another dimension', or being at the hospital and in another dimension simultaneously. A minority give it a number (the fifth dimension, the fourth), usually those with prior metaphysical reading; most leave it unnumbered.",
+      "aliases": [
+        { "term": "another dimension", "tradition": "secular", "note": "commonest form" },
+        { "term": "a different dimension", "tradition": null, "note": null },
+        { "term": "the fifth dimension", "tradition": "New Age", "note": "numbered variants come with prior belief vocabulary" },
+        { "term": "a higher dimension", "tradition": null, "note": null },
+        { "term": "other dimensions", "tradition": null, "note": null },
+        { "term": "a different frequency", "tradition": "New Age", "note": null }
+      ],
+      "regex": "(another|a different|a higher|the fifth|the fourth) dimension",
+      "negative_regex": "another dimension (of|to) (the (problem|issue|story|relationship)|human|his|her|my (personality|character|life|work|grief|love))|adds another dimension",
+      "quotes": [
+        { "videoId": "DOKX9bqOBvA", "cvnde": 16, "text": "Then I looked into this light as if into another dimension." },
+        { "videoId": "CFeREug0k1Y", "cvnde": 24, "text": "it's a different dimension, I can't describe it." },
+        { "videoId": "f8v2EN-_cXk", "cvnde": 14, "text": "I immediately was taken to heaven, the lowest level of heaven, which I know is the Fifth Dimension." }
+      ],
+      "sensory": [
+        "being in two places at once (hospital and elsewhere)",
+        "looking through something rather than travelling to it",
+        "the same room, but everything glowing and slowed"
+      ],
+      "journey_position": 0.4,
+      "parent": null,
+      "measured": { "all_pct": 10.31, "all_docs": 637, "cv13_pct": 8.81, "cv18_pct": 8.15, "cv23_pct": 9.39 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 8,
+      "notes": "DECLINES with evidential strength (10.31% all vs 8.15% at cv>=18) — 'dimension' is imported vocabulary, and the accounts that use it lean toward those with pre-existing metaphysical frameworks. Roughly four in ten hits are metaphorical or belong to post-NDE interpretation rather than the experience itself. Also inflated by interviewer prompts: in several translated Brazilian interviews the interviewer supplies the word ('Would you say you went to another dimension?') and the experiencer resists it."
+    },
+    {
+      "id": "home",
+      "name": "Home — The Place You Recognise and Have Never Been",
+      "category": "state",
+      "description": "The most emotionally loaded of the unnamed-place words, and the one most often chosen INSTEAD of a proper name. Narrators who cannot say where they were can say they were home. The recognition is described as instant and total, and specifically as pre-existing: not that the place resembled home, but that this was home and Earth was the trip. Many are greeted with the words 'welcome home' by beings or by the light itself, and several who had unhappy childhoods say the word means something they had never actually experienced.",
+      "aliases": [
+        { "term": "home", "tradition": "none", "note": "used as a location noun, not a simile" },
+        { "term": "welcome home", "tradition": null, "note": "the greeting formula, spoken or telepathic" },
+        { "term": "I was home", "tradition": null, "note": null },
+        { "term": "coming home", "tradition": null, "note": null },
+        { "term": "where I belonged", "tradition": null, "note": null },
+        { "term": "homey home", "tradition": null, "note": "one narrator's coinage" },
+        { "term": "this is your home", "tradition": null, "note": "spoken by the light / the voice" }
+      ],
+      "regex": "welcome home|i (knew|realized|realised|felt|thought|understood),? (that )?i was (finally |truly |really )?home|i'?m home[,.!]|felt like (i was )?(coming |going )?home|felt like home|feeling of (coming|going|being) home|this (is|was) (your|my) home|i was (finally|truly|really) home",
+      "negative_regex": "i was home (sick|alone|with|from|for|when|by|in bed)|i was homeless|welcome home (to youtube|from (the|your) (trip|deployment|tour))",
+      "quotes": [
+        { "videoId": "9yradTeG_ok", "cvnde": 15, "text": "you're a part of me. this is your home. welcome home." },
+        { "videoId": "m3vB2J-BH6Y", "cvnde": 15, "text": "they communicated to me a thought, a meaning, a perception of welcome home." },
+        { "videoId": "g0F_OX1JpOc", "cvnde": 15, "text": "Welcome home, deary. You know, that was a hard one. That was tough. But you did it." }
+      ],
+      "sensory": [
+        "recognition without memory",
+        "the greeting arriving as meaning rather than sound",
+        "relief in the chest, the sense of a held breath released",
+        "the conviction that Earth was the away-place"
+      ],
+      "journey_position": 0.6,
+      "parent": null,
+      "measured": { "all_pct": 8.57, "all_docs": 529, "cv13_pct": 10.01, "cv18_pct": 8.98, "cv23_pct": 9.39 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 16,
+      "notes": "Slightly commoner among better-evidenced accounts. The bare word 'home' is unusable as a detector — 'I was home sick', 'I was homeless', 'brought him home' dominate — so the pattern requires a recognition or greeting frame; the negative_regex removes the remaining domestic senses. 'Welcome home' alone appears in 1.55% of all docs (96 accounts) and is remarkably formulaic across unconnected narrators, which is itself worth noting: this is one of the very few fixed phrases the other side is reported to speak."
+    },
+    {
+      "id": "the-other-side",
+      "name": "The Other Side",
+      "category": "realm",
+      "description": "The corpus's own umbrella name for the unnamed destination — a name that is purely relational, saying only that it is not here and that there is a boundary. It absorbs everything: the garden, the city, the light, the dead, the darkness. Its great advantage for narrators is theological neutrality — Christians, secular experiencers and interviewers all use it without committing to any doctrine — and it is used both spatially ('on the other side') and as a direction of travel ('crossed over').",
+      "aliases": [
+        { "term": "the other side", "tradition": "none", "note": "the default neutral name" },
+        { "term": "over there", "tradition": null, "note": null },
+        { "term": "crossed over", "tradition": null, "note": "the verb form" },
+        { "term": "beyond the veil", "tradition": null, "note": null },
+        { "term": "the other realm", "tradition": null, "note": null },
+        { "term": "heaven", "tradition": "Christian", "note": "the named alternative; many narrators use both, 'the other side' when hedging" }
+      ],
+      "regex": "the other side(?! of (the |a |my |his |her |that |this )?(road|street|room|bed|car|house|door|table|highway|field|building|counter|desk|hall|hallway|fence|yard|lake|river|glass|window|wall|screen|couch|island|bridge|town|city|country|world|state|family|mountain))",
+      "negative_regex": "the other side of (the (argument|coin|debate|family|story|aisle|equation|bed|room)|town|my (family|face|body|head))",
+      "quotes": [
+        { "videoId": "DxXXPVPiAaQ", "cvnde": 20, "text": "these other beings were here to help me and to welcome me and to comfort me on the other side." },
+        { "videoId": "Xk_GeRlOjBg", "cvnde": 16, "text": "there is no comparison here for what you experience on the other side. Just, just none." },
+        { "videoId": "0w-ICim7B2g", "cvnde": 23, "text": "they were going to share more about not only their experiences on the other side" }
+      ],
+      "sensory": [
+        "a there implied by a here",
+        "a crossing implied without a described crossing-place",
+        "used for both the landscape and the population"
+      ],
+      "journey_position": 0.5,
+      "parent": null,
+      "measured": { "all_pct": 52.66, "all_docs": 3252, "cv13_pct": 57.12, "cv18_pct": 57.73, "cv23_pct": 61.33 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 8,
+      "notes": "The most widely used name for the destination in the entire corpus — more common than 'heaven' phrasings — and it rises steadily with evidential strength (52.66% all, 57.73% at cv>=18, 61.33% at cv>=23). Important caveat: the phrase is heavily used by INTERVIEWERS and hosts as well as experiencers, so doc-frequency overstates first-person usage. The lookahead in the regex strips the common literal senses (other side of the road/room/bed); the residual false positives are contrastive rhetoric ('on the other side, we can enslave ourselves to the news')."
+    },
+    {
+      "id": "place-of-pure-feeling",
+      "name": "A Place of Pure Love / Peace / Bliss",
+      "category": "state",
+      "description": "A large group of accounts locate themselves not by geography but by affect: the place IS the feeling. 'I was in this place of just pure unconditional love'; 'I was in this state of absolute bliss.' Narrators frequently slide mid-sentence between 'place' and 'state' as though the distinction had stopped mattering, and several say explicitly that the love was the environment rather than something in it — you were inside love the way you are inside a room.",
+      "aliases": [
+        { "term": "a place of pure love", "tradition": "none", "note": null },
+        { "term": "a state of bliss", "tradition": null, "note": null },
+        { "term": "a place of peace", "tradition": null, "note": null },
+        { "term": "a state of absolute bliss", "tradition": null, "note": null },
+        { "term": "a place of knowing", "tradition": null, "note": null },
+        { "term": "an atmosphere of love", "tradition": null, "note": null },
+        { "term": "I was love", "tradition": null, "note": "the strongest form: the feeling replaces both place and self" }
+      ],
+      "regex": "(a|this|that|in a|in this) (state|place|space|realm) of (just )?(pure |total |complete |absolute |unconditional )*(love|peace|bliss|joy|knowing|awareness|oneness|light|beauty|serenity|calm)",
+      "negative_regex": "(come|comes|coming|act|acting|operate|operating|speak|speaking|work|working) from a place of|from a place of (love|knowing|fear|compassion)|a place of (business|worship|work|employment)",
+      "quotes": [
+        { "videoId": "vFINxFxEbQs", "cvnde": 22, "text": "And then all of a sudden, I was in this place of just pure unconditional love." },
+        { "videoId": "Nj9PfK4JSTg", "cvnde": 15, "text": "I was in this state of absolute bliss." },
+        { "videoId": "TsDTsBCEd6A", "cvnde": 18, "text": "And then when I am in this state of bliss in just a flash like that, I appear in the maid's room" },
+        { "videoId": "NXKFo5lJUjA", "cvnde": 12, "text": "But it wasn't a place like here. It was an environment, an atmosphere. And it was love." }
+      ],
+      "sensory": [
+        "love as ambient medium rather than emotion",
+        "peace with a texture — thick, warm, holding",
+        "no object to attach the feeling to",
+        "the feeling continuing to be reported as a location after return"
+      ],
+      "journey_position": 0.55,
+      "parent": "the-unnamed-place",
+      "measured": { "all_pct": 7.64, "all_docs": 472, "cv13_pct": 6.15, "cv18_pct": 6.63, "cv23_pct": 4.42 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 8,
+      "notes": "Lowest precision of the entries kept: modern therapeutic idiom ('acting from a place of love', 'coming from a place of knowing') accounts for around half of raw hits and is post-NDE commentary, not a location during the experience — the negative_regex targets exactly that construction. Declines with evidential strength (7.64% -> 4.42% at cv>=23), consistent with the false-positive idiom being commoner in the more discursive, less evidentially rated accounts."
+    },
+    {
+      "id": "more-real-than-real",
+      "name": "More Real Than This",
+      "category": "state",
+      "description": "The single most insisted-upon property of the unnamed place, and the one narrators most resent being unable to convey: it was not dreamlike, it was hyperreal. The comparison is always downward — this life, this room, this conversation is the thinner thing. A nine-year-old's formulation, 'it was realer than real', is quoted back by researchers across the corpus. Narrators offer it specifically as their answer to the hallucination objection, and it is usually followed immediately by an admission that they cannot explain what they mean.",
+      "aliases": [
+        { "term": "more real than this", "tradition": "none", "note": null },
+        { "term": "realer than real", "tradition": null, "note": "child's formulation, widely repeated" },
+        { "term": "the most real thing I've ever experienced", "tradition": null, "note": null },
+        { "term": "real real", "tradition": null, "note": null },
+        { "term": "this life is the dream", "tradition": null, "note": "the inverted form" }
+      ],
+      "regex": "(more|most) real than (this|here|anything|any|life|earth|my|real|the)|realer than|(the )?most real (thing|experience|place)",
+      "negative_regex": "more real than (the movie|tv|a game|fiction|the news)",
+      "quotes": [
+        { "videoId": "-831_OI42Qk", "cvnde": 25, "text": "It was real. It was real, Dr. Morse. It was realer than real." },
+        { "videoId": "yu9ljcHcu3w", "cvnde": 22, "text": "This was more real than anything I experience on a day-to-day basis here." },
+        { "videoId": "rIT84m9_Ti4", "cvnde": 18, "text": "I don't know what to make of the experience other than I knew it was more real than real." }
+      ],
+      "sensory": [
+        "senses described as having been turned up rather than dulled",
+        "detail retained decades later with no fading",
+        "the felt thinness of ordinary waking life afterwards"
+      ],
+      "journey_position": 0.97,
+      "parent": null,
+      "measured": { "all_pct": 5.12, "all_docs": 316, "cv13_pct": 5.61, "cv18_pct": 5.66, "cv23_pct": 7.73 },
+      "precision_estimate": 0.9,
+      "precision_sample_n": 8,
+      "notes": "Rises with evidential strength across every stratum (5.12% -> 7.73% at cv>=23), the clearest positive gradient among the ineffability markers. Precision was 8/8 in the cv>=18 sample. This is a retrospective claim made from after the return, which is why journey_position is near 1 — but it is a claim ABOUT the place, and functionally it is how experiencers assert that the unnamed place has ontological standing."
+    },
+    {
+      "id": "no-comparison",
+      "name": "Nothing Here to Compare It To",
+      "category": "state",
+      "description": "A specific and distinct form of the language failure: not that the words are missing but that the referents are. Narrators say there is no earthly equivalent, no frame of reference, nothing on this side that can be held up against it. Where 'indescribable' concedes a failure of vocabulary, this concedes a failure of the world — the listener has never had the raw experience the word would need to point at. It is applied most often to the love, the light and the speed.",
+      "aliases": [
+        { "term": "no comparison", "tradition": "none", "note": null },
+        { "term": "no earthly equivalent", "tradition": null, "note": null },
+        { "term": "nothing here to compare it to", "tradition": null, "note": null },
+        { "term": "no frame of reference", "tradition": null, "note": null },
+        { "term": "nothing comparable here", "tradition": null, "note": null },
+        { "term": "nothing on Earth compares", "tradition": null, "note": null }
+      ],
+      "regex": "(nothing|no way) (here |on earth )?to compare|(there'?s|there is|it'?s) (no|nothing) (comparison|comparable)|no (earthly )?(comparison|equivalent|frame of reference)|nothing (on earth|here) (like|compares|comes close)",
+      "negative_regex": "no comparison (shopping|chart|between the two (products|models|prices))",
+      "quotes": [
+        { "videoId": "vBihF8HeXo8", "cvnde": 20, "text": "Truly, no earthly comparison can encapsulate just how swiftly this incredible occurrence unfolded." },
+        { "videoId": "hiGgb5Dkeok", "cvnde": 16, "text": "I felt sensations that have no earthly equivalent, like being simultaneously filled with fire and washed with light." },
+        { "videoId": "pEyKldhkEJY", "cvnde": 18, "text": "there's nothing comparable here, there's no feeling that I can compare" },
+        { "videoId": "Xk_GeRlOjBg", "cvnde": 16, "text": "there is no comparison here for what you experience on the other side. Just, just none." }
+      ],
+      "sensory": [
+        "similes offered and immediately withdrawn",
+        "the love measured against parental love and found to exceed it",
+        "the speed measured against every earthly speed and found to exceed it"
+      ],
+      "journey_position": 0.6,
+      "parent": "language-fails",
+      "measured": { "all_pct": 1.78, "all_docs": 110, "cv13_pct": 2.29, "cv18_pct": 3.04, "cv23_pct": 2.21 },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 8,
+      "notes": "Small but sharply concentrated in the better-evidenced accounts: 1.78% overall but 3.04% at cv>=18, a 1.7x enrichment. Two of the eight sampled snippets (K1TrJKxsZO8 and fCV7ayCLA1A) are near-identical retellings of the same experience by different uploads, so the effective witness count is slightly lower than the doc count."
+    },
+    {
+      "id": "hedged-naming",
+      "name": "For Lack of a Better Word",
+      "category": "state",
+      "description": "The naming hedge: a narrator uses a word while explicitly disowning it. 'A being, for lack of a better word.' 'The source of all love, that's, for lack of a better word, God — but I don't mean that in a religious sense at all.' 'I call it a lobby.' This is the corpus's characteristic move when the thing encountered has no available name: borrow the nearest word, flag the borrowing, and keep going. It is applied to places, beings and God alike, and it is one of the clearest signals that the imported theological vocabulary in these accounts is often provisional rather than doctrinal.",
+      "aliases": [
+        { "term": "for lack of a better word", "tradition": "none", "note": null },
+        { "term": "for lack of a better term", "tradition": null, "note": null },
+        { "term": "I'll call it", "tradition": null, "note": null },
+        { "term": "the closest thing I can say", "tradition": null, "note": null },
+        { "term": "the best way I can describe it", "tradition": null, "note": "commonest single form" },
+        { "term": "whatever you want to call it", "tradition": null, "note": "explicitly hands the naming to the listener" },
+        { "term": "you can call it God, you can call it Source, you can call it whatever you want", "tradition": "secular", "note": "the multi-tradition hedge" }
+      ],
+      "regex": "for lack of a better (word|term|phrase)|i(.| )ll call it|i (would|guess i'?d|will|could|can only) call it|(the )?closest (thing|word) (i can|to)|the (best|closest|only) way (i can|i could|to) describe",
+      "negative_regex": "closest thing to (a (friend|brother|sister|mother|father|son)|home i had)|i'?ll call it (a day|quits|even)",
+      "quotes": [
+        { "videoId": "hE43IUyyuDM", "cvnde": 15, "text": "that's, for lack of a better word, God, but I don't mean that in a religious sense at all." },
+        { "videoId": "YqShRo4lk5E", "cvnde": 18, "text": "It was then I could see my guide, for lack of a better word." },
+        { "videoId": "FvCe6-Dj5h8", "cvnde": 14, "text": "I'm gonna say being for lack of a better word, but it was a being" },
+        { "videoId": "9m77ID3wC6s", "cvnde": 19, "text": "it wasn't the the fullness of of heaven or or wherever I was at, right?" }
+      ],
+      "sensory": [
+        "the word used and disowned in the same breath",
+        "the narrator offering the listener a choice of names",
+        "religious names taken up as approximations rather than claims"
+      ],
+      "journey_position": 0.55,
+      "parent": "language-fails",
+      "measured": { "all_pct": 13.37, "all_docs": 826, "cv13_pct": 13.33, "cv18_pct": 13.95, "cv23_pct": 16.02 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 8,
+      "notes": "Rises with evidential strength (13.37% -> 16.02% at cv>=23). The bare hedge 'for lack of a better word' alone is 2.19% of docs; most of the mass comes from 'the best way I can describe it', which at 6.36% is one of the corpus's most characteristic verbal tics. Note that the hedge attaches to BEINGS at least as often as to places — the same linguistic mechanism covers both, which is why it is filed as a state rather than a place."
+    },
+    {
+      "id": "not-a-place",
+      "name": "It Wasn't a Place",
+      "category": "state",
+      "description": "The rarest and most philosophically explicit form: narrators who reject the whole category of location. They report an environment, an atmosphere, a condition — but insist it had no buildings, no landscape, no geography as we mean it. One describes becoming uncomfortable precisely BECAUSE it was not a place, wishing it looked more like one, whereupon a landscape appeared as if painted in. That account is the corpus's sharpest single hint about how the scenery in these experiences may be generated.",
+      "aliases": [
+        { "term": "it wasn't a place", "tradition": "none", "note": null },
+        { "term": "not a physical place", "tradition": null, "note": null },
+        { "term": "an environment, an atmosphere", "tradition": null, "note": null },
+        { "term": "a realm of pure energy", "tradition": "New Age", "note": null },
+        { "term": "a condition, not a location", "tradition": null, "note": null }
+      ],
+      "regex": "(not|wasn'?t|isn'?t|it was not) (a )?(physical|material|earthly) (place|location|space|world)|(it|there) (wasn'?t|was not) (really )?a place|more of a (state|feeling) than a place",
+      "negative_regex": "wasn'?t a placebo|wasn'?t a place (to (help|live|stay|park|work|eat))",
+      "quotes": [
+        { "videoId": "NXKFo5lJUjA", "cvnde": 12, "text": "But it wasn't a place like here. It was an environment, an atmosphere. And it was love." },
+        { "videoId": "NyfUJD1xf08", "cvnde": 14, "text": "And then I started to feel uncomfortable because it wasn't a place." },
+        { "videoId": "N44GQERfI1Y", "cvnde": 10, "text": "This wasn't a physical place with buildings and landscapes as we understand them." }
+      ],
+      "sensory": [
+        "presence without extension",
+        "no colours or dimension until wanted",
+        "scenery arriving after the wish for scenery",
+        "an atmosphere with no container"
+      ],
+      "journey_position": 0.5,
+      "parent": "the-unnamed-place",
+      "measured": { "all_pct": 0.57, "all_docs": 35, "cv13_pct": 0.84, "cv18_pct": 0.97, "cv23_pct": 1.1 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 10,
+      "notes": "Very rare in absolute terms (35 docs) but monotonically enriched with evidential strength (0.57% -> 1.10% at cv>=23), nearly a doubling. False positives include 'it wasn't a placebo' and 'there wasn't a place to really help people', both handled by the negative_regex. Worth flagging for follow-up: the Ellyn Dye account (NyfUJD1xf08 / NXKFo5lJUjA, the same experiencer under two uploads) describes the landscape being generated on demand, which if it recurs elsewhere would be a significant structural finding about the whole otherworld map."
+    }
+  ]
+}

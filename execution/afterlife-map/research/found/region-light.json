@@ -1,0 +1,697 @@
+{
+  "places": [
+    {
+      "id": "the-light",
+      "name": "The Light",
+      "category": "realm",
+      "description": "The destination almost everyone arrives at: not a lamp shining on a place but a place made of light, which people enter, stand in, are held by. Experiencers describe going into it, being in it, being part of it. It is spoken of as somewhere you ARE, not something you look at — 'I was in a sea of light', 'I found myself in a world of light'. Many say plainly that the light was itself the loving being; the distinction between the place and the person in it collapses.",
+      "aliases": [
+        {"term": "the Light", "tradition": "none", "note": "the corpus's own default name; usually capitalised in written accounts"},
+        {"term": "the bright light", "tradition": "none", "note": null},
+        {"term": "brilliant white light", "tradition": "none", "note": null},
+        {"term": "the light at the end of the tunnel", "tradition": "secular/folk", "note": "the phrase experiencers themselves flag as 'the cliche' before insisting theirs was different"},
+        {"term": "a world of light", "tradition": "none", "note": null},
+        {"term": "a sea of light", "tradition": "none", "note": null},
+        {"term": "the light of God", "tradition": "Christian", "note": null},
+        {"term": "God's Light", "tradition": "Christian", "note": null},
+        {"term": "the white light", "tradition": "none", "note": null},
+        {"term": "home", "tradition": "none", "note": "many name arrival in the light as 'I'm home' rather than by a place-name"}
+      ],
+      "regex": "(went|going|drawn|pulled|moved|travel(ing|ed)?|head(ing|ed)?|float(ing|ed)?|rush(ing|ed)?|flew|fly(ing)?|walk(ing|ed)?|step(ped)?|enter(ed|ing)?|absorbed|taken|got|came|come|coming) (right |straight |quickly |slowly |up |back )?(in)?to (the|this|that) (bright |white |brilliant |beautiful |big |warm |golden |pure |amazing |glorious )*light\\b|light at the end of (the|a|this|that) tunnel|(in|inside|within) (the|this|that) (bright |white |brilliant |beautiful |warm |golden |pure )*light[,. ]|(the|this|that) light (was|is|felt|seemed|became|grew|got|kept|just)\\b",
+      "negative_regex": "(street ?light|traffic light|light ?bulb|light switch|turn(ed)? (on|off) the light|day ?light|flash ?light|head ?light|lighter|lightning|shed light|in light of|light-?hearted)",
+      "quotes": [
+        {"videoId": "yMT7JDhQaxA", "text": "When I reached the point of light, I found myself in a world of light. Everything in this place was made of, and radiated, light.", "cvnde": 9},
+        {"videoId": "uwVw8M4uRTo", "text": "let me first say and get out of the way that very bluntly the light is God", "cvnde": 10},
+        {"videoId": "vNZSp6Z2RlM", "text": "the light, it was alive, and it was pulsating and vibrating with energy, blinding light", "cvnde": 12}
+      ],
+      "sensory": [
+        "white, but a white unlike earthly white — 'pure white, not yellow'",
+        "no discernible source and no direction; the light is the medium, not a beam",
+        "tactile — 'palpable', 'like velvet and honey', 'thick like a fog you couldn't see through'",
+        "carries emotion the way air carries sound: 'you could feel emotion in the light'",
+        "expands: starts small and grows until it fills the whole visual field",
+        "accompanied by a hum or vibration that rises as the brightness rises"
+      ],
+      "journey_position": 0.28,
+      "parent": null,
+      "measured": {"all_pct": 35.95, "all_docs": 2220, "cv13_pct": 40.59, "cv18_pct": 38.67, "cv23_pct": 37.02},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 20,
+      "notes": "MORE common among better-evidenced accounts (35.95% all vs 38.67% at cv>=18). The regex's weakest arm is the bare 'the light was...' clause, which occasionally catches ordinary room light or metaphor ('walk out of this life in the light'). Note the strong internal disagreement in the corpus about whether the Light is a place, a being, or the experiencer's own self — many say all three at once ('This light is me')."
+    },
+    {
+      "id": "painless-brightness",
+      "name": "Brighter Than the Sun, But It Doesn't Hurt Your Eyes",
+      "category": "state",
+      "description": "The single most repeated paradox in the corpus. The light is described as orders of magnitude beyond any earthly brightness — brighter than the sun, than the sun on snow, than a nuclear detonation — and yet the experiencer can look straight into it with wide-open eyes and feel no pain. People raise this unprompted, as the detail that convinces them it was not an ordinary perception.",
+      "aliases": [
+        {"term": "brighter than the sun", "tradition": "none", "note": "the most common formula"},
+        {"term": "ten thousand times brighter than the sun", "tradition": "none", "note": null},
+        {"term": "it didn't hurt my eyes", "tradition": "none", "note": null},
+        {"term": "so bright but it was soft on my eyes", "tradition": "none", "note": null},
+        {"term": "blinding light that didn't blind me", "tradition": "none", "note": null},
+        {"term": "brighter than the sun shining on a field of snow", "tradition": "none", "note": null},
+        {"term": "like looking at the sun with your eyes closed", "tradition": "none", "note": null}
+      ],
+      "regex": "brighter than (the |any |anything |a |ten thousand |a thousand |a million |ten |[0-9,]+ )*(sun|suns)|(didn'?t|did not|does ?n'?t|not|never) (hurt|burn|blind|bother) (my|your|the|our|their|his|her) eyes|so bright[^.]{0,80}(didn'?t|did not|not|never) (hurt|blind|burn)|bright(er)?[^.]{0,60}but (it )?(didn'?t|did not|wasn'?t) (hurt|blind|painful)",
+      "negative_regex": "(sunglasses|sunburn|sun ?screen|welding|migraine)",
+      "quotes": [
+        {"videoId": "KErzb_cCmyA", "text": "I looked like I was going toward this gigantic light, brighter than the sun, and yet it didn't hurt your eyes to look at it.", "cvnde": 14},
+        {"videoId": "Wa2I8IVAoQk", "text": "It was brighter than the sun shining on a field of snow. Yet I could look at it, and it didn't hurt my eyes.", "cvnde": 7},
+        {"videoId": "s2qzhQma_I8", "text": "regardless of how close it was to my face it was never too bright to hurt my eyes", "cvnde": 17}
+      ],
+      "sensory": [
+        "eyes wide open and looking directly into it",
+        "compared to the sun, to a Tsar Bomb detonation, to a field of snow in sunlight",
+        "no glare, no afterimage, no squinting",
+        "sometimes accompanied by 'superhero vision' — sight sharper than physical sight"
+      ],
+      "journey_position": 0.27,
+      "parent": "the-light",
+      "measured": {"all_pct": 3.19, "all_docs": 197, "cv13_pct": 4.34, "cv18_pct": 3.73, "cv23_pct": 3.31},
+      "precision_estimate": 0.89,
+      "precision_sample_n": 28,
+      "notes": "MORE common among better-evidenced accounts (3.19% all vs 3.73% at cv>=18, 4.34% at cv>=13). This is a lexical undercount — the phenomenon is described far more often than these exact formulas appear; many say only 'I could look right at it'."
+    },
+    {
+      "id": "living-light",
+      "name": "The Light That Is Alive",
+      "category": "being",
+      "description": "For a substantial minority the light is not illumination but a person. They report recognising, usually in a single instant and without being told, that the light is aware, that it is looking back at them, that it has 'a life to it all by itself'. Several describe the same discovery in near-identical words: 'the light was alive. It was living love.' This is the hinge on which the Light stops being a place and becomes an Other.",
+      "aliases": [
+        {"term": "living light", "tradition": "none", "note": null},
+        {"term": "the light was alive", "tradition": "none", "note": null},
+        {"term": "living love", "tradition": "none", "note": null},
+        {"term": "an amorphous intelligence", "tradition": "none", "note": null},
+        {"term": "loving, knowing intelligence", "tradition": "none", "note": null},
+        {"term": "a living, aware, loving being", "tradition": "none", "note": null},
+        {"term": "the light was the creator", "tradition": "Christian/none", "note": null},
+        {"term": "it wasn't just a light; it was a presence", "tradition": "none", "note": null}
+      ],
+      "regex": "living light|(the |this |that |a )light (was|is|felt|seemed|became) (a )?(alive|living|conscious|aware|intelligent|sentient|a being|a person|an entity)|light (that|which) (was |is )?(alive|aware|conscious|intelligent|knew|loved)|light[^.]{0,20}(was alive|is alive|had a life|had consciousness|had intelligence|was intelligent|was conscious|was aware|was a being|was a person|was sentient)|(the|this|that) light (knew|loved|recognized|understood) (me|us|everything)",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "ENwjMmQLKlU", "text": "I recognize that the light is alive. It has a life to it all by itself.", "cvnde": 16},
+        {"videoId": "OCZjqf9BdrQ", "text": "I discovered that the glowing golden globe of light was alive. It was a self. It was a living, aware, loving being.", "cvnde": 11},
+        {"videoId": "_K_sF2JH3Ac", "text": "There was this unbelievable, exciting, and enlightening living light. It was loving, it was kind and warm", "cvnde": 9}
+      ],
+      "sensory": [
+        "the light 'looks back' — in every direction it returns your gaze with recognition",
+        "pulsating, vibrating, humming with energy",
+        "palpable — you can feel it on you, not just see it",
+        "expands INTO you, filling every cell"
+      ],
+      "journey_position": 0.38,
+      "parent": "the-light",
+      "measured": {"all_pct": 1.78, "all_docs": 110, "cv13_pct": 2.05, "cv18_pct": 1.66, "cv23_pct": 2.21},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 14,
+      "notes": "Roughly flat across strata (1.78% all, 1.66% at cv>=18, 2.21% at cv>=23) — the tighter phrasing costs recall badly; a looser regex on 'alive' near 'light' hits 9.25% but drops to ~40% precision because 'everything was alive' describes the landscape, not the Light."
+    },
+    {
+      "id": "orb-of-light",
+      "name": "The Ball / Orb / Column of Light",
+      "category": "structure",
+      "description": "When the light takes a bounded shape rather than filling everything, it is nearly always one of a small set of forms: a ball or orb or sphere hanging in space, a column or pillar rising further than can be seen, a sea or ocean or pool the experiencer stands in. Several describe a human shape faintly discernible inside the column, 'the way we can see the form of a person in a doorway'.",
+      "aliases": [
+        {"term": "ball of light", "tradition": "none", "note": "most common form"},
+        {"term": "orb of light", "tradition": "none", "note": null},
+        {"term": "sphere of light", "tradition": "none", "note": null},
+        {"term": "globe of light", "tradition": "none", "note": null},
+        {"term": "column of light", "tradition": "none", "note": null},
+        {"term": "pillar of light", "tradition": "Christian/LDS", "note": "used by experiencers from Latter-day Saint backgrounds"},
+        {"term": "sea of light", "tradition": "none", "note": null},
+        {"term": "pool of white light", "tradition": "none", "note": null},
+        {"term": "orb of creator light", "tradition": "none", "note": null},
+        {"term": "the center of everything", "tradition": "none", "note": null}
+      ],
+      "regex": "(ball|orb|sphere|globe|column|pillar|sea|ocean|pool) of (brilliant |white |golden |pure |bright |living |intense |loving )*light",
+      "negative_regex": "(disco ball|ball of light bulbs|column of the newspaper)",
+      "quotes": [
+        {"videoId": "QuH9fQwHNEw", "text": "There arose just an amazing, incredibly beautiful, loving ball of brilliant, loving light.", "cvnde": 8},
+        {"videoId": "YuLe-DtB-xU", "text": "That divine being appeared in the form of a massive column of golden light with a suggestion of a human shape inside.", "cvnde": 10},
+        {"videoId": "Fq8iAG-hZxI", "text": "It was as if we were in the middle of a radiant pool of white light.", "cvnde": 12}
+      ],
+      "sensory": [
+        "expanding — grows larger and brighter as you approach or as it approaches you",
+        "sometimes 'musical light', with a melody or gong-like vibration inside it",
+        "a faint human silhouette occasionally visible within",
+        "the orb pulses, and each pulse throws off individual points of light described as souls"
+      ],
+      "journey_position": 0.35,
+      "parent": "the-light",
+      "measured": {"all_pct": 4.73, "all_docs": 292, "cv13_pct": 4.83, "cv18_pct": 5.52, "cv23_pct": 7.18},
+      "precision_estimate": 0.86,
+      "precision_sample_n": 14,
+      "notes": "Clearly MORE common among the best-evidenced accounts — 4.73% all, 5.52% at cv>=18, 7.18% at cv>=23. Adding 'wall|tunnel|river|beam|shaft|cloud|mass|source of light' to the regex raises coverage to 11.16% but mixes in the tunnel, which belongs to another region."
+    },
+    {
+      "id": "distant-light",
+      "name": "The Speck of Light in the Distance",
+      "category": "threshold",
+      "description": "The Light almost always begins as something very small and very far away, seen from inside darkness: a pinprick, a speck, a spark. It oscillates or expands, or the experiencer is drawn toward it 'like a magnet', and it grows until it fills everything. Several are unsure whether they moved toward it or it came toward them.",
+      "aliases": [
+        {"term": "pinpoint of light", "tradition": "none", "note": null},
+        {"term": "pinprick of light", "tradition": "none", "note": null},
+        {"term": "speck of light", "tradition": "none", "note": null},
+        {"term": "spark of light", "tradition": "none", "note": null},
+        {"term": "point of brilliant light in the distance", "tradition": "none", "note": null},
+        {"term": "a little tiny speck of light", "tradition": "none", "note": null},
+        {"term": "light way off in the distance", "tradition": "none", "note": null},
+        {"term": "like a tractor beam", "tradition": "secular", "note": "several use the Star Trek image for the pull"}
+      ],
+      "regex": "(pinpoint|pin ?point|speck|pinprick|dot|point|spot|sliver|glimmer|spark) of light|(tiny|little|small|distant|faint) light (in|at|way) (the |a )?(distance|far|end)|light (in|at) the distance|light (way )?off in the distance|light got (bigger|brighter|larger)|light (was )?getting (bigger|brighter|larger|closer)",
+      "negative_regex": "(spotlight|spot light on the stage|point of light years)",
+      "quotes": [
+        {"videoId": "hp2rAPDJDcQ", "text": "a light appears, a speck of light, and it begins to oscillate and get larger and larger", "cvnde": 12},
+        {"videoId": "MwtTRJmH1g0", "text": "I saw a pinprick of light that came rushing toward me faster than the speed of light", "cvnde": 10},
+        {"videoId": "yO8An4FV51o", "text": "I could see far ahead this pinpoint of light", "cvnde": 14}
+      ],
+      "sensory": [
+        "seen against total, 'soul-deep' darkness",
+        "oscillates or flickers, expanding a little with each turn",
+        "magnetic pull — desire to reach it grows as it nears",
+        "ambiguity of motion: 'I don't know if I was going to it or it was coming to me'"
+      ],
+      "journey_position": 0.2,
+      "parent": "the-light",
+      "measured": {"all_pct": 6.61, "all_docs": 408, "cv13_pct": 8.14, "cv18_pct": 8.7, "cv23_pct": 10.5},
+      "precision_estimate": 0.83,
+      "precision_sample_n": 12,
+      "notes": "Strongly MORE common among better-evidenced accounts: 6.61% all, 8.70% at cv>=18, 10.50% at cv>=23. Usually but not always inside a tunnel — many report the distant light in open darkness with no tunnel at all."
+    },
+    {
+      "id": "merging-with-the-light",
+      "name": "Being Absorbed Into the Light",
+      "category": "process",
+      "description": "Rather than arriving at the light, some are taken into it and stop being separate from it. The recurring images are dissolution without loss: sugar stirred into water, a drop returning to the ocean, melting, being taken apart molecule by molecule and put back together. A minority report fear at this point — fear of losing their individuality — and several say they remained themselves and one with it simultaneously.",
+      "aliases": [
+        {"term": "merged with the light", "tradition": "none", "note": null},
+        {"term": "absorbed into the light", "tradition": "none", "note": null},
+        {"term": "became one with the light", "tradition": "none", "note": null},
+        {"term": "melted into the light", "tradition": "none", "note": null},
+        {"term": "merged with Source", "tradition": "secular/New Age", "note": null},
+        {"term": "oneness with God", "tradition": "Christian", "note": null},
+        {"term": "reunited with the source", "tradition": "none", "note": "'one billionth of a drop of water in the ocean being reunited'"},
+        {"term": "unification with all that is", "tradition": "none", "note": null},
+        {"term": "the urge to merge", "tradition": "none", "note": null}
+      ],
+      "regex": "(merge[dsr]?|merging|melt(ed|ing)|absorbed|dissolv(ed|ing)|became one|become one|becoming one|blended|united) (in)?(to|with|into) (the |that |this )?(light|Source|God|love|oneness|everything|all that is)|(I|we) (was|were) (absorbed|merged|dissolved) (in)?to",
+      "negative_regex": "(merged (in)?to traffic|merge onto the (highway|freeway)|melted into the (crowd|couch|background))",
+      "quotes": [
+        {"videoId": "pSBL8khOlTE", "text": "I didn't go into the light. I was absorbed into the light.", "cvnde": 12},
+        {"videoId": "tPi5C7yo2js", "text": "I became one with the light, and the more I became one with the light, the better I felt.", "cvnde": 13},
+        {"videoId": "83_Q4mXCevI", "text": "Like I just melted into the light. So comforting.", "cvnde": 10}
+      ],
+      "sensory": [
+        "loss of body boundary while retaining awareness of self",
+        "sugar-into-water and drop-into-ocean similes recur independently",
+        "'taken apart molecule by molecule and put back together'",
+        "sometimes a chorus of other lights saying 'welcome home' just before absorption",
+        "one recurring fear: 'I started to be afraid of losing myself in the light'"
+      ],
+      "journey_position": 0.6,
+      "parent": "the-light",
+      "measured": {"all_pct": 3.81, "all_docs": 235, "cv13_pct": 3.44, "cv18_pct": 3.45, "cv23_pct": 3.31},
+      "precision_estimate": 0.62,
+      "precision_sample_n": 16,
+      "notes": "SLIGHTLY LESS common among better-evidenced accounts (3.81% all vs 3.45% at cv>=18, 3.31% at cv>=23) — consistent with the structured report, where cosmic_unity also falls from 60.9% to 49.2% as evidential strength rises. Precision is the weakest of my set: roughly a third of matches are retrospective philosophising ('we're already merged with Source') rather than a described moment in the experience."
+    },
+    {
+      "id": "love-in-the-light",
+      "name": "The Love Coming Off the Light",
+      "category": "state",
+      "description": "The overwhelming report is that the light's defining property is not brightness but love, and that the love is substantial — a medium, a force, a thing that washes over and through you, not an emotion you feel. People say flatly 'the light was love', 'the light was love itself, but not love as an emotion', 'every atom had been electrified with love'. Nearly all say the word 'love' is inadequate.",
+      "aliases": [
+        {"term": "unconditional love", "tradition": "none", "note": "by far the most used phrase in the corpus"},
+        {"term": "pure love", "tradition": "none", "note": null},
+        {"term": "the light was love", "tradition": "none", "note": null},
+        {"term": "love that was total", "tradition": "none", "note": null},
+        {"term": "infinite love", "tradition": "none", "note": null},
+        {"term": "God's love", "tradition": "Christian", "note": null},
+        {"term": "love upon love", "tradition": "none", "note": null},
+        {"term": "golden liquid love", "tradition": "none", "note": "rare, vivid variant"},
+        {"term": "an intoxication of love", "tradition": "none", "note": null},
+        {"term": "being hugged by the universe", "tradition": "secular", "note": null}
+      ],
+      "regex": "(pure|total|complete|absolute|infinite|overwhelming|indescribable) (unconditional )?love|unconditional(ly)? love|love (that|which) (I|you|we) (can'?t|cannot|could ?n'?t) (describe|explain|imagine)|love beyond (words|description|anything)",
+      "negative_regex": "(I love (you|it|that)|love (song|story|letter|interest)|in love with (my|his|her) (wife|husband|boyfriend|girlfriend))",
+      "quotes": [
+        {"videoId": "B28-QFooUKE", "text": "The light was love, and love was God.", "cvnde": 8},
+        {"videoId": "AEgxTodIs3o", "text": "And the light was love itself, but not love as an emotion.", "cvnde": 10},
+        {"videoId": "cbTWrNqyMhM", "text": "And all I could feel coming from that light was just deep, deep love.", "cvnde": 22}
+      ],
+      "sensory": [
+        "felt as pressure or waves washing over and through the body",
+        "described as tactile: velvet, honey, a warm bath, being wrapped in a blanket",
+        "penetrates 'to every cell of your being'",
+        "so intense several say 'I can't take any more of this' — yet it does not hurt",
+        "carries no conditions: it is directed at you specifically and does not depend on your conduct"
+      ],
+      "journey_position": 0.42,
+      "parent": "the-light",
+      "measured": {"all_pct": 29.86, "all_docs": 1844, "cv13_pct": 29.37, "cv18_pct": 27.62, "cv23_pct": 25.41},
+      "precision_estimate": 0.71,
+      "precision_sample_n": 14,
+      "notes": "SLIGHTLY LESS common among better-evidenced accounts (29.86% all, 27.62% at cv>=18, 25.41% at cv>=23). A large share of matches are the interviewee generalising about love after the fact rather than describing love inside the light; the phenomenon itself is near-universal (structured report: feelings_of_peace 93%)."
+    },
+    {
+      "id": "no-judgment",
+      "name": "Total Acceptance, No Judgment",
+      "category": "state",
+      "description": "Almost nobody in this corpus reports being judged by the light. The formula 'there was no judgment' recurs constantly, usually alongside a life review in which the experiencer sees their worst acts and is met only with a question — 'what did you learn?' — and more love. Many add that the only judgment present was their own, turned on themselves. Christians and non-Christians report this identically, and several say it directly contradicted what they had been taught.",
+      "aliases": [
+        {"term": "there was no judgment", "tradition": "none", "note": "the corpus's own dominant phrasing"},
+        {"term": "no condemnation", "tradition": "Christian", "note": null},
+        {"term": "absolutely no judgment", "tradition": "none", "note": null},
+        {"term": "total acceptance", "tradition": "none", "note": null},
+        {"term": "it wasn't judging me", "tradition": "none", "note": null},
+        {"term": "the only judgment comes from yourself", "tradition": "none", "note": null},
+        {"term": "that's your judgment of it, not ours", "tradition": "none", "note": "reported as a direct utterance of the presence"},
+        {"term": "nothing to be guilty about", "tradition": "none", "note": null}
+      ],
+      "regex": "(no|not any|zero|without any|absolutely no|there was no|wasn'?t any) (judg(e)?ment|condemnation)|(didn'?t|did not|never|wasn'?t) judg(e|ed|ing) me|not judged|no one judged|nobody judged|(total|complete|totally|completely|fully|utterly) (accept|accepted|acceptance)",
+      "negative_regex": "(judgment day|judgment call|judgment of the court|poor judgment|judgmental (people|person|attitude))",
+      "quotes": [
+        {"videoId": "-abMjizqeNQ", "text": "And there was no judgment and there was no condemnation. There was nothing to be guilty about.", "cvnde": 7},
+        {"videoId": "i6KdwZN0f_4", "text": "there was no judgment. Here I am in the arms of the divine just saying, but what did you learn?", "cvnde": 20},
+        {"videoId": "1GjCOcYc3WM", "text": "There was no hierarchy. There was no judgment, and there was no separation in the light.", "cvnde": 12}
+      ],
+      "sensory": [
+        "the reviewing presence asks questions rather than accuses",
+        "shame arises from the experiencer, not from the light",
+        "described as 'being met' rather than examined",
+        "several report expecting judgment and being astonished at its absence"
+      ],
+      "journey_position": 0.55,
+      "parent": "the-light",
+      "measured": {"all_pct": 11.9, "all_docs": 735, "cv13_pct": 12.61, "cv18_pct": 10.5, "cv23_pct": 10.5},
+      "precision_estimate": 0.71,
+      "precision_sample_n": 14,
+      "notes": "Roughly flat to slightly LESS common among the best-evidenced accounts (11.90% all vs 10.50% at cv>=18 and cv>=23). Note the countercurrent: a small number of distressing accounts do report being judged ('I'm judging you'), so this is a strong majority pattern, not a universal."
+    },
+    {
+      "id": "being-fully-known",
+      "name": "Being Completely Known",
+      "category": "state",
+      "description": "Alongside the absence of judgment sits its precondition: the light already knows everything about you, including things you have told nobody. Experiencers describe being read completely — 'it knew everything about me, my beliefs, what I loved, who I was' — and, crucially, being fine with it. The recurring formula is 'there was nothing to hide' paired with the discovery that total exposure and total acceptance arrive together.",
+      "aliases": [
+        {"term": "it knew everything about me", "tradition": "none", "note": null},
+        {"term": "there was nothing to hide", "tradition": "none", "note": null},
+        {"term": "it knew me and I knew it", "tradition": "none", "note": null},
+        {"term": "known better than my family, or even me", "tradition": "none", "note": null},
+        {"term": "fully known", "tradition": "none", "note": null},
+        {"term": "he knew me", "tradition": "Christian", "note": "used of Jesus"},
+        {"term": "we know each other. It knows me. I know it.", "tradition": "none", "note": null},
+        {"term": "it was all there on display", "tradition": "none", "note": null}
+      ],
+      "regex": "(presence|being|light|it|he|she|they) (that|who|which) (loved|knew|accepted|understood) me|it knew (me|everything about me)|knew everything about me|knew me (better|completely|entirely|fully)|(fully|completely|totally) (known|accepted)|nothing (was )?hidden|nothing to hide|(saw|knew|understood) every(thing)? (about|thought|deed)",
+      "negative_regex": "(knew everything about (cars|sports|the business|astronomy|computers)|nothing to hide from the (police|IRS))",
+      "quotes": [
+        {"videoId": "B_Xd2Gg279c", "text": "it knew everything about me, my beliefs, what I loved, who I was, how I was as a person, and that was all okay.", "cvnde": 7},
+        {"videoId": "pT8T93MR3Ok", "text": "It was as if this being had known me for my entire life, better than my family, or even me.", "cvnde": 10},
+        {"videoId": "7mqCLPv3HhQ", "text": "There were no there was nothing to hide. It knew everything.", "cvnde": 18},
+        {"videoId": "rbB_bKCViAA", "text": "And, and he knew me, and I knew him.", "cvnde": 21}
+      ],
+      "sensory": [
+        "a sense of being read or examined without hostility",
+        "recognition running both ways — the experiencer feels they know the light too, and always have",
+        "no need to speak: the knowing precedes any communication",
+        "'tailoring itself to me like a custom suit'"
+      ],
+      "journey_position": 0.5,
+      "parent": "the-light",
+      "measured": {"all_pct": 5.46, "all_docs": 337, "cv13_pct": 7.24, "cv18_pct": 5.94, "cv23_pct": 2.76},
+      "precision_estimate": 0.64,
+      "precision_sample_n": 14,
+      "notes": "Mixed across strata — higher at cv>=13 (7.24%) and cv>=18 (5.94%) than overall (5.46%), but sharply lower at cv>=23 (2.76%, only 5 of 181 docs, so the cv23 figure is noisy). The '(saw|knew|understood) everything about' arm catches biographical uses ('he knew everything about astronomy')."
+    },
+    {
+      "id": "the-presence",
+      "name": "The Presence",
+      "category": "being",
+      "description": "The being in the light, encountered before and often instead of any name. People report a presence behind them, beside them, in front of them — usually unseen, sometimes explicitly faceless — that is immense, loving, and instantly familiar. A recurring and striking pattern: they cannot see it, do not have a name for it, and are nevertheless certain of who it is. Naming happens afterwards, in the retelling, and is drawn from whatever vocabulary the experiencer has.",
+      "aliases": [
+        {"term": "a presence", "tradition": "none", "note": "the plainest and most common formulation"},
+        {"term": "the being of light", "tradition": "none", "note": "in the corpus's entity census, 'being of light' is 7.7% of encounters and 'unknown' 27.5%"},
+        {"term": "a being of light", "tradition": "none", "note": null},
+        {"term": "unknown being", "tradition": "none", "note": "the single most common unnamed identity in the corpus's entity census (286 encounters)"},
+        {"term": "the Man of Light", "tradition": "Christian/Muslim", "note": null},
+        {"term": "a light being", "tradition": "none", "note": null},
+        {"term": "an androgynous being", "tradition": "none", "note": null},
+        {"term": "a floating sphere of awareness", "tradition": "none", "note": null},
+        {"term": "an amorphous intelligence", "tradition": "none", "note": null},
+        {"term": "I didn't have a name for the presence", "tradition": "none", "note": null},
+        {"term": "the light", "tradition": "none", "note": "many simply address the being AS the light"}
+      ],
+      "regex": "(felt|sensed|there was|was) (a|this|that|the) (loving |powerful |huge |divine |enormous |overwhelming |warm |beautiful |male |female |strong )*presence|(a|the|this) presence (came|was|behind|next to|beside|with|of love|that)|(unknown|unnamed|unidentified|nameless) (being|presence|voice|figure|entity)",
+      "negative_regex": "(presence of mind|presence in the market|stage presence|web presence|presence of alcohol|no presence of)",
+      "quotes": [
+        {"videoId": "fqjOO7l1DuY", "text": "But this presence was always at my side. I knew it had always been there.", "cvnde": 7},
+        {"videoId": "pzfUfECO4_U", "text": "I somehow instinctively knew that we knew each other but I didn't have a name for the presence", "cvnde": 9},
+        {"videoId": "8pi2S9zsGhc", "text": "there was the presence next to me of what I felt was God", "cvnde": 22}
+      ],
+      "sensory": [
+        "positional: overwhelmingly reported as BEHIND or beside, rarely face-on",
+        "unseen but unmistakably located — 'right here, right next to me'",
+        "no face; several say they did not dare turn around",
+        "immense scale: 'so powerful and so cosmic and so wise'",
+        "communication by thought, or by nothing at all — 'presence_only' is the third most common communication method in the corpus"
+      ],
+      "journey_position": 0.45,
+      "parent": "the-light",
+      "measured": {"all_pct": 10.82, "all_docs": 668, "cv13_pct": 12.91, "cv18_pct": 13.4, "cv23_pct": 14.36},
+      "precision_estimate": 0.7,
+      "precision_sample_n": 20,
+      "notes": "Clearly MORE common among better-evidenced accounts: 10.82% all, 13.40% at cv>=18, 14.36% at cv>=23. This is the key finding for the brief's naming question: the UNNAMED presence gets commoner as evidential strength rises, while the named identities (Jesus 19.40% -> 14.92%; Source 7.59% -> 4.97%) get rarer. About a third of matches are outside the NDE proper (felt presences at home, in hospital, in later life)."
+    },
+    {
+      "id": "god-in-the-light",
+      "name": "God",
+      "category": "being",
+      "description": "The most common name given to the being in the light. Usually the identification is immediate and unargued — 'as I'm standing before this light, I knew it was God' — and experiencers are often at pains to say nobody told them and no figure was visible. A recurring qualification: the light is God, and the human form (throne, white hair, robe) is a concession to what the experiencer could receive, not God's actual shape. Several explicitly say 'God wasn't confined to that form'.",
+      "aliases": [
+        {"term": "God", "tradition": "Christian/Jewish/general theist", "note": "935 raw identities in the corpus's entity census, the single largest"},
+        {"term": "the Lord", "tradition": "Christian", "note": null},
+        {"term": "God the Father", "tradition": "Christian", "note": null},
+        {"term": "my Creator", "tradition": "Christian/general theist", "note": null},
+        {"term": "the Almighty", "tradition": "Christian", "note": null},
+        {"term": "the divine", "tradition": "none", "note": "used by those who dislike 'God'"},
+        {"term": "the Holy Spirit", "tradition": "Christian", "note": "10.07% of docs mention Holy Spirit/Holy Ghost"},
+        {"term": "God's Light", "tradition": "Christian", "note": null},
+        {"term": "a higher power", "tradition": "secular/12-step", "note": null},
+        {"term": "the voice of God", "tradition": "Christian", "note": null}
+      ],
+      "regex": "(saw|met|meeting|met with|stood before|standing before|standing in front of|in front of|face to face with|in the presence of|before) (the |my |our )?(God|Lord|Almighty|Creator|Father God|God the Father)\\b|(God|the Lord) (said|told|spoke|asked|answered|replied) (to )?me|(I|and|but|then) (just |somehow |instantly |immediately )?knew (it was|that it was|this was)[^.]{0,25}(God|the Lord|my Creator|the Creator)|voice of God",
+      "negative_regex": "(oh my god|thank god|god forbid|god knows|for god'?s sake|god ?damn|god bless)",
+      "quotes": [
+        {"videoId": "rs947vb-kSQ", "text": "But as I'm standing before this light, I knew it was God. I knew right away when I saw it, that was God.", "cvnde": 17},
+        {"videoId": "L3tzl7n7BaQ", "text": "I was in God's presence, but I was not able to see a form or an image. God did not allow me to see. He allowed me to see the light.", "cvnde": 7},
+        {"videoId": "momz1mwWpVE", "text": "I realized looking up into this huge bright light that didn't hurt my eyes", "cvnde": 11}
+      ],
+      "sensory": [
+        "often no visible form at all — only light, and certainty",
+        "when a form appears: white hair, a robe, a throne, a face too bright to look at",
+        "voice heard telepathically, 'in my head', not with the ears",
+        "several report the identification arriving as a fact rather than an inference: 'there was no doubt in my mind'"
+      ],
+      "journey_position": 0.48,
+      "parent": "the-presence",
+      "measured": {"all_pct": 15.48, "all_docs": 956, "cv13_pct": 15.8, "cv18_pct": 17.27, "cv23_pct": 14.92},
+      "precision_estimate": 0.72,
+      "precision_sample_n": 18,
+      "notes": "MORE common among the strongly-evidenced middle band (15.48% all vs 17.27% at cv>=18) then falling back at cv>=23 (14.92%). Naming tracks background strongly: almost every 'God' account comes from a Christian, Jewish or generically theistic upbringing, and several converts explicitly reach for 'God' only because it is the word available to them ('a source that I can name as God only because that's a name that is available to me')."
+    },
+    {
+      "id": "jesus-in-the-light",
+      "name": "Jesus / Christ",
+      "category": "being",
+      "description": "The second most common named identity, and the one most often recognised without being told: 'when the savior of the world stands in front of you, you'll know.' Jesus appears either as a robed human figure with a beard, or purely as light. Recognition is frequently reported by people with no Christian formation, and occasionally by people from other faiths entirely. In several accounts Jesus is the escort who takes the experiencer INTO the light, distinct from the light itself.",
+      "aliases": [
+        {"term": "Jesus", "tradition": "Christian", "note": "923 raw identities in the entity census, second only to God"},
+        {"term": "Jesus Christ", "tradition": "Christian", "note": null},
+        {"term": "Christ", "tradition": "Christian", "note": null},
+        {"term": "Yeshua", "tradition": "Christian/Messianic Jewish", "note": null},
+        {"term": "the Savior", "tradition": "Christian", "note": null},
+        {"term": "Christ consciousness", "tradition": "New Age", "note": "used by those who reject a personal Jesus but keep the name"},
+        {"term": "Christ energy", "tradition": "New Age", "note": null},
+        {"term": "the light of Christ", "tradition": "Christian", "note": null},
+        {"term": "a Man of Light with holes in his hands", "tradition": "Christian/Muslim", "note": "reported by an imam who recognised him"}
+      ],
+      "regex": "(saw|met|meeting|it was|knew it was|standing (next to|before|in front of)|appeared|embraced by|arms of|face of|beside me was|in front of me was) [^.]{0,25}\\b(Jesus|Christ|Yeshua|the Savior)\\b|(Jesus|Christ|Yeshua) (said|told|spoke|asked|smiled|embraced|hugged|held|took|walked|looked)",
+      "negative_regex": "(jesus christ[,!]|for christ'?s sake|christmas|christian(ity)?|christ ?church)",
+      "quotes": [
+        {"videoId": "tZgb_vg0Q1U", "text": "Jesus embraced me. He was not in a body but was a being of light in the brightest white, golden light.", "cvnde": 10},
+        {"videoId": "aGeNpYjLhRk", "text": "So I knew it was Jesus. Jesus, I knew who He was, and I could see Him, but it was like looking into the sun.", "cvnde": 8},
+        {"videoId": "1-TOzzLv5yU", "text": "And the light was alive. The light was love.", "cvnde": 16}
+      ],
+      "sensory": [
+        "eyes are the most-reported feature — 'eyes of lightning', violet, blue, holding an intense gaze",
+        "white robe, sometimes a golden sash; sometimes no body at all, only light",
+        "shows the wounds in his hands or side",
+        "smiles; the smile is repeatedly what triggers recognition",
+        "communicates without speaking: 'we weren't using words'"
+      ],
+      "journey_position": 0.5,
+      "parent": "the-presence",
+      "measured": {"all_pct": 19.4, "all_docs": 1198, "cv13_pct": 20.63, "cv18_pct": 18.65, "cv23_pct": 14.92},
+      "precision_estimate": 0.75,
+      "precision_sample_n": 16,
+      "notes": "LESS common among the best-evidenced accounts: 19.40% all, 18.65% at cv>=18, 14.92% at cv>=23. Together with the Presence trend (which rises), this is the clearest naming signal in the region — as evidential strength rises, the being is less often given a tradition-specific name and more often left as an unnamed presence. Some matches are the interviewer or host discussing Jesus rather than the experiencer's own encounter."
+    },
+    {
+      "id": "the-source",
+      "name": "The Source / The Creator / The Universe",
+      "category": "being",
+      "description": "The name reached for by experiencers who find 'God' too small, too human or too religious. The Source is described as where everything comes from and returns to — 'the source of all creation', 'the source of all being', 'the womb of God'. Many use it interchangeably with God and say so explicitly, stacking the names together: 'source, God, all the words are far too small'. Others prefer 'the Creator', 'the Universe', 'all that is', or 'universal consciousness'.",
+      "aliases": [
+        {"term": "Source", "tradition": "secular / New Age", "note": null},
+        {"term": "the Source of all creation", "tradition": "none", "note": null},
+        {"term": "Source energy", "tradition": "New Age", "note": null},
+        {"term": "the Creator", "tradition": "general theist", "note": null},
+        {"term": "the Universe", "tradition": "secular", "note": null},
+        {"term": "universal consciousness", "tradition": "secular", "note": null},
+        {"term": "all that is", "tradition": "New Age", "note": null},
+        {"term": "the all that isness", "tradition": "none", "note": null},
+        {"term": "Om", "tradition": "Hindu-inflected", "note": "used by one prominent account for a deity 'too big' for the word God"},
+        {"term": "the womb of God", "tradition": "none", "note": "used of the 'blacklight' variant of the Source"},
+        {"term": "Divine Source", "tradition": "none", "note": null}
+      ],
+      "regex": "the source of all (creation|things|being|life|love|that is|existence)|(merged?|merging|one|oneness|reunited|connected|back|return(ed)?) with (the )?source\\b|source energy|(call|called|calls) it (the )?source|source[,/ -]+(God|creator|light|love)|(God|creator|universe)[,/ -]+(the )?source\\b|the divine source",
+      "negative_regex": "(source of income|source of the (problem|infection|leak|noise|smell)|water source|food source|news source|source code|primary source|open source)",
+      "quotes": [
+        {"videoId": "-h_5uX-Kd2Q", "text": "I didn't see God because the light that I was in was God. The light was the creator. The light is everything.", "cvnde": 11},
+        {"videoId": "y639Ln5sFIg", "text": "I was being told that what I was looking at here was the source of all creation", "cvnde": 9},
+        {"videoId": "SRHWGuzUqoc", "text": "Everything that is comes from the light. It's the source of all being.", "cvnde": 9},
+        {"videoId": "I1HfCkNWwLc", "text": "i knew i was in the presence of divine love, god, source energy.", "cvnde": 13}
+      ],
+      "sensory": [
+        "described as a centre — 'the center of everything', with everything else radiating from it",
+        "sometimes seen as a vast cluster of uncountable suns",
+        "occasionally reported as dark rather than bright — the 'blacklight', 'an endless void of pitch blackness bursting with healing power'",
+        "pulses, and each pulse sends out individual souls"
+      ],
+      "journey_position": 0.55,
+      "parent": "the-presence",
+      "measured": {"all_pct": 7.59, "all_docs": 469, "cv13_pct": 6.39, "cv18_pct": 6.08, "cv23_pct": 4.97},
+      "precision_estimate": 0.57,
+      "precision_sample_n": 14,
+      "notes": "LESS common among better-evidenced accounts — 7.59% all, 6.08% at cv>=18, 4.97% at cv>=23. Lowest precision in my set: about 40% of matches are the speaker's present-day vocabulary rather than a described encounter, because 'source' has become house style in parts of the NDE-interview world. The cleanest sub-signal is 'the source of all creation/being', which is almost always a description of what was seen."
+    },
+    {
+      "id": "other-tradition-namings",
+      "name": "Buddha, Krishna, the Great Spirit",
+      "category": "being",
+      "description": "Rare but real: the being in the light identified by a name outside the Christian frame. Buddha is the most frequent — sometimes recognised years later from a picture on a wall — followed by Krishna, the Great Spirit, and Allah/Yahweh. Two features stand out. First, the recognition is usually retrospective: 'the man in my near-death experience was Buddha' comes long after the event. Second, at least one shared-death account has different people in the same event seeing different figures.",
+      "aliases": [
+        {"term": "Buddha", "tradition": "Buddhist", "note": "23 raw identities in the entity census"},
+        {"term": "Lord Krishna", "tradition": "Hindu", "note": null},
+        {"term": "the Great Spirit", "tradition": "Indigenous", "note": null},
+        {"term": "Allah", "tradition": "Muslim", "note": null},
+        {"term": "Muhammad", "tradition": "Muslim", "note": "15 raw identities"},
+        {"term": "Yahweh", "tradition": "Jewish/Messianic", "note": null},
+        {"term": "the cheerful King", "tradition": "Hindu", "note": "reported as the Hindu reading of the same figure"},
+        {"term": "your bear totem", "tradition": "Indigenous", "note": "offered in the corpus as an example of culturally-fitted recognition"},
+        {"term": "nobody had a nametag", "tradition": "none", "note": "the corpus's own summary of the whole problem"}
+      ],
+      "regex": "(saw|met|it was|knew it was|appeared as|in front of me was|before me (was|stood)) [^.]{0,25}\\b(Buddha|Krishna|Allah|Yahweh|Brahman|Vishnu|Shiva|the Great Spirit)\\b|\\b(Buddha|Krishna|Allah|Yahweh|Shiva|Vishnu)\\b[^.]{0,40}(appeared|said to me|told me|smiled|greeted|welcomed|standing|light)",
+      "negative_regex": "(buddha (statue|board|bowl)|Gopi Krishna|Hare Krishna|Muhammad Ali)",
+      "quotes": [
+        {"videoId": "lay-5hNWskw", "text": "The man in my near-death experience was Buddha.", "cvnde": 10},
+        {"videoId": "IQR25B69LrI", "text": "And then Rashad saw Buddha.", "cvnde": 26},
+        {"videoId": "mSotnAe7rsM", "text": "nobody had a nametag", "cvnde": 12}
+      ],
+      "sensory": [
+        "young, thin, bald, long brown robes, bare feet (Buddha)",
+        "a raft, a river bank",
+        "laughing face appearing in grass (the 'Happy Buddha')",
+        "in one shared account, three people in the same event met three different figures — a guide, a deceased father, and Buddha"
+      ],
+      "journey_position": 0.52,
+      "parent": "the-presence",
+      "measured": {"all_pct": 1.26, "all_docs": 78, "cv13_pct": 0.78, "cv18_pct": 1.1, "cv23_pct": 1.1},
+      "precision_estimate": 0.64,
+      "precision_sample_n": 14,
+      "notes": "LESS common among better-evidenced accounts (1.26% all vs 1.10% at cv>=18 and cv>=23; only 0.78% at cv>=13). Genuinely rare. The corpus is overwhelmingly Anglophone-Christian in composition, so this is a sampling fact about the corpus at least as much as about the afterlife. About a third of matches are commentary about other people's experiences rather than the speaker's own."
+    },
+    {
+      "id": "golden-light",
+      "name": "The Golden Light",
+      "category": "realm",
+      "description": "A distinct and consistently reported colour variant. Where most describe white, a substantial minority insist on gold or amber — often as a warmth-bearing colour rather than a hue, and often at the centre or edge of a white light. Several describe standing in 'a place of golden light', gold streaming off in icicle-like points, or a golden glow taken on by their own body.",
+      "aliases": [
+        {"term": "golden light", "tradition": "none", "note": null},
+        {"term": "white golden light", "tradition": "none", "note": null},
+        {"term": "amber light", "tradition": "none", "note": null},
+        {"term": "a golden glow", "tradition": "none", "note": null},
+        {"term": "gold-patented spectrum", "tradition": "none", "note": null},
+        {"term": "golden liquid love", "tradition": "none", "note": null},
+        {"term": "liquid gold", "tradition": "none", "note": null},
+        {"term": "the most beautiful color of gold as can be imagined", "tradition": "none", "note": null}
+      ],
+      "regex": "golden light|light was gold(en)?|gold(en)? (glow|hue|colou?r|light)|amber light|liquid gold",
+      "negative_regex": "(golden retriever|golden gate|golden years|golden rule|golden globe award|olden)",
+      "quotes": [
+        {"videoId": "rIT84m9_Ti4", "text": "I was instantly in the place of golden light and pure love.", "cvnde": 18},
+        {"videoId": "k8V7Iyqqm3U", "text": "my consciousness is seeing this golden light, white in the center, just unbelievably beautiful", "cvnde": 8},
+        {"videoId": "YuLe-DtB-xU", "text": "The light was of the most beautiful color of gold as can be imagined.", "cvnde": 10}
+      ],
+      "sensory": [
+        "gold streaming outward 'in streams in all directions, just like pinnacles, icicles'",
+        "warm rather than bright — the colour is doing the work of the warmth",
+        "gold at the edges with white at the centre, or the reverse",
+        "the experiencer's own body takes on the golden glow",
+        "one account: 'a golden sparkle in the air' as the whole of the visible apparition"
+      ],
+      "journey_position": 0.33,
+      "parent": "the-light",
+      "measured": {"all_pct": 6.27, "all_docs": 387, "cv13_pct": 6.57, "cv18_pct": 4.83, "cv23_pct": 3.87},
+      "precision_estimate": 0.79,
+      "precision_sample_n": 14,
+      "notes": "LESS common among better-evidenced accounts (6.27% all, 4.83% at cv>=18, 3.87% at cv>=23). Some matches describe golden features of the wider realm (a golden city wall, gold-clad beings) rather than the light itself."
+    },
+    {
+      "id": "warmth-of-the-light",
+      "name": "The Warmth",
+      "category": "state",
+      "description": "The light is felt as warm, and experiencers are unusually insistent that this is not a temperature. The corpus's own phrasing: 'a warmth, uh, not a temperature warmth. some have described it like just being hugged by the universe.' Several report the warmth first and only then realise the warmth IS the love. It is described as coming from inside as much as outside — 'in me, through me'.",
+      "aliases": [
+        {"term": "warm light", "tradition": "none", "note": null},
+        {"term": "warmth", "tradition": "none", "note": null},
+        {"term": "not a temperature warmth", "tradition": "none", "note": null},
+        {"term": "like a warm bath", "tradition": "none", "note": null},
+        {"term": "the warmth of the sun", "tradition": "none", "note": "used as a simile, not a claim about the sun"},
+        {"term": "hugged by the universe", "tradition": "secular", "note": null},
+        {"term": "a soft, warm, almost living light", "tradition": "none", "note": null},
+        {"term": "warm and inviting", "tradition": "none", "note": null}
+      ],
+      "regex": "warmth[^.]{0,40}(light|love|glow)|light[^.]{0,40}\\bwarm(th)?\\b|warm[^.]{0,25}light\\b|not a temperature|warmth that (wasn'?t|was not)",
+      "negative_regex": "(warm (bath|water|blanket|bed|weather|climate|shower|clothes|milk|meal)|warm(ed)? up the|global warming)",
+      "quotes": [
+        {"videoId": "jNBAu-0BtmE", "text": "First thing I felt about it was the warmth, that it was this wonderful warmth that was kind of like in me, through me. But then I realized the warmth was love.", "cvnde": 10},
+        {"videoId": "-gKY-EmmTSQ", "text": "they describe a warmth, uh, not a temperature warmth. some have described it like just being hugged by the universe.", "cvnde": 17},
+        {"videoId": "SmbpJmoXVPY", "text": "And the light was warm, glowing. It wasn't like a spotlight.", "cvnde": 20}
+      ],
+      "sensory": [
+        "explicitly distinguished from thermal warmth",
+        "felt inside the body as much as on it",
+        "arrives with the light and disappears with it",
+        "coupled with the loss of all pain and cold",
+        "one account compares it to lying in a field of lemongrass on a sunny afternoon"
+      ],
+      "journey_position": 0.3,
+      "parent": "the-light",
+      "measured": {"all_pct": 5.62, "all_docs": 347, "cv13_pct": 7.0, "cv18_pct": 6.35, "cv23_pct": 6.08},
+      "precision_estimate": 0.93,
+      "precision_sample_n": 14,
+      "notes": "MORE common among better-evidenced accounts (5.62% all, 6.35% at cv>=18, 6.08% at cv>=23). Highest precision of any place in my set — the collocation of 'warm' with 'light' is almost never accidental in this corpus."
+    },
+    {
+      "id": "light-without-shadow",
+      "name": "Light Everywhere, With No Source and No Shadow",
+      "category": "landscape",
+      "description": "A quieter and more distinctive observation than the bright-light encounter: once inside, experiencers notice there is no sun and no shadow. They check under leaves, behind rocks, beneath their own feet, and find nothing dark. The explanation offered inside the experience is usually that the light comes from within every object rather than falling on it — 'everything was made of light'. This is the corpus's most physically specific claim about the light.",
+      "aliases": [
+        {"term": "there were no shadows", "tradition": "none", "note": null},
+        {"term": "everything was made of light", "tradition": "none", "note": null},
+        {"term": "light coming from within every object", "tradition": "none", "note": null},
+        {"term": "no sun, no moon, yet there's a light from everywhere", "tradition": "none", "note": null},
+        {"term": "the light of God which shines on everything", "tradition": "Christian", "note": null},
+        {"term": "a world of light", "tradition": "none", "note": null},
+        {"term": "living color", "tradition": "none", "note": "'this life is black and white. Heaven is living color.'"}
+      ],
+      "regex": "(everything|all of it|it all) (was|is) (made (out )?of |made from )?light|made (out )?of (pure |living )?light|light (came|coming) from (everywhere|within|inside)|no shadows|(there (were|was)|had) no shadow|light everywhere|no sun[^.]{0,40}(light|shadow)",
+      "negative_regex": "(shadow of a doubt|shadow (government|ban|puppet)|casting a shadow over the (economy|deal))",
+      "quotes": [
+        {"videoId": "xDgNCCzowRs", "text": "There were just no shadows. Jesus had no shadow. I had no shadow.", "cvnde": 12},
+        {"videoId": "EhJoiaSTp7Y", "text": "I realized that everything was lit up, yet there was no sun. There's no shadows, there's no moon, yet there's a light from everywhere.", "cvnde": 11},
+        {"videoId": "JUnMQboc6b8", "text": "everything was made of light even though there were individual things and beings", "cvnde": 9}
+      ],
+      "sensory": [
+        "leaves, rocks and plants inspected specifically for shadows and found to have none",
+        "depth without darkness — 'there's depth to things without having darkness'",
+        "objects lit from the inside; the grass, the trees and the body all made of light",
+        "one painter's frustration: you cannot paint it, because painting brightness requires dark contrast",
+        "colours become impossible to render — 'millions of blues, millions of greens'"
+      ],
+      "journey_position": 0.42,
+      "parent": "the-light",
+      "measured": {"all_pct": 5.65, "all_docs": 349, "cv13_pct": 5.61, "cv18_pct": 5.66, "cv23_pct": 4.97},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 26,
+      "notes": "Flat across strata (5.65% all, 5.66% at cv>=18, 4.97% at cv>=23). Note that several of the 'no shadows' documents are the same speaker (Debbie Ali) retold across different channels, so document count overstates the number of distinct witnesses for that phrasing."
+    },
+    {
+      "id": "voice-from-the-light",
+      "name": "The Light Speaks",
+      "category": "process",
+      "description": "Communication out of the light, almost always without sound. People report the light saying things — 'you can come in', 'it's not your time', 'welcome home' — while insisting the words were not heard with ears and that no language was used. The corpus's own repeated formula is that meaning arrived whole and was translated afterwards into words. In the corpus's entity census, telepathy (2,942 encounters) rivals verbal communication (3,900).",
+      "aliases": [
+        {"term": "the light said", "tradition": "none", "note": null},
+        {"term": "the light spoke to me", "tradition": "none", "note": null},
+        {"term": "a voice came from the light", "tradition": "none", "note": null},
+        {"term": "telepathically", "tradition": "none", "note": null},
+        {"term": "it emanated to me in a telepathic way", "tradition": "none", "note": null},
+        {"term": "there were no words", "tradition": "none", "note": null},
+        {"term": "direct download", "tradition": "secular/technological", "note": null},
+        {"term": "thought transference", "tradition": "none", "note": null},
+        {"term": "an amorphous intelligence said to me without language", "tradition": "none", "note": null}
+      ],
+      "regex": "(the|this|that) light (spoke|speaks|said|told|communicated|asked|answered|talked)|voice (came )?(from|out of|within|inside) (the|that|this) light|(spoke|speaking|communicat\\w+) (to me )?(from|out of|through) the light|light[^.]{0,25}(telepath|without words|no words)",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "sUgMPIFHPmQ", "text": "It was as if the light said", "cvnde": 10},
+        {"videoId": "aGLTZxk3CU4", "text": "And then the light spoke to me", "cvnde": 7},
+        {"videoId": "uwVw8M4uRTo", "text": "the light emanated to me in a telepathic way", "cvnde": 10}
+      ],
+      "sensory": [
+        "heard 'in my head', not with the ears, often with no sense of a mouth or direction",
+        "concepts arrive whole and are 'translated' into sentences afterwards",
+        "sometimes a single booming voice, sometimes a chorus of many lights in unison",
+        "recurring utterances: 'if you want, come on in', 'it's not your time', 'welcome home, [name]'"
+      ],
+      "journey_position": 0.45,
+      "parent": "the-light",
+      "measured": {"all_pct": 2.01, "all_docs": 124, "cv13_pct": 2.9, "cv18_pct": 2.62, "cv23_pct": 2.76},
+      "precision_estimate": 0.58,
+      "precision_sample_n": 12,
+      "notes": "MORE common among better-evidenced accounts (2.01% all, 2.62% at cv>=18, 2.76% at cv>=23). Lower precision because the 'communicat*' arm catches communication from other beings standing in the light rather than from the light itself — a distinction the experiencers themselves often decline to make."
+    },
+    {
+      "id": "colors-within-the-light",
+      "name": "Colors Inside the White",
+      "category": "state",
+      "description": "A recurring surprise: the light looks white, but when experiencers look further into it they find colours — the rainbow spectrum plus colours they say do not exist here and cannot be named. The image reached for again and again is a prism: white light containing all colours, refracting. Several artists in the corpus report being unable to reproduce these colours afterwards.",
+      "aliases": [
+        {"term": "colors I'd never seen before", "tradition": "none", "note": null},
+        {"term": "inside a prism", "tradition": "none", "note": null},
+        {"term": "rays of magnificent colors coming out of it", "tradition": "none", "note": null},
+        {"term": "rainbow-colored light", "tradition": "none", "note": null},
+        {"term": "iridescent", "tradition": "none", "note": null},
+        {"term": "God's rainbow arms", "tradition": "Christian", "note": null},
+        {"term": "like the inside of a diamond", "tradition": "none", "note": null},
+        {"term": "millions of blues, millions of greens", "tradition": "none", "note": null}
+      ],
+      "regex": "light[^.]{0,60}(colou?rs (I|we|you)|colou?rs that|rainbow|prism|iridescen|every colou?r)|(colou?rs|rainbow)[^.]{0,40}(out of|from|within|inside) (the |that |this )light",
+      "negative_regex": "(rainbow (flag|coalition|bridge for pets)|prism(atic)? (of|lens) in the (camera|telescope))",
+      "quotes": [
+        {"videoId": "K1aw8E8aVKQ", "text": "these other colors started coming out of this light", "cvnde": 11},
+        {"videoId": "PYyzpBQQQ4I", "text": "even though the light seemed to be white, I could feel and sense the rays of magnificent colors coming out of it", "cvnde": 17},
+        {"videoId": "9eRjUzMi0ik", "text": "Everything was white, but I described the experience as being inside a prism.", "cvnde": 11}
+      ],
+      "sensory": [
+        "the colours are FELT as much as seen — 'I could feel and sense the rays'",
+        "colours outside the human gamut, reported as unnameable",
+        "diamond and prism imagery: facets, refraction, sparkle",
+        "iridescence that moves, compared to the Aurora Borealis",
+        "purples, aquas and magentas named more often than reds"
+      ],
+      "journey_position": 0.35,
+      "parent": "the-light",
+      "measured": {"all_pct": 2.3, "all_docs": 142, "cv13_pct": 2.77, "cv18_pct": 3.31, "cv23_pct": 3.87},
+      "precision_estimate": 0.71,
+      "precision_sample_n": 14,
+      "notes": "Clearly MORE common among better-evidenced accounts — 2.30% all, 3.31% at cv>=18, 3.87% at cv>=23. Some matches describe colours of the landscape or of beings rather than colours within the light itself."
+    }
+  ]
+}

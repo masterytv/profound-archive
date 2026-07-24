@@ -1,0 +1,584 @@
+{
+  "places": [
+    {
+      "id": "the-green-country",
+      "name": "The Green Country",
+      "category": "landscape",
+      "parent": null,
+      "journey_position": 0.44,
+      "description": "An open, living countryside that people arrive in after the dark passage or the light: meadows, rolling fields, grassy hillsides, pastures running to the horizon. Experiencers almost always say it is earth-LIKE but not earth — the same kinds of things (grass, flowers, trees, water) rendered at an intensity earth cannot hold. It is usually described as vast, unspoiled, and with 'no sign of death or decay' anywhere in it. Most say the ground under their feet felt solid and that they walked or glided across it.",
+      "aliases": [
+        { "term": "meadow", "tradition": "none", "note": "the single commonest word for it" },
+        { "term": "rolling hills", "tradition": "none", "note": null },
+        { "term": "fields / rolling fields / pastures", "tradition": "none", "note": null },
+        { "term": "the countryside", "tradition": "none", "note": null },
+        { "term": "paradise", "tradition": "Christian", "note": "often 'paradise outside the city walls'" },
+        { "term": "the garden of Eden / a new Earth", "tradition": "Christian", "note": null },
+        { "term": "the Gateway Valley", "tradition": "none", "note": "Eben Alexander's own coinage, repeated across his many interviews" },
+        { "term": "like Ireland / like Scotland / like Kentucky", "tradition": "secular", "note": "recurring earthly comparison for the green terrain" },
+        { "term": "nature scene", "tradition": "none", "note": null },
+        { "term": "another realm that resembled earth", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "green far beyond earthly green; 'the greenest green'",
+        "no shadows anywhere on the ground",
+        "vast, panoramic, 'seemed to go on forever'",
+        "no decay, nothing dying, nothing withered",
+        "solid ground underfoot, often walked barefoot",
+        "temperature perfect — neither hot nor cold"
+      ],
+      "regex": "\\b(meadow|meadows)\\b|(rolling|green|grassy|beautiful|vast|open|lush|endless|golden) (hill|hills|hillside|field|fields|pasture|pastures|valley|countryside|landscape)|(green|greenest|emerald|lush|vibrant|brilliant)[^.]{0,20}(grass|green)|fields? of (flowers|wildflowers)",
+      "negative_regex": "(mowing|mowed|cut) the (grass|lawn)|grass roots|grassy knoll",
+      "measured": { "all_pct": 13.8, "all_docs": 852, "cv13_pct": 19.84, "cv18_pct": 24.31, "cv23_pct": 24.31 },
+      "precision_estimate": 0.75,
+      "precision_sample_n": 20,
+      "quotes": [
+        { "videoId": "dSTSTrAuMKs", "cvnde": 20, "text": "there is this magnificent vista of rolling fields and pastures, and flowers, and colors that don't exist on Earth" },
+        { "videoId": "m9IWFNoqXXw", "cvnde": 20, "text": "As I looked up, I'm in rolling hills of all these different flowers. There were cities, there were rivers, there were little villages" },
+        { "videoId": "W01t1uDY73c", "cvnde": 16, "text": "here behind him is, is green grass and fields and mountains, crystal clear stream, untouched paradise, like a garden of Eden" },
+        { "videoId": "7YfKmJYfHyI", "cvnde": 25, "text": "I was surrounded by the most lush green plants and trees and grass, flowers of different varieties and colors." }
+      ],
+      "notes": "This is the parent region for everything else in this file — the other entries are features found inside it. Sharply enriched among the best-evidenced accounts: 13.80% of all accounts but 24.31% at cv>=18 and cv>=23. False positives come from earthly biography (lawn mowing, farm work, hiking) and from after-effect passages where returnees describe seeing earthly grass more vividly. A substantial minority who reach an otherworld see a CITY or structures instead of, or beyond, this countryside — that belongs to another region."
+    },
+    {
+      "id": "the-meadow",
+      "name": "The Meadow",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.44,
+      "description": "The specific open grassland where the experiencer most often first finds themselves standing after the tunnel, the light, or the dark. It is repeatedly described as a slope or a rise you come up over — the scene 'changes totally' at the crest — and as filled edge to edge with flowers. Deceased relatives, guides and crowds of people are frequently met here, and it is often where the border or fence lies.",
+      "aliases": [
+        { "term": "meadow", "tradition": "none", "note": null },
+        { "term": "meadows upon meadows", "tradition": "none", "note": null },
+        { "term": "open meadow", "tradition": "none", "note": null },
+        { "term": "field", "tradition": "none", "note": null },
+        { "term": "grassy hill / hillside", "tradition": "none", "note": null },
+        { "term": "wildflower field", "tradition": "none", "note": null },
+        { "term": "verdant meadow", "tradition": "secular", "note": null },
+        { "term": "mountain meadow", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "tall grass with wildflowers scattered through it",
+        "a slope or rise you climb, with a different scene beyond the crest",
+        "a breeze moving countless blades of grass",
+        "sometimes a white fence, wall or gate at its far edge",
+        "people, children and animals dancing or playing in it"
+      ],
+      "regex": "\\b(meadow|meadows)\\b",
+      "negative_regex": "Meadowbrook|Meadowlands|meadow hay|Meadow Lane|reseeded with meadows",
+      "measured": { "all_pct": 4.45, "all_docs": 275, "cv13_pct": 6.69, "cv18_pct": 8.01, "cv23_pct": 9.94 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 20,
+      "quotes": [
+        { "videoId": "3j7YqTZkRuE", "cvnde": 23, "text": "And what I saw then was a green, lush meadow type, filled with beautiful flowers, trees with lush leaves, it off in the distance, just absolutely gorgeous." },
+        { "videoId": "Y1cLvB7bfm8", "cvnde": 9, "text": "The meadow was, well, really the most intense green. The colors, I've honestly never seen the likes of them." },
+        { "videoId": "RKrVNq2bVV8", "cvnde": 27, "text": "it was like a meadow with countless blades of grass kind of blowing in a breeze off of the distance, sort of a white fence thing." },
+        { "videoId": "cMBRXeUtKfs", "cvnde": 25, "text": "There's this meadow of tall grass. And in this grass, there was just these wildflowers everywhere." },
+        { "videoId": "kPQEDdeOEtc", "cvnde": 10, "text": "there was just meadows upon meadows, and the most beautiful nature scene like you could ever describe" },
+        { "videoId": "6oA1G4FzJA4", "cvnde": 15, "text": "This is a vast meadow. And I'm infinitely far away from it. The green was beyond belief." }
+      ],
+      "notes": "A clean, high-precision term: the word 'meadow' is rare in ordinary English speech, so a bare match is usually the NDE landscape. Rises monotonically with evidential strength (4.45% -> 6.69% -> 8.01% -> 9.94%), which is one of the strongest cvNDE gradients in this region. Main false positives: German- and Portuguese-language accounts where farm meadows appear in the biographical setup, plus one recurring proper noun (Meadowbrook Parkway)."
+    },
+    {
+      "id": "the-living-grass",
+      "name": "The Living Grass",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.45,
+      "description": "The single most distinctive thing in this region: grass that is awake. Experiencers report that each individual blade has its own consciousness, its own shade of green, and its own light; that the grass knows they are there and is glad; that it parts to accept the foot and closes back around the ankle; that light ripples out through it where they step. Several say they could have stayed looking at the grass for a hundred years.",
+      "aliases": [
+        { "term": "the grass was alive", "tradition": "none", "note": null },
+        { "term": "every blade of grass", "tradition": "none", "note": "the canonical phrasing" },
+        { "term": "each blade had a consciousness", "tradition": "none", "note": null },
+        { "term": "grass that sings / sings the praises of God", "tradition": "Christian", "note": null },
+        { "term": "grass with its own light", "tradition": "none", "note": null },
+        { "term": "the softest of green fur", "tradition": "none", "note": null },
+        { "term": "plugging into the grass", "tradition": "secular", "note": "energy/consciousness idiom" }
+      ],
+      "sensory": [
+        "millions or billions of distinguishable shades of green",
+        "light emitted from inside each blade; ripples of light under the feet",
+        "soft underfoot; does not hurt or resist; parts and closes around the foot",
+        "a sweet smell and even a taste when touched",
+        "audible — a hum, a note, a symphony, singing",
+        "love or energy felt flowing up through the soles of the feet"
+      ],
+      "regex": "(blades? of grass|the grass)[^.]{0,90}(alive|conscious|glow|sing|sang|vibrat|aware|ripple|its own|personality|energy)",
+      "negative_regex": "(number of every|couldn.t create one|create a single) blade of grass|feet in the earth|mowing",
+      "measured": { "all_pct": 1.75, "all_docs": 108, "cv13_pct": 3.02, "cv18_pct": 3.87, "cv23_pct": 7.73 },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 20,
+      "quotes": [
+        { "videoId": "upmgXkXBKII", "cvnde": 9, "text": "And I could see the grass, every blade of grass moving independently. And it was alive and it was happy to see me." },
+        { "videoId": "zDQ1SN3fS9M", "cvnde": 23, "text": "And each blade of grass had a consciousness in it. Every single blade had a consciousness." },
+        { "videoId": "wrfI3D0sEQg", "cvnde": 11, "text": "the grass wrapped back around my foot and my ankle and it was caressing me" },
+        { "videoId": "yu9ljcHcu3w", "cvnde": 22, "text": "I could see each blade and each blade was singing. Each blade of grass was singing the praises of God." },
+        { "videoId": "5cSL2upSdX8", "cvnde": 7, "text": "Every blade perfectly formed and light coming from every blade of grass." },
+        { "videoId": "7SW-1rKQIrg", "cvnde": 20, "text": "And the grass itself had a sweet, sweet smell and even had a taste, even to touch it, you could taste it." },
+        { "videoId": "Xk_GeRlOjBg", "cvnde": 16, "text": "The grass was so alive. It was so green." }
+      ],
+      "notes": "This is the strongest cvNDE gradient in the whole region: 1.75% of all accounts but 7.73% of accounts scoring cv>=23 — four and a half times enriched among the best-evidenced. That pattern is worth flagging: the more evidentially solid the account, the more likely the grass is described as conscious. False positives are metaphorical or theological uses ('He knew the number of every blade of grass on Earth', 'I couldn't create one blade of grass') and post-NDE aftereffect passages about earthly lawns. Note that several of the richest testimonies (Vinney/Vincent Tolman) recur under multiple videoIds, so document counts slightly overstate the number of distinct experiencers."
+    },
+    {
+      "id": "the-flowers",
+      "name": "The Flowers",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.46,
+      "description": "Flowers cover the meadow and garden and are treated as the second wonder after the grass. They are described as radiating light from inside rather than reflecting it, as having colours with no earthly name, and — repeatedly — as responsive: they turn toward the experiencer, speak, sing, ask to be picked, or flow along beside them as they move. Several people report being able to zoom their attention into a single petal and find a whole world in it.",
+      "aliases": [
+        { "term": "wildflowers", "tradition": "none", "note": null },
+        { "term": "field of flowers", "tradition": "none", "note": null },
+        { "term": "flowers everywhere", "tradition": "none", "note": null },
+        { "term": "blossoms and buds on trees", "tradition": "none", "note": null },
+        { "term": "roses of different colors", "tradition": "Hindu", "note": "Rajiv Parti's meadow of roses with the Om chant" },
+        { "term": "flowers that glowed from the inside out", "tradition": "none", "note": null },
+        { "term": "translucent flowers like stained glass", "tradition": "none", "note": null },
+        { "term": "singing flowers", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "light radiating outward from within each petal, not reflected",
+        "colours with no earthly equivalent; 'pinks were pinker, reds were redder'",
+        "audible — flowers singing, each colour a different note",
+        "flowers turning toward, moving with, or speaking to the experiencer",
+        "sweet fragrance filling the air",
+        "extreme magnification possible — every vein, every grain of pollen visible"
+      ],
+      "regex": "(beautiful|magnificent|amazing|gorgeous|vibrant|lush|exquisite|glorious) (flowers|wildflowers|blossoms)|flowers everywhere|field of flowers|flowers and (trees|plants|grass)|(the |these )flowers were",
+      "negative_regex": "flower (nursery|shop|bed|pot)|funeral flowers|sent flowers|buy(ing)? flowers",
+      "measured": { "all_pct": 4.24, "all_docs": 262, "cv13_pct": 6.82, "cv18_pct": 7.04, "cv23_pct": 6.63 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 20,
+      "quotes": [
+        { "videoId": "QuH9fQwHNEw", "cvnde": 8, "text": "all the flowers, and like daisies and marigolds that were growing in the meadow around us, all glowed from the, the inside out" },
+        { "videoId": "wrfI3D0sEQg", "cvnde": 11, "text": "And the flowers were saying to me, I could hear it, I could understand everything" },
+        { "videoId": "bCnn-Lto7gE", "cvnde": 9, "text": "The flowers, they flow with you. They're like this magnificent neon colors, and they're alive. The flowers are alive." },
+        { "videoId": "SjNp_kXqh7Y", "cvnde": 9, "text": "I saw a garden with flowers. The flowers, when I saw them, sang." },
+        { "videoId": "DEeXXnu6u0g", "cvnde": 21, "text": "Drake helped me get my consciousness zoomed in and right on a flower, right on the petals of a flower, the edge of the flower." },
+        { "videoId": "Bj5dWGx2smg", "cvnde": 18, "text": "And the flowers were blooming from nowhere. And the flowers picked me up." },
+        { "videoId": "tjSSd6jCc5Q", "cvnde": 18, "text": "my hand would pass through the flowers and meld with and become them, and there would be that same ripple of joy" }
+      ],
+      "notes": "Unlike the grass, flowers do NOT rise further at cv>=23 (6.63% vs 7.04% at cv>=18) — the enrichment plateaus. False positives are earthly: gardening, flower nurseries, funeral flowers, and a recurring sponsor advertisement for a garden hose."
+    },
+    {
+      "id": "the-trees-and-forest",
+      "name": "The Trees",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.47,
+      "description": "Trees stand at the edges of the meadow, in groves, orchards and forests, and sometimes as a single great tree on a hilltop that the experiencer is drawn toward. Their bark and leaves are lit from inside; the brown of the trunk is described as a colour of brown never seen on earth. Several people report the trees as consciously present — solemn, wise, greeting them, or talking as they pass.",
+      "aliases": [
+        { "term": "grove of trees", "tradition": "none", "note": null },
+        { "term": "forest / woods", "tradition": "none", "note": null },
+        { "term": "lush foliage / plant life", "tradition": "none", "note": null },
+        { "term": "the tree at the top of the hill", "tradition": "none", "note": "a recurring single landmark tree" },
+        { "term": "tree of life", "tradition": "Christian", "note": "1.26% of accounts use this exact phrase" },
+        { "term": "fruit-laden trees", "tradition": "none", "note": null },
+        { "term": "tropical jungle", "tradition": "none", "note": null },
+        { "term": "leaves that had their own vibration", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "bark and leaves lit from within; no shadow under the leaves",
+        "brilliant brown with a tint of gold in the trunk",
+        "leaves quaking or shaking like aspen in the light",
+        "trees perceived as wise, solemn, welcoming, conscious",
+        "no dead wood, no decay, buds and blossoms in permanent bloom"
+      ],
+      "regex": "(trees|forest|woods|grove|foliage|plant life)[^.]{0,60}(glow|glowed|glowing|lit from|radiat|alive|lush|singing|no death|no decay|never seen|leaves were)",
+      "negative_regex": "family tree|tree stump|Christmas tree|hiking|backpacking|redwoods",
+      "measured": { "all_pct": 1.44, "all_docs": 89, "cv13_pct": 1.93, "cv18_pct": 2.76, "cv23_pct": 2.21 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 14,
+      "quotes": [
+        { "videoId": "4DhnSOcS9IU", "cvnde": 23, "text": "I then began to connect, plug into the trees, supreme wisdom and dignity of the trees, the solemnness of the trees." },
+        { "videoId": "90_bk9__d1o", "cvnde": 16, "text": "these trees were a brilliant, brilliant brown with a tint of gold on, which I thought, what a beautiful tree" },
+        { "videoId": "kkbnCeQ13HY", "cvnde": 13, "text": "you have to picture the whole tree is like that, and the bark is lit, and everything is almost like lit from within" },
+        { "videoId": "Y9xliZBvtQQ", "cvnde": 21, "text": "I have traveled to many places here on earth but have yet to find a place where the plants and trees glowed like they did in this place." },
+        { "videoId": "hh1qNojDFFA", "cvnde": 16, "text": "I walked down the path toward the woods, these beautiful trees that were totally alive, and they kind of talked to me as I went and welcomed me" }
+      ],
+      "notes": "Lower prevalence than grass or flowers and the precision is only moderate — the residual false positives are post-NDE aftereffect passages ('now I can feel the consciousness of trees') which describe a changed relationship to EARTHLY trees rather than the otherworld. A small distressing-NDE variant exists in which the trees are dead, black and scorched at the edge of a crevasse."
+    },
+    {
+      "id": "the-living-water",
+      "name": "The Living Water",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.48,
+      "description": "Running and standing water in the country: a stream or brook beside the path, a broad river with people on the far bank, waterfalls dropping into crystal-blue pools, still lakes. The water is described as impossibly clear and as sparkling like a thousand diamonds; some report it is silent even where it falls. A few say the water was intelligent and spoke to them or asked permission before washing over them.",
+      "aliases": [
+        { "term": "stream / brook / babbling stream", "tradition": "none", "note": null },
+        { "term": "crystal clear stream", "tradition": "none", "note": null },
+        { "term": "river", "tradition": "none", "note": "often doubles as the border/boundary — see the boundary region" },
+        { "term": "river of life", "tradition": "Christian", "note": null },
+        { "term": "living water", "tradition": "Christian", "note": null },
+        { "term": "sparkling waterfalls into crystal blue pools", "tradition": "none", "note": "Eben Alexander's recurring phrasing" },
+        { "term": "the lake", "tradition": "none", "note": null },
+        { "term": "fountain", "tradition": "none", "note": "1.31% of accounts" }
+      ],
+      "sensory": [
+        "water shining or sparkling like diamonds as it moves",
+        "clear enough to count the stones and see fish",
+        "silent flow — 'no rushing of it'",
+        "rocks in the streambed each with a different sound",
+        "warm, welcoming, wanting to be swum in",
+        "water that is aware and communicates"
+      ],
+      "regex": "\\b(river|brook|creek|stream|waterfall|waterfalls|lake|pond|pool|pools|fountain)\\b(?! of (conscious|thought|tears))[^.]{0,70}(crystal|diamond|sparkl|glisten|living water|glow|alive|beautiful|clear|flow|blue|calm|magnificent)",
+      "negative_regex": "stream(s)? of conscious|swimming pool|car pool|gene pool|Riverside|river city|whirlpool",
+      "measured": { "all_pct": 5.12, "all_docs": 316, "cv13_pct": 6.57, "cv18_pct": 6.77, "cv23_pct": 7.73 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 16,
+      "quotes": [
+        { "videoId": "GEWRPlpwrEU", "cvnde": 21, "text": "And this river was just beautiful, glistening, uh, clear, but sparkling like diamonds and and giving off the same light and just the most gorgeous water." },
+        { "videoId": "OMr1ntfvwgg", "cvnde": 22, "text": "there was a stream that just, I mean, it looked like there was a thousand diamonds in that stream. It was just sparkly and was going over some rocks." },
+        { "videoId": "uTDGvmlcS0g", "cvnde": 10, "text": "What caught my attention was this waterfall, clear as crystal. And as it was flowing down, there was no sound." },
+        { "videoId": "KbYr1BWm1P4", "cvnde": 11, "text": "surrounded by forest with beautiful sparkling waterfalls into crystal blue pools" },
+        { "videoId": "SmF2VR4J9GI", "cvnde": 15, "text": "And water, there is very intelligent and smart, and it asked me, it, the water asked me" },
+        { "videoId": "QacqSp3nqmk", "cvnde": 9, "text": "There was a river there that when it moved, I remember it shining like diamonds." }
+      ],
+      "notes": "Precision is the weakest in this region (~0.6) because 'stream(s) of consciousness' is a very common NDE idiom for the fragmenting of awareness during the life review, and because drowning is a frequent trigger so earthly water is everywhere in the biographical setup. The lookahead in the regex removes the consciousness sense but not drownings, swimming pools or place names. Note the overlap with the border/boundary region: a river is very often the thing you are told not to cross."
+    },
+    {
+      "id": "the-hills-and-distant-mountains",
+      "name": "The Hills and the Distant Mountains",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.5,
+      "description": "The country has depth: a slope or hillside you climb, and beyond it mountains standing on the horizon. The hill is usually climbed with a guide and the scene changes completely at the crest. The mountains are almost always at a distance and almost never reached — several people are told explicitly that going over the mountains means staying. A few describe ranges vastly larger than any on earth.",
+      "aliases": [
+        { "term": "rolling hills", "tradition": "none", "note": null },
+        { "term": "grassy hill / green hill", "tradition": "none", "note": null },
+        { "term": "hillside", "tradition": "none", "note": null },
+        { "term": "the slope", "tradition": "none", "note": "the crest where the scenery changes" },
+        { "term": "mountain range", "tradition": "none", "note": null },
+        { "term": "mountains in the distance", "tradition": "none", "note": null },
+        { "term": "valley", "tradition": "none", "note": "3.68% of accounts use 'the/a valley'" },
+        { "term": "where mountains met water", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "a rise you come up over, with an entirely new scene beyond",
+        "mountains far off, sometimes snowcapped, often purple or hazy",
+        "ranges described as many times larger than Everest",
+        "panoramic 360-degree seeing without turning the head",
+        "the mountains marked as a point of no return"
+      ],
+      "regex": "(rolling|green|grassy|beautiful|gentle|lush) (hill|hills|hillside)|(hill|hillside|slope)[^.]{0,50}(meadow|flowers|green grass|overlooking)|mountain ranges?[^.]{0,60}(distance|beautiful|bigger|huge|majestic)|(mountains?)[^.]{0,40}(in the distance|off in the distance)|(in the distance|distance)[^.]{0,30}(mountains?|rolling hills)",
+      "negative_regex": "Himalayan|hiking|backpacking|ski|snowfall|Rocky Mountains|mountaintop moments",
+      "measured": { "all_pct": 3.38, "all_docs": 209, "cv13_pct": 5.01, "cv18_pct": 4.28, "cv23_pct": 1.1 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 14,
+      "quotes": [
+        { "videoId": "LanOu6I1sFM", "cvnde": 11, "text": "it felt like I was out on a like a meadow on a hillside overlooking distant mountains and a valley" },
+        { "videoId": "XiLk2qjfmCY", "cvnde": 19, "text": "you're going to follow this path to the mountains, and you will go over the mountains, and once you're over the mountains, you will stay." },
+        { "videoId": "m9IWFNoqXXw", "cvnde": 20, "text": "mountain ranges ten thousand times bigger than, um, Mount Everest" },
+        { "videoId": "ZuE8dHCxhj8", "cvnde": 10, "text": "I come out onto a mountain ledge, and I'm overlooking the most beautiful, serene, three-tiered mountain meadow, earth-like, but not earth" },
+        { "videoId": "L4pvdsVMBHw", "cvnde": 22, "text": "I started walking up this kind of like grassy hill where I could see the blades of grass in finite detail" },
+        { "videoId": "Nk48t-FQW_Q", "cvnde": 19, "text": "giant rolling hills, gorgeous rolling hills with flowers that I'd never seen before, colors that I'd never seen before" }
+      ],
+      "notes": "Honest caveat: precision is only about 0.55 and this is the ONE feature in my region that DROPS at the highest evidential stratum (3.38% all, 5.01% cv>=13, 4.28% cv>=18, but only 1.10% cv>=23, n=2). Mountains are also a very common element of the earthly biography (hiking, skiing, car accidents on mountain roads, Himalayan travel), which drives most of the false positives. Treat the cv>=23 figure with caution given the small denominator (181 docs)."
+    },
+    {
+      "id": "the-garden",
+      "name": "The Garden",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.45,
+      "description": "A tended, bounded version of the country — paths, beds, manicured lawns, trees arranged rather than wild. People often say it looked like an English garden or a botanical garden, and that it lay beyond a gate, wall or bank of clouds. Reunions with deceased family very frequently happen here, and it is often where the experiencer meets a central figure.",
+      "aliases": [
+        { "term": "beautiful garden", "tradition": "none", "note": null },
+        { "term": "the gardens", "tradition": "none", "note": null },
+        { "term": "English manicured garden", "tradition": "secular", "note": "recurring comparison" },
+        { "term": "botanical garden", "tradition": "secular", "note": null },
+        { "term": "the garden of love", "tradition": "none", "note": "one experiencer's own name for it" },
+        { "term": "garden of Eden", "tradition": "Christian", "note": null },
+        { "term": "park / parks", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "paths and walkways running through it",
+        "emerald green, manicured lawn; grass like a carpet underfoot",
+        "surrounded by trees and flower beds",
+        "blue sky with white clouds above",
+        "birdsong; sweet, crisp air",
+        "gate, wall or fence at its edge"
+      ],
+      "regex": "(garden|gardens)[^.]{0,70}(beautiful|flowers|walked|walking|lush|magnificent|paths?|trees|fragrance|scent)",
+      "negative_regex": "garden hose|vegetable garden|gardening|my garden at home|hypnotic|visualize",
+      "measured": { "all_pct": 2.98, "all_docs": 184, "cv13_pct": 3.86, "cv18_pct": 3.18, "cv23_pct": 2.76 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 16,
+      "quotes": [
+        { "videoId": "QgnCz4WvgRA", "cvnde": 10, "text": "they looked like an English manicured garden, absolutely breathtakingly beautiful. I remember the grass was so green." },
+        { "videoId": "UhfdWlCzPso", "cvnde": 17, "text": "And it was the most beautiful, lush green garden with flowers and plants and trees, and it was paths." },
+        { "videoId": "f2uCOa2b6pM", "cvnde": 11, "text": "it was the most lush green grass that you could ever imagine, so thick, so lush. I could feel it under my feet like a carpet." },
+        { "videoId": "wC_BPOsrVfw", "cvnde": 11, "text": "then she takes me to this garden and i call this the garden of love" },
+        { "videoId": "Bn5Rt-Sx-lE", "cvnde": 11, "text": "And we walked further into the garden and I could see the beauty, the absolute beauty of everything." }
+      ],
+      "notes": "Precision is only moderate (~0.55): 'garden' collides with earthly gardening, with hypnotherapy scripts that ask the subject to visualise a garden, and with theological discussion of Eden. Prevalence is flat-to-declining across cvNDE strata, unlike the wild meadow which climbs steeply — suggesting the tended-garden framing may be more culturally supplied than the open meadow."
+    },
+    {
+      "id": "the-sunless-sky",
+      "name": "The Sky Without a Sun",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.46,
+      "description": "The sky over the country is usually blue — often a deeper, richer blue than earth's, sometimes with clouds — but there is no sun in it, and nothing casts a shadow. Experiencers frequently notice this only when they try to orient themselves, and then realise the light is not falling on things from outside but coming out of them. A pilot who tried to find the sun to work out his compass direction is the clearest example.",
+      "aliases": [
+        { "term": "there was no sun", "tradition": "none", "note": null },
+        { "term": "no shadows", "tradition": "none", "note": null },
+        { "term": "no sun or moon", "tradition": "Christian", "note": "often quoted alongside Isaiah/Revelation" },
+        { "term": "the light has no source", "tradition": "none", "note": null },
+        { "term": "light coming from everywhere", "tradition": "none", "note": null },
+        { "term": "a darker blue sky than we're used to", "tradition": "none", "note": null },
+        { "term": "the low sky", "tradition": "none", "note": "reported in several Portuguese-language accounts" },
+        { "term": "blue-black velvety skies", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "blue, deeper and more saturated than any earthly blue",
+        "bright as a sunny day with nothing overhead producing it",
+        "no shadows under leaves, rocks, people, or oneself",
+        "light that never hurts the eyes however bright",
+        "warmth without heat"
+      ],
+      "regex": "(no sun\\b|wasn.t a sun|was no sun|without a sun|didn.t see (a|the) sun|no shadows|were no shadows|light (came|coming|comes) from everywhere|no (external )?source (of|for|to) (the |that )?light|light (had|has) no source|no need (for|of) (a |the )?sun)",
+      "negative_regex": "land of no sun|sungazer|no sun like|no stars, no sun|dark void",
+      "measured": { "all_pct": 2.06, "all_docs": 127, "cv13_pct": 2.29, "cv18_pct": 1.93, "cv23_pct": 3.31 },
+      "precision_estimate": 0.75,
+      "precision_sample_n": 20,
+      "quotes": [
+        { "videoId": "BCzSEtgmTRE", "cvnde": 14, "text": "And this beautiful vault of a darker blue sky than we're used to here on Earth, but no sun." },
+        { "videoId": "GTBGTprQbYc", "cvnde": 11, "text": "there was no sun in the sky, but it was all light. But that made sense to me because the light was coming from within every molecule" },
+        { "videoId": "oJABwVFUKrc", "cvnde": 10, "text": "There were no shadows. The leaves, there were no shadows under the leaves, the rocks." },
+        { "videoId": "SV712eZNI3o", "cvnde": 24, "text": "There was no external source of light like our sun. There wasn't that. The light was coming from inside." },
+        { "videoId": "KG5xe8-g6rw", "cvnde": 14, "text": "It doesn't have a source; it's just there." },
+        { "videoId": "Hh5JAbkU4VI", "cvnde": 7, "text": "There wasn't any kind of shadow. There wasn't anything like that whatsoever. But there but there was no sun." }
+      ],
+      "notes": "A small but very consistent detail, and one people frequently volunteer as evidence against hallucination because it surprised them. False positives come from the dark void ('no stars, no sun, no moon' describes the darkness, not the country) and from one aftereffect discussion of sungazing. Prevalence is flat across strata rather than enriched."
+    },
+    {
+      "id": "impossible-colours",
+      "name": "Colours That Do Not Exist Here",
+      "category": "state",
+      "parent": null,
+      "journey_position": 0.43,
+      "description": "The most-reported perceptual quality of the whole landscape: colours outside the earthly range. Experiencers say the palette is not just brighter but larger — millions or billions of distinguishable shades where earth has a handful, colours with no names, colours the human eye has no receptor for. Many reach for the same analogies: black-and-white television to high definition, an undeveloped film finally developed, a veil removed.",
+      "aliases": [
+        { "term": "colors I had never seen before", "tradition": "none", "note": "the single commonest phrasing" },
+        { "term": "colors that don't exist on Earth", "tradition": "none", "note": null },
+        { "term": "millions of shades of green", "tradition": "none", "note": null },
+        { "term": "we don't have the color palette here", "tradition": "secular", "note": "used by an artist experiencer" },
+        { "term": "colors beyond the rainbow", "tradition": "none", "note": null },
+        { "term": "greener than green / bluer than blue", "tradition": "none", "note": null },
+        { "term": "the colors were their own sovereign beings", "tradition": "none", "note": "rare but repeated by one experiencer across interviews" },
+        { "term": "iridescent", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "colours that are alive, moving, vibrating independently",
+        "each colour with its own sound or vibration",
+        "pinks pinker, reds redder, yellows more yellow",
+        "no muted or dull tones anywhere",
+        "earthly colour remembered afterwards as pale by comparison"
+      ],
+      "regex": "colou?rs?[^.]{0,60}(never seen|don.t exist|do not exist|no name|never even|beyond (description|words|the rainbow|anything)|indescribable|can.t describe|cannot describe|no words|not on earth|we don.t have)|(millions?|thousands?|billions?) of (shades|colou?rs)|colou?rs (were|was)[^.]{0,40}(alive|vibrant|vivid|indescribable|brilliant|intense)",
+      "negative_regex": "color(s)? of (his|her|their) (skin|hair|eyes)|colorful language|people of color",
+      "measured": { "all_pct": 5.78, "all_docs": 357, "cv13_pct": 8.38, "cv18_pct": 9.67, "cv23_pct": 14.92 },
+      "precision_estimate": 0.95,
+      "precision_sample_n": 20,
+      "quotes": [
+        { "videoId": "_py2Qidf6Ic", "cvnde": 16, "text": "I saw colors that I had never seen before, and I can't describe them, because we don't have the color palette here." },
+        { "videoId": "4DhnSOcS9IU", "cvnde": 23, "text": "just millions of colors we don't have here, they're all there. So many colors that we can't even perceive exist there." },
+        { "videoId": "SV712eZNI3o", "cvnde": 24, "text": "the grass is so different than anything on Earth, just millions of shades of green" },
+        { "videoId": "pEyKldhkEJY", "cvnde": 18, "text": "a green that is not our green, it is a beautiful green, everything was very beautiful, there were colors that I had never seen" },
+        { "videoId": "_QUGwtCayhw", "cvnde": 7, "text": "The green was greener than green. The blue was bluer than any blue I have ever seen." },
+        { "videoId": "Vp5D-bZca1s", "cvnde": 12, "text": "I saw flowers that I hadn't seen before, uh, with colors, thousands of colors that I had never witnessed before." }
+      ],
+      "notes": "The highest-precision pattern in this region and one of the most strongly cvNDE-enriched features anywhere: 5.78% of all accounts, 14.92% of accounts scoring cv>=23 — a 2.6x enrichment. Tagged 'state' rather than 'landscape' because it is a quality of the whole otherworld (beings, cities, water) rather than a place you stand in, and left parentless for that reason."
+    },
+    {
+      "id": "everything-lit-from-within",
+      "name": "Everything Lit From Within",
+      "category": "state",
+      "parent": null,
+      "journey_position": 0.46,
+      "description": "The physical law of this landscape, stated over and over in the same words: down here the light reflects off things, there the light comes out of them. Grass, leaves, bark, petals, water, rock, and the beings themselves each carry their own light and radiate it outward. Several experiencers say the light IS the aliveness — 'the light within it was what made it alive'.",
+      "aliases": [
+        { "term": "lit from within", "tradition": "none", "note": null },
+        { "term": "glowing from the inside out", "tradition": "none", "note": null },
+        { "term": "radiated the light from within them", "tradition": "none", "note": null },
+        { "term": "everything had its own light", "tradition": "none", "note": null },
+        { "term": "everything glows with its own light", "tradition": "none", "note": null },
+        { "term": "the environment had its own light", "tradition": "none", "note": null },
+        { "term": "light emanating from everything", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "gentle, non-dazzling light — not glaring, 'not Las Vegasy'",
+        "no shadows anywhere as a consequence",
+        "light rippling outward through grass where feet fall",
+        "translucency — flowers described as stained glass, buildings faintly glowing",
+        "the light identified with life and with love rather than illumination"
+      ],
+      "regex": "(lit|glow(ed|ing)?|light(ed)?|radiat(ed|ing|es)) (from|with)in|glow(ed|ing)? from the inside|light (was )?(com|emanat)ing from (inside|within|everything|every)|(had|has) (its|their) own light|light (came|comes) from (inside|within)",
+      "negative_regex": "light within (us|you|me|this creation)|inner light|light within the soul",
+      "measured": { "all_pct": 2.87, "all_docs": 177, "cv13_pct": 2.29, "cv18_pct": 2.49, "cv23_pct": 2.21 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 12,
+      "quotes": [
+        { "videoId": "J5PhPHmQa4M", "cvnde": 21, "text": "and the grass, and the flowers, and the trees, and the leaves, everything that i saw was like it was lit from within" },
+        { "videoId": "oXrxmJ3ci5U", "cvnde": 23, "text": "everything had light from within it, as though they were all alive and glowing from within" },
+        { "videoId": "KXNZqAFMDa4", "cvnde": 8, "text": "Every single leaf on those trees emanated light. Every single tree, every single flower, everything was like it was glowing from the inside out." },
+        { "videoId": "3n5zyeOaAf0", "cvnde": 7, "text": "it seems that the environment had its own light" },
+        { "videoId": "dzpekGHWiCs", "cvnde": 23, "text": "And the grass and the flowers and the trees and the leaves, everything that I saw was like it was lit from within." }
+      ],
+      "notes": "Prevalence is flat or slightly LOWER among the best-evidenced accounts, which is worth reporting honestly — this is an interpretive formulation people reach for after the fact, and it may be more available to articulate experiencers than to the ones with the strongest veridical claims. Note that the same phrasing is also used of BEINGS (their skin glowing from within), which the regex cannot separate; roughly a third of matches are describing a being rather than the landscape."
+    },
+    {
+      "id": "the-singing-landscape",
+      "name": "The Landscape That Sings",
+      "category": "state",
+      "parent": "the-green-country",
+      "journey_position": 0.5,
+      "description": "The country is heard as much as seen. Experiencers describe every element having its own vibration, note or sound — the leaves one pitch, the trunk another, the grass another, the water another, the rocks another, even the colours — and all of it combining into what one person calls 'big music'. It is often the first thing noticed after the visual shock, and several people say the landscape is praising or worshipping.",
+      "aliases": [
+        { "term": "everything has a vibration", "tradition": "none", "note": null },
+        { "term": "big music", "tradition": "none", "note": "one experiencer's own coinage, used repeatedly" },
+        { "term": "each blade of grass has a vibration", "tradition": "none", "note": null },
+        { "term": "singing the praises of God", "tradition": "Christian", "note": null },
+        { "term": "a heavenly symphony", "tradition": "none", "note": null },
+        { "term": "everything is singing and celebrating", "tradition": "none", "note": null },
+        { "term": "each colour has its own vibrational sound", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "distinct pitches for leaves, trunk, grass, water, rock, colour",
+        "sound perceived as visible — one experiencer sees it rise as a pink haze",
+        "harmony rather than noise; nothing discordant",
+        "the sound felt through the feet as well as heard",
+        "flowers singing high or low notes according to their colour"
+      ],
+      "regex": "(everything|every ?thing|all of it|the whole place)[^.]{0,40}(had (a|its own) (vibration|sound|note|frequency)|was singing|sang|vibrat|hummed|humming)|(grass|leaves|trees|rocks|flowers|colou?rs) (had|have) (a|its|their) (own )?(vibration|sound|note)",
+      "negative_regex": "vibrational (healing|medicine|frequency of the body)|raise your vibration",
+      "measured": { "all_pct": 2.83, "all_docs": 175, "cv13_pct": 3.02, "cv18_pct": 2.62, "cv23_pct": 1.66 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 12,
+      "quotes": [
+        { "videoId": "INlz6VyG-A8", "cvnde": 9, "text": "The leaves on the trees have a vibration. Each blade of grass has a vibration." },
+        { "videoId": "H6KUCZKU8No", "cvnde": 10, "text": "the trees have a sound, the leaves have a different sound, the grass has a different sound, the water has a different sound" },
+        { "videoId": "OMr1ntfvwgg", "cvnde": 22, "text": "like the leaves have a vibration. The trunk of the tree has a different vibration." },
+        { "videoId": "kdZJVgPEA2U", "cvnde": 9, "text": "And the blades of grass and everything were swaying in rhythm of the vibrations that it was sending out." },
+        { "videoId": "gpPurcd_ERU", "cvnde": 14, "text": "the grass, the flowers, the trees, they were singing the praises of God" }
+      ],
+      "notes": "Declines across cvNDE strata (2.83% -> 1.66%), and the vocabulary overlaps heavily with New Age 'raise your vibration' talk in the aftereffect sections of interviews, which is the main precision risk. Distinct from celestial music (9.7% of sequenced accounts in the structured report) in that the source here is the landscape itself rather than choirs or unseen instruments."
+    },
+    {
+      "id": "the-fragrant-air",
+      "name": "The Air and the Scent",
+      "category": "state",
+      "parent": "the-green-country",
+      "journey_position": 0.45,
+      "description": "Smell is one of the least expected but most insistently reported senses in this landscape. The air is described as sweet, crisp, clean, pure — 'crystal clear' even to look at — and carrying a floral fragrance with no earthly equivalent. Some name specific flowers (roses, jasmine, gardenia, lilies, freesia); several say the scent returns to them years later on earth and takes them straight back.",
+      "aliases": [
+        { "term": "the air was sweet", "tradition": "none", "note": null },
+        { "term": "sweet smell to the air", "tradition": "none", "note": null },
+        { "term": "the scent of heaven", "tradition": "Christian", "note": null },
+        { "term": "heavenly flowers", "tradition": "none", "note": null },
+        { "term": "floral fragrances filled the air", "tradition": "none", "note": null },
+        { "term": "the smell of the wind", "tradition": "none", "note": null },
+        { "term": "a silken breeze", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "sweet, crisp, clean, pure — never heavy or cloying",
+        "floral: roses, jasmine, gardenia, tuberose, lilies, freesia",
+        "air that looks crystal clear, not just smells clean",
+        "a gentle warm breeze on the skin, or air 'moving yet still'",
+        "the grass itself carrying a smell and a taste",
+        "the scent recognised again years later on earth"
+      ],
+      "regex": "(sweet|sweetest|beautiful|wonderful|amazing|indescribable|floral|heavenly|pure|fragrant) (smell|scent|fragrance|aroma|perfume)|(smell|scent|fragrance|aroma)[^.]{0,45}(of (the )?flowers|heaven|indescribable|never smelled|can.t describe)|the air (was|smelled)[^.]{0,45}(sweet|fragrant|crystal|clear|perfect|pure|alive|warm)",
+      "negative_regex": "sweet smelling savio(u)?r|smelling flowers in the neighborhood|perfume counter",
+      "measured": { "all_pct": 1.78, "all_docs": 110, "cv13_pct": 2.59, "cv18_pct": 3.31, "cv23_pct": 1.66 },
+      "precision_estimate": 0.75,
+      "precision_sample_n": 14,
+      "quotes": [
+        { "videoId": "92eTYGTqvOk", "cvnde": 16, "text": "The air was pure and clean, crisp and sweet. It was filled with the fragrance of wildflowers that danced in the warm silken breeze that touched my skin." },
+        { "videoId": "Ot_oAFw1Qfw", "cvnde": 11, "text": "I noticed that I could feel the grass on my feet and it was soft. And I could, the air was sweet and crisp." },
+        { "videoId": "3bH946mWu18", "cvnde": 22, "text": "A clear water stream was flowing, and there was sweet smell to the air." },
+        { "videoId": "aa3aCe_rVZ0", "cvnde": 11, "text": "the smell is just heavenly flowers. Then you can never the beautiful, sweetest smelling fragrance." },
+        { "videoId": "9CnhW0uhmGs", "cvnde": 10, "text": "there's a scent to heaven and it's the scent of the most beautiful roses that you could imagine" },
+        { "videoId": "LXSAL05gb0c", "cvnde": 20, "text": "The grass was so lush and so green. The air was so perfect, moving yet still. Colors had intensity I've never known." }
+      ],
+      "notes": "Nearly doubles from all accounts (1.78%) to cv>=18 (3.31%) before dropping back at cv>=23 on a small denominator. The main false-positive source is post-NDE aftereffect passages in which returnees describe smelling earthly flowers with new intensity, and one recurring scriptural phrase ('a sweet smelling savour')."
+    },
+    {
+      "id": "the-path-through-the-country",
+      "name": "The Path",
+      "category": "landscape",
+      "parent": "the-green-country",
+      "journey_position": 0.5,
+      "description": "A way through the country that the experiencer walks, usually behind a guide who says 'follow me' and stays ahead. It runs through the meadow, the garden or the trees, sometimes cobblestone or paved with stone, sometimes gold, sometimes just a track worn through the grass. Where it leads is usually where the choice happens — toward mountains, a river bank, a gate, or a city.",
+      "aliases": [
+        { "term": "path", "tradition": "none", "note": null },
+        { "term": "pathway", "tradition": "none", "note": null },
+        { "term": "cobblestone path", "tradition": "none", "note": null },
+        { "term": "golden road / streets of gold", "tradition": "Christian", "note": "rare — only 0.42% of accounts use 'golden road/path/street'" },
+        { "term": "walkway", "tradition": "none", "note": null },
+        { "term": "the road", "tradition": "none", "note": null },
+        { "term": "footpath", "tradition": "none", "note": null }
+      ],
+      "sensory": [
+        "the path lined or arched over with trees",
+        "cobblestone, flagstone or pavers underfoot",
+        "a stream running alongside it",
+        "a guide always a little way ahead, saying 'follow me'",
+        "light coming up out of the road itself"
+      ],
+      "regex": "(path|pathway|walkway|trail|road)[^.]{0,60}(through the (garden|meadow|field|forest|woods|grass)|led (me )?(to|toward|through)|winding|of gold|golden|cobblestone|stone|lined with|paved)|(walking|walked|walk) (along|down|up|on) (a|the|this) (path|pathway|road|trail|lane)",
+      "negative_regex": "path (of|to) (healing|recovery|least resistance)|spiritual path|career path|bike path|the road to recovery",
+      "measured": { "all_pct": 3.87, "all_docs": 239, "cv13_pct": 4.22, "cv18_pct": 3.04, "cv23_pct": 2.76 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 14,
+      "quotes": [
+        { "videoId": "YqShRo4lk5E", "cvnde": 18, "text": "We arrived at the foot of a very large cobblestone path. Ahead, I could see a large city to the left and a beautiful field to the right. A babbling stream ran along the path." },
+        { "videoId": "cdeX_9-XRMk", "cvnde": 11, "text": "Scene starts to materialize and it's flowers. It's meadows. There's a path. There's rivers." },
+        { "videoId": "gERlqFtDBmY", "cvnde": 19, "text": "And I was walking down this path again, knowing that I died" },
+        { "videoId": "r8s4lGizt-M", "cvnde": 7, "text": "with this path going into the park down like that with all these amazing trees lining this path" },
+        { "videoId": "hh1qNojDFFA", "cvnde": 16, "text": "I walked down the path toward the woods, these beautiful trees that were totally alive, and they kind of talked to me as I went and welcomed me" }
+      ],
+      "notes": "Precision ~0.55; 'path' is heavily used metaphorically in these interviews ('my spiritual path', 'the path to healing'), which the negative_regex only partly removes. Prevalence declines with evidential strength. The famous 'streets of gold' is genuinely RARE in this corpus — 0.42% of accounts — far rarer than the plain grass path."
+    },
+    {
+      "id": "the-creatures-of-the-country",
+      "name": "The Animals of the Country",
+      "category": "being",
+      "parent": "the-green-country",
+      "journey_position": 0.47,
+      "description": "The landscape is inhabited. Dogs, cats, horses, birds and butterflies are seen playing in the meadow, often including the experiencer's own dead pets, restored to health and youth. Predators and prey are at peace with each other. Several people report the animals communicating telepathically, and a few describe creatures with no earthly counterpart — birds with three separated tails, huge animals flying in the sky.",
+      "aliases": [
+        { "term": "my animals / my pets", "tradition": "none", "note": null },
+        { "term": "birds singing", "tradition": "none", "note": null },
+        { "term": "butterflies", "tradition": "none", "note": "central to Eben Alexander's account" },
+        { "term": "horses and dogs playing", "tradition": "none", "note": null },
+        { "term": "animals of all kinds", "tradition": "none", "note": null },
+        { "term": "a swan that spoke by telepathy", "tradition": "none", "note": "rare but vivid single report" },
+        { "term": "a lion playing with children", "tradition": "Christian", "note": null }
+      ],
+      "sensory": [
+        "animals young, healthy and free of sickness",
+        "no fear between species; no predation",
+        "telepathic communication rather than sound",
+        "birds and butterflies in colours not seen on earth",
+        "pets waiting specifically for their person"
+      ],
+      "regex": "(birds|butterflies|animals|deer|horses|lions?)[^.]{0,60}(singing|sang|flying|everywhere|playing|roaming|beautiful|no fear|peaceful)",
+      "negative_regex": "animal (shelter|rescue|testing)|bird ?watching|horse ?back riding|farm animals",
+      "measured": { "all_pct": 3.68, "all_docs": 227, "cv13_pct": 5.13, "cv18_pct": 6.77, "cv23_pct": 3.87 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 16,
+      "quotes": [
+        { "videoId": "G9lrkqr1YUQ", "cvnde": 10, "text": "I could see children, adults, cats, dogs, birds, butterflies, lots of butterflies, and every kind of animal playing and singing in the meadow." },
+        { "videoId": "K9rOdAoaKcI", "cvnde": 10, "text": "they keep them in these beautiful meadows where they play with each other" },
+        { "videoId": "HvI_CtquBNE", "cvnde": 20, "text": "Feeding on the green, green grass were fat and happy horses, and animals of all kinds were scattered all over the green hills" },
+        { "videoId": "UsYu5TYGgh0", "cvnde": 10, "text": "there was a swan off in the distance who didn't speak to me in a normal vocal sense, but it was more in a way of telepathy" },
+        { "videoId": "xMO-uhEAthM", "cvnde": 7, "text": "around the sky were these giant animals flying. Now these animals I've never seen them before." }
+      ],
+      "notes": "Tagged 'being' rather than 'landscape' because these are encountered as persons, not scenery — but they belong here because they are almost always met IN the meadow or the hills rather than anywhere else. Nearly doubles from 3.68% (all) to 6.77% (cv>=18) before dropping at cv>=23 on 181 docs. Precision ~0.6; the residual false positives are earthly pets in the biographical setup and post-NDE animal-communication aftereffects."
+    }
+  ]
+}

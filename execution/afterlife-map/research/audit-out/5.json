@@ -1,0 +1,267 @@
+{
+  "audits": [
+    {
+      "id": "warmth-of-the-light",
+      "judged": 24,
+      "true_positives": 20,
+      "precision": 0.833,
+      "verdict": "solid",
+      "failure_modes": [
+        "post-NDE ordinary life: feeling 'a slight warmth' running fingers over oracle cards (W-y1sD7Kjt4)",
+        "pre-birth 'home' memory recalled years later while watching a movie, not perceived during the NDE (boVaPw6N3Sw)",
+        "generic channelled spirit-world teaching about conditions there ('the great central source of light... always delightfully warm'), no first-person perception (kdYRNYSQOl4)",
+        "an angelic comfort presence felt in the hospital bed rather than in the other world (iqJjlKwCVRY)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "s_sybmiU9Gc",
+        "text": "This white light, this warmth, it felt as if I was being held in a duvet cover, in in a blanket to keep me warm, to keep me safe."
+      }
+    },
+    {
+      "id": "hall-of-records",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Akashic records' as a belief or practice rather than a place visited: channeling, automatic writing, past-life regression, meditation journeys, morphic resonance (CQpPPZbaNOQ, 4EXcsShzies, oh28Poo0lLQ, 472bAZuZ8fg, 3sIULqoDkFE)",
+        "abstract metaphysical commentary — 'we carry that back to the Akashic records, which is the records of all time and space' (O5m1Z5hEnH4, ncMtQ-gEwk4)",
+        "evangelical 'my name was written in the Book of Life' salvation talk, in a restaurant and in a doctrinal argument, no hall involved (OQs6zq58o-E, XZ_AXQIom3Y)",
+        "metaphorical library — 'my life as a spiritual library versus a spiritual laboratory' (Wam1uEvgGuc)",
+        "a product plug listing afterlife locales including the Akashic records on a bestselling CD (5HKSk5F_aNo)",
+        "pre-birth planning memory of the 'akashic hall of records' recovered outside the NDE (boVaPw6N3Sw)"
+      ],
+      "suggested_regex": "(?:[Hh]all of [Rr]ecords|[Aa]kashic (?:[Hh]all|[Ll]ibrary)|(?:huge|enormous|giant|vast|great|massive|endless|infinite) library|library (?:hall|full of (?:books|tables))|(?:shelves|bookcases|rows) of (?:books|scrolls))",
+      "best_quote": {
+        "doc": "r-yH846hZwU",
+        "text": "it was a library, a huge enormous library with 20 or 30 foot high bookcases, and they were full of books. And my guide told me that anything you want to learn is in this library."
+      }
+    },
+    {
+      "id": "more-real-than-real",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "the interviewer/host saying it, not the experiencer — 'what I hear from people that have had NDEs is that it feels more real than reality' (CzdQVZhLVQw, 8Ptwu4Mar_E, GBlrSg8GWV8, 3ogvhI-tcdk)",
+        "researchers and advocates generalising about NDErs as a class — 'they will tell you it was more real than reality' (0mM3ut9pBvA)",
+        "channel bio boilerplate about a famous experiencer in the third person (o-U0ygvKvw0)",
+        "a spouse describing her husband's experience, having had none herself (C37LjuBwg24)",
+        "religious assertions with no perceptual content — the supernatural world / hell 'is realer than this world' offered as doctrine against skeptics (BHggP2VgfS4, h1uEl6Fi9sQ)"
+      ],
+      "suggested_regex": "(?:\\b(?:it|this|that place|the experience|everything)\\s+(?:was|is|felt|seemed)\\b[^.]{0,25}(?:more real than|realer than)\\b|\\b(?:most|realest) real(?:est)? thing (?:that )?I\\b)",
+      "best_quote": {
+        "doc": "zkzmVof-PSQ",
+        "text": "I found myself in a place that was not of this earth. It felt more real than reality itself. It was vivid, intelligent, and alive."
+      }
+    },
+    {
+      "id": "the-form-you-wear",
+      "judged": 24,
+      "true_positives": 23,
+      "precision": 0.958,
+      "verdict": "solid",
+      "failure_modes": [
+        "one biography match on the same 'had no / didn't have any' construction applied to something else entirely — 'I didn't have any regular religious training as a child' (yaWiPiE5jQs)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "OCZjqf9BdrQ",
+        "text": "I turned to face it, but I had no face. I had no body I could turn. I did what felt like turning to face it."
+      }
+    },
+    {
+      "id": "the-vastness",
+      "judged": 24,
+      "true_positives": 20,
+      "precision": 0.833,
+      "verdict": "solid",
+      "failure_modes": [
+        "sermon/scripture commentary — God answering Job about 'the vastness of the universe'; an altar call about 'the vastness of eternity and the finality of God's judgment' (sEVVlRKInQs, OjSv_natOLU)",
+        "third-person dramatised narration of someone else's NDE ('suddenly, he was weightless, suspended in an infinite velvety blackness') (SBnosgV4QIo)",
+        "a meditation-induced expansion the narrator herself distinguishes from her out-of-body experiences (GmMvszHb1Ww)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "PdszHuP8_2w",
+        "text": "Endless space, endless brightness, no horizon, no depth, no structure as such. It was a nothingness and something at the same time."
+      }
+    },
+    {
+      "id": "the-living-water",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "earthly water in biography: the pond in a commissioned mural, the canyon river where the drowning happened, present-day bike rides to a Palm Springs riverbed, avoiding cliffs and rivers during blackouts (cCO_eMWAP0k, HtlIU3LDTxg, G5bNTXajs2E, vHklG2DgREs)",
+        "someone else's earthly drowning story retold (Edgar Cayce wading in a flooded pond) (JyuSdpWgvHI)",
+        "metaphorical water: love 'like the river was flowing from him', a prayer visualisation of 'a river of light flowing through him' (SSlwG2sTO_o, RrKHw7q0PvQ)",
+        "word collisions — 'he was coming stream with me too' (transcription garble), 'pool-colored blue skin' (xMEWyjDkg4k, yUaAj06tdFI)",
+        "a precognitive glimpse of an earthly campus river, not otherworldly water (W_-o6-Bli0o)",
+        "a channelled spirit-world travelogue rather than an NDE report (kdYRNYSQOl4)"
+      ],
+      "suggested_regex": "(?:\\b(?:river|stream|brook|waterfall|lake|pool)s?\\b[^.]{0,80}\\b(?:crystal|crystalline|diamonds?|glisten\\w*|sparkl\\w*|glowing|alive|no sound|living water)\\b|\\b(?:crystal|crystalline|sparkling|glistening|living)\\s+(?:blue\\s+)?(?:water|river|stream|lake|pool|waterfall)s?\\b)",
+      "best_quote": {
+        "doc": "L1Hvp9VwsJ4",
+        "text": "seeing a waterfall with no sound, no splash, just running over, just flowing quietly, no sound."
+      }
+    },
+    {
+      "id": "orb-of-light",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "third-person narration of other people's experiences — a man seeing his dead dog's soul as a ball of light; 'he sees a levitating ball of bright light' (CPcDzI8KK5o, ThvrdY4SDEI)",
+        "generic instruction about deathbed visions — 'you might see an orb of light leave their body' (vrvk1fYgZfU)",
+        "a nurse's ongoing clairvoyance at hospital code blues, years after her own NDE (MkARlQQYFFY)",
+        "metaphor — 'I'm like a pillar of light for this region' (OUGS5aNm9R8)",
+        "doctrinal cosmology, not perception — the God worlds as an 'ocean of love and mercy... vast ocean of light and sound' (RWgSwYCbhuU)",
+        "the interviewer describing the image back to the guest (7T3O_y3l1KE)",
+        "a light apparition floating in a room, not the other world (3n5zyeOaAf0)",
+        "NOTE FOR THE MAP: roughly a third of the true hits are the experiencer's OWN form ('I was a ball of light'), which is the same evidence as the-form-you-wear; consider splitting encountered orb/column from self-as-orb before quoting counts"
+      ],
+      "suggested_regex": "(?:\\bI (?:was|saw|became|entered|moved into|noticed|approached|floated toward)\\b[^.]{0,40}\\b(?:ball|orb|sphere|globe|column|pillar) of (?:light|energy)\\b|\\b(?:ball|orb|sphere|column|pillar) of (?:light|energy)\\b[^.]{0,40}\\b(?:appeared|in front of me|before me|came toward)\\b)",
+      "best_quote": {
+        "doc": "fG1mhJghYGE",
+        "text": "And then swoosh, I'm sucked up the column of light like an envelope in a pneumatic mail tube."
+      }
+    },
+    {
+      "id": "the-tunnel-that-wasnt",
+      "judged": 24,
+      "true_positives": 24,
+      "precision": 1.0,
+      "verdict": "solid",
+      "failure_modes": [],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "us4kEmi0kCI",
+        "text": "I didn't go towards the light, you know, there was no tunnel or anything like that. I just woke up, opened my eyes, and I was in the most beautiful garden I have ever seen or experienced."
+      }
+    },
+    {
+      "id": "the-meadow",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "earthly meadows in biography — a Vietnam helicopter landing zone 'would be like a meadow'; finding four-leaf clovers in a meadow after a reconciliation (V6XXFICMXLU, OrhHnllvlPE)",
+        "the anonymous 'Rainbow Bridge' pet poem read aloud on air (KhIkLSY7d-Y)",
+        "host intro narration setting up a guest's interview (J7u2nHmclrs)",
+        "another experiencer's published account quoted at length (Ian McCormack) (5cSL2upSdX8)",
+        "a shared-death experience where the meadow belonged to the dying mother's crossing (hDhYK1ipR4M)",
+        "a heaven dream the narrator himself labels a dream (VHFiW1FLpBI)",
+        "a guide's general statement that the other side has 'mountains, oceans, lakes, rivers plains meadows' — nothing perceived (sFS-miPrf_s)"
+      ],
+      "suggested_regex": "(?:\\bI (?:was|found myself|stood|was standing|arrived|appeared|landed|walked)\\b[^.]{0,40}\\bmeadow\\b|\\bmeadow\\b[^.]{0,30}\\b(?:before me|in front of me|below me|stretched)\\b)",
+      "best_quote": {
+        "doc": "RKrVNq2bVV8",
+        "text": "it was like a meadow with countless blades of grass kind of blowing in a breeze off of the distance, sort of a white fence thing."
+      }
+    },
+    {
+      "id": "grandparents-waiting",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "deathbed and shared-death accounts of a RELATIVE being greeted by the grandparent, not the narrator (n07cRRykl1U, NyC1unA5mIk, ax2BVkTajPU, Ja2e3QubXTc)",
+        "clinicians and researchers relaying patients' or children's cases — 'she went somewhere and saw her grandmother', 'I remember one woman, she said... I met my grandmother' (a5GHSb94_Is, 6cviPcIr3GM, -gKY-EmmTSQ, tReEhEoe79c)",
+        "living grandparents in ordinary biography — 'there was Grandma and Grandpa, her parents, waving on the front porch' (this scene appears twice, from two docs, immediately before the accident) (w539EzriIT0, Xna-HGgLytk)"
+      ],
+      "suggested_regex": "(?:\\bI\\s+(?:saw|met|was greeted by|recognized|recognised|heard|felt)\\b[^.]{0,30}\\b(?:my\\s+)?(?:grandmother|grandma|grandfather|grandpa|great-?grandmother|grandparents|gram)\\b|\\b(?:my\\s+)(?:grandmother|grandma|grandfather|grandpa|grandparents)\\b\\s+(?:was|were)\\s+(?:there|standing|waiting|at the front))",
+      "best_quote": {
+        "doc": "a07iioZs-N4",
+        "text": "people walking over crests of the hill and coming towards me. And as they approach, I start recognizing right at the front, um, you know, I started recognizing my grandfather."
+      }
+    },
+    {
+      "id": "gate-of-heaven",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'pearly gates' invoked as cultural belief rather than perception — 'if you take your own life you're not allowed into the pearly gates', 'if you believe you'll see Pearly Gates you will manifest Pearly Gates', 'I didn't necessarily believe in the pearly gates' (bnZ2KyfwAuw, BXtPCN_At9Q, Fk7V4k3p3Ms)",
+        "gate as pure metaphor — people with 'a gate down' hiding their light, joy as 'the gateway to the connections', God 'opened the gate and said, go be happy' (0HGnO-tzeqw, M9uYYdU4j6w, 3woD7R1upDU)",
+        "ordinary earthly gates — opening the garden gate for arriving guests, dogs shut behind a gate at home (ySsEry7ozj0, V1JQfgpoHUg)",
+        "doctrine recalled, not seen — 'Jesus died to open the gates of heaven for all mankind'; scripture polemic about 'locking up the gate to heaven' (Vrnilxu3Wq8, A9WK6I6m-Tc)",
+        "gates seen in a dream or a prayer vision rather than in an NDE (amZKVHDf8Kc, IKrq_fUG97M, zcSGNnlzAdo)",
+        "a place name — locals call Black Rock Beach 'the gateway to the spirit world' (o5ouL9BVUDs)",
+        "a gate of hell, a different place sharing the word (4_xBUvfnbyc)"
+      ],
+      "suggested_regex": "(?:\\b(?:I|we)\\s+(?:saw|came to|approached|floated toward|walked (?:up )?to|stood (?:at|before)|passed through|went through|was taken to|arrived at)\\b[^.]{0,40}\\b(?:gate|gates|gateway)\\b|\\b(?:gate|gates|gateway)\\b[^.]{0,30}\\b(?:opened|was open|swung open|before me)\\b)",
+      "best_quote": {
+        "doc": "d5H2A01d874",
+        "text": "There was a gate. One side of the gate was open, and on the other, the gate was gold. And on the other side of the gate, everything was gold."
+      }
+    },
+    {
+      "id": "the-veil",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "the dominant use is idiom, exactly as the claim feared: 'the veil between heaven and earth is thin', 'the veil is thinner for us', 'on that side of the veil', 'those across the veil', 'peer through the veil', 'when the veil will be lifted' (qXpMDacWGe0, tquLbICSQcQ, D4LEsDewoTM, gaKcOv6WZV4, Afr4_LD0Dqo, dqKnO-qxgG0, KxgkceMHyxE, 1N7oh1KLcJ4)",
+        "doctrine and teaching — 'the veil of forgetfulness that we all go through'; being told during the NDE that a veil separates the planes, with nothing seen (CQpPPZbaNOQ, PBrBoc2C0Sc)",
+        "post-NDE psychic-openness talk — 'for weeks after this NDE the veil was still very thin with me' (cALgEYwnZYk); spirituality-study biography (b3pLo096qdo); a sound-product pitch about 'traversing the veil' (d39ZxFbYMfc)",
+        "'piercing the veil' used as a synonym for dying, no membrane perceived (JyuSdpWgvHI and its duplicate TEdeJcMC_EA)",
+        "'veiled' as an adverb for foggy vision, and a life-review projector curtain — the word without the boundary (jCAUIysvTLE, JxbJ9MRAwpY)",
+        "only 4 distinct docs in 24 actually SEE it: two describe looking down through a cloud that was the veil, one a white veil of light barring entry to the garden, one a thin veil between the OBE and the living"
+      ],
+      "suggested_regex": "(?:\\b(?:I|we) (?:saw|could see|looked through|looked down through|passed through|went through|stepped through|touched|reached)\\b[^.]{0,30}\\bveil\\b|\\b(?:a|this|that|the) (?:white|thin|misty|gauzy|shimmering|curtain-?like) veil\\b|\\bveil\\b[^.]{0,20}\\b(?:parted|opened|hung)\\b)",
+      "best_quote": {
+        "doc": "8LGGq0BGT4k",
+        "text": "That white light was the veil that kept me from entering heaven or whatever that other side was. I didn't know. But it was a white veil."
+      }
+    },
+    {
+      "id": "the-flowers",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "present-day earthly flowers — 'look out the window, see where I live now... there are flowers everywhere' (YAXBFbelu74)",
+        "a guided meditation script the host reads to the audience ('please envision that you are in a space with emerald green grass... hundreds of beautiful flowers') (pbkgMnyqnEE)",
+        "metaphor — 'everybody else sees a field of flowers' while she alone sees the oncoming catastrophe (2GqJWMn5kGs)",
+        "a hypothetical someone else's experience — 'maybe you're in a beautiful garden... removing weeds' (PRWLJUCq0iI)",
+        "generalisation about dying patients' deathbed visions of 'beautiful flowers' (YyQYfCiQV6k)",
+        "an after-death communication in which a deceased aunt shows a garden, plus flower-related biography (IkISinlMwIs)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "380o2GIluB8",
+        "text": "the flowers were all facing towards me and the leaves were all facing towards me and they were almost like they were leaning towards me."
+      }
+    },
+    {
+      "id": "robed-figures",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "MECHANICAL BUG, the biggest single class: 'robe' is matching as a substring inside ordinary words — 'Robert' in a guest bio, 'probe' in 'wanted to put the probe in' (vWfNxiqbYLU, VwjP938ypq0, and probably 0qJESVJi3tw and X312rYYRRxA, where no garment appears anywhere in the passage). Word boundaries alone would remove roughly a fifth of the matches",
+        "third-party retellings — a study of Indian NDErs cited from a book; a commentator narrating blind Brad's NDE; a man relaying his wife's experience (gtvHYeQD4hg, GywGA-9TEDk, 9gMYyRcE6DA)",
+        "expectation rather than perception — 'I was expecting a man in a white robe on a golden throne to greet me', followed by blackness (qwB2Icgkshc)",
+        "explicit absence — 'there wasn't any anthropomorphic figures or people in robes' (8KPRmzi2Ytg)",
+        "production talk about avoiding cheesy reenactments with 'crazy people standing around in robes' (iDkhDPzMjYI)",
+        "a black hooded jacket left beside a river in a dream (bYcuYsKiO8Q)"
+      ],
+      "suggested_regex": "(?:\\b(?:wearing|dressed in|clothed in|clad in|had on)\\s+(?:\\w+\\s+){0,3}\\b(?:robes?|gowns?|tunics?)\\b|\\b(?:hooded|white|brown|golden|long|flowing|simple|creamy)\\s+robes?\\b|\\bin robes\\b)",
+      "best_quote": {
+        "doc": "tuXgyMj9vfQ",
+        "text": "I was now able to see two rows of hooded beings in long robes, similar to monks, lined up in front of me."
+      }
+    }
+  ]
+}

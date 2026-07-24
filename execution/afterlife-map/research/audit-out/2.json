@@ -1,0 +1,283 @@
+{
+  "audits": [
+    {
+      "id": "the-unseen-presence",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "Post-NDE waking-life 'presence': a presence felt in the room years later, or one that told the experiencer to sit down and write her book (doc=LN00gsC8EhA, doc=kTeKcseAFoo)",
+        "Someone else's felt presence - the experiencer's mother feeling the Holy Spirit during an intervention (doc=kMJL19TFii8)",
+        "'Presence' used as a noun for beings that were plainly SEEN, i.e. a visible reunion with deceased relatives, not an unseen presence (doc=MTxcPlDFoSo)",
+        "A named, visible companion in a shared-death crossing described as 'her presence' (doc=5DGusHHAudg)",
+        "Aftermath/afterglow: 'that love that I felt in his presence lingered' describing months after return, not the encounter (doc=KxgkceMHyxE)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "oFAOr3qncpE",
+        "text": "I felt a presence next to me. But I couldn't see who it was. I just recognized him. I knew that I knew this being and I knew that he was male."
+      }
+    },
+    {
+      "id": "no-judgment",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.67,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'No judgment' as modern conversational filler about ordinary life - eating meat vs veganism, playing with animals, healing clients (docs xyS1Y21QmN8, lDV_EYhPqZc, vZ9IvPuCBug)",
+        "Describing a living person as non-judging ('my teacher has no judgment') (doc=Sq5O8jdrRfk)",
+        "Doctrinal generalisation about a pre-earth realm or 'the other side' stated as belief, not as something perceived (docs 28dqyrFMD9A, _a0xoFLbo3E)",
+        "A different sense of the word: 'no judgment about it, just pure observation' = emotional flatness at the ceiling, not absence of condemnation (doc=QN6UdytCcFg)",
+        "'No condemnation' about an invitation to a healing conference in ordinary life (doc=5BI5pex8qeI)"
+      ],
+      "suggested_regex": "(?:(?:I|we)\\s+(?:was|were|felt)\\s+not\\s+judged|(?:wasn['’]t|weren['’]t|was not|were not|never)\\s+judg(?:ing|ed)\\s+(?:me|us)|\\b(?:no|zero)\\s+judg(?:ement|ment)\\b[^.]{0,60}\\b(?:I|me|my)\\b)",
+      "best_quote": {
+        "doc": "1-TOzzLv5yU",
+        "text": "I realized as I was watching my life that Jesus wasn't judging me, he was comforting me as I judged myself"
+      }
+    },
+    {
+      "id": "the-spirit-world-and-the-ancestors",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "reject",
+      "failure_modes": [
+        "Dominant class: 'spirit world' as the channel for post-NDE psychic sensitivity - 'I'm very tuned with the spirit world', 'I started hearing the spirit world', 'I can feel people around me all the time' (docs _6VRn0gmI20, QPEiivpdRWg, UPTgLm8AVyo, zHHbZTyIr_c, 5OnZJurMgj4)",
+        "'Ancestors' meaning ordinary genealogy - Thomas Jefferson as an ancestor, inherited family patterns to break (docs -dez_5PZZ4g, F7njHC-2NeU)",
+        "Belief and teaching statements: 'I'm a Hindu, I believe in the spirit world', 'the reality that is real is the spirit world', world-religions comparative lecture (docs oP1_6lK6UJY, e1q02dah7zw, 3dhnAF0h1dU)",
+        "Researcher/interviewer summarising aftereffects or someone else's NDE (docs UPZ5Lat277I, I80ObozUryM)",
+        "Pre-NDE biography: studying shamanism, 'looking into the spirit world' after mother died (doc=lPKAzzq7pio)",
+        "The claim's distinctive content - ancestors as a gathered community already waiting - appears in only 2 of 24 passages; the phrase itself is overwhelmingly the corpus's mediumship vocabulary"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "Xdyn6u21GWw",
+        "text": "I began to see figures there, shapes. I knew these are my ancestors, who had waited there for me, and who got even more visible the closer I came towards the light."
+      }
+    },
+    {
+      "id": "the-ceiling-vantage",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.79,
+      "verdict": "solid",
+      "failure_modes": [
+        "Ordinary-life ceilings: 'I lift him up to the ceiling' in a post-healing story (doc=cOSSHHeZ_js)",
+        "A ceiling belonging to a different place - the high, angled ceilings of a hell-realm room (doc=Dh4Fep5og1U)",
+        "Interviewer generalising about what 'some people' report, with only a bare 'I did' from the experiencer (doc=ZOZ8Wugh438)",
+        "Theory rather than experience: a nightly-sleep model in which the spirit body rises near the ceiling every night (doc=WagtZ82vLgk)",
+        "A light in the corner of the room (Archangel Michael appearing) rather than the experiencer's own vantage looking down (doc=cofs12aN6iQ)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "qwB2Icgkshc",
+        "text": "I came out into the light and was in an upper corner of the ER looking down at my body on the gurney."
+      }
+    },
+    {
+      "id": "the-presence",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "Post-NDE encounters in ordinary life: a presence felt on an aeroplane, in sleep paralysis two weeks later, in a dark hospital room while a son was in surgery (docs CmY-Oa1kOHU, lXO5hctRdN0, FFOPXWsQYPo)",
+        "A visitation dream about a dying baby, reported by a nurse (doc=3hf2cKJbecQ)",
+        "Interviewer supplying the word - 'You did talk about this presence that was there' - plus channel plug (doc=e8qfghtJySI)",
+        "The interviewer paraphrasing a waking event in which the experiencer's father spoke (doc=aN2i_ErIF2w)",
+        "Heavy overlap with the-unseen-presence packet; the two regexes appear to be measuring the same passages"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "gERlqFtDBmY",
+        "text": "And I felt the presence of someone. Someone was with me. Could not see them. Couldn't tell you what they looked like, but I knew somebody was standing next to me."
+      }
+    },
+    {
+      "id": "no-judgement-here",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.54,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Self-help and audience-directed teaching: 'love yourself with no judgment, no attachment', 'there's no judgment on you in any way, shape or form' (docs LNz2TlZMn7M, 9NXyfhw-lb0)",
+        "'No judgments' about spiritual seekers' paths and growth levels (doc=CAd-JbQI5q8)",
+        "A researcher analysing what other experiencers say and warning against their interpretation (doc=_TsOqTRUL3c)",
+        "Generalisation about the whole population of NDErs rather than the speaker's own review (doc=MkARlQQYFFY)",
+        "Scriptural exegesis - the prodigal son parable, where God 'isn't judging you' (doc=AD5MIrb5Z7A)",
+        "A separate meditation experience, explicitly not the NDE (doc=Bzh2puwUODw)",
+        "Different sense: 'no judgment' meaning non-assessing, emotionally flat observation of the ambulance/accident scene (docs osXjHPbUmcY, K7TK10YfTWw)",
+        "Ordinary life: 'there's no judgment for me' about old friends who think he's crazy (doc=-8JjYWmWVMQ)"
+      ],
+      "suggested_regex": "(?:(?:I|we)\\s+(?:was|were|felt)\\s+not\\s+judged|(?:wasn['’]t|weren['’]t|was not|were not|never)\\s+judg(?:ing|ed)\\s+(?:me|us)|\\b(?:no|zero)\\s+judg(?:ement|ment)\\b[^.]{0,60}\\b(?:I|me|my)\\b)",
+      "best_quote": {
+        "doc": "UJyHra52zgA",
+        "text": "I was not judged. There was no judgment. There was no judge in a gavel, you know, a rap on the desk, guilty."
+      }
+    },
+    {
+      "id": "buildings-of-the-other-side",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.38,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'building' as gerund or compound: 'a building sense of urgency', 'love is the building block of all existence', 'an architect building a building' (docs dMKQYbnqZIg, pnPL-mdtouM, NeuLw8pV_0Q, zDQ1SN3fS9M)",
+        "The hospital: leaving 'the room and the building', looking for a phone 'somewhere in the building' (docs iEJ2nssxMTo, zLZVh4ND4tY)",
+        "Ordinary-life buildings: a car thrown into a building, the back of the Salvation Army, a church in Moscow, a past-life office in China (docs 2bHZx78NBsU, krbWhvF-Elg, Xd5-oL3al-c, 0NsLVjC6rd8)",
+        "Earthly buildings seen during an OBE or life review - a Brazilian city skyline, Vietnam-era rooftops - rather than otherworld edifices (docs vGOOU_7ZrLE, g54-az9lP5w)",
+        "Idiom: 'we really haven't left the building yet' (doc=7tXaHezdHTw)",
+        "A meditation-hall building experienced during Vipassana, not an NDE (doc=iWG_rLdW4Ng)"
+      ],
+      "suggested_regex": "\\b(?:saw|noticed|entered|approached|walked (?:in)?to|took me (?:in)?to|led me (?:in)?to|there (?:was|were))\\s+(?:[a-z]+\\s+){0,4}buildings?\\b(?!\\s*(?:block|blocks))",
+      "best_quote": {
+        "doc": "dSTSTrAuMKs",
+        "text": "And I said, \"What is that beautiful building?\" And the guardian said, \"James, that is the nursery.\""
+      }
+    },
+    {
+      "id": "another-dimension",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.42,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The interviewer supplies the word in a question and the experiencer only assents - this is the single biggest class (docs i6iCjDieaLc, MbNVvz0DzMw, XTqs-n7aniY, pgDyFqCpulU)",
+        "Numbered-dimension cosmology from prior metaphysical reading, describing a schema rather than a perceived place - 'we're in a construct of 12 dimensions', third/fourth/fifth dimension remote-viewing theory (docs yXfPyJSU2Z0, cXKJpmRm6iQ, FvajKZf1u5Q)",
+        "Metaphor for shock: 'I completely went into another dimension and was absolutely 100% useless' at an accident scene (doc=MlD3102w8Rw)",
+        "Other people's experiences - Strassman's DMT volunteers, general audience speculation that dreams are another dimension (docs mSotnAe7rsM, W1gU_uikYuo)",
+        "Astral-projection practice sessions rather than an NDE (doc=KXvXjjHsXkQ)",
+        "Book-plug generalisation about where loved ones go (doc=d3FfvNmOi6g)"
+      ],
+      "suggested_regex": "\\b(?:I|we)\\s+(?:was|were|am|found myself|went|entered|passed|popped|arrived)\\b[^.]{0,60}\\b(?:another|a different|the next|other)\\s+dimension\\b",
+      "best_quote": {
+        "doc": "In05KOW8PUc",
+        "text": "It was like another dimension, but I was still there at the hospital."
+      }
+    },
+    {
+      "id": "whatever-you-want-to-call-it",
+      "judged": 24,
+      "true_positives": 4,
+      "precision": 0.17,
+      "verdict": "reject",
+      "failure_modes": [
+        "The phrase is a generic English hedge and attaches to any noun at all: a trough of ashes, a sofa, a memorial ceremony, politicians, a real-estate practice, astral projection (docs qSxAhMx-w7g, ugyC_Qg5bnM, SLiM9GfxHC0, Vws4ILiL8Y0, sEVpSIJVRbI)",
+        "Naming the experience category rather than the presence - 'NDE, or out of body experience, whatever you call it', 'near death or whatever you want to call it' (docs R27B4iHJYWw, MbD0_bmQdTY, b_6Q5u9HWOE)",
+        "Audience-directed sermon in which God/Source/the universe is aliased as general reassurance, with no reference to anything the speaker perceived (docs 8LNgDOLl2Ag, us4kEmi0kCI, EfMi9cH-Bys, LTxzH5MwYIc, ANhkvmf1ZrE, tyoiHRAkn0Y, dYGSA4Umnbo)",
+        "Biography: 'I've always been connected to God, or Source, or Universe, whatever you call it' as a lifelong trait (doc=iWG_rLdW4Ng)",
+        "Even anchoring the phrase to divine nouns would leave the sermon class intact, so narrowing cannot rescue this one"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "drm-h8yZRpU",
+        "text": "You can call that whatever you want to call that because ultimately, that which is, is bigger than language."
+      }
+    },
+    {
+      "id": "the-nameless-being-of-light",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.58,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ongoing post-NDE visitations and channelling: 'since then I see beings that visit me', 'that's how I was trained by Jesus and other beings of light' (docs TEdeJcMC_EA, gr2Lksx6lJ4)",
+        "A dream at age 14 in which a light being appeared, explicitly framed as a dream (doc=cTiQrBB_sxI)",
+        "Researchers and hosts describing other people's cases or theorising about how the being is interpreted (docs QQWoQFtxYsM, l3knFDM9vLE, zd3_JCoz-kA)",
+        "Religious belief and upbringing: 'I believed I had angels and saints and all of these beings of light' (doc=LndPnnVfPw0)",
+        "A living human described as 'a light being' because he had a glow about him (doc=Oj-n3kP4tbE)",
+        "A token accident - 'the light being light, which is everything created from unconditional love' is not a being at all (doc=VhvGoA2oSE8)",
+        "Interviewer asking 'And what about the being of light?' with a one-word answer (doc=kiww4X_lSQM)"
+      ],
+      "suggested_regex": "\\b(?:I\\s+(?:saw|met|encountered|noticed|beheld)|(?:was|were)\\s+met by|there\\s+(?:was|were)|appeared)\\b[^.]{0,60}\\b(?:beings? of light|light beings?|light figure|figure of light)\\b",
+      "best_quote": {
+        "doc": "WB6KWokQM6g",
+        "text": "When I encountered this being of light, you might call her an angel. You can call her any name you want really. She was just absolute light."
+      }
+    },
+    {
+      "id": "the-knowing",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.67,
+      "verdict": "solid",
+      "failure_modes": [
+        "'Download' in ongoing post-NDE practice - waking at 1-3am to download information for transcripts, general theory that 'sometimes you get a great download' (docs ZqE188Qmp5o, 5zN52hVfIR4)",
+        "Post-NDE psychic ability in daily work: 'I knew everything about everybody that walked in the door' at her aesthetics business (doc=f8v2EN-_cXk)",
+        "'I knew everything that was happening to me' meaning veridical awareness of the ambulance/hospital events, not the state of total understanding (doc=zePilVOXHLc)",
+        "Ordinary-life knowing: guides warning about a real estate crash, childhood classes where 'I understood everything' (docs unClNFOH7Jo, rlMfY_l8aC4)",
+        "General spiritual musing about whether we should know all the answers, and present-day practice with a 'What would love do?' necklace (docs zwa02Vo8S08, P2bz4Q9uIaQ)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "yQX8OAtkBPM",
+        "text": "all the questions I'd ever had in my life were answered in sort of this instant of this information. And that one point was love."
+      }
+    },
+    {
+      "id": "portal-and-archway",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.46,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The modern web/tech sense: 'I'm building a real estate portal', 'that's the portal to be able to find that as well' pointing at a website (docs PkTRAmJVVf8, Cl4hMnKYPlU)",
+        "Energy-work and protection idiom in ordinary life: closing the portal after meditation, a psychic who 'opened a portal' in a client's house, 'you opened up the portal' between podcast guests (docs 1dgpAk3nQh8, OkLjOKU2N9c, ZWgQ7SwCgZ8)",
+        "Metaphor: 'Love is the portal', a magical sofa that acts as 'a portal of some kind' during channelling (docs zd3_JCoz-kA, ZbudzG3uKrU)",
+        "Post-NDE clairvoyance at other people's deathbeds, where a portal appears in the room (doc=ZTWpoIeJovE)",
+        "Interviewer supplying the word ('something opened up like a portal?') or a host retelling someone else's NDE (docs 2vG48fuOmNs, VI7W6QCUrTI)",
+        "Explicit refusal: 'I don't want to say it's a portal, but just into nothingness' (doc=ZKrfHYllw6k)",
+        "Cosmology lecture about 'portal gateways' between dimensional constructs (doc=ncpOTGWRxSA)"
+      ],
+      "suggested_regex": "(?:\\bportal\\b[^.]{0,60}\\b(?:opened|appeared|spun|of light|in the (?:sky|air|wall|ground))|\\b(?:I|we)\\s+(?:saw|stepped|walked|went|moved|looked|passed)\\b[^.]{0,40}\\bportal\\b)",
+      "best_quote": {
+        "doc": "qrY6Ii7kCNE",
+        "text": "a portal opened up and I looked through and I could see my parents back in their respective apartments in Columbus, Ohio."
+      }
+    },
+    {
+      "id": "deceased-relatives",
+      "judged": 24,
+      "true_positives": 5,
+      "precision": 0.21,
+      "verdict": "reject",
+      "failure_modes": [
+        "The single largest class is NEGATIVE: the phrase is the canonical expectation, so experiencers use it to report that it did NOT happen - 'I didn't see anyone, like any dead relatives', 'I don't see dead relatives, none of that', 'how come I'm not seeing my deceased relatives?', 'I thought they would be there for me... where is everybody?' (docs zecVmC3Mcg8, kQ26a98telc, F-rp6bqfJWQ, zKLqZ525oaA)",
+        "Third-party and research framing: a salesman's case retold, a hospice researcher's 1400 interviews, a Facebook-page summary of 'what many have noted', an interviewer narrating Carolyn's NDE (docs SO0Oys9Nf8o, HgOId0hWfV4, 7KFeKdJktsg, 4lrCbB9gla8)",
+        "Waking-life visitations and mediumship: a grandmother who appeared to start a granola business, a psychic instructing prayer to a dead grandmother, hearing clients' dead loved ones as a teenager, a visitation dream three nights after a sister died (docs ZWgQ7SwCgZ8, sC5KsWUIsQw, icRlaN2ned8, 0Vf5tSEYT9E)",
+        "Deathbed clairvoyance describing what OTHER dying people's relatives do (doc=VbM2nUpZsEU)",
+        "Frequency-technology marketing: 'say you want to visit your dead relatives, that's a certain blend' (doc=gIp8wWgMDsc)",
+        "Root cause: 'deceased/dead relatives' is the corpus's meta-vocabulary, not its experiential vocabulary. Real accounts say 'my grandmother', 'my mother', 'my wife'. A kin-term regex (I saw/was met by + mother|father|grandmother|brother|sister|uncle|aunt|wife|husband) would measure this feature; this one measures the discourse about it."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "cA_xqhwR_NU",
+        "text": "I was suddenly before my two deceased grandmothers."
+      }
+    },
+    {
+      "id": "demonic-beings",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Dominant class - Christian spiritual-warfare idiom applied to ordinary earthly life: demonic attack through drug use, demons entering via a phone or pornography, a 'demonic spirit' of depression and suicide, binding 'every demonic spirit of sickness' in a healing prayer (docs ebH-93btN7k, tNJ6i2Xhfqw, OupepTZCUZ0, _hD0PqeFjcw)",
+        "Waking-life clairvoyance: 'there were demons all over my house', demons circling over a McDonald's (doc=_MvGphIRdGY)",
+        "Metaphor: 'whatever the demons were that were in me' at a hockey bar, a father's 'few demons' meaning his addictions, 'the first layer of demons' meaning insomnia and negative self-talk (docs thHBBR7-Ve0, FF6WDR-fX1k, kPaNb0zeFc0)",
+        "Explicit denial - 'I see all these things about, oh, I met the devil, or I went to hell. I don't believe in any of that' (doc=iAP38LkUxTU)",
+        "The interviewer proposing 'demonic type?' and the experiencer rejecting it, saying they were children who existed in the absence of light (doc=yrHWBCYm9kw)",
+        "Channel boilerplate: 'Do you think that it was a trick by Satan? Let me know in the comments' (doc=56FxiGCJGnY)",
+        "Belief and upbringing statements about whether a devil exists (docs ENwjMmQLKlU, bjTcMA9r41U, Fc7kaWNIcRo, zHHbZTyIr_c, W4jDSfR6zIM, WalJw3rI9eo)"
+      ],
+      "suggested_regex": "\\b(?:demons?|demonic (?:beings?|creatures?|figures?|voice)|the devil)\\b[^.]{0,80}\\b(?:grabbed|grabbing|clawing|tearing|tore|shredding|ripping|dragged|dragging|surrounded|laughing|shrieking|screaming|said)\\b|\\b(?:I saw|I met|there were|there was)\\s+(?:[a-z]+\\s+){0,3}(?:demons?|the devil)\\b",
+      "best_quote": {
+        "doc": "iOZ60JhxRbM",
+        "text": "I had six demons on each side of me, literally shredding my arms off me."
+      }
+    }
+  ]
+}

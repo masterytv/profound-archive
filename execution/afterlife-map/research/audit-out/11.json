@@ -1,0 +1,257 @@
+{
+  "audits": [
+    {
+      "id": "the-trees-and-forest",
+      "judged": 24,
+      "true_positives": 17,
+      "precision": 0.708,
+      "verdict": "solid",
+      "failure_modes": [
+        "Earth trees seen during the out-of-body phase, not in the other world (two Finland-in-winter passages: 'the trees are supposedly dead, but they were so alive')",
+        "After-effect tree consciousness in ordinary life ('I can feel the consciousness of trees... if I put my hand on them, I can communicate with them')",
+        "Ordinary-life trees seen with new eyes while walking on earth (two near-duplicate passages, IYhYhyenAWE / AMuNQl3Sxa0)",
+        "Biography: childhood village with rivers and trees; a Mekong delta treeline from a war memoir"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "90_bk9__d1o",
+        "text": "I look at a trunk on a tree, it looks dirty to me, but these trees were a brilliant, brilliant brown with a tint of gold on"
+      }
+    },
+    {
+      "id": "the-hills-and-distant-mountains",
+      "judged": 24,
+      "true_positives": 21,
+      "precision": 0.875,
+      "verdict": "solid",
+      "failure_modes": [
+        "A vision seen during automatic writing rather than during an NDE ('while I was writing, I kept seeing this image in my mind's eye of these rolling hills')",
+        "Ordinary biography: driving home 'down this beautiful hilly country highway' before the cardiac event",
+        "A portal vision during meditation ('I got so excited... it poofed away... that's what my logo is')"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "gbakJ4HkuKE",
+        "text": "Over in the far distance, I could see mountains that were 10 times the size of Everest, see buildings that were 10 times the size of what they're now building in Dubai."
+      }
+    },
+    {
+      "id": "the-clouds",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Medevac airlift: three passages (two speakers) where 'flying through the clouds' turns out to be a real helicopter ride - the giveaway is the big H on the ground",
+        "Idiom and metaphor: 'you're still walking on clouds, aren't you?', 'you're not going to just go up into the clouds and ignore everything'",
+        "Explicit cliche-denial rather than perception: 'we aren't just sitting on the clouds eating grapes'",
+        "Scripture exposition (Jesus 'taken up into the clouds'), childhood imaginings of heaven, and a past-life regression session"
+      ],
+      "suggested_regex": "(?:float\\w*|flew|flying|rose|rising|jump\\w*|stood|standing|drift\\w*|pass\\w*|went|going|came|coming) (?:up |back )?(?:through|into|above|on|onto|between) (?:the |these |those )?clouds?",
+      "best_quote": {
+        "doc": "CPkMPH4fGe8",
+        "text": "I started jumping on clouds. I was like, wow, this is so cool. and then jumping from one cloud to another, hugging every cloud"
+      }
+    },
+    {
+      "id": "the-homesickness",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary homesickness: moving to Ohio, going away to college at 18, a child put on antidepressants who says 'I wasn't homesick. I was confused and broken'",
+        "General theorising rather than own report: 'certain types of depression can be related to a type of homesickness for our true home'",
+        "Interviewer and audience questions about minimising clients' homesickness; a practitioner describing experiencers in the third person",
+        "Inverted direction: homesickness for EARTH felt while out there ('When the Pacific Ocean appeared in its familiar shape, I felt homesick')",
+        "Missing loved ones rather than a place"
+      ],
+      "suggested_regex": "(?:I(?:'m| am| was| felt| feel| get| got| have been| became) (?:so |very |really |still |always )?home-?sick|home-?sick(?:ness)? (?:for|to go back to) (?:that|the other|there|heaven|home|what))",
+      "best_quote": {
+        "doc": "AEgxTodIs3o",
+        "text": "I've been homesick for 30 years."
+      }
+    },
+    {
+      "id": "the-family-waiting-room",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Waiting room' as an otherworldly place, not the hospital one: 'heaven's waiting room', a light-filled waiting room, a receiving area for the newly dead, a glass waiting room floating in space",
+        "The experiencer or a relative physically sitting in a hospital waiting room in ordinary time - oncology appointments, four hours bleeding before surgery, a deathbed vigil",
+        "Second-hand comfort rather than perception: 'Knowing that our friends were in the waiting room and praying for us meant so much to me' (two near-duplicate passages)",
+        "A revival scene where the experiencer physically walks to the waiting room after coming round"
+      ],
+      "suggested_regex": "(?:I (?:saw|could see|watched|observed|was aware of|found myself in|went into|went to|floated into)|looking (?:down into|through the ceiling of))[^.]{0,60}waiting room",
+      "best_quote": {
+        "doc": "wIOZaQsRrMM",
+        "text": "I went into the waiting room, where I saw my stepdad get a candy bar. He was like a health nut, so I thought that's odd."
+      }
+    },
+    {
+      "id": "evil-presence",
+      "judged": 24,
+      "true_positives": 1,
+      "precision": 0.042,
+      "verdict": "reject",
+      "failure_modes": [
+        "The regex is keying on the bare word 'evil' and catches moral/philosophical use above all: 'even the most evil, death, destruction, disease, is essential', 'at the soul level it does not exist', karma discussions",
+        "Biography: an 'evil relationship', 'pure, pure evil witches', an abusive grandfather seen in an ayahuasca ceremony",
+        "Sleep paralysis, haunted houses and alien-abduction episodes outside any near-death event - these supply the only formless 'evil presence in the room' language in the packet",
+        "Negations, which the regex cannot tell from affirmations: 'No evil was there', 'the next realm where there's no presence of evil of any kind', 'this laughter wasn't like some evil presence'",
+        "Where evil IS met during the experience it has a face - a woman who turns, a demon, Satan - which is the node this one is supposed to be distinct from"
+      ],
+      "suggested_regex": null,
+      "best_quote": null
+    },
+    {
+      "id": "the-council",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ongoing channelled contact with a 'council' outside any NDE: beings arriving while eating Cheerios, automatic-writing sessions (two passages, same speaker), thirteen nights of visits from twelve elders at a ranch (two passages), a spirit team of wisdom keepers",
+        "Host intros and channel boilerplate: 'was introduced to the Council of Light where he experienced a life review', 'she met a council of vibrational beings'",
+        "Interviewer speculation ('I think that's because a lot of times in near-death experiences people see the council of 12 elders') and third-party accounts (Aaron Green's pre-birth plan, a channeler's 'council of 12 angels')",
+        "Bare label with no scene: 'whether you want to call him Council of 11 or whatever you want to'"
+      ],
+      "suggested_regex": "(?:I (?:met|stood before|sat before|was (?:brought|taken) before|found myself before)[^.]{0,40}(?:council|elders)|(?:council|elders)[^.]{0,80}(?:semi-?circle|long table|around the table|seated|chuckl\\w+))",
+      "best_quote": {
+        "doc": "EWKEVABuDBI",
+        "text": "I actually was sitting in front of this semi-circle table, and I was in the center, facing the semicircle table. And God was opposite me with elders."
+      }
+    },
+    {
+      "id": "the-stench",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary-life smells: a dying cat, cigarette smoke on returning to the body, a supermarket smell-association story",
+        "Alien-abduction and entity sightings outside any NDE: Greys that 'smelled like a cross between sulfur or urine or a dead animal', reptilians with 'almost a stench coming from them'",
+        "Third-party material: hypnotherapy clients reporting sulfur, a shamanic medicine journey, a researcher's Bible/brimstone exposition and a Sodom retelling with no smell at all",
+        "A post-NDE phantosmia after-effect from nerve damage ('phantom taste and smell'), not the hell smell clinging",
+        "One passage with no smell content whatsoever (matched on 'brimstone' inside a denial)"
+      ],
+      "suggested_regex": "(?:(?:smell\\w*|odor|odour|stench|stink\\w*)[^.]{0,50}(?:sulfur|sulphur|brimstone|burning flesh|rotting|decay\\w*|hell)|(?:sulfur|sulphur|brimstone|burning flesh)[^.]{0,50}(?:smell\\w*|odor|odour|stench|stink\\w*))",
+      "best_quote": {
+        "doc": "dSTSTrAuMKs",
+        "text": "there was a stench, an odor of death and decay, a smell that you would associate with a grave"
+      }
+    },
+    {
+      "id": "building-substance",
+      "judged": 24,
+      "true_positives": 22,
+      "precision": 0.917,
+      "verdict": "solid",
+      "failure_modes": [
+        "Ordinary-life architecture: 'it was marble walls in this bank'",
+        "A crystalline structure used as a diagram of life decisions rather than a building ('heaven looked like a snowflake made out of crystal')"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "dzZmsROv3Gg",
+        "text": "The other buildings were made out of living stone. It's kind of like white quartz, but you can see the swirling white in the stone."
+      }
+    },
+    {
+      "id": "remembering-who-you-are",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The sermon form dominates: 'we have forgotten who we are' as general teaching about humanity - at least eight passages, none reporting an event inside an experience",
+        "Interviewer questions built on that phrase ('you said that we've forgotten who we are. Do you feel like that is by design?')",
+        "Biography: a medium who 'forgot who I was and what my life purpose was' growing up; post-discharge memory confusion explicitly NOT identity loss",
+        "Recognition of something else - an angel, a dragon - phrased as 'it was like I had always known this presence'",
+        "Ego-dissolution in a dream ('so profound that I forgot who I was') and a translation artefact ('I forgot say that I'm from Gaucha')"
+      ],
+      "suggested_regex": "(?:I (?:suddenly |instantly |finally |once again )?(?:remembered|recalled) (?:exactly )?who I (?:really |truly )?(?:was|am)|veil of forgetting (?:was )?(?:lifted|drawn back|pulled back|removed))",
+      "best_quote": {
+        "doc": "wzJQaceCsDU",
+        "text": "I remembered why I came here. I remembered who I am. I remembered what's happening."
+      }
+    },
+    {
+      "id": "other-tradition-namings",
+      "judged": 24,
+      "true_positives": 5,
+      "precision": 0.208,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Comparative-religion talk rather than a naming: 'if I was a Buddhist, I would call the light Buddha. If I was a Hindu, it would be Krishna' (two near-duplicate passages), 'one person will say I saw Buddha, the other will say I saw Krishna'",
+        "Second-hand reports: 'some saw Buddha, some saw Jesus', a Burmese monk who saw the Buddha in hell (with book plug), a researcher's summary",
+        "The historical Buddha as an example in teaching ('Buddha reached the Buddhahood enlightenment'), or as a quoted authority",
+        "Names attached to other kinds of experience: a psychedelic session where 'the Happy Buddha appeared in the grass', mystical journeys 'into the mind of Buddha', Brahman/Parabrahman practice phases",
+        "Objects and similes: a Buddha statue in an aunt's house, 'it was like I was a little Buddha sitting there on the bed'"
+      ],
+      "suggested_regex": "(?:I (?:saw|met|recogni[sz]ed|was greeted by)[^.]{0,30}(?:Buddha|Krishna|Vishnu|Great Spirit|Quan Yin|Allah|Yahweh)|the (?:being|man|figure)[^.]{0,40}was (?:the )?(?:Buddha|Krishna))",
+      "best_quote": {
+        "doc": "pICciopQs7w",
+        "text": "As Christ was gracing me, the light transformed, and within it, I saw the Buddha as a living lotus, the center unfolding endlessly."
+      }
+    },
+    {
+      "id": "earth-as-the-classroom",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Personal opinion rather than taught information, which is the distinction the claim itself rests on: 'I believe that Earth is really a great big classroom', 'I'm a firm believer that we come to this life to learn'",
+        "Produced channel narration quoting Vincent Tolman almost verbatim in two separate documents, including a section heading 'Earth School & Your Mission'",
+        "Doctrinal 'we believe' framing, scriptural teaching about the first and second death, and new-age ascension teaching ('we are moving to a more advanced school for souls')",
+        "Word overlap on 'trip' and 'passing through': a literal trip with a partner, and passing through blue scenery during the NDE journey itself"
+      ],
+      "suggested_regex": "(?:(?:taught|told|showed|shown|explained)[^.]{0,80}(?:earth|this life)[^.]{0,25}(?:is|was)[^.]{0,15}(?:just )?a (?:school|classroom)|(?:earth|this life)[^.]{0,20}(?:is|was)[^.]{0,15}(?:just )?a (?:school|classroom)[^.]{0,60}(?:not a courtroom|never (?:been )?a courtroom))",
+      "best_quote": {
+        "doc": "bw3IfMcy7bo",
+        "text": "he explained that Earth is just a school. That it's always been just a classroom and it's never been a courtroom."
+      }
+    },
+    {
+      "id": "this-life-is-the-dream",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Interviewer-side material: a host reading an audience comment about illusion, a host asking 'would you say this world is not real?', a host aside plus book plug",
+        "Literal dreams: a precognitive dream about motorcyclists, a dream of an aunt on a spiral staircase",
+        "Generic new-age or mediumistic illusion talk with no anchor to the experience ('because I see beyond the real truth, because this is illusional')",
+        "Integration doubt rather than the inversion ('you ask yourself, what is reality? Where is the illusion?')",
+        "Adjacent framings that are not the inversion: everything is 'a perception', 'this hologram' used in passing"
+      ],
+      "suggested_regex": "(?:this (?:life|world|earth|reality)|earthly life|the physical world)(?: that we (?:are living|live in))? (?:is|was|felt like|seemed like) (?:just )?(?:a |an |the )?(?:dream|illusion|shadow|hologram|not real|not the real)",
+      "best_quote": {
+        "doc": "9G948sjtGac",
+        "text": "It was almost as if my earthly life is the dream state and this heaven that I was standing in was actually my real reality."
+      }
+    },
+    {
+      "id": "the-ripple",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "solid",
+      "failure_modes": [
+        "Second-hand summary of what NDErs in general see: 'a lot of NDEers will talk about, in their life review, they saw...', 'anybody's had a life review knows', a practitioner describing 'a person' experiencing it",
+        "Citing a named other experiencer's review (Mary Neal seeing the ripple 16, 25, 30 times down the road)",
+        "Channel intro boilerplate ('In her life review, Nikesha Burell was shown three specific scenes')",
+        "Hypothetical speculation ('if Hitler had a life review... how that's rippled')",
+        "Channelled teaching about a future collective 'living life review' for humanity rather than the speaker's own"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "0Kk8F6jGIFQ",
+        "text": "I was shown my life in a three-dimensional panoramic view, meaning that I saw everything forward and backward. And every single ripple effect of my every thought, action, out to infinity"
+      }
+    }
+  ]
+}
