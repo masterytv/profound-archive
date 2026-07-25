@@ -1,0 +1,703 @@
+{
+  "places": [
+    {
+      "id": "leaving-the-body",
+      "name": "Coming Out of the Body",
+      "category": "process",
+      "description": "The moment of separation. People describe it less as dying than as being detached — popped, sucked, lifted, whisked or squeezed out of a body that is suddenly not theirs. Some feel a distinct exit point (the crown of the head, the chest, the feet); many feel nothing at all until they notice they are somewhere else looking at themselves. Almost nobody reports pain in this moment; the pain stops first, and then they are out.",
+      "aliases": [
+        { "term": "out of body", "tradition": "secular", "note": "the corpus's default phrasing; 41% of docs contain some form of 'left/out of the body'" },
+        { "term": "popped out", "tradition": null, "note": "sudden, effortless separation" },
+        { "term": "sucked out / vacuum-sucked", "tradition": null, "note": "the most common forceful image; also 'like a piece of dust in the vacuum hose'" },
+        { "term": "whisked out", "tradition": null },
+        { "term": "lifted right out of the body", "tradition": null },
+        { "term": "my soul injected from my body", "tradition": null, "note": "one experiencer's word for the shake-then-pop" },
+        { "term": "catapulted", "tradition": null },
+        { "term": "detaching", "tradition": null },
+        { "term": "levitating out of my body", "tradition": null },
+        { "term": "astral projection / my astral body left", "tradition": "New Age", "note": "used by experiencers who already had a metaphysical vocabulary" },
+        { "term": "my point of perception was whisked out", "tradition": "secular", "note": "phrasing preferred by clinician-experiencers" }
+      ],
+      "regex": "((sucked|pulled|popped|lifted|rose|rising|slipped|drawn|yanked|shot|floated|separated|ejected|extracted|expelled|whisked|catapulted|released|lift)[^.]{0,45}(out of|out from|from|off of) (my|the|this) (body|physical body|form)|(I|my (soul|spirit|consciousness|energy|essence))[^.]{0,35}(left|leaving|exited|departed|came out of) (my|the) (body|physical body))",
+      "negative_regex": "(left my body of work|body of evidence)",
+      "quotes": [
+        { "videoId": "mQ9k-x1LuzI", "text": "It was as if I were being vacuum-sucked out of my own body.", "cvnde": 15 },
+        { "videoId": "4sJmf88qe1U", "text": "I felt the shake and this pop and my soul injected from my body.", "cvnde": 18 },
+        { "videoId": "U1VxK7n8ccQ", "text": "And it was like I was whisked out of my body.", "cvnde": 9 },
+        { "videoId": "anETppox8Oo", "text": "two arms grabbed me and pulled me out of my body, catapulted me through the ceiling, and I was flying", "cvnde": 9 },
+        { "videoId": "vx9n4fwtMwA", "text": "my soul was just sucked out of my body", "cvnde": 12 }
+      ],
+      "sensory": [
+        "the pain stops a beat before the separation",
+        "a shake, a pop, a click or a jolt at the instant of exit",
+        "a felt exit point — crown of the head, chest, or 'it left through my feet'",
+        "sensation of suction, like a vacuum hose",
+        "weightlessness immediately afterwards"
+      ],
+      "journey_position": 0.03,
+      "parent": null,
+      "measured": {
+        "all_pct": 26.59,
+        "all_docs": 1642,
+        "cv13_pct": 30.88,
+        "cv18_pct": 32.46,
+        "cv23_pct": 35.36
+      },
+      "precision_estimate": 0.9,
+      "precision_sample_n": 12,
+      "notes": "MORE common among the best-evidenced accounts: 26.59% of all accounts vs 35.36% at cvNDE>=23. That is expected — cvNDE rewards veridical perception, which requires the experiencer to have been out and observing. The regex is deliberately restricted to first-person separation verbs; the looser phrase 'out of the body' alone hits 28.47% but includes interviewer questions and third-party discussion."
+    },
+    {
+      "id": "the-ceiling-vantage",
+      "name": "Up at the Ceiling, Looking Down",
+      "category": "threshold",
+      "description": "The first place people find themselves after leaving: hovering at ceiling height in the corner of the room, looking down on their own body and on the people working over it. The vantage is described with unusual precision — a specific corner, a specific height ('20 or 25, 30 feet above my body'), sometimes the sensation of the back of the head pressing against the ceiling as though it were a barrier. Several note there was no ceiling as such, only 'about ceiling height'. Emotion here is flat and curious rather than frightened; the body below is regarded as an object, often unrecognised at first.",
+      "aliases": [
+        { "term": "up at the ceiling", "tradition": null },
+        { "term": "ceiling height", "tradition": null, "note": "used by people who insist there was no physical ceiling" },
+        { "term": "up in the corner of the room", "tradition": null, "note": "the single most-repeated exact location" },
+        { "term": "my back was on the ceiling", "tradition": null },
+        { "term": "floating above the operating table", "tradition": null },
+        { "term": "bird's-eye view", "tradition": null },
+        { "term": "looking down at my body", "tradition": null },
+        { "term": "from the ceiling of the operating theatre", "tradition": null },
+        { "term": "sitting on the machines looking down", "tradition": null },
+        { "term": "point of perception 20 or 30 feet above my body", "tradition": "secular", "note": "clinician phrasing" }
+      ],
+      "regex": "((floating|hovering|suspended|drifting|up|was|were|found myself|myself)[^.]{0,35}(near|at|on|against|by|to) the ceiling|(in|at) the (upper |top |far )?corner of the (room|ceiling|operating)|looking down (at|on|upon)[^.]{0,30}(my (own )?body|myself|my corpse))",
+      "negative_regex": "(look(ing|ed)? up at the ceiling|star(e|ing|ed) at the ceiling|water (stain|damage) (on|at) the ceiling)",
+      "quotes": [
+        { "videoId": "boUQzaVDoNA", "text": "And the next thing was that I was up on the ceiling. It felt like I had reached a barrier.", "cvnde": 12 },
+        { "videoId": "tECJgapx_FY", "text": "I found myself up against the ceiling. There wasn't a ceiling, but about ceiling height, and I was looking down at Katie in the bed", "cvnde": 21 },
+        { "videoId": "Ogy7BKnMFiA", "text": "I found myself outside my body watching the entire procedure from the ceiling of the operating theater.", "cvnde": 24 },
+        { "videoId": "P2bz4Q9uIaQ", "text": "I was aware that I was up at the ceiling height, looking down at my body.", "cvnde": 21 },
+        { "videoId": "_eEQjU9LAUs", "text": "I left my body, floated up into the corner of the operating room.", "cvnde": 19 },
+        { "videoId": "SjNp_kXqh7Y", "text": "I floated out up near the ceiling, looking down at my body.", "cvnde": 9 }
+      ],
+      "sensory": [
+        "a fixed corner or ceiling-height vantage rather than free flight",
+        "the back of the head 'pressing against' the ceiling like a soft barrier",
+        "360-degree or all-at-once vision from that point",
+        "hearing the room clearly, including thoughts as well as speech",
+        "the body below looks small, limp, or unrecognisable — 'that's not me'",
+        "no feet: 'I was up near the ceiling and I had no feet'"
+      ],
+      "journey_position": 0.05,
+      "parent": null,
+      "measured": {
+        "all_pct": 12.21,
+        "all_docs": 754,
+        "cv13_pct": 18.82,
+        "cv18_pct": 23.76,
+        "cv23_pct": 31.49
+      },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 14,
+      "notes": "The strongest cvNDE gradient anywhere in this region: 12.21% of all accounts, 23.76% at cv>=18, 31.49% at cv>=23 — nearly a 2.6x enrichment. This is the veridical-perception engine of the whole corpus: the room seen from above is the claim that can be checked, so accounts containing it score higher by construction. The bare word 'ceiling' alone appears in 8.68% of docs but includes dying relatives staring at ceilings and metaphors; the constrained form above is far cleaner."
+    },
+    {
+      "id": "through-the-ceiling",
+      "name": "Passing Up Through the Ceiling and the Roof",
+      "category": "process",
+      "description": "The ceiling stops being a barrier. People report being drawn or shot straight up through the ceiling of the room, then through the floors above, then through the roof, and out into the open air — sometimes narrating the building shrinking beneath them. Solid matter offers no resistance; several remark with surprise that it did not hurt. This is often the immediate step between the ceiling vantage and the tunnel or the sky.",
+      "aliases": [
+        { "term": "through the ceiling", "tradition": null },
+        { "term": "through the roof", "tradition": null },
+        { "term": "pulled up through the ceiling of this floor up through another floor", "tradition": null },
+        { "term": "went through the wall", "tradition": null },
+        { "term": "sucked through the ceiling like a vacuum", "tradition": null },
+        { "term": "floated straight up through the ceiling, face first", "tradition": null },
+        { "term": "sucked through the mattress", "tradition": null, "note": "the downward inversion of the same move" }
+      ],
+      "regex": "(passed|passing|went|going|floated|floating|rose|rising|pulled|drawn|drifted|shot|travel\\w*|moved|moving|lifted|sucked|flew|flying|rocketed|zoomed)[^.]{0,30}(through|out through|up through) the (ceiling|roof)\\b",
+      "negative_regex": "(blood pressure|prices|costs|sales|went through the roof (with|in) (anger|excitement))",
+      "quotes": [
+        { "videoId": "3h4J81PfSbQ", "text": "We floated straight up through the ceiling, face first.", "cvnde": 14 },
+        { "videoId": "bnkb7lEzT7Y", "text": "And I was pulled through the roof of the dentist office up into the sky, up into this tunnel.", "cvnde": 9 },
+        { "videoId": "vmLRZCGt1xc", "text": "I just felt my soul rising up through the ceiling into the atmosphere.", "cvnde": 7 },
+        { "videoId": "V_R9ChlTfCE", "text": "I floated up through the through the ceiling, through the roof of the house.", "cvnde": 17 },
+        { "videoId": "gArMeQ51SP4", "text": "I recognized the sensation of passing through the ceiling and traversing through space, just like before.", "cvnde": 11 }
+      ],
+      "sensory": [
+        "no resistance, no pain — surprise that solid matter does not stop you",
+        "floor-by-floor ascent through a hospital building",
+        "the building, cars and streets shrinking below",
+        "sometimes 'face first' orientation",
+        "occasionally the reverse on return: coming back down through the roof of the vehicle"
+      ],
+      "journey_position": 0.08,
+      "parent": "leaving-the-body",
+      "measured": {
+        "all_pct": 2.04,
+        "all_docs": 126,
+        "cv13_pct": 3.56,
+        "cv18_pct": 4.7,
+        "cv23_pct": 7.73
+      },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 12,
+      "notes": "MUCH more common among the best-evidenced accounts: 2.04% overall rising to 7.73% at cv>=23, a 3.8x enrichment — the steepest gradient of any item in this region. Likely for the same reason as the ceiling vantage: accounts detailed enough to describe the exit route are also detailed enough to score on veridical criteria. The unconstrained phrase 'through the ceiling/roof/wall/window' hits 9.99% but is heavily contaminated by literal windows and the idiom 'went through the roof'."
+    },
+    {
+      "id": "the-silver-cord",
+      "name": "The Silver Cord",
+      "category": "structure",
+      "description": "A minority see a cord, filament or tether still joining them to the body they have just left. It is usually described as silver or luminous, attached at the crown or the torso, and understood without being told to mean that return is still possible. Its absence is reported just as pointedly by those who looked for it and found nothing — for them the missing cord is how they knew they had really died. A few see it frayed or torn.",
+      "aliases": [
+        { "term": "silver cord", "tradition": "Christian/esoteric", "note": "several cite Ecclesiastes; others learned the term afterwards" },
+        { "term": "cord", "tradition": null },
+        { "term": "the so-called garden hose", "tradition": null, "note": "one experiencer's first description before she had the word" },
+        { "term": "telephone cable", "tradition": null, "note": "same account, seen frayed at the end" },
+        { "term": "umbilical cord", "tradition": null },
+        { "term": "tether / connection", "tradition": null },
+        { "term": "no silver cord connecting me", "tradition": null, "note": "the negative report, offered as evidence of true death" }
+      ],
+      "regex": "silver cord",
+      "negative_regex": "(spinal cord|vocal cords?|cord blood|extension cord|cord of wood)",
+      "quotes": [
+        { "videoId": "C5NmSVgbkHw", "text": "And I realized that I was attached to this silver cord. And it was attached to the body.", "cvnde": 7 },
+        { "videoId": "AelDy1-42SA", "text": "they were connected to a silver cord, which the silver cord was also connected to me, not the body, but to me", "cvnde": 17 },
+        { "videoId": "DYnh3F093i0", "text": "I know that this was the so-called silver cord, which ruptures the moment the body dies", "cvnde": 23 },
+        { "videoId": "aguTPw_8goU", "text": "When I died, there was no connection.", "cvnde": 7 }
+      ],
+      "sensory": [
+        "silver or luminous",
+        "attached to the spirit self rather than to the body, in some tellings",
+        "frayed or torn at the end when death is final",
+        "seen alongside 'tablets' or screens with codes running down them, in two accounts",
+        "millions of such cords seen from a distance, connecting everything to everything"
+      ],
+      "journey_position": 0.06,
+      "parent": "leaving-the-body",
+      "measured": {
+        "all_pct": 1.54,
+        "all_docs": 95,
+        "cv13_pct": 1.93,
+        "cv18_pct": 1.93,
+        "cv23_pct": 1.66
+      },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 10,
+      "notes": "Rare but vivid and flat across cvNDE strata (1.54% all, 1.93% cv>=18, 1.66% cv>=23) — it neither strengthens nor weakens with evidential quality. About a third of matches are commentators discussing the cord as a theory rather than seeing one, and one notable account theorises that the tunnel IS the cord seen from inside. Note the striking cultural asymmetry: people who already knew the term report seeing it; several who did not know it describe a hose or cable and only later learn the name."
+    },
+    {
+      "id": "the-ascent",
+      "name": "Rising — Going Up Without a Tunnel",
+      "category": "process",
+      "description": "For a large minority there is no passage at all, only lift. They rise: above the body, above the trees, above the accident, above the hospital, up into the sky and then into a starfield, watching the world recede. The motion is sometimes gentle drift and sometimes rocket-like — 'insane G's' — but it is always upward and always without walls. Several describe an 'up and over' arc rather than a straight climb.",
+      "aliases": [
+        { "term": "floating up", "tradition": null },
+        { "term": "rising up through the air", "tradition": null },
+        { "term": "shot up into the sky", "tradition": null },
+        { "term": "going up and up and up", "tradition": null },
+        { "term": "ascending into the sky", "tradition": null },
+        { "term": "lifted up into the stars", "tradition": null },
+        { "term": "going out into the stars", "tradition": null },
+        { "term": "climbing up in this blue sky", "tradition": null },
+        { "term": "an up and over feeling", "tradition": null }
+      ],
+      "regex": "((floated|floating|rose|rising|lifted|drifting|ascending|ascended|soaring|soared)[^.]{0,40}(up|upward|upwards)[^.]{0,35}(sky|space|air|heavens|stars|clouds|atmosphere|ceiling|above)|(shot|rocketed|zoomed|propelled|catapulted) (straight )?up[^.]{0,25}(sky|air|space|heavens))",
+      "negative_regex": "(stock|prices|inflation|vibration is going up|frequency is going up)",
+      "quotes": [
+        { "videoId": "_7H68qKjo9U", "text": "I shot up into the sky.", "cvnde": 10 },
+        { "videoId": "sL_KGIDJMcI", "text": "I shot up straight into the air, like straight up towards, uh, the sky.", "cvnde": 11 },
+        { "videoId": "q-BzBYYzTwM", "text": "soon I realized that I was floating up above the earth, and it was dark", "cvnde": 15 },
+        { "videoId": "J7u2nHmclrs", "text": "here was still rising up through the air and the cars, the vehicles were getting smaller", "cvnde": 13 }
+      ],
+      "sensory": [
+        "the ground, cars and buildings shrinking with changing perspective",
+        "'insane G's' in the fast version; effortless drift in the slow one",
+        "an 'up and over' curve rather than a straight vertical",
+        "darkness and a starfield opening above",
+        "the Earth becoming visible below"
+      ],
+      "journey_position": 0.1,
+      "parent": null,
+      "measured": {
+        "all_pct": 3.25,
+        "all_docs": 201,
+        "cv13_pct": 4.22,
+        "cv18_pct": 4.83,
+        "cv23_pct": 4.42
+      },
+      "precision_estimate": 0.9,
+      "precision_sample_n": 12,
+      "notes": "Modestly MORE common in strongly-evidenced accounts (3.25% all vs 4.83% cv>=18, 4.42% cv>=23). This is the main alternative to the tunnel for the outbound leg and often replaces it entirely: several who deny a tunnel describe exactly this instead. The measured figure is a floor, not a ceiling — much rising is described with verbs too generic to isolate safely."
+    },
+    {
+      "id": "the-tunnel",
+      "name": "The Tunnel",
+      "category": "threshold",
+      "description": "The famous one, and it is neither universal nor uniform. People are drawn, sucked, thrown or gently shuffled into a long enclosed passage and carried along it, usually feet first or head first at great speed, toward something bright at the far end. Its walls are variously dark and velvet-soft, ribbed like a fuselage, made of light-specks, glass, or covered with scenes from the traveller's own life. Some ride it terrified, some in total peace; a few report other travellers alongside them. Crucially, only about one account in five describes it, and many are emphatic they had nothing of the kind.",
+      "aliases": [
+        { "term": "tunnel", "tradition": "secular", "note": "the default word, often used apologetically ('the proverbial tunnel')" },
+        { "term": "passageway", "tradition": null, "note": "Moody: 'a passageway, which they may call a tunnel or hallway or tube or whatever'" },
+        { "term": "tube", "tradition": null, "note": "'a glass tube', 'about 20 by 20 foot tube', 'a long tube with rounded ends'" },
+        { "term": "pipe", "tradition": null, "note": "'that light inside this tube pipe tunnel'" },
+        { "term": "hallway", "tradition": null },
+        { "term": "corridor", "tradition": null },
+        { "term": "wormhole / worm tunnel", "tradition": "secular", "note": "used by science-literate experiencers for the same shape" },
+        { "term": "fuselage", "tradition": null, "note": "'I said I was in something, some type of an airplane because it was that type of a fuselage shape'" },
+        { "term": "cave", "tradition": null, "note": "'what looked as though it was like a cave or a tunnel'" },
+        { "term": "roller coaster / water slide", "tradition": null, "note": "used for the turns and the ejection at the end" },
+        { "term": "conveyance / vehicle", "tradition": null, "note": "'this vehicle or tube that I was traveling in... I could see through apertures'" },
+        { "term": "velvet tunnel", "tradition": null, "note": "'a deep dark velvet tunnel', walls soft, pitch black" },
+        { "term": "time tunnel", "tradition": null },
+        { "term": "channel", "tradition": null },
+        { "term": "spherical realm / oval tunnel", "tradition": null },
+        { "term": "narrow way", "tradition": "Christian", "note": "one experiencer reads the passage through Matthew 7" },
+        { "term": "the cord", "tradition": "esoteric", "note": "one account theorises the tunnel is the silver cord seen from inside" }
+      ],
+      "regex": "(in|into|down|through|up|along|inside|entered|enter)\\s+(a|the|this|that)\\s+((\\w+)\\s+){0,2}tunnel",
+      "negative_regex": "(tunnel vision|carpal tunnel|road tunnel (on|of) the (highway|motorway)|(didn'?t|did not|never)\\s+(\\w+\\s+){0,3}(a |any |the )?tunnels?\\b|there was no tunnel|wasn'?t a tunnel|\\bno tunnel\\b)",
+      "quotes": [
+        { "videoId": "H9ipa_bYsG8", "text": "It felt as though I was in some sort of a tunnel and my conscious self was being rushed somewhere to an unknown destination. The speed frightened me.", "cvnde": 11 },
+        { "videoId": "EHwBXZXzByM", "text": "a huge opening, um, a big, what looked as though it was like a, a cave or a tunnel, very dark, opened in front of me, and I was drawn inside that", "cvnde": 23 },
+        { "videoId": "r27tdq6tbK4", "text": "I'm traveling at warp nine down a tunnel feet first. The tunnel is dark. There's a light at the end of the tunnel", "cvnde": 10 },
+        { "videoId": "UtokxomNPgA", "text": "they become aware of a passageway, which they may call a tunnel or hallway or tube or whatever", "cvnde": 11 },
+        { "videoId": "13XFdCP2Uek", "text": "As I look along the length of this passageway or tunnel, I could see at the extremity a kingdom of light.", "cvnde": 21 },
+        { "videoId": "4HLgDKXe8TE", "text": "I started down this, this really long, I don't know, if you had to gauge it, I would say it was about 20 by 20 foot tube with a very beautiful, bright light at the end of it", "cvnde": 21 },
+        { "videoId": "le1upcSMCN4", "text": "I went into this velvet, limitless tunnel. The walls were soft, and it was completely pitch black.", "cvnde": 11 },
+        { "videoId": "vHklG2DgREs", "text": "I was traveling very, very fast through this tube of light.", "cvnde": 9 }
+      ],
+      "sensory": [
+        "travelling feet first, or head first — people are specific about which",
+        "walls that are dark but visible: 'bits of the tunnel kind of flashing by'",
+        "soft, velvet, fluffy walls despite total blackness",
+        "walls made of tiny separate points of light",
+        "the traveller's own life playing on the tunnel walls",
+        "apertures or windows you can see out of",
+        "a smell (in the distressing versions, a terrible one)",
+        "other beings travelling alongside: 'we looked at each other saying, I believe we are dead'",
+        "being ejected at the end 'the way a man falls from the edge of a water slide into the pool'"
+      ],
+      "journey_position": 0.2,
+      "parent": null,
+      "measured": {
+        "all_pct": 21.57,
+        "all_docs": 1332,
+        "cv13_pct": 26.96,
+        "cv18_pct": 26.93,
+        "cv23_pct": 29.28
+      },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 20,
+      "notes": "MORE common in strongly-evidenced accounts: 21.57% all, 26.93% cv>=18, 29.28% cv>=23. This tracks the corpus's own structured coding (tunnel 23.9% all / 33.1% cv>=23) closely, which is reassuring. Beware the bare word: /tunnel/ matches 35.02% of docs, but a large slice of that is interviewers asking about tunnels and experiencers denying them — see the-tunnel-that-wasnt. Residual false positives in my regex are almost entirely sentences of the form 'I didn't go through a tunnel', which doc-level matching cannot exclude; hence precision 0.85 rather than higher."
+    },
+    {
+      "id": "the-turning-passage",
+      "name": "The Vortex — the Passage That Spins",
+      "category": "threshold",
+      "description": "A distinct minority variant of the passage: it does not merely carry you, it turns you. People describe corkscrewing forward, a spinning or circular motion, a whirlpool, a tornado with walls twisting around themselves, or being thrown into a vortex so violent they had to hold on to the walls. Where the plain tunnel is often peaceful, the turning passage is more often frightening or at least strenuous, and it appears at both the outbound and the return end of the journey.",
+      "aliases": [
+        { "term": "vortex", "tradition": "secular/New Age" },
+        { "term": "whirlpool", "tradition": null, "note": "'a rainbow-colored whirlpool, but it was upside down'" },
+        { "term": "tornado", "tradition": null, "note": "'the interior of a pitch-black tornado with the walls twisting around themselves endlessly'" },
+        { "term": "funnel", "tradition": null },
+        { "term": "corkscrewing / corkcrewing", "tradition": null, "note": "the corpus's own spelling in one account" },
+        { "term": "spiral / spiralling down", "tradition": null },
+        { "term": "swirl of stars", "tradition": null },
+        { "term": "rainbow vortex tube", "tradition": null },
+        { "term": "cyclone", "tradition": null }
+      ],
+      "regex": "((spiral|corkscrew|swirl|whirl)\\w*[^.]{0,40}(tunnel|vortex|down|upward|through)|(into|in|through|down|thrown into) (a|this|the) (\\w+ )?(vortex|whirlpool)|tunnel[^.]{0,40}(spiral|corkscrew|swirl|spinning|whirl|vortex|tornado)|vortex[^.]{0,40}(tunnel|portal))",
+      "negative_regex": "(Sedona|energy vortex(es)? (in|at|of) (Hawaii|Mount Shasta|the earth)|downward spiral of (depression|addiction|debt)|spiral (staircase|notebook|bound))",
+      "quotes": [
+        { "videoId": "cMBRXeUtKfs", "text": "It's this dark, kind of dark tunnel. It has some lights in it. It's a vortex. So it's moving in a circular motion.", "cvnde": 25 },
+        { "videoId": "9eRjUzMi0ik", "text": "there was this sort of movement like a corkscrew of circular circling forward through this tunnel", "cvnde": 11 },
+        { "videoId": "zKLqZ525oaA", "text": "the tunnel was corkcrewing, right? It wasn't just spinning like this. It was moving forward.", "cvnde": 7 },
+        { "videoId": "cdI8vchu_PI", "text": "And I was thrown into this vortex, as all I can describe it as.", "cvnde": 12 },
+        { "videoId": "cbTWrNqyMhM", "text": "it was like a rainbow-colored whirlpool, but it was upside down", "cvnde": 22 },
+        { "videoId": "T_yJZyY3Bf8", "text": "it looked like the interior of a pitch-black tornado with the walls twisting around themselves endlessly", "cvnde": 14 }
+      ],
+      "sensory": [
+        "forward rotation, not just spin — 'a forward rotation that was happening like a corkcrew'",
+        "walls twisting around themselves endlessly",
+        "streaks of blue light on the sides that can be heard as well as seen",
+        "having to grip the walls to avoid being flung out",
+        "an upside-down whirlpool that goes up rather than down",
+        "counterclockwise circling of light-beings around the traveller"
+      ],
+      "journey_position": 0.2,
+      "parent": "the-tunnel",
+      "measured": {
+        "all_pct": 4.19,
+        "all_docs": 259,
+        "cv13_pct": 5.01,
+        "cv18_pct": 5.11,
+        "cv23_pct": 3.87
+      },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 14,
+      "notes": "Slightly more common at cv>=13/18 (5.01%/5.11% vs 4.19% all) but LESS common at cv>=23 (3.87%) — with only 7 hits at that stratum the difference is not meaningful. The main precision leak is New Age geographic 'vortexes' (Sedona, Mount Shasta, Hawaii) and metaphorical downward spirals, which the negative_regex targets. Worth keeping separate from the plain tunnel because the rotation is consistently volunteered as the surprising, un-clichéd detail: 'not everybody does the tunnel, but I did the tunnel... I felt like I was corkscrewing'."
+    },
+    {
+      "id": "the-void",
+      "name": "The Void — the Darkness You Travel In",
+      "category": "realm",
+      "description": "Black, boundless, without floor or direction. People fall, drift or race through it; some stay in it a long time. It is not simply an absence of light — many say they could see perfectly well in it, or that it was an 'illuminated darkness', or that it held stars. Reactions split sharply: for most it is peaceful, warm and womb-like; for a substantial minority it is the most frightening place they have ever been, and they call out into it for help. It is the most common environment in the region after the body itself, and it frequently precedes the tunnel or replaces it entirely.",
+      "aliases": [
+        { "term": "the void", "tradition": "secular", "note": "the corpus's own most common name" },
+        { "term": "blackness / black space", "tradition": null },
+        { "term": "darkness", "tradition": null },
+        { "term": "nothingness / emptiness", "tradition": null },
+        { "term": "black void", "tradition": null },
+        { "term": "a place of complete darkness", "tradition": null },
+        { "term": "outer space / deep space", "tradition": null, "note": "'like when you look at pictures of outer space... nothing but just darkness'" },
+        { "term": "illuminated darkness", "tradition": null },
+        { "term": "a black hole", "tradition": null },
+        { "term": "zero point field", "tradition": "New Age" },
+        { "term": "the primordial / before creation", "tradition": "Christian", "note": "one experiencer reads it as 'before let there be light'" },
+        { "term": "kingdom of darkness", "tradition": "Christian" },
+        { "term": "where the soul goes in between the dimensions", "tradition": "New Age" }
+      ],
+      "regex": "(in|into|through) (a|the|this) (dark|black|deep)?\\s?(void|darkness|blackness|nothingness)",
+      "negative_regex": "(null and void|void (the|a) (contract|warranty|check)|in the darkness of (ignorance|sin|depression))",
+      "quotes": [
+        { "videoId": "4sJmf88qe1U", "text": "And in this dark tunnel, I'm looking at this this dark void. It's just immense space.", "cvnde": 18 },
+        { "videoId": "dh1PA6GvjRA", "text": "There's nothing around. Total darkness. Total emptiness. And I was in the midst of that environment without a physical body.", "cvnde": 10 },
+        { "videoId": "TviZuwU8I8Y", "text": "I was in absolute peace and absolute perfection in this black space, in this darkness", "cvnde": 12 },
+        { "videoId": "j_d7js8GaLk", "text": "It was, boom, next thing I know, I'm in a black void.", "cvnde": 8 },
+        { "videoId": "YtNnpI-D8Jo", "text": "everything went to black. And I realized later now I know that that was the void which is where the soul goes in between the dimensions", "cvnde": 7 },
+        { "videoId": "PXF88Wmr5-I", "text": "And this black, um, mist came over me, and all of a sudden, I was floating in total darkness.", "cvnde": 12 }
+      ],
+      "sensory": [
+        "no up, down or sideways — 'the feeling of above, below, and sideways was relative'",
+        "seeing perfectly well despite total blackness",
+        "warmth and total peace, or total terror — the corpus splits hard",
+        "stars or pinpricks of light scattered through it",
+        "silence, or a low hum that resolves into the approaching light",
+        "weightlessness and drifting; sometimes a sense of falling",
+        "cracks in the black through which other things can be glimpsed"
+      ],
+      "journey_position": 0.12,
+      "parent": null,
+      "measured": {
+        "all_pct": 13.91,
+        "all_docs": 859,
+        "cv13_pct": 15.44,
+        "cv18_pct": 14.5,
+        "cv23_pct": 18.78
+      },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 14,
+      "notes": "Somewhat MORE common in the best-evidenced accounts (13.91% all vs 18.78% at cv>=23), though it dips slightly at cv>=18. The corpus's own journey coding makes the void far more central than the tunnel: void_darkness appears in 57.1% of sequenced accounts against 18.1% for tunnel, and its mean journey position (0.056) is earlier than the tunnel's (0.222) — i.e. the darkness usually comes FIRST, and the tunnel, if it comes at all, forms inside or after it. The commonest transitions in the corpus are void_darkness>peace_calm (14.3%) and void_darkness>bright_light (10.0%). Main precision leak: hypnosis and meditation sessions described in the same interviews."
+    },
+    {
+      "id": "the-distant-light",
+      "name": "The Pinpoint of Light in the Distance",
+      "category": "threshold",
+      "description": "Far off in the black — at the end of the tunnel, or simply out there in the void — a single tiny light. People reach for the smallest possible words for it: a pinprick, a pinpoint, a speck, a dot, a flashlight held by someone far away, a single star in an otherwise empty sky. It grows, or it rushes toward them, and the closing of that distance is the pivot of the whole journey. Several stress that they moved toward it without willing it, and one insists the light came to her rather than she to it.",
+      "aliases": [
+        { "term": "pinpoint of light", "tradition": null },
+        { "term": "pinprick / pin prick of light", "tradition": null },
+        { "term": "speck of light", "tradition": null, "note": "'this minute little speck of light'" },
+        { "term": "a dot", "tradition": null, "note": "'way ahead in the tunnel, a yellow dot was shining'" },
+        { "term": "light at the end of the tunnel", "tradition": "secular", "note": "the cliché, used self-consciously" },
+        { "term": "like a distant star / the North Star", "tradition": null },
+        { "term": "a glowing pinpoint", "tradition": null },
+        { "term": "like a flashlight somebody way out in the dark had", "tradition": null },
+        { "term": "a glimmer of light", "tradition": null },
+        { "term": "a luminous spot at the end of the tunnel", "tradition": null }
+      ],
+      "regex": "((pinpoint|pinprick|pin ?prick|speck|dot) of (light|white)|light (at|in) the (very )?(end|far end)|(tiny|small|little|distant|faint|pinpoint) light[^.]{0,40}(in the distance|at the end|far away|ahead of me)|light (far|way) (off )?in the distance)",
+      "negative_regex": "(light at the end of the tunnel (for|of) (the economy|this project|recovery)|points? of light (charity|foundation))",
+      "quotes": [
+        { "videoId": "ANwBG-yxG-I", "text": "At some point, I felt sucked away into a long, dark tunnel at an incredible speed. At the end of the tunnel, there was a glowing pinpoint.", "cvnde": 10 },
+        { "videoId": "D3MlrVCbspk", "text": "way far, far in the distance was a single pinprick of light appeared, and this was like a star, like a single star in the night sky", "cvnde": 11 },
+        { "videoId": "wi5B58rvYxY", "text": "We traveled through the illuminated darkness until I saw a pinpoint of light in the distance.", "cvnde": 9 },
+        { "videoId": "neuciWsQxp4", "text": "I could see a small light at the end of the tunnel, and I moved towards it. It seemed to get bigger.", "cvnde": 19 },
+        { "videoId": "IZBcv4So38s", "text": "First, there was a tiny little speck of light in the darkness, and very rapidly, it got bright", "cvnde": 16 },
+        { "videoId": "yO8An4FV51o", "text": "So whisking through this tunnel, the next thing that I'll describe to you is that way off and paradoxically to infinity was this minute little speck of light.", "cvnde": 14 }
+      ],
+      "sensory": [
+        "vanishingly small at first — compared to a single star, a pin, a speck",
+        "grows or 'rushes toward me' rather than being approached",
+        "sometimes preceded by a hum that grows with it",
+        "colour usually white or golden, occasionally yellow",
+        "no glare despite extreme brightness once arrived"
+      ],
+      "journey_position": 0.28,
+      "parent": null,
+      "measured": {
+        "all_pct": 6.49,
+        "all_docs": 401,
+        "cv13_pct": 9.17,
+        "cv18_pct": 8.56,
+        "cv23_pct": 8.29
+      },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 14,
+      "notes": "MORE common among better-evidenced accounts (6.49% all vs 8.56% cv>=18), though it plateaus above cv>=13. Precision is limited by metaphorical 'points of light' and by the idiom 'light at the end of the tunnel' used about recovery or hardship; roughly four in fourteen sampled snippets were of that kind. The corpus's transition data supports this as a real waypoint: tunnel>bright_light is one of the top transitions (5.5% of sequenced accounts) and void_darkness>bright_light is higher still (10.0%)."
+    },
+    {
+      "id": "the-sound-of-the-crossing",
+      "name": "The Rushing Sound",
+      "category": "process",
+      "description": "The crossing is loud. People report a whoosh, a roar like rushing wind or a waterfall, a buzz like a flatlined heart monitor, humming, whirring 'almost like vast machinery', a jet-engine noise rising in the ears, or a wind-speed hiss as they are shot forward. The sound usually arrives at the moment of separation or during the passage and stops on arrival, often replaced by music or by absolute silence. Several describe it as unpleasant or alarming at the time and only benign in retrospect.",
+      "aliases": [
+        { "term": "whooshing", "tradition": null },
+        { "term": "buzzing", "tradition": null, "note": "'a loud buzz like the heart monitor sound when it goes flat'" },
+        { "term": "humming", "tradition": null },
+        { "term": "roaring", "tradition": null, "note": "'a roaring sound like rushing wind'" },
+        { "term": "whirring", "tradition": null, "note": "'sounds of humming and buzzing and whirring, almost like vast machinery'" },
+        { "term": "ringing in my ears", "tradition": null },
+        { "term": "rushing wind", "tradition": "Christian", "note": "occasionally read as Pentecost imagery" },
+        { "term": "jet engine noise", "tradition": null },
+        { "term": "the sound of wind speed", "tradition": null },
+        { "term": "a rumbling sound", "tradition": null },
+        { "term": "melodies / celestial music", "tradition": null, "note": "often replaces the noise halfway down the passage" }
+      ],
+      "regex": "((whoosh|swoosh)\\w*[^.]{0,70}(body|tunnel|sound|noise|ears|light)|(body|tunnel|travel\\w*|ears)[^.]{0,70}(whoosh|swoosh)\\w*|(buzzing|humming|ringing|roaring|rushing|whistling|whirring|swooshing|vibrating|whirling)[^.]{0,25}(sound|noise|in my ears)|(sound|noise) (like|of)[^.]{0,40}(wind|train|rushing|freight|waterfall|whoosh|buzz|roar))",
+      "negative_regex": "(tinnitus|hearing aid|ringing (of|in) the (phone|bell|doorbell)|buzzing (bees?|insects?|flies))",
+      "quotes": [
+        { "videoId": "18MkZDbjpTE", "text": "all of a sudden, I heard this loud sort of rushing or whooshing sound", "cvnde": 13 },
+        { "videoId": "-IuJKabyx_g", "text": "There's a sudden stirring and a roaring sound like rushing wind, and I swirl around in a descending spiral, zooming downward at great speed.", "cvnde": 15 },
+        { "videoId": "wrkE_OmKbso", "text": "It made a loud whooshing, whirring sound, similar to my sleep paralysis sound but slightly different.", "cvnde": 7 },
+        { "videoId": "9CjuxKbEZZQ", "text": "No heartbeat, just a loud buzz like the heart monitor sound when it goes flat.", "cvnde": 20 },
+        { "videoId": "U_dF87saqMA", "text": "And all of a sudden I felt this whooshing in my body. I heard a whooshing throughout my body.", "cvnde": 11 }
+      ],
+      "sensory": [
+        "located in the ears or throughout the whole body",
+        "rising in volume before separation, cutting off on arrival",
+        "compared to machinery, a jet engine, a waterfall, a freight train, a flatline tone",
+        "streaked light that can be heard as well as seen — a Doppler-like passing sound",
+        "melodies replacing the noise partway along the passage",
+        "sudden total silence as the alternative outcome"
+      ],
+      "journey_position": 0.12,
+      "parent": null,
+      "measured": {
+        "all_pct": 3.92,
+        "all_docs": 242,
+        "cv13_pct": 4.89,
+        "cv18_pct": 5.66,
+        "cv23_pct": 4.42
+      },
+      "precision_estimate": 0.65,
+      "precision_sample_n": 14,
+      "notes": "MORE common among well-evidenced accounts up to cv>=18 (3.92% all vs 5.66%), falling back at cv>=23 (4.42%, n=8 — small). Precision is the weakest in this region: 'whoosh' is also used for pain, for keys falling in a lake, and for emotional release, and 'vibration/humming' collide with the corpus's pervasive New Age frequency vocabulary. Reported honestly at 0.65. The sound is almost certainly under-counted: many describe it without any of these nouns ('a loud bumpy ride', 'a jolt and then a jolt')."
+    },
+    {
+      "id": "the-velocity",
+      "name": "Travelling at Impossible Speed",
+      "category": "process",
+      "description": "Whatever the passage is made of, the movement through it is fast beyond reference. People reach for the fastest thing they know: warp nine, the speed of light, a rocket, being flung, a high rate of speed. The speed itself is sometimes the frightening part even when everything else is peaceful, and a few report deceleration at the end as a distinct, noticeable event. Others insist that speed is meaningless there because there was no distance.",
+      "aliases": [
+        { "term": "at an incredible speed", "tradition": null },
+        { "term": "at a high rate of speed", "tradition": null },
+        { "term": "at the speed of light", "tradition": "secular" },
+        { "term": "warp speed / warp nine", "tradition": "secular", "note": "Star Trek reference volunteered by several" },
+        { "term": "a tremendously, horrifically rapid rate of speed", "tradition": null },
+        { "term": "faster than you can imagine", "tradition": null },
+        { "term": "like a bullet going through this tunnel", "tradition": null },
+        { "term": "insane G's", "tradition": null },
+        { "term": "a light-speed sensation", "tradition": null }
+      ],
+      "regex": "(at (an?|the) (incredible|tremendous|terrific|enormous|unbelievable|amazing|phenomenal|warp|breakneck|astonishing|dizzying|great|rapid|high|blinding|frightening) (rate of )?(speed|rate|velocity)|(travel\\w*|moving|going|shooting|flying|hurtling|zooming|racing|whizzing|rushing|sucked|pulled|drawn)[^.,]{0,30}(at the speed of light|at warp speed|faster than (the speed of )?light)|going at (a )?(tremendous|incredible|terrific|great|high) )",
+      "negative_regex": "(Einstein|astronomer|186,000|spaceship that could travel|scars? heals? at a rapid rate|heart rate)",
+      "quotes": [
+        { "videoId": "cHIdkYgdJJY", "text": "And it went at a tremendously, horrifically rapid rate of speed.", "cvnde": 19 },
+        { "videoId": "XZO_h3jT6ys", "text": "I went into a deep dark velvet tunnel at a high rate of speed.", "cvnde": 9 },
+        { "videoId": "js1LRxOSxIo", "text": "the next thing I felt was being propelled at an incredible speed, a speed that is beyond our comprehension here", "cvnde": 10 },
+        { "videoId": "MsgJH3358Ds", "text": "In the next moment, I was floating at full speed through an absolutely dark tunnel, in which there were some gleams", "cvnde": 19 },
+        { "videoId": "fRcFquC46bk", "text": "We literally went through the wall at an incredible rate.", "cvnde": 7 }
+      ],
+      "sensory": [
+        "colours and lights whizzing by and through the traveller",
+        "the stomach-drop of a roller coaster",
+        "a felt deceleration near the end, before arrival",
+        "fear of the speed even inside an otherwise peaceful passage",
+        "the paradox that speed felt meaningless where there was no distance"
+      ],
+      "journey_position": 0.16,
+      "parent": "the-tunnel",
+      "measured": {
+        "all_pct": 2.2,
+        "all_docs": 136,
+        "cv13_pct": 2.47,
+        "cv18_pct": 1.38,
+        "cv23_pct": 2.76
+      },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "notes": "Essentially FLAT to slightly weaker across strata (2.20% all, 1.38% at cv>=18, 2.76% at cv>=23 on only 5 docs) — speed language does not co-vary with evidential quality. I deliberately chose a tight regex: a looser speed pattern reaches 10.9% of docs but its precision collapsed to about 0.4 in sampling, mostly on astronomy digressions about the speed of light and on people typing or driving fast. The tight version at 2.20% is an undercount of a genuinely common feature — treat it as a lower bound."
+    },
+    {
+      "id": "the-portal",
+      "name": "The Portal, the Doorway, the Opening",
+      "category": "threshold",
+      "description": "Not a tunnel but an aperture: something opens and you go through it. It is described as a portal, an opening, an entrance, a door hanging in space, a hole in the sky, or an interdimensional passage with no earthly direction — 'it wasn't up or down'. Some pass through instantly; some stand at the edge and decide; at least one declines and watches it close. Where the tunnel implies travel, the portal implies a single step across.",
+      "aliases": [
+        { "term": "portal", "tradition": "secular/New Age", "note": "increasingly the preferred word in more recent accounts" },
+        { "term": "doorway / door", "tradition": null, "note": "'I still don't know whether to call it a door or a portal'" },
+        { "term": "opening", "tradition": null },
+        { "term": "entrance", "tradition": null },
+        { "term": "interdimensional passage", "tradition": "New Age" },
+        { "term": "a hole in the sky", "tradition": null },
+        { "term": "a channel", "tradition": null, "note": "'amethyst purple, like a channel or a portal with sparkling lights'" },
+        { "term": "gateway", "tradition": null },
+        { "term": "a mist-covered portal", "tradition": null },
+        { "term": "the veil", "tradition": "Christian/spiritualist" }
+      ],
+      "regex": "(through|into|to|toward|towards|opened|enter|entered) (a|the|this|that) ((\\w+)\\s+){0,2}portal",
+      "negative_regex": "(patient portal|web portal|portal vein|employee portal|Sedona|portal viewing|remote viewing)",
+      "quotes": [
+        { "videoId": "bYl4BxSiLwU", "text": "I found myself gliding through a portal, an interdimensional passage that defied Earthly directions.", "cvnde": 11 },
+        { "videoId": "NJO1iJD_3yo", "text": "It was amethyst purple, like a channel or a portal with sparkling lights.", "cvnde": 8 },
+        { "videoId": "-h_5uX-Kd2Q", "text": "I started to go up into the sky and into this portal, this energy, this vortex, this tunnel of some sort.", "cvnde": 11 },
+        { "videoId": "VfhqbDC12tc", "text": "I mostly remember coming, just coming through this open portal.", "cvnde": 8 },
+        { "videoId": "wy9LnsfxVvQ", "text": "I still don't know whether to call it a door or a portal. It's covered in mist", "cvnde": 13 }
+      ],
+      "sensory": [
+        "opens and closes — several watch it seal behind them or shut when they refuse",
+        "colours: amethyst purple with sparkling lights; golden-white like the sun",
+        "covered or filled with mist so you cannot see what you are stepping onto",
+        "no orientation: 'it wasn't up or down'",
+        "a second, brighter portal sometimes opening beyond the first"
+      ],
+      "journey_position": 0.25,
+      "parent": null,
+      "measured": {
+        "all_pct": 2.36,
+        "all_docs": 146,
+        "cv13_pct": 1.87,
+        "cv18_pct": 2.21,
+        "cv23_pct": 2.21
+      },
+      "precision_estimate": 0.75,
+      "precision_sample_n": 12,
+      "notes": "One of the few items in this region that is LESS common among strongly-evidenced accounts: 2.36% overall against 1.87% at cv>=13 and 2.21% at cv>=18/23. 'Portal' reads as a more recently acquired, more interpretive word than 'tunnel', and the bare term (8.76% of docs) is heavily used in metaphysical framing rather than in narration of the experience — which is why I constrained it to motion-through phrasing. The door/doorway variant could not be measured cleanly: '(through/into) a door' matches 18.35% of docs but is almost all front doors, hospital doors and knocking."
+    },
+    {
+      "id": "the-mist",
+      "name": "The Mist, the Fog, the Grey",
+      "category": "landscape",
+      "description": "A soft, weatherlike medium reported instead of, or in the middle of, the passage: white mist you move through, a pea-soup fog that is thick but actively dancing rather than falling, a grey that is described in flatly domestic terms — 'a wet beach sand grey'. It obscures where you are going and is often the thing you must cross before somewhere becomes visible. It also appears at boundaries: mist covering a doorway, mist clearing to reveal grass.",
+      "aliases": [
+        { "term": "mist", "tradition": null },
+        { "term": "white mist", "tradition": null },
+        { "term": "fog", "tradition": null, "note": "'a pea soup fog... very thick, but it was actively, like, dancing around me'" },
+        { "term": "haze", "tradition": null },
+        { "term": "cloud / clouds", "tradition": null },
+        { "term": "the grey area", "tradition": null },
+        { "term": "a misty sort of area", "tradition": null },
+        { "term": "black mist", "tradition": null, "note": "the distressing inversion, preceding total darkness" },
+        { "term": "pastel-coloured deep fog", "tradition": null },
+        { "term": "vapor", "tradition": null }
+      ],
+      "regex": "(\\b(mist|misty|fog|foggy|haze|hazy)\\b[^.]{0,50}(around me|surrounded|floating|drifting|through|moving|rolling)|(through|into|in) (a|the|this) (\\w+ )?\\b(mist|fog|haze)\\b|(grey|gray) (mist|fog|haze|area|space|nothingness|void|zone))",
+      "negative_regex": "(mistake|mistaken|mistreat|misty[- ]eyed|fog(gy)? (of war|in my (head|brain))|brain fog|anesthesia (fog|haze)|drug(ged)? haze)",
+      "quotes": [
+        { "videoId": "g0F_OX1JpOc", "text": "So as I'm moving through this white mist", "cvnde": 15 },
+        { "videoId": "3F1SZEFhqco", "text": "I had this incredible experience of of moving up into a misty sort of area.", "cvnde": 26 },
+        { "videoId": "wy9LnsfxVvQ", "text": "I still don't know whether to call it a door or a portal. It's covered in mist", "cvnde": 13 },
+        { "videoId": "gbakJ4HkuKE", "text": "this time back into this fog stage where you close my eyes and I open up and I'm in a different location again", "cvnde": 19 },
+        { "videoId": "PXF88Wmr5-I", "text": "And this black, um, mist came over me, and all of a sudden, I was floating in total darkness.", "cvnde": 12 }
+      ],
+      "sensory": [
+        "thick as pea soup yet actively dancing rather than settling",
+        "white, pastel-coloured, or 'a wet beach sand grey'",
+        "clears from the ground upward to reveal grass",
+        "shot through with golden light in the brighter versions",
+        "black in the distressing versions, arriving like a covering"
+      ],
+      "journey_position": 0.24,
+      "parent": null,
+      "measured": {
+        "all_pct": 4.23,
+        "all_docs": 261,
+        "cv13_pct": 4.95,
+        "cv18_pct": 4.7,
+        "cv23_pct": 4.42
+      },
+      "precision_estimate": 0.65,
+      "precision_sample_n": 12,
+      "notes": "Essentially FLAT across strata (4.23% all, 4.70% cv>=18, 4.42% cv>=23). Precision is limited by medical haze ('I was still in a haze when I woke up') and by fog used as a metaphor for depression or confusion, both targeted by the negative_regex. Included despite modest precision because it is a genuinely distinct transitional medium, repeatedly volunteered by people who explicitly deny a tunnel, and because it recurs at the border to the realms rather than only at the start."
+    },
+    {
+      "id": "the-instantaneous-transition",
+      "name": "The Switch — Arriving With No Passage At All",
+      "category": "process",
+      "description": "For some there is no travel of any kind. One moment they are in bed, on a bike, at a party, on the operating table; the next moment they are somewhere else entirely, with, as one puts it, no sense of transition. They reach for the same handful of images: a switch flipped, an instantaneous shift in consciousness, 'boom, there I am'. This is the cleanest statement in the corpus that the journey is not necessarily a journey.",
+      "aliases": [
+        { "term": "like somebody turned a switch on and you moved", "tradition": null },
+        { "term": "an instantaneous shift in consciousness", "tradition": null },
+        { "term": "one moment I was... and the next moment I was...", "tradition": null, "note": "the corpus's dominant syntax for this" },
+        { "term": "with no sense of transition", "tradition": null },
+        { "term": "boom, there I am", "tradition": null },
+        { "term": "a smooth transition into the other side", "tradition": null },
+        { "term": "I just turned and stepped down", "tradition": null }
+      ],
+      "regex": "(like (someone )?(flipp?ed|flicked|turned|threw) (on )?a switch|flip of a switch|flick of a switch|instantaneous(ly)? (shift|transition|transport|change)|instant(aneous)? shift in consciousness|(one (second|moment|minute)|one instant)[^.]{0,45}(the next|and the next)[^.]{0,45}I was)",
+      "negative_regex": "(light switch|switch (careers|jobs|sides|teams)|at the flip of a switch (the lights|the power))",
+      "quotes": [
+        { "videoId": "AW8YdHHiDzk", "text": "And I didn't go through a tunnel. I didn't any of that kind of thing. It was an instantaneous shift in consciousness.", "cvnde": 15 },
+        { "videoId": "IOODm4l7xa8", "text": "Like somebody turned a switch on and you moved.", "cvnde": 27 },
+        { "videoId": "j_d7js8GaLk", "text": "It was, boom, next thing I know, I'm in a black void.", "cvnde": 8 },
+        { "videoId": "MEonsq3osc0", "text": "there was no tunnel", "cvnde": 15 }
+      ],
+      "sensory": [
+        "no travel, no duration, no direction",
+        "no sense of transition at all — the seam is simply absent",
+        "the same construction used for the return: 'boom, I was back in my body'",
+        "sometimes accompanied by an accompanying feeling of relief rather than motion"
+      ],
+      "journey_position": 0.12,
+      "parent": null,
+      "measured": {
+        "all_pct": 0.92,
+        "all_docs": 57,
+        "cv13_pct": 1.45,
+        "cv18_pct": 1.1,
+        "cv23_pct": 1.66
+      },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "notes": "MORE common among the best-evidenced accounts (0.92% all vs 1.66% at cv>=23), though the absolute numbers are tiny (3 docs at cv>=23). This is a severe undercount of a common phenomenon: I tightened the regex hard because a looser version (4.16%, including bare 'boom' and 'in the blink of an eye') fired mostly on the RETURN transition and on the speed of the life review, not on outbound translocation. What survives is the specific 'one moment X, the next moment Y' construction, which is highly diagnostic. Conceptually this is the positive form of the-tunnel-that-wasnt."
+    },
+    {
+      "id": "the-tunnel-that-wasnt",
+      "name": "The Tunnel That Wasn't",
+      "category": "state",
+      "description": "A substantial group say, often unprompted and often with a note of apology or defiance, that they had no tunnel. They know the cliché — several name Moody or Kübler-Ross or 'the Hollywood version' — and they report its absence as a fact about their experience. In its place they describe going straight into the light, waking up already in a garden, stepping down into a meadow, or an instantaneous shift with nothing in between. One was told by a self-proclaimed expert that his was therefore not a near-death experience at all.",
+      "aliases": [
+        { "term": "there was no tunnel", "tradition": null },
+        { "term": "I didn't go through a tunnel", "tradition": null },
+        { "term": "it wasn't a tunnel", "tradition": null },
+        { "term": "this was not a tunnel experience", "tradition": null },
+        { "term": "not everybody does the tunnel", "tradition": null, "note": "the corpus's own hedge, used by people who DID have one" },
+        { "term": "I didn't have the normal tunnel of light that everybody has", "tradition": null },
+        { "term": "the light came to me", "tradition": null, "note": "the commonest stated alternative" }
+      ],
+      "regex": "((didn'?t|did not|never)\\s+(\\w+\\s+){0,3}(a |any |the )?tunnels?(?! vision)\\b|there (was|wasn'?t) no tunnel|wasn'?t a tunnel|\\bno tunnel\\b|not a tunnel\\b)",
+      "negative_regex": "(tunnel vision|carpal tunnel)",
+      "quotes": [
+        { "videoId": "MkARlQQYFFY", "text": "There wasn't a tunnel for me, but rather it's just this magnificent, huge, larger than life, larger than a galaxy light.", "cvnde": 13 },
+        { "videoId": "O4iKKsqXbsY", "text": "this was not a tunnel experience because it was this light that rather came to me", "cvnde": 14 },
+        { "videoId": "rHWBZSfWTVs", "text": "I just went straight to the light. I didn't go into a tunnel.", "cvnde": 8 },
+        { "videoId": "mZj9eWeccAM", "text": "I did not see a tunnel", "cvnde": 7 },
+        { "videoId": "AW8YdHHiDzk", "text": "And I didn't go through a tunnel. I didn't any of that kind of thing. It was an instantaneous shift in consciousness.", "cvnde": 15 }
+      ],
+      "sensory": [
+        "no passage, no walls, no travel time",
+        "the light approaching the experiencer instead of the reverse",
+        "waking up already arrived — in a garden, a room, a road, a meadow",
+        "a sideways 'step down' rather than a forward journey",
+        "explicit awareness of, and irritation at, the cultural script"
+      ],
+      "journey_position": 0.15,
+      "parent": "the-tunnel",
+      "measured": {
+        "all_pct": 4.53,
+        "all_docs": 280,
+        "cv13_pct": 6.63,
+        "cv18_pct": 5.94,
+        "cv23_pct": 4.97
+      },
+      "precision_estimate": 0.9,
+      "precision_sample_n": 14,
+      "notes": "This is the single most important corrective in the region. 4.53% of accounts explicitly DENY a tunnel — roughly one denial for every four affirmations — and denial is if anything commoner in the mid-evidence strata (6.63% at cv>=13) than overall, so it is not an artefact of vague accounts. Combined with the corpus's own coding (tunnel present in only 23.9% of accounts and only 18.1% of sequenced journeys) the picture is clear: the tunnel is a minority route, not the standard one, and its cultural centrality is not matched by its prevalence. Note also that these denials sit INSIDE the tunnel regex's matches at doc level, which is the main cap on that item's precision."
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "audits": [
+    {
+      "id": "the-suffering-multitude",
+      "judged": 24,
+      "true_positives": 7,
+      "precision": 0.29,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'on fire for God' as an idiom for religious enthusiasm (3 passages)",
+        "'tormented' used of ordinary life: abusive relationships, being an empath, clients with tormented souls",
+        "host intros and book plugs summarising a guest's hell NDE in the third person",
+        "political/theological argument about whether people deserve to be tortured in hell",
+        "visions of Earth burning in end-times prophecy, or God showing 'people being tortured' worldwide - not the afterlife multitude",
+        "the experiencer's own torment by entities rather than witnessing a crowd of others"
+      ],
+      "best_quote": {
+        "doc": "rH2pqLQU22c",
+        "text": "I could see people were in the Lake of Fire, and I could see like you could see at nighttime, you could see people like if they were in water, you'd see them bobbing up and down."
+      },
+      "suggested_regex": "\\b(?:hell|lake of fire|the pit|pits)\\b[^.]{0,160}\\b(?:people|souls|bodies|thousands|millions)\\b[^.]{0,80}\\b(?:burning|screaming|scream|wailing|tortured|tormented|agony|suffering)\\b"
+    },
+    {
+      "id": "the-nursery",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "hospital newborn/neonatal nursery - the medical setting, not the other world (5 passages)",
+        "daycare 'nursery' the speaker drops a child at, church nursery, Crisis Nursery charity",
+        "astronomical 'star nursery' / stellar nursery seen in space, and 'larval nursery' as a metaphor for Earth",
+        "plant nursery on an organic farm",
+        "a YouTube channel handle ('encrypted angels nursery') read out as boilerplate",
+        "a planned earthly community building that 'will have a nursery'"
+      ],
+      "best_quote": {
+        "doc": "wy9LnsfxVvQ",
+        "text": "And I asked what building that was, and I was stunned when they said, \"That is the nursery.\" And I responded, \"Nursery in heaven?\""
+      },
+      "suggested_regex": "nursery (?:in|of) heaven|heaven'?s nursery|(?:that|this) is the nursery|place where (?:the )?(?:babies|children|infants|unborn)[^.]{0,60}(?:die|died|passed (?:on|away))"
+    },
+    {
+      "id": "the-questions",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.33,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "the bare phrase 'three questions' in ordinary contexts: the interviewer's own questions, a daily self-improvement ritual, a rune-casting party, a medium's client Q&A",
+        "self-directed existential questions in the void ('I asked myself three questions: who am I, where did I come from') - the claim requires a voice asking the experiencer",
+        "researcher/host narration listing the questions other NDErs report, or introducing a guest's account in the third person",
+        "sermon speculation about what Jesus will ask you when you die",
+        "questions the experiencer asked the being, i.e. the reverse direction",
+        "note: 4 of the 8 true positives are the same Eagle Scout account re-uploaded on different channels, so distinct-account support is much thinner than the count suggests"
+      ],
+      "best_quote": {
+        "doc": "NHWzHFPs15A",
+        "text": "Following several minutes of silence, an unknown voice inquired, \"What have you done with your life?\" Sadly, I heard myself say, \"Nothing. I have wasted the entire 47 years.\""
+      },
+      "suggested_regex": "(?:voice|light|being|presence|god|jesus)[^.]{0,40}\\b(?:asked|inquired|said|threw a question)\\b[^.]{0,60}what (?:have|had|did) you (?:done|do) with (?:your|the) life"
+    },
+    {
+      "id": "point-of-no-return",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.63,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "the medical 'point of no return' in the OR - the doctors knowing time was running out",
+        "life-decision metaphor: a career pivot, leaving a company, 'I'm either going A or B'",
+        "hypnotherapists, hosts and commentators describing the threshold as a general NDE feature or in other people's regressions (4 passages)",
+        "the interviewer supplying the phrase and the experiencer only assenting, with no place described",
+        "note: 6 of the 15 true positives are three duplicated accounts re-published on different channels"
+      ],
+      "best_quote": {
+        "doc": "tp8Rd4rukKQ",
+        "text": "It says, \"If you take one more step, that's the point of no return, and you'll have no choice but to go back to mortality.\""
+      },
+      "suggested_regex": "(?:if (?:you|I) (?:take|took|go|went|cross|crossed|step|stepped)[^.]{0,80}(?:point of no return|no coming back|not be able to return)|(?:this|that) (?:was|is) the point of no return|crossed that border[^.]{0,40}no coming back)"
+    },
+    {
+      "id": "the-invisible-barrier",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.46,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "the phrase 'energy field' in new-age teaching and healing patter - lightening your energy field, clearing it with tones, Archangel Michael vacuuming it (6 passages, the single dominant junk source)",
+        "'an invisible wall went up between me and them' as a social metaphor after the NDE",
+        "a physical barrier in the accident scene (trapped under a car)",
+        "an interviewee relaying another person's NDE barrier",
+        "a visible golden city wall, which is a wall but not the invisible one",
+        "a meditation/surrender threshold rather than a boundary in the other world"
+      ],
+      "best_quote": {
+        "doc": "T6wuACTPWGQ",
+        "text": "But at the same time, there was something like an invisible fence between me and them. It was something like water, something he could barely see and feel."
+      },
+      "suggested_regex": "\\b(?:invisible|unseen|transparent) (?:wall|barrier|fence|shield|veil|glass|membrane|dome)\\b|\\bbarrier\\b[^.]{0,60}(?:couldn't (?:cross|pass|go)|could not (?:cross|pass|go)|not allowed to (?:cross|pass))"
+    },
+    {
+      "id": "the-grief-of-re-entry",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.79,
+      "verdict": "solid",
+      "failure_modes": [
+        "anger about something other than the return: a surgical scar and appearance, being late for things, having blamed God",
+        "an experiencer explicitly denying it ('a lot of people say they were angry that they had to come back - I didn't have that experience')",
+        "a practitioner generalising about how people argue and get angry when told to go back",
+        "note: this feature is an aftermath emotion rather than a place, so I scored it as 'the anger/grief is reported as the speaker's own on regaining the body'"
+      ],
+      "best_quote": {
+        "doc": "nr7lytwj1pw",
+        "text": "I came back and I was very angry that I was back and wished that this call had not come through and broken up my experience."
+      },
+      "suggested_regex": null
+    },
+    {
+      "id": "the-river-and-the-far-bank",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.58,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "metaphorical rivers: a 'river of all knowing' (the Akashic records, 2 copies), a raging river used as a simile for incoming love",
+        "earthly rivers in biography (the Mohawk River in childhood) and a Nile/Egypt past-scene with reeds and a boat",
+        "a river used as the exit portal back to the body, with no far bank and no dead",
+        "a creek with a footbridge toward a golden castle - water, but not the uncrossable divide",
+        "a commentator cataloguing river-crossing as a common NDE trope, and an audience member's question about the river",
+        "note: 6 of the 14 true positives are the same two accounts duplicated across channels"
+      ],
+      "best_quote": {
+        "doc": "uGMtd3YN3B0",
+        "text": "beyond the field was a small river about 30 feet across. We came to the bank of the river and on the opposite bank gathered in a big group were all my loved ones who had passed away."
+      },
+      "suggested_regex": "\\b(?:river|stream)\\b[^.]{0,140}\\b(?:opposite|other|far) (?:bank|side|shore)\\b[^.]{0,140}\\b(?:loved ones|relatives|family|people|souls|father|mother|grandmother|ancestors)\\b"
+    },
+    {
+      "id": "room-of-light",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.58,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "the circulating 'if you're white and you're in a white room, how would you know you're white?' teaching analogy about why souls incarnate - 5 passages, none of them a perceived place",
+        "a sleeping visitation dream in a white room with a table and chair, and a deliberate out-of-body practice session, neither during an NDE",
+        "the interviewer offering 'a white room or white light' as a menu option; the experiencer answers 'the nucleus of the white light', not a room",
+        "an experiencer explicitly rejecting the word ('I was in this white space. It's not a white room')"
+      ],
+      "best_quote": {
+        "doc": "1s0VkqcldAc",
+        "text": "I call it a room, but it has no doors, no windows, no walls, no floors."
+      },
+      "suggested_regex": "(?:I (?:was|found myself|ended up|end up|was standing)[^.]{0,30}(?:in|inside)[^.]{0,25}(?:white|bright|luminous|round white) room|room of light)(?![^.]{0,120}know (?:you're|you are) white)"
+    },
+    {
+      "id": "golden-road",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.67,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'path of light' as a moral/spiritual metaphor ('the opportunity to follow the path of light, but it depended on us')",
+        "'path of light' meaning the illuminated trajectory of the tunnel ascent, not a road",
+        "earthly paved surfaces: a marked highway before the crash, the unpaved muddy streets of his family's poor district, the cobbled streets of the speaker's own city seen through time",
+        "a garden of glowing paths explicitly framed as a dream",
+        "the anti-mention: 'it's not one of those things where you cross over and some people say, oh, I saw golden streets' - a denial the regex counts as a hit"
+      ],
+      "best_quote": {
+        "doc": "Bq8tMm0qySg",
+        "text": "To this day, I can still envision the golden streets, but even more so how they felt beneath my bare feet."
+      },
+      "suggested_regex": "\\b(?:I|we) (?:walked|was walking|stepped|step|arrived|came|followed|flew)[^.]{0,80}\\b(?:gold(?:en)? (?:street|streets|road|roads|path|pathway)|streets? of gold|cobble(?:d|stone)? (?:road|roads|path|pathway|street|streets))\\b"
+    },
+    {
+      "id": "the-instantaneous-transition",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.58,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "a literal switch on a portable ventilator, in one widely re-uploaded account (3 passages)",
+        "'a flick of a switch' as a metaphor for how easily he could have died had he chosen to stay (2 passages)",
+        "'from one moment to the next' in ordinary life: deciding to send an email, the onset of a haemorrhage, the moment after an electrocution",
+        "a host reciting what NDErs generally say about having 'no sense of transition'",
+        "note: I counted the return leg (light to body with no passage) as in-scope, since the claim's own wording is drawn from such a passage"
+      ],
+      "best_quote": {
+        "doc": "AW8YdHHiDzk",
+        "text": "I didn't go through a tunnel. I didn't any of that kind of thing. It was an instantaneous shift in consciousness. Boom, there I am."
+      },
+      "suggested_regex": "(?:one (?:moment|minute|second)|at one moment) I was[^.]{0,80}next (?:moment|minute|second|thing)[^.]{0,50}I was\\b|instantaneous shift in consciousness|no sense of transition"
+    },
+    {
+      "id": "the-healing-place",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.58,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "earthly 'healing centers': the speaker's own practice, yoga therapy in Thailand, retreats and workshops, a repurposed building in Colorado, a bio blurb (5 passages)",
+        "Egyptian healing temples at Saqqara recalled as history/past-life, not the NDE",
+        "a vision of future Earth in which surviving homes become healing centers",
+        "a medium watching angels heal a dying woman at her bedside, plus speculation about 'the healing centers in the spirit world'",
+        "'looking into the healing room' as a metaphor for treating cancer patients"
+      ],
+      "best_quote": {
+        "doc": "-lzzmcuFKbg",
+        "text": "And it, it was like a spiritual hospital for people who have died like a traumatic death or suicide."
+      },
+      "suggested_regex": "\\b(?:healing (?:pool|pools|temple|temples|chamber|chambers)|spiritual hospital|halls? of healing|healing centers? (?:in|on) the (?:spirit world|other side))\\b"
+    },
+    {
+      "id": "golden-light",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.79,
+      "verdict": "solid",
+      "failure_modes": [
+        "gold as the colour of scenery rather than of the light: gold-edged tree trunks, gold undersides of leaves, gold-tipped grass (3 passages, 2 of them the same duplicated account)",
+        "a waking vision seen 'in my mind's eye' while writing at a desk, with a gold glow over green hills - not an NDE (2 copies of the same account)"
+      ],
+      "best_quote": {
+        "doc": "NWMYIVoeMSo",
+        "text": "I was surprised to see myself encompassed within a beautiful yellow-gold light, very intense and very soothing."
+      },
+      "suggested_regex": null
+    },
+    {
+      "id": "the-fence",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'the picket fence' as shorthand for a conventional suburban life - house, marriage, two kids (2 passages)",
+        "earthly fences: the South Africa/Zimbabwe border fence, a backyard fence a bird lands on, wooden gates during home renovations, a whitewater rapid named the Picket Fence, a gang called the white fence",
+        "fence as a metaphor for mental limits ('there's no fence around heaven', 'our little fence building and logic building')",
+        "an earthly barbed-wire fence invoked only as a contrast to how run-down this world looks next to the new one",
+        "incidental fenced yards in an otherworld village that are scenery rather than the boundary"
+      ],
+      "best_quote": {
+        "doc": "wRuVNAf_InM",
+        "text": "And there was a wooden fence, um, telling me that there was one step over to the other side, and I wouldn't be able to come back for good."
+      },
+      "suggested_regex": "\\b(?:white|wooden|picket|barbed[- ]?wire|stone|low|little) fence\\b[^.]{0,140}\\b(?:meadow|grass|garden|beings|heaven|the other side|beyond)\\b|\\b(?:meadow|garden|grass|beings|heaven)\\b[^.]{0,140}\\b(?:white|wooden|picket|barbed[- ]?wire|stone|low|little) fence\\b"
+    },
+    {
+      "id": "great-columned-hall",
+      "judged": 24,
+      "true_positives": 20,
+      "precision": 0.83,
+      "verdict": "solid",
+      "failure_modes": [
+        "a motivational parable about an architect visiting workmen at a Roman temple",
+        "biography: a year of travel visiting Greek and Roman temples in Turkey, Syria and Jordan",
+        "a speaker describing the 'Greek column places' of learning he chose not to visit and only knows from other people's accounts",
+        "a teaching that Earth's Greek buildings and pyramids exist on the other side first, attached to a visit to a medieval castle",
+        "note: about a quarter of the true positives are the same columned-library account re-uploaded across channels"
+      ],
+      "best_quote": {
+        "doc": "By3UjYUe7rw",
+        "text": "I could see in the distance a beautiful Greek style building that was vibrantly white with many steps leading up to it and huge columns in front."
+      },
+      "suggested_regex": null
+    }
+  ]
+}

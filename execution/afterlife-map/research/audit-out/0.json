@@ -1,0 +1,267 @@
+{
+  "audits": [
+    {
+      "id": "the-other-side",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Channel/podcast boilerplate: 'people who have glimpsed the other side of death', the NDE Radio show intro, conference and book plugs (4 passages)",
+        "Interviewer talking: host quoting research statistics ('20% of cardiac arrest patients remember something from the other side') or asking the guest a question",
+        "Post-NDE mediumship in ordinary life: 'I do get communication from the other side' — after-death contact years later, not a place perceived during the NDE",
+        "Literal geography sharing the phrase: walking to the other side of an island, crossing to the other side of a battlefield",
+        "General teaching/speculation about what happens to everyone when they 'go to the other side', including one passage that explicitly denies it ('there is no other side')"
+      ],
+      "suggested_regex": "(?:\\bI (?:was|went|got|had been|found myself|came back)\\b[^.?!]{0,40}\\bthe other side\\b)|(?:\\bthe other side\\b[^.?!]{0,40}\\bI (?:was|saw|felt|knew)\\b)",
+      "best_quote": {
+        "doc": "zcSGNnlzAdo",
+        "text": "And one of the things that we experienced about the other side is a concern, a very deep and powerful concern for the Earth."
+      }
+    },
+    {
+      "id": "language-fails",
+      "judged": 24,
+      "true_positives": 20,
+      "precision": 0.833,
+      "verdict": "solid",
+      "failure_modes": [
+        "Ineffability attached to post-NDE aftereffects rather than the experience: 'it's hard to describe' about a changed personality, a restructured body, new intuitive abilities",
+        "Ineffability attached to physical medical pain — a hemorrhage described as 'indescribable' and 'can't be described unless you've experienced it'",
+        "One case where 'I can't describe it any other way than saying...' is a rhetorical lead-in to a description, not a failure of language"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "zGbjkSmDvZk",
+        "text": "there are no words in any of the world's lexicons to explain what that experience was"
+      }
+    },
+    {
+      "id": "heaven-by-that-name",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Scripture and liturgy: the Lord's Prayer ('Our Father which art in heaven'), 'the kingdom of heaven is within you', 'angels in heaven rejoice', catechism answers — 5 passages",
+        "Idiom: 'What in heaven's name was I doing...', 'I reached up to heaven' as a physical gesture",
+        "Host/interviewer boilerplate summarising a guest's NDE ('On the way to heaven, he saw all the prayers...') and book-show framing",
+        "Ordinary biography: a dying patient shouting 'I'm going to heaven tomorrow!' in a hospital hallway; a six-year-old son's pre-birth memories",
+        "Explicit denials that heaven is a place: 'it wasn't a place like going to heaven is a place', 'I haven't been to heaven, I haven't been to hell', 'Heaven is not a place, it is an awareness'",
+        "General theology about who gets in ('in heaven, you're all connected')"
+      ],
+      "suggested_regex": "(?:\\bI (?:was|found myself|realized I was|knew I was) in [Hh]eaven\\b)|(?:\\bI (?:went|was taken|was brought|was carried|got|transitioned) (?:up |in)?to [Hh]eaven\\b)|(?:\\bIs this [Hh]eaven\\b)|(?:\\bthis was [Hh]eaven\\b)|(?:\\bgateway to [Hh]eaven\\b)",
+      "best_quote": {
+        "doc": "opcQONTQHXQ",
+        "text": "Well, then I transitioned into heaven, which I call heaven. And to me, it was a holding place, though it looked like the Earth in perfection."
+      }
+    },
+    {
+      "id": "guides-guardians-escorts",
+      "judged": 24,
+      "true_positives": 7,
+      "precision": 0.292,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Post-NDE guide contact in ordinary life — found through a YouTube guided meditation, spoken to 'not so long ago', heard during a phone call in 2013, visiting in dreams for three years afterwards (6 passages). This is the single largest junk class.",
+        "'Guardian angel' as metaphor for a helpful stranger — the slow driver who kept you out of a crash 'was your guardian angel'",
+        "Ordinary-life guides and teachers: a first-grade teacher, a yoga teacher, a meditation guide, a schoolteacher at an accident scene",
+        "Interviewer/host framing: a researcher recounting two other experiencers' guides; NDE Radio host describing childhood belief in guardian angels",
+        "Post-hoc speculation about what guides are ('I have since come to understand that we have, call it spirit guides')"
+      ],
+      "suggested_regex": "(?:\\b(?:my |a |the )?(?:spirit |spiritual )?guide(?:s)?\\b[^.?!]{0,60}\\b(?:took my hand|took me|led me|walked with me|beside me|behind my|escorted|guided me|stayed with me|said to me)\\b)|(?:\\b(?:took my hand|led me|escorted me)\\b[^.?!]{0,40}\\b(?:guide|guardian|angel)\\b)",
+      "best_quote": {
+        "doc": "NVlnv2zBSTU",
+        "text": "Someone was there with me, a guide, just behind my left shoulder. He stayed with me and taught me through a series of panoramas while I gazed at the Earth."
+      }
+    },
+    {
+      "id": "the-source-and-the-universe",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'The universe' as everyday idiom for fate or providence: 'trust the universe is going to bring you helpers', 'the universe was like, okay, you said yes' (3 passages)",
+        "'Source' as an ordinary noun: 'that's really the source of my work and my life now'; 'a source of water and the source of light' as scenery",
+        "Popular-science talk: Niels Bohr, the universe as a symphony, NASA frequencies — no experience content at all",
+        "Host monologue generalising about what everyone becomes ('We enter a state of bright brilliant light... We become Oneness') before introducing a guest",
+        "Researcher quoting aggregated statements from other people's accounts",
+        "Post-hoc philosophy about consciousness and ascension written years after the event"
+      ],
+      "suggested_regex": "(?:\\boneness\\b)|(?:\\bone with (?:everything|all that is|the universe|the all)\\b)|(?:\\bthe [Ss]ource\\b(?!\\s+of\\s+(?:my|his|her|their|the|water|light|income|income)))|(?:\\bcollective consciousness\\b)|(?:\\bthe universe (?:was|is) (?:embracing|holding|inside|part of) me\\b)",
+      "best_quote": {
+        "doc": "nP5zZKCFvrc",
+        "text": "it was just this sense of this huge enormous oneness of everything that ever has been and ever will be and and anywhere in the universe"
+      }
+    },
+    {
+      "id": "telepathic-speech",
+      "judged": 24,
+      "true_positives": 17,
+      "precision": 0.708,
+      "verdict": "solid",
+      "failure_modes": [
+        "Telepathy in a practice rather than in the NDE: hospice/death-doula work coaching a dying man telepathically, mediumship and Ouija-board sessions, dragons contacted telepathically during a volcano ritual (4 passages)",
+        "Researcher summaries of other people's data — a pre-birth-experience study across 10 countries reporting telepathy",
+        "Podcast boilerplate: a four-part afterlife-communication series intro promising to relay what was 'received telepathically'",
+        "Deathbed-vision speculation about what dying people generally hear from the other side"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "kqk480ooV24",
+        "text": "I heard everything telepathically. No words were heard as sound. They were just put directly in my mind"
+      }
+    },
+    {
+      "id": "leaving-the-body",
+      "judged": 24,
+      "true_positives": 22,
+      "precision": 0.917,
+      "verdict": "solid",
+      "failure_modes": [
+        "Literal bodily discharge: 'the water that came out of my body' after paralysis — the phrase matched, the meaning is plumbing",
+        "Recurring post-NDE out-of-body practice at night ('I started having out-of-body experiences again... I'd start leaving my body and be taken to other realms') — aftereffect, not the separation moment",
+        "Note on strictness: several true positives are separations that were not medically near-death (a traumatic dissociation, a kundalini-style exit in an auditorium, a spontaneous exit on a friend's couch). I counted these as true because the passage describes the exit itself; a stricter map that requires a clinical near-death event would score this packet lower."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "BajThKWN0_4",
+        "text": "I felt this shake and this pop, and I was ejected from my body. So now I'm in this dark void."
+      }
+    },
+    {
+      "id": "the-passage-you-are-given",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Literal hallways, stairwells and rivers in this world: a hospital corridor, paramedics carrying stretchers down a stairwell, being sent across a river to South Africa, crossing a river on a rope swing, skipping down the hallway at work (6 passages) — 'hallway', 'river' and 'stairs' are the leaky tokens, 'tunnel' and 'corridor of light' are nearly clean",
+        "Interviewer generalising about the menu itself ('some even go through a tunnel, some don't')",
+        "Explicit denial: 'I recall arriving in a beautiful, completely strange world, not through a tunnel or a light'",
+        "Post-NDE domestic scenes: spirits seen 'down the hallway' at home"
+      ],
+      "suggested_regex": "(?<!not )\\b(?:down|through|into|along|up|in) (?:the|this|a|that) (?:tunnel|corridor|passageway|passage|stairway|staircase|escalator|elevator)\\b",
+      "best_quote": {
+        "doc": "RjodkC6razE",
+        "text": "I'm traveling down this tunnel at immense speed. I would have to say the speed of light."
+      }
+    },
+    {
+      "id": "the-life-review",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Explicit denials, which the phrase-match cannot distinguish from reports: 'I didn't have a life review', 'it was not a life review', 'there's no such thing as a life review' for infants (4 passages)",
+        "Interviewer questions asking whether there was one ('Bill, did you have a life review when you had your first NDE?')",
+        "Researcher and study summaries: children's NDE statistics, shared-death companions who 'participate in the life review'",
+        "Second-hand accounts — a mother relaying her dead son's life review",
+        "Generic teaching in the second person about what everyone undergoes ('you have a life review up there, so revenge is impossible')"
+      ],
+      "suggested_regex": "(?:\\bmy life review\\b)|(?:\\bI (?:had|was given|went through|watched|experienced|underwent)\\s+(?:a|my|the|this)\\s+life review\\b)|(?:\\bit was a life review\\b)|(?:\\btime for your life review\\b)",
+      "best_quote": {
+        "doc": "PSzv7SLUeR4",
+        "text": "My life review took the form of a large disorganized room, and in that instant, I was able to see how all the parts of my life were connected to one another."
+      }
+    },
+    {
+      "id": "the-light",
+      "judged": 24,
+      "true_positives": 20,
+      "precision": 0.833,
+      "verdict": "solid",
+      "failure_modes": [
+        "Literal light sources in the room: an operating-theatre lamp seen during an OBE, ceiling 'light fixtures' noticed while floating",
+        "TV host / book-promo framing ('Betty says that when she died, she went to the light and met Jesus')",
+        "Sermon-style speculation using the light rhetorically ('Are we going to the light? Or are we going to the darkness?')"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "F3qsXx4XK5o",
+        "text": "I saw the light. I was in it. This light is not something you just see and look at. It's like your whole self becomes your vision."
+      }
+    },
+    {
+      "id": "the-verdict-not-your-time",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Idiomatic narrative backtracking: 'I have to go back and say...', 'if I have to go back to one of the ones that shaped me', 'I had to go back to my parents' lives' when writing a memoir (3 passages)",
+        "Medical usage: 'I had to go back in for emergency programming' of a spinal stimulator",
+        "The experiencer's own decision or request to return rather than a verdict delivered to them ('I asked the being if I could go back', 'I knew I had to go back')",
+        "Explicit negation: 'my guides didn't tell me what to do. They didn't say, You have to go back or not'",
+        "Moralising about God's timing in general ('until it is your time, it's not your time')",
+        "Note: this packet is a near-duplicate of 'the-order-to-return' — same claim, same failure profile. They should probably be merged or one dropped."
+      ],
+      "suggested_regex": "(?:\\b(?:it(?:'s| is)?|this is|that(?:'s| is)?) not (?:yet )?your time\\b)|(?:\\byour time (?:has|had) not (?:yet )?come\\b)|(?:\\b(?:said|says|told me|saying|heard)\\b[^.?!]{0,50}\\byou (?:have|need|must|got|'ve got) to go back\\b)|(?:\\byou must return\\b)",
+      "best_quote": {
+        "doc": "QSDmyV44rZw",
+        "text": "the light itself, all these millions upon millions of fragments of light, said to me, this is not your time. You must return."
+      }
+    },
+    {
+      "id": "the-eastern-frame",
+      "judged": 24,
+      "true_positives": 7,
+      "precision": 0.292,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Past-life work as a profession or therapy: a past-life regression hypnotherapist, a stage healer 'clearing your past life', clients asking not to be told about bad past lives (3 passages)",
+        "Post-NDE psychic aftereffects in ordinary life — seeing other people's past lives in their auras, recognising a stranger as a past-life soul contract",
+        "Book and website plugs that happen to use the vocabulary ('DharmaTalks.com', 'my karma... more about the dharma')",
+        "Interviewer theology questions ('what's your thoughts on reincarnation?') and the guest's non-answer",
+        "Free-floating philosophy about karma, ego and reincarnation with no experience attached",
+        "Explicit negation ('Was there a life review where you saw your past life? No, I didn't see it there') and one contrast case ('some people say they have past life reviews. For me it was more like...')"
+      ],
+      "suggested_regex": "(?:\\bI (?:saw|was shown|was told|remembered|witnessed|relived)\\b[^.?!]{0,60}\\b(?:past li(?:fe|ves)|previous li(?:fe|ves)|reincarnat\\w*|other lifetimes|so many lifetimes)\\b)|(?:\\b(?:showed|told|informed) me\\b[^.?!]{0,50}\\b(?:past li(?:fe|ves)|my karma)\\b)",
+      "best_quote": {
+        "doc": "WfYJzm0OhQk",
+        "text": "I see a hologram of what seemed to be, I don't know if they were past lives, parallel lives, or whatever it was, but it was me in so many lifetimes."
+      }
+    },
+    {
+      "id": "the-order-to-return",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Hosts and researchers describing the formula in the abstract: 'what normally happens is they're greeted by somebody who tells them, it's not your time', 'mothers with children are told on the other side, it's not your time', channel outro commentary comparing this case to the usual script (4 passages)",
+        "Someone else's NDE relayed by the host — a colleague whose dead wife told him 'It's not your time, stay for Spencer'",
+        "Ordinary-life guidance voices: a voice in a bank saying 'You need to go back and ask someone else'",
+        "The experiencer's own reflection that 'it just wasn't my time', or their own begging to be sent back, with no utterance delivered to them",
+        "Return described with no verdict at all ('when they sent me back' / 'why would God send me back'), which the phrase-match cannot separate from the spoken order",
+        "Note: near-duplicate of 'the-verdict-not-your-time'; the two packets share passages by doc and should be reconciled."
+      ],
+      "suggested_regex": "(?:\\b(?:said|says|told me|saying|heard (?:a )?voice)\\b[^.?!]{0,60}\\b(?:it(?:'s| is)? not (?:yet )?your time|you (?:have|need|must|got|'ve got) to go back|you must (?:go back|return)|you're going back)\\b)",
+      "best_quote": {
+        "doc": "XjHJ4olBuRs",
+        "text": "his hand pulled back into that cloud and said, it is not yet your time. You have more things yet to do."
+      }
+    },
+    {
+      "id": "the-unnamed-place",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'A place where' as pure metaphor for an emotional or mental state: 'it put me in a place where I had a hard time trusting', 'I've got into a place where I love the word God', 'how she came to a place where she felt the need to kill herself' (3 passages) — this is the dominant junk class",
+        "Ordinary geography: relocating 800 miles 'to a place where I didn't know anyone', Hawaiian ghost-lore about going 'to a place' to see night marchers",
+        "General theological speculation in the second person ('when you die it is forever in a place of beauty', 'you're in a place where now you got to figure out if you want to reincarnate')",
+        "Someone else's NDE quoted by the narrator ('my client said, I went to a place where I could look up everything')",
+        "Interviewer echoing the phrase back as a question; one third-person spirit-world narration that is not a first-person report"
+      ],
+      "suggested_regex": "\\bI (?:found myself|saw myself|was|arrived|came|went|got|was taken|was transported|had been transported|woke up|ended up)\\b[^.?!]{0,30}\\b(?:in|to|at) (?:a|this) place\\b(?!\\s+where I (?:love|felt|had|have|couldn't))",
+      "best_quote": {
+        "doc": "zkzmVof-PSQ",
+        "text": "I found myself in a place that was not of this earth. It felt more real than reality itself. It was vivid, intelligent, and alive."
+      }
+    }
+  ]
+}

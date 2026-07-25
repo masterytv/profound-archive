@@ -1,0 +1,401 @@
+{
+  "places": [
+    {
+      "id": "the-home",
+      "name": "Home",
+      "category": "realm",
+      "parent": null,
+      "journey_position": 0.45,
+      "description": "The single most common name experiencers give the place they arrive at is not heaven, the light, or the other side — it is home. They are not describing a beautiful strange country; they are describing arrival at the place they came from and had somehow mislaid. The recognition is instant and total, and it arrives before any being speaks, before any landscape is examined. Many say the word is the only word that fits, and then apologise that it is not enough.",
+      "aliases": [
+        {"term": "home", "tradition": null, "note": "the bare word, used as a proper noun for the destination"},
+        {"term": "I was home", "tradition": null, "note": "the most frequent verbatim formula"},
+        {"term": "my real home", "tradition": null, "note": null},
+        {"term": "my true home", "tradition": null, "note": null},
+        {"term": "our home space", "tradition": null, "note": null},
+        {"term": "spiritual home", "tradition": "Christian", "note": "used by Eben Alexander and others"},
+        {"term": "homecoming", "tradition": null, "note": null},
+        {"term": "our original home", "tradition": null, "note": null},
+        {"term": "eternal home", "tradition": "Christian", "note": null},
+        {"term": "total home", "tradition": null, "note": "one experiencer's intensifier when 'home' proved too weak"}
+      ],
+      "regex": "(?:welcomed? home\\b|(?:real|true|eternal|spiritual|actual|forever) home\\b|homecoming|(?:felt|feels|feeling|sense|sensation) (?:like |of |that )?(?:i(?:'m| am| was)? )?(?:being )?home\\b|knew (?:that )?(?:i was|this was|it was|we were) home\\b|(?<!while )i(?:'m| am| was) (?:finally |truly )?home\\b(?!\\s*[,.]?\\s*(?:a few|alone|in bed|in the|with|from|when|for |by myself|sick|recovering|and (?:my|the|we|she|he|i|recovering)))|home at last)",
+      "negative_regex": "while i was home|homeless|nursing home|funeral home|home ?town|home run|welcome home to youtube",
+      "measured": {"all_pct": 14.12, "all_docs": 872, "cv13_pct": 16.41, "cv18_pct": 17.13, "cv23_pct": 19.34},
+      "precision_estimate": 0.81,
+      "precision_sample_n": 16,
+      "quotes": [
+        {"videoId": "AW8YdHHiDzk", "cvnde": 15, "text": "I was home. I was home. And I knew it. There's a sense of being home like you will never have here. It was total home. And I didn't want to leave."},
+        {"videoId": "s3s56iUENd4", "cvnde": 13, "text": "the only word I can come up with that is even close to what I felt is, \"I was home.\""},
+        {"videoId": "AHJtD6donPA", "cvnde": 19, "text": "I was home. I felt infinite grace, boundless joy, perfect peace, wholeness, complete acceptance, and total adoration."},
+        {"videoId": "Xw39iEvZcM8", "cvnde": 22, "text": "But at the same time, it was so familiar to me, as if I had always been there, as if it was my home."},
+        {"videoId": "UYBGm_rDvso", "cvnde": 22, "text": "it seemed like a spiritual home. And in many ways, it was far more real than this world."}
+      ],
+      "sensory": [
+        "an immediate, physical sense of relief — 'you could breathe'",
+        "described as bodily, not abstract: one man begins to run on ground he can feel",
+        "compared to a dead phone being plugged into its charger",
+        "no orientation period; the recognition precedes any inspection of the place",
+        "often accompanied by the thought 'I am never leaving'"
+      ],
+      "notes": "This is the strongest 'return' signal in the corpus and it strengthens monotonically with evidential quality: 14.12% of all accounts, 17.13% at cvNDE>=18, 19.34% at cvNDE>=23. That upward gradient is the opposite of what a culturally-scripted embellishment would do. The word cuts across traditions — Christian, secular, Buddhist and Indigenous experiencers all reach for 'home' unprompted, and several explicitly reject 'heaven' as the wrong word. Precision loss comes from biographical uses ('I was home in bed when I died'), which the lookaheads suppress but do not eliminate."
+    },
+    {
+      "id": "welcome-home",
+      "name": "Welcome Home",
+      "category": "process",
+      "parent": "the-home",
+      "journey_position": 0.4,
+      "description": "The greeting itself, reported as a fixed formula: the beings, the crowd, or a single relative say 'welcome home', often adding 'we've been waiting for you'. It is not merely a greeting to a visitor — it is spoken as a return. Experiencers who had no home in life report this as the most emotionally overwhelming moment of the whole experience.",
+      "aliases": [
+        {"term": "welcome home", "tradition": null, "note": "the exact phrase, frequently in quotation marks in the transcript"},
+        {"term": "welcomed home", "tradition": null, "note": null},
+        {"term": "we've been waiting for you", "tradition": null, "note": "the usual second clause"},
+        {"term": "you have come home", "tradition": "Buddhist", "note": "spoken by a meditation teacher's presence in one account"},
+        {"term": "welcome back", "tradition": null, "note": null}
+      ],
+      "regex": "welcomed? (?:me |us |you |back )?home\\b",
+      "negative_regex": "welcome home to youtube|welcome home from (?:the )?(?:war|deployment|hospital)",
+      "measured": {"all_pct": 2.07, "all_docs": 128, "cv13_pct": 2.59, "cv18_pct": 2.35, "cv23_pct": 0.55},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 10,
+      "quotes": [
+        {"videoId": "tjSSd6jCc5Q", "cvnde": 18, "text": "Welcome home. Welcome. We've been waiting for you."},
+        {"videoId": "0ISQ4ejRkXU", "cvnde": 17, "text": "my grandfather is extending his hands to me and saying, \"Welcome home, Donnie,\" in a language I've never heard before, but fully understood."},
+        {"videoId": "-IuJKabyx_g", "cvnde": 15, "text": "Then I heard her speak inside my mind, \"Welcome home. You have come home.\""},
+        {"videoId": "m3vB2J-BH6Y", "cvnde": 15, "text": "they communicated to me a thought, a meaning, a perception of welcome home. And I'll tell you, it was the most emotional homecoming I think I could have ever experienced"},
+        {"videoId": "Psi1qYOf2fs", "cvnde": 17, "text": "that feeling of being welcomed home was so rich, so real"}
+      ],
+      "sensory": [
+        "arrives telepathically as a whole meaning rather than as words",
+        "sometimes spoken in an unknown language that is nevertheless understood",
+        "delivered by a crowd speaking as one voice",
+        "reported by people who grew up in foster care or dysfunctional homes as unbearable in its sweetness"
+      ],
+      "notes": "Distinct from the already-catalogued welcoming-party (who is there) — this entry is what is said. Note the drop at cvNDE>=23 (0.55%, 1 of 181): the very best-evidenced accounts are dominated by short, medically-verified OBEs that never reach the greeting stage, so absence here is a truncation artefact, not disconfirmation."
+    },
+    {
+      "id": "more-real-than-real",
+      "name": "More Real Than Real",
+      "category": "state",
+      "parent": null,
+      "journey_position": 0.55,
+      "description": "Experiencers insist, almost defensively, that the other place was not dreamlike but the reverse: more solid, more detailed, more present than waking life. The comparison is volunteered without prompting and is usually offered as the reason they cannot accept a hallucination explanation. The phrasing collapses into a small set of near-identical formulas across thousands of unrelated accounts.",
+      "aliases": [
+        {"term": "more real than this", "tradition": null, "note": null},
+        {"term": "realer than real", "tradition": null, "note": null},
+        {"term": "more real than anything I've ever experienced", "tradition": null, "note": null},
+        {"term": "ultra-real", "tradition": "secular", "note": "Eben Alexander's coinage, now widespread"},
+        {"term": "hyper-real", "tradition": null, "note": null},
+        {"term": "too real to be real", "tradition": null, "note": null},
+        {"term": "the most real thing that ever happened to me", "tradition": null, "note": null}
+      ],
+      "regex": "(?:more real than\\b|realer than\\b|(?:ultra|hyper|super)[- ]?real\\b|most real (?:thing|experience|place|moment)|realest\\b|real(?:er|est)? than (?:this|life|anything))",
+      "negative_regex": null,
+      "measured": {"all_pct": 7.48, "all_docs": 462, "cv13_pct": 8.93, "cv18_pct": 8.84, "cv23_pct": 9.39},
+      "precision_estimate": 0.93,
+      "precision_sample_n": 14,
+      "quotes": [
+        {"videoId": "iw2G9UkDjzk", "cvnde": 15, "text": "it felt more real than this life. Yeah. It felt more significant than this life. It felt better in every way than this life."},
+        {"videoId": "sNCwFM2YKO0", "cvnde": 20, "text": "that was realer than realer than real. And, you know, again, that reminds me just how not real this place is."},
+        {"videoId": "IUmnDGHmMtc", "cvnde": 13, "text": "This, this place of reality that I was in, this different dimension, was way more real than this place."},
+        {"videoId": "GQi_jHowQ5Y", "cvnde": 15, "text": "more real than anything I'd ever experienced here, and I've concluded that that's my real home."}
+      ],
+      "sensory": [
+        "detail described as inexhaustible — every blade of grass individually perceived",
+        "colour and sound reported as saturated beyond earthly range",
+        "memory of it does not fade or blur with decades, unlike ordinary memory",
+        "the body on the table becomes 'less interesting', visually thinner than the spiritual form"
+      ],
+      "notes": "The claim is remarkably stable across strata — 7.48% overall, 8.84% at cvNDE>=18, 9.39% at cvNDE>=23 — i.e. it does not weaken among the accounts with the best-evidenced veridical perception. Frequently co-occurs with the-home in the same sentence; several accounts explicitly link them ('it feels more real, and so that gives you that feeling of being home')."
+    },
+    {
+      "id": "this-life-is-the-dream",
+      "name": "This Life Is the Dream",
+      "category": "state",
+      "parent": null,
+      "journey_position": 0.95,
+      "description": "The inversion. Having named the other place the real one, experiencers demote this one: earthly life is the dream, the shadow, the illusion, the murky film. The claim is almost always made after return and in the past tense of comparison — it is the residue of the visit rather than something perceived during it. Several say the demotion never wore off.",
+      "aliases": [
+        {"term": "this is the dream", "tradition": null, "note": "the compressed formula"},
+        {"term": "this life is a shadow", "tradition": "Christian", "note": null},
+        {"term": "this world is an illusion", "tradition": null, "note": null},
+        {"term": "the dream state", "tradition": null, "note": null},
+        {"term": "this is fake to me", "tradition": null, "note": null},
+        {"term": "a simulation", "tradition": "secular", "note": "younger experiencers' framing"},
+        {"term": "the murky world", "tradition": null, "note": null}
+      ],
+      "regex": "(?:(?:this|the physical|the earthly|earth(?:ly)?) (?:life|world|plane|reality|existence|realm|dimension)[^.!?]{0,30}(?:is|was|seems|seemed|felt like|feels like) (?:more like )?(?:the |a |an )?(?:dream|illusion|hologram|simulation|shadow|not real|unreal|less real)|less real than|this is the dream\\b|this life is (?:a |the )?(?:shadow|dream|illusion)|(?:this|here) (?:is|was) (?:the )?(?:fake|illusion))",
+      "negative_regex": "heaven is real|god is real|this is a dream\\?|was it a dream",
+      "measured": {"all_pct": 1.30, "all_docs": 80, "cv13_pct": 0.66, "cv18_pct": 0.69, "cv23_pct": 0.00},
+      "precision_estimate": 0.91,
+      "precision_sample_n": 11,
+      "quotes": [
+        {"videoId": "PdwUXAPnU9k", "cvnde": 15, "text": "This is the dream. This world, this material world is the murky, kind of dreamlike world."},
+        {"videoId": "Jod2NliehiU", "cvnde": 16, "text": "This life feels like a dream. Feels like I'm walking in a dream because I'm confined in this body with limited mental ability, and I long to go back home"},
+        {"videoId": "9aoNmu18U9k", "cvnde": 18, "text": "This is the dream. Heaven and all the things that are spiritual is the real thing."},
+        {"videoId": "iOZ60JhxRbM", "cvnde": 20, "text": "he says that it's like a shadow, this life is a shadow compared to that life."},
+        {"videoId": "YmnG7xlzplk", "cvnde": 13, "text": "When you cross over, it's alive. This is like that dream. This is the dream state, sort of like that dream."}
+      ],
+      "sensory": [
+        "this world described as heavy, slow, 'hip-deep molasses'",
+        "emotions here felt as condensed and raging by comparison",
+        "the body experienced as a confinement that limits mental bandwidth"
+      ],
+      "notes": "Deliberately measured separately from more-real-than-real, and it is far rarer (1.30% vs 7.48%). The asymmetry is the finding: many people will say the other place was more real; comparatively few take the further step of calling THIS one a dream. The zero at cvNDE>=23 (0/181) is a small-denominator effect but worth flagging — the strongest veridical cases lean toward sober medical description rather than metaphysical inversion."
+    },
+    {
+      "id": "the-recognition",
+      "name": "The Recognition — I Had Been Here Before",
+      "category": "state",
+      "parent": null,
+      "journey_position": 0.38,
+      "description": "The other world is reported not as strange but as remembered. People say it felt familiar, that they recognised the place, that they had been there before — often while simultaneously acknowledging they had never seen it in this life. The familiarity extends to the beings ('I know these people'), the light ('it had always been there and I just forgot'), and the knowledge itself. Several describe the total absence of the astonishment they would have expected.",
+      "aliases": [
+        {"term": "it felt familiar", "tradition": null, "note": "the most common formula"},
+        {"term": "I had been there before", "tradition": null, "note": null},
+        {"term": "I recognized this place", "tradition": null, "note": null},
+        {"term": "a sense of familiarity", "tradition": null, "note": null},
+        {"term": "as if I had always been there", "tradition": null, "note": null},
+        {"term": "I knew this place", "tradition": null, "note": null},
+        {"term": "deja vu", "tradition": "secular", "note": "occasionally used as the nearest earthly analogue"},
+        {"term": "it was just expected", "tradition": null, "note": "the absence of surprise, reported as itself surprising"}
+      ],
+      "regex": "(?:(?:felt|feels|seemed|was|were) (?:so |very |strangely |oddly |completely |totally )?familiar\\b(?! with)|sense of familiarity|feeling of familiarity|familiar place|i(?:'d| had) been there before|i(?:'ve| have) been there before|i recogni[sz]ed (?:this place|the place)|i knew (?:this|that) place|knew (?:i|we) (?:had )?been (?:there|here) before)",
+      "negative_regex": "familiar with|are you familiar|looked familiar",
+      "measured": {"all_pct": 7.14, "all_docs": 441, "cv13_pct": 7.78, "cv18_pct": 8.15, "cv23_pct": 8.29},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 26,
+      "quotes": [
+        {"videoId": "kU1sbFJC4AI", "cvnde": 25, "text": "I recognized this complex, and I knew I'd been there before"},
+        {"videoId": "nXP69odM2fI", "cvnde": 20, "text": "It was like, I've been there before. I've done it. I know these people."},
+        {"videoId": "lofSGRSqFeg", "cvnde": 22, "text": "I didn't feel surprised to be there, it was something that seems like I had been there before, it was a very natural thing."},
+        {"videoId": "OtyYwzvI3TY", "cvnde": 14, "text": "it was familiar, like it had always been there and I just forgot about it."},
+        {"videoId": "HvI_CtquBNE", "cvnde": 20, "text": "they felt more like family than the people I had seen. And they felt so familiar and so loving."},
+        {"videoId": "zVSo1B1SAPc", "cvnde": 15, "text": "oh, okay, I recognize this. This feels familiar."}
+      ],
+      "sensory": [
+        "the strangeness and the familiarity are reported simultaneously and without contradiction",
+        "recognition of faces that are not faces from this life",
+        "no wonder or tourist astonishment — the tone is 'yeah, okay, expected'",
+        "recognition of the darkness as well as the light in some accounts"
+      ],
+      "notes": "Rises gently with evidential quality (7.14% -> 8.15% -> 8.29%). Precision was measured across two samples: 12/12 clean at cvNDE>=18, roughly 9/14 in the mixed-quality sample, giving ~0.85 overall. The dominant false positive removed by the negative lookahead is 'familiar with' meaning merely acquainted. This is the same underlying report as the-home seen from a different angle — home is what the place IS, recognition is how it is known — and they co-occur heavily."
+    },
+    {
+      "id": "where-we-came-from",
+      "name": "Where We Came From",
+      "category": "realm",
+      "parent": null,
+      "journey_position": 0.5,
+      "description": "Beyond familiarity, a stronger claim: this is the place of origin, and the earthly life was the departure from it. Experiencers describe arriving back at a starting point rather than reaching a destination. It is often told as a discovery made in the moment — 'I know that this is where I came from' — and is frequently what converts the experience from an event into a cosmology.",
+      "aliases": [
+        {"term": "where I came from", "tradition": null, "note": null},
+        {"term": "where we all came from", "tradition": null, "note": null},
+        {"term": "our true home", "tradition": null, "note": null},
+        {"term": "my real home", "tradition": null, "note": null},
+        {"term": "the source we came from", "tradition": null, "note": null},
+        {"term": "our original home", "tradition": null, "note": null},
+        {"term": "our true state", "tradition": null, "note": null},
+        {"term": "the original source of energy", "tradition": "secular", "note": null},
+        {"term": "I knew you before you were ever born", "tradition": "Christian", "note": "scriptural framing offered by Christian experiencers"}
+      ],
+      "regex": "(?:(?:back|return(?:ing)?|go(?:ing)?) (?:to |home to )?where (?:i|we) (?:all )?(?:came|come) from|(?:this|that)(?:'s| is| was) where (?:i|we) (?:all )?(?:came|come) from|where (?:i|we) all (?:came|come) from|(?:i|we) (?:came|come) from (?:there|that place|the light|the source|god)\\b|(?:our|my) (?:original|true|real) home)",
+      "negative_regex": "the (?:church|town|city|country|village|state|neighborhood) (?:i|we) came from|asked where (?:i|we) came from",
+      "measured": {"all_pct": 3.93, "all_docs": 243, "cv13_pct": 3.86, "cv18_pct": 3.87, "cv23_pct": 4.42},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 10,
+      "quotes": [
+        {"videoId": "eH3-WZWEMqY", "cvnde": 25, "text": "This is where we came from. This is where we're going to return to. And this is really all that matters."},
+        {"videoId": "W8Clowv_NuU", "cvnde": 15, "text": "I really felt like I was going home. This is where I came from."},
+        {"videoId": "xo4qaSD-Y4E", "cvnde": 17, "text": "I got to the actual place we would consider heaven or home where we all came from."},
+        {"videoId": "Jr7nn-MYdq0", "cvnde": 13, "text": "that place is what I believe to be my real home. And this is not all that there is."},
+        {"videoId": "P_lg8R445Qg", "cvnde": 19, "text": "I had the feeling ... that that place was my true home"}
+      ],
+      "sensory": [
+        "described as a 'larger matrix' one has been separated from",
+        "the sense of arriving at a source rather than a destination",
+        "often paired with the immediate refusal to leave again"
+      ],
+      "notes": "Flat across strata (3.93% / 3.87% / 4.42%) — neither strengthened nor weakened by evidential quality. Overlaps the-home heavily by design; kept separate because the claim is different in kind. Home is a felt quality; 'where I came from' is a cosmological assertion about origin, and it is the hinge on which many accounts turn toward pre-birth existence and reincarnation language. False positives are biographical ('the church I came from') and are handled by the negative regex."
+    },
+    {
+      "id": "remembering-who-you-are",
+      "name": "Remembering Who You Really Are",
+      "category": "process",
+      "parent": null,
+      "journey_position": 0.55,
+      "description": "A specific event inside the experience: an amnesia lifts and the person remembers their own identity — not their biography but what they were before the biography. Several describe it as the veil of forgetting being drawn back, and report astonishment that such a thing could have been forgotten at all. The mirror-image report is equally common: on return, they forget again, and know that they have forgotten.",
+      "aliases": [
+        {"term": "I remembered who I was", "tradition": null, "note": null},
+        {"term": "I forgot who I was", "tradition": null, "note": "the inverse, describing incarnation"},
+        {"term": "the veil of forgetting had been lifted", "tradition": null, "note": null},
+        {"term": "I remembered that I was source", "tradition": "secular", "note": null},
+        {"term": "how could I have forgotten", "tradition": null, "note": null},
+        {"term": "I've known all this, but why did I forget it?", "tradition": null, "note": null},
+        {"term": "self-realization", "tradition": "Hindu", "note": "one experiencer's later framing of the same moment"}
+      ],
+      "regex": "(?:remembered who (?:i|we|you) (?:really |truly )?(?:was|am|are|were)|forgot(?:ten)? who (?:i|we|you) (?:really |truly )?(?:was|am|are|were)|remembered (?:my|our) (?:soul|true|real|divine|eternal)|remembered everything (?:about|from) (?:before|my soul)|(?:it|this) (?:was|felt) like (?:i|you|we) (?:had )?always known|(?:i|we) (?:had )?always known (?:this|it|that place)|i (?:just )?forgot\\b[^.!?]{0,40}(?:when i (?:came|got) here|born))",
+      "negative_regex": "forgot who (?:he|she|they) (?:was|were)",
+      "measured": {"all_pct": 1.25, "all_docs": 77, "cv13_pct": 0.78, "cv18_pct": 1.24, "cv23_pct": 0.00},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 10,
+      "quotes": [
+        {"videoId": "fxgClj4J3G0", "cvnde": 18, "text": "I literally remembered who I was. And as if the veil of forgetting had been lifted, and I remembered that I was source."},
+        {"videoId": "wzJQaceCsDU", "cvnde": 15, "text": "I remembered why I came here. I remembered who I am. I remembered what's happening."},
+        {"videoId": "ilK9__WhYOU", "cvnde": 22, "text": "How could I possibly have forgotten who I really am? How could I have forgotten all these life experiences?"},
+        {"videoId": "s9PL3Bmodrg", "cvnde": 20, "text": "Why did I forget all this?"}
+      ],
+      "sensory": [
+        "reported as a lifting or drawing-back, not as being told",
+        "arrives with the memory of choosing this life",
+        "the forgetting is described as structural, a condition of being born, not a personal failure",
+        "on return the knowledge drains away and the loss is felt as it happens"
+      ],
+      "notes": "Deliberately narrow. A looser regex catching 'I remembered everything' reaches 8.4% but is dominated by people remembering the accident, so I discarded it. What is left (1.25%) is the soul-identity sense only, and it holds up at cvNDE>=18 (1.24%). This is the recognition of self that parallels the-recognition's recognition of place; it is adjacent to but distinct from the already-catalogued veil-of-forgetting, which names the barrier rather than the moment it lifts."
+    },
+    {
+      "id": "the-belonging",
+      "name": "Belonging — And Not Belonging Here",
+      "category": "state",
+      "parent": null,
+      "journey_position": 0.5,
+      "description": "The other side of home: the conviction that one belongs there, coupled — often in the same breath — with the conviction that one does not belong on earth. Experiencers describe earthly life afterwards as an exile, a posting, a charter trip, a deportation. Some report the not-belonging as a lifelong condition that predated the experience and was only explained by it.",
+      "aliases": [
+        {"term": "I belonged there", "tradition": null, "note": null},
+        {"term": "this is where I belong", "tradition": null, "note": null},
+        {"term": "a sense of belonging", "tradition": null, "note": null},
+        {"term": "I don't belong here", "tradition": null, "note": "the inverse, reported after return"},
+        {"term": "I'm on a charter trip down here", "tradition": null, "note": null},
+        {"term": "like a deportation", "tradition": null, "note": "one experiencer's word for embodied life"},
+        {"term": "a family reunion", "tradition": null, "note": null}
+      ],
+      "regex": "(?:(?:i|we) (?:don't|do not|didn't|never) belong(?:ed)? (?:here|on earth|in this world|in that body)|(?:this|that|here) (?:is|was) where (?:i|we) belong(?:ed)?|sense of belonging|feeling of belonging|i belong(?:ed)? (?:there|to that place)|(?:i|we) belong(?:ed)? there)",
+      "negative_regex": "belong to (?:a|the) (?:church|club|group|union|party)",
+      "measured": {"all_pct": 3.42, "all_docs": 211, "cv13_pct": 3.62, "cv18_pct": 2.49, "cv23_pct": 2.21},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 10,
+      "quotes": [
+        {"videoId": "OrA_5m1JwAg", "cvnde": 20, "text": "I felt that this is my true home and I belonged there. My presence on Earth looked like a deportation to a stranger, an isolated island that was incompatible and unpleasant."},
+        {"videoId": "AEGk9UM2eOY", "cvnde": 22, "text": "I belonged to that place ... I belonged. I was happy to be there."},
+        {"videoId": "E_MuhBgw2es", "cvnde": 25, "text": "I feel that I'm on a charter trip down here and that I belong to the spiritual world."},
+        {"videoId": "DsRZRN_MYP8", "cvnde": 14, "text": "This is where I belonged. I felt that this was really, um, home to me in many ways."},
+        {"videoId": "sjvD1FvIhdo", "cvnde": 24, "text": "This time I was coming home. I was homecoming. I was going home, baby. This is where I belong."}
+      ],
+      "sensory": [
+        "earth afterwards described as an island, a posting, a base camp",
+        "the belonging is felt toward beings never met in this life",
+        "reported as relief from a lifelong low-grade misfit feeling"
+      ],
+      "notes": "This is the only entry in my set that DECLINES with evidential quality (3.42% overall -> 2.49% at cvNDE>=18 -> 2.21% at cvNDE>=23). The likely reason is that belonging language is heavily concentrated in long reflective interviews and post-hoc philosophy, which are more common in the lower-cvNDE strata; the strongest veridical accounts are shorter and more event-focused. Worth flagging honestly rather than smoothing over."
+    },
+    {
+      "id": "the-homesickness",
+      "name": "The Homesickness",
+      "category": "state",
+      "parent": null,
+      "journey_position": 1.0,
+      "description": "The chronic, sometimes lifelong condition that follows the return: not grief for a person but homesickness for a place. Experiencers use the ordinary word for the ordinary feeling and mean it literally. Some report it beginning before they were even back in the body. Several were explicitly warned by beings that remembering would cause it. One child experiencer described it as being dropped at a bus stop by God, who then forgot to come back.",
+      "aliases": [
+        {"term": "homesick", "tradition": null, "note": "the word used unprompted and literally"},
+        {"term": "homesickness", "tradition": null, "note": null},
+        {"term": "homesick for heaven", "tradition": "Christian", "note": null},
+        {"term": "lonesome for the other side", "tradition": null, "note": null},
+        {"term": "I just want to go back there", "tradition": null, "note": null},
+        {"term": "existential depression", "tradition": "secular", "note": "one experiencer's clinical name for the same state"},
+        {"term": "missing it already", "tradition": null, "note": null}
+      ],
+      "regex": "(?:homesick|home ?sickness|lonesome for)",
+      "negative_regex": "never been homesick|homesick for (?:college|school|my (?:mom|mother|parents)|england|ireland|home town)",
+      "measured": {"all_pct": 1.33, "all_docs": 82, "cv13_pct": 1.51, "cv18_pct": 1.66, "cv23_pct": 0.55},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 10,
+      "quotes": [
+        {"videoId": "kdSL-HCxl4o", "cvnde": 18, "text": "I call it homesick for heaven. And I felt like God had dropped me off at a bus stop and had forgotten to pick me up."},
+        {"videoId": "ENwjMmQLKlU", "cvnde": 16, "text": "I don't want to be able to go back. I, I just, I'm already missing it. I'm already homesick."},
+        {"videoId": "A1TZ2U38_eM", "cvnde": 21, "text": "turned towards the youth who asked me not to remember because the homesickness could have done me harm"},
+        {"videoId": "XTqs-n7aniY", "cvnde": 13, "text": "I felt homesick, but I didn't really know it at the time. I just knew like, I I want to be there so bad."},
+        {"videoId": "zuJ07pwQgUs", "cvnde": 19, "text": "I was lonesome. I was lonesome for what was over on the other side."}
+      ],
+      "sensory": [
+        "described as a bodily ache rather than an emotion",
+        "onset sometimes during the experience itself, before return",
+        "can persist for decades and is often mistaken by clinicians for depression",
+        "temporarily relieved in the company of other experiencers"
+      ],
+      "notes": "Rises to 1.66% at cvNDE>=18 from 1.33% overall. This is the emotional cost side of the home claim and it is measured with an unusually clean single-word regex — 'homesick' is almost never used biographically in these transcripts. The single cvNDE>=23 hit is a genuine one. Related to but distinct from the catalogued refusal-to-return, which happens at the threshold; this one is the aftermath, and it is what experiencers say ruined or reordered their subsequent lives."
+    },
+    {
+      "id": "the-grief-of-re-entry",
+      "name": "The Anger and Grief of Coming Back",
+      "category": "state",
+      "parent": null,
+      "journey_position": 0.98,
+      "description": "The first emotion on regaining the body is very often not gratitude but rage. Experiencers report being furious at the rescuer, the phone call, the paramedic, God, or themselves for the decision to return. Some describe years of clinical depression that they later re-diagnosed as resistance to being back. Small children who could not explain it refused food and refused to be touched.",
+      "aliases": [
+        {"term": "I was so angry that I came back", "tradition": null, "note": null},
+        {"term": "resisting being back", "tradition": null, "note": null},
+        {"term": "I was devastated", "tradition": null, "note": null},
+        {"term": "angry at God", "tradition": "Christian", "note": null},
+        {"term": "why did you bring me back", "tradition": null, "note": null},
+        {"term": "clinically depressed", "tradition": "secular", "note": "the diagnosis given to the state"},
+        {"term": "back in the little box", "tradition": null, "note": "one experiencer's image for re-embodiment"}
+      ],
+      "regex": "(?:(?<!not )(?<!n't )(?:angry|furious|devastated|resentful|bitter|mad)\\b[^.!?]{0,70}(?:i (?:was|had to|got) (?:sent |brought )?back|being back|coming back|to (?:come|go) back|(?:they|god|he) sent me back|brought me back|had to return|i (?:came|was) back)|(?:(?:sent|brought) me back|i (?:was|came) back|being back|back in (?:my|this) body)[^.!?]{0,70}(?<!not )(?<!n't )(?:angry|furious|devastated|resentful|bitter|betrayed)\\b)",
+      "negative_regex": "(?:not|n't) (?:upset|angry|mad)|angry (?:at|with) (?:my|his|her) (?:husband|wife|father|mother|boss)",
+      "measured": {"all_pct": 1.05, "all_docs": 65, "cv13_pct": 1.39, "cv18_pct": 1.24, "cv23_pct": 1.66},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 10,
+      "quotes": [
+        {"videoId": "TqUf2YJ6GSE", "cvnde": 18, "text": "I'm so mad. I was so mad. I, I was so mad that I didn't stay there. I was so mad that I came back here"},
+        {"videoId": "P7D7XaXiNVc", "cvnde": 22, "text": "And I realize now it was because I was so angry and I was resisting being back."},
+        {"videoId": "nr7lytwj1pw", "cvnde": 13, "text": "I came back and I was very angry that I was back and wished that this call had not come through and broken up my experience."},
+        {"videoId": "m8lqk4fS4cA", "cvnde": 18, "text": "now I'm just back in this body, made me feel very, very angry."},
+        {"videoId": "uOFmEr0cAic", "cvnde": 17, "text": "I was angry because I'm like, I just want to go back there."}
+      ],
+      "sensory": [
+        "the anger arrives with the cold and the pain of the returning body",
+        "in children: refusal to eat, refusal to be touched, withdrawal",
+        "the rescuer or the ringing phone becomes the object of the rage",
+        "years-long depression later reinterpreted as unresolved resistance"
+      ],
+      "notes": "Highest in the best-evidenced stratum (1.66% at cvNDE>=23 vs 1.05% overall), though on small numbers. This entry is measured with a proximity regex requiring the anger and the return to sit in the same clause, because bare anger words appear in 21% of transcripts for unrelated biographical reasons. Distinct from the catalogued heaviness-of-re-entry (the physical weight) and refusal-to-return (the decision at the threshold): this is the emotional aftermath of having lost the place."
+    },
+    {
+      "id": "earth-as-the-classroom",
+      "name": "Earth as the Trip, Not the Home",
+      "category": "realm",
+      "parent": null,
+      "journey_position": 0.6,
+      "description": "The framing that makes the home claim coherent: earthly life is temporary and instrumental — a school, a classroom, a base camp, a passage, a trip you took on purpose. Several experiencers report being explicitly corrected on this point by a being: it is a classroom, not a courtroom. The framing is presented as taught information rather than as personal opinion.",
+      "aliases": [
+        {"term": "Earth is just a school", "tradition": null, "note": null},
+        {"term": "a classroom, not a courtroom", "tradition": null, "note": "recurring near-verbatim formula"},
+        {"term": "we are just passing through", "tradition": "Christian", "note": null},
+        {"term": "life here is just a passage", "tradition": "Christian", "note": null},
+        {"term": "we are pilgrims", "tradition": "Christian", "note": null},
+        {"term": "spiritual beings having a human experience", "tradition": "secular", "note": "the most-quoted formula in the corpus"},
+        {"term": "base camp", "tradition": null, "note": null},
+        {"term": "this is temporary", "tradition": null, "note": null}
+      ],
+      "regex": "(?:spiritual beings having a human experience|(?:earth|this life|this world|this place) is (?:just )?(?:a|like a) (?:school|classroom|schoolhouse|base camp|training ground|university|boot camp|playground|game)|(?:we|i) (?:are|were|'re) (?:just )?(?:here )?(?:on a trip|passing through|on a charter)|school for souls|(?:earth|this life) (?:is|was) (?:just )?(?:a )?temporary)",
+      "negative_regex": "we were (?:just )?visiting (?:in|my|her|his|the)",
+      "measured": {"all_pct": 1.13, "all_docs": 70, "cv13_pct": 1.39, "cv18_pct": 2.07, "cv23_pct": 2.76},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 10,
+      "quotes": [
+        {"videoId": "HpgDfdWT6LA", "cvnde": 23, "text": "life on Earth is just a classroom. We come here so we can learn, and that's it."},
+        {"videoId": "7SW-1rKQIrg", "cvnde": 20, "text": "Earth is just a school. That it's always been just a classroom, and it's never been a courtroom."},
+        {"videoId": "A9R7casMtCA", "cvnde": 23, "text": "life here... is just a passage. We are just passing through, we are pilgrims."},
+        {"videoId": "KCirNvirqq4", "cvnde": 14, "text": "This is temporary. That's all it is."},
+        {"videoId": "HpgDfdWT6LA", "cvnde": 23, "text": "when we were in our home space, our home space is so permeated with love"}
+      ],
+      "sensory": [
+        "presented as instruction received, often from a named guide",
+        "the correction 'classroom not courtroom' delivered as a relief from expected judgement",
+        "earth viewed from outside as small, temporary, and purposeful"
+      ],
+      "notes": "This is the entry that climbs most steeply with evidential quality: 1.13% overall, 2.07% at cvNDE>=18, 2.76% at cvNDE>=23 — more than doubling. It is the cosmological complement to the-home: if that place is home, this one has to be explained, and the corpus's own explanation is school, passage, or trip. Note that the 'classroom not courtroom' phrasing clusters in accounts connected to one experiencer (Vincent/Vinney Tolman) appearing under multiple video ids, so the true independent-witness count is lower than the document count suggests."
+    }
+  ]
+}

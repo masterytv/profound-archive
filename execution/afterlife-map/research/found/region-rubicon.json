@@ -1,0 +1,724 @@
+{
+  "places": [
+    {
+      "id": "point-of-no-return",
+      "name": "the point of no return",
+      "category": "boundary",
+      "parent": null,
+      "journey_position": 0.78,
+      "description": "The place in the journey where the experiencer understands that one more step forward ends the possibility of coming back. Most people do not name it; they describe arriving somewhere and simply knowing that this is the edge. When they do name it, they call it the point of no return, the border, the boundary, or the line. It is almost always encountered late, after the light, the beings and the life review, and it is where the narrative turns around.",
+      "aliases": [
+        { "term": "point of no return", "tradition": "secular", "note": "the corpus's own most-used name; only 0.62% of accounts use the exact phrase" },
+        { "term": "the Rubicon", "tradition": "secular", "note": "used explicitly by one experiencer alongside 'the crossing'" },
+        { "term": "the border", "tradition": null, "note": "the term used by researchers (van Lommel, Alexander) and echoed by experiencers" },
+        { "term": "the boundary", "tradition": null },
+        { "term": "the line", "tradition": null },
+        { "term": "the threshold", "tradition": null },
+        { "term": "the veil of death", "tradition": "Christian" },
+        { "term": "a place of no return", "tradition": null },
+        { "term": "the crossing", "tradition": null },
+        { "term": "the in-between", "tradition": null, "note": "some describe the whole staging area short of the boundary this way" }
+      ],
+      "regex": "(point of no return|(a|the|that|this) (border|boundary|line|threshold|point|barrier)[^.?!]{0,80}(no (turning|coming|going) back|couldn'?t (come|go|get) back|can'?t (come|go|get) back|cannot (cross|come back|return)|never (come|go|get) back|not be able to (come|go|get|return) back|wouldn'?t (come|be coming) back))",
+      "negative_regex": "point of no return[^.?!]{0,40}(poison|drank|addiction|screw|Armageddon|planet)",
+      "measured": { "all_pct": 0.96, "all_docs": 59, "cv13_pct": 1.45, "cv18_pct": 0.69, "cv23_pct": 1.66 },
+      "precision_estimate": 0.83,
+      "precision_sample_n": 12,
+      "sensory": [
+        "no visible marker at all in many accounts — the limit is felt, not seen",
+        "an abrupt, physical-feeling stop, 'like hitting something'",
+        "the far side is visibly brighter, greener or more populated than the near side",
+        "a sense of magnetic pull forward that has to be resisted"
+      ],
+      "quotes": [
+        { "videoId": "PVZDj4q8jzo", "cvnde": 14, "text": "That door means it's the point of no return, the crossing, the Rubicon." },
+        { "videoId": "CKdCOF2nKow", "cvnde": 8, "text": "a voice said stop right there. That's the point of no return. If you go any further you'll have no choice but to return back to mortality back to Earth." },
+        { "videoId": "LBpwZxmwups", "cvnde": 18, "text": "I know that if I touch that light or try to go through it that I will not be able to return. This is like a point of no return." },
+        { "videoId": "YJSv6oBpQoY", "cvnde": 13, "text": "They come to a border and they know that when I cross this border, I will never come back." },
+        { "videoId": "-FFsdF5Oo0E", "cvnde": 7, "text": "I had this wrong sense that beyond that was the point of no return, and I would have no choice but to go back to earth." },
+        { "videoId": "_jDrbRk96l8", "cvnde": 7, "text": "they cross to the other side, but they have a boundary, they cannot really go to the place where those who never come back go." }
+      ],
+      "notes": "The structured element 'border_boundary' is coded present in 37.5% of all accounts and 42.3% of cv>=18 accounts, and sits at mean relative journey position 0.818 — very late. My lexical regex catches only the small fraction who name the boundary explicitly (0.96%). The gap between 37.5% and 0.96% is the single most important fact about this region: the boundary is overwhelmingly reported without a name and often without an object. Note that cv>=18 (0.69%) is LOWER than cv>=13 (1.45%) for the named phrase, while the coded element barely moves across strata — better-evidenced accounts are no less likely to hit a boundary, they are just less likely to reach for the stock phrase."
+    },
+    {
+      "id": "the-rule",
+      "name": "the rule: if you cross this you cannot come back",
+      "category": "process",
+      "parent": "point-of-no-return",
+      "journey_position": 0.78,
+      "description": "The explicit statement of the condition, delivered as words. A voice, an angel, a guide, a dead relative or Jesus tells the experiencer that passing the marker forfeits return. The wording is remarkably stable across thousands of accounts: 'if you cross this, you can't come back' / 'if you pass through this door, there's no turning back'. The rule is nearly always stated before the choice is offered, never after.",
+      "aliases": [
+        { "term": "if you cross this you can't go back", "tradition": null },
+        { "term": "if you pass through this door there is no turning back", "tradition": null },
+        { "term": "if you go up here then you can't go back", "tradition": null },
+        { "term": "you can go, but then you can't come back", "tradition": null },
+        { "term": "if you enter you won't come back", "tradition": null },
+        { "term": "if you pass, you won't be back", "tradition": null },
+        { "term": "no turning back", "tradition": null },
+        { "term": "the warning", "tradition": null }
+      ],
+      "regex": "(if|once|when) (you|I|he|she|we|they)[^.?!]{0,70}(cross|crossed|step|stepped|go|went|going|pass|passed|touch|touched|enter|entered|walk|walked)[^.?!]{0,80}(can'?t|cannot|couldn'?t|could not|won'?t|wouldn'?t|never|not be able to|no turning back|no coming back|no going back|not going to)[^.?!]{0,25}(come|go|get|turn|return|be able)?[^.?!]{0,10}back",
+      "negative_regex": "if (I|you) (go|went) (to the |to )?(hospital|home|out|there tonight)|if (I|you) (go|went) back to that version",
+      "measured": { "all_pct": 2.09, "all_docs": 129, "cv13_pct": 2.23, "cv18_pct": 2.21, "cv23_pct": 1.10 },
+      "precision_estimate": 0.61,
+      "precision_sample_n": 18,
+      "sensory": [
+        "communicated telepathically far more often than audibly",
+        "delivered without emotion or coercion — stated as a fact, not a threat",
+        "sometimes 'downloaded' whole rather than spoken word by word"
+      ],
+      "quotes": [
+        { "videoId": "igtnQwP6FYI", "cvnde": 13, "text": "We heard a voice say, \"If you pass through this door, you can't come back.\"" },
+        { "videoId": "t4hCgW5NgQc", "cvnde": 10, "text": "If you cross this stream, you can't go back. If you step over this wall, you can't go back. If you go through this portal, you can't go back." },
+        { "videoId": "AFNoPeKNm4g", "cvnde": 10, "text": "If you go beyond this point, um, I can't bring you back. You will not come back." },
+        { "videoId": "MJ9HD6u9CWA", "cvnde": 13, "text": "he said, yeah, if if you go up here, then you can't go back." },
+        { "videoId": "P1MVSAwKZ8Y", "cvnde": 9, "text": "she heard a voice saying, you can go, but then you can't come back." },
+        { "videoId": "y2ANf9jb1vM", "cvnde": 11, "text": "Suddenly I hear a voice ... \"You decide.\" \"If you pass, you won't be back.\"" }
+      ],
+      "notes": "One experiencer (t4hCgW5NgQc) spontaneously enumerates the interchangeable forms — stream, wall, portal — which is the strongest internal evidence in the corpus that these are one place with many costumes. Precision is limited by biographical 'if I go out tonight I won't come back' constructions; the negative_regex removes some. The rule is stated by a being roughly as often as it is simply known (see 'the-unspoken-knowing')."
+    },
+    {
+      "id": "the-unspoken-knowing",
+      "name": "the unspoken knowing of the limit",
+      "category": "state",
+      "parent": "point-of-no-return",
+      "journey_position": 0.76,
+      "description": "The boundary arrives as certainty rather than as information. No one speaks, nothing is written, often nothing is even visible, and yet the experiencer knows with total confidence that a specific further step ends the return. Several people explicitly contrast this with being told: 'I was never asked if I could go. I was never told I couldn't go. I just knew.' This is reported as the same order of certainty as knowing one's own name.",
+      "aliases": [
+        { "term": "I just knew", "tradition": null },
+        { "term": "I understood without being told", "tradition": null },
+        { "term": "a knowing", "tradition": null },
+        { "term": "I knew in myself", "tradition": null },
+        { "term": "that knowing hit me", "tradition": null },
+        { "term": "instinctively knew", "tradition": null }
+      ],
+      "regex": "(I|he|she) (just |somehow |instinctively |intuitively |innately )?knew[^.?!]{0,50}(if|once) (I|he|she|you)[^.?!]{0,80}(cross|step|stepped|go|going|went|pass|passed|touch|touched|walk|walked|enter|entered|continue|kept going|got|reached)[^.?!]{0,90}((couldn'?t|could not|wouldn'?t|would not|won'?t|never|not be able|wasn'?t|would have|not) (be |ever |going )*(come|coming|go|going|get|getting|be|return|returning)( back| home)|no (turning|coming|going) back)",
+      "negative_regex": null,
+      "measured": { "all_pct": 0.37, "all_docs": 23, "cv13_pct": 0.24, "cv18_pct": 0.41, "cv23_pct": 0.00 },
+      "precision_estimate": 0.92,
+      "precision_sample_n": 12,
+      "sensory": [
+        "certainty without a source — 'it just hit me'",
+        "no words, no voice, no visible sign",
+        "coexists with intense desire to cross anyway",
+        "described as more reliable than earthly knowledge"
+      ],
+      "quotes": [
+        { "videoId": "9oNvs75DDEk", "cvnde": 10, "text": "I understood without being told that if I crossed that line, or passed through it (if it was opened), there would be no coming back." },
+        { "videoId": "APPKmB7lOrc", "cvnde": 7, "text": "I was never asked if I could go. I was never told I couldn't go. I just knew I couldn't go with them." },
+        { "videoId": "P2bz4Q9uIaQ", "cvnde": 21, "text": "there wasn't a threshold, but there was an energetic threshold, I knew if I stepped over that, I wouldn't be going back." },
+        { "videoId": "WzyaTY1Wt5U", "cvnde": 7, "text": "I cannot go behind that gate because I knew in myself as if I came from there but if I ever go back behind this gate I'm not coming back" },
+        { "videoId": "Kiy5TkJnSoI", "cvnde": 10, "text": "I knew the door was a barrier. I knew if I went through the door, I wasn't coming back." },
+        { "videoId": "7ApHsDD0Z3E", "cvnde": 17, "text": "we walked to the gate and then I knew if I crossed the gate, I'm not coming back." }
+      ],
+      "notes": "This is a deliberately high-precision, low-recall regex: 12 of 12 sampled snippets were genuine. The measured 0.37% is a floor, not a prevalence — the same phenomenon appears unregexable in a much larger share of accounts, where people just say 'I couldn't go any further' with no explanation (see 'this-far-and-no-further', 3.68%). Zero hits at cv>=23 is a small-denominator artefact (181 docs), not evidence of absence."
+    },
+    {
+      "id": "this-far-and-no-further",
+      "name": "this far and no further",
+      "category": "boundary",
+      "parent": "point-of-no-return",
+      "journey_position": 0.75,
+      "description": "The commonest form the boundary takes: not an object and not a rule, but a simple inability to proceed. The experiencer is moving freely and then cannot move any more. There is no wall to touch, no gate to open, no one saying no; forward motion just stops being available. People describe it in flat, almost administrative language — 'I couldn't go any further', 'I wasn't allowed', 'this was as far as I could go'.",
+      "aliases": [
+        { "term": "I couldn't go any further", "tradition": null },
+        { "term": "I wasn't allowed to go further", "tradition": null },
+        { "term": "I couldn't progress any further", "tradition": null },
+        { "term": "that's the limit", "tradition": null },
+        { "term": "this is as far as you go", "tradition": null },
+        { "term": "I was stopped", "tradition": null },
+        { "term": "not permitted", "tradition": null }
+      ],
+      "regex": "((couldn'?t|could not|can'?t|cannot|wasn'?t able to|not able to) (go|come|move|proceed|travel|walk|get) (any )?(further|farther|beyond|past)|(not|wasn'?t|weren'?t) (allowed|permitted) to (go|cross|enter|pass|come|proceed|touch|continue)|(this|that) (is|was) as far as (you|I|he|she|we))",
+      "negative_regex": "(not|wasn'?t) allowed to (cry|leave the house|talk about it|say|go to school|watch)",
+      "measured": { "all_pct": 3.68, "all_docs": 227, "cv13_pct": 4.70, "cv18_pct": 5.25, "cv23_pct": 5.52 },
+      "precision_estimate": 0.65,
+      "precision_sample_n": 16,
+      "sensory": [
+        "movement simply ceases to be possible; no impact, no pain",
+        "the far side stays fully visible and desirable",
+        "sometimes a sense of being 'up against' something soft or water-like",
+        "no anger or frustration reported — the limit is accepted as correct"
+      ],
+      "quotes": [
+        { "videoId": "OzAHPfAx2zM", "cvnde": 26, "text": "we had to stop because I felt that I was up against like an invisible barrier of some sort." },
+        { "videoId": "9xAyDHVxv2k", "cvnde": 13, "text": "we came up to an invisible barrier of some sort. And I felt that I couldn't go any further." },
+        { "videoId": "kfDl0i4Z2sQ", "cvnde": 20, "text": "I couldn't go past that barrier. And if I did, then I wouldn't be coming back." },
+        { "videoId": "bmnQDUEn7fI", "cvnde": 19, "text": "there was this energy wall that kind of stopped me, and I couldn't go any farther." },
+        { "videoId": "b61n2cGa_Ik", "cvnde": 13, "text": "And then there were these huge gates. They were massive." }
+      ],
+      "notes": "This is the only rubicon regex that rises monotonically with evidential strength (3.68 -> 4.70 -> 5.25 -> 5.52%), which matters: the better-evidenced accounts report the bare experience of being stopped more often, and the named, furnished versions less often. Precision is dragged down by biographical uses of 'wasn't allowed'; the negative_regex removes the commonest childhood-abuse and hospital-visitor cases."
+    },
+    {
+      "id": "the-line",
+      "name": "the line on the ground",
+      "category": "boundary",
+      "parent": "point-of-no-return",
+      "journey_position": 0.78,
+      "description": "The barest possible object: a line. Sometimes visible — a yellow line of light on the floor, a black zig-zag across a tan wall — and sometimes explicitly invisible or imaginary, a line the experiencer knows is 'over there to my right' without seeing anything. Crossing it, or even saying out loud that one wants to stay, is understood to constitute the crossing.",
+      "aliases": [
+        { "term": "an invisible line", "tradition": null },
+        { "term": "an imaginary line", "tradition": null },
+        { "term": "a line of light", "tradition": null },
+        { "term": "a yellow line", "tradition": null },
+        { "term": "a divider", "tradition": null },
+        { "term": "the line of the door", "tradition": null, "note": "one account fuses line and threshold" },
+        { "term": "don't cross this line", "tradition": "Christian", "note": "spoken by Jesus in two accounts" }
+      ],
+      "regex": "((invisible|imaginary) line\\b|(don'?t|do not|not|never) cross (that|this|the) line|(a|the|this|that) line[^.?!]{0,80}(if I crossed|once I crossed|couldn'?t cross|can'?t cross|not (allowed|able) to cross|I would never|never come back|no coming back|other side of (it|that|the line))|(cross|crossed|stepped over) (that|this|the) line[^.?!]{0,80}(never|couldn'?t|can'?t|no coming back|stay|wouldn'?t))",
+      "negative_regex": "line in the sand|drawing the line|lines get crossed|imaginary line coming from your center",
+      "measured": { "all_pct": 0.24, "all_docs": 15, "cv13_pct": 0.18, "cv18_pct": 0.14, "cv23_pct": 0.00 },
+      "precision_estimate": 0.67,
+      "precision_sample_n": 12,
+      "sensory": [
+        "a thick black zig-zag running across a tan-coloured wall",
+        "a yellow line 'made of light' on the floor by a door",
+        "known to be 'off to my right, I don't know how many feet away' while unseen"
+      ],
+      "quotes": [
+        { "videoId": "9oNvs75DDEk", "cvnde": 10, "text": "Further to my left was a tan-colored wall with a thick, black, zig-zag line, all the way across it." },
+        { "videoId": "hhwo47DrQQk", "cvnde": 9, "text": "I knew if I had said, \"I want to stay here,\" I knew I was going to cross that line, and I was never coming back." },
+        { "videoId": "y2ANf9jb1vM", "cvnde": 11, "text": "a line on the floor by the door ... like a yellow line ... made of light." },
+        { "videoId": "vjt-VgrOn7E", "cvnde": 14, "text": "I understood without being told that if I crossed that line or passed through it, there would be no coming back." }
+      ],
+      "notes": "Genuinely rare (15 docs) once the biographical 'line in the sand' and 'crossing a line' idioms are excluded — which is worth reporting honestly, because 'a line you must not cross' is the culturally expected image and the corpus does NOT strongly support it. Two of the 15 are the same account told twice (9oNvs75DDEk / vjt-VgrOn7E, 'Charlyn'/'Cherylyn'), so the true document count is lower still."
+    },
+    {
+      "id": "the-fence",
+      "name": "the fence",
+      "category": "structure",
+      "parent": "point-of-no-return",
+      "journey_position": 0.77,
+      "description": "A low, unimposing, entirely domestic barrier standing between the experiencer and a meadow, garden or gathering of people. Wooden, white, ornate, chest-high, or barbed wire. It is never described as defensive or menacing; several people note it is far too low to keep anyone out, which is precisely what makes its authority strange. In some accounts the ground beyond the fence is visible and sharp; in others it is deliberately blurred.",
+      "aliases": [
+        { "term": "a wooden fence", "tradition": null },
+        { "term": "an ornate white fence", "tradition": null },
+        { "term": "a barbed wire fence", "tradition": null },
+        { "term": "a bob wire fence", "tradition": null },
+        { "term": "an invisible fence", "tradition": null },
+        { "term": "a white fence thing", "tradition": null },
+        { "term": "a low wall", "tradition": null }
+      ],
+      "regex": "(fence|fencing)[^.?!]{0,100}(cross|other side|couldn'?t|can'?t|not (allowed|able)|go back|come back|beyond|boundary|barrier)|((wooden|picket|barbed wire|invisible|white|low|little) fence)",
+      "negative_regex": "white picket fence|hedge fund|fence around the pool|fenced-in yard|fence post",
+      "measured": { "all_pct": 1.04, "all_docs": 64, "cv13_pct": 1.21, "cv18_pct": 1.80, "cv23_pct": 1.66 },
+      "precision_estimate": 0.57,
+      "precision_sample_n": 14,
+      "sensory": [
+        "chest-high, 'not real high', clearly climbable",
+        "ordinary wood or wire — nothing celestial about the material",
+        "the view beyond is fuzzy and blurry in the barbed-wire accounts, crystal clear in the garden accounts",
+        "people on the far side are talking, laughing, unhurried"
+      ],
+      "quotes": [
+        { "videoId": "wRuVNAf_InM", "cvnde": 18, "text": "And there was a wooden fence, um, telling me that there was one step over to the other side, and I wouldn't be able to come back for good." },
+        { "videoId": "kAtWae_l-mo", "cvnde": 15, "text": "there was an ornate white fence in front of me, beautiful fence, only like about chest high, not real high." },
+        { "videoId": "APPKmB7lOrc", "cvnde": 7, "text": "some of the beings were going through an opening in a bob wire fence that I couldn't see beyond. It was blurry and I just knew I couldn't go with them." },
+        { "videoId": "RKrVNq2bVV8", "cvnde": 27, "text": "it was like a meadow with countless blades of grass kind of blowing in a breeze off of the distance, sort of a white fence thing." },
+        { "videoId": "T6wuACTPWGQ", "cvnde": 10, "text": "there was something like an invisible fence between me and them. It was something like water, something he could barely see and feel." }
+      ],
+      "notes": "The fence rises with evidential strength (1.04 -> 1.21 -> 1.80% at cv>=18), one of the few boundary objects that does. The barbed-wire variant is one experiencer (Bri Lafferty) told across four separate videos, so document counts overstate distinct people; the wooden/white-fence-in-a-meadow variant is genuinely multi-source. Precision is limited by literal childhood fences in biographical passages."
+    },
+    {
+      "id": "the-golden-wall",
+      "name": "the golden wall around the city",
+      "category": "structure",
+      "parent": "point-of-no-return",
+      "journey_position": 0.74,
+      "description": "A wall that marks where the realm proper begins — most often described as enormous blocks of pure gold, sometimes stone, marble or jasper. Experiencers stand outside it and try, absurdly and unsuccessfully, to jump or climb it; several later realise the gates a few feet along were standing wide open. The wall is repeatedly described as a marker rather than a defence: 'it seemed too low for protection. It just marked the boundary.'",
+      "aliases": [
+        { "term": "the golden wall", "tradition": "Christian" },
+        { "term": "pure gold cinder blocks", "tradition": null },
+        { "term": "the rock wall", "tradition": null },
+        { "term": "the wall of the city", "tradition": "Christian" },
+        { "term": "a low wall of glowing golden rocks", "tradition": null },
+        { "term": "the wall of heaven", "tradition": "Christian" }
+      ],
+      "regex": "((golden|gold|stone|rock|marble|jasper|white|low|great) wall[^.?!]{0,90}(city|heaven|around|surround|other side|couldn'?t|beyond|climb|jump)|wall (that |which )?(surrounded|surrounds|went around|encircled) the city)",
+      "negative_regex": "hitting a stone wall at a hundred miles|Berlin Wall|retaining wall|stone wall to hold the ground",
+      "measured": { "all_pct": 0.36, "all_docs": 22, "cv13_pct": 0.66, "cv18_pct": 1.10, "cv23_pct": 1.66 },
+      "precision_estimate": 0.8,
+      "precision_sample_n": 10,
+      "sensory": [
+        "huge cinder-block-sized bricks of solid gold, stacked",
+        "so tall it cannot be jumped, yet the gates beside it stand open",
+        "sound carries over it — dishes clanging, music, people laughing",
+        "in one account it is low, made of glowing golden rocks, with a single gap for a gate"
+      ],
+      "quotes": [
+        { "videoId": "cbTWrNqyMhM", "cvnde": 22, "text": "I was standing outside of this great big huge golden wall. It was like cinder blocks, one on top of the other, huge ones." },
+        { "videoId": "kfDl0i4Z2sQ", "cvnde": 20, "text": "there's the golden wall that surrounds the city, which I took to mean that they're, that's the barrier. I couldn't go past that barrier. And if I did, then I wouldn't be coming back." },
+        { "videoId": "TsOGyCidXLQ", "cvnde": 22, "text": "this wall was like real thick, pure gold cinder blocks, and it was so tall. I kept trying to jump the wall, thinking I could jump over it." },
+        { "videoId": "ZH0J83t7LZs", "cvnde": 9, "text": "I think the rock wall was the boundary, you know? If I had touched that wall, I don't think I would have came back." },
+        { "videoId": "h6HA9EjP7bo", "cvnde": 13, "text": "And then over that wall on the other side there, I could see these little rolling hills." }
+      ],
+      "notes": "Rare in absolute terms but strongly skewed toward well-evidenced accounts: 0.36% overall rises to 1.10% at cv>=18 and 1.66% at cv>=23, a 4.6x enrichment — the steepest positive gradient of any object in this region. Caution: Sharon Milliman/Millerman accounts for several of the 22 documents across repeat interviews."
+    },
+    {
+      "id": "the-invisible-barrier",
+      "name": "the invisible barrier",
+      "category": "boundary",
+      "parent": "point-of-no-return",
+      "journey_position": 0.76,
+      "description": "A boundary with no visible substance that nonetheless stops the body absolutely. Experiencers reach for physical analogies they immediately reject: like glass, like water, like a dome, like a wall of energy. It is transparent in both directions — the dead can be seen and sometimes heard on the far side — and touching it, or being touched through it, is often forbidden.",
+      "aliases": [
+        { "term": "an invisible barrier", "tradition": null },
+        { "term": "an invisible wall", "tradition": null },
+        { "term": "an energy wall", "tradition": null },
+        { "term": "a water wall", "tradition": null },
+        { "term": "a force field", "tradition": null },
+        { "term": "like glass", "tradition": null },
+        { "term": "the veil of death", "tradition": "Christian", "note": "one family's name for exactly this barrier" },
+        { "term": "a pale light flowing barrier", "tradition": null },
+        { "term": "a cloud-like barrier", "tradition": null }
+      ],
+      "regex": "(invisible (barrier|wall|line|fence|shield|force ?field)|energy (wall|barrier|field)[^.?!]{0,70}(stopped|couldn'?t|barrier|go)|(a|an|the) (barrier|force ?field)[^.?!]{0,80}(couldn'?t (go|get|pass|cross)|could not (go|pass|cross)|stopped me|no (further|farther)|not (allowed|able)))",
+      "negative_regex": "sound barrier|jersey barrier|concrete barrier|language barrier",
+      "measured": { "all_pct": 0.97, "all_docs": 60, "cv13_pct": 0.97, "cv18_pct": 0.97, "cv23_pct": 2.21 },
+      "precision_estimate": 0.75,
+      "precision_sample_n": 14,
+      "sensory": [
+        "transparent, seen only by its effect",
+        "compared to water, crystal, glass or a thick liquid",
+        "the light of the far side can be seen through it but not entered",
+        "sometimes described as soft or cloud-like on impact rather than hard"
+      ],
+      "quotes": [
+        { "videoId": "9xAyDHVxv2k", "cvnde": 13, "text": "we came up to an invisible barrier of some sort. And I felt that I couldn't go any further." },
+        { "videoId": "9xAyDHVxv2k", "cvnde": 13, "text": "My one daughter told me, \"Well, Dad, that was the veil of death.\"" },
+        { "videoId": "Y7kb2FdgivE", "cvnde": 14, "text": "Like there's an invisible barrier I know I can't cross, even though I can't see it." },
+        { "videoId": "YijIrQHMk2o", "cvnde": 7, "text": "I could feel that there was like an invisible barrier between me and the light, and some kind of being was there." },
+        { "videoId": "bmnQDUEn7fI", "cvnde": 19, "text": "there was this energy wall that kind of stopped me, and I couldn't go any farther." },
+        { "videoId": "T6wuACTPWGQ", "cvnde": 10, "text": "there was something like an invisible fence between me and them. It was something like water, something he could barely see and feel." }
+      ],
+      "notes": "Flat at 0.97% through cv>=18 then doubling at cv>=23 (2.21%), though the cv>=23 stratum is only 181 documents so that jump is 4 docs and should not be over-read. This is the form of the boundary most often reported by people who also report seeing deceased relatives standing just beyond it."
+    },
+    {
+      "id": "the-gate",
+      "name": "the gate",
+      "category": "threshold",
+      "parent": "point-of-no-return",
+      "journey_position": 0.72,
+      "description": "A gate in a wall or standing alone in empty space, sometimes closed and sometimes wide open, that constitutes the entrance to the realm proper. It is the most culturally loaded object in the region — 'pearly gates' arrives pre-formed from Christian language — but experiencers frequently report details that cut against the cliché: a black gate with vertical bars and white pillars and nothing at all to either side; twelve gates with angels outside; a gate that closes in the face at the last instant with the words 'not your time'.",
+      "aliases": [
+        { "term": "the pearly gates", "tradition": "Christian" },
+        { "term": "the gates of heaven", "tradition": "Christian" },
+        { "term": "heaven's gate", "tradition": "Christian" },
+        { "term": "an archway", "tradition": null, "note": "several people correct 'gate' to 'archway' as more accurate" },
+        { "term": "a large black gate with vertical bars", "tradition": null },
+        { "term": "a sheep gate", "tradition": "Christian" },
+        { "term": "the gate of light", "tradition": null },
+        { "term": "twelve gates", "tradition": "Christian" }
+      ],
+      "regex": "((pearly|pearl) gates?|gates? of (heaven|pearl|the city|light)|heaven'?s gate|(a|the|this|these|those|huge|giant|golden|big|large|iron|wrought|white|beautiful|massive|wooden) gates?\\b[^.?!]{0,80}(heaven|light|city|open|closed|angel|couldn'?t|other side|through|beyond|not (allowed|able)))",
+      "negative_regex": "Golden Gate Bridge|boarding gate|gate where the plane|gate of the heart|go\\/no-go",
+      "measured": { "all_pct": 3.71, "all_docs": 229, "cv13_pct": 5.19, "cv18_pct": 5.39, "cv23_pct": 3.87 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 14,
+      "sensory": [
+        "mother-of-pearl surface, 'white pearl with these blue streaks in it'",
+        "a gate of many brilliant colours the experiencer had no names for",
+        "standing open with dishes clanging and music audible beyond",
+        "closing 'real quick' at the last moment",
+        "vertical bars you can see through, with square white pillars and nothing beside them"
+      ],
+      "quotes": [
+        { "videoId": "cHIdkYgdJJY", "cvnde": 19, "text": "there was a certain gate that I could not go toward, because I knew that if I went to that gate, I could not come back." },
+        { "videoId": "klsmBdhTeCo", "cvnde": 19, "text": "And it was a gate that came in like this, and I was getting ready to walk in, and it's closed real quick." },
+        { "videoId": "IM5kk-UhsAs", "cvnde": 19, "text": "I didn't realize that I could just walk a couple feet down, and the gates were open." },
+        { "videoId": "WzyaTY1Wt5U", "cvnde": 7, "text": "I cannot go behind that gate because I knew in myself as if I came from there but if I ever go back behind this gate I'm not coming back" },
+        { "videoId": "b61n2cGa_Ik", "cvnde": 13, "text": "And then there were these huge gates. They were massive." }
+      ],
+      "notes": "The most common named boundary object in the region. Rises to 5.39% at cv>=18 then falls back to 3.87% at cv>=23. One experiencer (b61n2cGa_Ik) reports gates with visible surprise at her own imagery — 'Gates? Really? It's my death. I get to have what I want' — which is the corpus commenting on its own cultural furnishing."
+    },
+    {
+      "id": "the-door",
+      "name": "the door",
+      "category": "threshold",
+      "parent": "point-of-no-return",
+      "journey_position": 0.76,
+      "description": "A single door, most often big, tall and white, standing at the far end of a white room or in darkness. Unlike the gate it is usually solitary and unattached to any wall or building. The condition is stated at the door more explicitly than at any other object in the corpus, and in several accounts the experiencer inches toward it repeatedly, bargaining, before being pulled away. In one account a dead mother physically stands in the doorway to block her child from crossing.",
+      "aliases": [
+        { "term": "a big tall white door", "tradition": null },
+        { "term": "a big white door", "tradition": null },
+        { "term": "the doorway", "tradition": null },
+        { "term": "the door of life", "tradition": null },
+        { "term": "the threshold of the door", "tradition": null },
+        { "term": "a portal", "tradition": null },
+        { "term": "an archway", "tradition": null }
+      ],
+      "regex": "((a|an|the|this|that|big|huge|white|golden|large|wooden|beautiful) door(way)?[^.?!]{0,100}(if (you|I) (go|went|walk|walked|pass|passed|step|stepped|enter|entered)|couldn'?t (go|come|get) back|no turning back|not (allowed|able) to (go|enter|pass)|other side|closed (in|on) (my|his|her) face|shut|slammed))",
+      "negative_regex": "hospital room door|front door of (the|my) house|car door|the door had been shut 40 feet down the hallway|opened the door to another side of spiritual",
+      "measured": { "all_pct": 2.32, "all_docs": 143, "cv13_pct": 3.20, "cv18_pct": 2.35, "cv23_pct": 2.21 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 14,
+      "sensory": [
+        "tall, white, plain — no ornament reported",
+        "shut when it 'should have been open'",
+        "the pull to reach it described as an appetite, 'I couldn't wait to get to that door'",
+        "voices and named people audible behind it"
+      ],
+      "quotes": [
+        { "videoId": "SH2KAFC2yzg", "cvnde": 16, "text": "there was a big tall white door. And they said, if you pass through this door, then there is no turning back. You have to stay here with us." },
+        { "videoId": "b_T7Odr_JJM", "cvnde": 17, "text": "there was a big white door. And they said, \"If you pass through this door, then there's no turning back." },
+        { "videoId": "Kiy5TkJnSoI", "cvnde": 10, "text": "I knew the door was a barrier. I knew if I went through the door, I wasn't coming back." },
+        { "videoId": "igtnQwP6FYI", "cvnde": 13, "text": "We heard a voice say, \"If you pass through this door, you can't come back.\"" },
+        { "videoId": "PVZDj4q8jzo", "cvnde": 14, "text": "That door means it's the point of no return, the crossing, the Rubicon." }
+      ],
+      "notes": "Lowest precision of the object set (0.50): 'the door shut' and 'other side' both occur constantly in hospital and biographical passages. The two strongest quotes (SH2KAFC2yzg, b_T7Odr_JJM) are the same experiencer under two names (Elissa/Alyssa Hope), so treat the white-door-with-explicit-rule motif as attested but not independently multi-source at that level of detail."
+    },
+    {
+      "id": "the-river-and-the-far-bank",
+      "name": "the river and the far bank",
+      "category": "landscape",
+      "parent": "point-of-no-return",
+      "journey_position": 0.70,
+      "description": "Water dividing the experiencer from the dead. The river is consistently small — twenty to thirty feet across, shallow, sparkling, 'not a very wide river' — and consistently uncrossable. On the far bank stand relatives, ancestors and crowds of souls, close enough to recognise faces and feel their love. Several accounts describe stepping-stones or a shallow ford that make the impossibility of crossing all the stranger.",
+      "aliases": [
+        { "term": "the river", "tradition": null },
+        { "term": "the stream", "tradition": null },
+        { "term": "the creek", "tradition": null },
+        { "term": "the other side of the river", "tradition": null },
+        { "term": "the opposite bank", "tradition": null },
+        { "term": "the beautiful river", "tradition": "Christian", "note": "several experiencers reach for the hymn 'Shall We Gather at the River'" },
+        { "term": "the River Styx", "tradition": "secular", "note": "used once as an explanatory analogy, not as experience" },
+        { "term": "we go through the water", "tradition": null }
+      ],
+      "regex": "((cross|crossing|crossed|wade|waded|swim|swam|step|stepped|go|going|went) (over |across |into |through )(that|this|the|a) (river|stream|creek|brook)|(other|opposite|far) (side|bank|shore) of (the|that|this|a) (river|stream|creek|brook)|(bank|banks) of (the|that|this|a) (river|stream|creek|brook))",
+      "negative_regex": "flood|rafting|kayak|rapids|drowned that night|across the river from St. Louis|river of grief",
+      "measured": { "all_pct": 1.15, "all_docs": 71, "cv13_pct": 1.99, "cv18_pct": 2.76, "cv23_pct": 4.97 },
+      "precision_estimate": 0.64,
+      "precision_sample_n": 14,
+      "sensory": [
+        "twenty to thirty feet across, never wide",
+        "crystal clear, 'sparkling clear and letting off light'",
+        "rocks visible on the bottom, trout with visible eyes",
+        "hundreds of souls on the far bank beaming love toward the near bank",
+        "baby-soft grass on the far side in one account"
+      ],
+      "quotes": [
+        { "videoId": "By3UjYUe7rw", "cvnde": 23, "text": "We came to the bank of the river, and on the opposite bank, I saw all my loved ones who had passed away." },
+        { "videoId": "EHwBXZXzByM", "cvnde": 23, "text": "I was immediately behind him on the bank of a river. And the river itself was about, I don't know, 20 feet or so across, but very, very sparkling clear and letting off light" },
+        { "videoId": "l_pQ9Cxi-6A", "cvnde": 23, "text": "he was on the bank of River and this River wasn't very big but it was you maybe 20 ft or so across and on the other side I saw my my deceased relatives" },
+        { "videoId": "OTZVoRPfWkM", "cvnde": 7, "text": "Then often times souls are not allowed to cross the river because it's the point of no return." }
+      ],
+      "notes": "The strongest evidential gradient of any place in this region: 1.15% overall, 1.99% at cv>=13, 2.76% at cv>=18, 4.97% at cv>=23 — a 4.3x enrichment among the best-evidenced accounts. Whatever else is true, the river-with-relatives-on-the-far-bank is not an artefact of weakly-evidenced storytelling. Precision is limited by real rivers in accident narratives (drownings, rafting); the negative_regex removes some but not all."
+    },
+    {
+      "id": "the-bridge",
+      "name": "the bridge you must not cross",
+      "category": "structure",
+      "parent": "point-of-no-return",
+      "journey_position": 0.74,
+      "description": "A small footbridge over a creek or brook, sometimes with golden railings, leading toward something magnetically desirable on the far side — a golden castle, a group of angels. The bridge is unusual in this region because it is an invitation rather than an obstacle: it exists precisely to be walked over, and the experiencer's foot is often already on it when they are stopped.",
+      "aliases": [
+        { "term": "a little wooden footbridge", "tradition": null },
+        { "term": "a narrow bridge with golden railings", "tradition": null },
+        { "term": "a land bridge", "tradition": null },
+        { "term": "a cobblestone bridge", "tradition": null },
+        { "term": "the bridge", "tradition": null }
+      ],
+      "regex": "((cross|crossing|crossed|walk|walked|go|going|went) (over |across )?(that|this|the) (bridge|foot ?bridge)[^.?!]{0,90}(castle|other side|heaven|not.{0,12}time|couldn'?t|can'?t|never|go back|come back)|(a|the) (little |small |wooden |golden |stone |narrow )*(foot ?)?bridge[^.?!]{0,90}(other side|couldn'?t cross|can'?t cross|not (allowed|able) to cross|castle|golden|go back|come back))",
+      "negative_regex": "Golden Gate|bridge the gap|cross that bridge when|kayak|bridge pilings",
+      "measured": { "all_pct": 0.19, "all_docs": 12, "cv13_pct": 0.30, "cv18_pct": 0.14, "cv23_pct": 0.00 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 10,
+      "sensory": [
+        "small and wooden, spanning a creek or 'brooklet'",
+        "golden railings you can hold onto",
+        "a giant golden castle visible far off on the far side",
+        "a magnetic, physically felt pull toward it that vanishes the instant a hand touches your shoulder"
+      ],
+      "quotes": [
+        { "videoId": "hhADKDdhTTk", "cvnde": 17, "text": "And she said, \"You can't cross that bridge yet because it's not yet your time.\"" },
+        { "videoId": "PqddJsxn16s", "cvnde": 15, "text": "In front of me I saw a bridge hanging over a brooklet, and I stepped onto it." },
+        { "videoId": "PqddJsxn16s", "cvnde": 15, "text": "It was a narrow bridge with golden railings. I held on to the railing, intending to take a few steps towards the other side." },
+        { "videoId": "P1MVSAwKZ8Y", "cvnde": 9, "text": "she heard a voice saying, you can go, but then you can't come back." },
+        { "videoId": "BXtPCN_At9Q", "cvnde": 7, "text": "They couldn't cross a bridge, they couldn't cross a creek where they were told by a being of light that it wasn't their time and they had to go back." }
+      ],
+      "notes": "Rare and, of the 12 documents, two are the same experiencer (Joni Gommo, hhADKDdhTTk and IZWbojibwyA) and one is second-hand commentary. Reported here because it is a distinct and vivid form the brief asks about, not because it is common — the bare noun 'bridge' occurs in 7.32% of accounts but almost entirely as real bridges in accident narratives, which is exactly the false-positive trap the method rules warn about."
+    },
+    {
+      "id": "the-veil",
+      "name": "the veil",
+      "category": "boundary",
+      "parent": "point-of-no-return",
+      "journey_position": 0.55,
+      "description": "A thin, permeable membrane between the two worlds — misting, curtain-like, sometimes literally a curtain hanging the length of a room with movement visible behind it. Unlike the other boundary forms the veil is bidirectional and is often described being passed through on the way in rather than blocked at on the way out. A large share of uses are conceptual ('the veil between worlds is thin') rather than perceptual, and this must be stated plainly.",
+      "aliases": [
+        { "term": "the veil", "tradition": null },
+        { "term": "the veil of death", "tradition": "Christian" },
+        { "term": "a very thin veil", "tradition": null },
+        { "term": "the curtain", "tradition": null },
+        { "term": "a curtain of forgetfulness", "tradition": null },
+        { "term": "the veil between heaven and earth", "tradition": "Christian" },
+        { "term": "a misting", "tradition": null }
+      ],
+      "regex": "((the|a) veil[^.?!]{0,70}(between|of death|other side|through|lifted|thin|cross|separat)|veil of death|(the|a) curtain[^.?!]{0,70}(other side|between|through|open|part|separat))",
+      "negative_regex": "veil of the temple|shower curtain|curtain call",
+      "measured": { "all_pct": 4.36, "all_docs": 269, "cv13_pct": 5.07, "cv18_pct": 4.70, "cv23_pct": 3.87 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 14,
+      "sensory": [
+        "a misting filling the whole length of a room",
+        "movement visible behind it — an elbow, a pant leg, a foot peeking out",
+        "thin enough to step through 'like going through someone's room'",
+        "described as lifting off the eyes rather than standing in the path"
+      ],
+      "quotes": [
+        { "videoId": "rbPZ2nAIh0o", "cvnde": 11, "text": "I actually felt like I had entered through a veil, a very thin veil, to get to the place where the angels and my family were." },
+        { "videoId": "K1vwxIKQWWc", "cvnde": 8, "text": "I see this like misting, like a veil almost, filling the whole length of the room on the other side. I can see movement on the other side." },
+        { "videoId": "9xAyDHVxv2k", "cvnde": 13, "text": "My one daughter told me, \"Well, Dad, that was the veil of death.\"" },
+        { "videoId": "KZZpf_QPi3Y", "cvnde": 18, "text": "there was something like a curtain. And I saw my grandfather on my mom's side peek through" }
+      ],
+      "notes": "Honest caveat: this is the weakest member of the region. Roughly half of matched snippets use 'veil' as a metaphor for ordinary human forgetfulness or for the general thinness between worlds, not as a boundary encountered during the experience. It declines with evidential strength (5.07% at cv>=13 down to 3.87% at cv>=23), the opposite pattern from the river and the golden wall — consistent with 'veil' being partly imported vocabulary rather than reported perception. Included because it is unmistakably the corpus's own word for the divide, with 845 documents mentioning it at all."
+    },
+    {
+      "id": "the-tree-on-the-hill",
+      "name": "the tree at the top of the hill",
+      "category": "landscape",
+      "parent": "point-of-no-return",
+      "journey_position": 0.72,
+      "description": "A boundary made of pure desire rather than obstruction: a single tree standing at the crest of a grassy hill, or a distant landmark of the same kind. Nothing bars the way. The experiencer knows that reaching the tree and seeing over the horizon behind it is the crossing, and wants to run to it 'with every fiber of my being'. Being talked out of running is the whole of the boundary.",
+      "aliases": [
+        { "term": "that tree", "tradition": null },
+        { "term": "the singular tree", "tradition": null },
+        { "term": "the top of the hill", "tradition": null },
+        { "term": "the other edge of that horizon", "tradition": null },
+        { "term": "the crest", "tradition": null }
+      ],
+      "regex": "((that|the) tree[^.?!]{0,80}(never come back|couldn'?t come back|other side|top of the hill)|top of the hill[^.?!]{0,80}(tree|never come back|other side))",
+      "negative_regex": "family tree|tree of knowledge|Christmas tree",
+      "measured": { "all_pct": 0.19, "all_docs": 12, "cv13_pct": 0.00, "cv18_pct": 0.00, "cv23_pct": 0.00 },
+      "precision_estimate": 0.75,
+      "precision_sample_n": 8,
+      "sensory": [
+        "grass so alive that every individual blade is felt as it moves",
+        "colours 'more vivid than I've ever experienced here'",
+        "light shining through the body from every direction, not from a sun",
+        "a single tree, no forest",
+        "the tree itself perceived as drinking in the light"
+      ],
+      "quotes": [
+        { "videoId": "UPZ5Lat277I", "cvnde": 12, "text": "With every fiber of my being, I had to run to that tree because I knew if I reached it, I would see what's on the other edge of that horizon, and I would never come back here." },
+        { "videoId": "YOi92hxfJgA", "cvnde": 10, "text": "There was a tree at the top of the hill, this singular tree." },
+        { "videoId": "TYiLzS6Jq54", "cvnde": 7, "text": "I knew if I got to that tree, I'd never come back here. I was pulled to that tree." },
+        { "videoId": "9uQPuelkQT0", "cvnde": 10, "text": "I really wanted to go to that tree because I knew if I did, I'd never come back here" }
+      ],
+      "notes": "Reported as a genuinely rare vivid specific, with the honest caveat that most of the 12 documents are one experiencer (David Maginley / McGinley) interviewed repeatedly, plus one independent account (ZH0J83t7LZs) where a single beautiful tree stands on the far side of the boundary wall. Zero hits at every cvNDE threshold. Included because the brief asks for rare-but-real detail and because this account articulates the mechanism of a desire-boundary more clearly than any other in the corpus."
+    },
+    {
+      "id": "halted-by-a-hand",
+      "name": "the hand that stops you",
+      "category": "process",
+      "parent": "point-of-no-return",
+      "journey_position": 0.80,
+      "description": "The boundary enforced by a body. A being puts a hand on the shoulder, an arm across the chest, or simply raises a palm, and forward motion — and often the desire for it — ends instantly. Experiencers stress that there is no force or violence in it; the touch is loving and the pull toward the far side simply disappears at the moment of contact.",
+      "aliases": [
+        { "term": "a hand on my shoulder", "tradition": null },
+        { "term": "he held up his right hand and he goes, 'No'", "tradition": "Christian" },
+        { "term": "an arm of a man in a robe stops him", "tradition": null },
+        { "term": "the angel stopped him", "tradition": "Christian" },
+        { "term": "a huge hand gathers up everything about me and stops me", "tradition": null },
+        { "term": "God stopped me", "tradition": "Christian" }
+      ],
+      "regex": "((a|an|the) (hand|arm|angel|being|figure|man|voice|presence)[^.?!]{0,60}(stopped|blocked|barred|held) (me|my (way|path|shoulder))|(stopped|blocked|barred) my (way|path)|(put|held|raised) (out |up )?(his|her|their|a) (hand|arm)[^.?!]{0,50}(stop|no further|couldn'?t|not allowed))",
+      "negative_regex": "stopped me in the street|stopped me dead in my tracks|homeless guy",
+      "measured": { "all_pct": 0.62, "all_docs": 38, "cv13_pct": 0.60, "cv18_pct": 0.69, "cv23_pct": 0.55 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 14,
+      "sensory": [
+        "the weight of a hand felt distinctly on the shoulder",
+        "an arm laid across the body from behind",
+        "a palm raised with a single silent 'No'",
+        "the urge to cross vanishing at the instant of contact"
+      ],
+      "quotes": [
+        { "videoId": "MY-XSFRZvy4", "cvnde": 22, "text": "It was this like an arm, and it held me on my shoulder. And I knew right then and there, I just knew it. It was over. I knew I had to go back." },
+        { "videoId": "hhADKDdhTTk", "cvnde": 17, "text": "the lady who was walking with me put her hand on my shoulder from behind. And the second she did, the urge to cross that bridge was gone." },
+        { "videoId": "FRz3o-u4mIg", "cvnde": 18, "text": "he starts to go through, walk through the archway into the city when the angel stopped him and and sent him back." }
+      ],
+      "notes": "Flat across all cvNDE strata. Precision is limited by the extremely common English idiom 'it stopped me dead in my tracks' used about ordinary life events; the negative_regex removes the most frequent forms. This is the physical-contact variant of the boundary and is the only one where the experiencer's desire to cross is described as being removed rather than overruled."
+    },
+    {
+      "id": "the-verdict-not-your-time",
+      "name": "it is not your time — you have to go back",
+      "category": "process",
+      "parent": "the-choice",
+      "journey_position": 0.87,
+      "description": "The judgement that closes the boundary scene. Almost always a single compound utterance: a statement about time ('it's not your time', 'your time has not yet come') joined to a directive ('you have to go back', 'you must return'). It is delivered by God, Jesus, an angel, a dead relative, or an unattributed voice, and it is almost never negotiable — experiencers argue, beg and refuse, and it makes no difference.",
+      "aliases": [
+        { "term": "it's not your time", "tradition": null },
+        { "term": "it's not your time yet", "tradition": null },
+        { "term": "your time has not yet come", "tradition": null },
+        { "term": "your race has not yet run", "tradition": "Christian" },
+        { "term": "you have to go back", "tradition": null },
+        { "term": "you must return", "tradition": null },
+        { "term": "turn around, go back", "tradition": null },
+        { "term": "you can't stay here", "tradition": null },
+        { "term": "not yet", "tradition": null }
+      ],
+      "regex": "(((you|I) (have|had|has|need|needed|got|must) to go back)|(you|I) (must|have to|had to) return|(it'?s|it is|it was|this is|that'?s) not (your|my|his|her) time)",
+      "negative_regex": "I have to go back a bit|have to go back to your room|I have to go back to work",
+      "measured": { "all_pct": 25.31, "all_docs": 1563, "cv13_pct": 31.85, "cv18_pct": 32.87, "cv23_pct": 37.02 },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 14,
+      "sensory": [
+        "spoken 'in a stern, loud voice' by some, gently by others",
+        "telepathic in the majority — heard in the middle of the head, not the ears",
+        "delivered without explanation; reasons, when given, come afterwards",
+        "often accompanied by a touch or by the light dimming"
+      ],
+      "quotes": [
+        { "videoId": "fEj5-ufE7LI", "cvnde": 23, "text": "Then I heard a voice say, \"Turn around. Go back. It is not your time.\"" },
+        { "videoId": "Ojh4PQV4_MY", "cvnde": 24, "text": "he said, \"Um, it's not your time. You have to go back.\"" },
+        { "videoId": "6hogP2qF3RI", "cvnde": 22, "text": "I was told in no uncertain manner, \"Your time has not yet come. Your race has not yet run. You must return." },
+        { "videoId": "KZZpf_QPi3Y", "cvnde": 18, "text": "my grandmother told me, \"You have to go. You can't stay here. It's not your time.\"" },
+        { "videoId": "LvnHIC8Csdg", "cvnde": 13, "text": "He looks at me, He says, \"No, it's not your time. Go back.\"" },
+        { "videoId": "QSDmyV44rZw", "cvnde": 14, "text": "the light itself, all these millions upon millions of fragments of light, said to me, this is not your time. You must return." }
+      ],
+      "notes": "By far the largest measurement in this region and one of the few that climbs steadily with evidential strength: 25.31% overall to 37.02% at cv>=23. The bare phrase 'not your time' alone is 7.25% (448 docs) and also climbs. One strongly-evidenced experiencer (6oDB4BzndCQ, cv=23) explicitly names it as the expected script he did NOT receive — 'I didn't have the classic declaration made to me' — which is good evidence the corpus knows this is a formula and does not always fill it in."
+    },
+    {
+      "id": "the-choice",
+      "name": "the choice",
+      "category": "process",
+      "parent": null,
+      "journey_position": 0.87,
+      "description": "The moment the decision is handed to the experiencer. It is usually put as a plain question — 'do you want to stay or return?', 'you can stay or you can go back' — and often paired with information intended to inform it: what will happen to the children, what work remains, what the return will cost in pain. Almost nobody wants to go back. Many report that the offer is genuinely free and that the beings will not argue.",
+      "aliases": [
+        { "term": "do you wish to stay or return?", "tradition": null },
+        { "term": "do you want to go back?", "tradition": null },
+        { "term": "you can stay or you can go back", "tradition": null },
+        { "term": "you have a choice", "tradition": null },
+        { "term": "it's your decision", "tradition": null },
+        { "term": "an option point", "tradition": null },
+        { "term": "free will", "tradition": null }
+      ],
+      "regex": "((do|did|would) you (want|wish) to (stay|go back|come back|return)|(you|I) (have|had|has|get|got) (a|the) choice[^.?!]{0,40}(stay|go back|come back|return)|(the|a) choice (to (stay|go back|come back|return)|was (mine|yours|given|up to))|(you|I) (can|could|may) (stay|choose)[^.?!]{0,25}or (you|I)? ?(can|could|may)? ?(go|come) back)",
+      "negative_regex": null,
+      "measured": { "all_pct": 6.72, "all_docs": 415, "cv13_pct": 8.50, "cv18_pct": 8.01, "cv23_pct": 5.52 },
+      "precision_estimate": 0.85,
+      "precision_sample_n": 16,
+      "sensory": [
+        "posed as a question, never as pressure",
+        "asked telepathically in most accounts",
+        "sometimes accompanied by a preview of the life that would follow each answer",
+        "several report the offer being withdrawn the instant the decision forms"
+      ],
+      "quotes": [
+        { "videoId": "FKOBI1oqfMU", "cvnde": 20, "text": "And he said, \"Do you wish to stay or return?\"" },
+        { "videoId": "_PpFinFUD8o", "cvnde": 13, "text": "'You can stay if you want, or you can go back. But if you go back, you have to do something.'" },
+        { "videoId": "22ge3Qp6sS8", "cvnde": 16, "text": "You can stay or you can go back." },
+        { "videoId": "EUu0CznJPdo", "cvnde": 19, "text": "I felt I could stay there, then glanced around at my Son, my Wife, and finally, my baby girl, and something told me I need to be there for them." }
+      ],
+      "notes": "The structured coding puts 'choice_to_return' at 78.3% of all accounts and 85.1% at cv>=23, at mean journey position 0.867 — so the choice is nearly universal even though only 6.72% phrase it in these particular words. My lexical measure declines at cv>=23 (5.52%) while the coded element does not, which suggests the well-evidenced accounts describe the decision without the stock question-and-answer framing."
+    },
+    {
+      "id": "the-forced-return",
+      "name": "being sent back",
+      "category": "process",
+      "parent": "the-choice",
+      "journey_position": 0.92,
+      "description": "The other outcome: no choice at all. The experiencer is sent, pushed, put or simply removed, sometimes mid-sentence and sometimes before they have even reached the boundary they were walking toward. Several describe it as being catapulted, shot, or falling backwards. The consistent emotional report is not fear but grief and protest — people describe arriving back in the body devastated, and in pain.",
+      "aliases": [
+        { "term": "he sent me back", "tradition": null },
+        { "term": "I was sent back", "tradition": null },
+        { "term": "I was pushed back", "tradition": null },
+        { "term": "I was put back", "tradition": null },
+        { "term": "I had no choice", "tradition": null },
+        { "term": "I wasn't given a choice", "tradition": null },
+        { "term": "I was catapulted back into my body", "tradition": null },
+        { "term": "it wasn't my decision to come back", "tradition": null }
+      ],
+      "regex": "((sent|send|pushed|shoved|thrust|thrown|threw|kicked|booted|shot) (me|him|her|us) back|(had|got) no (choice|say)[^.?!]{0,40}(back|return)|(wasn'?t|was not|weren'?t) (given|offered) (a|any) choice|(against|not) my (will|choosing)[^.?!]{0,30}back)",
+      "negative_regex": "sent me back home with|sent me back to the shelter|sent me back to work|doctor sent me back|urgent care|sent me back to my room",
+      "measured": { "all_pct": 8.35, "all_docs": 516, "cv13_pct": 8.02, "cv18_pct": 6.63, "cv23_pct": 5.52 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 12,
+      "sensory": [
+        "sudden and instantaneous — 'in one second I was back in my body'",
+        "described as a whoosh, a slide backwards, a fall, a catapult",
+        "the return into the body is painful where the journey out was not",
+        "no farewell; the scene simply ends"
+      ],
+      "quotes": [
+        { "videoId": "wRuVNAf_InM", "cvnde": 18, "text": "But I was cut, put back into my ICU before I could, uh, go through that fence. So it wasn't my decision to come back." },
+        { "videoId": "XtCPZ_EzvFg", "cvnde": 16, "text": "when he went like this to me, that it was not my time, he sent me back to my body." },
+        { "videoId": "zhx_rZywFPw", "cvnde": 15, "text": "The angel sent me back over the meadow and into my body." },
+        { "videoId": "FRz3o-u4mIg", "cvnde": 18, "text": "he starts to go through, walk through the archway into the city when the angel stopped him and and sent him back." }
+      ],
+      "notes": "This is the only major process in the region that DECLINES with evidential strength: 8.35% overall down to 5.52% at cv>=23. The structured journey coding shows the same shape in reverse — 'forced_return' is coded in 27.1% of sequenced accounts at mean position 0.893, versus 'choice_to_return' at 80.8%. Precision is limited by medical 'the doctor sent me back home' constructions, which the negative_regex only partly removes."
+    },
+    {
+      "id": "return-for-the-children",
+      "name": "the children who pull you back",
+      "category": "process",
+      "parent": "the-choice",
+      "journey_position": 0.88,
+      "description": "The single commonest reason people choose to come back. Not love of life, not fear of death, not unfinished ambition — a child. Experiencers who are otherwise entirely unwilling to return describe the thought of a son, daughter or baby arriving and the decision being made instantly and irreversibly. Several report knowing exactly what would happen to those children if they stayed, and that this is what settles it.",
+      "aliases": [
+        { "term": "my daughter needs me", "tradition": null },
+        { "term": "my kids needed me", "tradition": null },
+        { "term": "I couldn't leave my children", "tradition": null },
+        { "term": "who would raise them", "tradition": null },
+        { "term": "I need to be there for them", "tradition": null },
+        { "term": "your children need you", "tradition": null }
+      ],
+      "regex": "((my|your|her|his) (children|kids|son|daughter|baby|babies|boys|girls)[^.?!]{0,60}(need|needed|needs)|(go|come|came|went|coming|going) back (for|because of) (my|your|her|his|the) (children|kids|son|daughter|baby|babies)|(who|what) (would|will|was going to) (take care of|raise|look after) (my|the) (children|kids|baby|babies))",
+      "negative_regex": "your son needs an emergency|needs to go into surgery|daughter's in hospital",
+      "measured": { "all_pct": 3.89, "all_docs": 240, "cv13_pct": 5.07, "cv18_pct": 5.39, "cv23_pct": 5.52 },
+      "precision_estimate": 0.64,
+      "precision_sample_n": 14,
+      "sensory": [
+        "the children's faces appearing in front of the experiencer, looking back at them",
+        "the decision described as forming before the question has finished",
+        "'the hardest decision I had ever had to make'",
+        "the offer to stay withdrawing itself the instant the thought lands"
+      ],
+      "quotes": [
+        { "videoId": "r3no_PDEDWk", "cvnde": 20, "text": "And I remember going, \"My daughter needs me. I need to get back.\"" },
+        { "videoId": "zhx_rZywFPw", "cvnde": 15, "text": "I also saw that I couldn't leave my children to stay in this carefree place." },
+        { "videoId": "EUu0CznJPdo", "cvnde": 19, "text": "I felt I could stay there, then glanced around at my Son, my Wife, and finally, my baby girl, and something told me I need to be there for them." },
+        { "videoId": "4jU7ioZdqzE", "cvnde": 14, "text": "And I knew that my kids needed me" }
+      ],
+      "notes": "Rises with evidential strength (3.89% -> 5.52%). One experiencer (RROedrc0Nw8) turns this into practical advice for paramedics: that saying 'your children need you' to a coding patient may reach them where their own name does not. Precision limited by medical narrative uses of 'my son needs an operation'."
+    },
+    {
+      "id": "the-unfinished-work",
+      "name": "the work you have not finished",
+      "category": "process",
+      "parent": "the-choice",
+      "journey_position": 0.86,
+      "description": "The second great reason for return: a task, mission or purpose that is not complete. It is usually stated by the being rather than realised by the experiencer, and it is characteristically vague — 'you have more work to do', 'you'll be able to figure that out' — with the content withheld. Many return without ever being told what the work is, and spend years afterwards trying to identify it.",
+      "aliases": [
+        { "term": "you have more work to do", "tradition": null },
+        { "term": "I still had work to do", "tradition": null },
+        { "term": "you have a mission", "tradition": null },
+        { "term": "unfinished business", "tradition": null },
+        { "term": "your work on earth is not done", "tradition": null },
+        { "term": "you're not finished yet", "tradition": null },
+        { "term": "a contract", "tradition": null },
+        { "term": "a special job to do in this life", "tradition": null }
+      ],
+      "regex": "((more|still) (work|things|something) to do|(work|mission|purpose|job|task|assignment) (left )?(to do|to finish|to complete)|(your|my|his|her) (work|mission|purpose|job|task) (is|was|isn'?t|wasn'?t) not (done|finished|complete|over)|unfinished (business|work))",
+      "negative_regex": null,
+      "measured": { "all_pct": 7.79, "all_docs": 481, "cv13_pct": 7.90, "cv18_pct": 8.43, "cv23_pct": 11.05 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 8,
+      "sensory": [
+        "stated as fact, without detail",
+        "often paired directly with 'it is not yet your time' in the same breath",
+        "the experiencer is told they will work out what the work is themselves",
+        "sometimes framed as duty: 'it was my duty, and I wouldn't be asked if I couldn't handle it'"
+      ],
+      "quotes": [
+        { "videoId": "RJBzkwnJP94", "cvnde": 19, "text": "He said, is it you have more work to do and it is not yet your time." },
+        { "videoId": "kVmoJhR6xfI", "cvnde": 19, "text": "I was told that I was too early. I still had work to do." },
+        { "videoId": "jYXjxZVDWxI", "cvnde": 12, "text": "And he said, \"Look, the work you have to do is really important.\"" },
+        { "videoId": "Xhsekx75p2c", "cvnde": 10, "text": "No, you've come this far already. You've learned so many lessons already" }
+      ],
+      "notes": "Rises with evidential strength, reaching 11.05% at cv>=23 — the highest cv>=23 figure of any process in this region apart from the verdict itself. Precision is imperfect because 'more work to do' is also used about post-NDE life and about spiritual growth generally, but in this corpus those uses are usually downstream of the same boundary scene."
+    }
+  ]
+}

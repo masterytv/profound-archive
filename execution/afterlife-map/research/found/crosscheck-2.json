@@ -1,0 +1,432 @@
+{
+  "places": [
+    {
+      "id": "the-form-it-takes-for-you",
+      "name": "The One Who Wears the Face You Would Know",
+      "category": "process",
+      "description": "Experiencers repeatedly volunteer their own theory of why the same destination has so many names: the light, the energy, the presence takes whatever shape the arriving person can bear. A Christian meets Jesus, a Buddhist meets Buddha, a Hindu meets Shiva or Krishna, a Muslim meets Allah, and several say this is deliberate comfort, not deception. Some experiencers report meeting a figure from a tradition that was NOT their own, which they treat as evidence the naming is not simple projection.",
+      "aliases": [
+        { "term": "it takes the form you can recognize", "tradition": "cross-tradition", "note": "the commonest phrasing" },
+        { "term": "Christians will say I met Jesus, Buddhists will say I met Buddha", "tradition": "cross-tradition", "note": null },
+        { "term": "to make you comfortable in the transition", "tradition": "secular/spiritualist", "note": null },
+        { "term": "what you believe is what you see", "tradition": "secular", "note": "the sceptical-sounding version, still said approvingly" },
+        { "term": "self-manifesting it", "tradition": "none", "note": "used by non-religious experiencers wary of their own projection" },
+        { "term": "the same energy finds a way to communicate with you", "tradition": "energy/Source", "note": null }
+      ],
+      "regex": "((christians?|buddhists?|hindus?|muslims?|jews?|jewish people)[^.?!]{0,90}(will say|would say|they see|they saw|see|saw|meet|met)[^.?!]{0,40}(jesus|buddha|krishna|shiva|allah|muhammad)|(take|takes|took|assume|assumes|assumed|appear|appears|appeared)[^.?!]{0,25}form[^.?!]{0,70}(recogni[sz]|understand|comfort|accept|believe|need|relate)|what you believe is what you see|some (saw|see) (buddha|jesus)[^.?!]{0,40}some (saw|see))",
+      "negative_regex": "(take the form of a corporation|legal form|form you fill)",
+      "quotes": [
+        { "videoId": "hJZpd_FdQgo", "cvnde": 19, "text": "That is why Christians, when they encounter the white light, the universal intelligence, will say, I met Jesus. Buddhists will say, I met Buddha. Hindus, I met Shiva or Vishnu." },
+        { "videoId": "OpVQTAu1svo", "cvnde": 7, "text": "If you're a Muslim, you may see Allah. If you're a Buddhist, you may say Buddha. If you're a Christian, you may see Christ." },
+        { "videoId": "RjlHo__Hsk8", "cvnde": 11, "text": "some saw Buddha, some saw Jesus, some saw other types of religion. The fact is that that same energy, uh, finds a way to communicate with you." },
+        { "videoId": "b_6Q5u9HWOE", "cvnde": 12, "text": "let's say a person's a Muslim, they may die and they may see Allah. Or a person's Buddhist, and they may die and see a Buddha." },
+        { "videoId": "H4XFFqNOWLY", "cvnde": 14, "text": "he was raised Hindu, and then he saw Archangel Michael. And, you know, and I'm not raised Hindu, and I saw Shiva." }
+      ],
+      "sensory": [
+        "the figure is recognised before it is seen clearly",
+        "recognition arrives as certainty rather than by facial detail",
+        "the same overwhelming love reported regardless of which name is used"
+      ],
+      "journey_position": 0.5,
+      "precision_estimate": 0.75,
+      "precision_sample_n": 12,
+      "measured": { "all_pct": 1.55, "all_docs": 96, "cv13_pct": 1.75, "cv18_pct": 1.93, "cv23_pct": 3.31 },
+      "notes": "This is the single most important finding for alias-mapping: the corpus theorises about its own naming variation, and it does so MORE among the best-evidenced accounts (1.55% overall, 3.31% at cv>=23 - a doubling). Cross-tradition mismatches are reported in both directions: a Hindu-raised man seeing Archangel Michael, a non-Hindu seeing Shiva, atheists seeing Jesus, a Hindu woman seeing Jesus. Caveat: many of these passages are spoken by researchers, mediums and pastors summarising other people's accounts rather than by the experiencer about their own NDE - roughly a quarter of matches. Where an experiencer offers it about their own experience, it is almost always offered defensively ('I know how this sounds')."
+    },
+    {
+      "id": "the-named-one-in-the-light",
+      "name": "The Named One - Jesus, Christ, Buddha, Krishna, Allah, the Great Spirit",
+      "category": "being",
+      "description": "The central figure encountered in or beside the light, given a proper name drawn from the arriver's own tradition. The behaviour described is near-identical across names: the figure is already waiting, radiates unbearable love, communicates without speech, holds or embraces the person, and delivers the verdict about returning. Only the name and the clothing change.",
+      "aliases": [
+        { "term": "Jesus", "tradition": "Christian", "note": "overwhelmingly dominant; 43.05% of all docs mention the word, 15.27% have Jesus as grammatical actor (Jesus was/came/took/held/said)" },
+        { "term": "Christ", "tradition": "Christian", "note": "20.35% of docs; declines with evidential strength (11.60% at cv>=23)" },
+        { "term": "Yeshua", "tradition": "Messianic Jewish / Hebrew-roots", "note": "2.30% of docs; slightly ENRICHED at cv>=18 (3.18%)" },
+        { "term": "the Lord", "tradition": "Christian", "note": null },
+        { "term": "Buddha", "tradition": "Buddhist", "note": "6.98% of docs mention the word, but only 0.26% in an encounter frame - most mentions are rhetorical lists" },
+        { "term": "Krishna / Shiva / Vishnu / Rama", "tradition": "Hindu", "note": "Krishna 2.17%; all Hindu-deity encounter frames together 0.13%" },
+        { "term": "Allah", "tradition": "Muslim", "note": "1.47%; the only named figure that does NOT decline at high cvNDE (1.80% at cv>=18)" },
+        { "term": "Muhammad / the Prophet", "tradition": "Muslim", "note": "2.30% (pattern also catches the given name Mohammed)" },
+        { "term": "the Great Spirit", "tradition": "Indigenous / Native American", "note": "1.46%; 2.21% at cv>=23" },
+        { "term": "Mother Mary / the Virgin", "tradition": "Catholic", "note": "3.06%" },
+        { "term": "God the Father / Heavenly Father", "tradition": "Christian / LDS", "note": "often reported as a SECOND figure alongside Jesus, seated or at a distance" }
+      ],
+      "regex": "((saw|met|there (was|stood)|it was|standing (there|in front)|in front of me|beside me|next to me|recogni[sz]ed|knew (it|that) was|face of|arms of|presence of)\\W{0,30}(Jesus|Christ\\b|Yeshua|Buddha|Krishna|Allah|the Great Spirit|the Lord\\b)|(Jesus|Christ|Yeshua|Buddha|Krishna|the Great Spirit) (was (there|standing|holding|smiling)|came (to|toward|up to) me|took my hand|held me|hugged me|said to me|reached out|walked (with|toward) me))",
+      "negative_regex": "(Jesus Christ[,!]? (what|why|how|man|dude|almighty)|oh my Jesus|a (man|guy|kid|boy) named Jesus|Jesus (Rodriguez|Garcia|Hernandez|Martinez))",
+      "quotes": [
+        { "videoId": "z-51iznugZA", "cvnde": 19, "text": "In the last NDE, I experienced Jesus was there. Pretty sure it was Jesus that looked just like all the paintings of Jesus." },
+        { "videoId": "0qJESVJi3tw", "cvnde": 20, "text": "Christ held me on his lap. And when he did that, I could feel tremendous love like I have never felt before" },
+        { "videoId": "s2CHotA6kcA", "cvnde": 13, "text": "His face lit up, and I saw the Great Spirit." },
+        { "videoId": "QhkfQyuzguQ", "cvnde": 10, "text": "I met Buddha too, or Krishna." },
+        { "videoId": "s9PL3Bmodrg", "cvnde": 20, "text": "Life review is over. And then Jesus was there again. And they both took me to like a barrier, and it was like an opening." }
+      ],
+      "sensory": [
+        "recognised instantly without introduction",
+        "often described as looking like the pictures the person grew up with",
+        "white or dazzling robe; hands and eyes reported most often",
+        "communication heart to heart, not aloud",
+        "physical contact - held, hugged, taken by the hand, held on a lap"
+      ],
+      "journey_position": 0.5,
+      "precision_estimate": 0.68,
+      "precision_sample_n": 22,
+      "measured": { "all_pct": 12.58, "all_docs": 777, "cv13_pct": 13.87, "cv18_pct": 13.26, "cv23_pct": 11.6 },
+      "notes": "The naming is overwhelmingly lopsided: this is an Anglophone, mostly North American YouTube corpus, so Christian namings outnumber all others by roughly 20:1 in encounter frames. That skew is a property of WHO IS SPEAKING, not of the destination. Non-Christian names appear far more often inside rhetorical lists ('God, Jesus, Buddha, or any other entity') than in first-person encounter frames - the gap between 6.98% for the bare word Buddha and 0.26% for 'saw/met Buddha' is the clearest demonstration of this in the corpus. Denominational base rates of the speakers: Catholic 18.62%, Jewish 5.73%, Buddhist 5.39%, Muslim/Islam 4.18%, Hindu 3.89%, Mormon/LDS 1.49%, Jehovah's Witness 0.42%, Sikh 0.16%. Precision caveat: 'Jesus' is also a common given name and an expletive; roughly a third of raw matches are biographical or conversion narrative rather than NDE encounter."
+    },
+    {
+      "id": "the-nameless-being-of-light",
+      "name": "The Being of Light Who Is Not Given a Name",
+      "category": "being",
+      "description": "The same central figure, met by people who decline to name it or who cannot. Described as a figure, a form, a presence, a light being, sometimes plural. Reported as neither male nor female, sometimes without a face, sometimes as a shape made only of light. Experiencers frequently say explicitly that they do not know who or what it was and are unwilling to guess.",
+      "aliases": [
+        { "term": "a being of light", "tradition": "secular", "note": "the corpus's default neutral term" },
+        { "term": "a figure of light / light figure", "tradition": "secular", "note": null },
+        { "term": "the presence", "tradition": "none", "note": null },
+        { "term": "the being of light, we call God", "tradition": "Christian-adjacent", "note": "the naming being applied after the fact" },
+        { "term": "beings of light (plural)", "tradition": "secular / spiritualist", "note": "often three, or a dozen" },
+        { "term": "not male or female, just made of lights", "tradition": "none", "note": null }
+      ],
+      "regex": "((a|the|this) being of light|beings of light|(a|the) light being\\b|(a|the) (figure|form) of light|light figure)",
+      "negative_regex": null,
+      "quotes": [
+        { "videoId": "XSfBTNu5JQs", "cvnde": 13, "text": "I approached it very quickly and then gradually perceived a figure of light. An incredible love emanated from this light figure." },
+        { "videoId": "0JpUGaonueY", "cvnde": 13, "text": "These three beings of light, they also had a human shape, not male or female, just made of lights." },
+        { "videoId": "WNgBqJmmAeo", "cvnde": 17, "text": "And the being of light, we call God, is so powerful that, you know, you know without a doubt that this being is going to protect you" },
+        { "videoId": "ZroPOzfxF48", "cvnde": 15, "text": "He was a being of pure love, wisdom, light, and energy." }
+      ],
+      "sensory": [
+        "human-shaped but sexless",
+        "no face, or a face that cannot be held in memory",
+        "love felt as emanation rather than gesture",
+        "brightness without glare - explicitly not painful to look at",
+        "sometimes fragments or splits into several beings"
+      ],
+      "journey_position": 0.45,
+      "precision_estimate": 0.95,
+      "precision_sample_n": 8,
+      "measured": { "all_pct": 9.03, "all_docs": 558, "cv13_pct": 9.11, "cv18_pct": 7.46, "cv23_pct": 4.97 },
+      "notes": "Runs the OPPOSITE way to evidential strength: 9.03% overall but only 4.97% among cv>=23 accounts, while the named-figure pattern holds at 11-14% across strata. The unnamed vocabulary is commonest in the more discursive, spiritually-eclectic accounts. A separate marker of naming refusal - 'I don't know what/who it was' - runs 8.10% overall and RISES to 11.05% at cv>=23, so it is not that the best-evidenced accounts are more certain of identity; they are more willing to say they cannot identify it while still not reaching for the phrase 'being of light'."
+    },
+    {
+      "id": "whatever-you-want-to-call-it",
+      "name": "Whatever You Want to Call It",
+      "category": "state",
+      "description": "A verbal move so common it functions as a place-marker in its own right: the experiencer names the destination or the presence, then immediately withdraws the name and offers the listener a substitution. God, Source, the Universe, the divine, the light, spirit, energy - explicitly presented as interchangeable labels for one thing the speaker met and cannot name. This is the corpus's own admission that the alias map exists.",
+      "aliases": [
+        { "term": "God, or whatever you want to call it", "tradition": "cross-tradition", "note": null },
+        { "term": "the universe, the divine, whatever you want to call it", "tradition": "secular", "note": null },
+        { "term": "call it whatever makes you feel good", "tradition": "none", "note": null },
+        { "term": "source or God or whatever you call it", "tradition": "New Age / Source", "note": null },
+        { "term": "for lack of a better term", "tradition": "none", "note": "the weaker cousin of the same move" }
+      ],
+      "regex": "(whatever you (want to |wanna |wish to )?call (it|him|her|them|that)|call (it|him|her|that) whatever|whatever (name|word|label) you|or whatever we call)",
+      "negative_regex": "(whatever you want to call it[^.?!]{0,20}(cough|flu|virus|condition|syndrome|disorder))",
+      "quotes": [
+        { "videoId": "8LNgDOLl2Ag", "cvnde": 10, "text": "The universe, the divine, whatever you want to call it, loves you so much. You are all welcome." },
+        { "videoId": "m3UVVK0RcN0", "cvnde": 9, "text": "You've touched God, you touched the universe. It's sort of, whatever you want to call it. There was no sense that there's any religion in what this was." },
+        { "videoId": "INd_QHYJJCA", "cvnde": 21, "text": "Call it whatever makes you feel good, but it's here." },
+        { "videoId": "X49kruqDmz0", "cvnde": 9, "text": "there is no disconnect between us and the reality of source or God or whatever you call it" }
+      ],
+      "sensory": [],
+      "journey_position": 0.5,
+      "precision_estimate": 0.7,
+      "precision_sample_n": 10,
+      "measured": { "all_pct": 10.07, "all_docs": 622, "cv13_pct": 9.23, "cv18_pct": 9.25, "cv23_pct": 11.05 },
+      "notes": "10.07% of all accounts contain this explicit refusal to fix a name, rising to 11.05% among the best-evidenced. Restricting the pattern to cases where a divine noun sits in the same clause drops it to 3.42% (211 docs), so about a third of instances are unambiguously about naming the divine; the rest are ordinary hedging ('a whooping cough, whatever you want to call it'). Treat 3-10% as the credible band. The important point is directional, not numeric: the corpus does not treat its own names as load-bearing."
+    },
+    {
+      "id": "heaven-by-that-name",
+      "name": "Heaven",
+      "category": "realm",
+      "description": "The destination named in Christian vocabulary. Reported as an arrival - you go to it, you are in it, you are shown around it. Contains most of the other catalogued structures (the green country, the city, the buildings, the gate) but the naming carries an ownership claim the other names do not: heaven is somewhere you are admitted to, not somewhere you return to.",
+      "aliases": [
+        { "term": "heaven", "tradition": "Christian", "note": "the word appears in 48.96% of all documents; 34.36% in an arrival frame" },
+        { "term": "the kingdom of God / the kingdom of heaven", "tradition": "Christian", "note": "4.03%" },
+        { "term": "paradise", "tradition": "Christian / Muslim", "note": "4.58%, and RISES with evidential strength to 6.63% at cv>=23" },
+        { "term": "my Father's kingdom", "tradition": "Christian", "note": null },
+        { "term": "nirvana", "tradition": "Buddhist", "note": "1.33% - and in this corpus almost always used loosely as a synonym for bliss, not as an arrival place" },
+        { "term": "the Summerland", "tradition": "Spiritualist / Wiccan", "note": "essentially absent: 3 documents, 0.05%. A classic afterlife name that this population does not use." }
+      ],
+      "regex": "((in|into|to|got to|went to|was in|been to|arrived in) heaven\\b|kingdom of (god|heaven)|heaven (was|is|looked|felt|has|had))",
+      "negative_regex": "(heaven forbid|heavens[,!]|good heavens|seventh heaven|heaven knows)",
+      "quotes": [
+        { "videoId": "tReEhEoe79c", "cvnde": 20, "text": "she crawled up a brick, a brick, uh, lined tunnel, uh, to heaven and met a woman named Elizabeth." },
+        { "videoId": "x8QUi2hhOkQ", "cvnde": 13, "text": "he describes looking out over this city that he knew was the kingdom of God." },
+        { "videoId": "fo7jJRAKXrY", "cvnde": 15, "text": "And then I said, \"Um, what is the true religion in heaven?\" And he said, \"In heaven, there is no religion." },
+        { "videoId": "4pQJG9ZlvqQ", "cvnde": 24, "text": "They went floating past me, and some of them went through me and on beyond, and up, and I knew that they were going up to heaven." }
+      ],
+      "sensory": [
+        "colours and light described as saturated beyond earthly range",
+        "grass, gardens, a city, buildings - the same furniture other namings report",
+        "no sun but everything lit",
+        "music and singing"
+      ],
+      "journey_position": 0.55,
+      "precision_estimate": 0.85,
+      "precision_sample_n": 6,
+      "measured": { "all_pct": 37.53, "all_docs": 2318, "cv13_pct": 42.94, "cv18_pct": 42.82, "cv23_pct": 45.3 },
+      "notes": "Heaven is the strongest single naming in the corpus and it gets STRONGER with evidential quality: 37.53% overall, 45.30% among cv>=23 accounts (the arrival-frame subset alone, 'in/to heaven', is 34.36% overall and 43.65% at cv>=23). Contrast with 'Summerland' (0.05%) and 'nirvana' (1.33%): the alias set is not evenly stocked. The corpus's population is Anglophone and Christian-adjacent, so this is a demographic fact about the tellers before it is a fact about the place. Note that Christian namings and secular namings frequently coexist in the same document - 'heaven' and 'the Source' are not mutually exclusive vocabularies here."
+    },
+    {
+      "id": "the-other-side",
+      "name": "The Other Side",
+      "category": "realm",
+      "description": "The most tradition-neutral name for the destination, usable by Christians, atheists and spiritualists alike without commitment. Implies a boundary crossed rather than a territory entered. People report going to it, coming back from it, and being spoken to from it. It is the one name in the corpus that carries no theology and requires no belief.",
+      "aliases": [
+        { "term": "the other side", "tradition": "secular / cross-tradition", "note": "the bare phrase appears in 54.21% of documents and rises to 62.43% at cv>=23" },
+        { "term": "crossing over / crossed over", "tradition": "spiritualist", "note": null },
+        { "term": "the other realm / that realm", "tradition": "none", "note": null },
+        { "term": "over there", "tradition": "none", "note": null },
+        { "term": "the in-between", "tradition": "none", "note": "used when the speaker will not commit to arrival" }
+      ],
+      "regex": "((went|going|go|been|was|coming|crossed|passed|crossing) (to|over to|back to) the other side|from the other side|the other side (is|was|of death))",
+      "negative_regex": "the other side of (the |my |his |her )?(road|street|room|bed|town|world|car|truck|fence|body|pool|tank|door|house|table|river|family|story|coin)",
+      "quotes": [
+        { "videoId": "YuqcBVDsCXk", "cvnde": 22, "text": "it's the instant that I was conscious in this body again, I was where I died. I just went to the other side." },
+        { "videoId": "hPUPIs0ZLpg", "cvnde": 20, "text": "I have a friend who was agnostic to the bone, yet everything changed when he passed to the other side." },
+        { "videoId": "tUgJ2PY89y0", "cvnde": 7, "text": "the other side is so much of a collective of um you know all of our beliefs, Jesus, Buddha, God, our ancestors" },
+        { "videoId": "MZtXl5zgxkw", "cvnde": 12, "text": "I know, I'm, for lack of a better term, on the other side." }
+      ],
+      "sensory": [
+        "described more by relation than by appearance - it is where the dead are",
+        "the boundary itself is what is felt, not the landscape"
+      ],
+      "journey_position": 0.5,
+      "precision_estimate": 0.65,
+      "precision_sample_n": 8,
+      "measured": { "all_pct": 17.16, "all_docs": 1060, "cv13_pct": 18.94, "cv18_pct": 18.92, "cv23_pct": 18.78 },
+      "notes": "The bare phrase 'the other side' is the most common destination-name in the whole corpus (54.21% of documents, 62.43% at cv>=23 - the largest cvNDE enrichment of any naming I measured), but it is heavily contaminated by ordinary spatial use ('the other side of the road'). The movement-constrained regex reported here (17.16%) is the conservative floor. Its neutrality is the point: this is the name people reach for when they want to describe the destination without claiming a religion, and it is the name that survives best in the accounts with the strongest veridical evidence."
+    },
+    {
+      "id": "home",
+      "name": "Home",
+      "category": "realm",
+      "description": "Not a description of the place but a claim about the arriver's relationship to it: this is where I am from, this is where I belong, I have been here before. Reported by Christians, atheists, Hindus and spiritualists in identical words. Frequently paired with an explicit reversal - earthly life is recast as the trip away, and the body is the place you are sent back to.",
+      "aliases": [
+        { "term": "home", "tradition": "cross-tradition", "note": "the single most tradition-portable name in the corpus" },
+        { "term": "welcome home", "tradition": "cross-tradition", "note": "1.55% - reported as the first thing said or transmitted on arrival" },
+        { "term": "where I belonged", "tradition": "none", "note": null },
+        { "term": "back where I belong", "tradition": "none", "note": null },
+        { "term": "my original source / the great heart", "tradition": "Indigenous / African", "note": "same claim, different vocabulary" },
+        { "term": "going home", "tradition": "Christian", "note": "used by Christians as a synonym for dying" }
+      ],
+      "regex": "(felt like (I was |i'd come |i had come )?(back )?home|feels like home|welcome home|I(?:'m| am| was) home\\b|this (is|was) (my |our |your )?(real |true )?home|home[^.?!]{0,30}where (I|we|you) (belong|came from|come from)|going home\\b|coming home\\b)",
+      "negative_regex": "(home from (the |work|school)|got home|drove home|went home from|came home from|home from the hospital|nursing home|funeral home|home run|stay(ed)? home)",
+      "quotes": [
+        { "videoId": "ASfXZHniI8A", "cvnde": 15, "text": "I look around and I'm thinking, this is home. This is, this is home. And it felt so good, Peggy." },
+        { "videoId": "XKLe9eLdqfg", "cvnde": 20, "text": "it felt like I was home. It felt like I was where I belonged. I felt totally embraced and permeated by this light." },
+        { "videoId": "iPD0qHBxNj0", "cvnde": 16, "text": "they were kind of radiating or emanating this feeling of, welcome home." },
+        { "videoId": "_7ng2Hw6aNQ", "cvnde": 22, "text": "I just felt like I was home. Not not a home that was a thought in my head, but a feeling in in my soul. It was it was like my soul was home." },
+        { "videoId": "Bj5dWGx2smg", "cvnde": 18, "text": "this is the first time in the three years of my life that I felt that I was home." }
+      ],
+      "sensory": [
+        "familiarity that precedes recognition",
+        "safety described as bodily rather than emotional",
+        "immediate reluctance to leave",
+        "the feeling arrives before any landscape is seen"
+      ],
+      "journey_position": 0.55,
+      "precision_estimate": 0.85,
+      "precision_sample_n": 8,
+      "measured": { "all_pct": 22.22, "all_docs": 1372, "cv13_pct": 24.55, "cv18_pct": 24.86, "cv23_pct": 25.41 },
+      "notes": "22.22% overall and monotonically rising with evidential strength to 25.41% at cv>=23. This is the naming that crosses every demographic line I could test: it appears in explicitly atheist accounts, in LDS accounts, in Hindu-influenced accounts and in Indigenous-framed accounts with no change of meaning. It is also the naming least dependent on the landscape - people report being 'home' inside a void, inside a light, and inside a green country. If the project needs one label for the destination that does not import theology, this is the corpus's own answer."
+    },
+    {
+      "id": "the-source-and-the-universe",
+      "name": "The Source, the Universe, Oneness",
+      "category": "realm",
+      "description": "The secular and New Age naming of the same destination and the same presence: an origin you dissolve back into rather than a kingdom you are admitted to. Described as consciousness, energy, intelligence, the field of everything. Experiencers who use it often say explicitly that they chose it to avoid the word God.",
+      "aliases": [
+        { "term": "the Source", "tradition": "New Age / secular", "note": "10.95% of documents" },
+        { "term": "Source energy / back to Source", "tradition": "New Age", "note": null },
+        { "term": "the Universe", "tradition": "secular", "note": "used as a personal agent - the Universe told me, the Universe wants" },
+        { "term": "oneness", "tradition": "secular / Eastern-influenced", "note": "12.61% of documents; peaks at cv>=18 (13.26%)" },
+        { "term": "universal consciousness / universal intelligence", "tradition": "secular", "note": null },
+        { "term": "the divine", "tradition": "cross-tradition", "note": "the diplomatic option" },
+        { "term": "pure consciousness", "tradition": "secular", "note": null },
+        { "term": "God-source / the God source", "tradition": "hybrid", "note": "the seam where the two vocabularies are stitched together" }
+      ],
+      "regex": "(\\bthe Source\\b|source energy|Source of all|back to (the )?source|universal (consciousness|intelligence|energy|mind)|divine (consciousness|intelligence)|infinite (consciousness|intelligence)|the Universe (is|was|loves|wants|has|showed|told)|\\boneness\\b|pure consciousness)",
+      "negative_regex": "(source of (the )?(income|infection|the problem|light pollution|funding|water supply)|open source|source code|primary source|news source)",
+      "quotes": [
+        { "videoId": "MRp0AVgsTQU", "cvnde": 17, "text": "I think source is more appropriate to use because God is such a loaded term, but the source of energy was absorbing this universe, including myself, into it." },
+        { "videoId": "TBtLnf42xPU", "cvnde": 7, "text": "And I made it to what they call, or I call it, Source. So I didn't see God. I didn't, you know, Jesus didn't pay me a visit." },
+        { "videoId": "Uiurzpj6hg8", "cvnde": 18, "text": "I was just, I was home. I was in such joy. I was being completely loved by the source." },
+        { "videoId": "9CjuxKbEZZQ", "cvnde": 20, "text": "I feel as though I'm having this conversation with a higher entity, a loving judge. Then she writes, \"The Source.\"" }
+      ],
+      "sensory": [
+        "absorption rather than arrival - being pulled or drawn in",
+        "loss of the sense of a separate self",
+        "described as energy or vibration rather than as scenery",
+        "no figure, no face, no location"
+      ],
+      "journey_position": 0.6,
+      "precision_estimate": 0.6,
+      "precision_sample_n": 8,
+      "measured": { "all_pct": 30.12, "all_docs": 1860, "cv13_pct": 28.35, "cv18_pct": 26.93, "cv23_pct": 23.2 },
+      "notes": "This is the only major naming cluster that runs DOWNWARD with evidential strength: 30.12% overall falling to 23.20% at cv>=23. The same inversion shows in the structured element table (cosmic_unity 60.9% overall, 49.2% at cv>=23). Two readings are available and the data does not decide between them: either Source/oneness language attaches to more interpretive, less veridically-anchored accounts, or the veridical-perception score rewards the concrete hospital-room detail that dissolution accounts by definition lack. Precision is the weakest of my entries (~0.6) because 'the source' has heavy ordinary usage; the tighter subset 'the Source' alone gives 10.95%."
+    },
+    {
+      "id": "the-spirit-world-and-the-ancestors",
+      "name": "The Spirit World and the Ancestors",
+      "category": "realm",
+      "description": "The naming used by Indigenous, African-diaspora, spiritualist and LDS experiencers. The destination is populated first and located second: it is where the ancestors are, and they are already gathered before you arrive. Distinctive in that the dead are described as an ongoing community with obligations to the living rather than as individuals waiting to greet one person.",
+      "aliases": [
+        { "term": "the spirit world", "tradition": "Spiritualist / LDS / Indigenous", "note": "5.83% of documents; central to LDS accounts where the phrase is doctrinal" },
+        { "term": "the ancestors", "tradition": "Indigenous / African", "note": "reported as a plural agency that calls, sings, gathers" },
+        { "term": "the Great Spirit", "tradition": "Native American", "note": "1.46%; 2.21% at cv>=23" },
+        { "term": "the spirit realm", "tradition": "Spiritualist", "note": null },
+        { "term": "the great heart / my original source", "tradition": "Indigenous / African", "note": "one experiencer's own vocabulary for the same destination" },
+        { "term": "the happy hunting ground", "tradition": "Native American (as reported by others)", "note": "essentially absent from first-person accounts" }
+      ],
+      "regex": "(spirit world|the spirit realm|Great Spirit|happy hunting ground|the ancestors\\b|ancestor spirits|my ancestors)",
+      "negative_regex": "(spirit world(s)? of (fiction|the novel)|ancestors (came|emigrated|immigrated) (from|to))",
+      "quotes": [
+        { "videoId": "3_pTZ_cKPWc", "cvnde": 16, "text": "Everyone is here, all the ancestors are here, including my dog that have passed recently." },
+        { "videoId": "CJ4hQMqfjL0", "cvnde": 14, "text": "she had called on the ancestors to remind me of my purpose." },
+        { "videoId": "H4XFFqNOWLY", "cvnde": 14, "text": "the presence that sung me into being, that was my original source." },
+        { "videoId": "V_R9ChlTfCE", "cvnde": 17, "text": "when you enter into the spirit world, there is no condemnation. There is no negativity." }
+      ],
+      "sensory": [
+        "arrival announced by gathering - everyone already assembled",
+        "song and calling as the medium of contact",
+        "animals and pets counted among the ancestors without distinction",
+        "veils that close behind you and can be reopened"
+      ],
+      "journey_position": 0.55,
+      "precision_estimate": 0.7,
+      "precision_sample_n": 10,
+      "measured": { "all_pct": 11.53, "all_docs": 712, "cv13_pct": 11.46, "cv18_pct": 8.84, "cv23_pct": 10.5 },
+      "notes": "11.53% overall, dipping at cv>=18 (8.84%). Demographic base rate for the vocabulary's likely speakers: native american/cherokee/navajo/lakota/apache/indigenous 6.48%, Mormon/LDS 1.49%. Two structural features distinguish this naming from 'heaven': (1) the destination is defined by its inhabitants, not its architecture; (2) the return is often described as being SUNG or CALLED back by living relatives rather than sent back by an authority - a return mechanism that does not appear in the Christian-named accounts I read."
+    },
+    {
+      "id": "the-passage-you-are-given",
+      "name": "The Passage - Tunnel, Stairway, Road, River, Elevator",
+      "category": "threshold",
+      "description": "The conveyance between the body and the destination. The corpus supplies a menu and each experiencer gets one: a tunnel, a tube, a shaft, a corridor; a stairway or staircase going up into cloud; a road or path to walk; a river or bridge to cross; occasionally an escalator or lift. The reported function is identical - motion toward light, no ability to stop, a sense of being carried - only the vehicle changes.",
+      "aliases": [
+        { "term": "tunnel / tube / shaft / chute", "tradition": "secular (default)", "note": "the dominant form: 18.35% for 'through/down/up a tunnel'; the structured element table gives tunnel 23.9% overall, 33.1% at cv>=23" },
+        { "term": "stairway / staircase / steps", "tradition": "Christian (Jacob's ladder imagery)", "note": "1.81% for 'a/the stairway|staircase', and it TRIPLES with evidential strength to 6.63% at cv>=23; ornamented variants (golden/marble/white/crystal/spiral) 0.91% overall, 4.42% at cv>=23" },
+        { "term": "a road / path / walkway", "tradition": "cross-tradition", "note": "0.74% in a 'led to' frame" },
+        { "term": "a river to cross / the far bank", "tradition": "cross-tradition", "note": "1.49% for crossing a river or water" },
+        { "term": "a bridge", "tradition": "cross-tradition", "note": "0.37%" },
+        { "term": "an escalator / elevator / lift", "tradition": "secular, modern", "note": "0.63% - the mechanised version, and it exists" },
+        { "term": "a hallway or corridor", "tradition": "none", "note": null },
+        { "term": "no passage at all", "tradition": "none", "note": "a substantial minority state flatly that there was no tunnel and no stairway" }
+      ],
+      "regex": "((through|down|up|into|along) (a|the|this) (tunnel|tube|shaft|corridor|hallway|passageway|chute)|(a|the) (stairway|staircase)\\b|(golden|marble|white|crystal|spiral) (stairs|steps)|(up|down|on|onto|rode|in) (a|the) (escalator|elevator|lift)\\b|(crossed|cross|crossing|over) (a|the) (river|stream|bridge)|(walked|walking|travel(l)?ing|went) (down|along|up) (a|the) (road|path|pathway|golden road))",
+      "negative_regex": "(carpal tunnel|wind tunnel|tunnel vision (from|caused by)|Lincoln Tunnel|the stairs (in|at|of) (my|the) (house|home|apartment|basement)|fell down the stairs|walked up the stairs to (my|the) (bedroom|office|room))",
+      "quotes": [
+        { "videoId": "QgFtJYYOHEU", "cvnde": 27, "text": "I went over to the staircase and I started to slowly work my way up the staircase." },
+        { "videoId": "O0A0Fr1-AN8", "cvnde": 27, "text": "I saw this beautiful white staircase going up into the clouds, way as far as you could see." },
+        { "videoId": "0KepnGvqkII", "cvnde": 23, "text": "So what happened to me was I didn't see a light. I didn't see a stairway or anything like that." },
+        { "videoId": "dsrBzN1Ca5I", "cvnde": 20, "text": "There was a river there and Bob told me that the river was called the river of forgetfulness." },
+        { "videoId": "tReEhEoe79c", "cvnde": 20, "text": "she crawled up a brick, a brick, uh, lined tunnel, uh, to heaven and met a woman named Elizabeth." }
+      ],
+      "sensory": [
+        "movement felt as being carried, not walking",
+        "light at the far end regardless of vehicle type",
+        "rushing or roaring sound",
+        "walls that are dark, brick-lined, spiralling, or absent",
+        "in stairway versions: cloud at the top, no visible summit"
+      ],
+      "journey_position": 0.25,
+      "precision_estimate": 0.7,
+      "precision_sample_n": 16,
+      "measured": { "all_pct": 26.49, "all_docs": 1636, "cv13_pct": 34.86, "cv18_pct": 33.84, "cv23_pct": 38.12 },
+      "notes": "The most interesting demographic result in this set. The stairway variant is not merely a Christian ornament on the tunnel: it is roughly 3.7x more common among the best-evidenced accounts (1.81% -> 6.63%), and the ornamented golden/marble/white/crystal stairway is 4.9x more common (0.91% -> 4.42%). The tunnel shows the same direction but a shallower slope. Meanwhile the road, the bridge and the escalator do not enrich at all. Precision caveat: bare 'stairs' is hopeless (house stairs, hospital stairs, falling down stairs) so I excluded it and kept only 'stairway/staircase' plus ornamented 'stairs'; even so about half the cv>=18 staircase matches I read were ordinary architecture. The tunnel arm is much cleaner. Note also the explicit negatives - people who volunteer 'I didn't see a tunnel, I didn't see a stairway' - which is itself a menu-awareness effect worth tracking."
+    },
+    {
+      "id": "the-unbeliever-who-arrives-anyway",
+      "name": "The Atheist Who Gets There Anyway",
+      "category": "state",
+      "description": "The demographic control case. Experiencers who state plainly that before the event they were atheist, agnostic, or believed death was annihilation. They arrive at the same structures - the light, the presence, the review, the deceased relatives, the boundary - and describe them with the same landmarks. What changes is the vocabulary afterwards: they tend to reach for love, consciousness, connection and Source rather than heaven, and several insist explicitly that what happened was not a religious event.",
+      "aliases": [
+        { "term": "I was an atheist", "tradition": "none", "note": "2.07% of documents use this exact self-description" },
+        { "term": "I was an agnostic", "tradition": "none", "note": null },
+        { "term": "a militant / staunch / die-hard atheist", "tradition": "none", "note": "the intensified form, used to raise the stakes of the reversal" },
+        { "term": "I didn't believe in anything", "tradition": "none", "note": null },
+        { "term": "not a Judeo-Christian thing - a love, consciousness connection thing", "tradition": "none", "note": "the post-hoc naming an unbeliever chooses" },
+        { "term": "I'm still not religious", "tradition": "none", "note": "many report belief in an afterlife WITHOUT adopting a religion; 'not religious' appears in 3.61% of documents" }
+      ],
+      "regex": "(I (was|had been|am|used to be)( a| an)? (atheist|agnostic)|I (didn't|did not|never) believe(d)? in (god|an afterlife|the afterlife|any of (that|this)|anything)|(a|an) (die.?hard|staunch|militant|lifelong|complete|total) atheist|raised (with )?(no|without) religio)",
+      "negative_regex": null,
+      "quotes": [
+        { "videoId": "WJhDea6rrTU", "cvnde": 18, "text": "prior to my near-death experience, I was agnostic, I was a former Catholic, I didn't believe in God, I didn't believe in Jesus" },
+        { "videoId": "2KheWMmrQZs", "cvnde": 26, "text": "I was an agnostic. I thought there probably is no God and there's no afterlife. But I didn't know." },
+        { "videoId": "dwCEPYFD67s", "cvnde": 15, "text": "I was an atheist. I did not believe in God. I used to pick on Christians and anybody with any religion." },
+        { "videoId": "LYRGK9ufSHY", "cvnde": 9, "text": "For me, it's not a Judeo-Christian thing. It's a love, consciousness connection thing. There aren't rules." },
+        { "videoId": "HtlIU3LDTxg", "cvnde": 7, "text": "Like let's say I'm Buddhist and I really believe in Buddhism and then I encounter Buddha, you know, and I'm like, \"Okay, I kind of self-manifest it.\"" }
+      ],
+      "sensory": [],
+      "journey_position": 0.02,
+      "precision_estimate": 0.85,
+      "precision_sample_n": 18,
+      "measured": { "all_pct": 4.05, "all_docs": 250, "cv13_pct": 4.22, "cv18_pct": 4.28, "cv23_pct": 4.97 },
+      "notes": "ANSWER TO THE ASSIGNED QUESTION: on the evidence I could read, prior non-belief changes the NAMES, not the STRUCTURES. Prior-unbelief statements are slightly ENRICHED among the best-evidenced accounts (4.05% -> 4.97% at cv>=23), so unbelievers are not over-represented in the vaguer material. Reading their accounts, they report the same inventory: leaving the body, the light, the presence, the review, deceased relatives, the boundary, the order to return. The corpus also contains explicit cross-testimony that unbelievers meet named figures (atheists reporting Jesus) and that believers meet figures from other traditions. Two structural differences I could see but could NOT quantify with a single regex, so treat as hypotheses: (1) unbelievers more often describe a formless presence or Source rather than a person; (2) unbelievers more often report initial fear or confusion because they had no framework for what was happening. Method note: I attempted a cross-tabulation regex (atheist AND tunnel, atheist AND light, etc.) but the lookahead patterns caused catastrophic backtracking and timed out, so no cross-tab percentages are reported here rather than estimated ones."
+    },
+    {
+      "id": "no-religion-on-the-other-side",
+      "name": "There Is No Religion Here",
+      "category": "state",
+      "description": "A message reported back from the destination: the denominational labels do not operate there. Delivered in several forms - there is no religion in heaven; God does not care what religion you are; Christ belonged to no religion; all the religions are reaching for the same thing and each has a fragment. Reported by Christians, ex-Christians and unbelievers alike, and often reported as the single most unwelcome thing the experiencer had to bring back.",
+      "aliases": [
+        { "term": "in heaven there is no religion", "tradition": "Christian speaker", "note": null },
+        { "term": "God doesn't care about your religion", "tradition": "Christian speaker", "note": null },
+        { "term": "Christ belonged to no religion", "tradition": "Christian speaker", "note": null },
+        { "term": "all religions have the same root", "tradition": "cross-tradition", "note": null },
+        { "term": "all religions have about 10% right", "tradition": "none", "note": "the sharpest version in the corpus" },
+        { "term": "that's why we have so many religions - it's our attempt at understanding", "tradition": "cross-tradition", "note": null },
+        { "term": "love itself was the true religion", "tradition": "cross-tradition", "note": null }
+      ],
+      "regex": "((is|was|are|were) no religion|no religion (in heaven|there|up there)|(doesn't|does not|didn't|don't) (care|matter) (what|which|about your) (religion|denomination|church|faith)|belonged to no religion|all (the )?religions (are|lead|have|point|teach|were|worship)|so many religions|(didn't|doesn't|does not) matter (what|which) (religion|church|faith))",
+      "negative_regex": null,
+      "quotes": [
+        { "videoId": "fo7jJRAKXrY", "cvnde": 15, "text": "In heaven, there is no religion. What you're going to find here is the love. The love of God is going to unite the whole humanity in one." },
+        { "videoId": "35bzZcacOcI", "cvnde": 10, "text": "God does not care about your religion. Does not care in the least." },
+        { "videoId": "PK7PTC3Qw4s", "cvnde": 21, "text": "I was told that Christ belonged to no religion. Love itself was the true religion." },
+        { "videoId": "0K9w0YPL1Ts", "cvnde": 10, "text": "God did make it very very very very clear to me that all religions have about 10% right" },
+        { "videoId": "xo4qaSD-Y4E", "cvnde": 17, "text": "that's why we have so many religions is because that's our attempt at trying to understand who God is." }
+      ],
+      "sensory": [],
+      "journey_position": 0.65,
+      "precision_estimate": 0.7,
+      "precision_sample_n": 10,
+      "measured": { "all_pct": 2.61, "all_docs": 161, "cv13_pct": 2.65, "cv18_pct": 2.35, "cv23_pct": 2.76 },
+      "notes": "Small but flat across strata (2.61% overall, 2.76% at cv>=23), so it is not an artefact of the weaker accounts. This is the theological counterpart to the alias map: the corpus does not merely use interchangeable names, it reports being TOLD the names are interchangeable. Note the asymmetry in who says it - the strongest versions come from Christian speakers reporting a message that undercuts their own denomination, which is the opposite of the direction expectancy-confabulation would predict."
+    },
+    {
+      "id": "the-eastern-frame",
+      "name": "Karma, Past Lives and Coming Back",
+      "category": "process",
+      "description": "The same review-and-return sequence, narrated in Eastern rather than Christian vocabulary. What one account calls judgment another calls karma; what one calls heaven another calls a stop between incarnations; what one calls 'it is not your time' another calls unfinished karmic work. Experiencers report being shown previous lives inside the review, being told they chose this life before birth, and in a few cases being shown the life they would return to next.",
+      "aliases": [
+        { "term": "karma / karmic lesson / burning off karma", "tradition": "Hindu / Buddhist / New Age", "note": "7.46% of documents; declines with evidential strength to 5.52% at cv>=23" },
+        { "term": "reincarnation / coming back", "tradition": "Hindu / Buddhist / New Age", "note": "12.74%" },
+        { "term": "past lives / my last three reincarnations", "tradition": "Hindu / Buddhist / New Age", "note": "13.70%, falling to 7.18% at cv>=23" },
+        { "term": "the Akashic records", "tradition": "Theosophical / New Age", "note": "the Eastern-flavoured name for the hall of records" },
+        { "term": "the Lords of Karma", "tradition": "Theosophical", "note": "one account's name for the robed council" },
+        { "term": "dharma / moksha / samsara", "tradition": "Hindu / Buddhist", "note": "rare as first-person vocabulary" },
+        { "term": "soul contract / life plan chosen before birth", "tradition": "New Age", "note": "the Westernised restatement of the same idea" }
+      ],
+      "regex": "(\\bkarma\\b|reincarnat|past li(fe|ves)|\\bdharma\\b|\\bmoksha\\b|\\bsamsara\\b)",
+      "negative_regex": "(karma (police|chameleon)|Karma is (her|his) name|past life regression therapy business)",
+      "quotes": [
+        { "videoId": "Ck2bpBt8874", "cvnde": 22, "text": "And there I was shown my last three reincarnations." },
+        { "videoId": "ax2BVkTajPU", "cvnde": 14, "text": "they wore brown capes. And I found them as being nine. And they told me much later that there were the Lords of Karma." },
+        { "videoId": "tECJgapx_FY", "cvnde": 21, "text": "I heard her say, \"No, Annie. Remember last time you left first? No, now it's your turn to stay longer.\"" },
+        { "videoId": "abTmGNqRElA", "cvnde": 21, "text": "Maybe that person has been the caretaker of everyone else, and now it's burning off karma in turn to take care of the person who is ill." }
+      ],
+      "sensory": [
+        "previous lives shown as scenes or panels within the review",
+        "a felt sense of prior agreement or contract",
+        "robed or caped figures presiding, counted in fixed numbers"
+      ],
+      "journey_position": 0.6,
+      "precision_estimate": 0.7,
+      "precision_sample_n": 8,
+      "measured": { "all_pct": 24.89, "all_docs": 1537, "cv13_pct": 23.28, "cv18_pct": 20.72, "cv23_pct": 19.34 },
+      "notes": "Runs downward with evidential strength on every step (24.89% -> 23.28% -> 20.72% -> 19.34%), the same direction as the Source/oneness cluster and the opposite of heaven and the stairway. Worth flagging honestly: this pattern catches a great deal of post-hoc interpretive talk in interviews, not only in-experience content, so the decline may reflect that the best-evidenced accounts are more tightly focused on the event itself. The alias-mapping value is nonetheless clear - the council reappears as the Lords of Karma, the hall of records as the Akashic records, the life review as past lives, and 'it is not your time' as unfinished karmic work."
+    }
+  ]
+}

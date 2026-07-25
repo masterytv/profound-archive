@@ -1,0 +1,694 @@
+{
+  "places": [
+    {
+      "id": "hell-realm",
+      "name": "Hell",
+      "category": "realm",
+      "description": "A place experiencers name outright as hell: somewhere they were taken, thrown or dragged rather than travelled to willingly. It is described as a location with an interior — realms or levels within it, a floor, gates, an edge — and as permanent: the dominant terror is not the pain but the certainty of never leaving. Many say the word only reluctantly, and several insist the place they saw was not the hell they had been taught.",
+      "aliases": [
+        { "term": "hell", "tradition": "Christian", "note": "by far the most common name; used by both believers and people who say they never believed in it" },
+        { "term": "the dark realms", "tradition": "Christian", "note": "Camille Hall: 'I went into three dark realms'; hell as a series of chambers, each worse" },
+        { "term": "hellish realm", "tradition": "secular", "note": "the researcher/interviewer register, also adopted by experiencers who reject the theology" },
+        { "term": "the pits of hell", "tradition": "Christian" },
+        { "term": "the depths of hell", "tradition": "Christian" },
+        { "term": "the gates of hell", "tradition": "Christian", "note": "usually the threshold seen from outside, not entered" },
+        { "term": "the hell realm", "tradition": "Buddhist", "note": "named as one of the six realms alongside the hungry ghost realm" },
+        { "term": "a place where God is not", "tradition": "Christian", "note": "the absence of God is offered as the definition of the place more often than fire is" },
+        { "term": "the lower realms", "tradition": "secular" },
+        { "term": "outer darkness", "tradition": "Christian", "note": "some use this as a synonym for hell, others as the space between hell's chambers" }
+      ],
+      "regex": "(I (was|found myself|ended up|woke up) in hell|(took|taking|takes|dragged|dragging|drug|pulled|pulling|sucked|thrown|throwing|cast|carried) (me|my soul)[^.]{0,25}(down )?(to|into|toward) hell|taken (down )?(to|into) hell|(gates|depths|brink|edge|pits?|bowels|outskirts) of hell|hell (is|was) (a )?(real|place|dark|hot|not)|(saw|seen|visited|experienced|been to|went to) hell\\b|in hell (and|I|with|there)|hellish (realm|place|dimension|environment|landscape)|hell realm)",
+      "negative_regex": "(what the hell|hell of a|hell no|scared as hell|hurt like hell|hell hath no fury|go to hell\\b.{0,40}(I told|I said))",
+      "quotes": [
+        { "videoId": "iOZ60JhxRbM", "text": "I knew being dragged to hell by these demons that I deserved it.", "cvnde": 20 },
+        { "videoId": "0p9kZTTxTT0", "text": "So I saw hell, and, uh, and the demons, and I knew I was going to be there forever.", "cvnde": 12 },
+        { "videoId": "lIHzazKdR-k", "text": "And I heard others screaming, \"Oh no,\" in the distance, and, and I knew I was in hell.", "cvnde": 13 },
+        { "videoId": "oFAOr3qncpE", "text": "Hell is a manner of suffering, and I was in hell long before I took my life.", "cvnde": 8 }
+      ],
+      "sensory": [
+        "no light of its own; what light there is comes from fire and is orange or reddish",
+        "black gates and black cells (lpZW9u8HK2A)",
+        "a floor of rock, soot in the air",
+        "time that will not end — 'forever and ever and ever'",
+        "the knowledge, arriving without being told, that you belong there"
+      ],
+      "journey_position": 0.35,
+      "measured": { "all_pct": 6.49, "all_docs": 401, "cv13_pct": 6.27, "cv18_pct": 7.46, "cv23_pct": 8.29 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 22,
+      "notes": "MORE common among the best-evidenced accounts, and monotonically so: 6.49% overall -> 7.46% at cv>=18 -> 8.29% at cv>=23. That runs against the assumption that hellish reports are an artifact of weak accounts. Precision is the main caveat: roughly 45% of matches are theology, interviewer framing, or third-party retelling ('a man I talked to says he went to hell') rather than the speaker's own experience. The corpus-level structured coder puts journey_nde_type=distressing at 3.9% (243/6176) and hellish_realm in 4.4% of sequenced journeys — my 6.49% is the looser lexical upper bound on the same phenomenon. Note also that many experiencers volunteer the word only to reject it: 'there is no hell' is itself a recurring statement."
+    },
+    {
+      "id": "the-pit",
+      "name": "The pit / the abyss",
+      "category": "landscape",
+      "description": "A hole without a bottom, usually below or behind the experiencer, sometimes glimpsed rather than entered. People describe standing at its edge and knowing that if they fall they can never climb back. Where hell is a destination, the pit is a direction: down, and endlessly so. Several describe it as darker than the darkness around it.",
+      "aliases": [
+        { "term": "the abyss", "tradition": "secular" },
+        { "term": "bottomless pit", "tradition": "Christian" },
+        { "term": "a black abyss", "tradition": "Muslim", "note": "Amir: 'I was falling in this black abyss, falling so fast'" },
+        { "term": "a chasm", "tradition": "none" },
+        { "term": "the deep dungeon dark world", "tradition": "Hindu", "note": "Santosh Acharji's own phrase for the drop below the closed gates" },
+        { "term": "a hole without an end", "tradition": "Christian" },
+        { "term": "the belly of the earth", "tradition": "Christian" },
+        { "term": "a bottomless, endless void beneath me", "tradition": "Christian" }
+      ],
+      "regex": "\\b(abyss|chasm|bottomless pit|deep dark pit|dark pit|black pit|pit of (hell|fire|darkness)|(fell|falling|fall|descend\\w*|plunged?|dropping|dropped|sinking|sank) (down )?(in)?to (a |the |this )?(pit|abyss|chasm))",
+      "negative_regex": "(pit of (my|the|his|her) stomach|pit of despair|gray area|armpit|cherry pit|pit crew)",
+      "quotes": [
+        { "videoId": "urwAKQKvXuA", "text": "it seemed to be a bottomless, endless abyss, it was a very great darkness", "cvnde": 10 },
+        { "videoId": "EswluiJwppw", "text": "I looked down, and what I perceived was a very deep, bottomless black pit.", "cvnde": 11 },
+        { "videoId": "X1SEgbDqLxE", "text": "there was this sense of an absolutely bottomless, endless void beneath me", "cvnde": 20 },
+        { "videoId": "Kom6aLOjbyk", "text": "Only option I have is to, is to dive down on my left into the deep dungeon dark world.", "cvnde": 11 }
+      ],
+      "sensory": [
+        "no floor, no echo — depth without a bottom",
+        "an edge or lip you stand on, often with a wall or closed gate behind you",
+        "darker than the surrounding dark",
+        "sometimes a single light at the bottom, which turns out to be fire"
+      ],
+      "parent": null,
+      "journey_position": 0.3,
+      "measured": { "all_pct": 3.74, "all_docs": 231, "cv13_pct": 4.16, "cv18_pct": 4.14, "cv23_pct": 4.42 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 18,
+      "notes": "Slightly MORE common in the better-evidenced strata (3.74% -> 4.42%). Main false positives are idiomatic: 'pit of my stomach', 'pit of despair', 'digging my way out of the pit' as a metaphor for depression — the negative_regex targets these. The pit is frequently paired with a gate or wall: the experiencer cannot go forward into the light and cannot go back, and the only remaining direction is down."
+    },
+    {
+      "id": "the-downward-fall",
+      "name": "Falling / being taken down",
+      "category": "process",
+      "description": "The transit into the dark places, and the single most consistent kinaesthetic in this whole region. It is almost never voluntary: people are thrown, dropped, sucked, pushed, or the floor simply goes. The speed is emphasised — wind, breathlessness, 'thousands of miles an hour' — and so is the absence of any bottom arriving. Where the classic NDE moves toward light, this movement is unmistakably downward.",
+      "aliases": [
+        { "term": "falling", "tradition": "none" },
+        { "term": "free falling", "tradition": "none" },
+        { "term": "being thrown down", "tradition": "Christian" },
+        { "term": "the floor dropped out beneath me", "tradition": "Christian" },
+        { "term": "being pushed down", "tradition": "Catholic", "note": "Javier Gonzales: 'without my consent I was being pushed down'" },
+        { "term": "spiralling down an escalator", "tradition": "Christian", "note": "Dana's image: 'going round and round and round right into hell'" },
+        { "term": "sucked down", "tradition": "none" },
+        { "term": "sinking", "tradition": "none" }
+      ],
+      "regex": "\\b(bottomless pit|falling and falling|kept falling|free.?fall\\w*|(falling|fell|plummet\\w*|plung\\w*|sinking|descending|dropping|spiraling|sucked) [^.]{0,40}(down )?(in)?to (a |the |this )?(dark|black|bottomless|deep|pit|abyss|hole|void|chasm|hell|nothing))",
+      "negative_regex": "(fell (in)?to a deep sleep|fell asleep|fell into place|fell in love|falling in love|fell down the stairs)",
+      "quotes": [
+        { "videoId": "lIHzazKdR-k", "text": "And then the floor just dropped out beneath me, and I started falling into complete darkness.", "cvnde": 13 },
+        { "videoId": "dGnVBEoKg_M", "text": "As I literally started free falling into this outer darkness and racing down this uh tunnel", "cvnde": 11 },
+        { "videoId": "L7CGjrR3njI", "text": "Suddenly I fell into this hole without an end and I'm falling fast on that hole.", "cvnde": 14 },
+        { "videoId": "kG-Grfn_b9w", "text": "I could see myself going on this escalator spiraling down and it was going round and round and round right into hell.", "cvnde": 7 }
+      ],
+      "sensory": [
+        "wind on the face, breath taken away",
+        "extreme speed with no landmarks to measure it against",
+        "no impact — the fall is interrupted, not landed",
+        "the body position is wrong: head-first, or dragged sideways by others"
+      ],
+      "parent": null,
+      "journey_position": 0.2,
+      "measured": { "all_pct": 4.53, "all_docs": 280, "cv13_pct": 5.25, "cv18_pct": 5.94, "cv23_pct": 6.08 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 16,
+      "notes": "Rises steadily with evidential strength: 4.53% -> 5.94% at cv>=18 -> 6.08% at cv>=23. Drowning and vehicle accidents are the chief contaminant (literal falling and literal sinking in water), which the context words only partly exclude. Worth noting that a downward-falling entry is not always distressing: a minority fall into the dark and then find it peaceful (void_darkness>peace_calm is the 6th most common transition in the corpus at 14.3%), so falling predicts the dark region, not distress within it."
+    },
+    {
+      "id": "outer-darkness",
+      "name": "The outer darkness",
+      "category": "realm",
+      "description": "Darkness that has a quality — thick, pressing, and felt as hostile or occupied rather than merely empty. Experiencers stress that it is unlike any earthly dark: 'blacker than black', a blackness you can feel on the skin, sometimes described as being inside you as well as around you. Some hear voices in it; some feel watched. It is the same darkness others report as peaceful, which is precisely what makes this the most contested region on the map.",
+      "aliases": [
+        { "term": "outer darkness", "tradition": "Christian", "note": "explicitly quoted from scripture by many; 0.92% of the corpus uses this exact phrase" },
+        { "term": "the void", "tradition": "secular" },
+        { "term": "a black void", "tradition": "none" },
+        { "term": "a blackness you can feel", "tradition": "Christian" },
+        { "term": "soul-oppressing darkness", "tradition": "none", "note": "Penny Wilson's phrase" },
+        { "term": "a spiritual darkness", "tradition": "Christian" },
+        { "term": "complete darkness, almost like space", "tradition": "Christian" },
+        { "term": "blacker than black", "tradition": "secular" },
+        { "term": "the darkest dark", "tradition": "none" },
+        { "term": "the great illuminated darkness", "tradition": "Christian", "note": "Peter Panagore's paradox: dark, yet he can see" }
+      ],
+      "regex": "\\b(outer darkness|blackness you can feel|(soul.oppressing|oppressive|suffocating|penetrating|terrifying|frightening|menacing|malevolent|horrifying) (darkness|blackness|void)|(darkness|blackness|void)\\b[^.]{0,70}\\b(terrif\\w+|oppressive|evil|menacing|suffocating|malevolent|hopeless|despair)\\b|\\b(terrified|terrifying|panick\\w*|dread|despair|hopeless|so alone|all alone|utterly alone)\\b[^.]{0,90}\\b(the darkness|the blackness|the void|black void|dark void|blackness)\\b)",
+      "negative_regex": "(darkness (of|in) (the world|humanity|our society)|forces of darkness|powers of darkness|dark night of the soul|no fear|wasn.t afraid|not afraid|peaceful (void|blackness|darkness))",
+      "quotes": [
+        { "videoId": "T69fFcY-Puc", "text": "It's so black there. It's a blackness you can feel. It's like a, a penetrating evil, evil, evil.", "cvnde": 18 },
+        { "videoId": "h1uEl6Fi9sQ", "text": "You're permeated with darkness. It's not just all around you, it's in you, in your soul and your spirit.", "cvnde": 9 },
+        { "videoId": "2Dq1vB_ZOiM", "text": "It was like invisible eyes looking at me. It was like a spiritual darkness.", "cvnde": 18 },
+        { "videoId": "TAdFR0DIrrI", "text": "The only way I know how to describe this is complete darkness. It's almost like it was space.", "cvnde": 9 },
+        { "videoId": "6jOhjQQZVrs", "text": "I went to this black void, and it was really cold.", "cvnde": 23 }
+      ],
+      "sensory": [
+        "thickness — the dark has texture, weight, or stickiness",
+        "cold; several independently pair the black void with freezing (measured separately at 1.78% for cold+dark co-occurrence)",
+        "voices heard without bodies ('men screaming out of the darkness')",
+        "the feeling of being looked at by something you cannot see",
+        "darkness experienced as being inside the self, not only outside"
+      ],
+      "parent": null,
+      "journey_position": 0.18,
+      "measured": { "all_pct": 2.2, "all_docs": 136, "cv13_pct": 2.05, "cv18_pct": 2.21, "cv23_pct": 1.1 },
+      "precision_estimate": 0.45,
+      "precision_sample_n": 24,
+      "notes": "This is the hardest measurement in the region and the number should be read with care. The BROAD darkness/void vocabulary is enormous — void_darkness appears in 57.1% of sequenced journeys, and a plain 'the void / a black void / dark realm' regex matches 17.07% of all documents — but the overwhelming majority of those describe the dark as neutral or actively peaceful (void_darkness>peace_calm is 14.3% of journeys vs void_darkness>fear_distress at 7.0%). The regex here deliberately requires an explicit distress or hostility marker, which is why it lands at 2.20%. Precision is only ~0.45: it still picks up abstract talk about 'darkness and evil in the world' and, worse, sentences that mention fear in order to deny it ('I remember thinking, I'm pretty terrified in the dark... and yet I'm not afraid'). Flat-to-lower across strata, with 1.10% at cv>=23 — of all the places here, this is the one that does NOT strengthen with evidential quality."
+    },
+    {
+      "id": "the-grey-place",
+      "name": "The grey place / the in-between",
+      "category": "realm",
+      "description": "Neither light nor dark: a colourless, foggy, half-lit country populated by people who seem stuck. Experiencers describe wandering figures who do not look up, do not speak, and appear unaware they can leave. The distress here is not pain but drabness and pointlessness — this life with the life drained out of it. Different traditions supply different names for the same terrain.",
+      "aliases": [
+        { "term": "the gray world", "tradition": "Christian", "note": "Ryan Cook coined it himself: 'this life void of life'" },
+        { "term": "a grey realm", "tradition": "none" },
+        { "term": "grey mist / blue-grey mist", "tradition": "none" },
+        { "term": "purgatory", "tradition": "Catholic" },
+        { "term": "limbo", "tradition": "Catholic" },
+        { "term": "the in-between place", "tradition": "secular" },
+        { "term": "Bardo", "tradition": "Buddhist", "note": "described as 'the cleansing station'" },
+        { "term": "the hungry ghost realm", "tradition": "Buddhist", "note": "'the wandering souls who never did anything to help anybody... they just wander around suffering'" },
+        { "term": "the lower astral realm", "tradition": "secular/spiritualist", "note": "'where like ghosts and spirits and lost souls hang out'" },
+        { "term": "lost souls", "tradition": "none" },
+        { "term": "earthbound spirits", "tradition": "spiritualist" }
+      ],
+      "regex": "\\b(gr[ae]y (place|realm|world|zone|mist|fog|landscape|space|nothingness|land)|lost souls|souls wander\\w*|wandering (souls|spirits|aimlessly)|hungry ghost|lower astral|purgatory|limbo|in.between (place|realm|world|state|dimension))\\b",
+      "negative_regex": "(gr[ae]y area|gr[ae]y hair|gr[ae]y matter|in.between (jobs|meals|sessions)|limbo (dance|bar))",
+      "quotes": [
+        { "videoId": "78QEtegZ90g", "text": "I nicknamed it the gray world, because that's exactly all you see.", "cvnde": 8 },
+        { "videoId": "gHM2WPW6zz0", "text": "They seemed to be stuck and very much in sorrow.", "cvnde": 11 },
+        { "videoId": "-rT_TateZ5U", "text": "So I think I made it over there to the lower astral realm, you know, where like ghosts and spirits and lost souls hang out.", "cvnde": 11 },
+        { "videoId": "UvZwj5acUJo", "text": "it's filled with people. And they're all in these filthy white robes.", "cvnde": 10 },
+        { "videoId": "B3yfVunO1t0", "text": "But what I do know is that it was somewhere where I wouldn't want to be ending up again.", "cvnde": 11 }
+      ],
+      "sensory": [
+        "colour drains out the further you walk",
+        "fog, mist, a dusty ramshackle quality",
+        "filthy or grey-white clothing on the inhabitants",
+        "faces turned down; no one makes eye contact",
+        "silence, or a low murmur rather than screaming"
+      ],
+      "parent": null,
+      "journey_position": 0.45,
+      "measured": { "all_pct": 6.01, "all_docs": 371, "cv13_pct": 4.76, "cv18_pct": 5.39, "cv23_pct": 3.31 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 20,
+      "notes": "LESS common among the best-evidenced accounts (6.01% overall, 3.31% at cv>=23), the sharpest negative gradient in this region. That is partly a genuine signal and partly an artifact: 'purgatory' and 'limbo' are often invoked as theological vocabulary in reflective discussion rather than as descriptions of somewhere visited, and reflective discussion is not what raises a cvNDE score. Precision ~0.5 for that reason. The distinctive and defensible core — a grey, colourless country with people stuck in it who do not seem to know they are stuck — is reported independently by Christian, Catholic, Buddhist and secular experiencers using their own tradition's name for it, which is the strongest synonymy finding in my region."
+    },
+    {
+      "id": "lake-of-fire",
+      "name": "The lake of fire",
+      "category": "landscape",
+      "description": "Fire as terrain rather than as event: a lake, a burning valley, a mountainside pocked with holes, all of it alight. What experiencers stress is that the burning does not consume — flesh regrows so it can burn again — and that the flames give no light. It is the most theologically loaded feature in the region and, correspondingly, the one people are most careful to say they did not expect.",
+      "aliases": [
+        { "term": "the lake of fire", "tradition": "Christian" },
+        { "term": "fire and brimstone", "tradition": "Christian" },
+        { "term": "the flames of hell", "tradition": "Christian" },
+        { "term": "a burning lake", "tradition": "Hindu/Christian" },
+        { "term": "flames that weren't emitting any light", "tradition": "Christian", "note": "Shayla's detail; several report fire without illumination" },
+        { "term": "little fires everywhere", "tradition": "Christian" },
+        { "term": "unbearable heat", "tradition": "none" }
+      ],
+      "regex": "\\b(lake of fire|fire and brimstone|(burning|flames|fire)\\b[^.]{0,70}\\b(hell|forever|souls|torment|demons?)\\b|\\bhell\\b[^.]{0,70}\\b(fire|flames|burning|heat|lava|hot)\\b|unbearable heat)",
+      "negative_regex": "(house fire|fire department|fire truck|campfire|fire alarm|burning (the )?(garbage|trash|calories)|heartburn)",
+      "quotes": [
+        { "videoId": "WeAg6UtyxDw", "text": "this cart stops at a lake of fire. And inside this lake are thousands of people.", "cvnde": 9 },
+        { "videoId": "L7CGjrR3njI", "text": "it was a lake of fire and I was burning from my toe to my chin.", "cvnde": 14 },
+        { "videoId": "w3JYT2ZWDOE", "text": "Desolate mountain with little holes in it everywhere. There were little fires everywhere and then down below the mountain a huge lake of fire.", "cvnde": 10 },
+        { "videoId": "rH2pqLQU22c", "text": "So I could see people were in the Lake of Fire", "cvnde": 8 }
+      ],
+      "sensory": [
+        "heat described as coming from inside the body outward, not from outside in",
+        "flames that produce no light",
+        "an orange or burnt-red glow seen from a distance and mistaken for sunrise",
+        "flesh burning off and regrowing in cycles",
+        "the surface of the lake bobbing with heads, 'like people in water'"
+      ],
+      "parent": "hell-realm",
+      "journey_position": 0.42,
+      "measured": { "all_pct": 2.83, "all_docs": 175, "cv13_pct": 3.44, "cv18_pct": 3.59, "cv23_pct": 3.31 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 12,
+      "notes": "MORE common in the better-evidenced strata (2.83% -> 3.59% at cv>=18). Contamination is mainly doctrinal discussion of what hell is or isn't ('I don't believe there's a fiery hell'), which is why precision sits at ~0.7 rather than higher. Notable dissent inside the corpus: several distressing experiencers explicitly report NO fire — Darren Shiner (cv=23) went to a black void that was 'really cold' and says 'I didn't see any fire' — so fire is a feature of some hellish realms, not a defining property of them."
+    },
+    {
+      "id": "the-screaming",
+      "name": "The screaming",
+      "category": "process",
+      "description": "The soundtrack of the dark places, and often the first thing noticed. Experiencers say the screams are not human-sounding — not producible by a vocal cord — and that they come from beyond sight, from people who cannot be seen. Several report they could hear individual voices calling for help, and that hearing another person's torment was as bad as their own. A handful reach for the scriptural formula: weeping and gnashing of teeth.",
+      "aliases": [
+        { "term": "screams", "tradition": "none" },
+        { "term": "shrieking", "tradition": "none" },
+        { "term": "wailing", "tradition": "Christian" },
+        { "term": "moaning and groaning", "tradition": "Christian" },
+        { "term": "weeping and gnashing of teeth", "tradition": "Christian", "note": "exact phrase in 0.37% of the corpus (23 docs)" },
+        { "term": "hell screams", "tradition": "Christian", "note": "Camille Hall's own compound" },
+        { "term": "people screaming for help", "tradition": "none" }
+      ],
+      "regex": "\\b(screams?|screaming|screamed|shrieking|shrieks|wailing|moaning|howling|gnashing|groaning)\\b[^.]{0,140}\\b(hell|darkness|the dark|demons?|torment|agony|souls|down there|that place|sulfur|sulphur|fire)\\b|\\b(hell|darkness|demons?|torment|that place|down there|the pit|abyss)\\b[^.]{0,140}\\b(screams?|screaming|screamed|shrieking|shrieks|wailing|moaning|howling|gnashing|groaning)\\b",
+      "negative_regex": "(nurses? (were )?screaming|my (mother|wife|husband|friend) (was )?screaming|screaming (in|at) the (ambulance|hospital|emergency|delivery room))",
+      "quotes": [
+        { "videoId": "iOZ60JhxRbM", "text": "Those screams are not earthly. They are not any kind of thing your vocal cord could do, your vocal cords.", "cvnde": 20 },
+        { "videoId": "nYmODXP7AZg", "text": "there was Flames but they weren't emitting any light and I could hear a lot of Screams but I couldn't see anybody", "cvnde": 18 },
+        { "videoId": "2Dq1vB_ZOiM", "text": "And I heard men screaming out of the darkness, saying, \"Shut up!\"", "cvnde": 18 },
+        { "videoId": "S074V5Ze2dg", "text": "from the depths of hell, where it was just the gnashing of teeth and darkness and despair and moaning and groaning", "cvnde": 7 },
+        { "videoId": "S7T5qmE6jsU", "text": "It was people screaming for help. And I remember one person, one guy, I can hear him saying, \"Help me. Help me.\"", "cvnde": 10 }
+      ],
+      "sensory": [
+        "sound arriving from a direction the eye cannot resolve",
+        "screams described as not producible by a human voice",
+        "individual voices distinguishable within the mass",
+        "the screams heard through a wall, from an adjacent room",
+        "in a few accounts, no screams at all — total silence is reported as its own horror"
+      ],
+      "parent": "hell-realm",
+      "journey_position": 0.42,
+      "measured": { "all_pct": 1.98, "all_docs": 122, "cv13_pct": 1.93, "cv18_pct": 2.07, "cv23_pct": 2.21 },
+      "precision_estimate": 0.6,
+      "precision_sample_n": 10,
+      "notes": "Mildly MORE common in the better-evidenced strata (1.98% -> 2.21% at cv>=23). This one required aggressive constraint: an unqualified /scream/ matches 32% of the corpus, almost all of it the resuscitation scene ('I could see people screaming and crying' while watching their own body), so the regex demands hell/darkness/torment context within the sentence. Residual false positives are mostly interviewers and second-hand retellings."
+    },
+    {
+      "id": "the-stench",
+      "name": "The stench",
+      "category": "landscape",
+      "description": "A smell reported with unusual specificity and unusual agreement: sulphur, burning flesh, rotting meat, decaying animal — often several at once, and described as thick enough to taste. Multiple experiencers say the smell was the worst part, worse than the sight or the pain, and several report it clinging to them after they returned.",
+      "aliases": [
+        { "term": "sulfur / sulphur", "tradition": "Christian" },
+        { "term": "brimstone", "tradition": "Christian" },
+        { "term": "burning flesh", "tradition": "none" },
+        { "term": "sweet rotting meat smell", "tradition": "Christian" },
+        { "term": "a decaying animal, amplified", "tradition": "Christian" },
+        { "term": "a foul odor you can taste", "tradition": "Christian" },
+        { "term": "the stench", "tradition": "none" }
+      ],
+      "regex": "\\b(stench|putrid|rotting|decay\\w*|sulfur|sulphur|brimstone|foul|rancid)\\b[^.]{0,80}\\b(smell|odor|odour|air|hell|dark|place)\\b|\\b(smell|smelled|odor|odour)\\b[^.]{0,60}\\b(sulfur|sulphur|burning flesh|death|rotting|putrid|foul|awful|horrible)\\b",
+      "negative_regex": "(smell of gasoline|gas leak|smelled like (earth|dirt|rain|the (sea|ocean|hospital))|tooth decay|decay(ing)? (rate|of the body politic))",
+      "quotes": [
+        { "videoId": "DiqCVc2C9ck", "text": "I didn't mention this, but I smelled sulfur. So strong.", "cvnde": 9 },
+        { "videoId": "w3JYT2ZWDOE", "text": "it's like a sweet rotting meat smell sometimes or a sulfur, really strong sulfur burning smell, but it's nasty.", "cvnde": 10 },
+        { "videoId": "L7CGjrR3njI", "text": "the odor, the, the smell over there is burning flesh.", "cvnde": 14 },
+        { "videoId": "nYmODXP7AZg", "text": "it was like a a decaying animal but Amplified and like burning flesh added on to that", "cvnde": 18 }
+      ],
+      "sensory": [
+        "sulphur, most commonly",
+        "burning flesh",
+        "rotting or decaying animal",
+        "thickness — 'you can almost taste it', 'it felt thick in the air'",
+        "the smell reported as persisting in the nose after return"
+      ],
+      "parent": "hell-realm",
+      "journey_position": 0.4,
+      "measured": { "all_pct": 1.44, "all_docs": 89, "cv13_pct": 1.81, "cv18_pct": 1.66, "cv23_pct": 2.21 },
+      "precision_estimate": 0.65,
+      "precision_sample_n": 14,
+      "notes": "MORE common in the better-evidenced strata (1.44% -> 2.21% at cv>=23). This is a genuinely surprising find: NDE accounts are overwhelmingly visual, and smell is barely reported anywhere else in the corpus — but in the distressing region it is reported often, in convergent detail, and treated by the experiencer as the most memorable channel. Chief false positive is the smell of gasoline at accident scenes (two near-identical Jeff Olsen transcripts), covered by the negative_regex."
+    },
+    {
+      "id": "demonic-beings",
+      "name": "The demons",
+      "category": "being",
+      "description": "The inhabitants: creatures the experiencer recognises as wholly malevolent, usually multiple, usually physical enough to grab and tear. They are described as taking pleasure in the harm — laughing, competing over the soul — and as changing shape, sometimes wearing the faces of people the experiencer knows. Several stress that no light comes from them at all. This is a BEING, not a place, and should not be conflated with the realm it inhabits.",
+      "aliases": [
+        { "term": "demons", "tradition": "Christian" },
+        { "term": "demonic beings / demonic entities", "tradition": "Christian" },
+        { "term": "the devil / Satan / Lucifer", "tradition": "Christian", "note": "named as an individual in a subset; 'satan' appears as a raw entity identity 35 times in the corpus census" },
+        { "term": "evil spirits", "tradition": "Christian" },
+        { "term": "creatures", "tradition": "secular" },
+        { "term": "these things", "tradition": "none", "note": "the commonest secular hedge for the same encounter" },
+        { "term": "the beings that were once human", "tradition": "secular", "note": "Howard Storm's reading of his attackers" },
+        { "term": "dark forces", "tradition": "secular" },
+        { "term": "hungry ghosts", "tradition": "Buddhist" }
+      ],
+      "regex": "\\b(demons?|demonic|devil|satan|lucifer|evil (beings?|entit\\w+|spirits?|creatures?))\\b[^.]{0,140}\\b(I|me|my|saw|surround\\w*|around|attack\\w*|torment\\w*|grabb\\w*|laugh\\w*)\\b",
+      "negative_regex": "(devil.s advocate|speak of the devil|devil.s food|between the devil and|demonize|demonis|inner demons|my demons|personal demons)",
+      "quotes": [
+        { "videoId": "w3JYT2ZWDOE", "text": "Demons absolutely hate us and there's no good in them and there's no light in them.", "cvnde": 10 },
+        { "videoId": "M5p3GX_-0wk", "text": "it degenerated from kicking and punching to ripping, gouging, tearing, biting, clawing, which degenerated into invasive things.", "cvnde": 12 },
+        { "videoId": "nYmODXP7AZg", "text": "out of the ground were six or seven demons that crawled out of the ground and they were coming toward me", "cvnde": 18 },
+        { "videoId": "iOZ60JhxRbM", "text": "as they were doing these things, they're just laughing like it's the most pleasurable perversion.", "cvnde": 20 }
+      ],
+      "sensory": [
+        "emit no light; several say they are visible as absence",
+        "laughter, mockery, whispering",
+        "shapeshifting — into people the experiencer knows, then back",
+        "physical strength wildly out of proportion ('picked me up as if I was a pen')",
+        "in a few accounts they wear incongruous clothing (nurse uniforms, a trench coat, gold chains)"
+      ],
+      "parent": null,
+      "journey_position": 0.4,
+      "measured": { "all_pct": 9.16, "all_docs": 566, "cv13_pct": 9.11, "cv18_pct": 8.98, "cv23_pct": 9.39 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 20,
+      "notes": "Essentially FLAT across strata (9.16% -> 9.39%). The corpus's own entity census is a useful cross-check and much stricter than my lexical regex: it codes demon/demonic/demonic_figure entities in only ~50 of 11,885 encounters (0.6%+0.1%+0.1%), against angel at 17.3% and religious_figure at 48.1%. The gap between 9.16% lexical and <1% coded is mostly people discussing demons rather than meeting them. Treat 9.16% as an upper bound on mention and the census as the lower bound on encounter."
+    },
+    {
+      "id": "shadow-figures",
+      "name": "Shadow figures",
+      "category": "being",
+      "description": "Dark human-shaped presences with no features, seen at the edge of the experience: sometimes clustered, sometimes a single tall silhouette. Distinct from demons in that they are usually silent and do not attack — the distress comes from being watched, followed, or clung to. Notably, this figure is NOT always malevolent in the corpus: a substantial minority recognise the silhouette as a deceased relative.",
+      "aliases": [
+        { "term": "shadow people", "tradition": "secular" },
+        { "term": "shadow figures", "tradition": "secular" },
+        { "term": "shadowy beings", "tradition": "none" },
+        { "term": "dark figures", "tradition": "none" },
+        { "term": "tangled shadows", "tradition": "secular", "note": "Mellen-Thomas Benedict: sticky, abrasive, holding on" },
+        { "term": "a hooded figure", "tradition": "none" },
+        { "term": "outlines", "tradition": "none" },
+        { "term": "silhouettes", "tradition": "none" }
+      ],
+      "regex": "\\b(shadow (people|figures?|beings?|creatures?|entit\\w+|men|man|forms?)|shadowy (figures?|beings?|forms?|creatures?|shapes?)|dark (figures?|shapes?|forms?|silhouettes?|hooded)|hooded (figure|being|creature)|figures? in (the )?(dark|black|hood|cloak))\\b",
+      "negative_regex": "(shadow (of a doubt|government|banking|work|self)|dark figure(s)? (in|of) (the )?(economy|history|politics))",
+      "quotes": [
+        { "videoId": "qTqUg_3lg2c", "text": "It was a deep forest of tangled shadows that were grabbing and trying to hold me.", "cvnde": 11 },
+        { "videoId": "Sfzj-xsHzkw", "text": "I saw two very big black deep eyes or where eyes should be", "cvnde": 9 },
+        { "videoId": "VqkTDg8sYl8", "text": "I was fighting with this dark forces. That was a dark figure.", "cvnde": 9 }
+      ],
+      "sensory": [
+        "featureless — no face, or eyes where eyes 'should be'",
+        "stickiness or abrasiveness on contact",
+        "abnormal height (8-12 feet in several accounts)",
+        "coldness radiating from them",
+        "movement without walking"
+      ],
+      "parent": null,
+      "journey_position": 0.35,
+      "measured": { "all_pct": 2.33, "all_docs": 144, "cv13_pct": 2.59, "cv18_pct": 1.93, "cv23_pct": 1.66 },
+      "precision_estimate": 0.45,
+      "precision_sample_n": 12,
+      "notes": "LESS common in the strongest stratum (2.33% -> 1.66% at cv>=23). Precision for DISTRESSING shadow figures is only ~0.45 and the reason is interesting rather than merely technical: in this corpus a 'shadow figure' is about as likely to be a welcoming dead relative seen against the tunnel light as it is to be a threat — Zach Tavcar (three separate recordings, cv up to 23) recognises his grandfather as 'a shadow figure of a man in a trench coat'. The corpus entity census codes shadow_figure at 1.2% of encounters, which is the better estimate of the neutral category; the distressing subset is smaller still."
+    },
+    {
+      "id": "clutching-hands",
+      "name": "Being seized and dragged",
+      "category": "process",
+      "description": "Hands, claws or bodies that take hold of the experiencer and pull them downward. Reported with striking physical detail — the thickness of the fingers, a nail that is a claw, hands on both arms, a grip that tears skin — and always against the person's will. In some accounts the grip is a swarm; in others one enormous hand. It is the mechanism by which people arrive in the dark places rather than fall into them.",
+      "aliases": [
+        { "term": "grabbed me", "tradition": "none" },
+        { "term": "dragged me down", "tradition": "Christian" },
+        { "term": "claws / talons", "tradition": "none" },
+        { "term": "hands reaching up", "tradition": "none" },
+        { "term": "shadows grabbing and trying to hold me", "tradition": "secular" },
+        { "term": "shredding my arms", "tradition": "Christian" },
+        { "term": "dragging my soul down", "tradition": "Christian" }
+      ],
+      "regex": "((demon|demonic|dark|black|shadow|evil|creature|claw|hell)\\w*[^.]{0,100}(grabb?(ed|ing)|pull(ed|ing)|dragg?(ed|ing)|yank(ed|ing)|clutch\\w*|snatch\\w*)[^.]{0,40}\\b(me|my)\\b)|((grabb?(ed|ing)|pull(ed|ing)|dragg?(ed|ing))[^.]{0,25}\\b(me|my \\w+)\\b[^.]{0,80}(down (in)?to|into the (dark|black|pit|hole)|toward\\w? hell|to hell|down (in)?to hell))|\\b(claws|clawing|talons)\\b",
+      "negative_regex": "(clawing (at the ice|for air|to breathe|my way up the rocks)|dragged me (under the car|along|out of the water)|the current (pulled|dragged) me|pulled me (out of the water|into the boat|onto the deck))",
+      "quotes": [
+        { "videoId": "T69fFcY-Puc", "text": "because I had demons on each side, six demons on each side grabbing me.", "cvnde": 18 },
+        { "videoId": "nnIF-sScMK0", "text": "I heard demons yelling 'hell,' and they were dragging my soul down to hell.", "cvnde": 18 },
+        { "videoId": "o17HXmDu294", "text": "the fingers are like this thick, and the nail, it was a claw.", "cvnde": 10 },
+        { "videoId": "BlqIHQOfM3U", "text": "his nails or his claws, whatever it may be, I can feel it hitting my spine", "cvnde": 13 },
+        { "videoId": "-abMjizqeNQ", "text": "these demons came out and they grabbed the person and they dragged them away screaming off to hell.", "cvnde": 7 }
+      ],
+      "sensory": [
+        "grip strength described in physical measurements (finger thickness, nail as claw)",
+        "skin and tendon damage that heals instantly so it can recur",
+        "being held on both sides simultaneously by many hands",
+        "stickiness — the shadows that will not let go",
+        "the experiencer fighting back and losing"
+      ],
+      "parent": null,
+      "journey_position": 0.28,
+      "measured": { "all_pct": 2.17, "all_docs": 134, "cv13_pct": 2.47, "cv18_pct": 2.49, "cv23_pct": 2.76 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 16,
+      "notes": "MORE common in the better-evidenced strata (2.17% -> 2.76% at cv>=23). The false positives are almost entirely literal and physical: drowning victims clawing at ice, rescuers grabbing an arm, a car dragging a body — the negative_regex targets these. An unconstrained /grabbed me|pulled me|dragging me/ matches 12.90% of the corpus and is essentially useless; the demon/dark/claw proximity requirement is what makes this measurable at all."
+    },
+    {
+      "id": "trapped-immobile",
+      "name": "Being trapped",
+      "category": "state",
+      "description": "The signature inner condition of the region, and the one experiencers say was worse than pain: the certainty that there is no exit and no end. It shows up as physical immobility (muscles clenched, feet fixed, tied down), as spatial enclosure (walls you cannot see closing in), and as temporal enclosure — the arriving knowledge, unspoken and immediate, that this is now permanent.",
+      "aliases": [
+        { "term": "trapped", "tradition": "none" },
+        { "term": "stuck", "tradition": "none" },
+        { "term": "I couldn't move", "tradition": "none" },
+        { "term": "no way out", "tradition": "none" },
+        { "term": "forever and ever and ever", "tradition": "Christian" },
+        { "term": "I would never get out of this place", "tradition": "Christian" },
+        { "term": "chained / tied", "tradition": "Christian" }
+      ],
+      "regex": "\\b(I (was|felt|got) (trapped|stuck)|couldn.t (move|get out|escape|leave)|could not (move|get out|escape)|no way (out|to escape)|unable to move|paraly[sz]ed)\\b[^.]{0,120}\\b(dark|black|place|there|void|hell|demons?|torment|fear|terrif\\w*)\\b|\\b(dark|black|void|hell|demons?|torment)\\b[^.]{0,120}\\b(I (was|felt|got) (trapped|stuck)|couldn.t (move|get out|escape|leave)|no way (out|to escape)|unable to move)",
+      "negative_regex": "(trapped (in the car|under the|in the wreckage|in my body by the ventilator)|couldn.t move (because of the|due to the) (restraints|traction|cast)|sleep paralysis)",
+      "quotes": [
+        { "videoId": "0p9kZTTxTT0", "text": "I knew I was never going to get out of this place. I'm going to be here forever and ever and ever.", "cvnde": 12 },
+        { "videoId": "TAdFR0DIrrI", "text": "And I'm just stuck there. It was like my body, my muscles were just, my body was like clenched up.", "cvnde": 9 },
+        { "videoId": "L7CGjrR3njI", "text": "it seems like there's walls around you because you can't move your feet, nothing.", "cvnde": 14 },
+        { "videoId": "M5p3GX_-0wk", "text": "left me on the ground of that place, unable to move", "cvnde": 12 },
+        { "videoId": "lpZW9u8HK2A", "text": "I can see black gates, and the cells were black.", "cvnde": 18 }
+      ],
+      "sensory": [
+        "muscles clenched, body rigid",
+        "feet fixed to a spot, invisible walls at arm's length",
+        "cells, gates, ropes, chains in a minority of accounts",
+        "the knowledge of permanence arriving without being spoken",
+        "time reported as dilating — 'in hell it seemed like it was eternal'"
+      ],
+      "parent": "hell-realm",
+      "journey_position": 0.45,
+      "measured": { "all_pct": 2.3, "all_docs": 142, "cv13_pct": 2.05, "cv18_pct": 1.38, "cv23_pct": 1.66 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 12,
+      "notes": "LESS common in the better-evidenced strata (2.30% -> 1.38% at cv>=18). Bare /trapped|stuck|couldn't move/ matches 44.53% of the corpus — overwhelmingly people trapped in wreckage, under water, or on a ventilator — so this regex demands otherworld context and still only reaches ~0.5 precision. A separate probe for cells/cages/chains in hellish context reached only 0.83% of docs at roughly 0.2 precision, so I did not promote it to its own place; the vocabulary exists (black gates, black cells, holes in the mountain, a rope burnt to the bone) but is too rare and too lexically fragile to measure cleanly."
+    },
+    {
+      "id": "hopeless-torment",
+      "name": "The torment that is not physical",
+      "category": "state",
+      "description": "A distressing NDE without any hellish scenery: pure despair, hopelessness, self-disgust, or the mass of every negative emotion at once, experienced as a condition rather than a location. Several experiencers argue explicitly that this IS hell — that the place is a manifestation of the state and not the other way round. It is the most under-reported form because it produces no imagery to describe.",
+      "aliases": [
+        { "term": "despair", "tradition": "none" },
+        { "term": "hopelessness", "tradition": "none" },
+        { "term": "torment", "tradition": "Christian" },
+        { "term": "a hell of my own making", "tradition": "secular" },
+        { "term": "unrelenting emotional distress", "tradition": "secular" },
+        { "term": "filth you can't wash off", "tradition": "Christian" },
+        { "term": "every negative feeling at once", "tradition": "secular", "note": "Darren Shiner: 'despair and jealousy and envy and hate and worry and guilt and shame'" },
+        { "term": "mental torment", "tradition": "secular" }
+      ],
+      "regex": "\\b(hopeless\\w*|despair|torment\\w*|agony|anguish|dread|terror|horrif\\w+)\\b[^.]{0,80}\\b(place|realm|there|darkness|hell|feeling|state)\\b|\\b(place|realm|darkness|hell)\\b[^.]{0,80}\\b(hopeless\\w*|despair|torment\\w*|agony|anguish|dread|terror|horrif\\w+)\\b",
+      "negative_regex": "(agony of (the|my) (surgery|recovery|withdrawal)|terror(ism|ist)|in agony (from|with) (the pain of|my (back|leg|burns)))",
+      "quotes": [
+        { "videoId": "oFAOr3qncpE", "text": "Hell is a manner of suffering, and I was in hell long before I took my life.", "cvnde": 8 },
+        { "videoId": "lpZW9u8HK2A", "text": "imagine if you had been violated by someone. And you can't wash the filth off you.", "cvnde": 18 },
+        { "videoId": "6jOhjQQZVrs", "text": "all the bad feelings that you could experience in life, all the negative stuff, like despair and jealousy and envy and hate", "cvnde": 23 }
+      ],
+      "sensory": [
+        "no imagery at all in some accounts — only the feeling",
+        "self-disgust that cannot be washed away",
+        "the sense of being the cause of your own condition",
+        "isolation as an active force rather than an absence"
+      ],
+      "parent": null,
+      "journey_position": 0.5,
+      "measured": { "all_pct": 5.8, "all_docs": 358, "cv13_pct": 5.97, "cv18_pct": 6.08, "cv23_pct": 3.87 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 12,
+      "notes": "Rises to cv>=18 (5.80% -> 6.08%) then drops at cv>=23 (3.87%), though n=181 there so that last figure is noisy. This is the category the corpus itself is worst at capturing: the structured coder has one-off labels for mental_torment (2 accounts), pain_suffering (3), regret (1) — the vocabulary is genuinely idiosyncratic because there is no scenery to name. Nancy Evans Bush, the corpus's own researcher-experiencer, is the one who names it directly: distressing NDEs range 'from fear of the unknown to a frightening experience of the void to an experience that is truly hellish', and she estimates roughly 20% of NDEs are distressing — far above anything my regexes or the structured coder measure."
+    },
+    {
+      "id": "the-nothingness",
+      "name": "The nothingness / annihilation",
+      "category": "realm",
+      "description": "Not darkness with something in it, but the absence of anything at all — including the self. Experiencers describe a place where they had never existed and would not exist, where God could not reach because God did not know it was there. It is reported as distinct from the peaceful void: the peaceful void feels full, this one feels cancelled.",
+      "aliases": [
+        { "term": "nothingness", "tradition": "secular" },
+        { "term": "non-existence", "tradition": "secular" },
+        { "term": "oblivion", "tradition": "secular" },
+        { "term": "annihilation", "tradition": "secular" },
+        { "term": "like I never existed", "tradition": "Christian" },
+        { "term": "a single point of nothingness", "tradition": "secular" },
+        { "term": "the ground and the maggots", "tradition": "atheist", "note": "the voice in Lorraine Kane's account offering annihilation as the alternative to God" }
+      ],
+      "regex": "\\b(nothingness|non.?existence|annihilat\\w+|ceased? to exist|oblivion)\\b",
+      "negative_regex": "(annihilat\\w+ (the|my) (competition|opponent|team)|nothingness (of|in) (Buddhist|Zen) (philosophy|teaching) )",
+      "quotes": [
+        { "videoId": "EswluiJwppw", "text": "It felt as if it went forever, and it felt it was nothingness", "cvnde": 11 },
+        { "videoId": "lIHzazKdR-k", "text": "I felt completely, uh, completely like I never existed", "cvnde": 13 },
+        { "videoId": "XVuyrjAVdY0", "text": "There is no God, and you're going to go to the ground, and maggots are going to eat your body.", "cvnde": 11 }
+      ],
+      "sensory": [
+        "no sound, no light, no direction, no body",
+        "the loss of self as the specific terror, distinct from loss of surroundings",
+        "sometimes preceded by a voice asserting that nothing exists",
+        "reported as unbearable by some and as the most peaceful state possible by others"
+      ],
+      "parent": null,
+      "journey_position": 0.3,
+      "measured": { "all_pct": 7.79, "all_docs": 481, "cv13_pct": 7.06, "cv18_pct": 7.46, "cv23_pct": 6.08 },
+      "precision_estimate": 0.35,
+      "precision_sample_n": 12,
+      "notes": "Roughly FLAT to slightly lower with evidential strength (7.79% -> 6.08% at cv>=23). Precision is the weakest in my set at ~0.35 and I want to be blunt about why: 'nothingness' is used at least as often in a positive, non-dual, Buddhist-adjacent register ('the state of non-self, or the state of nothingness') as it is in a terrified one, and the two are lexically indistinguishable without reading the surrounding paragraph. The distressing sense — annihilation of the self as a horror — is real and vivid but is a minority of these matches. Downstream correction is essential here."
+    },
+    {
+      "id": "dark-tunnel-down",
+      "name": "The black tunnel",
+      "category": "threshold",
+      "description": "The dark inverse of the classic NDE tunnel. Experiencers who expected light report a black shaft, a vortex, a dark cavern or a spiralling funnel, and note that there is no point of light at the far end — or that the light at the end turns out to be fire. The direction is felt as downward even where there is no visual reference for it.",
+      "aliases": [
+        { "term": "a black tunnel", "tradition": "Christian", "note": "Paul O'Hada: 'I didn't see a bright light. I saw a black tunnel.'" },
+        { "term": "a dark tunnel", "tradition": "none" },
+        { "term": "a deep, dark cavern", "tradition": "Christian" },
+        { "term": "a spinning tunnel of vortex", "tradition": "Christian" },
+        { "term": "a wormhole / a vortex", "tradition": "secular" },
+        { "term": "a dark shaft", "tradition": "none" },
+        { "term": "an escalator spiralling down", "tradition": "Christian" },
+        { "term": "a tunnel of energy", "tradition": "secular" }
+      ],
+      "regex": "\\b(a|the|this|that) (dark|black|pitch.black|dim) (tunnel|shaft|hole|corridor|passage\\w*|hallway|vortex|funnel)\\b|tunnel (that|which) (was|went) (dark|down)|(going|went|heading|travel\\w*) down (a|the|this) (dark|black|tunnel)",
+      "negative_regex": "(tunnel (vision|syndrome)|black hole (theory|physics)|dark hallway (of|in) (the|my) (house|hospital|apartment))",
+      "quotes": [
+        { "videoId": "dGnVBEoKg_M", "text": "As I literally started free falling into this outer darkness and racing down this uh tunnel", "cvnde": 11 },
+        { "videoId": "sjvD1FvIhdo", "text": "I found myself in a terrifying, spinning tunnel of vortex", "cvnde": 24 },
+        { "videoId": "vNZSp6Z2RlM", "text": "But I was in a deep, dark cavern, uh, flying along at tremendous speed.", "cvnde": 12 }
+      ],
+      "sensory": [
+        "no light at the far end, or an orange light that resolves into fire",
+        "walls felt but not seen; a sense of being squeezed through",
+        "wind, roaring, tremendous speed",
+        "in a few accounts, freezing cold inside the tunnel",
+        "spiralling or turning rather than straight"
+      ],
+      "parent": null,
+      "journey_position": 0.15,
+      "measured": { "all_pct": 5.57, "all_docs": 344, "cv13_pct": 5.73, "cv18_pct": 4.7, "cv23_pct": 4.42 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 12,
+      "notes": "LESS common in the better-evidenced strata (5.57% -> 4.42% at cv>=23), which is the opposite of the tunnel element overall — the structured coder has tunnel at 23.9% overall rising to 33.1% at cv>=23. So the BRIGHT tunnel strengthens with evidential quality while the BLACK tunnel weakens. A dark tunnel is not automatically distressing: a substantial share of accounts describe a dark tunnel with a light at the end and experience it as neutral or joyful, and this regex cannot separate those without the light-at-the-end clause."
+    },
+    {
+      "id": "the-suffering-multitude",
+      "name": "The others who are suffering",
+      "category": "landscape",
+      "description": "Seeing other people in torment: crowds in the fire, bodies in holes trying to climb out and being pushed back, faces bobbing in the lake. Experiencers consistently report that witnessing this was as distressing as anything done to them, and several recognise individuals they knew in life. The crowd is dense — 'thousands' is the recurring word.",
+      "aliases": [
+        { "term": "people in the lake of fire", "tradition": "Christian" },
+        { "term": "people in these holes", "tradition": "Christian" },
+        { "term": "souls being tormented", "tradition": "Christian" },
+        { "term": "thousands of people", "tradition": "Christian" },
+        { "term": "people burning forever", "tradition": "Christian" },
+        { "term": "faces I recognised", "tradition": "Christian" }
+      ],
+      "regex": "\\b(people|souls|figures|bodies|others|men and women)\\b[^.]{0,70}\\b(being tortured|being tormented|tormented|writhing|in agony|burning (alive|in|forever|up)|on fire|in the (fire|flames|lake))\\b|\\b(I (saw|could see|watched|saw all))\\b[^.]{0,60}\\b(people|souls|others|bodies)\\b[^.]{0,70}\\b(tortur\\w*|torment\\w*|agony|burn\\w*)\\b",
+      "negative_regex": "(people (screaming|crying) (and|around) (the|my) (bed|gurney|body)|burn (unit|ward|victim)|house (was )?on fire)",
+      "quotes": [
+        { "videoId": "rH2pqLQU22c", "text": "So I could see people were in the Lake of Fire", "cvnde": 8 },
+        { "videoId": "TMswDQpX2fI", "text": "people were in these holes trying to crawl out and these creatures were knocking them back in", "cvnde": 23 },
+        { "videoId": "N7GXmorVzb4", "text": "And I also seen maggots crawling through your flesh, through your, in your bones, and they're eating you.", "cvnde": 8 }
+      ],
+      "sensory": [
+        "density — thousands, as far as the eye can see",
+        "heads bobbing on the surface of the lake 'like people in water'",
+        "people climbing out and being pushed back in, repeatedly",
+        "recognition of specific individuals from the experiencer's life",
+        "in the grey place the equivalent crowd is silent and does not look up"
+      ],
+      "parent": "hell-realm",
+      "journey_position": 0.45,
+      "measured": { "all_pct": 1.1, "all_docs": 68, "cv13_pct": 0.78, "cv18_pct": 0.69, "cv23_pct": 2.21 },
+      "precision_estimate": 0.7,
+      "precision_sample_n": 12,
+      "notes": "Erratic across strata — 1.10% overall, dipping to 0.69% at cv>=18 then jumping to 2.21% at cv>=23, which on n=181 is only 4 documents, so that spike is not meaningful. Report as rare and roughly flat. The tighter regex (requiring torture/torment/burning rather than merely screaming) cut the match set from 349 docs to 68 and lifted precision from about 0.25 to about 0.70; the discarded matches were almost entirely people watching their own resuscitation."
+    },
+    {
+      "id": "the-vermin",
+      "name": "The worms and crawling things",
+      "category": "landscape",
+      "description": "A rare but startlingly convergent detail: worms, maggots, or insects crawling in, on and through the body, eating flesh that regrows so the eating can continue. Reported by experiencers with no apparent contact with each other and in near-identical terms, including the note that the vermin themselves stink worse than anything else.",
+      "aliases": [
+        { "term": "hell maggots", "tradition": "Christian", "note": "Dominic Morrow's coinage: 'thick as soda cans'" },
+        { "term": "worms", "tradition": "Christian" },
+        { "term": "maggots", "tradition": "Christian" },
+        { "term": "creepy crawlies", "tradition": "Christian" },
+        { "term": "things that stick to your body and sear you", "tradition": "Christian" }
+      ],
+      "regex": "\\b(worms|maggots|snakes|serpents|spiders|reptilian|scorpions)\\b[^.]{0,110}\\b(hell|demons?|dark\\w*|crawl\\w*|torment|flesh|my (body|skin)|pit)\\b|\\b(hell|demons?|dark place|the pit)\\b[^.]{0,110}\\b(worms|maggots|snakes|serpents|spiders|reptilian|scorpions)\\b",
+      "negative_regex": "(worms (in|for) (the|my) (garden|compost|dog|cat)|snake (bite|handler)|spider (bite|man|web design)|serpent(ine) (road|river))",
+      "quotes": [
+        { "videoId": "o17HXmDu294", "text": "I call them hell maggots because they're thick.", "cvnde": 10 },
+        { "videoId": "TMswDQpX2fI", "text": "the worms devour their flesh", "cvnde": 23 },
+        { "videoId": "h1uEl6Fi9sQ", "text": "they look more like worms, but they just, they would stick to your body and just sear you", "cvnde": 9 }
+      ],
+      "sensory": [
+        "unnatural size — 'thick as soda cans', tarantulas 'ginormous'",
+        "an inchworm motion, crawling up the body",
+        "entering the body and passing through it",
+        "the worst smell in the whole experience comes off them",
+        "flesh consumed and restored in a loop"
+      ],
+      "parent": "hell-realm",
+      "journey_position": 0.45,
+      "measured": { "all_pct": 0.36, "all_docs": 22, "cv13_pct": 0.3, "cv18_pct": 0.55, "cv23_pct": 0.55 },
+      "precision_estimate": 0.65,
+      "precision_sample_n": 12,
+      "notes": "Genuinely rare — 22 documents in 6,176 — but MORE common in the better-evidenced strata (0.36% -> 0.55% at cv>=18 and cv>=23). I include it precisely because it is rare and specific: three experiencers who share no channel, tradition, or vocabulary independently describe worms that eat flesh which then regrows, and one of them (Bryan Melvin, cv=23) says his publisher asked him to cut it from the book. False positives are earthly phobia talk ('worms crawling all over me, like I was afraid of') rather than experience."
+    },
+    {
+      "id": "evil-presence",
+      "name": "The felt presence of evil",
+      "category": "state",
+      "description": "Evil apprehended directly, without a form to see: an atmosphere or a knowledge rather than a figure. Experiencers say they knew the presence was evil the way they knew their own name — instantly, without deduction — and several describe it as the single most certain thing in the experience. Distinct from meeting a demon: here there is nothing to look at.",
+      "aliases": [
+        { "term": "pure evil", "tradition": "none" },
+        { "term": "a presence of evil", "tradition": "none" },
+        { "term": "penetrating evil", "tradition": "Christian" },
+        { "term": "you know the presence is evil", "tradition": "Christian" },
+        { "term": "the most intense evil", "tradition": "Christian" },
+        { "term": "a negative presence", "tradition": "secular" },
+        { "term": "invisible eyes looking at me", "tradition": "Christian" }
+      ],
+      "regex": "\\b(pure evil|absolute evil|presence of evil|evil presence|felt (the )?evil|sense of evil|something evil|(the most|such) (intense )?evil|evil (was|is) (there|real|palpable))\\b",
+      "negative_regex": "(evil (in the world|of racism|of war|men do)|necessary evil|lesser of two evils|good and evil (are|is a) (concept|duality|illusion))",
+      "quotes": [
+        { "videoId": "T69fFcY-Puc", "text": "It's so black there. It's a blackness you can feel. It's like a, a penetrating evil, evil, evil.", "cvnde": 18 },
+        { "videoId": "2Dq1vB_ZOiM", "text": "It was like invisible eyes looking at me. It was like a spiritual darkness.", "cvnde": 18 },
+        { "videoId": "Gied8BGrNJ0", "text": "all of a sudden i felt this freezing cold thing in my being and i felt this fear in me", "cvnde": 12 }
+      ],
+      "sensory": [
+        "knowledge without perception — you know what it is without seeing it",
+        "cold arriving in the body at the moment of recognition",
+        "the feeling of being observed from a direction that does not exist",
+        "evil described as having weight or pressure"
+      ],
+      "parent": "outer-darkness",
+      "journey_position": 0.3,
+      "measured": { "all_pct": 1.33, "all_docs": 82, "cv13_pct": 1.57, "cv18_pct": 1.38, "cv23_pct": 1.66 },
+      "precision_estimate": 0.55,
+      "precision_sample_n": 10,
+      "notes": "Slightly MORE common in the better-evidenced strata (1.33% -> 1.66% at cv>=23). This is the most under-lexicalised item in the region — experiencers repeatedly say the thing they encountered had no form, which means it also has no noun, so most of the corpus's evidence for it lives in clauses I cannot pattern-match ('you know everything... you know why things happen'). Treat 1.33% as a floor."
+    },
+    {
+      "id": "rescue-cry",
+      "name": "Calling out, and the light that comes",
+      "category": "process",
+      "description": "The exit from the dark places, and it is almost always the same shape: the experiencer, having no resources left, calls out — usually a name, usually aloud, usually to a figure they say they had stopped believing in — and something answers. A pinpoint of light appears and grows, or a hand comes down and takes hold. Experiencers stress the surprise: they did not expect it to work.",
+      "aliases": [
+        { "term": "Jesus, please save me", "tradition": "Christian", "note": "the single most repeated sentence in the distressing region" },
+        { "term": "God help me", "tradition": "Christian" },
+        { "term": "I cried out into the darkness", "tradition": "Christian" },
+        { "term": "a speck of light in the darkness", "tradition": "Christian" },
+        { "term": "a hand came down", "tradition": "Christian" },
+        { "term": "a grip on my forearm", "tradition": "Christian" },
+        { "term": "a huge hand landed on my forehead", "tradition": "Christian" },
+        { "term": "praying", "tradition": "none" }
+      ],
+      "regex": "\\b((Jesus|God|Lord)[,.!]* (please )?(save|help) me|(cried|called|screamed|yelled|shouted) out,? (to|into|for) (God|Jesus|the Lord|the darkness|help)|I (prayed|called) (to|on|out to) (God|Jesus|the Lord)|God,? (if you)?.{0,12}(help|save) me)",
+      "negative_regex": "(pray(ed|ing)? (for|over) (my|his|her|their|the) (family|children|patients|recovery|country)|God help (us|them|you)|God save the (queen|king))",
+      "quotes": [
+        { "videoId": "7sX2YlKMf4w", "text": "I called on to the darkness, \"Jesus, please save me.\" And to my complete surprise, he came, surrounded in brilliant white light.", "cvnde": 11 },
+        { "videoId": "IZBcv4So38s", "text": "First, there was a tiny little speck of light in the darkness, and very rapidly, it got bright", "cvnde": 16 },
+        { "videoId": "X1SEgbDqLxE", "text": "I just came to my senses and just cried out with everything I had, \"Jesus, save me! Help me!\"", "cvnde": 20 }
+      ],
+      "sensory": [
+        "a pinpoint of light that grows rapidly rather than approaches",
+        "physical grip — a hand on the forearm, on the head, lifting",
+        "the light described as so bright it would destroy an earthly body",
+        "immediate cessation of the darkness, not a gradual fade",
+        "the sound of one's own voice heard as a scream even when thought silently"
+      ],
+      "parent": null,
+      "journey_position": 0.7,
+      "measured": { "all_pct": 7.85, "all_docs": 485, "cv13_pct": 8.99, "cv18_pct": 8.98, "cv23_pct": 11.05 },
+      "precision_estimate": 0.5,
+      "precision_sample_n": 14,
+      "notes": "Clearly MORE common among the best-evidenced accounts: 7.85% overall rising to 11.05% at cv>=23. That is the strongest positive gradient of anything I measured in this region. Precision ~0.5 because the regex also catches praying in ordinary life and praying on behalf of others; a much tighter variant requiring dark/hell context within 200 characters of the cry matched only 17 documents but was ~90% precise, and every one of those 17 followed the identical script: call out by name, light or hand arrives, extraction is immediate. The rescue is the most stereotyped sequence in the distressing region and deserves its own scrutiny downstream."
+    }
+  ]
+}

@@ -1,0 +1,2096 @@
+ 1858  30.08%  like
+  874  14.15%  that
+  867  14.04%  beautiful
+  833  13.49%  just
+  646  10.46%  this
+  630  10.20%  light
+  523   8.47%  very
+  507   8.21%  him
+  458   7.42%  amazing
+  455   7.37%  there
+  409   6.62%  dark
+  391   6.33%  body
+  375   6.07%  real
+  360   5.83%  the
+  338   5.47%  nothing
+  304   4.92%  heaven
+  301   4.87%  time
+  297   4.81%  god
+  276   4.47%  room
+  275   4.45%  jesus
+  270   4.37%  love
+  262   4.24%  them
+  260   4.21%  really
+  255   4.13%  her
+  247   4.00%  bed
+  238   3.85%  incredible
+  229   3.71%  interesting
+  229   3.71%  wonderful
+  229   3.71%  dream
+  227   3.68%  tunnel
+  216   3.50%  pain
+  216   3.50%  over
+  213   3.45%  place
+  210   3.40%  hard
+  210   3.40%  weird
+  202   3.27%  different
+  198   3.21%  you
+  197   3.19%  gone
+  194   3.14%  something
+  194   3.14%  bad
+  191   3.09%  huge
+  188   3.04%  fear
+  185   3.00%  as if i was
+  184   2.98%  horrible
+  178   2.88%  other side
+  176   2.85%  big
+  174   2.82%  bright
+  173   2.80%  myself
+  165   2.67%  home
+  164   2.66%  people
+  163   2.64%  good
+  163   2.64%  clear
+  162   2.62%  one
+  158   2.56%  painful
+  158   2.56%  coma
+  153   2.48%  about
+  153   2.48%  man
+  151   2.44%  great
+  151   2.44%  strange
+  149   2.41%  fast
+  148   2.40%  space
+  147   2.38%  white
+  146   2.36%  not
+  145   2.35%  peace
+  144   2.33%  powerful
+  143   2.32%  was
+  140   2.27%  again
+  138   2.23%  peaceful
+  136   2.20%  earth
+  135   2.19%  funny
+  134   2.17%  for me
+  134   2.17%  sleep
+  133   2.15%  everything
+  132   2.14%  going to be a
+  131   2.12%  okay
+  130   2.10%  scary
+  130   2.10%  overwhelming
+  130   2.10%  judgment
+  128   2.07%  black
+  127   2.06%  darkness
+  127   2.06%  happening
+  124   2.01%  house
+  121   1.96%  difficult
+  121   1.96%  experience
+  120   1.94%  intense
+  120   1.94%  crazy
+  120   1.94%  hell
+  120   1.94%  perfect
+  115   1.86%  true
+  114   1.85%  cold
+  113   1.83%  life
+  112   1.81%  door
+  107   1.73%  church
+  107   1.73%  angel
+  105   1.70%  all
+  105   1.70%  many
+  103   1.67%  more
+  103   1.67%  alive
+  102   1.65%  hard for me to
+  102   1.65%  as if i had
+  102   1.65%  time for me to
+  101   1.64%  shock
+  100   1.62%  lot
+   99   1.60%  energy
+   98   1.59%  warm
+   98   1.59%  feeling
+   97   1.57%  fun
+   93   1.51%  quick
+   93   1.51%  way
+   93   1.51%  terrible
+   93   1.51%  almost like i was
+   91   1.47%  before
+   91   1.47%  awful
+   89   1.44%  profound
+   88   1.42%  moment
+   87   1.41%  to me
+   87   1.41%  magnificent
+   86   1.39%  part of me that
+   85   1.38%  easy
+   85   1.38%  cool
+   85   1.38%  voice
+   85   1.38%  long
+   85   1.38%  things
+   84   1.36%  sun
+   84   1.36%  on the other side
+   83   1.34%  clear to me that
+   83   1.34%  strong
+   83   1.34%  nothing i could do
+   82   1.33%  lot of pain
+   82   1.33%  face
+   81   1.31%  knowing
+   81   1.31%  normal
+   80   1.30%  almost like
+   80   1.30%  white light
+   80   1.30%  nice
+   79   1.28%  kind of
+   78   1.26%  i was in a
+   78   1.26%  life review
+   78   1.26%  simple
+   77   1.25%  void
+   77   1.25%  too much
+   77   1.25%  unbelievable
+   76   1.23%  accident
+   76   1.23%  calm
+   75   1.21%  spirit
+   74   1.20%  sound
+   74   1.20%  bathroom
+   73   1.18%  terrifying
+   73   1.18%  much pain
+   72   1.17%  angels
+   72   1.17%  being
+   71   1.15%  lot of
+   69   1.12%  important
+   69   1.12%  i was
+   69   1.12%  woman
+   69   1.12%  one of the most
+   69   1.12%  here
+   69   1.12%  these
+   68   1.10%  hot
+   68   1.10%  words
+   67   1.08%  water
+   66   1.07%  comforting
+   66   1.07%  deep
+   66   1.07%  quiet
+   65   1.05%  ceiling
+   65   1.05%  done
+   65   1.05%  much
+   65   1.05%  presence
+   65   1.05%  some
+   64   1.04%  something else
+   64   1.04%  as if i were
+   63   1.02%  at that point that
+   63   1.02%  near-death experience
+   63   1.02%  at that moment that
+   62   1.00%  two
+   62   1.00%  floor
+   61   0.99%  yesterday
+   61   0.99%  as if it was
+   61   0.99%  eternity
+   60   0.97%  nothing there
+   59   0.96%  called
+   59   0.96%  bright light
+   58   0.94%  right
+   58   0.94%  wrong
+   56   0.91%  more like
+   56   0.91%  loving
+   55   0.89%  almost as if i
+   55   0.89%  telepathic
+   55   0.89%  as if
+   55   0.89%  mine
+   55   0.89%  of light
+   55   0.89%  going to be
+   55   0.89%  little
+   54   0.87%  familiar
+   54   0.87%  it was like a
+   54   0.87%  another place
+   54   0.87%  miracle
+   53   0.86%  awesome
+   53   0.86%  wall
+   53   0.86%  instant
+   52   0.84%  pure love
+   52   0.84%  same thing
+   52   0.84%  heavy
+   52   0.84%  joy
+   52   0.84%  small
+   52   0.84%  choice
+   52   0.84%  same
+   51   0.83%  in the middle of
+   51   0.83%  lot of things that
+   51   0.83%  now
+   51   0.83%  as if it were
+   50   0.81%  too late
+   50   0.81%  loud
+   50   0.81%  parents
+   50   0.81%  music
+   50   0.81%  actually
+   50   0.81%  long time
+   49   0.79%  pure
+   49   0.79%  stars
+   49   0.79%  children
+   49   0.79%  confusing
+   49   0.79%  trouble
+   49   0.79%  going to happen
+   49   0.79%  blackness
+   48   0.78%  moving
+   48   0.78%  family
+   48   0.78%  thing
+   48   0.78%  presence of god
+   48   0.78%  point
+   48   0.78%  trees
+   47   0.76%  living room
+   47   0.76%  it was
+   47   0.76%  vision
+   47   0.76%  natural
+   47   0.76%  saying
+   47   0.76%  it was it was
+   47   0.76%  death
+   47   0.76%  colors
+   47   0.76%  gorgeous
+   46   0.74%  forever
+   46   0.74%  pitch black
+   46   0.74%  raining
+   46   0.74%  awe
+   45   0.73%  everywhere
+   45   0.73%  kitchen
+   45   0.73%  as though i was
+   45   0.73%  and out of consciousness
+   45   0.73%  fire
+   45   0.73%  sense of
+   45   0.73%  son
+   44   0.71%  mess
+   44   0.71%  traumatic
+   44   0.71%  as if there was
+   44   0.71%  time to go
+   44   0.71%  absolutely beautiful
+   44   0.71%  end
+   44   0.71%  dark place
+   44   0.71%  clouds
+   44   0.71%  field
+   43   0.70%  separation
+   43   0.70%  in front of me
+   43   0.70%  most beautiful
+   43   0.70%  grandmother
+   43   0.70%  future
+   43   0.70%  walls
+   43   0.70%  massive
+   42   0.68%  world
+   42   0.68%  surreal
+   42   0.68%  i was in the
+   42   0.68%  much love
+   42   0.68%  tree
+   42   0.68%  almost like it was
+   42   0.68%  person
+   42   0.68%  guy
+   42   0.68%  ground
+   42   0.68%  physical
+   42   0.68%  movie
+   42   0.68%  20s
+   41   0.66%  silence
+   41   0.66%  back
+   41   0.66%  lights
+   41   0.66%  blue
+   41   0.66%  coming from
+   41   0.66%  tough
+   40   0.65%  cloud
+   40   0.65%  situation
+   40   0.65%  more than that
+   40   0.65%  drugs
+   40   0.65%  nothing like that
+   40   0.65%  movement
+   40   0.65%  night
+   40   0.65%  part of me
+   40   0.65%  brilliant
+   40   0.65%  coming
+   40   0.65%  one of those things
+   40   0.65%  possible
+   40   0.65%  at the time
+   40   0.65%  also
+   40   0.65%  wild
+   39   0.63%  bizarre
+   39   0.63%  wheelchair
+   39   0.63%  as if they were
+   39   0.63%  building
+   39   0.63%  nde
+   39   0.63%  none of that
+   39   0.63%  lovely
+   39   0.63%  odd
+   39   0.63%  gift
+   39   0.63%  grandfather
+   39   0.63%  short
+   39   0.63%  fine
+   38   0.62%  instantaneous
+   38   0.62%  pretty
+   38   0.62%  bliss
+   38   0.62%  tall
+   38   0.62%  fascinating
+   38   0.62%  too
+   38   0.62%  nobody there
+   38   0.62%  always there
+   38   0.62%  horrific
+   38   0.62%  beautiful experience
+   38   0.62%  process
+   38   0.62%  soul
+   37   0.60%  large
+   37   0.60%  healing
+   37   0.60%  holy spirit
+   37   0.60%  supposed to be
+   37   0.60%  connection
+   37   0.60%  i was there for
+   37   0.60%  own
+   37   0.60%  empty
+   36   0.58%  still
+   36   0.58%  internet
+   36   0.58%  nighttime
+   36   0.58%  state
+   36   0.58%  window
+   36   0.58%  fantastic
+   36   0.58%  portal
+   36   0.58%  beach
+   36   0.58%  sister
+   36   0.58%  another
+   36   0.58%  going to be okay
+   36   0.58%  at that point
+   36   0.58%  river
+   36   0.58%  thought
+   36   0.58%  bedroom
+   35   0.57%  hope
+   35   0.57%  panic
+   35   0.57%  important for me to
+   35   0.57%  extraordinary
+   35   0.57%  soft
+   35   0.57%  shocking
+   35   0.57%  question
+   35   0.57%  slow
+   35   0.57%  beautiful place
+   34   0.55%  brother
+   34   0.55%  difficult for me to
+   34   0.55%  in my head
+   34   0.55%  something like that
+   34   0.55%  going
+   34   0.55%  office
+   34   0.55%  sad
+   34   0.55%  problem
+   34   0.55%  air
+   34   0.55%  garden
+   33   0.53%  pleasant
+   33   0.53%  always
+   33   0.53%  rough
+   33   0.53%  reality
+   33   0.53%  excruciating pain
+   33   0.53%  friday
+   33   0.53%  people there
+   32   0.52%  unconditional love
+   32   0.52%  meant to be
+   32   0.52%  different place
+   32   0.52%  frightening
+   32   0.52%  three
+   32   0.52%  green
+   32   0.52%  infinite
+   32   0.52%  beautiful day
+   32   0.52%  something wrong with me
+   32   0.52%  about me
+   32   0.52%  all of a sudden
+   32   0.52%  and i said
+   31   0.50%  most
+   31   0.50%  sky
+   31   0.50%  library
+   31   0.50%  physical body
+   31   0.50%  late at night
+   31   0.50%  daughter
+   31   0.50%  saturday
+   31   0.50%  early in the morning
+   31   0.50%  fault
+   31   0.50%  i was going to
+   31   0.50%  little boy
+   31   0.50%  another dimension
+   31   0.50%  supposed to be a
+   31   0.50%  universe
+   31   0.50%  demon
+   30   0.49%  still there
+   30   0.49%  lady
+   30   0.49%  chair
+   30   0.49%  bright white light
+   30   0.49%  such a
+   30   0.49%  long time ago
+   30   0.49%  in heaven
+   30   0.49%  first
+   30   0.49%  early 20s
+   30   0.49%  open
+   30   0.49%  other
+   30   0.49%  high
+   30   0.49%  what looked like a
+   29   0.47%  opposite
+   29   0.47%  source
+   29   0.47%  big deal
+   29   0.47%  magical
+   29   0.47%  way for me to
+   29   0.47%  little bit of a
+   29   0.47%  grass
+   29   0.47%  male
+   29   0.47%  almost
+   29   0.47%  it was almost like
+   29   0.47%  at that moment
+   29   0.47%  obvious
+   29   0.47%  brief
+   29   0.47%  sense of time
+   28   0.45%  afterlife
+   28   0.45%  evil
+   28   0.45%  late
+   28   0.45%  it was kind of
+   28   0.45%  silent
+   28   0.45%  only
+   28   0.45%  amazing experience
+   28   0.45%  jesus christ
+   28   0.45%  something that
+   28   0.45%  almost like i had
+   28   0.45%  dead
+   28   0.45%  impossible
+   28   0.45%  blood
+   28   0.45%  rush
+   28   0.45%  gold
+   27   0.44%  in that moment that
+   27   0.44%  for
+   27   0.44%  complete darkness
+   27   0.44%  similar
+   27   0.44%  realm
+   27   0.44%  download
+   27   0.44%  at that time that
+   27   0.44%  close
+   27   0.44%  around me
+   27   0.44%  closed
+   27   0.44%  complete
+   27   0.44%  emotional
+   27   0.44%  anything
+   27   0.44%  worth it
+   27   0.44%  broken
+   27   0.44%  my time
+   27   0.44%  phenomenal
+   27   0.44%  day
+   27   0.44%  said
+   27   0.44%  memory
+   27   0.44%  something there
+   27   0.44%  too much for me
+   27   0.44%  round
+   27   0.44%  thick
+   27   0.44%  shower
+   27   0.44%  vivid
+   27   0.44%  color
+   26   0.42%  first time
+   26   0.42%  and
+   26   0.42%  completely dark
+   26   0.42%  going to be the
+   26   0.42%  roof
+   26   0.42%  picture
+   26   0.42%  telepathy
+   26   0.42%  vast
+   26   0.42%  feet
+   26   0.42%  christ
+   26   0.42%  realization
+   26   0.42%  as if i could
+   26   0.42%  welcoming
+   26   0.42%  name
+   26   0.42%  nobody
+   26   0.42%  truth
+   26   0.42%  at night
+   26   0.42%  40s
+   26   0.42%  immediate
+   26   0.42%  time when i was
+   26   0.42%  most beautiful place
+   26   0.42%  many people
+   26   0.42%  male voice
+   26   0.42%  summer
+   26   0.42%  first time that i
+   26   0.42%  depression
+   26   0.42%  serious
+   25   0.40%  gentle
+   25   0.40%  it all
+   25   0.40%  lot of people
+   25   0.40%  middle of the night
+   25   0.40%  planet
+   25   0.40%  ventilator
+   25   0.40%  nothing wrong
+   25   0.40%  i was able to
+   25   0.40%  consciousness
+   25   0.40%  uncomfortable
+   25   0.40%  impossible for me to
+   25   0.40%  easy for me to
+   25   0.40%  i was in
+   25   0.40%  conference
+   25   0.40%  transparent
+   25   0.40%  clearly
+   25   0.40%  immense
+   25   0.40%  city
+   25   0.40%  unusual
+   25   0.40%  first time i had
+   25   0.40%  glowing
+   25   0.40%  challenging
+   25   0.40%  explained to me that
+   25   0.40%  far away
+   25   0.40%  lord
+   25   0.40%  pleasure
+   25   0.40%  one thing
+   25   0.40%  path
+   25   0.40%  dog
+   25   0.40%  me and you
+   25   0.40%  noise
+   24   0.39%  beings
+   24   0.39%  gentleman
+   24   0.39%  many of them
+   24   0.39%  time to go back
+   24   0.39%  insane
+   24   0.39%  out-of-body experience
+   24   0.39%  living
+   24   0.39%  almost like they were
+   24   0.39%  communication
+   24   0.39%  way out
+   24   0.39%  at the same time
+   24   0.39%  meditation
+   24   0.39%  clear to me
+   24   0.39%  boom
+   24   0.39%  new
+   24   0.39%  flowers
+   24   0.39%  wind
+   24   0.39%  then
+   24   0.39%  what it was
+   24   0.39%  indescribable
+   24   0.39%  at the end of
+   24   0.39%  eyes
+   24   0.39%  of that
+   24   0.39%  exciting
+   24   0.39%  i was in this
+   24   0.39%  ocean
+   24   0.39%  old
+   24   0.39%  life-changing
+   24   0.39%  glorious
+   23   0.37%  much more
+   23   0.37%  past
+   23   0.37%  gray
+   23   0.37%  something like
+   23   0.37%  almost like a
+   23   0.37%  hole
+   23   0.37%  doubt in my mind
+   23   0.37%  child
+   23   0.37%  right in front of
+   23   0.37%  table
+   23   0.37%  because
+   23   0.37%  hard for me
+   23   0.37%  personal
+   23   0.37%  way i was going
+   23   0.37%  girl
+   23   0.37%  friend
+   23   0.37%  scene
+   23   0.37%  far
+   22   0.36%  nothing that i could
+   22   0.36%  suffering
+   22   0.36%  golden
+   22   0.36%  difference
+   22   0.36%  creator
+   22   0.36%  it was like i
+   22   0.36%  more of a
+   22   0.36%  couch
+   22   0.36%  something more
+   22   0.36%  intensive care
+   22   0.36%  comfortable
+   22   0.36%  hallucination
+   22   0.36%  excruciating
+   22   0.36%  other side of the
+   22   0.36%  what
+   22   0.36%  red
+   22   0.36%  devastating
+   22   0.36%  hallway
+   22   0.36%  warmth
+   22   0.36%  kids
+   22   0.36%  working
+   22   0.36%  someone
+   22   0.36%  blissful
+   22   0.36%  sensation
+   22   0.36%  buildings
+   22   0.36%  light at the end
+   22   0.36%  somebody
+   22   0.36%  apartment
+   22   0.36%  other people
+   21   0.34%  well
+   21   0.34%  gate
+   21   0.34%  good thing
+   21   0.34%  shortly after that that
+   21   0.34%  it was just like
+   21   0.34%  total darkness
+   21   0.34%  one there
+   21   0.34%  at that time
+   21   0.34%  i was looking at
+   21   0.34%  lot of people in
+   21   0.34%  whole thing
+   21   0.34%  message
+   21   0.34%  going to be like
+   21   0.34%  anger
+   21   0.34%  military
+   21   0.34%  enormous
+   21   0.34%  doctors
+   21   0.34%  what i call the
+   21   0.34%  nothingness
+   21   0.34%  right now
+   21   0.34%  imagination
+   21   0.34%  party
+   21   0.34%  nothing else
+   21   0.34%  in my mind
+   21   0.34%  i was like
+   21   0.34%  park
+   21   0.34%  enough
+   20   0.32%  summertime
+   20   0.32%  tears
+   20   0.32%  sort of
+   20   0.32%  birthday
+   20   0.32%  emergency
+   20   0.32%  incredible experience
+   20   0.32%  class
+   20   0.32%  blood everywhere
+   20   0.32%  cave
+   20   0.32%  solid
+   20   0.32%  brutal
+   20   0.32%  unbearable
+   20   0.32%  almost like there was
+   20   0.32%  phone
+   20   0.32%  more pain
+   20   0.32%  most beautiful thing
+   20   0.32%  several
+   20   0.32%  lot of people that
+   20   0.32%  right here
+   20   0.32%  his
+   20   0.32%  of this
+   20   0.32%  blessing
+   20   0.32%  and out
+   20   0.32%  point in my life
+   20   0.32%  hand
+   20   0.32%  doubt
+   20   0.32%  sunday
+   20   0.32%  chaos
+   20   0.32%  audible
+   20   0.32%  houses
+   20   0.32%  in that moment
+   20   0.32%  stairs
+   20   0.32%  as though i had
+   20   0.32%  dark space
+   20   0.32%  image
+   19   0.31%  right there
+   19   0.31%  lot of fun
+   19   0.31%  necessary
+   19   0.31%  it was like it
+   19   0.31%  golden light
+   19   0.31%  nothing wrong with me
+   19   0.31%  ridiculous
+   19   0.31%  oneness
+   19   0.31%  breathing
+   19   0.31%  light everywhere
+   19   0.31%  as if i knew
+   19   0.31%  absolutely amazing
+   19   0.31%  yes
+   19   0.31%  road
+   19   0.31%  flat
+   19   0.31%  street
+   19   0.31%  understanding
+   19   0.31%  coming towards me
+   19   0.31%  pure light
+   19   0.31%  something in me that
+   19   0.31%  humbling
+   19   0.31%  unexpected
+   19   0.31%  three of them
+   19   0.31%  boy
+   19   0.31%  morning
+   19   0.31%  as if we were
+   19   0.31%  definitely
+   19   0.31%  full
+   19   0.31%  glass
+   19   0.31%  worry
+   19   0.31%  literally
+   19   0.31%  it was just a
+   19   0.31%  turn
+   19   0.31%  both
+   19   0.31%  nightmare
+   19   0.31%  journey
+   19   0.31%  hands
+   19   0.31%  black void
+   19   0.31%  soothing
+   19   0.31%  nothing they could do
+   19   0.31%  outside
+   19   0.31%  time in my life
+   18   0.29%  confirmation
+   18   0.29%  first time in my
+   18   0.29%  neutral
+   18   0.29%  answer
+   18   0.29%  cardiac arrest
+   18   0.29%  saturday morning
+   18   0.29%  funeral
+   18   0.29%  30s
+   18   0.29%  entity
+   18   0.29%  point where i was
+   18   0.29%  side
+   18   0.29%  in my life review
+   18   0.29%  you know
+   18   0.29%  sudden
+   18   0.29%  i said
+   18   0.29%  animals
+   18   0.29%  life after death
+   18   0.29%  joyful
+   18   0.29%  power
+   18   0.29%  need
+   18   0.29%  something that i was
+   18   0.29%  something that i had
+   18   0.29%  stretcher
+   18   0.29%  hours
+   18   0.29%  others
+   18   0.29%  at that point i
+   18   0.29%  translucent
+   18   0.29%  back then
+   18   0.29%  all-encompassing
+   18   0.29%  endless
+   18   0.29%  communicated to me that
+   18   0.29%  timeless
+   18   0.29%  from
+   18   0.29%  next day
+   18   0.29%  probably
+   18   0.29%  out of body
+   18   0.29%  unreal
+   18   0.29%  dangerous
+   18   0.29%  absolutely
+   18   0.29%  with me
+   18   0.29%  anxiety
+   18   0.29%  up to me to
+   18   0.29%  london
+   18   0.29%  lot of things
+   17   0.28%  one day
+   17   0.28%  time to come back
+   17   0.28%  going on
+   17   0.28%  positive
+   17   0.28%  computer
+   17   0.28%  lot of people there
+   17   0.28%  shadows
+   17   0.28%  as though
+   17   0.28%  in me
+   17   0.28%  end of the world
+   17   0.28%  nowhere to go
+   17   0.28%  busy
+   17   0.28%  people everywhere
+   17   0.28%  new york
+   17   0.28%  nature
+   17   0.28%  absolutely incredible
+   17   0.28%  many people there
+   17   0.28%  whole
+   17   0.28%  many things
+   17   0.28%  constant
+   17   0.28%  wet
+   17   0.28%  forest
+   17   0.28%  in my near-death experience
+   17   0.28%  rehab
+   17   0.28%  sweet
+   17   0.28%  after that
+   17   0.28%  dark room
+   17   0.28%  gross
+   17   0.28%  it was going to
+   17   0.28%  nurses
+   17   0.28%  anymore
+   17   0.28%  sunday morning
+   17   0.28%  plane
+   17   0.28%  square
+   17   0.28%  yeah
+   17   0.28%  ecstasy
+   17   0.28%  man sitting on the
+   17   0.28%  transition
+   17   0.28%  spiritual
+   17   0.28%  information
+   17   0.28%  thoughts
+   17   0.28%  war
+   17   0.28%  awareness
+   17   0.28%  pretty cool
+   16   0.26%  struggle
+   16   0.26%  yellow
+   16   0.26%  planned
+   16   0.26%  tangible
+   16   0.26%  nothing to do
+   16   0.26%  other things
+   16   0.26%  corner
+   16   0.26%  spinning
+   16   0.26%  india
+   16   0.26%  sign
+   16   0.26%  pause
+   16   0.26%  opening
+   16   0.26%  line
+   16   0.26%  most beautiful building i
+   16   0.26%  restaurant
+   16   0.26%  train
+   16   0.26%  faces
+   16   0.26%  mirror
+   16   0.26%  cell phones
+   16   0.26%  later
+   16   0.26%  something wrong with my
+   16   0.26%  acceptance
+   16   0.26%  heart
+   16   0.26%  it now
+   16   0.26%  winter
+   16   0.26%  pretty bad
+   16   0.26%  demons
+   16   0.26%  young man
+   16   0.26%  labor
+   16   0.26%  safe
+   16   0.26%  vibration
+   16   0.26%  weirdest thing
+   16   0.26%  made of light
+   16   0.26%  when i was in
+   16   0.26%  white room
+   16   0.26%  theater
+   16   0.26%  body again
+   16   0.26%  floating
+   16   0.26%  conclusion
+   16   0.26%  lot going on
+   16   0.26%  cross
+   16   0.26%  unconditional
+   16   0.26%  okay for me to
+   16   0.26%  store
+   16   0.26%  demonic
+   16   0.26%  spirits
+   16   0.26%  out
+   16   0.26%  classroom
+   16   0.26%  bed that night
+   16   0.26%  friends
+   16   0.26%  difficult for me
+   16   0.26%  sunny day
+   16   0.26%  coma for three days
+   16   0.26%  myself there
+   16   0.26%  important to me
+   16   0.26%  i was being pulled
+   16   0.26%  understand
+   16   0.26%  almost like i could
+   16   0.26%  better place
+   16   0.26%  sense of like
+   16   0.26%  today
+   16   0.26%  perfection
+   16   0.26%  honor
+   16   0.26%  exhausting
+   15   0.24%  feeling of
+   15   0.24%  after
+   15   0.24%  coming back
+   15   0.24%  problems
+   15   0.24%  happy
+   15   0.24%  whole life
+   15   0.24%  corridor
+   15   0.24%  mind-blowing
+   15   0.24%  i was looking down
+   15   0.24%  intelligence
+   15   0.24%  behind me
+   15   0.24%  explained to me
+   15   0.24%  around
+   15   0.24%  going to be an
+   15   0.24%  simultaneous
+   15   0.24%  with
+   15   0.24%  learning
+   15   0.24%  waiting room
+   15   0.24%  middle
+   15   0.24%  rock
+   15   0.24%  millions upon millions of
+   15   0.24%  tunnel of light
+   15   0.24%  way i could have
+   15   0.24%  front of him
+   15   0.24%  mist
+   15   0.24%  prison
+   15   0.24%  divorce
+   15   0.24%  kindergarten
+   15   0.24%  knees
+   15   0.24%  in my mind's eye
+   15   0.24%  satan
+   15   0.24%  another room
+   15   0.24%  as though i could
+   15   0.24%  at all
+   15   0.24%  environment
+   15   0.24%  circle
+   15   0.24%  euphoric
+   15   0.24%  quite
+   15   0.24%  one time
+   15   0.24%  shown to me
+   15   0.24%  annoying
+   15   0.24%  toilet
+   15   0.24%  decision
+   15   0.24%  basically
+   15   0.24%  grandpa
+   15   0.24%  being of light
+   15   0.24%  danger
+   15   0.24%  calming
+   15   0.24%  it was amazing
+   15   0.24%  exactly
+   15   0.24%  at first
+   15   0.24%  low
+   15   0.24%  barrier
+   15   0.24%  never
+   15   0.24%  cute
+   15   0.24%  right thing to do
+   15   0.24%  storm
+   15   0.24%  remarkable
+   15   0.24%  guardian angel
+   15   0.24%  it all the time
+   15   0.24%  watching a movie
+   15   0.24%  prayer
+   15   0.24%  negative
+   15   0.24%  form
+   15   0.24%  something wrong
+   15   0.24%  lightning
+   15   0.24%  personal experience
+   15   0.24%  going to
+   15   0.24%  contact with
+   15   0.24%  head
+   15   0.24%  recovery
+   15   0.24%  total peace
+   15   0.24%  daytime
+   15   0.24%  nothing left
+   15   0.24%  in there
+   15   0.24%  christmas
+   14   0.23%  getting worse and worse
+   14   0.23%  as though they were
+   14   0.23%  infinity
+   14   0.23%  communicated to me
+   14   0.23%  five
+   14   0.23%  steps
+   14   0.23%  feelings
+   14   0.23%  shore
+   14   0.23%  more like i was
+   14   0.23%  earthquake
+   14   0.23%  pure white
+   14   0.23%  i was going through
+   14   0.23%  ugly
+   14   0.23%  chaotic
+   14   0.23%  detailed
+   14   0.23%  therapy
+   14   0.23%  curiosity
+   14   0.23%  liberating
+   14   0.23%  bus
+   14   0.23%  where i was
+   14   0.23%  lot of pain and
+   14   0.23%  about love
+   14   0.23%  surprising
+   14   0.23%  lonely
+   14   0.23%  lot of them
+   14   0.23%  joke
+   14   0.23%  none
+   14   0.23%  arms
+   14   0.23%  temple
+   14   0.23%  bad shape
+   14   0.23%  change
+   14   0.23%  other side and i
+   14   0.23%  one of those
+   14   0.23%  isolation
+   14   0.23%  it as if it
+   14   0.23%  enough for me to
+   14   0.23%  few
+   14   0.23%  first time i was
+   14   0.23%  love upon love upon
+   14   0.23%  i could see the
+   14   0.23%  baby
+   14   0.23%  stuff
+   14   0.23%  ship
+   14   0.23%  explosion
+   14   0.23%  easier for me to
+   14   0.23%  at this time that
+   14   0.23%  airplane
+   14   0.23%  talking
+   14   0.23%  center
+   14   0.23%  something going on
+   14   0.23%  dark tunnel
+   14   0.23%  slow motion
+   14   0.23%  absolutely wonderful
+   14   0.23%  of it
+   14   0.23%  one of the first
+   14   0.23%  doorway
+   14   0.23%  first time i ever
+   14   0.23%  spirit body
+   14   0.23%  too painful
+   14   0.23%  little girl
+   14   0.23%  meeting
+   14   0.23%  for a long time
+   14   0.23%  what appeared to be
+   14   0.23%  as if someone had
+   14   0.23%  freezing
+   14   0.23%  it was a very
+   14   0.23%  more of
+   14   0.23%  helpful
+   14   0.23%  place where i was
+   14   0.23%  moon
+   14   0.23%  much like that
+   14   0.23%  violent
+   14   0.23%  beginning
+   14   0.23%  completely different
+   14   0.23%  in the
+   14   0.23%  celebration
+   14   0.23%  stream
+   14   0.23%  1986
+   14   0.23%  going up
+   14   0.23%  at this point that
+   14   0.23%  off in the distance
+   14   0.23%  lake
+   14   0.23%  pictures
+   14   0.23%  getting dark
+   14   0.23%  university
+   14   0.23%  dark outside
+   14   0.23%  mountains
+   14   0.23%  shadow
+   14   0.23%  most incredible
+   14   0.23%  women
+   14   0.23%  things that i was
+   14   0.23%  warning
+   14   0.23%  as well
+   14   0.23%  much light
+   14   0.23%  i felt like i
+   13   0.21%  i had
+   13   0.21%  palpable
+   13   0.21%  time where i was
+   13   0.21%  almost as if the
+   13   0.21%  meadow
+   13   0.21%  supernatural
+   13   0.21%  nothing more
+   13   0.21%  telepathically
+   13   0.21%  it too
+   13   0.21%  as though it was
+   13   0.21%  different realm
+   13   0.21%  wonderful feeling
+   13   0.21%  evening
+   13   0.21%  quite a bit of
+   13   0.21%  closet
+   13   0.21%  grocery store
+   13   0.21%  breathtaking
+   13   0.21%  one of the best
+   13   0.21%  life support
+   13   0.21%  brilliant light
+   13   0.21%  common
+   13   0.21%  as soon as i
+   13   0.21%  beautiful there
+   13   0.21%  beings there
+   13   0.21%  traffic
+   13   0.21%  another realm
+   13   0.21%  corridor off to my
+   13   0.21%  crib
+   13   0.21%  heartbeat
+   13   0.21%  only love
+   13   0.21%  normal day
+   13   0.21%  freedom
+   13   0.21%  much fun
+   13   0.21%  more or less like
+   13   0.21%  minutes
+   13   0.21%  sadness
+   13   0.21%  reason for me to
+   13   0.21%  archangel michael
+   13   0.21%  clearing
+   13   0.21%  lie
+   13   0.21%  him again
+   13   0.21%  brown
+   13   0.21%  reports of crosswinds
+   13   0.21%  blue sky
+   13   0.21%  in the distance
+   13   0.21%  something different
+   13   0.21%  still dark
+   13   0.21%  pure bliss
+   13   0.21%  nothing to fear
+   13   0.21%  smooth
+   13   0.21%  mistake
+   13   0.21%  severe
+   13   0.21%  it was like the
+   13   0.21%  punishment
+   13   0.21%  top
+   13   0.21%  at once
+   13   0.21%  couple
+   13   0.21%  vietnam
+   13   0.21%  part of my life
+   13   0.21%  because i
+   13   0.21%  crystal clear
+   13   0.21%  figure
+   13   0.21%  gravity
+   13   0.21%  to the point where
+   13   0.21%  show
+   13   0.21%  female
+   13   0.21%  call
+   13   0.21%  horrific accident
+   13   0.21%  it was beautiful
+   13   0.21%  corner of the room
+   13   0.21%  as if he was
+   13   0.21%  coming from behind me
+   13   0.21%  in the future
+   13   0.21%  relief
+   13   0.21%  something like this
+   13   0.21%  black space
+   13   0.21%  growing
+   13   0.21%  dark void
+   13   0.21%  other place
+   13   0.21%  there was
+   13   0.21%  story
+   13   0.21%  devil
+   13   0.21%  special
+   13   0.21%  more of a feeling
+   13   0.21%  white space
+   13   0.21%  conversation
+   13   0.21%  boat
+   13   0.21%  in that
+   13   0.21%  simply
+   13   0.21%  seconds
+   13   0.21%  familiar to me
+   13   0.21%  overpowering
+   12   0.19%  good experience
+   12   0.19%  higher self
+   12   0.19%  miraculous
+   12   0.19%  lot of trauma
+   12   0.19%  little bit
+   12   0.19%  waking up from a
+   12   0.19%  such a thing as
+   12   0.19%  of a sudden
+   12   0.19%  relationship
+   12   0.19%  interesting experience
+   12   0.19%  lifetime
+   12   0.19%  gender
+   12   0.19%  embarrassing
+   12   0.19%  more of like a
+   12   0.19%  blink of an eye
+   12   0.19%  hour
+   12   0.19%  pure consciousness
+   12   0.19%  boys
+   12   0.19%  much peace
+   12   0.19%  emptiness
+   12   0.19%  details
+   12   0.19%  i was there
+   12   0.19%  ghost
+   12   0.19%  coming home
+   12   0.19%  nothing but love
+   12   0.19%  lot of things i
+   12   0.19%  essence
+   12   0.19%  light and it was
+   12   0.19%  something i had to
+   12   0.19%  knock at the door
+   12   0.19%  bad place
+   12   0.19%  well received
+   12   0.19%  refreshing
+   12   0.19%  grandma
+   12   0.19%  there was a
+   12   0.19%  during that time that
+   12   0.19%  language
+   12   0.19%  foggy
+   12   0.19%  souls
+   12   0.19%  being there
+   12   0.19%  one of the things
+   12   0.19%  wonderful experience
+   12   0.19%  happen
+   12   0.19%  nothing to become
+   12   0.19%  everybody
+   12   0.19%  another one
+   12   0.19%  tiny
+   12   0.19%  these people
+   12   0.19%  tight
+   12   0.19%  spectacular
+   12   0.19%  dry
+   12   0.19%  automatic
+   12   0.19%  profound experience
+   12   0.19%  pressure
+   12   0.19%  man there
+   12   0.19%  what i saw
+   12   0.19%  man from behind
+   12   0.19%  in my nde
+   12   0.19%  dimension
+   12   0.19%  tree of life
+   12   0.19%  please write us our
+   12   0.19%  gurney
+   12   0.19%  those
+   12   0.19%  vacation
+   12   0.19%  hair
+   12   0.19%  other way around
+   12   0.19%  full of love
+   12   0.19%  horrifying
+   12   0.19%  i mean
+   12   0.19%  inside
+   12   0.19%  still a lot of
+   12   0.19%  oxygen
+   12   0.19%  good place
+   12   0.19%  thinking
+   12   0.19%  supposed to
+   12   0.19%  lot of other things
+   12   0.19%  most amazing thing
+   12   0.19%  dying
+   12   0.19%  bookstore
+   12   0.19%  much blood
+   12   0.19%  painting
+   12   0.19%  many things that i
+   12   0.19%  as if everything was
+   12   0.19%  dusk
+   12   0.19%  bleeding
+   12   0.19%  i was trying to
+   12   0.19%  at that moment i
+   12   0.19%  compassion
+   12   0.19%  such a beautiful experience
+   12   0.19%  limit
+   12   0.19%  there was a lot
+   12   0.19%  paradise
+   12   0.19%  intentional
+   12   0.19%  i could see
+   12   0.19%  angelic
+   12   0.19%  about three or four
+   12   0.19%  vastness
+   12   0.19%  reason
+   12   0.19%  created
+   12   0.19%  coincidence
+   12   0.19%  plan
+   12   0.19%  california
+   12   0.19%  chocolate cake
+   12   0.19%  club
+   12   0.19%  resistance
+   12   0.19%  whole team of medics
+   12   0.19%  late afternoon
+   12   0.19%  guide
+   12   0.19%  also a lot of
+   12   0.19%  men
+   12   0.19%  spirit world
+   12   0.19%  doing
+   12   0.19%  hill
+   12   0.19%  helicopter
+   12   0.19%  spiritual realm
+   11   0.18%  i was kind of
+   11   0.18%  inviting
+   11   0.18%  always like
+   11   0.18%  something to do with
+   11   0.18%  nobody to talk to
+   11   0.18%  they were
+   11   0.18%  i was sitting in
+   11   0.18%  images
+   11   0.18%  group of people
+   11   0.18%  vortex
+   11   0.18%  weird because i was
+   11   0.18%  getting worse
+   11   0.18%  grandparents
+   11   0.18%  above me
+   11   0.18%  in this
+   11   0.18%  firm
+   11   0.18%  game
+   11   0.18%  business
+   11   0.18%  specific
+   11   0.18%  telling me
+   11   0.18%  desert
+   11   0.18%  it like this
+   11   0.18%  hundreds
+   11   0.18%  it looked like a
+   11   0.18%  raft
+   11   0.18%  was real
+   11   0.18%  happening to me
+   11   0.18%  flowing
+   11   0.18%  hotel
+   11   0.18%  money
+   11   0.18%  extremely painful
+   11   0.18%  outer space
+   11   0.18%  bench
+   11   0.18%  man or a woman
+   11   0.18%  about five or six
+   11   0.18%  nobody in the room
+   11   0.18%  was like
+   11   0.18%  galaxy
+   11   0.18%  brightness
+   11   0.18%  purple
+   11   0.18%  trauma
+   11   0.18%  spiritual experience
+   11   0.18%  surprise
+   11   0.18%  vehicle
+   11   0.18%  brighter than the sun
+   11   0.18%  most incredible feeling
+   11   0.18%  on fire
+   11   0.18%  absolutely real
+   11   0.18%  duty
+   11   0.18%  glow
+   11   0.18%  first grade
+   11   0.18%  planets
+   11   0.18%  immediately
+   11   0.18%  perfect peace
+   11   0.18%  being fueled because up
+   11   0.18%  i think it was
+   11   0.18%  see her
+   11   0.18%  questions
+   11   0.18%  such a physical experience
+   11   0.18%  communicated
+   11   0.18%  where
+   11   0.18%  gigantic
+   11   0.18%  i was being sucked
+   11   0.18%  colorful
+   11   0.18%  was made of pure
+   11   0.18%  point where
+   11   0.18%  covid
+   11   0.18%  i saw
+   11   0.18%  they
+   11   0.18%  black hole
+   11   0.18%  birth
+   11   0.18%  enjoyable
+   11   0.18%  almost like he was
+   11   0.18%  eternal
+   11   0.18%  three beings
+   11   0.18%  smell
+   11   0.18%  incredibly beautiful
+   11   0.18%  word
+   11   0.18%  early
+   11   0.18%  pool
+   11   0.18%  planet earth
+   11   0.18%  fog
+   11   0.18%  emotion
+   11   0.18%  beyond
+   11   0.18%  such a beautiful
+   11   0.18%  from god
+   11   0.18%  bed one night
+   11   0.18%  coming out of the
+   11   0.18%  split second
+   11   0.18%  on earth
+   11   0.18%  abuse
+   11   0.18%  europe
+   11   0.18%  disturbing
+   11   0.18%  matter of fact
+   11   0.18%  and i
+   11   0.18%  of love and light
+   11   0.18%  tube
+   11   0.18%  wow
+   11   0.18%  when i came back
+   11   0.18%  or what it was
+   11   0.18%  internal
+   11   0.18%  packed
+   11   0.18%  going to take me
+   11   0.18%  wings
+   11   0.18%  expansion
+   11   0.18%  times when i was
+   11   0.18%  buddha
+   11   0.18%  locked
+   11   0.18%  two angels
+   11   0.18%  absolutely gorgeous
+   11   0.18%  right away
+   11   0.18%  better
+   11   0.18%  field of flowers
+   11   0.18%  dark out
+   11   0.18%  years later
+   11   0.18%  lot of light
+   11   0.18%  doors
+   11   0.18%  box
+   11   0.18%  strangest thing
+   11   0.18%  written
+   11   0.18%  time for my life
+   11   0.18%  as if you were
+   11   0.18%  dramatic
+   11   0.18%  akashic records
+   11   0.18%  hilarious
+   11   0.18%  answered
+   11   0.18%  lucid dream
+   11   0.18%  most beautiful thing i
+   11   0.18%  from the moment i
+   11   0.18%  totally different
+   11   0.18%  nobody around
+   11   0.18%  one in the house
+   11   0.18%  rest
+   11   0.18%  group
+   11   0.18%  hawaii
+   11   0.18%  horrendous
+   11   0.18%  way that i could
+   11   0.18%  known
+   11   0.18%  time stood still
+   11   0.18%  where i was going
+   11   0.18%  lot of people who
+   11   0.18%  impressive
+   11   0.18%  perfect day
+   11   0.18%  amazing feeling
+   11   0.18%  moving toward me
+   11   0.18%  dead people
+   11   0.18%  medication
+   11   0.18%  good feeling
+   11   0.18%  playground
+   11   0.18%  cars
+   11   0.18%  such a state of
+   11   0.18%  telepathic communication
+   11   0.18%  part
+   11   0.18%  shown to me that
+   10   0.16%  moments
+   10   0.16%  such a profound experience
+   10   0.16%  any
+   10   0.16%  time or space
+   10   0.16%  heartbreaking
+   10   0.16%  big tree
+   10   0.16%  i was home
+   10   0.16%  worries
+   10   0.16%  obvious to me that
+   10   0.16%  and love
+   10   0.16%  supposed to be an
+   10   0.16%  brilliant white light
+   10   0.16%  within me
+   10   0.16%  about the size of
+   10   0.16%  twins
+   10   0.16%  nothing to worry about
+   10   0.16%  death experience
+   10   0.16%  we're in
+   10   0.16%  frustrating
+   10   0.16%  normal thing
+   10   0.16%  something out of a
+   10   0.16%  despair
+   10   0.16%  time there
+   10   0.16%  we live in
+   10   0.16%  beautiful thing
+   10   0.16%  completely
+   10   0.16%  right or wrong
+   10   0.16%  inside of me
+   10   0.16%  last year
+   10   0.16%  up there
+   10   0.16%  intention
+   10   0.16%  things that
+   10   0.16%  judgment whatsoever
+   10   0.16%  time to go home
+   10   0.16%  hierarchy
+   10   0.16%  super
+   10   0.16%  then that i realized
+   10   0.16%  it was like
+   10   0.16%  week
+   10   0.16%  same place
+   10   0.16%  early morning
+   10   0.16%  bigger
+   10   0.16%  order
+   10   0.16%  9/11
+   10   0.16%  much more than that
+   10   0.16%  area
+   10   0.16%  was this
+   10   0.16%  as if there were
+   10   0.16%  airport
+   10   0.16%  bible
+   10   0.16%  caused
+   10   0.16%  bow
+   10   0.16%  kidney failure
+   10   0.16%  subtle
+   10   0.16%  such a sense of
+   10   0.16%  there was like a
+   10   0.16%  look
+   10   0.16%  severe pain
+   10   0.16%  came
+   10   0.16%  meant to happen
+   10   0.16%  curious
+   10   0.16%  successful
+   10   0.16%  song
+   10   0.16%  such a warm
+   10   0.16%  physically
+   10   0.16%  set up
+   10   0.16%  place where i could
+   10   0.16%  things that i had
+   10   0.16%  total blackness
+   10   0.16%  stress
+   10   0.16%  shared death experience
+   10   0.16%  in the air
+   10   0.16%  elevator
+   10   0.16%  purpose
+   10   0.16%  womb
+   10   0.16%  breath
+   10   0.16%  when
+   10   0.16%  as though there was
+   10   0.16%  as if i didn't
+   10   0.16%  eerie
+   10   0.16%  body lying on the
+   10   0.16%  i was the only
+   10   0.16%  wide
+   10   0.16%  denial
+   10   0.16%  hate
+   10   0.16%  heaven and i was
+   10   0.16%  reunion
+   10   0.16%  impactful
+   10   0.16%  treatment
+   10   0.16%  place where there was
+   10   0.16%  position
+   10   0.16%  too early
+   10   0.16%  something going on with
+   10   0.16%  going to be this
+   10   0.16%  dynamic
+   10   0.16%  more real than this
+   10   0.16%  worship
+   10   0.16%  complications
+   10   0.16%  revealed to me
+   10   0.16%  second
+   10   0.16%  of love
+   10   0.16%  use
+   10   0.16%  hall
+   10   0.16%  idea
+   10   0.16%  these things
+   10   0.16%  run
+   10   0.16%  almost like we were
+   10   0.16%  thousands
+   10   0.16%  everything that i had
+   10   0.16%  religion
+   10   0.16%  more real
+   10   0.16%  new york city
+   10   0.16%  matter
+   10   0.16%  pulling me
+   10   0.16%  finished
+   10   0.16%  undeniable
+   10   0.16%  i was i was
+   10   0.16%  absolutely no judgment
+   10   0.16%  mind
+   10   0.16%  works
+   10   0.16%  training
+   10   0.16%  way home
+   10   0.16%  i was at the
+   10   0.16%  warmest
+   10   0.16%  anaphylactic shock
+   10   0.16%  on me
+   10   0.16%  i was watching it
+   10   0.16%  worse
+   10   0.16%  speaking
+   10   0.16%  other people that were
+   10   0.16%  light body
+   10   0.16%  while
+   10   0.16%  sleep that night
+   10   0.16%  podium
+   10   0.16%  long train
+   10   0.16%  disaster
+   10   0.16%  in the beginning
+   10   0.16%  screen
+   10   0.16%  there was a light
+   10   0.16%  something that i
+   10   0.16%  much information
+   10   0.16%  between
+   10   0.16%  it was like this
+   10   0.16%  clear that i had
+   10   0.16%  good idea
+   10   0.16%  multiplied
+   10   0.16%  neat
+   10   0.16%  fact that i was
+   10   0.16%  pulse
+   10   0.16%  pastor
+   10   0.16%  for them
+   10   0.16%  thousands and thousands of
+   10   0.16%  body on the bed
+   10   0.16%  expansive
+   10   0.16%  good hands
+   10   0.16%  every cell in my
+   10   0.16%  sense
+   10   0.16%  already
+   10   0.16%  similar to that
+   10   0.16%  when i woke up
+   10   0.16%  agony
+   10   0.16%  two beings
+   10   0.16%  family reunion
+   10   0.16%  two people sitting at
+   10   0.16%  back seat
+   10   0.16%  windy
+   10   0.16%  best feeling
+   10   0.16%  i was watching a
+   10   0.16%  giant
+   10   0.16%  response
+    9   0.15%  pure peace
+    9   0.15%  how
+    9   0.15%  incredibly bright
+    9   0.15%  own body
+    9   0.15%  more real than anything
+    9   0.15%  body and i was
+    9   0.15%  beautiful feeling
+    9   0.15%  what happened
+    9   0.15%  somebody else
+    9   0.15%  yet
+    9   0.15%  it was coming from
+    9   0.15%  it was a long
+    9   0.15%  rare
+    9   0.15%  foreign
+    9   0.15%  lot of things going
+    9   0.15%  situation where i was
+    9   0.15%  accurate
+    9   0.15%  people around me
+    9   0.15%  battle
+    9   0.15%  orb
+    9   0.15%  there for me
+    9   0.15%  confusing to me
+    9   0.15%  voice of god
+    9   0.15%  something very
+    9   0.15%  incredibly peaceful
+    9   0.15%  possible for me to
+    9   0.15%  horrible experience
+    9   0.15%  signs
+    9   0.15%  beyond words
+    9   0.15%  one of those moments
+    9   0.15%  appeared
+    9   0.15%  live
+    9   0.15%  bed and i was
+    9   0.15%  total bliss
+    9   0.15%  other people in the
+    9   0.15%  him and he was
+    9   0.15%  more about
+    9   0.15%  reflex
+    9   0.15%  about an hour after
+    9   0.15%  knowledge
+    9   0.15%  for him
+    9   0.15%  woman in the back
+    9   0.15%  to be in the
+    9   0.15%  hurting
+    9   0.15%  beautiful garden
+    9   0.15%  somewhere else
+    9   0.15%  see him
+    9   0.15%  two and a half
+    9   0.15%  when i was a
+    9   0.15%  showing me
+    9   0.15%  getting
+    9   0.15%  it went on for
+    9   0.15%  birds
+    9   0.15%  brain
+    9   0.15%  existence
+    9   0.15%  bright lights
+    9   0.15%  body in the bed
+    9   0.15%  was solid
+    9   0.15%  young woman
+    9   0.15%  holding place
+    9   0.15%  past lives
+    9   0.15%  i was part of
+    9   0.15%  it was the most
+    9   0.15%  electricity
+    9   0.15%  big thing
+    9   0.15%  three of us
+    9   0.15%  presence next to me
+    9   0.15%  presence of my creator
+    9   0.15%  two places at once
+    9   0.15%  different this time
+    9   0.15%  laughing
+    9   0.15%  extreme
+    9   0.15%  sunny
+    9   0.15%  we were going to
+    9   0.15%  talking to me
+    9   0.15%  state of being
+    9   0.15%  tremendous
+    9   0.15%  four
+    9   0.15%  service
+    9   0.15%  whole group of people
+    9   0.15%  to die
+    9   0.15%  it was such a
+    9   0.15%  separate
+    9   0.15%  door in front of
+    9   0.15%  beauty
+    9   0.15%  frequency
+    9   0.15%  brand new
+    9   0.15%  speck of light
+    9   0.15%  upside down
+    9   0.15%  deep sleep
+    9   0.15%  cocaine
+    9   0.15%  body there
+    9   0.15%  going down
+    9   0.15%  almost kind of like
+    9   0.15%  drama
+    9   0.15%  hard to
+    9   0.15%  star
+    9   0.15%  bar
+    9   0.15%  three series of pictures
+    9   0.15%  aunt
+    9   0.15%  real experience
+    9   0.15%  abusive
+    9   0.15%  roller coaster
+    9   0.15%  clothes
+    9   0.15%  medically induced coma
+    9   0.15%  young
+    9   0.15%  on the news
+    9   0.15%  something missing
+    9   0.15%  after midnight
+    9   0.15%  mid-20s
+    9   0.15%  screaming
+    9   0.15%  break
+    9   0.15%  my consciousness fragmented into
+    9   0.15%  efficient
+    9   0.15%  in the life review
+    9   0.15%  verbal communication
+    9   0.15%  perfect temperature
+    9   0.15%  june
+    9   0.15%  was that
+    9   0.15%  much pain that i
+    9   0.15%  valley
+    9   0.15%  correct
+    9   0.15%  i was no longer
+    9   0.15%  gym
+    9   0.15%  wood
+    9   0.15%  person there
+    9   0.15%  they were showing me
+    9   0.15%  skippy
+    9   0.15%  infinite love
+    9   0.15%  going to be really
+    9   0.15%  freaky
+    9   0.15%  as if all the
+    9   0.15%  such
+    9   0.15%  there was a little
+    9   0.15%  strange feeling
+    9   0.15%  up to me
+    9   0.15%  instant knowing
+    9   0.15%  back of my head
+    9   0.15%  unique
+    9   0.15%  coming down to me
+    9   0.15%  right place
+    9   0.15%  myself as a child
+    9   0.15%  time to go to
+    9   0.15%  most loving
+    9   0.15%  in my
+    9   0.15%  small room
+    9   0.15%  most beautiful thing i've
+    9   0.15%  clean
+    9   0.15%  other realm
+    9   0.15%  it was alive
+    9   0.15%  good for me
+    9   0.15%  army
+    9   0.15%  early 30s
+    9   0.15%  wavy
+    9   0.15%  filled with people
+    9   0.15%  third grade
+    9   0.15%  it was a really
+    9   0.15%  12 of them
+    9   0.15%  mission
+    9   0.15%  circular
+    9   0.15%  more people
+    9   0.15%  monday morning
+    9   0.15%  one sitting up front
+    9   0.15%  jail
+    9   0.15%  him and i said
+    9   0.15%  tar
+    9   0.15%  everyone
+    9   0.15%  strange thing
+    9   0.15%  body laying on the
+    9   0.15%  much energy
+    9   0.15%  coming in
+    9   0.15%  dark night of the
+    9   0.15%  man walking towards me
+    9   0.15%  incident
+    9   0.15%  peru
+    9   0.15%  passenger seat
+    9   0.15%  dense
+    9   0.15%  front
+    9   0.15%  divine
+    9   0.15%  stressful
+    9   0.15%  furniture
+    9   0.15%  myself from above
+    9   0.15%  somehow
+    9   0.15%  quick thing
+    9   0.15%  thin
+    9   0.15%  marvelous
+    9   0.15%  looking at the sun
+    9   0.15%  light there
+    9   0.15%  coma for a month
+    9   0.15%  in an instant
+    9   0.15%  extremely bright
+    9   0.15%  pretty amazing
+    9   0.15%  in the room
+    9   0.15%  hazy
+    9   0.15%  i was on a
+    9   0.15%  one time when i
+    9   0.15%  foreign to me
+    9   0.15%  what i would call
+    9   0.15%  i knew
+    9   0.15%  corridor off to the
+    9   0.15%  something that i would
+    9   0.15%  duality
+    9   0.15%  supermarket
+    9   0.15%  many things that were
+    9   0.15%  point where i just
+    9   0.15%  other things that happened
+    9   0.15%  coming up
+    9   0.15%  stop
+    9   0.15%  mountain
+    9   0.15%  more to life than
+    9   0.15%  was that i was
+    9   0.15%  clarity
+    9   0.15%  windows
+    9   0.15%  lots and lots of
+    9   0.15%  human body
+    9   0.15%  friday night
+    9   0.15%  dozens
+    9   0.15%  what you're saying
+    8   0.13%  20 years ago
+    8   0.13%  interesting to me
+    8   0.13%  monastery
+    8   0.13%  i was moving through
+    8   0.13%  archangel raphael
+    8   0.13%  male presence
+    8   0.13%  air force
+    8   0.13%  all the time
+    8   0.13%  tuesday
+    8   0.13%  something that was
+    8   0.13%  them again
+    8   0.13%  catholic church
+    8   0.13%  complicated
+    8   0.13%  complete peace
+    8   0.13%  cosmos
+    8   0.13%  emotions
+    8   0.13%  interesting because
+    8   0.13%  frosty
+    8   0.13%  two people
+    8   0.13%  walking
+    8   0.13%  fetal position
+    8   0.13%  much like
+    8   0.13%  three of me
+    8   0.13%  getting darker and darker
+    8   0.13%  as if i felt
+    8   0.13%  flower
+    8   0.13%  right then that i
+    8   0.13%  god's presence
+    8   0.13%  pure white light
+    8   0.13%  real trouble
+    8   0.13%  almost as if they
+    8   0.13%  at this point
+    8   0.13%  another plane
+    8   0.13%  i was connected to
+    8   0.13%  two things
+    8   0.13%  male or female
+    8   0.13%  looking into space
+    8   0.13%  sin
+    8   0.13%  old man with a
+    8   0.13%  going to be my
+    8   0.13%  divine intervention
+    8   0.13%  griffin
+    8   0.13%  impact
+    8   0.13%  more fear
+    8   0.13%  beautiful light
+    8   0.13%  only light
+    8   0.13%  way that i was
+    8   0.13%  in the shape of
+    8   0.13%  and experienced
+    8   0.13%  great shape
+    8   0.13%  edge
+    8   0.13%  as a
+    8   0.13%  concept of time
+    8   0.13%  world war ii
+    8   0.13%  absolutely nothing
+    8   0.13%  as if the second
+    8   0.13%  love that was total
+    8   0.13%  part of my soul
+    8   0.13%  whoosh
+    8   0.13%  for the first time
+    8   0.13%  important to me to
+    8   0.13%  how long his eyelashes
+    8   0.13%  and the next
+    8   0.13%  illusion
+    8   0.13%  comfort
+    8   0.13%  it was quite a
+    8   0.13%  every single minute detail
+    8   0.13%  another reality
+    8   0.13%  rocks
+    8   0.13%  hug
+    8   0.13%  touch and go for
+    8   0.13%  man and a woman
+    8   0.13%  lit up
+    8   0.13%  disorienting
+    8   0.13%  movie theater
+    8   0.13%  three days later
+    8   0.13%  clinic
+    8   0.13%  interesting because i was
+    8   0.13%  humbling experience
+    8   0.13%  realize
+    8   0.13%  veil
+    8   0.13%  explanation
+    8   0.13%  best
+    8   0.13%  nothing for me to
+    8   0.13%  entertaining
+    8   0.13%  craziest thing
+    8   0.13%  even
+    8   0.13%  your
+    8   0.13%  spaceship
+    8   0.13%  myself floating
+    8   0.13%  end of the day
+    8   0.13%  everything around me
+    8   0.13%  need for me to
+    8   0.13%  childhood
+    8   0.13%  there was a man
+    8   0.13%  columns
+    8   0.13%  beautiful and it was
+    8   0.13%  heart monitor
+    8   0.13%  totally peaceful
+    8   0.13%  probably one of the
+    8   0.13%  lot of chaos
+    8   0.13%  visible
+    8   0.13%  land
+    8   0.13%  almost as if he
+    8   0.13%  band
+    8   0.13%  big tank
+    8   0.13%  body suspended in the
+    8   0.13%  different dimension
+    8   0.13%  three little hooded guys
+    8   0.13%  much love coming from
+    8   0.13%  many colors
+    8   0.13%  they were trying to
+    8   0.13%  in the 70s
+    8   0.13%  other souls
+    8   0.13%  white robe
+    8   0.13%  more than just a
+    8   0.13%  in slow motion
+    8   0.13%  was huge
+    8   0.13%  front door
+    8   0.13%  nothing that i was
+    8   0.13%  state of
+    8   0.13%  my soul
+    8   0.13%  nothing to hold on
+    8   0.13%  it could have been
+    8   0.13%  sunset
+    8   0.13%  difficult to speak
+    8   0.13%  in the form of
+    8   0.13%  many angels
+    8   0.13%  about that time that
+    8   0.13%  me there
+    8   0.13%  knock on the door
+    8   0.13%  stage
+    8   0.13%  called a near-death experience
+    8   0.13%  as a child
+    8   0.13%  out of body experience
+    8   0.13%  middle of the day
+    8   0.13%  new year's eve
+    8   0.13%  most beautiful thing that
+    8   0.13%  computers
+    8   0.13%  little bit different
+    8   0.13%  wars
+    8   0.13%  flame
+    8   0.13%  first one
+    8   0.13%  it was real
+    8   0.13%  hell of my own
+    8   0.13%  grassy hill
+    8   0.13%  i closed my eyes
+    8   0.13%  huge group of people
+    8   0.13%  one moment where i
+    8   0.13%  stroke
+    8   0.13%  in between
+    8   0.13%  lot of stuff going
+    8   0.13%  hour and a half
+    8   0.13%  surrounding me
+    8   0.13%  two of them
+    8   0.13%  three symmetrical grids of
+    8   0.13%  pinpoint of light
+    8   0.13%  it was one of
+    8   0.13%  brothers
+    8   0.13%  as if they had
+    8   0.13%  windshield
+    8   0.13%  what i needed
+    8   0.13%  great experience
+    8   0.13%  instinct
+    8   0.13%  clear that it was
+    8   0.13%  exquisite
+    8   0.13%  one around
+    8   0.13%  aggressive
+    8   0.13%  timelessness
+    8   0.13%  absolute darkness
+    8   0.13%  times when i would
+    8   0.13%  within us
+    8   0.13%  absolutely terrifying
+    8   0.13%  people in there
+    8   0.13%  more real than real
+    8   0.13%  beyond that
+    8   0.13%  place of
+    8   0.13%  confusion
+    8   0.13%  lot of information that
+    8   0.13%  1977
+    8   0.13%  hard for me because
+    8   0.13%  real life
+    8   0.13%  almost like being in
+    8   0.13%  dark in the room
+    8   0.13%  happening simultaneously
+    8   0.13%  hopeless
+    8   0.13%  i didn't want to
+    8   0.13%  place that i was
+    8   0.13%  over and over and
+    8   0.13%  long time before i
+    8   0.13%  pink
+    8   0.13%  fight or flight mode
+    8   0.13%  going to be something
+    8   0.13%  homecoming
+    8   0.13%  it was crazy
+    8   0.13%  sand
+    8   0.13%  months
+    8   0.13%  i was looking into
+    8   0.13%  for me it was
+    8   0.13%  easter sunday
+    8   0.13%  liquid
+    8   0.13%  what was going on
+    8   0.13%  crowded
+    8   0.13%  higher
+    8   0.13%  someone else
+    8   0.13%  going on and on
+    8   0.13%  obvious to me
+    8   0.13%  and one foot in
+    8   0.13%  abrupt
+    8   0.13%  clear that i was
+    8   0.13%  i don't know
+    8   0.13%  spontaneous
+    8   0.13%  my time yet
+    8   0.13%  kid
+    8   0.13%  every day
+    8   0.13%  in love
+    8   0.13%  always a lot of
+    8   0.13%  first time i really
+    8   0.13%  vacuum
+    8   0.13%  coming out
+    8   0.13%  at the end
+    8   0.13%  toxic
+    8   0.13%  flowers everywhere
+    8   0.13%  in my body
+    8   0.13%  i was just in
+    8   0.13%  generation after generation after
+    8   0.13%  blackout
+    8   0.13%  magnificent garden
+    8   0.13%  total
+    8   0.13%  test
+    8   0.13%  other room
+    8   0.13%  something inside of me
+    8   0.13%  light in the distance
+    8   0.13%  absolutely stunning
+    8   0.13%  in the evening
+    8   0.13%  tree at the top
+    8   0.13%  during
+    8   0.13%  it as
+    8   0.13%  same feeling
+    8   0.13%  galaxies
+    8   0.13%  revealed to me that
+    8   0.13%  fresh
+    8   0.13%  times
+    8   0.13%  present
+    8   0.13%  such a relief
+    8   0.13%  absolute
+    8   0.13%  almost as if it
+    8   0.13%  then that i noticed
+    8   0.13%  universe itself
+    8   0.13%  easier
+    8   0.13%  down there
+    8   0.13%  pure energy
+    8   0.13%  your face
+    8   0.13%  nice to meet you
+    8   0.13%  inside me
+    8   0.13%  green grass
+    8   0.13%  bang
+    8   0.13%  going to be very
+    8   0.13%  blurry
+    8   0.13%  nobody else in the
+    8   0.13%  paramedics
+    8   0.13%  it was a
+    8   0.13%  period of time where
+    8   0.13%  with my eyes open
+    8   0.13%  faint
+    8   0.13%  it from above
+    8   0.13%  as if i
+    8   0.13%  books
+    8   0.13%  pond
+    8   0.13%  five minutes
+    8   0.13%  visual
+    8   0.13%  escape
+    8   0.13%  picture placed in my
+    8   0.13%  dirt
+    8   0.13%  completely gone
+    8   0.13%  way in this world
+    8   0.13%  days
+    8   0.13%  and felt
+    8   0.13%  what i can only
+    8   0.13%  force
+    8   0.13%  nebula
+    8   0.13%  six
+    8   0.13%  nasty
+    8   0.13%  little brown and white
+    8   0.13%  taking me
+    8   0.13%  gates
+    8   0.13%  cardiologist
+    8   0.13%  in my life
+    8   0.13%  difficult time
+    8   0.13%  it was just so
+    8   0.13%  pure unconditional love
+    8   0.13%  time for him to
+    8   0.13%  video
+    8   0.13%  nothing else i could
+    8   0.13%  whisper
+    8   0.13%  nothing to be afraid
+    8   0.13%  voice in my head
+    8   0.13%  sea
+    8   0.13%  delivery room
+    8   0.13%  every
+    8   0.13%  exactly what i saw
+    8   0.13%  it was dark
+    8   0.13%  things like
+    8   0.13%  and out of my
+    8   0.13%  people that i knew
+    8   0.13%  overwhelming for me
+    8   0.13%  silhouette
+    8   0.13%  another world
+    8   0.13%  space where i was
+    8   0.13%  first time i'd ever
+    8   0.13%  over in a blink
+    8   0.13%  spiritual awakening
+    8   0.13%  during covid
+    8   0.13%  garage
+    8   0.13%  at the top of
+    8   0.13%  one night
+    8   0.13%  masculine voice
+    8   0.13%  possibility

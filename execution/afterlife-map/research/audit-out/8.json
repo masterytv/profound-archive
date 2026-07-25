@@ -1,0 +1,265 @@
+{
+  "audits": [
+    {
+      "id": "no-religion-on-the-other-side",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The conversational filler 'I don't care what religion you are / what gender you are / what country you're from' — pure inclusivity boilerplate in intros and outros (3 passages)",
+        "Post-NDE comparative-religion study and book promotion ('I've written over 20 spiritual books about different religions', 'all religions have the same common roots')",
+        "Ordinary biography: Catholic upbringing, a priest visiting a dying father in a care home, a New Age spiritual search",
+        "A pastor/host summarising what NDErs in general report ('at least according to NDErs, there is no religion in heaven') rather than his own experience",
+        "General theological opinion with no anchor to the experience ('all religions are man-made', 'God's religion is love') — plausibly derived from the NDE but never stated as perceived there"
+      ],
+      "suggested_regex": "\\bno religions?\\b[^.]{0,50}\\b(?:there|here|in heaven|on the other side|over there)\\b|\\b(?:on the other side|in heaven|over there|when I (?:was dead|died))\\b[^.]{0,60}\\bno religion\\b|\\bthey (?:said|told me)\\b[^.]{0,40}\\bthere is no religion\\b",
+      "best_quote": {
+        "doc": "0R1tf931mqU",
+        "text": "When I was dead, there was no religion there. There was no gender. There were no concepts. Nothing human beings have thought of existed there."
+      }
+    },
+    {
+      "id": "lake-of-fire",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Fire and brimstone' as a label for a preaching style, not a place ('he never talked about the fire and brimstone', 'a fire and brimstone kind of guy') — the single biggest junk class",
+        "Doctrine being cited in order to be rejected: ex-pastors quoting 'as the Bible says, in the lake of fire and brimstone', hosts defining hell 'according to the Christian definition'",
+        "Explicit denials that fire was seen ('where are the fire and the devils with pitchforks? I didn't see any of that', 'I don't know if I believe in a hell fire burning... that's not what I saw')",
+        "Metaphor: 'fire insurance to avoid the pits of hell', 'love the hell out of them'",
+        "Word collisions: 'twin flames', 'his eyes of fire', a candle lit against a demon in a dream",
+        "Third-party retellings — hosts describing Santos's or Howard Storm's hell, not their own"
+      ],
+      "suggested_regex": "\\bI\\s+(?:saw|could see|was shown|fell into|found myself (?:over|above|in)|was hovering over)\\b[^.]{0,90}\\b(?:lake of fire|burning lake|sea of fire|the flames)\\b|\\b(?:lake of fire|burning lake)\\b[^.]{0,80}\\bI\\s+(?:saw|could see|was in|watched|fell)\\b",
+      "best_quote": {
+        "doc": "thHBBR7-Ve0",
+        "text": "I was shown the lake of fire. I was shown, um, just millions of people, and, and it was a ring of fire, and it was a lake, and people, you know, people were in it"
+      }
+    },
+    {
+      "id": "the-surround",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'surround/surrounding' in ordinary senses: 'eight to ten feet of water surrounding the boat', 'the endless void surrounding me', 'I was surrounded by love', 'surrounded by souls just like yours'",
+        "'Bubble' that is not the review container — a protective bubble of light around the body while the review itself was 'a line of pictures above my head'",
+        "Someone else's review seen mediumistically ('when I saw his life review... on this big screen')",
+        "A host relaying a third party's hologram-book review (Greg Rickard) rather than his own",
+        "360-degree vision reported after the review, describing the landscape and the city — a real feature, but a different one",
+        "Life reviews with no spatial staging at all, matched only on the word 'review' plus a stray 'surrounded'"
+      ],
+      "suggested_regex": "\\b(?:360[- ]?degrees?|panoramic|holograph\\w+|all around me|screens all around|inside (?:a|the|this) (?:giant )?(?:sphere|bubble|dome|ball))\\b[^.]{0,130}\\blife review\\b|\\blife review\\b[^.]{0,130}\\b(?:360[- ]?degrees?|panoramic|holograph\\w+|all around me|screens all around|inside (?:a|the|this) (?:giant )?(?:sphere|bubble|dome|ball))\\b",
+      "best_quote": {
+        "doc": "iaTDlPW52bY",
+        "text": "What I found when I went through the life review, there were screens all around me, and they were showing my life and my choices."
+      }
+    },
+    {
+      "id": "how-did-you-love",
+      "judged": 24,
+      "true_positives": 5,
+      "precision": 0.208,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'It's all about love' as podcast filler — it appears in host outros, sign-offs, channel plugs and general life advice in at least ten of the twenty-four passages, almost never attached to a review",
+        "Sermon and scripture exposition (Paul on freedom and love, Jesus on the cup of cold water and visiting prisoners)",
+        "'Random acts of kindness' in ordinary life: paying for the car behind at Burger King, teenagers inventing cancer tests, a medium's third-eye errands",
+        "Second-hand reports — a family member recounting that the experiencer 'came back saying it's all about love and relationships'",
+        "Explicitly flagged speculation ('this is just my take on it, coming back from the NDE') and generic post-NDE value shifts"
+      ],
+      "suggested_regex": "\\bhow (?:did|do) you love\\b|\\bwhat have you done for others\\b|\\b(?:life review|review of my life)\\b[^.]{0,140}\\b(?:acts? of kindness|how (?:much |well )?(?:I|you) (?:had )?loved|the love (?:I|you) gave)\\b|\\b(?:acts? of kindness|how (?:much |well )?(?:I|you) (?:had )?loved)\\b[^.]{0,140}\\b(?:life review|review of my life)\\b",
+      "best_quote": {
+        "doc": "1jyu35n9SnU",
+        "text": "he asked me, \"how do you love? what have you done for others?\" and at the same time, I saw thousands of hands turned, raised to the sky, pleading."
+      }
+    },
+    {
+      "id": "temple-and-cathedral",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Chapel' is almost entirely earthly and accounts for most of the junk: hospital chapels during surgery, a school chapel, a convent chapel, a childhood parish chapel, a chapel in the speaker's own backyard, a chemo-unit chapel",
+        "Earthly cathedrals as history or parable: the Anasazi-vs-Europe conversation with a park ranger, the three-stonemasons parable, 'this is why you have the cathedrals' cosmology",
+        "Physical religious sites visited after the event (a Fatima shrine, Rennes-le-Chateau grotto, Lily Dale's healing temple)",
+        "Channel boilerplate ('you are indeed a pastor of a great church there in Minnesota') and an interviewer asking about a chapel in a dream",
+        "One genuine NDE chapel that is nonetheless an earthly building (a Glastonbury chapel seen out-of-body), not an otherworld temple"
+      ],
+      "suggested_regex": "\\b(?:crystal temple|healing temple|temple of (?:light|knowledge|wisdom|healing)|cathedral of light)\\b|\\bI\\s+(?:saw|was taken (?:in)?to|was brought (?:in)?to|entered|went into|walked into|stood before)\\b[^.]{0,70}\\b(?:temple|cathedral)s?\\b",
+      "best_quote": {
+        "doc": "2O07zj0k4iw",
+        "text": "And I was going to go before this beautiful, magnificent cathedral-looking place. And these 12 beings appeared, and a 13th being appeared, and they were shimmering."
+      }
+    },
+    {
+      "id": "the-veil-of-forgetting",
+      "judged": 24,
+      "true_positives": 17,
+      "precision": 0.708,
+      "verdict": "solid",
+      "failure_modes": [
+        "The inverted case: being told 'you WILL remember this' as a charge to carry a message or a prophecy back (a dying friend's message to his wife, a Hajj prediction, a week-ahead job prophecy) — the regex cannot tell being made to remember from being made to forget",
+        "Ordinary forgetting in biography ('I don't remember him there' at an accident scene)",
+        "General commentary about NDErs 'taking off the veil of forgetfulness', framed through a Peter Pan analogy rather than a personal report",
+        "One restriction on perception rather than memory ('there are some things you can't see or are not allowed to know' about the being's appearance)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "K2HexYeBLzY",
+        "text": "I knew all things. I knew everything. I even had the reason for the earth years, why we had to do time on Earth. I knew that over there, but I couldn't bring it back with me."
+      }
+    },
+    {
+      "id": "inside-the-other-person",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Third-person explanations of the phenomenon rather than reports of it — a narrator on dying-brain theory ('people usually describe... they experience it from the perspective of everybody else'), and one experiencer who explicitly disclaims ('I'm probably not the best one to describe these life reviews because I was so young')",
+        "'See through the other person's eyes' used as moral advice for this life ('why do we have to wait until it's too late?')",
+        "Ordinary-life 'I was that person' (a recovering alcoholic identifying with newcomers)",
+        "Perspective shifts that are not the injured party's: seeing one's life through God's eyes, merging with a squirrel, inhabiting a past-life self",
+        "A novelist describing writing her book 'through his eyes'"
+      ],
+      "suggested_regex": "\\bI\\s+(?:was|felt|experienced|could feel|got to (?:experience|feel|see)|had to feel)\\b[^.]{0,90}\\b(?:from (?:their|his|her|everyone(?:'s)?|the other person's) (?:point of view|perspective|eyes)|as if I (?:was|were) (?:them|him|her)|inside (?:their|his|her) (?:body|mind|head|emotions)|I (?:was|became) (?:them|every person))\\b",
+      "best_quote": {
+        "doc": "5ym6hLJnDRo",
+        "text": "all the pain that I gave to them, because I experienced it from their point of view, as if I was them, juxtaposed to all of my reasons for causing their pain simultaneously."
+      }
+    },
+    {
+      "id": "city-of-light",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Revelation 21-22 exposition — the holy city, New Jerusalem, streets of gold, 'the city has no need of sun or moon' — preached or quoted rather than seen (4 passages)",
+        "Interviewer framing that names the city while asking the question ('I wonder if you could spend a couple of minutes describing the city of Heaven')",
+        "Other people's experiences: 'she didn't make it into the city of heaven', and a citation of Seneca Sodi's book '40 Days in Heaven'",
+        "Post-NDE research ('I started to Google Golden City') and generalised afterlife teaching about what environments exist there"
+      ],
+      "suggested_regex": "\\bI\\s+(?:saw|could see|entered|walked (?:in|into|through)|arrived (?:at|in)|was in|came into|traveled the streets of|looked (?:down )?(?:at|into|through))\\b[^.]{0,90}\\b(?:city of (?:light|gold)|golden city|crystal(?:line)? city|celestial city|shining city|cities of light|city below)\\b",
+      "best_quote": {
+        "doc": "Oediqi3PkUk",
+        "text": "I was in a beautiful golden city. Stunningly beautiful, big sky-rise golden buildings with opaque windows as far as you could see up in the sky."
+      }
+    },
+    {
+      "id": "the-instant",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Simultaneously' used for perspective simultaneity rather than temporal simultaneity — being in three viewpoints at once, feeling the victim's pain alongside one's own. These are real and vivid but they belong to the 'inside the other person' node, not to the claim that a whole life takes no time (4 passages)",
+        "Essayistic musing about time, Anita Moorjani and Raymond Moody, with no experience being reported",
+        "Ordinary 'split second' usage — taking a split second to answer a being, hedged speculation that 'maybe you have a week's worth of experience in a split second'",
+        "A simultaneous panoramic display the experiencer explicitly says was NOT a life review (120 videos of her family's future)",
+        "A review explicitly described as a sequential black-and-white movie, matched only on a stray 'all at once'"
+      ],
+      "suggested_regex": "\\blife review\\b[^.]{0,120}\\b(?:all at once|simultaneous(?:ly)?|no time|instantaneous|split second|in a flash|eternal now)\\b|\\b(?:all at once|simultaneous(?:ly)?|no time at all|split second|eternal now)\\b[^.]{0,120}\\b(?:my (?:whole|entire) life|birth to death|every event of my life|from birth)\\b",
+      "best_quote": {
+        "doc": "kdYRNYSQOl4",
+        "text": "The entire review appeared to last for only a split second because all the events of my entire life were shown to me simultaneously"
+      }
+    },
+    {
+      "id": "throne-room",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Scripture and sermon: Isaiah 6 at the throne, Daniel's Ancient of Days on a throne of fire, Jacob's ladder cosmology, a preacher's set-piece about Jesus getting off the throne and handing over his crown, and a hymn lyric about the river that flows from the throne of God (5 passages)",
+        "'Going to the throne room' as a metaphor for praying directly to God ('why not go right to the top')",
+        "Interviewer framing ('you were ushered eventually into the throne room of God, so we have a lot to look forward to')",
+        "Visions outside the NDE — a church-meeting vision at age 14, a dream of a small throne with Satan on it",
+        "Note on scoring: the claim deliberately counts denials ('not an old man on a throne'), so I counted denials as true when an experiencer was reasoning from their own encounter, and false when the denial was mere lifelong belief. Under a stricter reading that admits only perceived thrones, precision falls to 0.46"
+      ],
+      "suggested_regex": "\\bI\\s+(?:saw|entered|was (?:in|at|ushered into|set down in|brought (?:in)?to)|stood before|approached|fell (?:down )?before)\\b[^.]{0,70}\\bthrone(?:\\s*room)?\\b|\\bthrone(?:\\s*room)?\\b[^.]{0,50}\\b(?:in front of me|before me|I saw|I was)\\b",
+      "best_quote": {
+        "doc": "56FxiGCJGnY",
+        "text": "In what seemed like a nanosecond, I was at the opening of a huge throne room. The doors opened, and I was told to enter."
+      }
+    },
+    {
+      "id": "the-silence",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "'Dead silence' in ordinary conversation — a pause on a phone call with a mother, an audience going quiet after a talk",
+        "'Absolute stillness' used for emotional calm rather than absence of sound (a pool of peace dissolving shame) — the same account appears twice in the sample, once quoted, so it costs two of the six errors",
+        "Grief silence in an empty house after the children have gone ('the silence just absolutely screams')",
+        "Stillness meaning immobility — hiding motionless as a small lizard creature while something hunts it"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "BajThKWN0_4",
+        "text": "I was instantly impressed by the complete silence. You know, having gone from this chaotic hospital room with so many noises."
+      }
+    },
+    {
+      "id": "colors-within-the-light",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The prism used as a teaching metaphor rather than a description — white light refracting into colours as an analogy for individual souls, or for personal healing frequencies. This is the main recurring junk and it reads almost identically to the real thing (3 passages)",
+        "Rainbow-coloured lights that are not the white light: a chakra column seen during an out-of-body view of one's own body (twice, same account), a refracted rainbow floor",
+        "Host boilerplate ('some people go through the tunnel and see rainbows and, I almost said unicorns')",
+        "Colour talk about a different object entirely — the planet's coloured vortices seen from outside"
+      ],
+      "suggested_regex": "\\bcolou?rs? (?:with)?in the (?:white )?light\\b|\\b(?:white light|the light)\\b[^.]{0,90}\\bcolou?rs?\\b[^.]{0,40}\\b(?:within|inside|in it|coming (?:out|off))\\b|\\bcolou?rs? (?:that )?(?:I|we|you)?\\s?(?:have )?(?:never seen|can'?t describe|cannot describe|don'?t exist here|are not here)\\b",
+      "best_quote": {
+        "doc": "3aHSOCxbiuY",
+        "text": "It's like a waterfall of light, and it has 10 zillion colors in it of every hue and tone, and all these colors, and they're all white, and they're all colored all at the same time."
+      }
+    },
+    {
+      "id": "shadow-figures",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.542,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary-life shadow sightings unconnected to any near-death episode — sleep paralysis from age five, a bedroom entity the husband also sees, a haunted house, a wife glimpsing a figure after a cruise, ongoing post-NDE sightings of three-foot shadow beings (6 passages, the dominant error class)",
+        "Hooded figures that are luminous, not dark — Christ with wounds, and 'a hooded figure that had only light for a face'",
+        "General mediumship commentary about apparitions and 'the shadow people' with no scene attached",
+        "Shadow people inside a prophetic vision of earthly crowds — perceived during the experience but not the silhouette at the edge of it"
+      ],
+      "suggested_regex": "\\b(?:shadow (?:figure|being|people|person)s?|humanoid shadows?|dark (?:figures?|shapes?|silhouettes?))\\b[^.]{0,140}\\b(?:tunnel|the light|the opening|my body|other side|realm|wormhole|out of body)\\b|\\b(?:tunnel|the light|the opening|left my body|other side|realm)\\b[^.]{0,140}\\b(?:shadow (?:figure|being|people|person)s?|humanoid shadows?|dark (?:figures?|shapes?|silhouettes?))\\b",
+      "best_quote": {
+        "doc": "yk8jRt2shnU",
+        "text": "I saw a shadow figure, like a silhouette of a man in a trench coat or a day coat, a long day coat. And immediately said, oh, that's, that's my grandpa Joe"
+      }
+    },
+    {
+      "id": "the-door",
+      "judged": 24,
+      "true_positives": 2,
+      "precision": 0.083,
+      "verdict": "reject",
+      "failure_modes": [
+        "The word 'door' is overwhelmingly metaphorical in this corpus: 'the door never shut again' for ongoing psychic access, 'they kicked the door in from the other side', 'the door to voluntary death slammed shut', 'death is only a door', 'a bird in a cage with the door clapped shut', spirit teachers finding 'the door firmly shut with a Do Not Disturb sign' (9 passages)",
+        "Ordinary and medical doors: a husband walking out of the hospital room, ambulance doors closing, a stepdaughter's bedroom door, a train's automatic doors trapping a coat, a bank lobby door while homeless, a Ring-camera front door",
+        "Analogy for dying — 'shutting the house down, locking the doors, turning off the lights'",
+        "Bedroom-terror doors: a closet door a devil figure steps out of, a door slamming shut in a dream with a demonic face",
+        "'Doorway to the other side' used as an abstract threshold by someone who says he never went beyond it",
+        "Not one of the twenty-four passages showed the claimed object — a big white solitary door at the end of a room, with the condition stated at it. The two genuine otherworld doors were a bright door boys entered in a temple vision and a door admitting swarms of healing beings. best_quote left null so the map does not print a quote for a feature this sample cannot support."
+      ],
+      "suggested_regex": null,
+      "best_quote": null
+    }
+  ]
+}

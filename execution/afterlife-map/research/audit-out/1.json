@@ -1,0 +1,268 @@
+{
+  "audits": [
+    {
+      "id": "the-tunnel",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "Meta-commentary about NDEs in general rather than the speaker's own transit: 'Not everybody goes through the tunnel', 'only 30 percent have tunnel experiences' (2 of 24)",
+        "Explicit denials that the speaker had a tunnel: 'I did not have the full-blown experience where you go through the tunnel'",
+        "Workshop-leader summaries of OTHER people's accounts: 'what they have in common is they go through a tunnel'",
+        "Pure metaphor from ordinary life: 'sent me into this like PTSD tunnel'",
+        "A narrow gap between crowding souls described in passing as 'this little tunnel between them' — not the transit passage"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "rsqAYFYt7j8",
+        "text": "I immediately felt myself go into the tunnel, and it was very black, very dark in the tunnel. I wasn't scared at all. I was moving very fast."
+      }
+    },
+    {
+      "id": "love-in-the-light",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.5417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Unconditional love' used as doctrine or cosmology rather than perceived substance: 'the active ingredient in any religion is the unconditional love of God', 'the Devan is the density closest to pure love' (4 of 24)",
+        "Recurring podcast intro montage — the identical 'Round Trip Death' cold-open clip ('absolute love and peace... Welcome to Roundtrip Death, everybody') appears verbatim across many separate docs and inflates the match count (2 of 24 here, 3 of 24 in the-place-that-is-home)",
+        "Third-person generalisations about what NDErs feel: 'it was the unconditional love they felt for themselves that transformed them'",
+        "Ordinary-life or post-NDE love (a hug by candlelight, philosophy about the soul being 'pure light through pure love' followed by a cancer diagnosis)",
+        "Love as the CONTENT of a spoken message ('we are unconditionally loved') rather than as a perceived medium"
+      ],
+      "suggested_regex": "(light|it) (was|is) (pure |unconditional |absolute |just |literally )*love|love (poured|radiated|emanated|streamed|washed|flowed|came) (off|from|out of|over|through)|(bathed|immersed|enveloped|engulfed|saturated|infused|filled|flooded) (in|with) ([a-z]+ ){0,2}love",
+      "best_quote": {
+        "doc": "VD0Pd7twFBY",
+        "text": "I was only in light of eternity, of eternity, of eternity, all love, pure love, in me, through me, around me, all forever, and again, the most loving light you can imagine."
+      }
+    },
+    {
+      "id": "the-place-that-is-home",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.5417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary earthly home: 'I feel like I'm home when I'm in nature', 'that's why home feels like home' (colours we wear), 'I didn't feel unsafe in my home, I grew up with loving parents' (4 of 24)",
+        "The recurring 'Round Trip Death' channel intro montage, identical text in three separate docs ('I'm back home again... Welcome to Roundtrip Death, everybody')",
+        "Post-NDE aftermath: 'I figured out where to feel at home' after a yoga teacher training",
+        "Someone else's homecoming — a grandfather 'going back home' at his deathbed; a figure in a vision thinking 'I'm at my house' about a white two-storey house",
+        "Closing generalisations that death in general 'felt like coming home' rather than an arrival perceived in the experience"
+      ],
+      "suggested_regex": "i'?m (finally |actually |really |back )?home|i knew (i was|it was|that i was)[^.]{0,30}\\bhome\\b|welcome home|felt (like )?(i was |i had come |i'd come )home|my (real|true|eternal) home|this (is|was) home",
+      "best_quote": {
+        "doc": "_ZCHx9NND5g",
+        "text": "I remember thinking, you know, this is home. This is where I belong. I don't want to ever go back wherever I was before, because this was too good."
+      }
+    },
+    {
+      "id": "light-beings",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.5417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Researcher / host summaries of the NDE model: 'The research said that you go down a tunnel, you meet a being of light'; a Moody-style 'they tell us they may meet a being of light' (2 of 24)",
+        "'We are light beings' as philosophy about humans in general, answered to an interview question — no being perceived",
+        "Experiences outside the NDE: a DMT trip, an Egypt temple tour 'connecting with light beings', a medium telling the speaker they are 'a strong light being', light beings visiting years later during a divorce (4 of 24)",
+        "A film plot (The Astral City) in which 'beings of light would show up'",
+        "Explicit negation: 'It was neither Jesus, nor an angel, nor a luminous being, but a simple man in a tunic'",
+        "Channel/website plug about 'advanced light beings' and ET civilisations"
+      ],
+      "suggested_regex": "(i|we) (saw|met|was met by|was greeted by|found myself (in front of|before)|looked (up|over) at)[^.]{0,60}(beings? of light|light beings?|balls? of light|orbs?|luminous being)|(beings? of light|light beings?|balls? of light|luminous being)[^.]{0,40}(appeared|approached|emerged|came toward|surrounded|greeted|took) me",
+      "best_quote": {
+        "doc": "g0F_OX1JpOc",
+        "text": "And by angel, I mean, just this being of light. And not even in human form, just like this whirling ball of white energy, of white light."
+      }
+    },
+    {
+      "id": "home",
+      "judged": 24,
+      "true_positives": 22,
+      "precision": 0.9167,
+      "verdict": "solid",
+      "failure_modes": [
+        "Ordinary-life home inside caregiving biography: 'he'd be in hospital a week and then we'd bring him home'",
+        "A 'welcome home' received in deep meditation rather than in the near-death event itself (the narrator retroactively frames it as an end-of-life experience)"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "Wlavsx0DX6o",
+        "text": "And they all said in a giant chorus, welcome home, Andy. And I said out loud, I'm home at last. I'm home."
+      }
+    },
+    {
+      "id": "the-other-side",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.3333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Channel and organisation boilerplate — 'Spirit Travels, where we narrate the experiences of people who have glimpsed the other side of death', the IANDS NDE Radio show open, an IANDS event promo (3 of 24)",
+        "Interviewer speech: questions and study citations ('20% of cardiac arrest patients remember something from the other side') (3 of 24)",
+        "General teaching or speculation about what happens to everyone when they cross over (3 of 24), including one flat denial: 'there is no other side'",
+        "Post-NDE mediumship — 'I do get communication from the other side' — and aftermath scenes where a relative doubts the speaker went there",
+        "Purely spatial ordinary usage: walking to the other side of an island; a war/dream scene 'when I went to the other side and stepped on a grenade'",
+        "The phrase is so tradition-neutral that it is also the corpus's most common HOST vocabulary, which is what drives the 998-account match count"
+      ],
+      "suggested_regex": "i (was|were) (on|over) (on )?the other side|i (went|got|crossed over|travel(l)?ed|made it) to the other side|when i was on the other side|(i|we) (came|come) back from the other side|(my|the) (time|experience) on the other side",
+      "best_quote": {
+        "doc": "mTtGgXi4l9c",
+        "text": "I got to see it in action, in real-life application on the other side of death. Trust me, there is no such thing as death."
+      }
+    },
+    {
+      "id": "the-levels",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Levels/layers' in senses that have nothing to do with a tiered afterlife: levels of consciousness, levels of meditation and belief, layers of brain processing, layers of meaning in the Bible, 'higher levels of degrees', 'it amazes me on so many levels', 'so many different layers and depths' to my story (10 of 24 — the dominant failure)",
+        "Belief and speculation rather than perception: 'I do believe there are different levels, different spots you can go to', 'I still believe there is different levels over there' (3 of 24)",
+        "Doctrine delivered as a message about souls progressing to higher dimensions over lifetimes, not a structure the narrator saw",
+        "'Levels' meaning generations of family in a life review",
+        "Tiered structure reported from nightly spirit travel rather than from the near-death event"
+      ],
+      "suggested_regex": "(higher|lower|upper|next|second|third|fourth|other) (realm|plane|sphere|level|dimension)s?\\b|(realms?|planes?|spheres?|levels?|dimensions?) (above|below|beneath) (us|me|that|this)|through (two|three|four|five|several|multiple|different) (realms?|planes?|levels?|layers?|spheres?)|layers of (the )?spirit world",
+      "best_quote": {
+        "doc": "OJJrkopaens",
+        "text": "He came into my room and he conducted me through four different realms of life after death."
+      }
+    },
+    {
+      "id": "the-refusal-to-return",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.7917,
+      "verdict": "solid",
+      "failure_modes": [
+        "Inverted matches — the same vocabulary used for the OPPOSITE wish: 'Please let me go back, I begged... I was the first soul to beg to go back instead of begging to stay'; 'I begged God not to die' (2 of 24)",
+        "Ordinary-life reluctance: not wanting to leave family when a husband insisted on moving house; devotees who 'didn't ever want to leave' a guru's ashram",
+        "Interviewer summarising other guests: 'a lot of our guests have said I did not want to return... but in your case that was not the situation'",
+        "Minor nuance, not counted as an error: one true match refuses to return because of remembered PAIN rather than the pull of the place, against the claim's stated reason"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "zTsrlEfrTXU",
+        "text": "And I wanted to stay there. I wanted to stay there because I knew I was home."
+      }
+    },
+    {
+      "id": "angels",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Word-share with ordinary life: Victoria's Secret Angels and their lingerie wings; church statues of 'saints and angels and wings and Buddhas'; a nursery joke that 'there were angels in her room' (3 of 24)",
+        "Metaphor: 'it was like some divine angel paramedic came down and said, Okay, Bill, clear'",
+        "Explicit denials and non-identifications: 'you hear kids say I saw an angel... I never had any of that'; 'I can't tell you if they were two men, two women, two angels, two demons' (2 of 24)",
+        "Angels seen by SOMEONE ELSE (a visitor who 'observed black and white angels fighting over my bed') or in a later dream / post-NDE life guidance (3 of 24)",
+        "Interviewer questions that name angels while the answer describes clouds and light instead",
+        "'Angelic' used as an adjective for the atmosphere of the realm, with no being present"
+      ],
+      "suggested_regex": "(i|we) (saw|could see|met|was met by|was greeted by|was surrounded by|felt)[^.]{0,50}\\bangels?\\b|\\bangels?\\b[^.]{0,40}(took me|came for me|appeared to me|stood (at|by|in front)|carried me|lifted me|enfolded|escorted)",
+      "best_quote": {
+        "doc": "WXTCMvLFa-k",
+        "text": "I could see that they were just humongous, and they would take one wing and they would fan that wing out, and then they would take the next wing and they would fan it out."
+      }
+    },
+    {
+      "id": "the-void",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.7917,
+      "verdict": "solid",
+      "failure_modes": [
+        "Interviewer speech and book plugs that name the void without describing it ('explaining the different levels of consciousness and where you went into the void') (2 of 24)",
+        "Second-person teaching about what happens to the dead generally: 'You may go into the void. After death you may end up quite stuck in this void'",
+        "Aftermath reflection that references the void only to say it removed the speaker's fear of death — no description of the place",
+        "Ordinary-life darkness: a man walking off into the dark outside a hotel bar"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "tjOEB4oSTT4",
+        "text": "It's black, but it isn't black. Everything that has ever existed is there, but nothing is there."
+      }
+    },
+    {
+      "id": "the-green-country",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Green' as the colour of a being, a light or an energy rather than a landscape: an emerald-green light being, Archangel Raphael's green healing energy, Jesus radiating emerald green in a therapy room (3 of 24)",
+        "A person named Meadow Walker matched on the landscape vocabulary — pure word collision",
+        "Ordinary earthly fields: a police officer parked beside an open field of tall grass before the incident; enhanced-but-explicitly-alive perception of 'a simple coconut tree and green grass' where the narrator says 'so I wasn't dead'",
+        "A vision of Earth's restored FUTURE with lush green forests, narrated in the third person",
+        "A lush green garden seen in a dream after hospital discharge, which the narrator labels a dream",
+        "Other planets and biospheres remembered from past lives ('the sky was greenish, the grass was sort of blue')"
+      ],
+      "suggested_regex": "grass(y)? (field|hill|meadow|land|plain)|(rolling|lush|open|vast|endless|beautiful) (green |grassy )?(hills?|meadows?|fields?|countryside|pastures?|valleys?)|green (grass|meadow|field|hills|pasture)|meadows? (of|with|and|that|was|there)",
+      "best_quote": {
+        "doc": "ZuE8dHCxhj8",
+        "text": "I come out onto a mountain ledge, and I'm overlooking the most beautiful, serene, three-tiered mountain meadow, earth-like, but not earth"
+      }
+    },
+    {
+      "id": "hedged-naming",
+      "judged": 24,
+      "true_positives": 17,
+      "precision": 0.7083,
+      "verdict": "solid",
+      "failure_modes": [
+        "The hedge attached to ordinary-life content instead of to something encountered: 'I'll call it a traumatic childhood', 'my little Johnny Appleseed ways', 'the best way to describe it is my throat closing up' (a drug reaction), 'I would call it going into the void' applied to mountaineering (4 of 24)",
+        "The hedge used inside general teaching about who greets you, not about a perceived thing",
+        "The hedge attached to non-NDE spiritual events: a kundalini awakening during recovery, a wave of love felt while walking down a sidewalk",
+        "Note on scope: the hedge also fires often on the vacated body seen from outside ('like a rag doll', 'a sack of meat'), which I counted as true since it is perceived during the experience — if the map means the hedge only for unnameable places and beings, those two would drop precision to about 0.63"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "JK0W0rYhmHE",
+        "text": "I would like to say the flowers are made of crystals and things like this only because that's the closest way to describe it in a human context"
+      }
+    },
+    {
+      "id": "the-named-one-in-the-light",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.5417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Interviewer speech that names Jesus while framing a question ('Over and over, you talked about this was Jesus that saved you') (2 of 24)",
+        "Retellings of other people's famous NDEs: Howard Storm, the 'Heaven Is for Real' boy, a host narrating a guest's account in the third person ('she said, there was Jesus floating up 30 feet in the air') (3 of 24)",
+        "Scriptural and theological exposition with no encounter described: 'Moses gave us 613 laws, Jesus said I am the fulfillment of the law'",
+        "Explicit non-identification, which is the exact opposite of the claim: 'I truly can't say it was God. I truly can't say it was Jesus'; 'people ask me if that white light was Jesus — I don't know' (2 of 24)",
+        "The ABSENCE of the figure, in hell accounts: 'I was without the presence of Jesus Christ. I felt he was absent'",
+        "An ordinary-life church visit where the speaker felt 'the presence of Jesus' in a pew weeks after the accident"
+      ],
+      "suggested_regex": "i (saw|met|knew it was|recognized|was (held|embraced|greeted|met|comforted) by|looked into the eyes of)[^.]{0,40}(jesus|christ|buddha|krishna|allah|the great spirit)|(jesus|christ)[^.]{0,30}(was standing|stood (there|in front)|came (over|to|toward) me|held out his hand|took my hand|reached out|said to me)",
+      "best_quote": {
+        "doc": "NEFE-ZeHtGg",
+        "text": "a man showed up, and he stood in front of me, and I knew immediately that it was Jesus. He had a white robe on"
+      }
+    },
+    {
+      "id": "the-home",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "Ordinary earthly home: 'when I got home, first day I was home, my daughter comes over'; 'I haven't found a church that feels like home' (2 of 24)",
+        "'Homecoming' as parable or prophecy about humanity — 'this will be the prodigal's return' — rather than the narrator's own arrival",
+        "Someone ELSE's crossing described as a homecoming: a dying friend taken up through a golden tunnel; souls watched being met after violent deaths (2 of 24)",
+        "General between-lives metaphysics: 'lives I've chosen to experience from the other side when I'm home'"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "i6KdwZN0f_4",
+        "text": "the only word that comes close to what I was experiencing is I was home. It's like I was home. It's like it felt so welcoming and so familiar."
+      }
+    }
+  ]
+}

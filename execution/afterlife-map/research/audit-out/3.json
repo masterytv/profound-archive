@@ -1,0 +1,239 @@
+{
+  "audits": [
+    {
+      "id": "home",
+      "judged": 24,
+      "true_positives": 23,
+      "precision": 0.958,
+      "verdict": "solid",
+      "failure_modes": [
+        "One passage used 'home' in the ordinary domestic sense — bringing a dying relative home from the emergency room (P18, doc=YtaS1Zyrxnw)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "8hOabMYEGEo",
+        "text": "I knew I was home. I knew it. It's very unique because I, it, it felt like I was waking up from a nightmare. And the nightmare was my life. Was Earth."
+      }
+    },
+    {
+      "id": "the-forced-return",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.458,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary-life uses of 'send/sent back': sent back home as a child, transferred back to another hospital, fear of not being sent back home from the psych ward (P2, P12, P22).",
+        "Passages that describe the OPPOSITE — an explicit choice to return ('I was given my way', 'I was given a choice whether to come back or to stay in heaven') (P3, P14).",
+        "Third-party and generic speculation: 'people say I chose to stay and they still sent me back', a medium saying a mother 'sent him back', general theorising that being told to go back is still a soul choice (P6, P7, P15, P21).",
+        "Physical propulsion at the START of the event rather than the return — lightning throwing the body backwards like a ragdoll (P5).",
+        "Involuntary movement INSIDE the afterlife (pushed away from beings, refused passage over a boundary) rather than return to the body (P10, P16); a sleep-paralysis episode where the experiencer asked to be returned (P20)."
+      ],
+      "suggested_regex": "\\b(?:sent|pushed|shoved|thrust|threw|thrown|catapulted|shot|propelled|forced)\\s+(?:me\\s+)?back(?:wards)?\\s+(?:in(?:to)?|to)\\s+(?:my|the)\\s+body\\b|\\b(?:wasn'?t|was not|never)\\s+given\\s+a\\s+choice\\b[^.]{0,80}\\b(?:go|going|come|coming)\\s+back\\b|\\byou\\s+(?:must|have to|cannot stay)\\b[^.]{0,40}\\bgo\\s+back\\b",
+      "best_quote": {
+        "doc": "qUKjcFv_e0k",
+        "text": "I felt two invisible hands on my chest, thrust me backwards and I never got through the door."
+      }
+    },
+    {
+      "id": "the-nothingness",
+      "judged": 24,
+      "true_positives": 4,
+      "precision": 0.167,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The claim explicitly excludes the peaceful/full void, but that is what most of the on-topic matches actually describe — 'nothingness, but it was everything all at the same time', 'the nothingness was not empty, it was completely filled with the presence of the living God', 'limbo state of nothingness and just calm, peace, serenity' (P9, P10, P11, P15, P16, P17, P22). Counting those as hits would raise precision to 11/24 = 0.46, but they are a different place sharing a word.",
+        "Ordinary idiom: 'I got annihilated by an 18-wheeler', 'I pounded it into oblivion', 'it falls into oblivion' as a figure of speech for being forgotten (P1, P6, P12).",
+        "'Cease to exist' used about the Soviet Union, the human species, the planet, and as generic reassurance that souls are eternal (P13, P19, P20, P21, P23).",
+        "Generic speculation about what people fear about death (P5); a simile for being unseen during an OBE, 'as if I had ceased to exist' (P7); a metaphor inside a healing vision, 'vanished into nothingness' (P4); a split-second blackout on collapsing (P14); and a passage that DENIES annihilation, 'I was not annihilated' (P18)."
+      ],
+      "suggested_regex": "\\b(?:vortex|abyss|pit|place|state|realm)\\s+of\\s+(?:nothingness|non-?existence)\\b|\\bfear\\s+of\\s+non-?existence\\b|\\b(?:I|you)\\s+would\\s+never\\s+(?:exist|have\\s+existed|be\\s+found|be\\s+heard|experience\\s+anything)\\b",
+      "best_quote": {
+        "doc": "5NhVMCH80IE",
+        "text": "It is a bottomless abyss where there's no end to it. It is like a giant vortex of nothingness that if a person would go in there, they'd be super conscious, conscious"
+      }
+    },
+    {
+      "id": "the-unfinished-work",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Work to do' / 'job to do' is a dead-common English idiom: doctors having 'work to do on my physical body' during the OBE, a road-rage anecdote, a rant about the state of the world, a third-person parable about John forgiving his father (P7, P11, P16, P22).",
+        "General religious exhortation to the audience — 'we have a job to do here on earth... to give our testimony' — with no NDE encounter attached (P9, P12, P15).",
+        "Someone else's NDE retold by a narrator ('Lou still had a lot of work to do back on earth'), and generalisations about what NDErs report (P1, P15).",
+        "The WORK OF OTHER BEINGS rather than the experiencer's return mandate — deceased sons shouting 'we have very important work to do', a hell-realm figure assigning forced labour ('you're mine now, and you've got a job to do') (P4, P19, P20).",
+        "Post-NDE career/mission talk with no being stating it (walk-in theory, leaving a job, a dream vision) (P2, P8, P14)."
+      ],
+      "suggested_regex": "\\b(?:you|I)\\s+(?:still\\s+)?(?:have|had|'ve|ve|got|have got)\\s+(?:more\\s+|a\\s+lot\\s+of\\s+)?(?:work|homework|a\\s+mission|a\\s+purpose|business)\\s+to\\s+(?:do|finish)\\b[^.]{0,140}\\b(?:go\\s+back|come\\s+back|send\\s+\\w+\\s+back|not\\s+your\\s+time|return(?:ed)?|not\\s+(?:yet|now))\\b",
+      "best_quote": {
+        "doc": "-PNYA4cso1g",
+        "text": "And, and it said, and I wrote it down so I never forget it. It says, \"No, not now. You have more work to do.\""
+      }
+    },
+    {
+      "id": "rescue-cry",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Cried out to God' in ordinary life with no experience following: praying in a hospital bed, at the moment of a car impact, while holding a gun, during addiction struggles, in a bedroom at rock bottom (P2, P5, P8, P9, P13, P15, P16, P19, P21).",
+        "Physically shouting for help after an accident ('I called for help' from a culvert) — the same words, no other world (P1).",
+        "Post-NDE integration prayers, and the interviewer/experiencer using 'God help me' as a rhetorical aside (P7, P14, P24).",
+        "Someone ELSE crying out — a soul observed inside a vision, and a bystander scenario where the cry is to a person in the room (P12, P22).",
+        "Note also that one on-topic passage is a cry from a hell realm that is explicitly NOT answered (P10) — the regex cannot distinguish answered from unanswered cries."
+      ],
+      "suggested_regex": "\\b(?:cried|screamed|called|shouted)\\s+out\\b[^.]{0,100}\\b(?:God|Jesus|Lord)\\b[^.]{0,200}\\b(?:a\\s+(?:tiny|little)\\s+light|pin-?point\\s+of\\s+light|speck\\s+of\\s+light|a\\s+(?:giant|huge)\\s+hand|an\\s+angel\\s+appeared|lifted\\s+me|pulled\\s+me\\s+out|opened\\s+a\\s+portal)\\b",
+      "best_quote": {
+        "doc": "zew3avMaz3o",
+        "text": "To my surprise, a tiny little light like a star appeared in that darkness and it got very bright very fast and it came over me right in front of me."
+      }
+    },
+    {
+      "id": "the-source",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Source' overwhelmingly appears as a name-stack in general spiritual teaching rather than as something perceived — 'God, Source, the universe, whatever name you want to plug in', 'we all come from the same source', 'we are made of source energy' (P5, P7, P11, P12, P13, P14, P17, P20, P22).",
+        "Interviewer clarifications and host boilerplate that recite the name list ('some people could call it God, people could call it Source'; 'she reports source god provided her with...') (P15, P23).",
+        "New-age commentary unconnected to any experience — scalar/portal theory, channelled explanations of how manifestation works, God-as-learner metaphysics (P10, P16, P22).",
+        "Someone else's NDE summarised by a narrator ('she felt cradled in the heart of the source of all love') (P9).",
+        "Post-experience after-effects rather than the experience ('experiencing my oneness with the source 24/7 while driving my car') (P2), and a passage where 'Source God' is only an aside while the place described is hell (P3)."
+      ],
+      "suggested_regex": "\\b(?:I|my)\\b[^.]{0,110}\\bsource\\s+of\\s+all\\s+(?:creation|life|love|being|light)\\b",
+      "best_quote": {
+        "doc": "T5giGHYv4kU",
+        "text": "I just knew straight away that this was the source of all creation that I was looking at. This was God, you know, this was, this is where it all comes from."
+      }
+    },
+    {
+      "id": "more-real-than-real",
+      "judged": 24,
+      "true_positives": 17,
+      "precision": 0.708,
+      "verdict": "solid",
+      "failure_modes": [
+        "Interviewers and hosts supplying the formulation themselves, or generalising about the corpus — 'what I hear from people that have had NDEs is that the experience feels more real than reality', 'they will tell you it was more real than reality' (P1, P2, P4, P9).",
+        "Channel boilerplate summarising a famous case in third person (Eben Alexander's 'realm more real than this earthly one') (P6).",
+        "A spouse describing the experiencer's NDE rather than the experiencer (P21).",
+        "One doctrinal use about the supernatural/demonic world in general — footsteps in the roof, 'the supernatural world is realer than this world' — not the NDE place (P11)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "Fm57RQqLYX8",
+        "text": "It was more real than this reality and it had more color. It was more vivid than this reality and more beautiful and it was just so crisp"
+      }
+    },
+    {
+      "id": "god-in-the-light",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'God' is the single most common word in the corpus outside the experience: thanking God for a song on the radio, scripture recall in a jail cell, an etymology riff on 'hue/God', a suicide-hotline phone call (P3, P4, P5, P7).",
+        "'The voice of God' meaning intuition, meditation practice, or wisdom in daily life rather than a being encountered (P2, P11, P12 in part, P19).",
+        "Host and channel boilerplate — the IANDS radio intro, an ASMR narrator's opening — which recite 'the voice of God' or 'I died and met God' (P14, P18, P21).",
+        "Generalisations about NDErs as a class ('we feel special because we met God') and commentary on someone else's experience ('that's how HE saw God') (P1, P6).",
+        "Passages that DENY the identification: 'I don't believe it was the voice of God... it was my higher self', 'nobody introduced themselves as Jesus, nobody had a nametag' (P22, P8), plus interviewer questions about aftermath rather than encounter (P20)."
+      ],
+      "suggested_regex": "\\b(?:I|i)\\s+(?:immediately\\s+|instinctively\\s+|instantly\\s+)?(?:knew|realized|realised|understood|saw|met|stood\\s+before|was\\s+in\\s+the\\s+presence\\s+of)\\b[^.]{0,60}\\b(?:it\\s+was\\s+God|this\\s+was\\s+God|God'?s?\\s+(?:face|presence)|the\\s+light\\s+was\\s+God)\\b",
+      "best_quote": {
+        "doc": "hmXS_nlfL28",
+        "text": "And like any good atheist that stands before the light, I immediately knew it was God."
+      }
+    },
+    {
+      "id": "jesus-in-the-light",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Scripture quotation and Bible discussion — 'Blessed are the meek', 'what Jesus said', sermon-style recall from childhood church (P1, P10, P13, P20).",
+        "Host and channel intros that name the encounter before the account begins ('he met jesus face to face', 'his favourite vision was when he met Jesus twice', a rhetorical list of what matters most about NDEs) (P3, P7, P9).",
+        "A large recurring class of NEGATIONS the regex reads as hits: 'I can't say I saw Jesus', 'I truly can't say it was Jesus', 'Nothing inside me thought it was Jesus, God, Peter, Paul. He was nameless' (P6, P11, P22).",
+        "Third-party identification of an unnamed figure — a father telling the experiencer 'you probably met Jesus or God himself' when she never looked at him (P14); an ambiguous waking-room voice the experiencer cannot attribute (P15)."
+      ],
+      "suggested_regex": "\\b(?:Jesus|Christ)\\s+(?:said\\s+to\\s+me|told\\s+me|spoke\\s+to\\s+me|walked\\s+up|was\\s+(?:there|beside\\s+me|now\\s+beside\\s+me)|held\\s+out|reached\\s+out|took\\s+my\\s+hand)\\b|\\b(?:I|i)\\s+(?:saw|met|stood\\s+(?:in\\s+front\\s+of|before)|was\\s+standing\\s+(?:in\\s+front\\s+of|before)|held\\s+on\\s+to|was\\s+holding)\\s+(?:\\w+\\s+){0,3}(?:Jesus|Christ)\\b",
+      "best_quote": {
+        "doc": "q8d-3GD2i1A",
+        "text": "Then Jesus walked up to me. He was tall and so beautiful. His hair was dark and wavy and very long down to his waist. His skin was dark and his eyes were a warm liquid brown."
+      }
+    },
+    {
+      "id": "the-choice",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "Negations that the regex reads as hits — the forced-return cases: 'I was not given a choice to stay or go back, I was just pushed back into my body', 'I didn't make the choice to come back' (P5, P10).",
+        "General metaphysical teaching about how transitions work for everyone — 'we always have the choice to come back', 'around this age you can get a choice to leave' (P1, P17).",
+        "Interviewer questions containing the words ('did you want to go back to it?', 'did you want to return?') where the answer describes attachment, not an offer (P8, P23)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "e09Z6lv-0Uo",
+        "text": "they did let me know the choice was mine and I could decide what I wanted to do."
+      }
+    },
+    {
+      "id": "the-space",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Space' as emotional or mental state — 'it's okay to stay in that space and be honest with spirit', 'my kids were in the space I was in when my mother passed away' (P1, P18).",
+        "Ordinary physical rooms and buildings — 'walking into a space and feeling a strong energy', journaling 'getting that into a space where it's in print' (P6, P12).",
+        "Cosmology and perception theory using 'space' in the physics sense — the edge of the universe, convergent focus, light appearing as the space between your hands (P7, P11, P17).",
+        "Metaphysical teaching about pre-incarnation ('that is the space... before we individuated from the Godhead') and about reconnecting to 'that space we come in with' (P10, P20).",
+        "OBE descriptions of the PHYSICAL setting rather than the other world — the hospital corner feeling bigger, 'the space was the same as what I saw in the physical body' (P22, P23); and a breathwork session describing a 'cube-like space' representing the lungs (P9)."
+      ],
+      "suggested_regex": "\\b(?:I\\s+was\\s+in|found\\s+myself\\s+in|ended\\s+up\\s+in|pulled\\s+into|moved?\\s+into|went\\s+(?:in)?to)\\s+(?:this|a|that)\\s+(?:\\w+\\s+){0,2}space\\b",
+      "best_quote": {
+        "doc": "bw3IfMcy7bo",
+        "text": "I ended up in more of a space space. I'm not standing on grass and I'm not out into the woods and there aren't uh streets paved with gold. But where I'm at is in a space"
+      }
+    },
+    {
+      "id": "the-distant-light",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.792,
+      "verdict": "solid",
+      "failure_modes": [
+        "Explicit negations: 'no tunnels, no light at the end of the tunnel, no spirits, nothing'; a spiritist describing the expected script then confirming 'none of this happened'; a tunnel with no light at the end (P6, P13, P15).",
+        "'Light at the end of the tunnel' as the ordinary English idiom for hope, used in a prediction about humanity's future (P7).",
+        "'Speck of light' used inside a simile spoken by a being rather than as a perceived distant light (P16)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "EHwBXZXzByM",
+        "text": "all I could see in the very, very far distance was like a pinprick of light, but I began moving very, very fast in the direction of that pinprick of light"
+      }
+    },
+    {
+      "id": "distant-light",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Point/spark of light' used as an analogy or theory rather than a perception — consciousness singularity as 'a light on a lamppost 30, 40 feet away', a pinprick of light used to explain what a SOUND was like, 'your soul is that spark of light of the creator' (P22, P19, P13).",
+        "Third-party generalisation and book-plug context — a researcher summarising 'they see a little pinpoint of light and get drawn to it like a magnet', 'other people have said... I saw this light in the distance' (P7, P12).",
+        "A large light already arrived at, or a light source seen from inside heaven, rather than a distant speck in darkness (P3, P9).",
+        "A post-NDE confirmation event in ordinary physical reality ('a spark of light bloated in front of me... it made a popping sound') and an ego-stripping process ending in a pinprick of light that is the SELF, not a place (P17, P24)."
+      ],
+      "suggested_regex": "\\b(?:I|i)\\s+(?:saw|noticed|became\\s+aware\\s+of|could\\s+see|was\\s+aware\\s+of)\\b[^.]{0,80}\\b(?:pin-?point|pin-?prick|speck|spot|dot|glimmer|tiny\\s+light|small\\s+bright\\s+light|point\\s+of\\s+light)\\b[^.]{0,60}\\b(?:distance|far\\s+away|far\\s+off|darkness|dark|end\\s+of\\s+the\\s+tunnel)\\b",
+      "best_quote": {
+        "doc": "D3MlrVCbspk",
+        "text": "way far, far in the distance was a single pinprick of light appeared, and this was like a star, like a single star in the night sky"
+      }
+    }
+  ]
+}

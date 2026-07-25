@@ -1,0 +1,275 @@
+{
+  "audits": [
+    {
+      "id": "place-of-pure-feeling",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Present-tense spiritual teaching and after-effect talk: 'create from a space of love', 'find that place of love and acceptance that we all hunger for' (5 passages)",
+        "Meditation, mystical practice or post-NDE re-entry into the state rather than the NDE itself ('energetically transform myself back into that space of love')",
+        "Third-party speculation about where the dead are: a reverend at a funeral, a father assumed to be 'in a place of peace'",
+        "A researcher/host generalising about what NDErs long for after they return",
+        "'place of knowing' during an unrelated psychic episode about a drowning child — same construction, different place"
+      ],
+      "suggested_regex": "(?:I (?:was|found myself|awoke|woke up)|we were) (?:back )?(?:in|inside|surrounded by|immersed in) (?:this |that |a |an )?(?:place|space|state|realm) of (?:pure |absolute |total |complete |just )*(?:unconditional )?(?:love|peace|bliss|joy)",
+      "best_quote": {
+        "doc": "vFINxFxEbQs",
+        "text": "And then all of a sudden, I was in this place of just pure unconditional love."
+      }
+    },
+    {
+      "id": "the-life-you-agreed-to",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Host intros and channel boilerplate built on the phrase 'pre-birth memories' ('Max has both pre-birth memories and multiple near-death experiences') — 4 passages",
+        "Standalone pre-birth-memory guests who never describe an NDE; the plan is remembered from childhood, not from dying",
+        "'Soul contract' as an everyday spiritual belief: contracts with pets, contracts reported by astrologers, contracts figured out years later in therapy",
+        "Interviewer questions ('have you figured out your soul contract with him?')",
+        "A researcher summarising what experiencers in general report about soul contracts"
+      ],
+      "suggested_regex": "(?:I (?:remembered|re-?remembered|was shown|was told|learned|realized|knew)|(?:he|she|they|god|my guide|the being)s? (?:told|showed) me)[^.]{0,80}(?:soul contract|planned (?:this|my) life|pre-?birth plan|chose (?:my|this) (?:parents|life)|agreed to (?:come|this))",
+      "best_quote": {
+        "doc": "PRIMYkoZ9HY",
+        "text": "he told me that I had promised to give birth to him before I was born, that we had planned this together"
+      }
+    },
+    {
+      "id": "wherever-i-was",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The near-identical phrase 'I didn't know what to call it' applied to something else entirely — the NDE label, remote viewing, music therapy, the feeling of God (5 of the 8 false positives)",
+        "Ordinary-life disorientation: waking drugged in a foreign country, being trapped under lake ice, walking through your own house during a panic attack",
+        "Otherwise clean; the surviving matches are genuine in-experience hedges about location"
+      ],
+      "suggested_regex": "(?:wherever I (?:was|had been)\\b|I (?:didn't|did not|couldn't) know where I (?:was|had been|was going)\\b)",
+      "best_quote": {
+        "doc": "ZZ4mLk4Xj7A",
+        "text": "I knew I wasn't on earth anymore, and I didn't know where I was."
+      }
+    },
+    {
+      "id": "somewhere",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "ELEVEN of 24 passages are the identical Roundtrip Death cold-open montage ('I didn't realize that was actually my physical body because I was somewhere else') replayed at the head of every episode — one clip inflating the account count by an order of magnitude",
+        "Geographic 'somewhere': 'somewhere in Asia' in a past-life meditation, 'somewhere in the Middle East' judged from people's dress",
+        "The medical setting: knowing you are 'somewhere else' on waking in a recovery room",
+        "Clock-time confusion in a gurney ('I knew I had been somewhere at 11:00 in the morning')"
+      ],
+      "suggested_regex": "(?:I (?:kn[eo]w|realiz\\w+|felt|was sure)(?: that)? I (?:was|had been|ended up) somewhere|the fact that I had been somewhere|I ended up somewhere)\\b(?!\\s+(?:in|between|at|near)\\s)",
+      "best_quote": {
+        "doc": "r2sIRtE9DRI",
+        "text": "I didn't know where I was, but I knew that I was somewhere."
+      }
+    },
+    {
+      "id": "the-grey-place",
+      "judged": 24,
+      "true_positives": 7,
+      "precision": 0.292,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Purgatory' as Catholic doctrine rather than perceived terrain: childhood catechism, Medjugorje visionaries, indulgence arithmetic, 'there's nobody floating around in purgatory'",
+        "'Purgatory' as a theory about other souls — mediums describing clients, Monroe Institute speculation that belief systems can strand people",
+        "Earth itself called purgatory ('this is purgatory, and we've already lived it')",
+        "'Lost souls' as astral-plane instruction addressed to the listener in the second person",
+        "Documentary voiceover narrating a third party's hellish NDE",
+        "Content recovered in a hypnosis session rather than during the NDE"
+      ],
+      "suggested_regex": "I (?:was|found myself|ended up|arrived|woke up) (?:in |at )?(?:this |that |a |an |the )?(?:in-?between|gr[ae]y|foggy|misty|dismal|drab|colou?rless)[^.]{0,30}(?:place|space|realm|world|state|land|zone)|(?:souls|spirits|people|figures)[^.]{0,50}(?:stuck|wandering|milling|shuffling)",
+      "best_quote": {
+        "doc": "gHM2WPW6zz0",
+        "text": "They seemed to be stuck and very much in sorrow. Was this Purgatory? I do not know."
+      }
+    },
+    {
+      "id": "hell-realm",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Idiomatic hell: 'everything went to hell', 'we've been to hell and back', slaughterhouse footage as 'hell on earth', domestic violence as 'I was in hell'",
+        "Doctrinal exposition with no experience attached — the six Buddhist realms, Calvinist eternal torment",
+        "Experiencers arguing hell does NOT exist and explaining away other people's hellish NDEs (3 passages)",
+        "Host bio intros and interviewer lines ('you called out to Jesus from the pit of hell', plus a book plug)",
+        "Someone else's NDE reported second-hand ('another person I spoke with told me she went to hell')",
+        "Being told online that you were in hell"
+      ],
+      "suggested_regex": "(?:I (?:was|went|fell|was taken|was thrown|was dragged|was sent|ended up)(?: down)? (?:in|into|to) (?:a |the )?hell|I was in hell|(?:this|the|a) hell realm)\\b(?! (?:on earth|and back))",
+      "best_quote": {
+        "doc": "nYmODXP7AZg",
+        "text": "during that 10 minutes I went to hell and I remember enough to tell you that it was very very dark that I couldn't see my hand in front of my face"
+      }
+    },
+    {
+      "id": "hopeless-torment",
+      "judged": 24,
+      "true_positives": 5,
+      "precision": 0.208,
+      "verdict": "reject",
+      "failure_modes": [
+        "The defining feature — torment with NO imagery — has no lexical signature, so every candidate word ('despair', 'torment', 'hopeless', 'hell') is dominated by other things",
+        "Theological exposition about eternal conscious torment (Calvinism, end-times preaching) with no experience attached",
+        "Ordinary-life despair and biography: a precognitive dream, Christian guilt about tarot cards, a snowstorm walk, a custody hearing",
+        "Reaction-channel intros ('today we're going to watch a very scary hellish nde of a woman') and interviewer recaps",
+        "Distressing NDEs that DO have hellish scenery (pits, fire, mine-shafts) — the opposite of the claim",
+        "Passages where the answer is that there was NO despair ('there was no anguish... I was feeling very complete')",
+        "Despair attributed to an observed entity (looking into Satan's eyes) rather than suffered by the narrator"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "irETpN2GmCE",
+        "text": "It was a void for me, a horrible void, an indescribable, lonely, ugly, horrible feeling."
+      }
+    },
+    {
+      "id": "the-recognition",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "'I have been there before' meaning 'I have visited it (in my NDE)' rather than 'it felt already known' — the one systematic semantic slip",
+        "Familiarity in ordinary life: Reconnective Healing frequencies, a dream about riding in grandparents' Buick",
+        "Post-NDE amnesia where nothing felt familiar (a polarity flip the regex cannot see)",
+        "Familiarity of unpleasant earthly sensation on re-entering the body",
+        "Past-life confusion ('they were familiar to me, but not as they thought they were')"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "rKk5PGyWlBA",
+        "text": "I just knew that it was completely familiar and that it wasn't the first time I was there"
+      }
+    },
+    {
+      "id": "impossible-colours",
+      "judged": 24,
+      "true_positives": 17,
+      "precision": 0.708,
+      "verdict": "solid",
+      "failure_modes": [
+        "Colours merely brighter or more vibrant than earth's rather than outside its range ('the colors were more intense', 'a white that dazzled') — 3 passages; these support a weaker claim than the one made",
+        "Neuroscience philosophising that colour does not exist in nature at all",
+        "An earthly analogy used as the descriptor (Aurora Borealis) with no beyond-range claim",
+        "Generalised comparison of 'the other realms' to earth in an after-effects reflection rather than a described perception",
+        "Synaesthesia ('the colors were alive', sound bringing colours) rather than impossible hues"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "_py2Qidf6Ic",
+        "text": "I saw colors that I had never seen before, and I can't describe them, because we don't have the color palette here."
+      }
+    },
+    {
+      "id": "light-without-shadow",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Made of light' describing BEINGS — angels, God, an alien, robed figures, orbs — not the shadowless environment. Nine passages, and it is a different (already well-attested) feature of the corpus",
+        "Theological inference ('God is light, we're made in his image, so we're made of light')",
+        "Interviewer reading the experiencer's own book back to them",
+        "'We're made of light and energy' asserted from a hospital bed as general metaphysics",
+        "One pure idiom: 'for me I had no shadow' in a story about a job selection process"
+      ],
+      "suggested_regex": "(?:there (?:was|were) no (?:sun|shadows?)\\b|light (?:was )?everywhere[^.]{0,60}no (?:sun|shadow)|(?:the )?light (?:came|seemed to come|was coming) from (?:with)?in (?:every|each|all)|everything (?:was|is) made of light)",
+      "best_quote": {
+        "doc": "Zgn0TtqrAFY",
+        "text": "There was light everywhere but no sun. The light seemed to come from within everything, even the air."
+      }
+    },
+    {
+      "id": "the-music",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "solid",
+      "failure_modes": [
+        "Earthly singing at the bedside — a sister singing a hope song to the patient in hospital",
+        "Explicit denials that inherit the vocabulary ('It was nothing like I've read about other people saying, or angels singing')",
+        "Other people's experiences (a niece and father who 'described hearing the most beautiful music ever')",
+        "A book plug — Don Piper's 90 Minutes in Heaven quoted as the best description of heaven's music",
+        "Musical metaphor for non-auditory experience ('like a beautiful harmonic progression' describing weaving vibrations)",
+        "Commentary on the purpose of the heavenly choir rather than a description of hearing it"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "HXaMWiQWq-g",
+        "text": "There was this music that I never heard and never have again that was otherworldly, other instruments, beautiful, all pervasive like this place was music."
+      }
+    },
+    {
+      "id": "dark-tunnel-down",
+      "judged": 24,
+      "true_positives": 3,
+      "precision": 0.125,
+      "verdict": "reject",
+      "failure_modes": [
+        "The single largest class is the ORDINARY tunnel described as dark — 'a light at the end of this black tunnel', 'traveling down a dark tunnel... I was travelling towards a light'. The classic NDE tunnel is normally dark, so the regex cannot isolate the dark inverse it claims to measure (7 passages)",
+        "'Black hole' as a depression metaphor ('the black hole in the pit of my stomach', 'get myself out of this black hole')",
+        "'Black hole' as astronomy in a cosmological download, or as a simile for evil beings",
+        "'It's like going down the dark tunnel. There ain't no light' used as a simile for looking down a cobra's throat — claim language, zero claim content",
+        "A physically dark hospital hallway outside the morgue",
+        "Interviewer generalising about the common tunnel motif",
+        "A tighter pattern would have to pair the dark shaft with an explicit absence of light or a downward/fire ending; that intersection is rare enough that this node should probably not be built from the current match set"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "DN-bhUt14zA",
+        "text": "And I felt like I fell into black. It was all darkness. I was totally alone."
+      }
+    },
+    {
+      "id": "the-hall-of-records",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Lamb's Book of Life' as scripture, preaching and closing prayer — pure doctrine, never a perceived place (4 passages)",
+        "'Akashic Records' as a present-day practice: dice divination, paid readings, psychic sessions, 'I know a couple that work with the Akashic Records'",
+        "Generalising about what OTHER NDErs report ('other people who have NDEs sometimes speak of going to a Hall of Records')",
+        "Metaphor ('we're different chapters in one book of life') and denial of the building ('I am the freaking Book of Life')",
+        "An earthly library in an unrelated vision about a priest's book collection"
+      ],
+      "suggested_regex": "(?:I (?:was (?:taken|brought|led)|went|arrived at|found myself in|entered|walked into)[^.]{0,60}(?:hall of (?:records|knowledge|events)|akashic record|library)|(?:a |this |that )(?:vast|enormous|huge|great|endless) library|(?<!Lamb's )books? of life (?:(?:was|were) (?:open|stored)|open))",
+      "best_quote": {
+        "doc": "j8mGcC2jq0Q",
+        "text": "My guide communicated to me, this is where the books of life are stored, but we are going to another area."
+      }
+    },
+    {
+      "id": "being-fully-known",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Direction reversal — the dominant failure. 'I knew everything about the universe / about them / about human evolution' is the experiencer becoming omniscient, the exact inverse of being known (6 passages)",
+        "'Nothing was hidden' meaning panoramic 360-degree vision or cosmic transparency, not personal exposure ('there was nothing hidden from me. So while I'm looking to the left, I'm still seeing to the right')",
+        "Scripture quotation (Luke 8:17, nothing hidden that will not be revealed)",
+        "Speculation about a future heavenly reunion where 'there's nothing to hide'",
+        "Ordinary life: a wife who 'knew me better than probably anyone else'",
+        "Acceptance or mutual recognition without the knowing (a grandmother who 'knew me very well too')"
+      ],
+      "suggested_regex": "(?:(?:he|she|it|they|god|jesus|the light|the being|the presence|this (?:light|being|presence))\\s+(?:already )?knew (?:everything|all|it all) about me|I (?:was|felt) (?:completely|totally|fully) known|there was nothing (?:to hide|hidden) from (?:him|her|it|them|god)|they saw (?:every ?(?:bit|thing)|all) of me)",
+      "best_quote": {
+        "doc": "x8QUi2hhOkQ",
+        "text": "when he looked into my eyes, he knew everything about me. And he loved me anyway."
+      }
+    }
+  ]
+}

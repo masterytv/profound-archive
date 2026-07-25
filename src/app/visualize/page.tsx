@@ -1,6 +1,6 @@
 import { serializeJsonLd } from '@/lib/json-ld';
 import Link from 'next/link';
-import { ArrowLeft, Network, Globe, Cpu, Waypoints, Orbit, Radio, Clock } from 'lucide-react';
+import { ArrowLeft, Network, Globe, Cpu, Waypoints, Orbit, Radio, Clock, Compass } from 'lucide-react';
 
 /**
  * Visualize Hub — Landing page with cards for each available 3D visualization.
@@ -83,6 +83,16 @@ const UAP_VISUALIZATIONS: VizCard[] = [
 ];
 
 const NDE_VISUALIZATIONS: VizCard[] = [
+  {
+    id: 'afterlife-map',
+    title: 'The Map of the Afterlife',
+    description: 'Not what one person saw — what the collective reported. Every place, being and boundary described across 6,176 near-death accounts, sized by how many experiencers reached it.',
+    domain: 'nde',
+    href: '/visualize/afterlife-map',
+    icon: Compass,
+    status: 'live',
+    nodeCount: '6,176 accounts',
+  },
   {
     id: 'nde-elements',
     title: 'NDE Element Network',

@@ -1,0 +1,253 @@
+{
+  "audits": [
+    {
+      "id": "no-comparison",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'No comparison' in the ranking/judgment sense — 'there was no judgment, there was no comparison, there was no competition' — 5 of 12 false positives (hDhYK1ipR4M, whDi9xOppRQ, XZ7ztpAloaw, i6KdwZN0f_4, tIkz_plTSbU). This is the opposite claim: not 'nothing on earth is like it' but 'nobody there ranks anybody'.",
+        "'No frame of reference' / 'nothing to compare it to' meaning the experiencer had never heard of NDEs and had no cultural framework afterwards — biography, not the realm (-WjDhktugRU, dpM6AHETrTI, Kqzaowe3T1o, 8eJQg9zfo1w).",
+        "Interviewer banter and earthly comparisons: Houston heat 'no comparison' (CbS1au2tx-Y), comparing people's suffering (CHCobOyoPHE), and one passage where the incomparable thing is earthly life itself — sunsets and fireflies (M-DWYU1YJMU)."
+      ],
+      "suggested_regex": "\\b(?:no|nothing|never)\\b[^.]{0,40}\\b(?:compar\\w+|equivalent)\\b(?![^.]{0,30}\\b(?:judg\\w+|competition|competing|scorekeeping|greater than)\\b)[^.]{0,60}\\b(?:earth|here|this (?:world|life|realm|plane|side)|anything)\\b",
+      "best_quote": {
+        "doc": "vBihF8HeXo8",
+        "text": "Truly, no earthly comparison can encapsulate just how swiftly this incredible occurrence unfolded."
+      }
+    },
+    {
+      "id": "living-light",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "Light that is a person in a different sense — individual souls seen as balls/tangles of light (JXj-XeY8HB4), or 'the light in everything that was alive' where the light is in living things rather than being the living Other (DbqQ2EP93yI).",
+        "Channel and book material: an artist's painting of 'the living light that was God' plus a plug for Heaven Is for Real (ub4fkjcV6Bo); taxonomy talk about categories of NDE with no encounter (BXtPCN_At9Q, 8NRb1MdnmJ4).",
+        "'Realm of living light' used as scene-setting for a pre-birth experience rather than an aware light looking back (Mo2dBMci8OM)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "OCZjqf9BdrQ",
+        "text": "I discovered that the glowing golden globe of light was alive. It was a self. It was a living, aware, loving being."
+      }
+    },
+    {
+      "id": "the-fragrant-air",
+      "judged": 24,
+      "true_positives": 21,
+      "precision": 0.875,
+      "verdict": "solid",
+      "failure_modes": [
+        "'The air was filled with smiles, songs, and the sweet voices of these little souls' — air as a carrier of sound, no scent and no quality of air (E2srnfBuOJM).",
+        "Host reading someone else's written account and joking about whether heaven smells of gasoline (gvKOCuaOWV4).",
+        "One passage where the flower smell belongs to the return-to-earth sequence (being called to dinner, tantrums about her name) rather than the other world (m8lqk4fS4cA)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "92eTYGTqvOk",
+        "text": "The air was pure and clean, crisp and sweet. It was filled with the fragrance of wildflowers that danced in the warm silken breeze that touched my skin."
+      }
+    },
+    {
+      "id": "many-mansions",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Bare John 14 quotation used homiletically or as theology, with nothing seen: a pastor quoting it at funerals (xQCSh0wcOGo), an interviewer citing it to frame a book question (Nfnsd_yvCa0, 3rTk7Xmffi0), 'there are many mansions in my father's house. So there are many places' (02lXN7FqiOE), 'Prepared a mansion for all of us' (Kh5vu-3RQgc), Paul's 'house in heaven' meaning the resurrection body (_TsOqTRUL3c). This is the single largest junk class.",
+        "Literal earthly father's house: living at dad's while studying (S3e7nba_ffI), hearing footsteps at night in Russia (69UKHPIDgc0), and the prodigal son parable (cnKhuI7kahQ).",
+        "The mansion mentioned only to be declined or dismissed inside the NDE — 'I can go see my mansion later' (7nmCYK0L1BU), 'people talk about a mansion. I don't care about that' (QHNW29X-nrE) — and one explicit denial: it 'looked nothing like the mansions in the sky I had learned about in childhood' (3rAYA_P1pXQ).",
+        "Second-hand or generalised dwellings: a dream in which the speaker's mother says she lives in a castle (_jDrbRk96l8), a seven-level cosmology asserting 'at least there are houses there' (j_p8kyiEK9k), and a lecture on building astral houses by thought (0oQKp4266YQ)."
+      ],
+      "suggested_regex": "\\b(?:I|we)\\s+(?:saw|was shown|were shown|entered|walked into|went into|stood before|was looking at|looked at)\\b[^.]{0,80}\\b(?:mansion|castle|cottage|(?:my|our|his|her)\\s+(?:house|home))\\b(?![^.]{0,40}\\bFather\\b)",
+      "best_quote": {
+        "doc": "H6fNB8_xKNY",
+        "text": "I was looking on this huge white mansion. And as soon as I was to think, I was inside the doors. And inside the doors, I could see like infinite doorways, golden doors"
+      }
+    },
+    {
+      "id": "the-living-grass",
+      "judged": 24,
+      "true_positives": 23,
+      "precision": 0.958,
+      "verdict": "solid",
+      "failure_modes": [
+        "Only one non-testimony passage: the host reading a quotation from the guest's book and name-dropping another guest's grass story (swpIEufGRUQ). The described phenomenon is genuine but the speaker is the interviewer, so it fails the strict test.",
+        "Everything else was first-person and on target — this is the cleanest packet in my batch. Several near-duplicate transcripts of the same accounts (mUzS5gHTAvI/J7u2nHmclrs, f5dO4hsR8_M/SV712eZNI3o, IZWbojibwyA/hhADKDdhTTk) inflate the apparent independence of the evidence and should be de-duplicated before counting accounts."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "b112r5ZlTJ8",
+        "text": "each blade of grass had its own distinguishing shade of green. So that means there's billions and billions of shades of green."
+      }
+    },
+    {
+      "id": "the-bridge",
+      "judged": 11,
+      "true_positives": 3,
+      "precision": 0.273,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Bridge as metaphor for death itself, years after the fact: 'For me death is when I say, I recognize the bridge... and I go to the other side' — the same passage appears twice (OizX472ycCw, coSo-eQS1jI). Also a visualised 'bridge of golden healing' sent during prayer (HfEcEjYuT9k).",
+        "Ordinary earthly bridges: an escalator footbridge over a street while being chased (OLGWAewZDp0), a bridge on a waterfall-blessing walk (Hsr31XRRqSI), and a cobblestone bridge in a 1800s past-life scene (tlQGWtu9emM).",
+        "Generalisation about what other NDErs report — 'they couldn't cross a bridge, they couldn't cross a creek' (BXtPCN_At9Q) — and one account of someone else's NDE told in the third person (P1MVSAwKZ8Y), which is otherwise a textbook instance of the feature.",
+        "Note: only 11 accounts matched corpus-wide and 2 of the 3 true positives are the same experiencer's story told twice (hhADKDdhTTk, IZWbojibwyA). This node rests on roughly two independent witnesses."
+      ],
+      "suggested_regex": "\\b(?:foot ?bridge|little (?:wooden )?bridge|narrow bridge)\\b|\\bbridge\\b[^.]{0,60}\\b(?:golden railings?|over a (?:creek|brook|brooklet|stream))\\b",
+      "best_quote": {
+        "doc": "PqddJsxn16s",
+        "text": "In front of me I saw a bridge hanging over a brooklet, and I stepped onto it. It was a narrow bridge with golden railings."
+      }
+    },
+    {
+      "id": "the-staircase",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.458,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Book titles: 'Stairway to Heaven' discussed as a published book (c7qstScs3eI, _jDrbRk96l8) and 'Crystal Stairway to Heaven' haggled over on air with editing costs (Rkho24Vkve4).",
+        "Ordinary domestic and hospital stairs: the long staircase at home after discharge (3BjfBiLXQcA), steep steps the paramedics couldn't get a gurney up (wZFbkcngdDM), and a passage that matched only on 'no footsteps in the fresh snowfall' (E016R6wu-Y8).",
+        "Metaphor and denial: 'like walking up a spiral staircase' as a figure for spiritual progress (EGrpt5KgwH4), and 'There is no stairway to Heaven. There's nothing. It's darkness' (DOYgrnM1iKs).",
+        "The hell-pit accounts where 'spiral staircase' is a simile for the shape of a pit lined with cells, not steps to be climbed (sjvD1FvIhdo, dwCEPYFD67s — same experiencer twice).",
+        "Second-hand and dream stairs: another child's tornado NDE with stairs to heaven (3oEi1487nAU), a dream of Machu Picchu steps (nHe0gyl3uiE), a dream of a hospital marble staircase (u0Mngi-Bvr4)."
+      ],
+      "suggested_regex": "\\b(?:stairs|staircase|stairway|steps)\\b[^.]{0,80}\\b(?:up into the sky|into the sky|through the clouds|leading up to the (?:entry|entrance|door|doorway|building|temple)|worn down in the cent(?:er|re)|going up (?:and|or) coming down)\\b",
+      "best_quote": {
+        "doc": "Oediqi3PkUk",
+        "text": "I looked over and I saw this big beautiful staircase going up into the sky. I said, \"If I can get to that staircase, maybe somebody will find me.\""
+      }
+    },
+    {
+      "id": "through-the-ceiling",
+      "judged": 24,
+      "true_positives": 20,
+      "precision": 0.833,
+      "verdict": "solid",
+      "failure_modes": [
+        "The idiom 'went through the roof': 'My energy went through the roof' after cutting out meat (Sq1NhW9mwxw).",
+        "A white light leaving through the car ceiling rather than the person passing through it — the same story from one experiencer on two channels (a3ahyF00aaw, j5wd-MufFy0).",
+        "Interviewer summarising and the experiencer contradicting him: 'You don't remember going through the roof of the hospital... It's just that, by magic, you were already outside the planet' (1AqyxjuZ_go).",
+        "Judgment call worth flagging: I counted three passages where the ceiling/roof is passed downward on the way back (JHzBNw0evfI, fRcFquC46bk, 8ePE5EBbkhI). They are the same permeability phenomenon but reverse the direction the claim asserts; if the map insists on 'up', precision drops to 0.708."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "2F2Sj6KBnGU",
+        "text": "So I moved up through the ceiling and I saw in the ceiling all the suitcases and the boxes, and I thought, \"Wow, this is very cool.\""
+      }
+    },
+    {
+      "id": "outer-darkness",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Outer darkness' as a scripture tag or doctrinal category with nothing perceived: degrees-of-glory theology (oqzQIHghPpg), 'throw them into the outer darkness where there will be weeping and gnashing of teeth' cited over a description of heat and pain (HyTbmpdeQuw), end-times teaching about darkness being confined to the lake of fire (FKOBI1oqfMU).",
+        "Earthly darkness and metaphor: 'there was this darkness in his eyes' about an abusive partner (OUyaObD1lgQ), 'my valley of darkness... became a door of hope' (yDfMtakkas0), 'Darkness and evil cannot live in the light of God' as an aphorism (BCzSEtgmTRE).",
+        "Book and channel material: a book title, Tightrope of Depression: My Journey from Darkness (7yTJlCHNb44), and a podcast promo montage cutting between clips of different speakers (8YGDBN9X7R8).",
+        "Second-hand and commentary: Howard Storm's NDE retold (stcYIqiQvjs); an interviewer's cultural aside plus 'I've interviewed several other near-death experiencers that have gone to that blackness' (-R2iBAH40O8).",
+        "Boundary warnings that name the region without entering or describing it — 'one more step, you'll be in outer darkness and you will not come back', the same experiencer twice (4sor4n4MZKA, p9ZggRgHFS8) — plus a void described only as the far end of a tunnel by a being who explained it (y5Nvc1eHywM), and one explicit denial of any malevolence, with a possible medical explanation offered (WpNBRe_QFsI). These four are the most arguable of my rejections."
+      ],
+      "suggested_regex": "\\b(?:I|we)\\s+(?:was|were|got|felt|found myself|floated|drifted|fell|dropped|was thrown|was pushed|experienced)\\b[^.]{0,60}\\b(?:outer darkness|black void|black limbo|(?:pitch|absolute|abject|total|utter)\\s+(?:black|blackness|dark|darkness))\\b",
+      "best_quote": {
+        "doc": "W01t1uDY73c",
+        "text": "Then I felt this darkness had a spiritual component, a very cold and evil presence. And I thought, where, where am I? I heard men in the darkness saying, shut up."
+      }
+    },
+    {
+      "id": "the-heaviness-of-re-entry",
+      "judged": 24,
+      "true_positives": 22,
+      "precision": 0.917,
+      "verdict": "solid",
+      "failure_modes": [
+        "An interviewer stating the claim on behalf of other experiencers — 'Some near-death experiencers say that it was painful to come back into the body because they felt very constrained' — and the guest rejecting it: 'I was so happy to be back' (VfxlSpSuxuI).",
+        "One passage where the pain on return is the ongoing grief of having lost a child, i.e. life circumstance rather than the weight of re-entry (XUBmfoItQ7M).",
+        "Otherwise unusually clean; the similes the claim predicts all show up verbatim (diving suit, prison, bottle, toothpaste tube, clay). Two of the strongest passages are the same account transcribed twice (KQNAmYgHmEQ, Xna-HGgLytk)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "Xna-HGgLytk",
+        "text": "But back to the grief and the pain and the regret and the guilt and the trauma. It was so heavy to be back in the body."
+      }
+    },
+    {
+      "id": "the-form-it-takes-for-you",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "This node is mostly a discourse, not a place. The single biggest class (about 6 passages) is the theory stated in the abstract about people in general, with no encounter attached: 'one person will say I saw Buddha, the other Krishna, the other Jesus' (Tqa05mlAjEE), 'Christians will say it was Jesus. Buddhists will say it was Buddha' (x3voOKz5YJA), 'the love of heaven will appear to you in the form that you recognize' (cElqN6A0ll0), 'people in other cultures see Krishna... an NDE is a little bit culturally colored' (WFFHntnF52o), 'other people based off of their belief system see what it is they believe in' (QvJUaJ669wM), 'Some people that were Jewish saw Jesus' (nsc0Z2N-HJE). Under the stated rule these are speculation about what happens generally; if the map wants the theory itself as the node, precision rises to about 0.5, and that is the honest headline: the regex measures NDE comparative-religion talk-show discourse, not a perceived figure.",
+        "Interviewer framing and channel boilerplate: a host posing the many-faces theory to a guest who rejects it (9m77ID3wC6s), an episode teaser (oJABwVFUKrc), a Christian testimony preamble (w_WtY63NnoM).",
+        "Passages that matched only on a religion word: complaints about atheist and Jewish friends (EzAqXCw1inc), 'the Buddhist smile that you might see on Buddha' describing the speaker's own face (feep8OaA8xc), demons and generational curses (k6kLAU6cP-I), body-heating and dormant knowledge (XliDnmcoND0), word-frequency energy talk (rL3KRwPz4TA), ego and the light (ckN-AJxfpi0), general encouragement to listeners (I3U3frTbE94), and a past-life review in which the speaker was a Buddhist (I9NyXh0mMfI).",
+        "Second-hand cases: Jewish children who see Jesus, reported about others (vko4tnKFRA8), and 'a young man... Aaron Green' style referrals."
+      ],
+      "suggested_regex": "\\b(?:took|takes|take|taking)\\s+(?:on\\s+)?the\\s+form\\s+of\\b|\\bI\\s+(?:saw|met)\\s+(?:Shiva|Krishna|Buddha|Quan\\s?Yin|Muhammad|Allah)\\b|\\bappeared?\\s+to\\s+me\\s+(?:as|in the form)\\b",
+      "best_quote": {
+        "doc": "exzEb5Xz9KI",
+        "text": "my guide took the form of my grandfather so that I would be able to recognize someone and surrender to the interaction."
+      }
+    },
+    {
+      "id": "the-great-door",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Idiomatic doors: 'this course opened many doors for me' (PA0_C-Ya238), 'it can open up many many doors of opportunities' (acbEt8BtJKI), 'I knocked on many doors, and no jobs' (TvZHlmMaMwA). Requiring a size/material adjective removes all three.",
+        "Earthly doors: the huge white doors of a hospital corridor in a dream about the speaker's dead father (u0Mngi-Bvr4).",
+        "Doors seen in mystical or deathbed visions rather than the speaker's own NDE — golden doors opening as a dying woman's aura departs, the same event told twice (1Jumd6LWoCs, gM2YIAFdB0s) — and a recurring bedside vision of a white door/portal outside any near-death event (O3cMj9h3oE4).",
+        "One rhetorical reference to 'getting into those gold doors' as a stand-in for salvation rather than a door that was seen (TLeahFEj6iw)."
+      ],
+      "suggested_regex": "\\b(?:huge|giant|enormous|massive|tall|towering|white|golden|gold|glass|ornate|wooden|arched|pearl\\w*|infinite)\\s+(?:double\\s+)?doors?(?:way)?\\b|\\bdoors?\\s+(?:of|made of)\\s+(?:gold|glass|pearl|light)\\b",
+      "best_quote": {
+        "doc": "xV-MVyTH7Hc",
+        "text": "he took me into a hallway with infinite doors, and I walked into one door that was on my right, a gold door."
+      }
+    },
+    {
+      "id": "the-council",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Post-NDE mediumship and channelling, where 'the council' is an ongoing correspondent rather than a body met in the afterlife: automatic writing with 'the council I met on the other side', the same speaker twice (-BL5i9sr-j4, waNHxKi4iQQ); 'the council of wise ones on the spirit side have said' (pS-iWRXrqh8); a spirit team called the wisdomkeepers with 'a council of 12' and an alien race (XZ7ztpAloaw); the Galactic Federation announcing itself over a bowl of Cheerios (vZ9IvPuCBug).",
+        "Nightly visitation series rather than the NDE itself: 13 nights, 12 elders, 13 chapters of a dictated book, transcribed twice (-JPV9Oa2oJY, exrc19Zm5Bg), and a sleep-onset journey to 'the in-between' before a council (69t5LgDucZk).",
+        "Channel boilerplate: two episode intros that mention the guest meeting a Council of Light (FDRE-3bWS-E, 2CFhbs1WBqw), plus an interviewer volunteering that '12 people around the table' is probably the council of 12 elders (A2B_3JA0VhA).",
+        "Other people's accounts (gJqHuSuAAU0), a third party's 'council of 12 angels' identified as a jinn (_MvGphIRdGY), a self-corrected reference where the entity is actually record keepers (mM8mfkICL9I), and a felt sense of being observed later reinterpreted as a council with no furniture or procedure (t5DZ9X5JLAg, BG_ZWXG32ag)."
+      ],
+      "suggested_regex": "\\b(?:I|we)\\s+(?:met|saw|sat before|stood before|was (?:brought|taken|led) (?:before|to)|found myself (?:before|in front of|sitting))\\b[^.]{0,60}\\bcouncil\\b|\\bcouncil of (?:twelve|12|elders|men|light)\\b[^.]{0,80}\\b(?:table|semi-?circle|chamber|robes|asked me|chuckl\\w+)\\b",
+      "best_quote": {
+        "doc": "EWKEVABuDBI",
+        "text": "before I knew it, I actually was sitting in front of this semi-circle table, and I was in the center, facing the semicircle table. And God was opposite me with elders."
+      }
+    },
+    {
+      "id": "the-silver-cord",
+      "judged": 24,
+      "true_positives": 14,
+      "precision": 0.583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ecclesiastes 12:6 quoted as doctrine — 'Remember your creator before the silver cord is loose' — in a preaching passage (CFeREug0k1Y), in a list of biblical parallels (ecoG5fo3IWE), and in astral-projection instruction warning the cord can snap (G8tX9pcfxTM).",
+        "Interviewer and medium commentary about the cord rather than a sighting: a host summarising what OBE practitioners call it (dXngq55bO80), 'that silver cord hasn't been severed, right?' (ZEYE-gw7ca4), and a host musing that 'hardly anybody' sees it and it might be the vagus nerve (QzBvf9lIfxM).",
+        "General teaching about what the cord is and does, addressed to listeners: the umbilical-cord explanation of dying (acbEt8BtJKI), a theory that the tunnel simply is the cord (spjWeT9sNH4), and a model of the moment of death when the cord breaks (j_p8kyiEK9k).",
+        "One sighting that occurs in deep meditation rather than a near-death event (n9BjGhrYfNY).",
+        "Note also that four of the true positives are the same floating-cord account transcribed across different uploads (q54BP2lR2RI, M5GFp_wVcGw, fRlc2wjzc28, k1nRZ0mQWZQ, plus nNHeb_P4j2M), so the independent-witness count is much lower than the match count."
+      ],
+      "suggested_regex": "\\b(?:I\\s+(?:saw|noticed|could see|felt|followed)|attached to my|connected to my|came out of my|coming out of my)\\b[^.]{0,50}\\b(?:silver (?:cord|thread|filament)|cord|tether)\\b(?![^.]{0,40}\\bEcclesiastes\\b)",
+      "best_quote": {
+        "doc": "uHjUZNJ76dc",
+        "text": "Looking down, I couldn't see any feet, but I did see a silver cord attached to my body, which had a luminescence to it."
+      }
+    }
+  ]
+}

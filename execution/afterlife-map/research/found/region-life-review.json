@@ -1,0 +1,626 @@
+{
+  "places": [
+    {
+      "id": "the-life-review",
+      "name": "the life review",
+      "category": "process",
+      "parent": null,
+      "description": "The place in the journey where your life is given back to you to be seen. Experiencers almost never call it 'judgement' - they call it a review, a reliving, a re-experiencing. It is not remembering: people insist they were IN the events again, with the original feelings intact, but now with understanding added. It commonly runs from birth (or from conception, or from the womb) forward to the moment of dying, and it is repeatedly described as more detailed than memory could ever be - 'every single minute detail', things forgotten for decades.",
+      "aliases": [
+        {"term": "life review", "tradition": "secular", "note": "by far the dominant term; many say 'I later learned it's called the life review'"},
+        {"term": "the reliving", "tradition": "none", "note": "several insist review is the wrong word - 'it's not a review, it's a relive'"},
+        {"term": "my life flashed before my eyes", "tradition": "secular", "note": "the folk phrase; many use it then correct it as too shallow"},
+        {"term": "life preview", "tradition": "none", "note": "used when the content was future rather than past"},
+        {"term": "panoramic memory", "tradition": "none"},
+        {"term": "the movie of my life", "tradition": "none"},
+        {"term": "a classroom, not a courtroom", "tradition": "secular", "note": "a widely repeated framing among experiencers"},
+        {"term": "the weighing of the heart", "tradition": "Egyptian/comparative", "note": "used by one experiencer-researcher comparing traditions"},
+        {"term": "judgment day", "tradition": "Christian", "note": "usually invoked only to be denied: 'there was no judgment day for me'"}
+      ],
+      "regex": "life[- ]review|review of (my|your|his|her|the) life|review(ing|ed)? my (whole |entire |)life|my life (flashed|passed|played|replayed|unfolded|began to play|started to play)|life (flashing|passing) before|reliv(e|ed|ing) my (whole |entire |)life",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "UntuKHaMpOI", "cvnde": 13, "text": "Christ took me through a life review that was filled with compassion and understanding and absolutely absent of judgment."},
+        {"videoId": "yl3OS7aA1gg", "cvnde": 16, "text": "It wasn't a review of my entire life in every detail, but only those moments of intense love that I felt in a shared experience with other people."},
+        {"videoId": "Io5sd8ri6Fo", "cvnde": 21, "text": "I was just surrounded by this review of my life. It was like a 360° kind of panoramic movie of my life."}
+      ],
+      "sensory": [
+        "runs from birth (sometimes from conception or in the womb) forward to the moment of death",
+        "sometimes plays in reverse, from the dying moment backwards",
+        "detail far exceeding ordinary memory - 'every single minute detail'",
+        "original emotions restored, but with understanding added",
+        "no fear or defensiveness while it runs; the fear comes afterwards in the telling"
+      ],
+      "journey_position": 0.57,
+      "measured": {"all_pct": 25.92, "all_docs": 1601, "cv13_pct": 29.07, "cv18_pct": 29.01, "cv23_pct": 29.83},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 20,
+      "notes": "The structured coder marks life_review present in 49.3% of accounts, but the literal phrase 'life review' occurs in only 24.2% - so roughly half of reviews are described without the term, which is why this regex adds 'my life flashed/passed', 'reliving my life' and 'review of my life'. Prevalence rises modestly with evidential strength (25.9% all vs 29.8% at cv>=23). A minority explicitly report having NO life review and say so ('there's no life review, but in my case there's a life preview'); those docs still match, which is the main precision loss. A small distressing variant exists in which only the harmful acts are shown."
+    },
+    {
+      "id": "the-screen",
+      "name": "the screen",
+      "category": "structure",
+      "parent": "the-life-review",
+      "description": "The most common physical staging of the review: a screen, or many screens, on which your life plays. People reach for cinema again and again - a movie theatre, a curtain that parts, a countdown, an old black-and-white reel, a vintage projector clicking in one ear. Several describe a round room ringed with fifteen or twenty screens, each running a different age of your life at once. Some are careful to say the screen was a frame of reference their mind supplied, not the thing itself.",
+      "aliases": [
+        {"term": "movie screen", "tradition": "secular"},
+        {"term": "movie theater", "tradition": "secular", "note": "'God and I were in a big movie theater in the galaxy'"},
+        {"term": "a big screen came down", "tradition": "none"},
+        {"term": "film strip / movie reel", "tradition": "none", "note": "often explicitly old-fashioned, black-and-white, 35mm"},
+        {"term": "projector", "tradition": "none", "note": "several hear the projector sound before seeing anything"},
+        {"term": "the well", "tradition": "none", "note": "one experiencer's idiosyncratic frame of reference for the same function"},
+        {"term": "TV", "tradition": "secular"},
+        {"term": "screens all around the ceiling", "tradition": "none"}
+      ],
+      "regex": "(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)[\\s\\S]{0,300}(screen|movie|film|theater|theatre|projector|reel)|(screen|movie|film|theater|theatre|projector|reel)[\\s\\S]{0,300}(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)",
+      "negative_regex": "(on|shows on|it shows on) the screen (there|here|now)|link in the (description|screen)|subscribe",
+      "quotes": [
+        {"videoId": "DmE2V4TYYYQ", "cvnde": 10, "text": "And it revealed a larger-than-life movie screen. And I heard the countdown of the numbers, three, two, one. And I saw the title in front of me, \"The Life Review of Erica McKenzie.\""},
+        {"videoId": "iWuEAhVQYG8", "cvnde": 10, "text": "It was like a round theater and on top of me or on and the on the ceiling were all these movie screens and there must have been like 15 or 20 of these and they were all in a circle."},
+        {"videoId": "Ls1WKeDNDUY", "cvnde": 20, "text": "the screen comes down and I'm watching this screen and it was like watching an oldfashioned black and white movie on an oldfashioned movie reel."}
+      ],
+      "sensory": [
+        "black-and-white, old-fashioned, silent",
+        "a curtain of stars parting to the right",
+        "the clicking sound of a vintage projector, heard in one ear",
+        "fifteen to twenty screens ringing a round room, one per age",
+        "a title card with your own name on it"
+      ],
+      "journey_position": 0.55,
+      "measured": {"all_pct": 5.23, "all_docs": 323, "cv13_pct": 6.69, "cv18_pct": 5.80, "cv23_pct": 5.52},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 14,
+      "notes": "The cinema staging is culturally loaded and several experiencers push back on it explicitly - 'it wasn't like watching a movie screen or anything as simple as that', 'instead of just watching it like you'd watch a movie or a film strip, I became myself again'. The screen and the surround (see the-surround) are therefore best read as two competing accounts of the same event: spectator versus participant. Remaining false positives are host chatter about what is 'on the screen' of the video."
+    },
+    {
+      "id": "the-surround",
+      "name": "the surround",
+      "category": "structure",
+      "parent": "the-life-review",
+      "description": "The other staging, and the one experiencers usually insist is more accurate: the review is not in front of you, it is all around you and you are inside it. Recurring containers are a sphere, a giant bubble, a ball, a dome, a round chamber; recurring adjectives are panoramic, 360-degree, holographic, immersive. Several describe standing inside a hologram that rose out of the centre of a table. People stress they did not have to turn their heads - vision came from every direction at once.",
+      "aliases": [
+        {"term": "panoramic life review", "tradition": "secular", "note": "Dannion Brinkley's term, widely echoed"},
+        {"term": "360-degree", "tradition": "secular"},
+        {"term": "a giant bubble / spherical / inside a ball", "tradition": "none"},
+        {"term": "hologram", "tradition": "none"},
+        {"term": "holographic panoramic memory", "tradition": "none", "note": "Raymond Moody's phrasing, repeated by experiencers"},
+        {"term": "a dome of glass", "tradition": "none"},
+        {"term": "all around me", "tradition": "none"},
+        {"term": "immersive / all-encompassing viewpoint", "tradition": "none"}
+      ],
+      "regex": "(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)[\\s\\S]{0,250}(panoramic|360[ °]?|all around me|surround\\w+ (me|by)|bubble|spher\\w+|dome|hologra\\w+|immersive|inside (it|the memor|a ball)|encircl\\w+|every direction)|(panoramic|360[ °]?|all around me|surround\\w+ (me|by)|bubble|spher\\w+|dome|hologra\\w+|immersive|inside (it|the memor|a ball)|encircl\\w+|every direction)[\\s\\S]{0,250}(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)",
+      "negative_regex": "holographic (universe|nature of reality|principle)|simulation",
+      "quotes": [
+        {"videoId": "m3vB2J-BH6Y", "cvnde": 15, "text": "we went into this area that I perceived as being spherical, round, like inside a ball. And we started to relive my life."},
+        {"videoId": "2O07zj0k4iw", "cvnde": 17, "text": "I call it the panoramic life review, and you will see your entire life pass before you in a 360-degree panorama."},
+        {"videoId": "1GjCOcYc3WM", "cvnde": 12, "text": "now I'm in a giant sphere about the size of a football stadium. And I'm looking all around in 360 degrees. Everywhere are little like motion picture screens of my lives"}
+      ],
+      "sensory": [
+        "a sphere the size of a football stadium",
+        "a hologram rising in the centre of an oval conference table",
+        "no need to turn your head; sight from every direction simultaneously",
+        "three-dimensional, forward and backward at the same time",
+        "sometimes explicitly not visual at all - 'I wasn't watching it, I was reliving it'"
+      ],
+      "journey_position": 0.56,
+      "measured": {"all_pct": 2.67, "all_docs": 165, "cv13_pct": 4.10, "cv18_pct": 3.18, "cv23_pct": 3.31},
+      "precision_estimate": 0.85,
+      "precision_sample_n": 16,
+      "notes": "Runs notably richer in the better-evidenced strata (2.67% all vs 4.10% at cv>=13). 'Hologram' outside review context is usually philosophical talk about reality being a hologram, hence the negative_regex. The surround and the-screen overlap in some accounts - people describe curved screens wrapping all the way around, which is the hinge between the two stagings."
+    },
+    {
+      "id": "inside-the-other-person",
+      "name": "inside the other person",
+      "category": "process",
+      "parent": "the-life-review",
+      "description": "The signature detail of the whole region: during the review you do not merely watch what you did, you experience it from the position of the person you did it to. Experiencers say they were inside the other person's body, brain and emotions, feeling the exact hurt or comfort they had caused, often simultaneously with their own original justification for causing it. Several describe consciousness fragmenting into multiple streams so that one event is lived from every participant's side at once. This is the mechanic that turns the review from information into moral experience - and it is the reason many say a bad review is what hell actually means.",
+      "aliases": [
+        {"term": "from the other person's point of view", "tradition": "secular"},
+        {"term": "I felt what they felt", "tradition": "none"},
+        {"term": "I was the other person", "tradition": "none"},
+        {"term": "on the receiving end", "tradition": "none"},
+        {"term": "through their eyes / through everyone's perspective", "tradition": "none"},
+        {"term": "the golden rule written into the fabric of the universe", "tradition": "Christian/secular"},
+        {"term": "multiple streams of consciousness", "tradition": "none"}
+      ],
+      "regex": "(felt|feel|experienc\\w+|saw|see|seeing|reliv\\w+|watch\\w+|relived) (it |everything |this |them |my life |)(from|through) (the |)(other (person|people)(.s)?|everyone|everybody|their|his|her|each person|every person)[^.]{0,25}(point of view|perspective|eyes|shoes|experience)|felt what (he|she|they|the other person|everyone|others|that person) felt|I (became|was) (the )?(that|the other) person|felt (their|his|her) (pain|hurt|anger|joy|sadness|emotions|feelings) (that I|I had|from|when)",
+      "negative_regex": "empathy is|try to see it from|put yourself in (their|his|her)",
+      "quotes": [
+        {"videoId": "GEWRPlpwrEU", "cvnde": 21, "text": "I also was able to feel as though I was the other person that I was interacting with. And if I had behaved hurtfully, I was feeling that hurt of that other person."},
+        {"videoId": "blrj2nojb-0", "cvnde": 10, "text": "I felt what they felt, juxtaposed and simultaneous to my own justifications and emotional state for causing them their, my reasons, my hurt."},
+        {"videoId": "UYBGm_rDvso", "cvnde": 22, "text": "you relive it from the perspective of everyone involved. So if you've been busy handing out pain and suffering to others in your life review, you'll be on the receiving end of that."}
+      ],
+      "sensory": [
+        "being inside the other person's body, brain and physical suffering",
+        "your own justification running simultaneously alongside their pain",
+        "the pain you gave described as disproportionate in size - 'the size of a mountain'",
+        "the good is felt the same way: you receive the gratitude of people you helped",
+        "seeing how the person then carried the hurt onward into other lives"
+      ],
+      "journey_position": 0.58,
+      "measured": {"all_pct": 2.43, "all_docs": 150, "cv13_pct": 1.99, "cv18_pct": 2.21, "cv23_pct": 1.10},
+      "precision_estimate": 0.72,
+      "precision_sample_n": 14,
+      "notes": "Almost certainly under-counted: many describe the mechanic without any of these fixed phrases ('I was in that person as they experience it'). The wording is highly idiosyncratic, so recall is the weak point, not precision. Requiring life-review proximity would raise precision but collapses the count to 47 docs (0.76%), so the looser form is reported. Note this element does NOT rise with cvNDE - it is slightly less common in the best-evidenced accounts, unlike most of this region."
+    },
+    {
+      "id": "no-judgement-here",
+      "name": "no judgement here",
+      "category": "state",
+      "parent": "the-life-review",
+      "description": "The most consistently reported quality of the review: the total absence of condemnation. Experiencers repeatedly say nobody was judging them - not God, not the being holding them, not the beings watching. Where they had been raised to expect a throne, a scepter, a gavel and a verdict, they found instead compassion, interest and even amusement. Many report the being explicitly refusing the frame: 'that's your judgment of it, not ours'. Remorse is still present and can be agonising - but it is remorse without condemnation, and several call this the single fact that changed their lives.",
+      "aliases": [
+        {"term": "no judgment", "tradition": "secular", "note": "the near-universal phrasing"},
+        {"term": "absent of judgment", "tradition": "none"},
+        {"term": "not a courtroom, a classroom", "tradition": "secular"},
+        {"term": "nobody was judging me", "tradition": "none"},
+        {"term": "there was no judgment day for me", "tradition": "Christian", "note": "used to negate the expected theology"},
+        {"term": "no condemnation", "tradition": "Christian"},
+        {"term": "unconditional love", "tradition": "none", "note": "the substitute frequently named in place of judgement"}
+      ],
+      "regex": "no judg(e)?ment|not judg(ed|ing) (me|you|us|my)|(wasn.t|weren.t|was not) (being |ever )?judged|absent of judg(e)?ment|without (any )?judg(e)?ment|(nobody|no one|nothing) (was |there was )?judging|not a courtroom",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "lwkOnahGlsc", "cvnde": 20, "text": "And the beautiful being that held me said, \"That's your judgment of it, not ours."},
+        {"videoId": "cMBRXeUtKfs", "cvnde": 25, "text": "this presence, who is God, did not judge me. I didn't judge me. Nobody else judged me."},
+        {"videoId": "Xyld1mDGkXU", "cvnde": 10, "text": "we have this life review, and there's nobody judging you. God's not sitting there, ascended masters are not sitting there, Jesus, Buddha, no one's sitting there judging your life."}
+      ],
+      "sensory": [
+        "the expected throne, scepter and gavel are looked for and found missing",
+        "the reviewer's tone described as neutral, kind, curious, sometimes humorous",
+        "'are you sure about that?' rather than accusation",
+        "regret and remorse still present, sometimes excruciating, but uncondemned"
+      ],
+      "journey_position": 0.58,
+      "measured": {"all_pct": 10.43, "all_docs": 644, "cv13_pct": 10.74, "cv18_pct": 9.39, "cv23_pct": 8.84},
+      "precision_estimate": 0.75,
+      "precision_sample_n": 12,
+      "notes": "This is the single most contested item in the region. A minority of accounts - particularly the distressing and the explicitly evangelical ones - report the opposite: being questioned by God, shown only their harms, or feeling accountable and afraid. The phrase also drifts into general post-NDE philosophy ('there is no hell, there is no judgment'), which is the main precision loss. Slightly less frequent in the best-evidenced stratum."
+    },
+    {
+      "id": "you-are-your-own-judge",
+      "name": "you are your own judge",
+      "category": "process",
+      "parent": "the-life-review",
+      "description": "Where judgement does occur in the review, experiencers overwhelmingly report that they are the ones doing it. The being beside them stays neutral or loving while they themselves recoil, feel shame, and pass sentence. Several say plainly that they were far harsher than anyone else could have been, and one says he judged himself guilty not against other people but against the purity of the love that was holding him. Some are told afterwards that their verdict was their own and not shared.",
+      "aliases": [
+        {"term": "I judged myself", "tradition": "none"},
+        {"term": "I was the one doing the judging", "tradition": "none"},
+        {"term": "the only one judging me is me", "tradition": "none"},
+        {"term": "the judgment is our judgment, not God holding trial on us", "tradition": "secular"},
+        {"term": "your judgment of it, not ours", "tradition": "none"},
+        {"term": "self-condemnation", "tradition": "Christian"}
+      ],
+      "regex": "I judg(ed|e|ing) my ?(self|own life)|I was the one (doing the |who was )?judg(ing|ed)|judging myself|the only one judging me|your judgment of it|harder on myself than|my own judg(e)?ment of",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "90_bk9__d1o", "cvnde": 16, "text": "I was not judged on the bad and the good, but I, but I judged myself on the bad and the good. And, you know, as individuals, we're harder on ourselves than anybody else could be on us."},
+        {"videoId": "XQLNtxa0Jvo", "cvnde": 16, "text": "But he wasn't judging me. I was judging me. And, uh, the one thing I saw and felt was if I hurt someone, if my words hurt someone, I felt what they felt."},
+        {"videoId": "ii1UDGWi6Gk", "cvnde": 10, "text": "I was there with my guide, watching everything that I'd ever done and seeing the ripple effects throughout all the people around me. And I was the one doing the judging."}
+      ],
+      "sensory": [
+        "shame and guilt arising in a place where nothing shames you",
+        "measuring yourself not against other people but against the love present",
+        "the reviewer gently disputing the verdict you have just passed",
+        "in one account the elders laughing kindly whenever the experiencer condemned herself"
+      ],
+      "journey_position": 0.60,
+      "measured": {"all_pct": 2.12, "all_docs": 131, "cv13_pct": 2.47, "cv18_pct": 2.35, "cv23_pct": 3.31},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "notes": "Rises steadily with evidential strength (2.12% all to 3.31% at cv>=23), the clearest positive gradient of the judgement cluster. Some false positives are ordinary biographical self-criticism ('I judged myself for that') from depression narratives outside the NDE."
+    },
+    {
+      "id": "the-one-who-watches-with-you",
+      "name": "the one who watches with you",
+      "category": "being",
+      "parent": "the-life-review",
+      "description": "Almost nobody reviews their life alone. A presence stands beside, behind or around the experiencer for the duration - a guide, an angel of light, a being of light, Jesus, a soul family, or something unseen that can only be sensed. Its function is remarkably consistent: it does not narrate and does not accuse. It says 'why don't we look at this', it pauses the review to discuss a scene, it holds the experiencer while they weep, and it answers their self-condemnation with love. Where the experiencer expected a prosecutor they found a companion.",
+      "aliases": [
+        {"term": "my guide", "tradition": "secular"},
+        {"term": "a presence next to me", "tradition": "none"},
+        {"term": "the being of light", "tradition": "none"},
+        {"term": "an angel of light", "tradition": "Christian"},
+        {"term": "Jesus / Christ", "tradition": "Christian"},
+        {"term": "my soul family", "tradition": "none", "note": "in some accounts the whole group relives your life with you"},
+        {"term": "something loving beside me", "tradition": "none", "note": "explicitly invisible, sensed only"},
+        {"term": "the escort", "tradition": "none"}
+      ],
+      "regex": "(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)[\\s\\S]{0,180}(beside me|next to me|with me|standing (there|by me)|holding me|arm around me|by my side|watch(ed|ing) (it |them |)with me|my guide|the being of light)|(beside me|next to me|standing (there|by me)|holding me|arm around me|by my side|my guide|the being of light)[\\s\\S]{0,180}(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "cHIdkYgdJJY", "cvnde": 19, "text": "during the time that I was being shown this review of my life, he was with me in all of it."},
+        {"videoId": "UvZwj5acUJo", "cvnde": 10, "text": "And then I realize right at the end, that there is a presence next to me. I can't see him, I know he's male, and I know that I know him intimately."},
+        {"videoId": "ZI1juiCO5O8", "cvnde": 23, "text": "There was something loving beside me. It wasn’t anything visible. You could only sense it. It was a kind of spirit or soul."}
+      ],
+      "sensory": [
+        "standing behind or slightly to one side, often unseen",
+        "communicating without speech; questions rather than statements",
+        "pausing the review to ask 'okay, how do you feel about that?'",
+        "physical holding - arms around you while the worst scenes run"
+      ],
+      "journey_position": 0.55,
+      "measured": {"all_pct": 2.23, "all_docs": 138, "cv13_pct": 3.02, "cv18_pct": 3.73, "cv23_pct": 6.63},
+      "precision_estimate": 0.9,
+      "precision_sample_n": 14,
+      "notes": "The strongest cvNDE gradient anywhere in this region: 2.23% of all accounts but 6.63% of the best-evidenced ones, a threefold enrichment. Whatever else the review is, the presence of a non-judging companion is disproportionately reported by the accounts with the strongest veridical corroboration. Recall is limited because many describe the companion without any of these anchor phrases."
+    },
+    {
+      "id": "the-council",
+      "name": "the council",
+      "category": "being",
+      "parent": null,
+      "description": "A seated group - most often twelve, sometimes three, sometimes an unnumbered circle - who receive the newly arrived and go through their life with them. They sit in a circle or around an oval table, wear white or golden robes, and speak in one voice. Experiencers call them the council, the council of light, the council of twelve, the elders, or simply 'my council'. Their tone is consistently reported as loving and non-punitive; several describe being laughed with rather than at.",
+      "aliases": [
+        {"term": "the Council of 12", "tradition": "New Age/secular"},
+        {"term": "Council of Light", "tradition": "New Age"},
+        {"term": "council of elders", "tradition": "none"},
+        {"term": "the elders", "tradition": "none"},
+        {"term": "council chamber", "tradition": "none"},
+        {"term": "a council of high spiritual beings", "tradition": "none"},
+        {"term": "the Room of the Blueprints", "tradition": "none", "note": "one experiencer's name for the room where her council sat at a white boardroom table"},
+        {"term": "ascended masters", "tradition": "New Age"}
+      ],
+      "regex": "council of (light|elders|twelve|12|souls|wisdom|masters|beings|high)|(the|my|a) council (of|was|were|there|said|told|sat|is|that)|council chamber|(elder|wise) council|before (the|a) council|(circle|group) of elders",
+      "negative_regex": "council of (nicaea|nicea|trent|constantinople|chalcedon|europe|ministers|churches)|city council|town council|student council|scientific council|rabbinical council|council (tax|estate|house|flat)",
+      "quotes": [
+        {"videoId": "XWYbDyESS7k", "cvnde": 12, "text": "It was as though I had entered into a space to help me review like a council chamber. From that place, this one magnificent being, and then suddenly appeared an additional three beings."},
+        {"videoId": "N0IxuzRf66U", "cvnde": 7, "text": "I went in there and that's where I met the Council of Light, which were these 12 beings. I saw 12 beings, and they were just like beings of light."},
+        {"videoId": "yK5HZqeD7tU", "cvnde": 10, "text": "I sat right there with, uh, the 12 you know, the Council of 12. They were in white robes."},
+        {"videoId": "8p7y58V6sMM", "cvnde": 14, "text": "What I have also experienced was the presence of a council of elders."}
+      ],
+      "sensory": [
+        "twelve figures, white or golden robes, heads bowed",
+        "seated in a circle, or around a white or oval boardroom table",
+        "speaking with one voice, not over each other",
+        "'we've been waiting for you'",
+        "a window beyond them showing galaxies"
+      ],
+      "journey_position": 0.60,
+      "measured": {"all_pct": 1.59, "all_docs": 98, "cv13_pct": 1.45, "cv18_pct": 1.24, "cv23_pct": 1.10},
+      "precision_estimate": 0.75,
+      "precision_sample_n": 14,
+      "notes": "Parent left null because the council appears in two distinct settings: presiding at the life review, and pre-birth life planning ('we sit with a council of 12 and they help us write what we need to master'). It is one of the few items in this region that gets LESS common as evidential strength rises (1.59% all vs 1.10% at cv>=23), which is worth flagging - the numbered-council motif is heavily New Age inflected. Remaining false positives are church councils and civic councils not caught by the negative regex."
+    },
+    {
+      "id": "the-hall-of-records",
+      "name": "the hall of records",
+      "category": "structure",
+      "parent": null,
+      "description": "A building where everything that has happened is kept. Descriptions converge on institutional architecture - marble columns, a triangular pediment, wide steps, 'like the Supreme Court building', 'like the Lincoln Memorial' - and inside, a library of impossible size with twenty-foot shelves and people quietly reading and studying. Others encounter it not as a building but as a field of information you can simply attend to. Names vary by tradition: the Akashic Records, the Hall of Records, the hall of knowledge, the Book of Life, the Great Book of Judgment.",
+      "aliases": [
+        {"term": "Akashic Records", "tradition": "New Age/Theosophical"},
+        {"term": "Hall of Records", "tradition": "none"},
+        {"term": "hall of knowledge", "tradition": "none", "note": "a round room with aisles leading in from all sides and the stars visible overhead"},
+        {"term": "the Book of Life", "tradition": "Christian"},
+        {"term": "the Lamb's Book of Life", "tradition": "Christian", "note": "a registration book in which arrivals are recorded"},
+        {"term": "the Great Book of Judgment", "tradition": "Christian"},
+        {"term": "the library", "tradition": "secular"},
+        {"term": "I am the book of life", "tradition": "none", "note": "one experiencer rejects the external record entirely: the record IS the person"}
+      ],
+      "regex": "akashic|hall of records|halls? of knowledge|book of life|great book of judgment|library of (souls|light|knowledge|all)|(gigantic|enormous|huge|vast|infinite|celestial|massive) librar",
+      "negative_regex": "(public|local|school|university|town|city) librar|library card|book of life (insurance|assurance)",
+      "quotes": [
+        {"videoId": "jeSyFDZaSys", "cvnde": 7, "text": "after you go through your life review, and you know, you go through the Hall of Records, the Akashic Records, whatever you call it"},
+        {"videoId": "K-CCneVnkAM", "cvnde": 26, "text": "I think I was in the Hall of Records. Now that I've learned, you know, what, how it's been, others have described it."},
+        {"videoId": "8p7y58V6sMM", "cvnde": 14, "text": "The hall of knowledge is a wonderful place, where one can listen to spiritual teachers."},
+        {"videoId": "2O07zj0k4iw", "cvnde": 17, "text": "The call of Records or the Great Book of Judgment and all those terms that we hear, something like that does exist."}
+      ],
+      "sensory": [
+        "marble columns, triangular pediment, long flights of steps",
+        "brown wooden bookshelves twenty feet high, full of books everywhere",
+        "gold, chandeliers, a big magnificent room",
+        "a round room with aisles from every side and the stars visible above",
+        "other people already there, reading, studying, visiting"
+      ],
+      "journey_position": 0.62,
+      "measured": {"all_pct": 5.55, "all_docs": 343, "cv13_pct": 5.85, "cv18_pct": 5.66, "cv23_pct": 9.39},
+      "precision_estimate": 0.6,
+      "precision_sample_n": 16,
+      "notes": "Strongly enriched in the best-evidenced stratum (5.55% all vs 9.39% at cv>=23). Precision is the weakest of the well-attested places here: 'akashic records' is frequently discussed as a concept rather than a visited place, and 'book of life' sometimes appears in doctrinal argument. Kept because the architectural descriptions, when they do occur, are unusually concrete and mutually consistent."
+    },
+    {
+      "id": "the-knowing",
+      "name": "the knowing",
+      "category": "state",
+      "parent": null,
+      "description": "The state, usually adjacent to or immediately following the review, in which everything is understood at once. Experiencers describe it as knowledge arriving without being sought - a download, a flooding, a lid coming off - and as the disappearance of questions rather than the receipt of answers. Several say they had nothing to ask because there was nothing left unknown; one describes knowing everything the light knew, about flowers, plants, asteroids, suns and novas. The corpus's own preferred word for this is 'download'.",
+      "aliases": [
+        {"term": "download", "tradition": "secular", "note": "the corpus's dominant idiom - 'a download of information', 'a knowledge download'"},
+        {"term": "I knew everything", "tradition": "none"},
+        {"term": "all knowledge", "tradition": "none"},
+        {"term": "all the questions were answered", "tradition": "none"},
+        {"term": "instant knowing", "tradition": "none"},
+        {"term": "the lid came off", "tradition": "none"},
+        {"term": "omniscience", "tradition": "secular"},
+        {"term": "universal knowledge / cosmic knowledge", "tradition": "none"}
+      ],
+      "regex": "I knew (everything|all things|it all)|knew all the answers|(all|every) (the |)(question|answer)s? (I|were|was|had ever|ever)[^.]{0,40}(answered|answer)|(all|infinite|total|complete|universal) knowledge (was|of the universe|poured|came|downloaded|available)|knowledge download|download(ed|ing)? (of )?(information|knowledge|data)|understood (everything|all of it|it all)",
+      "negative_regex": "download (the|our|my|this) (app|book|episode|podcast|pdf|guide)",
+      "quotes": [
+        {"videoId": "9G948sjtGac", "cvnde": 7, "text": "all knowledge was downloaded instantly. I knew where I was. I knew who I was"},
+        {"videoId": "HvI_CtquBNE", "cvnde": 20, "text": "once I was in the light, I knew everything the light knew. I knew all about the universe. I knew everything about flowers, about plants, about asteroids, about suns, about novas, everything."},
+        {"videoId": "0Kk8F6jGIFQ", "cvnde": 11, "text": "which by the way, is quite a download of information all at once. I saw everything in the eternal now, all at once, every possibility"}
+      ],
+      "sensory": [
+        "arriving all at once rather than sequentially",
+        "questions dissolving rather than being answered",
+        "knowledge experienced as available on demand - 'you think of it, it comes to you'",
+        "described as flooding, pouring, a funnel, a lid coming off"
+      ],
+      "journey_position": 0.63,
+      "measured": {"all_pct": 9.05, "all_docs": 559, "cv13_pct": 10.31, "cv18_pct": 9.12, "cv23_pct": 9.94},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 14,
+      "notes": "The structured coder marks knowledge_download present in 61.4% of accounts, so this lexical regex is capturing perhaps a seventh of the phenomenon - the state is usually described without these fixed phrases. life_review > knowledge_download is the second most common transition in the whole corpus (1072 occurrences, 19.7% of sequenced accounts), which is why this sits immediately downstream of the review."
+    },
+    {
+      "id": "the-veil-of-forgetting",
+      "name": "the veil of forgetting",
+      "category": "boundary",
+      "parent": null,
+      "description": "The threshold on the way back, where what was known is taken away again. Experiencers report being told they will not be allowed to keep it, or discovering afterwards that specifically the answers - and only the answers - have been erased. Several say the knowledge is still in them but sealed; a few say fragments surface over decades. The withdrawal is usually described as deliberate and purposeful rather than as ordinary forgetting, and it is often explained to them: remembering would remove the point of being here.",
+      "aliases": [
+        {"term": "veil of forgetfulness", "tradition": "none"},
+        {"term": "not allowed to remember", "tradition": "none"},
+        {"term": "the answers were erased", "tradition": "none"},
+        {"term": "they wiped it", "tradition": "none"},
+        {"term": "a helmet of lead collapsed over my consciousness", "tradition": "none", "note": "one experiencer's image for the moment of return"},
+        {"term": "the veil", "tradition": "secular"}
+      ],
+      "regex": "veil of forget\\w+|not allowed to (remember|bring|know|retain|keep)|(wasn.t|weren.t|won.t be|couldn.t be) allowed to (remember|bring|keep|retain)|(made|make) me forget|you (will|won.t) remember (this|any of|it)|(knowledge|information|answers|all of it|understanding|it all) (was|were|got) (taken|stripped|removed|withheld|blocked|erased|wiped)|(couldn.t|can.t) (bring|carry|retain) (it|that|the knowledge|any of it) back|forgot(ten)? (most of|all of|almost all)",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "QWuK_uHwlZo", "cvnde": 7, "text": "these answers were erased. That's the the only thing that was erased through this whole event were the answers to the questions that we all have."},
+        {"videoId": "2AQ74T5PF20", "cvnde": 7, "text": "Most of the knowledge that I gained in that expanded state, I was not allowed to remember."},
+        {"videoId": "UYBGm_rDvso", "cvnde": 22, "text": "We had to go through a veil of forgetfulness because that love is so strong and so powerful that even the remembrance of that love would prevent us from having true free agency."}
+      ],
+      "sensory": [
+        "a lead helmet closing over the mind at the instant of return",
+        "the answers specifically removed while the events remain",
+        "memories surfacing gradually over years afterwards",
+        "knowing that you knew, without being able to reach it"
+      ],
+      "journey_position": 0.95,
+      "measured": {"all_pct": 2.48, "all_docs": 153, "cv13_pct": 2.35, "cv18_pct": 3.18, "cv23_pct": 1.10},
+      "precision_estimate": 0.75,
+      "precision_sample_n": 12,
+      "notes": "An earlier, looser version of this regex reached 10.75% but was dominated by 'I can't take it anymore' from the dying-body narrative; this tightened version trades recall for precision. Some hits are the mirror-image doctrine (a pre-birth veil placed before incarnation) rather than the post-NDE withdrawal - the corpus itself treats these as the same mechanism running in two directions."
+    },
+    {
+      "id": "the-preview",
+      "name": "the preview",
+      "category": "process",
+      "parent": null,
+      "description": "The forward-facing twin of the review. Instead of, or alongside, what you did, you are shown what is coming - your own future, your children growing up, the life your family will have with or without you, or events on a global scale. Experiencers are careful to distinguish two grades: things that will definitely occur and things that are only possible, since free will has not been spent. The corpus's own term for it is 'life preview'. Several are shown their family's life if they do not return, and this is what decides them.",
+      "aliases": [
+        {"term": "life preview", "tradition": "secular"},
+        {"term": "flash-forward", "tradition": "none"},
+        {"term": "future events", "tradition": "none"},
+        {"term": "the future without me", "tradition": "none"},
+        {"term": "shown what would happen", "tradition": "none"},
+        {"term": "prophecy", "tradition": "Christian"},
+        {"term": "potential futures / probabilities", "tradition": "none"}
+      ],
+      "regex": "life preview|shown (me )?(the |my |our |)future|saw (my |the |our )future|flash-?forward|future (events|visions?)|shown (me )?what (would|was going to) happen|preview of (my|the) (life|future)",
+      "negative_regex": "future of (this channel|the show|the podcast)|in the future,? (please|if you)",
+      "quotes": [
+        {"videoId": "EYD7MlADJbU", "cvnde": 11, "text": "So there's no life review. But in my case, there's a life preview. And at the time, I didn't realize how far it went."},
+        {"videoId": "By3UjYUe7rw", "cvnde": 23, "text": "Then they showed me through the same screen some future events in my life if I chose to return to it. Some events would definitely occur, and some events were possible but not definite."},
+        {"videoId": "W9RHVlN2yhg", "cvnde": 10, "text": "Then I was shown the future without me."}
+      ],
+      "sensory": [
+        "shown on the same screen or in the same field as the past",
+        "graded into 'definite' and 'possible but not definite'",
+        "personal futures (a child's bedroom, a funeral, a graduation) far more common than global ones",
+        "sometimes explicitly withdrawn afterwards: 'I'm not allowed to know the future'"
+      ],
+      "journey_position": 0.71,
+      "measured": {"all_pct": 3.74, "all_docs": 231, "cv13_pct": 5.43, "cv18_pct": 6.08, "cv23_pct": 7.73},
+      "precision_estimate": 0.7,
+      "precision_sample_n": 14,
+      "notes": "One of the strongest cvNDE gradients in the region: 3.74% of all accounts but 7.73% of the best-evidenced ones. This is intuitive - a shown future is checkable, so accounts containing one are more likely to score highly on veridical evidence. Precision loss comes from interviewer questions about 'the future of humanity' and from channelled future-prediction segments unconnected to the NDE itself."
+    },
+    {
+      "id": "how-did-you-love",
+      "name": "how did you love",
+      "category": "state",
+      "parent": "the-life-review",
+      "description": "What the review turns out to be measuring. Not achievement, not belief, not money, not career - experiencers say over and over that what registered were acts of kindness, often trivial ones they had entirely forgotten, and the love given and received. Several report that the review skipped everything they had been proud of and lingered on a kind word to a stranger. One says her review consisted only of moments of intense shared love and nothing else. The measure is repeatedly phrased as a single question: how did you love?",
+      "aliases": [
+        {"term": "how did you love?", "tradition": "none"},
+        {"term": "how well did you love?", "tradition": "none"},
+        {"term": "what did you do for others?", "tradition": "none"},
+        {"term": "the love impact you had", "tradition": "none"},
+        {"term": "random acts of kindness", "tradition": "secular"},
+        {"term": "the golden rule", "tradition": "Christian/secular"},
+        {"term": "what you bring back is your heart", "tradition": "Christian"}
+      ],
+      "regex": "how (much|well) (did|have) you love|did you learn (how )?to love|(only|all) that mattered (was|were)|the only thing that mattered|it.s all about (love|how you)|(smallest|littlest|random|small) acts? of kindness|(what|how) (did|have) you (done|do) for others",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "PK7PTC3Qw4s", "cvnde": 21, "text": "Only one question mattered. How did you love? What did you do for others? The quality of our being is all that truly matters."},
+        {"videoId": "cbLijI1NW4c", "cvnde": 8, "text": "Nothing else really mattered, but the love that I had given and how I had shared with others."},
+        {"videoId": "j2Z0rAoJaDc", "cvnde": 11, "text": "It's a life review of how much you loved people. What was the love impact that you had on people on this earth?"}
+      ],
+      "sensory": [
+        "small forgotten kindnesses shown as 'the most magnificent thing I had done'",
+        "achievements offered up ('I'm an Eagle Scout') and dismissed",
+        "love given to yourself counted alongside love given to others",
+        "one review consisting only of moments of shared love, nothing else"
+      ],
+      "journey_position": 0.62,
+      "measured": {"all_pct": 2.49, "all_docs": 154, "cv13_pct": 2.71, "cv18_pct": 3.04, "cv23_pct": 2.76},
+      "precision_estimate": 0.55,
+      "precision_sample_n": 14,
+      "notes": "Honest precision warning: about half of the matches are the experiencer stating the lesson in the interview rather than describing the measure being applied during the review. That is still evidence about the content of the belief, but it is not the same as a described scene. 'Acts of kindness' also appears in ordinary post-NDE advice-giving."
+    },
+    {
+      "id": "the-questions",
+      "name": "the questions",
+      "category": "process",
+      "parent": "the-life-review",
+      "description": "In a distinct minority of accounts the review is not silent. A voice - usually identified as God, sometimes simply 'a voice' - asks a small fixed set of questions, most commonly two or three, and waits. The recurring question across unrelated accounts is remarkably stable: 'What have you done with your life?' Experiencers describe answering with their credentials and having the answer rejected, then discovering that in that realm you cannot think one thing and say another, because the questioner already knows.",
+      "aliases": [
+        {"term": "what have you done with your life?", "tradition": "Christian/secular"},
+        {"term": "three questions", "tradition": "none"},
+        {"term": "what have you done for others?", "tradition": "none"},
+        {"term": "how do you think you've done? what could you do better?", "tradition": "none"},
+        {"term": "the voice", "tradition": "none"}
+      ],
+      "regex": "what have you done with (your|the|my) life|what had I done with my life|what did you do with your life|(issued|asked me|threw|there were) (three|two) questions|three questions",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "6hogP2qF3RI", "cvnde": 22, "text": "this wonderful voice, with the voice that I now recognize as the voice of God, issued three questions."},
+        {"videoId": "2840RVyMh7Y", "cvnde": 15, "text": "And he threw a question, \"What had I done with my life?\" And I thought, \"Well, I'm an Eagle Scout.\""},
+        {"videoId": "Zm1uXOx24m8", "cvnde": 11, "text": "a voice asked me, \"What have you done for others? What have you done to help yourself? And have you always believed in Me?\""}
+      ],
+      "sensory": [
+        "the question repeated verbatim after an evasive answer",
+        "the voice penetrating 'my very being' rather than being heard",
+        "the impossibility of hypocrisy - the questioner already knows what you think",
+        "the questions asked while the images are still running"
+      ],
+      "journey_position": 0.55,
+      "measured": {"all_pct": 0.97, "all_docs": 60, "cv13_pct": 1.03, "cv18_pct": 0.97, "cv23_pct": 0.55},
+      "precision_estimate": 0.7,
+      "precision_sample_n": 14,
+      "notes": "Rare but strikingly consistent across unconnected accounts, which is why it is included despite the low count. The 'three questions' phrasing occasionally matches interview logistics ('I have three questions for you'), the main false positive. Note the interrogative review is the exception, not the rule - the no-judgement accounts vastly outnumber it."
+    },
+    {
+      "id": "the-ripple",
+      "name": "the ripple",
+      "category": "process",
+      "parent": "the-life-review",
+      "description": "The chain of consequence made visible. In these accounts the review does not stop at what you did and how it felt to the other person - it follows what that person then did to a third person, and outward from there, sometimes described as running out to infinity. Experiencers see kindness compounding and hurt propagating, and several say this was the most morally shocking part of the experience: not the acts themselves but their unbounded onward travel. The corpus's own word for it is almost always 'ripple'.",
+      "aliases": [
+        {"term": "ripple effect", "tradition": "secular", "note": "overwhelmingly the dominant phrasing"},
+        {"term": "rippled out", "tradition": "none"},
+        {"term": "how they passed it on", "tradition": "none"},
+        {"term": "they carried that hurt on to other people", "tradition": "none"},
+        {"term": "you were the creator of that", "tradition": "none"},
+        {"term": "domino effect", "tradition": "secular"}
+      ],
+      "regex": "(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)[\\s\\S]{0,300}(ripple|domino|chain reaction|passed (it )?on to|carried (it|that) (on|forward))|(ripple effect|rippled out)[\\s\\S]{0,300}(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "dzpekGHWiCs", "cvnde": 23, "text": "It was just an amazing ability to see the ripple effect of how you interact with other people and that it's how we're all connected"},
+        {"videoId": "0Kk8F6jGIFQ", "cvnde": 11, "text": "And every single ripple effect of my every thought, action, out to infinity, which by the way, is quite a download of information all at once."},
+        {"videoId": "k3JdTHx9EWE", "cvnde": 7, "text": "everything that if you did that affected and rippled out to someone else, you were the creator of that, and so you experienced your creation."}
+      ],
+      "sensory": [
+        "consequences followed out to infinity, not stopping at the first person",
+        "seeing a hurt person go on to hurt someone else, and that person another",
+        "a kind act 'like a ripple that changed universes'",
+        "concentric circles spreading outward"
+      ],
+      "journey_position": 0.60,
+      "measured": {"all_pct": 1.10, "all_docs": 68, "cv13_pct": 1.39, "cv18_pct": 1.24, "cv23_pct": 0.55},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "notes": "The unconstrained phrase 'ripple effect' matches 4.57% of the corpus but is mostly post-NDE moral advice; requiring life-review proximity cuts it to 1.10% with much better precision. This is under-counted, since many describe the same mechanic as 'chains' or 'how it went on and on' without the word ripple."
+    },
+    {
+      "id": "past-lives-in-the-review",
+      "name": "past lives in the review",
+      "category": "process",
+      "parent": "the-life-review",
+      "description": "A minority variant in which the review is not confined to this life. Experiencers describe screens that re-scroll to add six earlier lifetimes so that seven are being reviewed at once, or being shown the whole progression of lives and what was learned in each. Some who had no conventional review at all report this instead. Several object to the word 'past', saying the lives are simultaneous or parallel rather than sequential, since time does not run there.",
+      "aliases": [
+        {"term": "past lives", "tradition": "New Age/Buddhist/Hindu"},
+        {"term": "previous lifetimes", "tradition": "none"},
+        {"term": "parallel lives", "tradition": "none", "note": "preferred by those who reject sequential time"},
+        {"term": "past life review", "tradition": "none"},
+        {"term": "seven lifetimes", "tradition": "none"},
+        {"term": "the progression of lives", "tradition": "none"}
+      ],
+      "regex": "(past|previous|other|prior) li(fe|ves|fetimes?)[\\s\\S]{0,120}(review|shown|showed|saw|watched|flashed)|(shown|showed me|saw|watched) (all )?(my|of my) (past|previous|other) (lives|lifetimes)|past[- ]life review",
+      "negative_regex": "past life regression (therapy|session|therapist)|hypnotherap",
+      "quotes": [
+        {"videoId": "hh1qNojDFFA", "cvnde": 16, "text": "I was shown all of my past lives. Um, all of my past lives, kind of like a movie, like a silent movie that I watch."},
+        {"videoId": "hp2rAPDJDcQ", "cvnde": 12, "text": "now they have dropped six past lives into the screen, and I'm now reviewing seven lifetimes."},
+        {"videoId": "yXfPyJSU2Z0", "cvnde": 7, "text": "I saw thousands of lifetimes in a circle around me in bubbles. They were like in bubbles of light, transparent light."}
+      ],
+      "sensory": [
+        "the screen re-scrolling backwards past birth",
+        "lifetimes seen as bubbles of transparent light arranged in a circle",
+        "the progression of what was learned visible across lives",
+        "described as silent, like a silent movie"
+      ],
+      "journey_position": 0.58,
+      "measured": {"all_pct": 3.14, "all_docs": 194, "cv13_pct": 2.90, "cv18_pct": 2.90, "cv23_pct": 2.76},
+      "precision_estimate": 0.6,
+      "precision_sample_n": 12,
+      "notes": "Gets slightly rarer as evidential strength rises. A meaningful share of matches are past-life regression therapy or general reincarnation belief rather than something seen during the NDE, which is the main precision cost even with the negative regex."
+    },
+    {
+      "id": "the-instant",
+      "name": "the instant",
+      "category": "state",
+      "parent": "the-life-review",
+      "description": "The temporal signature of the review: it contains a whole life and takes no time. Experiencers describe birth to death presented simultaneously rather than in sequence, and struggle openly with the contradiction - 'it lasted an eternity', 'it was over like that', 'a blink of an eye which seemed like it went on for a long time'. Some describe it as more spatial than sequential, a single room in which every part of a life is visible at once and the connections between them can be seen. Several narrate it linearly only because language forces them to.",
+      "aliases": [
+        {"term": "all at once", "tradition": "none"},
+        {"term": "simultaneously", "tradition": "none"},
+        {"term": "instantaneously", "tradition": "none"},
+        {"term": "deep time", "tradition": "secular", "note": "Eben Alexander's term for the non-sequential temporal order"},
+        {"term": "the eternal now", "tradition": "none"},
+        {"term": "a moment of no time", "tradition": "none"},
+        {"term": "more spatial than sequential", "tradition": "none"}
+      ],
+      "regex": "(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)[\\s\\S]{0,250}(all at once|simultaneous\\w*|at the same time|instantaneous\\w*|in an instant|no time at all|split second|in a second)|(all at once|simultaneous\\w*|instantaneous\\w*|in an instant|split second)[\\s\\S]{0,250}(life[- ]?review|review of my life|reliv\\w+ my life|review(ing)? your life|my life (flash|pass|play|replay|unfold)\\w*|life (flashing|passing) before|watching my life|saw my (whole |entire |)life|shown my (whole |entire |)life)",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "PSzv7SLUeR4", "cvnde": 14, "text": "I had an instantaneous flash of life review. It felt more spatial than sequential."},
+        {"videoId": "KkORcP_EzS8", "cvnde": 19, "text": "when people, for example, describe life reviews, you know, birth, death, everything in between appearing to you simultaneously"},
+        {"videoId": "oXrxmJ3ci5U", "cvnde": 23, "text": "I became myself again in all of those circumstances. I relived them instantaneously."}
+      ],
+      "sensory": [
+        "birth, death and everything between present at once",
+        "a large disorganised room in which all the parts of a life can be seen connected",
+        "an eternity that is also over in a blink",
+        "the narrator apologising for telling it in a linear order"
+      ],
+      "journey_position": 0.57,
+      "measured": {"all_pct": 2.32, "all_docs": 143, "cv13_pct": 2.23, "cv18_pct": 1.93, "cv23_pct": 2.21},
+      "precision_estimate": 0.8,
+      "precision_sample_n": 12,
+      "notes": "Under-counted: the corpus expresses this constantly with idiosyncratic phrasing ('a moment of no time', 'time meant nothing') that no fixed regex catches. The structured coder marks time_distortion at 58.8% overall, so this lexical measure is a small slice of a very large phenomenon."
+    },
+    {
+      "id": "the-paths-not-taken",
+      "name": "the paths not taken",
+      "category": "process",
+      "parent": "the-life-review",
+      "description": "A rare but vivid extension of the review in which you are shown not only what you did but what you could have done, or what would have followed from a different choice. Some see the alternative words they might have spoken in a given scene; some are shown the life their family would have had without them; one describes being shown his life as a tree whose roots were all the paths that could have led to that moment. Experiencers are consistent that this is not presented to induce guilt but to make the reality of choice visible.",
+      "aliases": [
+        {"term": "shown alternatives", "tradition": "none"},
+        {"term": "what my life would have been like", "tradition": "none"},
+        {"term": "the future without me", "tradition": "none"},
+        {"term": "the roots of the tree", "tradition": "none", "note": "one experiencer's image: all the possible paths to the same event"},
+        {"term": "what could have been", "tradition": "none"}
+      ],
+      "regex": "shown alternatives|(shown|showed me|showed us|saw|got to see) (me )?(what|how) (it|things|my life|life|my death|my family|my children|my kids) (would|could|might) have (been|looked|gone|turned|ended)|shown (me )?the (life|future) without me|(paths?|choices|options|possibilit\\w+) (that )?I (could|would|might) have (made|taken|chosen)|(could|would) have (said|done|chosen) (differently|otherwise)|what I could have been",
+      "negative_regex": null,
+      "quotes": [
+        {"videoId": "b9Qm715y2zg", "cvnde": 11, "text": "a lot of times NDErs will say in their life review, they will be shown alternatives of what they could have been and could have said or done."},
+        {"videoId": "W9RHVlN2yhg", "cvnde": 10, "text": "Then I was shown the future without me. It was an apartment and at the end of the hall was a bedroom."},
+        {"videoId": "txu8xBD-4vY", "cvnde": 12, "text": "when I died, they showed me my potential. They showed me what I could have been had I lived in alignment with my soul."},
+        {"videoId": "VOBEOvAgm4I", "cvnde": 10, "text": "I saw all these paths that I could have taken when I was dead, and in this, it was like looking at the bottom of a large cable, a fiber optic cable made up of many fiber optic cables."}
+      ],
+      "sensory": [
+        "a tree whose roots are every path that could have reached this moment",
+        "a fiber optic cable of many strands, intersecting everywhere",
+        "a bedroom fit for princesses - the life the children would have had without her",
+        "the alternative sentence you might have spoken, played back",
+        "explicitly not framed as accusation"
+      ],
+      "journey_position": 0.68,
+      "measured": {"all_pct": 0.44, "all_docs": 27, "cv13_pct": 0.36, "cv18_pct": 0.55, "cv23_pct": 0.00},
+      "precision_estimate": 0.55,
+      "precision_sample_n": 12,
+      "notes": "Genuinely rare - 27 documents - and included because it is vivid and specific rather than common. Two looser regexes were rejected: one including 'alternate realities/timelines' (0.94%) was dominated by parallel-universe speculation, and one including 'what would have happened if' (0.65%) was almost entirely retrospective biographical musing. Even the tightened form mixes shown-during-review alternatives with ordinary regret about roads not taken, hence the modest precision estimate. Zero hits in the cv>=23 stratum, which at n=181 is not evidence of absence."
+    }
+  ]
+}

@@ -1,0 +1,265 @@
+{
+  "audits": [
+    {
+      "id": "the-snap-back",
+      "judged": 24,
+      "true_positives": 22,
+      "precision": 0.9167,
+      "verdict": "solid",
+      "failure_modes": [
+        "One passage is a researcher/host generalising about what OTHER experiencers report ('The description I hear the most on people coming back... being slammed back into my body')",
+        "One passage is a repeatable self-induced out-of-body experience during a nap, not the NDE re-entry"
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "-hcxQmEY4AM",
+        "text": "I felt myself suddenly and violently yanked back into my body, which was still about 40 feet away, in the back bedroom - WHOOSH!"
+      }
+    },
+    {
+      "id": "the-unbeliever-who-arrives-anyway",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'I didn't believe' used in a non-atheism sense — disbelieving a reiki teacher, disbelieving psychics while still nominally Catholic",
+        "Loss of faith AFTER the event ('I didn't believe in God anymore after the accident'), which is the inverse of the claim",
+        "Speakers who explicitly deny being atheist ('I wouldn't say I was atheist, per se') still match",
+        "Disbelief located in teenage years with no link to belief-state at the time of the NDE"
+      ],
+      "suggested_regex": "\\b(?:was|were|had been|used to be)\\s+(?:a\\s+)?(?:militant\\s+|total\\s+|complete\\s+|closet\\s+|feverishly\\s+)?(?:atheist|agnostic)\\b|\\bI (?:didn't|did not) believe in (?:God|an afterlife|any afterlife|life after death)\\b(?!\\s*anymore)",
+      "best_quote": {
+        "doc": "ieaT1rRh0DE",
+        "text": "I didn't believe in God, but it was like I met God."
+      }
+    },
+    {
+      "id": "the-turning-passage",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.4583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The hospital whirlpool bath in the physiotherapy department (two near-duplicate passages) — a literal medical whirlpool, not a passage",
+        "Life-story metaphor: 'I kept spiraling further downhill', 'my health spiraled down very fast'",
+        "'vortex of the child welfare system' — pure figure of speech from an unrelated narrative",
+        "Swirling things that are not passages: colours swirled through God's throne, a whirling mist visitation, a swirling hourglass of light seen at a distance",
+        "Swirl at the moment of exit in a meditation-induced OBE, not an NDE transit"
+      ],
+      "suggested_regex": "\\b(?:tunnel|passage|funnel|portal)\\b[^.]{0,80}\\b(?:vortex|corkscrew\\w*|spiral\\w*|swirl\\w*|spinning|tornado|whirl\\w*)\\b|\\b(?:vortex|corkscrew\\w*|spiral(?:ed|ing)|swirling|spinning|tornado)\\b[^.]{0,80}\\b(?:tunnel|passage|funnel|portal)\\b|(?:thrown into|pulled (?:back )?through|sucked into|going down) (?:a|this|the) vortex",
+      "best_quote": {
+        "doc": "prczt0TRH4A",
+        "text": "the tunnel sort of twisted and it corkscrewed. So there was movement. It wasn't just static like turning around me. It was turning and moving at the same time"
+      }
+    },
+    {
+      "id": "where-we-came-from",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.4583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The exact inversion: 'they were going to send me back to where I came from' / 'I turned around to go back where I came from' — here 'where I came from' means Earth or a direction in space, not the origin",
+        "Post-hoc sermon and affirmation material ('our true home is in the spiritual world', 'that's where we came from, we came here with free will') — general cosmology, not a perception",
+        "A poem read aloud from a book about returning 'to where we all come from'",
+        "Untranslatable philosophical rambling where 'we came from there' is a rhetorical aside"
+      ],
+      "suggested_regex": "\\b(?:I (?:knew|realized|recognized|remembered|understood)|it (?:was|felt like)|this (?:was|is)|that (?:was|is))\\b[^.]{0,60}\\b(?:my (?:true|real) home|where (?:I|we) (?:came|come) from)\\b",
+      "best_quote": {
+        "doc": "WSMk_ItXZx4",
+        "text": "Then, with a sudden burst of joy, I realized that this was my real home. Back on Earth, I had been a visitor, a misfit, and a homesick stranger."
+      }
+    },
+    {
+      "id": "the-sound-of-the-crossing",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Physical-world noise at the moment of injury: the sound of the car crash, the noise of a sandstorm",
+        "Sounds heard INSIDE the destination rather than during the crossing — humming from trees, light beams that buzz as they pass through the head (two passages), whale-song and wind-chime sounds of other worlds",
+        "Generalised instruction about what one 'may hear' during separation — a teaching, not a report",
+        "'whoosh' as a narrative sound effect in biography (an entity stepping in to defend the body)",
+        "A roaring sound as a lingering post-NDE aftereffect days later, not at the crossing"
+      ],
+      "suggested_regex": "\\b(?:whoosh(?:ing)?|roar(?:ing)?|rushing|buzz(?:ing)?|humming|whirring|ringing|hiss(?:ing)?)\\b[^.]{0,90}\\b(?:out of (?:my|the) body|left my body|leave my body|tunnel|back into my body|the other side|separat\\w+)\\b|\\b(?:out of my body|left my body|tunnel|back into my body|other side)\\b[^.]{0,90}\\b(?:whoosh(?:ing)?|roaring|rushing sound|buzz(?:ing)? (?:sound|noise)|humming|whirring|ringing in my ears)\\b",
+      "best_quote": {
+        "doc": "OQdS9iDDJzk",
+        "text": "I \"heard\" a loud buzzing sound and also a \"rushing\" sound, like Niagara Falls. Suddenly, I found myself outside my body and beside my bed"
+      }
+    },
+    {
+      "id": "return-for-the-children",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.4583,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary parenting and biography: custody battles, a child born with Down syndrome, 'my children really needed somebody to help take care of them' while she was ill",
+        "'my kids need me' shouted in the hospital room to get a doctor's attention — the medical setting, not the other side",
+        "Two near-duplicate OBE passages where 'my kids need me' only explains why she habitually checks the clock",
+        "Advice to paramedics that they should say 'your children need you' at a resuscitation — speculation about others",
+        "Channel boilerplate (Instagram/website sign-off) that happens to mention 'my kids'"
+      ],
+      "suggested_regex": "\\b(?:go(?:ing)? back|come back|return(?:ing)?|not my time|leave them)\\b[^.]{0,120}\\bmy (?:son|daughter|kids|children|baby|babies|boys|girls)\\b|\\bmy (?:son|daughter|kids|children|baby|babies|boys|girls)\\b[^.]{0,60}\\bneed(?:s|ed)? me\\b[^.]{0,120}\\b(?:go back|come back|return|can't stay|couldn't stay|have to go)\\b",
+      "best_quote": {
+        "doc": "37_GDecRdkA",
+        "text": "I wanted to go back for my children. I knew deep down they needed me and nothing was going to stop me from getting back to them."
+      }
+    },
+    {
+      "id": "merging-with-the-light",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Theological debate about whether one is OBLIGED to dissolve back into Source — free-will commentary, hypothetical and future-tense ('if you want to merge with source, you can'), two passages from the same speaker",
+        "The interviewer's own question ('can you focus on the mechanics of the merger?') and a host reading from the guest's book",
+        "Observing OTHER souls already merged with God rather than being absorbed oneself (two passages)",
+        "Meditation/stillness talk about 'becoming one with everything', and a YouTube-channel plug about 'the whole idea of enlightenment and merging with God'"
+      ],
+      "suggested_regex": "\\bI (?:was|got) (?:absorbed|dissolved|melted|drawn|taken) into\\b|\\bI (?:merged|dissolved|melted|blended) (?:with|into)\\b|\\bI became (?:one with|part of) (?:the|that|this) (?:light|love|oneness)\\b|\\bmerged with (?:the|this|that) light\\b",
+      "best_quote": {
+        "doc": "CdvRq3vZ9eY",
+        "text": "I plunged, plunged into it and merged, and merged with this light. At which point, everything changed. My personal sense of identity was gone at that point. I was this light."
+      }
+    },
+    {
+      "id": "the-crowd-of-souls",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.5417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'group of souls' used for reincarnation soul-group philosophy ('the same thousand or 10,000 will come back into your life in lifetimes') rather than a perceived crowd",
+        "Small councils of three, four or twelve beings — structurally the opposite of the mass the claim describes",
+        "A channelled entity ('still heirlam speaking') lecturing about what happens when 'a group of souls' works with dark intention",
+        "A psychic telling the guest he is 'protected by thousands of angels right now', plus a book plug",
+        "Two duplicate passages where the group is eight shadowed figures in a hospital hallway",
+        "New-age oversoul/fractal theorising where 'group of beings' means humanity"
+      ],
+      "suggested_regex": "\\b(?:hundreds|thousands|millions|dozens|multitudes?|countless|a host|a sea|myriads?)\\b(?:\\s+(?:and|upon)\\s+\\w+)?\\s+of\\s+(?:souls|spirits|beings|people|angels)\\b",
+      "best_quote": {
+        "doc": "kmajN8_SqTs",
+        "text": "On the other side of the river were hundreds of souls, and I knew that during many lifetimes I had lived and interacted with them."
+      }
+    },
+    {
+      "id": "the-preview",
+      "judged": 24,
+      "true_positives": 13,
+      "precision": 0.5417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Podcast and radio boilerplate — host intros, 'link in the description', episode teasers that list 'visions of possible future events' (four passages)",
+        "A YouTube narrator analysing somebody ELSE's NDE and its predictions",
+        "A researcher's statistical aside: 'of the 1200 testimonies I've heard, a very small percentage are shown future events'",
+        "Precognitive dreams in ordinary life and future-seeing in a past-life regression — not the NDE",
+        "'our perception of future events' used in a general talk about which emotions survive death"
+      ],
+      "suggested_regex": "\\bI (?:was|am) (?:being )?shown\\b[^.]{0,80}\\b(?:future|what (?:was|would be) coming|their lives|my life)\\b|\\b(?:they|he|she|it) showed me\\b[^.]{0,60}\\b(?:future|what would happen)\\b|\\blife preview\\b|\\bI saw (?:my|the) future\\b",
+      "best_quote": {
+        "doc": "By3UjYUe7rw",
+        "text": "Then they showed me through the same screen some future events in my life if I chose to return to it. Some events would definitely occur, and some events were possible but not definite."
+      }
+    },
+    {
+      "id": "the-downward-fall",
+      "judged": 24,
+      "true_positives": 7,
+      "precision": 0.2917,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The single biggest contaminant: the blood-pressure free-fall sensation on the gurney — 'imagine jumping out of an airplane without a parachute' while nurses call out 50 over 15. FOUR near-identical passages, all the same story, all the medical setting",
+        "'I fell into a deep depression' / 'a deep hole' / 'a deep peaceful sleep' — biography and idiom (four passages)",
+        "'I kind of chose to just freefall' as a life-choice metaphor, and a preacher's 'fallen into the pit of feeling you've gone too far'",
+        "Physical collapse on a bathroom floor from hypoxia, and a blow to the temple that 'plunged me into darkness' (loss of consciousness)",
+        "A host recounting other people's glimpses of a bottomless pit"
+      ],
+      "suggested_regex": "\\b(?:fell|fall(?:ing)?|dropped|plunged|sinking|sank|descending|racing)\\b[^.]{0,50}\\b(?:into (?:the |this |total |complete )?(?:darkness|dark|blackness|pit|abyss|nothingness|hell)|down (?:this|the) (?:black )?tunnel|lower and lower)\\b",
+      "best_quote": {
+        "doc": "fqQ0xxTmu6o",
+        "text": "the bottom dropped out, just like you're in an elevator and the floor opens up and you start falling into total darkness. And the thought came, there is a hell."
+      }
+    },
+    {
+      "id": "the-gate",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.4167,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'pearly gates' invoked as the cliche being DENIED — 'it wasn't the pearly gates either', 'I had always understood heaven is pearly gates, streets of gold. It wasn't anything like that' (four passages of expectation or negation)",
+        "Ordinary gates: an airport departure gate, a log-cabin gate left open, a house gate in a Portuguese biography, the gates of a temple on Sunset Boulevard",
+        "Doctrine and book titles — 'Jesus died to open the gates of heaven for all mankind', the memoir 'From Vegas to the Pearly Gates'",
+        "The interviewer generalising about experiences 'at the gates of heaven'",
+        "A childhood sky-vision of golden gates at age 11, outside any NDE"
+      ],
+      "suggested_regex": "\\b(?:saw|reached|approached|came to|stood (?:at|before)|was (?:taken|brought|led) to|went through|walked through|entered|circled)\\b[^.]{0,60}\\b(?:gates? of heaven|heaven'?s gates?|the gates?|a gate)\\b(?![^.]{0,30}(?:security|flight|airport|boarding))",
+      "best_quote": {
+        "doc": "7TfFeukn10I",
+        "text": "While at heaven's gate, which was closed, I saw myself alone before the gate. Then a man opened the gate for me"
+      }
+    },
+    {
+      "id": "the-welcoming-party",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.6667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'they were waiting for me' in the hospital sense — the surgical team waiting, twelve staff at the ER door, family waiting in the waiting room (three passages)",
+        "A speaker describing a CHILD's case in the third person ('that was his greeting committee for his pets')",
+        "Biography: demonic presences that 'knew I was coming and were waiting for me' in a Texas town",
+        "A promise of a FUTURE greeting ('they would all be there to greet me when it was time') rather than an arrival",
+        "A single welcomer or a disembodied welcoming voice, where the claim is specifically about an assembled group"
+      ],
+      "suggested_regex": "\\b(?:welcom(?:e|ing) (?:committee|party)|greeting committee|(?:they|we)re waiting for me|were (?:there )?(?:waiting for|to greet) me|greeted me|welcomed me home)\\b(?![^.]{0,60}(?:hospital|waiting room|surgery|surgical|doctors|nurses|emergency))",
+      "best_quote": {
+        "doc": "PnbK-8jddWM",
+        "text": "And everyone envelops me in this huge hug. There's 18 or 20 souls there. It's my soul family."
+      }
+    },
+    {
+      "id": "the-pit",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'abyss' as pure metaphor: the abyss of grief and bereavement, a black hole of abyss meaning depression, 'the abyss of God's wisdom', 'the abyss of humanity's existence in the Holocaust', a 'weekend abyss' spent nursing a dying partner (six passages)",
+        "'chasm' meaning emotional distance from a son, or an 'emotional chasm of stuff' unwound by Jesus",
+        "'abyss' meaning benign cosmic vastness — staring down into galaxies and nebulas with awe and no fear (three near-duplicate passages from the same account)",
+        "Hosts and interviewers talking about 'the pit of hell' with Bible quotation attached",
+        "A speaker retelling another woman's NDE across a chasm"
+      ],
+      "suggested_regex": "\\b(?:teetering|standing|stood|edge of|brink of|looked down|fall(?:ing)?|fell)\\b[^.]{0,60}\\b(?:bottomless pit|black pit|dark pit|the pit|the abyss(?! of (?:grief|God|humanity|despair)))\\b|\\b(?:bottomless pit|black pit|the abyss)\\b[^.]{0,60}\\b(?:no bottom|never climb|fall(?: in| into| down)?|darker than)\\b",
+      "best_quote": {
+        "doc": "lpZW9u8HK2A",
+        "text": "So I was teetering over the edge of a black pit. And in front of me was a darkness."
+      }
+    },
+    {
+      "id": "this-far-and-no-further",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'not allowed' in ordinary life — a restraining order, a teenage girlfriend he 'wasn't allowed to see', a psychologist's account of being sixteen and 'not allowed to pursue it', spirits 'not allowed to come to me' when off duty",
+        "'couldn't get past' as idiom or physical obstruction — firemen and a gurney, a doctor's belly button, a rope jammed on a rock ledge, veterans who 'can't get past things', a host's 'I can't get beyond the fact that...'",
+        "The dying body failing physically ('I couldn't get past my knees'), which is the medical setting not a boundary in the realm",
+        "Third-party generalisation about NDEs — 'people are only allowed to visit the entrance, they are not allowed to continue in'",
+        "Boundaries reported for OTHER souls in a mediumship context, and one meditation vision rather than an NDE"
+      ],
+      "suggested_regex": "\\bI (?:couldn't|could not|wasn't allowed to|was not allowed to|was not permitted to|knew I couldn't)\\s(?:go|move|proceed|continue|cross|pass|travel)\\b[^.]{0,40}\\b(?:any (?:further|farther)|further|beyond|past (?:this|that))\\b|\\bthis (?:was|is) as far as I (?:could go|got)\\b",
+      "best_quote": {
+        "doc": "B_EDuAMTf9I",
+        "text": "I was aware that somehow there were unseen barriers beyond which I knew I was not permitted to pass."
+      }
+    }
+  ]
+}

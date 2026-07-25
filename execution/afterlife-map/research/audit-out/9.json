@@ -1,0 +1,272 @@
+{
+  "audits": [
+    {
+      "id": "the-portal",
+      "judged": 24,
+      "true_positives": 12,
+      "precision": 0.5,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Post-NDE psychic/after-effect uses: 'it opened a portal' for mediumship, astral projection, meditation and time-slip experiences (5 passages) - the portal is a metaphor for a new ability, not a perceived aperture.",
+        "Haunted-house occult sense: a Ouija board 'opened a portal in the house' that dark entities came through - ordinary life, not the NDE.",
+        "Word-sense collisions: 'the portal of the iron lung' (a medical viewing window) and 'I gave an interview to a portal about NDEs' (a news website).",
+        "Relayed account: the speaker describing her mother's crossing through an amethyst portal, not her own experience.",
+        "Negated / merely-hypothetical references: 'maybe I didn't go through this portal, probably not', 'I think I would have crossed that portal... so I didn't go through the portal'."
+      ],
+      "suggested_regex": "(?:went|going|go|came|come|moved|moving|stepped|step|pulled|drawn|floated|passed|walked|sucked)\\s+(?:\\w+\\s+){0,3}(?:through|into|toward|towards|up to)\\s+(?:a|the|this|that)\\s+portal|(?:a|the|this|that)\\s+portal\\s+(?:was\\s+)?(?:opened|opening|open)|(?:saw|see|seeing)\\s+(?:a|the|this)\\s+portal|stood\\s+(?:just\\s+)?(?:at|beyond|before)\\s+the\\s+portal",
+      "best_quote": {
+        "doc": "-g0yjH9Q57k",
+        "text": "finally there was a portal. I didn't see a tunnel, I saw a portal. And I went up to the portal and I could see through the entrance to the portal."
+      }
+    },
+    {
+      "id": "trapped-immobile",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.458,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary-life physical entrapment: pinned under a waterfall, held captive by kidnappers, stuck in the muck under a dock, unable to get up off the bedroom floor (5 passages).",
+        "Medical setting: intubated and unable to move hands or feet in ICU; permanent paralysis from a spinal abscess.",
+        "Metaphor and general teaching: 'paralyzed by fear', 'we paralyze ourselves with guilt' in a talk about grief.",
+        "Biography: a job the speaker felt she could not leave for ten years.",
+        "Simile rather than place: 'my life review almost felt like I was stuck in hell... there is no such thing'.",
+        "Inverse of the claim: 'I couldn't get out of there fast enough' counted as trapped when the speaker in fact left freely; that passage also runs into channel boilerplate."
+      ],
+      "suggested_regex": "(?:stuck|trapped|no way out|couldn't get out|could not get out|couldn't leave|couldn't move)(?:(?!\\.).){0,120}(?:forever|eternity|eternal|for all time|time without end|hell|the darkness|dark place|void|pit|abyss|this place|that place)|(?:forever|eternity|for all eternity|hell|darkness|void|the pit)(?:(?!\\.).){0,120}(?:stuck|trapped|no way out|couldn't get out)",
+      "best_quote": {
+        "doc": "hqVRkajhIYk",
+        "text": "I'm in this like horrible place, and my sense was, is that I was stuck there forever and ever and ever and ever, time without end, with all these other miserable people."
+      }
+    },
+    {
+      "id": "the-one-who-watches-with-you",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Bare 'life review' with no companion of any kind in the passage (3 passages) - the regex appears to fire on the review, not on the presence.",
+        "Explicit negation: 'There was no, of some spiritual being standing with me as I watched my life unfold on a screen. It was none of that.'",
+        "Contradicts the claim's ordering: one speaker's review glimpse happened before he met his guide ('It was essentially right before'), i.e. he reviewed alone.",
+        "Someone else's review: the speaker sits in an audience watching another man's life review on a stage.",
+        "Self-only review with no other presence: the theatre account where director, producer, actor and scriptwriter are all the experiencer."
+      ],
+      "suggested_regex": "(?:life review|review of my life)(?:(?!\\.).){0,160}(?:my guide|guides|angel|being of light|beings|presence|Jesus|Christ|ascended master|soul group|with me|beside me|next to me|behind me|either side of me)|(?:my guide|guides|angel|being of light|beings|presence|Jesus|ascended master)(?:(?!\\.).){0,160}(?:life review|review of my life|watched my life)",
+      "best_quote": {
+        "doc": "ZmOu6p6Rvyw",
+        "text": "And the other one stood in front of me, beside me, as we watched my life review."
+      }
+    },
+    {
+      "id": "clutching-hands",
+      "judged": 24,
+      "true_positives": 7,
+      "precision": 0.292,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Metaphorical clawing: 'clawing my way through life', 'clawing my way back to this world', 'obstacles pulling me down into the abyss' before a suicide attempt (3 passages).",
+        "Benign or neutral pulls with no grip: pulled upward toward the light, pulled forward into the glimmer, a guide leading 'like a parent pulling you... not forcefully', sucked into a black hole like a vacuum cleaner (4 passages).",
+        "Creature descriptions with talons but no seizing - two passages inventory the beings' fur, fangs and yellow eyes without any hold being taken.",
+        "Word collisions: palace stones 'that looked like lion's claws', 'they tied me down with red claws' (prayer ties in a healing ceremony), a teaching about which animal species have claws.",
+        "Own body / medical: the experiencer's own hands turning to claws as he morphs; clawing and fighting to breathe during resuscitation.",
+        "Ordinary life: heavy winter clothes 'pulling me down into the water', a truck of soldiers pulling up, plus interview boilerplate."
+      ],
+      "suggested_regex": "(?:hands|claws|talons|fingers|demons|creatures|beings|things|something)(?:(?!\\.).){0,50}(?:grabbed|seized|grasped|clutch(?:ed|ing)|took hold of|had hold of|dragg(?:ed|ing)|clawing at|pulling|pulled)\\s+(?:me|my (?:arms?|legs?|body|soul|feet|ankles))|(?:dragging|dragged|pulling|pulled)\\s+(?:me|my soul)\\s+(?:down|downward|under|into)(?:(?!\\.).){0,60}(?:hell|the dark|darkness|pit|abyss)",
+      "best_quote": {
+        "doc": "UItXrmtyE28",
+        "text": "being pulled back by what felt like a hundred hands scraping and clawing over every inch of my body"
+      }
+    },
+    {
+      "id": "you-are-your-own-judge",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Ordinary-life self-criticism, before or after the NDE: 'I was judging myself, how I sounded talking about such things', 'I had spent my whole life criticizing myself, judging myself', 'I learned to stop judging other people, then I could stop judging myself' (4 passages).",
+        "Explicit negations of self-judgement: 'no thought, no being, no human, not even myself judging myself' and 'I didn't judge myself, and nobody else around me judged me either'.",
+        "Post-NDE prayer/meditation realisation rather than the review itself.",
+        "Hedged, interviewer-supplied answer: 'they didn't judge me on anything, I could have been judging myself there'."
+      ],
+      "suggested_regex": "(?:no one|nobody|not|never|wasn't|weren't|didn't|he|they|God|Jesus|the light|the being)\\s*(?:\\w+\\s+){0,4}judg\\w*\\s+me(?:(?!\\.).){0,100}I\\s+(?:was\\s+)?judg(?:ing|ed)\\s+my ?self|I\\s+(?:was\\s+)?judg(?:ing|ed)\\s+my ?self(?:(?!\\.).){0,100}(?:no one|nobody|he wasn't|they didn't|the light|the being)|that'?s your judg(?:e)?ment of it, not",
+      "best_quote": {
+        "doc": "OIo2kFjcWHs",
+        "text": "There was no judgment day for me. I judged myself and my shame in comparison to this beneficent, benevolent being of goodness that only wanted love for me."
+      }
+    },
+    {
+      "id": "pets-and-animals",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.458,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "General reassurance with no perception attached: 'our pets are on the other side', 'your dog will be there to pick you up', 'if there are children in heaven, there are animals in heaven' (5 passages) - preaching, not report.",
+        "Post-NDE mediumship: pets 'coming through' in readings for clients (2 passages).",
+        "Visitation dreams rather than the NDE - the same speaker's childhood dog Shag appears in two packets, both times in a dream years later.",
+        "Interviewer / co-host commentary comparing guests' animal encounters.",
+        "Explicit negation: 'Did you see any former pets or animals on the other side?' 'No.' followed by a friend's story instead.",
+        "Living earthly pets invoked during the NDE as a reason to return ('your dogs need to be fed'), and a doctrinal aside that 'animals are not killed in Heaven'."
+      ],
+      "suggested_regex": "(?:my|our)\\s+(?:dog|dogs|cat|cats|puppy|kitten|pony|horse|pet|pets|bird)\\w*(?:(?!\\.).){0,60}(?:was there|were there|was waiting|greeted me|came to me|running (?:toward|to) me)|(?:saw|see|met)\\s+(?:my|our|his|her)?\\s*(?:dogs?|cats?|pets?|horses?|animals?)(?:(?!\\.).){0,60}(?:there|on the other side|in heaven|greeting me)",
+      "best_quote": {
+        "doc": "uwVw8M4uRTo",
+        "text": "And now he didn't have fur, legs, and stuff, but it was Skippy. He was also a floating sphere of awareness."
+      }
+    },
+    {
+      "id": "welcome-home",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.792,
+      "verdict": "solid",
+      "failure_modes": [
+        "Generic speculation about what happens to everyone: 'the moment that we cross over... all those who loved us will be waiting for us singing welcome home'.",
+        "Theological framing rather than report: 'God says, thank you, welcome home. Let me love you again' - immediately followed by channel intro boilerplate.",
+        "Conditional / future promise rather than the greeting itself: 'you will be loved and welcomed home regardless', 'I can go there and I can be welcomed home'.",
+        "One non-NDE mystical vision: voices of the fay saying 'Welcome home, daughter' at a spring, in a pagan otherworld experience rather than a near-death event.",
+        "Note: five true positives are the same Archangel Michael formula from what appear to be four re-tellings by one experiencer plus one near-duplicate pair, so the account count behind this node is smaller than the match count suggests."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "HvI_CtquBNE",
+        "text": "And all of them knew me, and they all said in the giant chorus, 'Welcome home, Andy.' And I said out loud, 'I'm home at last! I'm home!'"
+      }
+    },
+    {
+      "id": "voice-from-the-light",
+      "judged": 24,
+      "true_positives": 20,
+      "precision": 0.833,
+      "verdict": "solid",
+      "failure_modes": [
+        "Relayed accounts of someone else's NDE: a son quoting his father's ('the light said, Earl, you have to go back') and a researcher recounting a rabbi's void experience.",
+        "Metaphor: 'the light speaks for itself, you know it when you feel it' in a talk about sharing NDEs.",
+        "A telepathic being at the tunnel border rather than the light itself - on-corpus for telepathy, off-claim for 'the light speaks'.",
+        "Note: at least six true positives are the same 'you must return, you have a purpose' account retold across different channels; treat the underlying account count as much lower than the match count."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "FJVGdJZPIi0",
+        "text": "And as I moved to the edge of the river, the light spoke. The light itself spoke and said, 'It is not time.'"
+      }
+    },
+    {
+      "id": "the-rule",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The dominant miss, and the reason precision is low: the rule is NOT delivered as words in most matches - the experiencer simply knows it. 'I knew if I stepped in that golden sphere, I wouldn't be able to go back', 'I knew that just intuitively', 'I felt like if I went further I wouldn't be able to come back', and most explicitly 'No explanation was necessary for me to understand... that once I crossed the boundary, I could never come back' (7 passages). If the claim were reworded to 'the rule, told or known', precision would be 16/24 = 0.67; as written ('delivered as words... tells the experiencer'), it is 9/24.",
+        "Interviewer or host supplies the formula: 'Could that ladder relate to that famous limit that if we go past it we won't come back?' and a channel intro summarising 'both times she saw a limit that if she crossed she wouldn't be able to go back'.",
+        "Interviewer generalising about barriers in NDEs at large: 'people see barriers. They know if they cross, they're not going to come back.'",
+        "Speculation and denial: 'Some people say if you go too far over there you'll never come back. And I don't think that they would allow that.'",
+        "Off-topic biography (a buried infant, a bereavement) and general chat about death not being final."
+      ],
+      "suggested_regex": "(?:told me|said(?: to me)?|says|say|explained|warned|spoke|the voice|he said|she said|they said)(?:(?!\\.).){0,100}if (?:you|I) (?:go|went|cross|crossed|step|stepped|pass|passed|enter|entered)(?:(?!\\.).){0,80}(?:can'?t|cannot|could not|couldn'?t|won'?t|will not|would not|never)\\s*(?:be able to )?(?:come|go|get|turn) back|I was told(?:(?!\\.).){0,80}(?:could not|couldn'?t|can'?t) come back",
+      "best_quote": {
+        "doc": "hE43IUyyuDM",
+        "text": "And then I was told that if I went through that window, I could not come back. That was my border."
+      }
+    },
+    {
+      "id": "the-screaming",
+      "judged": 24,
+      "true_positives": 10,
+      "precision": 0.417,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The experiencer's own screaming rather than the soundtrack of the place: screaming at the beings 'I won't go', waking up screaming from a nightmare, screaming 'let me out of here' at demons, and the figure of speech 'I felt the air scream from my lungs' (5 passages, two of them near-duplicates of one text).",
+        "Ordinary-life screaming: the 1989 Santa Cruz earthquake recounted twice, and a school gym crying episode.",
+        "Someone else's death: a resuscitated man who sat up shouting 'I'm in hell', and a grandmother screaming that demons were taking her - both relayed second-hand.",
+        "Channel narration / AI-style voiceover framing another person's distressing NDE ('a place of fire and screaming').",
+        "Theological teaching using the scriptural formula ('weeping and gnashing of teeth') with nothing perceived.",
+        "Explicit negation: a cold silent grey place where 'there was no screaming, there was nothing'."
+      ],
+      "suggested_regex": "(?:heard|hear|hearing|could hear)(?:(?!\\.).){0,60}(?:people|men|women|voices|souls|others)?\\s*(?:screams|screaming|shrieking|wailing|moaning|crying out)(?:(?!\\.).){0,100}(?:hell|darkness|dark place|pit|torment|abyss|fire)|(?:hell|the darkness|the pit|torment)(?:(?!\\.).){0,100}(?:heard|could hear)(?:(?!\\.).){0,50}(?:screams|screaming|shrieking|wailing)",
+      "best_quote": {
+        "doc": "WeAg6UtyxDw",
+        "text": "I can hear people screaming and crying in pain, and I just knew I must be in hell."
+      }
+    },
+    {
+      "id": "the-sunless-sky",
+      "judged": 24,
+      "true_positives": 18,
+      "precision": 0.75,
+      "verdict": "solid",
+      "failure_modes": [
+        "The dark realm's sunlessness, which is a different place sharing the words: black leafless trees where 'there was no sunlight, you couldn't tell if it was night or day', and a dark void with 'no sun and moon and all that stuff' (2 passages, one of which also carries a sponsor read).",
+        "The void described as a list of absences ('no colour, no movement, no form, no texture, no sun') - not a sky at all.",
+        "Discussion of the earthly sun as our spiritual home (Kundalini talk), and a Revelation 21 exegesis by a host summarising what blind experiencers report.",
+        "An ambiguous aside, 'for me, there was no sunshine in my story', which is a comment about the account's mood rather than a sky.",
+        "Caveat for the map: 3 of the 18 true positives (2 speakers) describe the shadowless, self-luminous light during an out-of-body episode in an earthly bedroom or street, not the sky over the country. They belong to 'lit from within' more than to 'the sky'."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "SKL0T_1vodw",
+        "text": "the sky was blue. It was like the sun was shining, but there really wasn't a sun in the sky. Everything was lit up."
+      }
+    },
+    {
+      "id": "halls-of-learning",
+      "judged": 24,
+      "true_positives": 9,
+      "precision": 0.375,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "By far the dominant junk: the 'Earth is a school' metaphor - 'life and Earth, it's very much like a school', 'this is like a school where we do some homework of evolving our soul', 'Earth is just a place of learning and growth', 'it was a learning ground experience, like a school' (7 passages). The regex cannot tell a building from a simile.",
+        "Earthly schools and universities in biography: a school excursion where a teacher rescued the speaker, 'I was a university professor', an esoteric school following a master's teachings, and an English academic who 'teaches at a university there'.",
+        "Abstract 'higher place of learning / higher place of education' in a vibration-level teaching, with no structure seen.",
+        "Second-hand or generalised: a speaker listing what OTHER NDErs claim ('there were these great halls of learning... I don't have a body. There was no stuff there'), and a channelled description of specialised halls where spirit doctors train.",
+        "Explicit non-perception: 'whether it was a school or anything or a classroom' - the speaker says God did not show him."
+      ],
+      "suggested_regex": "halls? of (?:learning|knowledge|wisdom)|(?:I saw|I visited|I entered|I went (?:in)?to|took me to|they showed me|there was)\\s+(?:a|the|this)\\s+(?:huge |big |beautiful |great )?(?:library|university|college|campus|school|classroom|place of learning)(?:(?!\\.).){0,80}(?:there|on the other side|in heaven|of light|marble|books)",
+      "best_quote": {
+        "doc": "UUcCnYHuyW8",
+        "text": "I had gone into this hall of learning where the walls go straight up as far as you can see. There are these huge windows, looked like an old library, but very, very clean."
+      }
+    },
+    {
+      "id": "the-velocity",
+      "judged": 24,
+      "true_positives": 16,
+      "precision": 0.667,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Speed of perception rather than speed of travel: life-review scenes 'moving at the speed of light' like a video screen, history absorbed 'at an astonishing speed', observations 'happening at such an incredible rate of speed' (3 passages). Same words, different phenomenon.",
+        "Ordinary-life and physical speed: a brain tumour 'growing at a breakneck speed', a plane hitting a tree 'at a tremendous rate of speed'.",
+        "Channel boilerplate: a host reading listener comments and quoting a physicist on travelling at the speed of light.",
+        "Metaphorical propulsion into a new phase of life: 'suddenly I was propelled at a rapid speed into those experiences'.",
+        "Abstract reflection with no described passage: 'I was just picking up on what it's like to travel at the speed of light'."
+      ],
+      "suggested_regex": "(?:I (?:was|am)|I'?m|was being|being)\\s+(?:\\w+\\s+){0,3}(?:moving|travel(?:l)?ing|flying|falling|pulled|propelled|sucked|shot|hurtling|rushing|going|lifted|drawn)(?:(?!\\.).){0,50}(?:at|with)\\s+(?:an?|the|such )?\\s*(?:incredible|tremendous|high|rapid|great|warp|astonishing|immense|blinding|terrific)?\\s*(?:rate of )?speed|(?:at|faster than) the speed of (?:light|thought)(?:(?!\\.).){0,60}(?:I |me|my |through|tunnel)",
+      "best_quote": {
+        "doc": "V-n0w7XpzWk",
+        "text": "I feel like I'm going through it at warp speed, but it doesn't even make sense because how can I be going fast when it's kind of not physical?"
+      }
+    },
+    {
+      "id": "everything-lit-from-within",
+      "judged": 24,
+      "true_positives": 11,
+      "precision": 0.458,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The overwhelming failure is the devotional phrase 'the light within' used about people on earth: 'maybe you could be a light within it' (a church, appearing twice as a near-duplicate), 'connect with their light within', 'they haven't re-remembered that light within them', 'the light within ourselves', 'grow that light within', 'the darker something is, the more pronounced the light within it is' (8 passages). None of these are landscape.",
+        "After-effect rather than the place: seeing 'that fragment of light within' other people's eyes back on earth after the NDE.",
+        "A spontaneous earthly mystical moment on a subway car where everyone was 'illuminated from the inside... not light shining upon them but light coming from inside of them' - the exact formula, wrong setting.",
+        "Psychic vision of pyramids 'glowing from the inside with white light' in a channelling session.",
+        "One ambiguous in-NDE line, 'you could see the light within the light', which describes structure inside the light rather than objects carrying their own."
+      ],
+      "suggested_regex": "(?:light|glow(?:ing)?)(?:(?!\\.).){0,40}(?:coming|came|emanat\\w+|radiat\\w+|shining|shone|glowing)\\s+(?:out\\s+)?from\\s+(?:with)?in(?:side)?(?:(?!\\.).){0,60}(?:everything|every object|the trees?|the grass|the flowers?|the leaves|the rocks?|the stone|the marble|them|it)|(?:trees?|grass|flowers?|leaves|rocks?|stone|everything|they)(?:(?!\\.).){0,30}(?:had|have|has)\\s+(?:its|their)\\s+own light|glowing from the inside out",
+      "best_quote": {
+        "doc": "-FFsdF5Oo0E",
+        "text": "It was like everything was alive. Light was coming from within every object, the tree, the flowers, the plant life."
+      }
+    }
+  ]
+}

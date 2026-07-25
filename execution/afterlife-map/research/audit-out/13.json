@@ -1,0 +1,256 @@
+{
+  "audits": [
+    {
+      "id": "strangers-who-are-known",
+      "judged": 24,
+      "true_positives": 19,
+      "precision": 0.792,
+      "verdict": "solid",
+      "failure_modes": [
+        "Ordinary-life recognition: a hospice nurse feeling she 'knew' a patient she'd never met; two living people in an NDE support group who felt they 'knew each other but didn't know why' (docs HwmnyYSXE44, Bvc3Y5SqpOk).",
+        "A family apparition seen in waking life rather than in an NDE - the sister who 'felt like we knew her, but we didn't know from where' was seen in the house, not on the other side (doc xZ_ID_3zt78).",
+        "Inverted phenomenon: an OBE-er looking down at her own LIVING husband and failing to place him ('I knew I knew him, but I didn't know who he was') - the same wording, the opposite experience (doc D3Ql06RhYlI).",
+        "A psychedelic ceremony in which the recognised beings turned out to be the physically present trip sitters (doc Dpbf1fK5J04)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "kq0h0KV8vb4",
+        "text": "I noticed two figures. I mean, figures just like me. I sensed that I knew them, but not in this life. In fact, not in any life."
+      }
+    },
+    {
+      "id": "halted-by-a-hand",
+      "judged": 24,
+      "true_positives": 5,
+      "precision": 0.208,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Dominant junk (12 of 19 FPs): the phrase 'the being that held me' from a single widely re-uploaded life-review testimony - an EMBRACE during the life review, not a halt. It appears near-verbatim in docs E7OaKzbPWgI, eNETJUp8URI, ZZGPNU28pbo, xiuSeJvsHcQ, lDSDP1tGfJ0, dT_jJEu7kRw, i6KdwZN0f_4, Xna-HGgLytk, z1QtKaNnN8o, ACneU_WZYjg, Z7vnMIgoWe0.",
+        "Hospital hands: paramedics putting their hands up to stop a relative reaching the gurney; a charge nurse putting her hand over the narrator's mouth (docs n1kf29odZoU, gpPurcd_ERU).",
+        "Ordinary-life scenes and figures of speech: a bridesmaid throwing herself on a car hood with arms out; 'it felt like a hand just held me back from being hit' as an illustration of everyday miracles (docs 8cnODbcgbBg, ZY1h7hqkDnE).",
+        "Hands used for something other than stopping - beings placing hands over the ears to relieve pain (doc 5JYUdLF7EAY)."
+      ],
+      "suggested_regex": "(?:[Hh]ands?|[Aa]rms?|[Pp]alm)[^.!?]{0,80}(?:stopped me|stopping me|stop me|held me back|blocked me|couldn't go (?:any )?(?:further|farther)|not your time)|(?:stopped me|stopping me)[^.!?]{0,60}(?:hand|arm|palm)",
+      "best_quote": {
+        "doc": "D_tq80hYeNY",
+        "text": "Suddenly, the one standing next to me raised his hand before what I can only equate as my face, stopping me from running forward."
+      }
+    },
+    {
+      "id": "not-a-place",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Not a place OF X' constructions, which are evaluations rather than denials of location: 'it wasn't a place of punishment', 'it was not a place of sadness', 'it wasn't a place of passage', 'it was not a place where you would want to be' (docs CcRIwKX2QaM, hMSWWKrTeEA, o4JcqQPaoVo, B3yfVunO1t0).",
+        "Interviewer framing rather than experiencer testimony - two packets are the same host's question 'gives the impression that it was not a material place' (docs En-uQwoKdRA, ruQIUNs-xYs, O1f0heJGsUM).",
+        "The exact OPPOSITE claim: 'I've heard people say that heaven isn't a physical place, and I disagree... I think it is an actual place' (doc vko4tnKFRA8).",
+        "General theology about where souls go, not a perceived environment (doc Ht8fFjCAYNA), and plain ordinary-life idiom - Babaji's cave 'wasn't a place you could tour to', 'there wasn't a place to really help people' (docs IGj-rUp7sD0, 5U5VhcILuxk)."
+      ],
+      "suggested_regex": "(?:wasn['’]?t|was not|isn['’]?t|is not) (?:really |exactly |truly )?a (?:physical |material |real )?place\\b(?!\\s+(?:of|for|to|where you would want|you could))[^.!?]{0,120}(?:environment|atmosphere|state of being|a state|realm|dimension|like here|physical location|floor|ceiling|buildings|landscape|geograph)",
+      "best_quote": {
+        "doc": "NyfUJD1xf08",
+        "text": "And then I started to feel uncomfortable because it wasn't a place. And we're used to colors and then 3D and dimension. And I thought, \"I wish it looked more like a place.\""
+      }
+    },
+    {
+      "id": "the-one-not-known-to-be-dead",
+      "judged": 24,
+      "true_positives": 2,
+      "precision": 0.083,
+      "verdict": "reject",
+      "failure_modes": [
+        "Overwhelmingly visitation DREAMS and after-death communications rather than NDEs - the 'Todd' visitation-dream account alone appears four times (docs Qw555prIkR0, SH2KAFC2yzg, d3FfvNmOi6g, hBVoA0vkbrs), plus a grandmother's presence felt in an apartment (PtTl_qJ_3zE) and a bedside apparition (-izaPscGjUs).",
+        "Mediumship and channelling sessions where the sitter didn't know the person had died (docs WalJw3rI9eo, eAwaG0TwVkU, AtHzYbZt-Ws).",
+        "Third-party retellings and researcher generalisations - the 'one woman was in a coma... she had no idea she was dead' anecdote recurs three times (docs OpUrgiYbA7Q, kEt_UIk4ty4, A1onYxA8wiY); also Jeffrey Long being summarised (AAPfM01EO6E), a deathbed-vision researcher (HgOId0hWfV4), a host's intro (pdZ18zb1eTA).",
+        "The inverted case: it is the DEAD person who doesn't know they're dead, not the experiencer who didn't know they'd died (docs ZroPOzfxF48, AtHzYbZt-Ws).",
+        "Post-coma disorientation ('when I came out of my coma, I didn't know my dad had died') and a past-life regression (docs INd_QHYJJCA, SBfzuW4J7tc).",
+        "Note: the phenomenon itself is clearly real in the corpus - it just cannot be found by matching 'didn't know X had died', which is dominated by dream visitations. Any rebuild should require a seeing/meeting verb inside the experience adjacent to the unknown death."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "wjDMKRFbf-A",
+        "text": "Then I saw a neighbor that I didn't know was dead. I used to babysit for him."
+      }
+    },
+    {
+      "id": "the-barrier-wall",
+      "judged": 24,
+      "true_positives": 17,
+      "precision": 0.708,
+      "verdict": "solid",
+      "failure_modes": [
+        "'Picket fence' as the standard American metaphor for conventional life - 'the picket fence, the marriage, the two kids', 'the house and the picket fence' (docs RvTt0Qyt-4Q, xtCpWPldQIE). This is the one recurring junk type; three of seven FPs.",
+        "Literal ordinary-world walls and fences: a hospital operating-room glass wall, a wooden fence in an apartment complex, and a rapid on the Rogue River nicknamed 'the picket fence' (docs lMEQ4Oe18FU, qt8LlDTFIk8, uHjUZNJ76dc).",
+        "A transparent wall used as a viewing window inside a craft, not a limit (doc Md2PdURAXGI).",
+        "An interview passage in which the experiencer explicitly DENIES having any sense of a limit or line (doc -wXVPKwR-OM)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "vjt-VgrOn7E",
+        "text": "I understood without being told that if I crossed that line or passed through it, there would be no coming back."
+      }
+    },
+    {
+      "id": "the-web-of-light",
+      "judged": 24,
+      "true_positives": 15,
+      "precision": 0.625,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Dominant junk: 'web of light' as a post-NDE metaphor for the community of awakened people - 'we are part of this web of light living on the earth', 'the worldwide web of light grows stronger', 'I do feel that we are a web' (docs Q_zxxxlz-BY, erdr_f7Q3Lo, -rbvd7s4o1A). Five of nine FPs are this.",
+        "New Age cosmology being taught rather than perceived: 'the good matrix, the universal consciousness, the web of energy', 'the grid of light that exists on the planet' (docs WMpe7PNqgZ0, 3YMv3-FTVkI).",
+        "Ayahuasca-ceremony teaching about 'the matrix we're in', which appears twice from the same speaker (docs wh5DaS6zyww, zwqIXOFCQTc).",
+        "Post-NDE psychic impressions of trees as 'a network of energy' (doc kiHW1mmCoB0)."
+      ],
+      "suggested_regex": "(?:\\bI (?:saw|was|entered|found myself)|looked like|appeared to be|described? (?:it )?as|embedded in|enveloped by|surrounded by|propelled (?:in)?to|moving into)[^.!?]{0,100}(?:spider ?-? ?web|matrix|lattice|network|mesh) of (?:light|lights|energy)",
+      "best_quote": {
+        "doc": "rp2bkltjlLs",
+        "text": "I started moving into what I would describe as a spiderweb of light, just a beautiful matrix of light that was just streaming everywhere, and I was embedded in it."
+      }
+    },
+    {
+      "id": "the-paths-not-taken",
+      "judged": 24,
+      "true_positives": 8,
+      "precision": 0.333,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "'Things I could have done differently' as ordinary retrospective regret, in this life and after it - business failures, parenting after a child's death, grief counselling, a pastor's 'it's not a path I would have chosen' (docs sL_KGIDJMcI, qmFtC1IHe0E, hdv3lC5mWTU, O_gDiLAN9F0, A2NGV591_Tw, qhYHcNf0sBY, WOcckxpAZeg).",
+        "Second-biggest source: one widely re-uploaded life-review account whose 'the things that I could have done and should have done and would have done differently' is regret INSIDE the review, not a display of alternatives (docs 7kDx-wkVzCM, -PNYA4cso1g, FJBZ5rEsJQM).",
+        "Generalisations about how life reviews work for everyone, spoken by hosts or teachers (docs 2xskMb26t2M, acbEt8BtJKI, mPc5R8WkwDc).",
+        "An OBE overhearing parents argue about 'what they could have done differently' in the waiting room (doc MZpBV3BZ1lc)."
+      ],
+      "suggested_regex": "(?:show(?:ed|n)|saw|seeing)[^.!?]{0,70}(?:(?:all )?(?:the |these |those )?paths?(?: that)? I could have (?:taken|made)|what I could have been|what my life would have been|the future without me|the life[^.!?]{0,20}would have had|my potential)",
+      "best_quote": {
+        "doc": "VOBEOvAgm4I",
+        "text": "I saw all these paths that I could have taken when I was dead, and in this, it was like looking at the bottom of a large cable, a fiber optic cable made up of many fiber optic cables."
+      }
+    },
+    {
+      "id": "children-and-babies",
+      "judged": 24,
+      "true_positives": 6,
+      "precision": 0.25,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Dominant junk: miscarriage, stillbirth and abortion as BIOGRAPHY - the medical crisis that caused the NDE, or the speaker's obstetric history, with no encounter at all (docs KF1qu6P9pTo, XqtLcCDHSO8, PY5I2sCRQWE, yVxCeJVXGi8, sqaV-SF6pRQ, iAP38LkUxTU, IZBcv4So38s). Seven of eighteen FPs.",
+        "Doctrine and speculation about abortion, soul contracts and pre-birth plans, including one anti-NDE-community rant (docs turt5McjUlw, g3yQGY61eFc).",
+        "Researchers and hosts summarising the pattern in other people's NDEs - one packet states the entire claim verbatim as a generalisation about 'many NDErs' (docs nWjAa28WEc4, pYjYg1E4I0g).",
+        "Interviewer speculation ('what if one of them was the child you aborted?') and prophetic-ministry stories outside any NDE (docs fqQ0xxTmu6o, 7ST8RQYB4EM), plus one prayer-induced heaven visit rather than an NDE (doc mZ5CKy2i5cs)."
+      ],
+      "suggested_regex": "(?:I saw|I met|met|saw|greeted|carrying|holding|introduced (?:me )?to|there (?:was|were))[^.!?]{0,70}(?:child|baby|son|daughter|sister|brother|boy|girl)[^.!?]{0,70}(?:miscarr\\w+|stillborn|aborted)|(?:miscarr\\w+|stillborn|aborted)[^.!?]{0,70}(?:was there|came (?:to|toward) me|I met|I saw|walking (?:down )?to me|hi,? ?mommy)",
+      "best_quote": {
+        "doc": "FWZkPwiWJDE",
+        "text": "Out of the corner of my eye, in a place I should not have been able to see, I saw my sister who died as a baby. Now she was walking down to me and carrying my son."
+      }
+    },
+    {
+      "id": "the-unspoken-knowing",
+      "judged": 23,
+      "true_positives": 23,
+      "precision": 1.0,
+      "verdict": "solid",
+      "failure_modes": [
+        "None. Every one of the 23 passages is a first-person report of knowing, without being told, that a specific further step ends the return - across water, a tree, a gate, clouds, a door, a threshold, a line, a light.",
+        "The only impurities are cosmetic: two passages run into channel boilerplate after the sentence (docs AEgxTodIs3o, YOi92hxfJgA) and three are the same 'behind this gate' testimony re-uploaded (docs WzyaTY1Wt5U, Y0McKoG83Ds, oRF8Y6GeJ4Q). Neither affects the judgement.",
+        "Caveat for the map, not the regex: duplicate uploads mean 23 matches are roughly 19 distinct accounts."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "P2bz4Q9uIaQ",
+        "text": "but there was an energetic threshold, I knew if I stepped over that, I wouldn't be going back."
+      }
+    },
+    {
+      "id": "the-golden-wall",
+      "judged": 22,
+      "true_positives": 16,
+      "precision": 0.727,
+      "verdict": "solid",
+      "failure_modes": [
+        "Other walls in other settings: the white walls of the oval-table review room, seen twice from the same experiencer (docs lMEQ4Oe18FU, aSNVGewTc0M), a low stone wall around a well in a hellish crowd (doc mPWwxnYiq9A), and a white bedroom wall in an optical-illusion experiment at home (doc K9vI9ZTn9fA).",
+        "Walls inside the realm that are not the boundary wall: stone walls around houses in an ancient village, and a garden wall with doors leading to life-review scenes (docs 46a6x_wZq70, rfTxpUTdJkc).",
+        "MAJOR CAVEAT for the map: 15 of the 16 true positives are one recurring 'Glorious City' testimony re-uploaded across many channels (cMBRXeUtKfs, kfDl0i4Z2sQ, jvhSmwTQ4-E, TsOGyCidXLQ, Bn5Rt-Sx-lE, cbTWrNqyMhM, 9T8RidoORJU, OmmjdXTVWNA, OMr1ntfvwgg, CiTPmS94xfE, 92eTYGTqvOk, b0hqU1UoD0g, Ot_oAFw1Qfw, SKL0T_1vodw, H6KUCZKU8No). Only one independent account (iyl-82q6Ha0, the low wall by the River of Life). The precision is real; the convergence is not."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "TsOGyCidXLQ",
+        "text": "I'm standing at the golden wall that surrounded the Glorious City. And this wall was like real thick, pure gold cinder blocks, and it was so tall. I kept trying to jump the wall"
+      }
+    },
+    {
+      "id": "the-vermin",
+      "judged": 20,
+      "true_positives": 6,
+      "precision": 0.3,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "Simile for trauma, not perception: 'I've had times where I felt like maggots were crawling in my skin' after being raped - appears twice from the same speaker (docs FDyJb9IhFIc, OE2RiW1JmE4).",
+        "Ordinary-life religious rhetoric: preachers calling Catholics 'serpents', twice from the same speaker (docs rx1rfPpbI-k, tdRdrfiacns).",
+        "Fear-of-the-grave references and an atheist father's mantra 'you're buried, the worms eat you' - explicitly NOT what was experienced (docs WalJw3rI9eo, yu9ljcHcu3w).",
+        "Post-NDE aftereffects and dreams about spiders and bugs (docs GJShJRwEf6o, 7cJiP2m6sss), plus 'my reptilian brain' in a hypothermia survival story (doc RVuU5U_0beI).",
+        "Adjacent-but-different infernal imagery that does not include vermin in the body: snake-pit past life, demons around pits, spiders on walls, tarantulas laid on bedding (docs M-DWYU1YJMU, gAJShDqxM1E, A2NGV591_Tw, DiqCVc2C9ck)."
+      ],
+      "suggested_regex": "(?<!like )(?:worms?|maggots?)\\b[^.!?]{0,60}\\b(?:crawling|crawled|devour(?:ed|ing)?|eating|ate|clung|biting)\\b[^.!?]{0,60}(?:my (?:body|skin|flesh|arms|bones|skeleton)|their flesh|your flesh|the flesh|in and out of me|through me)",
+      "best_quote": {
+        "doc": "TMswDQpX2fI",
+        "text": "to see them fall inside of a hole and the worms devour their flesh and then then the flesh comes back on over and over again is a sight you just don't forget"
+      }
+    },
+    {
+      "id": "the-line",
+      "judged": 14,
+      "true_positives": 11,
+      "precision": 0.786,
+      "verdict": "solid",
+      "failure_modes": [
+        "'Crossing a line' as a life metaphor: bereavement ('this line has been crossed in your life... that person's gone') and a self-protective rule adopted after an assault (docs I4PHMgUuTns, 3rAYA_P1pXQ).",
+        "A literal geographic line in the ordinary world - reindeer still refusing to cross the old Berlin Wall boundary (doc FNUtgGdfYws).",
+        "Note the packet is small and duplicated: 14 matches are about 10 distinct accounts (docs kfmkyqG6oO4/Cpc4xLUfza0, vjt-VgrOn7E/9oNvs75DDEk, c7PK7WmSDhM/TTDNl010QuA are pairs)."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "y2ANf9jb1vM",
+        "text": "I saw ... a line on the floor by the door ... like a yellow line ... made of light. But it was a yellow line ... like one ... a divider ... I don't know ... a line that I couldn't cross"
+      }
+    },
+    {
+      "id": "the-tree-on-the-hill",
+      "judged": 12,
+      "true_positives": 8,
+      "precision": 0.667,
+      "verdict": "solid",
+      "failure_modes": [
+        "Ordinary-world trees and hills: a car wreck that 'hit a tree' at the top of a hill, and an OBE over a familiar pond where the road 'bent up around the top of the hill' with treetops behind (docs 8X6GcHqiKqk, 8cnODbcgbBg).",
+        "Vegetation described as scenery inside the experience but with no single tree and no boundary function - a cerrado-like trail, and walking under trees checking their shadows (docs Cr_Bh4A9lCM, jK_wNH2hxes).",
+        "MAJOR CAVEAT for the map: six of the eight true positives are one experiencer (David McGinley) re-interviewed across six channels (AEgxTodIs3o, UPZ5Lat277I, 9uQPuelkQT0, jYXjxZVDWxI, TYiLzS6Jq54, YOi92hxfJgA). Only two independent accounts remain: the tree beyond the rock wall (ZH0J83t7LZs) and the young tree on the hill his boyfriend would 'become' (Q_DrclCSBaU). The image should not be presented as convergent."
+      ],
+      "suggested_regex": null,
+      "best_quote": {
+        "doc": "UPZ5Lat277I",
+        "text": "And at the top of the hill was that tree. With every fiber of my being, I had to run to that tree"
+      }
+    },
+    {
+      "id": "the-bridge",
+      "judged": 11,
+      "true_positives": 3,
+      "precision": 0.273,
+      "verdict": "needs_narrowing",
+      "failure_modes": [
+        "The bridge as a metaphor for dying, from an 80-year-old interviewee - 'I recognize the bridge... and I go to the other side' - appearing twice as duplicate uploads (docs OizX472ycCw, coSo-eQS1jI).",
+        "Ordinary-world bridges: fleeing a pursuer over a street bridge at 6am, a retreat walk over a bridge to a waterfall, and a cobblestone bridge in an 1800s past-life memory (docs OLGWAewZDp0, Hsr31XRRqSI, tlQGWtu9emM).",
+        "A prayer visualisation - 'I pictured a golden healing, like a bridge' - imagined deliberately, not perceived (doc HfEcEjYuT9k).",
+        "Generalisation about what most NDErs report ('they couldn't cross a bridge, they couldn't cross a creek') and a third-person retelling of someone else's footbridge NDE (docs BXtPCN_At9Q, P1MVSAwKZ8Y). The second one is painfully on-claim but it is 'she', not 'I'.",
+        "Also note: the two strongest matches are the same experiencer (hhADKDdhTTk, IZWbojibwyA), so the surviving evidence is two distinct accounts, not three."
+      ],
+      "suggested_regex": "(?:\\bfoot ?bridge\\b|\\bbridge\\b[^.!?]{0,40}\\b(?:creek|brook|brooklet|stream|golden railing)\\b)[^.!?]{0,140}\\b(?:I (?:saw|stepped|started|felt|was pulled|wanted)|cross that bridge|urge to cross|put (?:one )?foot)\\b",
+      "best_quote": {
+        "doc": "PqddJsxn16s",
+        "text": "In front of me I saw a bridge hanging over a brooklet, and I stepped onto it. It was a narrow bridge with golden railings."
+      }
+    }
+  ]
+}
