@@ -3,20 +3,28 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { Shield, ChevronDown, X } from "lucide-react"
+import { fetchGeo } from "@/lib/consent/geo"
 
 /* ─────────────────────────────────────────────────────────────────────────────
- * CookieConsent — GDPR/ePrivacy-compliant cookie consent banner.
+ * CookieConsent — geo-gated GDPR/ePrivacy consent banner.
  *
- * Requirements met:
- * 1. Prior blocking: Non-essential cookies don't load until consent given
+ * GEO-GATING (2026-07): the banner auto-shows ONLY for visitors in regions
+ * where prior consent is legally required (EEA + UK, via /api/geo — see
+ * src/lib/consent/regions.ts). Everyone else gets measurement on by default
+ * (see consent-gated-scripts.tsx) and can opt out any time via the footer
+ * "Cookie Settings" link, which reopens this banner worldwide.
+ *
+ * Requirements met (for consent-required regions):
+ * 1. Prior blocking of identifiers: GA runs cookieless until consent given
  * 2. Equal prominence: Accept & Reject buttons same size/styling
  * 3. Granular control: Per-category toggles (Analytics, Marketing)
  * 4. No pre-ticked boxes: Defaults to OFF
  * 5. Easy withdrawal: "Cookie Settings" in footer reopens banner
  * 6. Consent logging: Stores timestamp + choices in localStorage
  *
- * This component emits a CustomEvent "cookie-consent-update" that the
- * root layout listens for to conditionally load GA4 and ConvertKit.
+ * This component emits a CustomEvent "cookie-consent-update" that
+ * ConsentGatedScripts listens for to update Google Consent Mode and
+ * conditionally load ConvertKit.
  * ───────────────────────────────────────────────────────────────────────────── */
 
 export interface CookiePreferences {
@@ -27,8 +35,10 @@ export interface CookiePreferences {
   version: number // Bump when cookie policy changes to re-prompt
 }
 
-const CONSENT_KEY = "pp-cookie-consent"
-const CONSENT_VERSION = 1
+// Exported: consent-gated-scripts.tsx reads the stored choice synchronously
+// (inside its inline gtag bootstrap) and must use the same key + version.
+export const CONSENT_KEY = "pp-cookie-consent"
+export const CONSENT_VERSION = 1
 
 /** Read stored preferences (or null if not yet set) */
 export function getStoredConsent(): CookiePreferences | null {
@@ -58,12 +68,28 @@ export default function CookieConsent() {
   const [marketing, setMarketing] = useState(false)
 
   useEffect(() => {
-    // Show banner only if no valid consent exists
+    // Auto-show only if (a) no valid consent exists AND (b) the visitor is in
+    // a region where prior consent is required. If the geo lookup fails we
+    // can't tell where they are, so we show the banner — the safe default.
     const stored = getStoredConsent()
-    if (!stored) {
+    if (stored) return
+
+    let timer: ReturnType<typeof setTimeout> | undefined
+    let cancelled = false
+    const show = () => {
       // Small delay so the page renders first — feels less jarring
-      const timer = setTimeout(() => setVisible(true), 800)
-      return () => clearTimeout(timer)
+      timer = setTimeout(() => setVisible(true), 800)
+    }
+    fetchGeo()
+      .then((geo) => {
+        if (!cancelled && geo.requiresConsent) show()
+      })
+      .catch(() => {
+        if (!cancelled) show()
+      })
+    return () => {
+      cancelled = true
+      if (timer) clearTimeout(timer)
     }
   }, [])
 
