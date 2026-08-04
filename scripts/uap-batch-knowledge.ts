@@ -4,12 +4,15 @@
  * Copy-Modify from: scripts/uap-batch-triad.ts
  * Reference: SPRINT.md Story 2.4.1
  *
- * Extracts structured knowledge from Tier 2 (program/investigative) UAP videos.
- * Uses Claude Sonnet via OpenRouter — more expensive than gpt-4o-mini triad,
- * so defaults to lower concurrency.
+ * ⛔ ON HOLD since 2026-08-04 — too expensive at current model prices. See
+ *    UAP_KNOWLEDGE_HOLD_NOTE in src/lib/pipeline/uap-knowledge.ts.
+ *    This is a near-duplicate of scripts/uap-knowledge-batch.ts and is the more
+ *    expensive of the two (one request per video, so no 50% batch discount).
+ *    It is a deletion candidate — kept only until someone confirms nothing
+ *    schedules it.
  *
- * COST ESTIMATE: Claude Sonnet ~$0.01-0.03/call → ~$50-70 for 2,194 videos.
- * Consider running on a subset first to validate quality.
+ * Extracts structured knowledge from Tier 2 (program/investigative) UAP videos.
+ * Now runs on the direct Anthropic API via extractUapKnowledge().
  *
  * Usage:
  *   npx tsx scripts/uap-batch-knowledge.ts                    # defaults: 1000 limit, 2 concurrency
@@ -21,7 +24,11 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
-import { extractUapKnowledge } from '../src/lib/pipeline/uap-knowledge';
+import {
+  extractUapKnowledge,
+  UAP_KNOWLEDGE_ON_HOLD,
+  UAP_KNOWLEDGE_HOLD_NOTE,
+} from '../src/lib/pipeline/uap-knowledge';
 
 // ─── Environment ────────────────────────────────────────────────────────────
 
@@ -191,6 +198,11 @@ async function processWithConcurrency(
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 async function runBatchKnowledgeExtraction() {
+  if (UAP_KNOWLEDGE_ON_HOLD) {
+    console.error(`\n⛔ ${UAP_KNOWLEDGE_HOLD_NOTE}\n`);
+    process.exit(1);
+  }
+
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('  UAP Knowledge Extraction Batch (Tier 2)');
   console.log(`  Limit: ${BATCH_LIMIT} | Concurrency: ${CONCURRENCY} | Dry Run: ${DRY_RUN}`);

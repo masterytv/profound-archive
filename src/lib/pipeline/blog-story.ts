@@ -26,6 +26,7 @@ import {
 import { sanitizeMarkdownLinks, stripMarkdownLinks } from './blog-article';
 import { gatePublishStatus } from './content-quality';
 import { wrapAiClient } from '../ai/usage-tracker';
+import { claudeChat } from '../ai/claude';
 import { SEO_REFRESH_PROMPT } from './blog-prompts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -66,18 +67,15 @@ function getSupabaseAdmin() {
     return createClient(url, key);
 }
 
-function getOpenRouter() {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable');
-    return wrapAiClient(new OpenAI({
-        apiKey,
-        baseURL: 'https://openrouter.ai/api/v1',
-        timeout: 6 * 60 * 1000, // 6-minute timeout — drafts with 24K max_tokens can take 3-4 minutes
-        defaultHeaders: {
-            'HTTP-Referer': 'https://projectprofound.org',
-            'X-Title': 'Project Profound Story Pipeline',
-        },
-    }), { provider: 'openrouter', operation: 'blog-story' });
+/**
+ * Direct OpenAI, for the small gpt-4o-mini SEO pass. Claude calls go through
+ * claudeChat(); the Anthropic SDK's default 10-minute timeout is more generous
+ * than the 6 minutes this client used to allow for 24K-token drafts.
+ */
+function getOpenAI() {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error('Missing OPENAI_API_KEY environment variable');
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'blog-story' });
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -394,8 +392,6 @@ async function assembleStoryContext(candidate: ExperiencerCandidate): Promise<St
 // ─── Stage 3: Claude Draft ────────────────────────────────────────────────────
 
 async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
-    const openRouter = getOpenRouter();
-
     const userPrompt = buildStoryDraftUserPrompt({
         experiencer: context.experiencer,
         primaryVideos: context.primaryVideos,
@@ -404,34 +400,32 @@ async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
 
     console.log(`    [story] Sending draft request to Claude (${userPrompt.length} chars)...`);
 
-    const response = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-sonnet-4-5',
-        messages: [
-            { role: 'system', content: STORY_DRAFT_SYSTEM_PROMPT },
-            { role: 'user', content: userPrompt },
-            { role: 'assistant', content: '{' },
-        ],
-        max_tokens: 24000, // Must be high enough to never truncate a 4K-word story in JSON. Truncation = broken article.
+    const response = await claudeChat({
+        operation: 'blog-story.draft',
+        system: STORY_DRAFT_SYSTEM_PROMPT,
+        user: userPrompt,
+        prefill: '{',
+        maxTokens: 24000, // Must be high enough to never truncate a 4K-word story in JSON. Truncation = broken article.
         temperature: 0.7,
     });
 
-    const rawContent = response?.choices?.[0]?.message?.content;
-    const finishReason = response?.choices?.[0]?.finish_reason ?? 'unknown';
+    // Already includes the '{' prefill, so an empty completion is exactly '{'.
+    const rawContent = response.text;
 
-    if (!rawContent || rawContent.trim().length === 0) {
-        throw new Error(`Claude returned empty content (finish_reason: ${finishReason}). Model may be overloaded or the request was filtered.`);
+    if (rawContent.trim() === '{') {
+        throw new Error(`Claude returned empty content (truncated: ${response.truncated}). Model may be overloaded or the request was filtered.`);
     }
 
     // HARD BLOCK: Never publish a truncated story. If Claude hit max_tokens, the article is incomplete.
-    if (finishReason === 'length') {
+    if (response.truncated) {
         throw new Error(
-            `TRUNCATION DETECTED: Claude hit max_tokens and stopped mid-output (finish_reason: "length"). ` +
+            `TRUNCATION DETECTED: Claude hit max_tokens and stopped mid-output. ` +
             `Output was ${rawContent.length} chars. The story would be incomplete. ` +
             `Increase max_tokens or reduce input context size.`
         );
     }
 
-    let jsonStr = '{' + rawContent;
+    let jsonStr = rawContent; // prefill already included
     // Strip markdown code fence if present
     jsonStr = jsonStr.replace(/```json\s*/g, '').replace(/```\s*/g, '');
 
@@ -472,40 +466,37 @@ async function generateStoryDraft(context: StoryContext): Promise<StoryDraft> {
 // ─── Stage 4: Voice Pass ──────────────────────────────────────────────────────
 
 async function applyVoicePass(draft: StoryDraft): Promise<StoryDraft> {
-    const openRouter = getOpenRouter();
-
-    const voiceResponse = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-sonnet-4-5',
-        messages: [
-            { role: 'system', content: STORY_VOICE_PASS_SYSTEM },
-            { role: 'user', content: `Apply the voice pass to this story article. Return ONLY the corrected body_mdx text (no JSON wrapper, no markdown fence).\n\nCurrent body_mdx:\n\n${draft.body_mdx}` },
-        ],
-        max_tokens: 6000,
+    const voiceResponse = await claudeChat({
+        operation: 'blog-story.voice',
+        system: STORY_VOICE_PASS_SYSTEM,
+        user: `Apply the voice pass to this story article. Return ONLY the corrected body_mdx text (no JSON wrapper, no markdown fence).\n\nCurrent body_mdx:\n\n${draft.body_mdx}`,
+        maxTokens: 6000,
         temperature: 0.3,
     });
 
-    const voiceContent = voiceResponse?.choices?.[0]?.message?.content;
-    const revisedBody = (voiceContent && voiceContent.trim().length > 100)
+    const voiceContent = voiceResponse.text;
+    const revisedBody = voiceContent.trim().length > 100
         ? voiceContent
         : draft.body_mdx; // Fall back to original if voice pass returned empty/short
     if (!voiceContent) {
         console.warn('[story] Voice pass returned empty content, keeping original body');
     }
 
-    // Refresh SEO fields
-    const seoResponse = await openRouter.chat.completions.create({
-        model: 'openai/gpt-4o-mini',
+    // Refresh SEO fields. json_object replaces the '{' prefill: OpenAI has
+    // native JSON mode, and the prefill only worked because OpenRouter passed it through.
+    const seoResponse = await getOpenAI().chat.completions.create({
+        model: 'gpt-4o-mini',
         messages: [
             { role: 'user', content: `${SEO_REFRESH_PROMPT}\n\nTITLE: ${draft.title}\n\nARTICLE BODY:\n${revisedBody.slice(0, 3000)}` },
-            { role: 'assistant', content: '{' },
         ],
+        response_format: { type: 'json_object' },
         max_tokens: 400,
         temperature: 0.2,
     });
 
     let seoFields = { lead_paragraph: draft.lead_paragraph, seo_description: draft.seo_description };
     try {
-        seoFields = JSON.parse('{' + (seoResponse.choices[0]?.message?.content ?? '{}'));
+        seoFields = JSON.parse(seoResponse.choices[0]?.message?.content ?? '{}');
     } catch { /* keep original */ }
 
     const wordCount = revisedBody.split(/\s+/).filter(Boolean).length;

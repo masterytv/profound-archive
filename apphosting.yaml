@@ -44,8 +44,13 @@ env:
   - variable: OPENAI_API_KEY
     secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/2
 
-  - variable: OPENROUTER_API_KEY
-    secret: projects/432036554831/secrets/OPENROUTER_API_KEY/versions/2
+  # Anthropic — Claude drafting for the blog pipeline and questions-autogen.
+  # Replaced OPENROUTER_API_KEY (2026-08-04): same models at the same token
+  # prices, without OpenRouter's top-up fee or its shared monthly key limit.
+  # Version MUST stay numeric — the floating alias fails App Hosting builds
+  # (docs/LEARNINGS.md §5), so bump this by hand when the key is rotated.
+  - variable: ANTHROPIC_API_KEY
+    secret: projects/432036554831/secrets/ANTHROPIC_API_KEY/versions/1
 
   # Secret for securing Cron/Automated jobs
   - variable: CRON_SECRET

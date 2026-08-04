@@ -15,7 +15,7 @@
     "warm:prod": "ts-node --project scripts/tsconfig.json scripts/warm-questions.ts --url=https://projectprofound.org"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.67.1",
+    "@anthropic-ai/sdk": "^0.115.0",
     "@google-analytics/data": "^5.2.1",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^4.1.3",

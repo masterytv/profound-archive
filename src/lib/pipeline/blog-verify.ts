@@ -13,6 +13,7 @@
 
 import OpenAI from 'openai';
 import { wrapAiClient } from '../ai/usage-tracker';
+import { claudeChat } from '../ai/claude';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,17 +51,15 @@ interface VerifyResult {
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
 
-function getOpenRouter() {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY');
-    return wrapAiClient(new OpenAI({
-        apiKey,
-        baseURL: 'https://openrouter.ai/api/v1',
-        defaultHeaders: {
-            'HTTP-Referer': 'https://projectprofound.org',
-            'X-Title': 'Project Profound Blog Pipeline',
-        },
-    }), { provider: 'openrouter', operation: 'blog-verify' });
+/**
+ * Direct OpenAI, for the gpt-4o-mini claim extraction / fact-check passes and
+ * the gpt-4o link-relevance check. The Claude correction pass goes through
+ * claudeChat(). All three used to be routed via OpenRouter, whose key is retired.
+ */
+function getOpenAI() {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error('Missing OPENAI_API_KEY');
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'blog-verify' });
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -129,15 +128,15 @@ async function extractAndVerifyClaims(
     correctedRefs: ArticleReference[];
     stats: VerifyResult['stats'];
 }> {
-    const openRouter = getOpenRouter();
+    const openai = getOpenAI();
     const tavilyKey = process.env.TAVILY_API_KEY;
     if (!tavilyKey) throw new Error('Missing TAVILY_API_KEY');
 
     // ── Step 1a: Extract claims with GPT-4o-mini ──
     console.log('    [verify] Extracting factual claims...');
 
-    const extractResponse = await openRouter.chat.completions.create({
-        model: 'openai/gpt-4o-mini',
+    const extractResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
         messages: [
             {
                 role: 'system',
@@ -207,8 +206,8 @@ Return a JSON array. Be exhaustive — extract at least 20 claims.`,
     }
 
     // Use Claude to analyze the evidence against each claim
-    const verifyResponse = await openRouter.chat.completions.create({
-        model: 'openai/gpt-4o-mini',
+    const verifyResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
         messages: [
             { role: 'system', content: 'You are a meticulous fact-checker. Use the provided search evidence to verify each claim. Return valid JSON.' },
             {
@@ -252,12 +251,9 @@ SEARCH EVIDENCE:\n${tavilyEvidence}\n\nCLAIMS:\n${claimsList}\n\nReturn JSON arr
 
     const verificationText = typeof verified === 'string' ? verified : JSON.stringify(verified, null, 2);
 
-    const correctResponse = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-sonnet-4-5',
-        messages: [
-            {
-                role: 'system',
-                content: `You are an expert copy editor doing a final fact-check pass on a near-death experience article. You have three jobs:
+    const correctResponse = await claudeChat({
+        operation: 'blog-verify.correct',
+        system: `You are an expert copy editor doing a final fact-check pass on a near-death experience article. You have three jobs:
 
 1. CORRECT FACTS: For every claim marked "incorrect" or "partially_correct", surgically change ONLY the specific wrong detail. Do NOT change surrounding prose, voice, or structure.
 
@@ -283,19 +279,20 @@ OUTPUT FORMAT:
   "body_mdx": "the full corrected article",
   "references": [{"title": "Author (Year). Title.", "url": "https://... or null", "type": "academic"|"book"|"site"}]
 }`,
-            },
-            {
-                role: 'user',
-                content: `ARTICLE:\n${article}\n\nEXISTING REFERENCES:\n${JSON.stringify(refs, null, 2)}\n\nVERIFICATION DATA:\n${verificationText}\n\n${verifyCitations.length ? `ADDITIONAL SOURCES:\n${verifyCitations.map((c: unknown, i: number) => `[${i + 1}] ${typeof c === 'string' ? c : JSON.stringify(c)}`).join('\n')}` : ''}`,
-            },
-            { role: 'assistant', content: '{' },
-        ],
-        max_tokens: 24000,
+        // Previously appended an "ADDITIONAL SOURCES" block built from a
+        // `verifyCitations` variable that was never declared anywhere in this
+        // file. Referencing it threw a ReferenceError on every run, and both
+        // callers wrap verifyArticle() in try/catch, so the whole correction
+        // pass has been silently failing — articles published unverified.
+        // The Tavily evidence it was meant to carry already reaches the model
+        // through VERIFICATION DATA below.
+        user: `ARTICLE:\n${article}\n\nEXISTING REFERENCES:\n${JSON.stringify(refs, null, 2)}\n\nVERIFICATION DATA:\n${verificationText}`,
+        prefill: '{',
+        maxTokens: 24000,
         temperature: 0.3,
     });
 
-    const correctRaw = '{' + (correctResponse.choices[0]?.message?.content ?? '{}');
-    const cleaned = correctRaw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+    const cleaned = correctResponse.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
 
     let corrected: { body_mdx?: string; references?: ArticleReference[] };
     try {
@@ -306,9 +303,8 @@ OUTPUT FORMAT:
     }
 
     // If Claude hit max_tokens, the corrected body is incomplete — keep original
-    const finishReason = correctResponse.choices[0]?.finish_reason;
-    if (finishReason === 'length') {
-        console.warn(`    [verify] TRUNCATION DETECTED in correction pass (finish_reason: "length"). Keeping original body.`);
+    if (correctResponse.truncated) {
+        console.warn(`    [verify] TRUNCATION DETECTED in correction pass. Keeping original body.`);
         return { correctedBody: article, correctedRefs: refs, stats };
     }
 
@@ -422,7 +418,7 @@ async function validateLinks(
     article: string,
     refs: ArticleReference[],
 ): Promise<{ body_mdx: string; references: ArticleReference[]; linksChecked: number; linksOk: number; linksFixed: number; linksStripped: number }> {
-    const openRouter = getOpenRouter();
+    const openai = getOpenAI();
     const tavilyKey = process.env.TAVILY_API_KEY;
 
     // Extract all external URLs
@@ -503,9 +499,9 @@ async function validateLinks(
 
         if (linksForLlmCheck.length > 0) {
             try {
-                const relResponse = await openRouter.chat.completions.create({
+                const relResponse = await openai.chat.completions.create({
                     // GPT-4o (not mini) — mini failed to catch "puberty" vs "cardiac arrest"
-                    model: 'openai/gpt-4o',
+                    model: 'gpt-4o',
                     messages: [
                         { role: 'system', content: 'You are a citation accuracy checker. For each link, determine if the page content is actually about the topic claimed in the anchor text. Be STRICT: if the page title is about a completely different subject than what the link text claims, mark it irrelevant. Return JSON only.' },
                         {

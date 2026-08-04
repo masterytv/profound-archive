@@ -39,7 +39,8 @@ Priority order = blast radius × likely exposure. Rotate top-down.
 
 | # | Env var | Provider | Used by | Stored in | Provider cap? | Rotated | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | `OPENROUTER_API_KEY` | OpenRouter | Blog pipeline + questions autogen (PP) | SM `v2`, VM, local | ✅ $25/mo | ✅ 2026-06-11 | ✅ verified local+VM+staging. **TODO:** revoke old `antigravity-tom` key · disable SM v1 · promote to prod (main) |
+| 1 | `ANTHROPIC_API_KEY` | Anthropic | Blog pipeline + questions autogen (PP) — `claude-sonnet-4-5` | SM `v1`, local | ✅ monthly cap set at creation | ✅ created 2026-08-04 | ✅ verified local (real calls, priced `api_usage_log` rows). **TODO:** add to VM `.env.local` · promote to prod (main) |
+| 1b | ~~`OPENROUTER_API_KEY`~~ | OpenRouter | **RETIRED 2026-08-04** — replaced by #1 | ~~SM `v2`~~ removed from `apphosting.yaml`; still on VM + local | ✅ $25/mo | ✅ 2026-06-11 | ⚠️ Key disabled by Tom during the Aug 2 burn incident. **TODO:** revoke old `antigravity-tom` key · delete remaining OpenRouter key(s) · destroy SM v1+v2 · remove from VM `.env.local`. Two dev-only scripts still read it (`scripts/test-guide-pipeline*.ts/.mjs`) — neither runs on App Hosting or cron. |
 | 2 | `OPENAI_API_KEY` | OpenAI | Embeddings + chat (PP, both apps?) | SM, VM, local | ⬜ hard cap | ⬜ | Pending — confirm Feb leak dead |
 | 3 | `SUPABASE_SERVICE_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Supabase | ⚠️ **~30 routes + ~50 scripts — full DB, bypasses RLS** | SM, VM, local | n/a | ⬜ | Pending — **highest impact**, do carefully |
 | 4 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase | Client auth | SM, VM, local | n/a | ⬜ | Rotate with #3 (RLS-bound, lower risk) |

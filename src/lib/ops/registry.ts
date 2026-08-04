@@ -86,7 +86,8 @@ export const PROCESS_REGISTRY: ProcessSpec[] = [
         schedule: 'Daily noon & 2pm ET (pg_cron → /api/cron/blog-*)',
         operationPrefixes: ['blog-story', 'blog-article', 'blog-verify', 'blog-research', 'uap-blog', 'blog-questions'],
         services: [
-            { provider: 'openrouter', label: 'OpenRouter (Claude Sonnet)', envVar: 'OPENROUTER_API_KEY', costModel: 'tokens', pricingNote: 'anthropic/claude-sonnet-4-5 + gpt-4o-mini voice pass.' },
+            { provider: 'anthropic', label: 'Anthropic (Claude Sonnet)', envVar: 'ANTHROPIC_API_KEY', costModel: 'tokens', pricingNote: 'claude-sonnet-4-5 drafting. $3/$15 per Mtok.' },
+            { provider: 'openai', label: 'OpenAI (voice + fact-check)', envVar: 'OPENAI_API_KEY', costModel: 'tokens', pricingNote: 'gpt-4o-mini SEO/claim passes, gpt-4o link check, embeddings.' },
             { provider: 'tavily', label: 'Tavily (research)', envVar: 'TAVILY_API_KEY', costModel: 'quota', quotaLimit: 1000, quotaPeriod: 'month', unit: 'credits', pricingNote: '1 credit/query. 1,000 free/mo.' },
         ],
     },

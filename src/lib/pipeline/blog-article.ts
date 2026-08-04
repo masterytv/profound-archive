@@ -10,7 +10,7 @@
  * 5 steps (mirrors intake.ts pattern):
  * 1. Context assembly   — Supabase question + top NDE chunks
  * 2. Tavily research    — web search with domain filter
- * 3. Claude draft       — full MDX article via OpenRouter
+ * 3. Claude draft       — full MDX article via the direct Anthropic API
  * 4. Voice pass         — strip AI tics, enforce Gladwellian rhythm
  * 5. Publish            — insert blog_posts row (status = 'draft')
  */
@@ -23,6 +23,7 @@ import { generateHeroImage } from './blog-image';
 import { verifyArticle, type ArticleReference } from './blog-verify';
 import { gatePublishStatus } from './content-quality';
 import { wrapAiClient } from '../ai/usage-tracker';
+import { claudeChat } from '../ai/claude';
 import {
     buildDraftSystemPrompt,
     buildDraftUserPrompt,
@@ -76,17 +77,15 @@ function getSupabaseAdmin() {
     return createClient(url, key);
 }
 
-function getOpenRouter() {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable');
-    return wrapAiClient(new OpenAI({
-        apiKey,
-        baseURL: 'https://openrouter.ai/api/v1',
-        defaultHeaders: {
-            'HTTP-Referer': 'https://projectprofound.org',
-            'X-Title': 'Project Profound Blog Pipeline',
-        },
-    }), { provider: 'openrouter', operation: 'blog-article' });
+/**
+ * Direct OpenAI, for the small gpt-4o-mini passes. Claude calls go through
+ * claudeChat() in src/lib/ai/claude.ts. Both used to be routed via OpenRouter,
+ * whose key is retired.
+ */
+function getOpenAI() {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error('Missing OPENAI_API_KEY environment variable');
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'blog-article' });
 }
 
 // ─── Timeout Wrapper ──────────────────────────────────────────────────────────
@@ -280,8 +279,6 @@ async function draftArticle(
     noeticMapSummary?: string,
     overusedWarning?: string,
 ): Promise<ArticleDraft> {
-    const openRouter = getOpenRouter();
-
     const researchText = [
         research.rawText,
         research.citations.length > 0
@@ -291,48 +288,43 @@ async function draftArticle(
         overusedWarning ?? '',
     ].join('');
 
-    const response = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-sonnet-4-5',
-        messages: [
-            { role: 'system', content: buildDraftSystemPrompt() },
-            {
-                role: 'user',
-                content: buildDraftUserPrompt({
-                    question: context.question,
-                    consumerQuestion: context.consumerQuestion,
-                    hydePassage: context.hydePassage,
-                    research: researchText,
-                    topChunks: context.topChunks,
-                    authorName: context.authorName,
-                    videoReferences: context.videoReferences,
-                    relatedQuestionSlugs: context.relatedQuestionSlugs,
-                }),
-            },
-            // Assistant prefill forces JSON output (Claude-specific)
-            { role: 'assistant', content: '{' },
-        ],
-        max_tokens: 24000, // Must be high enough to never truncate. Truncation = broken article.
+    const response = await claudeChat({
+        operation: 'blog-article.draft',
+        system: buildDraftSystemPrompt(),
+        user: buildDraftUserPrompt({
+            question: context.question,
+            consumerQuestion: context.consumerQuestion,
+            hydePassage: context.hydePassage,
+            research: researchText,
+            topChunks: context.topChunks,
+            authorName: context.authorName,
+            videoReferences: context.videoReferences,
+            relatedQuestionSlugs: context.relatedQuestionSlugs,
+        }),
+        // Assistant prefill forces JSON output (Claude-specific)
+        prefill: '{',
+        maxTokens: 24000, // Must be high enough to never truncate. Truncation = broken article.
         temperature: 0.7,
     });
 
-    const rawContent = '{' + (response.choices[0]?.message?.content ?? '{}');
     // Strip markdown code fences if model wraps JSON in ```json ... ```
-    const cleaned = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    const cleaned = response.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    // HARD BLOCK: Never publish a truncated article. Checked before parsing —
+    // truncated JSON usually fails to parse, and the parse error would otherwise
+    // mask the real cause.
+    if (response.truncated) {
+        throw new Error(
+            `TRUNCATION DETECTED: Claude hit max_tokens and stopped mid-output. ` +
+            `Output was ${cleaned.length} chars. The article would be incomplete.`
+        );
+    }
 
     let draft: ArticleDraft;
     try {
         draft = JSON.parse(cleaned);
     } catch {
         throw new Error(`Claude returned invalid JSON: ${cleaned.slice(0, 200)}`);
-    }
-
-    // HARD BLOCK: Never publish a truncated article
-    const finishReason = response.choices[0]?.finish_reason;
-    if (finishReason === 'length') {
-        throw new Error(
-            `TRUNCATION DETECTED: Claude hit max_tokens and stopped mid-output (finish_reason: "length"). ` +
-            `Output was ${cleaned.length} chars. The article would be incomplete.`
-        );
     }
 
     // Validate required fields
@@ -346,37 +338,32 @@ async function draftArticle(
 // ─── Step 4: Voice Pass ───────────────────────────────────────────────────────
 
 async function voicePass(draft: ArticleDraft): Promise<ArticleDraft> {
-    const openRouter = getOpenRouter();
-
-    const voiceResponse = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-sonnet-4-5',
-        messages: [
-            { role: 'system', content: buildVoicePassSystemPrompt() },
-            {
-                role: 'user',
-                content: `Article title: ${draft.title}\n\n${draft.body_mdx}`,
-            },
-        ],
-        max_tokens: 6000,
+    const voiceResponse = await claudeChat({
+        operation: 'blog-article.voice',
+        system: buildVoicePassSystemPrompt(),
+        user: `Article title: ${draft.title}\n\n${draft.body_mdx}`,
+        maxTokens: 6000,
         temperature: 0.3, // lower temp = more consistent voice enforcement
     });
 
-    const revisedBody = voiceResponse.choices[0]?.message?.content ?? draft.body_mdx;
+    const revisedBody = voiceResponse.text || draft.body_mdx;
 
-    // Re-generate lead_paragraph and seo_description from revised body
-    const seoResponse = await openRouter.chat.completions.create({
-        model: 'openai/gpt-4o-mini',
+    // Re-generate lead_paragraph and seo_description from revised body.
+    // json_object replaces the '{' prefill: OpenAI has native JSON mode, and
+    // the prefill only ever worked because OpenRouter passed it through.
+    const seoResponse = await getOpenAI().chat.completions.create({
+        model: 'gpt-4o-mini',
         messages: [
             { role: 'user', content: `${SEO_REFRESH_PROMPT}\n\nQUESTION: ${draft.title}\n\nARTICLE BODY:\n${revisedBody.slice(0, 3000)}` },
-            { role: 'assistant', content: '{' },
         ],
+        response_format: { type: 'json_object' },
         max_tokens: 400,
         temperature: 0.2,
     });
 
     let seoFields = { lead_paragraph: draft.lead_paragraph, seo_description: draft.seo_description };
     try {
-        seoFields = JSON.parse('{' + (seoResponse.choices[0]?.message?.content ?? '{}'));
+        seoFields = JSON.parse(seoResponse.choices[0]?.message?.content ?? '{}');
     } catch {
         // Non-fatal — keep original fields
     }
@@ -1027,8 +1014,6 @@ async function draftGuide(
     context: GuideContext,
     research: ResearchResult,
 ): Promise<ArticleDraft & { faq_data?: Array<{ question: string; answer: string }> }> {
-    const openRouter = getOpenRouter();
-
     const researchText = [
         research.rawText,
         research.citations.length > 0
@@ -1036,31 +1021,32 @@ async function draftGuide(
             : '',
     ].join('');
 
-    const response = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-sonnet-4-5',
-        messages: [
-            { role: 'system', content: buildGuideDraftSystemPrompt() },
-            {
-                role: 'user',
-                content: buildGuideDraftUserPrompt({
-                    pillarTitle: context.pillarTitle,
-                    targetQuery: context.targetQuery,
-                    research: researchText,
-                    topChunks: context.topChunks,
-                    authorName: context.authorName,
-                    relatedQuestionSlugs: context.relatedQuestionSlugs,
-                    existingGuideSlugs: context.existingGuideSlugs,
-                    videoReferences: context.videoReferences,
-                }),
-            },
-            { role: 'assistant', content: '{' },
-        ],
-        max_tokens: 24000, // guides are longer than big-question articles
+    const response = await claudeChat({
+        operation: 'blog-article.guide-draft',
+        system: buildGuideDraftSystemPrompt(),
+        user: buildGuideDraftUserPrompt({
+            pillarTitle: context.pillarTitle,
+            targetQuery: context.targetQuery,
+            research: researchText,
+            topChunks: context.topChunks,
+            authorName: context.authorName,
+            relatedQuestionSlugs: context.relatedQuestionSlugs,
+            existingGuideSlugs: context.existingGuideSlugs,
+            videoReferences: context.videoReferences,
+        }),
+        prefill: '{',
+        maxTokens: 24000, // guides are longer than big-question articles
         temperature: 0.7,
     });
 
-    const rawContent = '{' + (response.choices[0]?.message?.content ?? '{}');
-    const cleaned = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    const cleaned = response.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    if (response.truncated) {
+        throw new Error(
+            `TRUNCATION DETECTED: Claude hit max_tokens generating the guide. ` +
+            `Output was ${cleaned.length} chars. The guide would be incomplete.`
+        );
+    }
 
     let draft: ArticleDraft & { faq_data?: Array<{ question: string; answer: string }> };
     try {
