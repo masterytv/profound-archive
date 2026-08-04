@@ -1,6 +1,13 @@
 /**
  * UAP Knowledge Extraction Batch Script
  *
+ * ⛔ ON HOLD since 2026-08-04 — too expensive at current model prices.
+ *    Measured: $238 (Haiku 4.5) / $866 (Sonnet 5) per 10,000 videos.
+ *    Reintroduce below $50 per 10,000. Full criteria and the steps to bring
+ *    it back are in UAP_KNOWLEDGE_HOLD_NOTE in src/lib/pipeline/uap-knowledge.ts.
+ *    The code below is migrated, typechecked and tested — it is switched off
+ *    on price alone, not because anything is broken.
+ *
  * Pushes Tier 2 videos that have transcripts but no extracted knowledge
  * (people_mentioned IS NULL) through the Anthropic Message Batches API —
  * one batch per run, 50% off standard token prices.
@@ -30,6 +37,8 @@ import {
   getAnthropic,
   UAP_KNOWLEDGE_MODEL_DEFAULT,
   UAP_TRANSCRIPT_CHAR_LIMIT,
+  UAP_KNOWLEDGE_ON_HOLD,
+  UAP_KNOWLEDGE_HOLD_NOTE,
 } from '../src/lib/pipeline/uap-knowledge';
 import { MODEL_PRICES, estimateCost } from '../src/lib/ai/pricing';
 import * as dotenv from 'dotenv';
@@ -117,6 +126,11 @@ interface VideoResult {
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (UAP_KNOWLEDGE_ON_HOLD) {
+    console.error(`\n⛔ ${UAP_KNOWLEDGE_HOLD_NOTE}\n`);
+    process.exit(1);
+  }
+
   console.log(`\n🔬 UAP Knowledge Extraction Batch`);
   console.log(`   Model:   ${MODEL}`);
   console.log(`   Limit:   ${LIMIT}`);

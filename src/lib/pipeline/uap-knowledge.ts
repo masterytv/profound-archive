@@ -326,6 +326,43 @@ export type KnowledgeOutcome =
   | { ok: true; data: UAPKnowledgeResult }
   | { ok: false; reason: string };
 
+// ─── ON HOLD ─────────────────────────────────────────────────────────────────
+
+/**
+ * Master switch. Every path that spends money on this pipeline goes through
+ * buildKnowledgeParams(), so the gate lives here rather than in a script —
+ * cron and pm2 bypass individual entry points (see the ops-switch rule).
+ */
+export const UAP_KNOWLEDGE_ON_HOLD = true;
+
+export const UAP_KNOWLEDGE_HOLD_NOTE = `
+UAP knowledge extraction is ON HOLD (put on hold 2026-08-04).
+
+Reason: cost. The 2026-08-04 trial measured, at Batch API pricing:
+    claude-haiku-4-5   $0.0238/video  ->  $238 per 10,000 videos
+    claude-sonnet-5    $0.0866/video  ->  $866 per 10,000 videos
+
+REINTRODUCE WHEN this workload costs under $50 per 10,000 videos
+(<= $0.005/video). At the trial's observed token mix (~19.9k input and
+~5.5k output per video) that needs a model at roughly $0.21/M input and
+$1.05/M output after the 50% batch discount — about a fifth of what
+Haiku 4.5 costs today.
+
+Both figures above are FLOORS: 11 of the 40 trial requests were still being
+truncated at the old 8000-token output cap, so the cap raise to 24000 will
+push real output tokens (and therefore cost) higher.
+
+To reintroduce:
+  1. Set UAP_KNOWLEDGE_ON_HOLD = false.
+  2. Re-run the 20-video trial to re-measure cost against current prices:
+       npx tsx scripts/uap-knowledge-batch.ts --limit 20 --no-save --model <model>
+  3. Confirm the >90% saved-extraction rate now that max_tokens is 24000.
+  4. Only then resume the backlog in capped chunks.
+
+Nothing else is blocked by this hold — the code is migrated, typechecked and
+tested; it is switched off purely on price.
+`.trim();
+
 // ─── Request Construction ────────────────────────────────────────────────────
 
 export const UAP_KNOWLEDGE_MODEL_DEFAULT = 'claude-haiku-4-5';
@@ -362,6 +399,8 @@ export function buildKnowledgeParams(
   title?: string,
   model: string = UAP_KNOWLEDGE_MODEL_DEFAULT,
 ): Anthropic.MessageCreateParamsNonStreaming {
+  if (UAP_KNOWLEDGE_ON_HOLD) throw new Error(UAP_KNOWLEDGE_HOLD_NOTE);
+
   const truncated = subtitles.slice(0, UAP_TRANSCRIPT_CHAR_LIMIT);
   const userContent = title
     ? `VIDEO TITLE: ${title}\n\nTRANSCRIPT:\n${truncated}`
