@@ -329,7 +329,17 @@ export type KnowledgeOutcome =
 // ─── Request Construction ────────────────────────────────────────────────────
 
 export const UAP_KNOWLEDGE_MODEL_DEFAULT = 'claude-haiku-4-5';
-export const UAP_KNOWLEDGE_MAX_TOKENS = 8000;
+
+/*
+ * Was 8000, inherited from the OpenRouter code. In the 2026-08-04 trial that cap
+ * was the *only* failure mode: 11 of 40 requests across both models stopped at
+ * exactly 8000 output tokens on the longest transcripts, while successful
+ * extractions averaged ~4.5k (Haiku) and ~6k (Sonnet 5). 24000 leaves wide
+ * headroom and is well under both models' output ceilings (64K / 128K).
+ * Output tokens bill only for what's generated, so this costs nothing on the
+ * videos that already fit.
+ */
+export const UAP_KNOWLEDGE_MAX_TOKENS = 24000;
 /** Transcript cap; leaves room for the prompt and the JSON output. */
 export const UAP_TRANSCRIPT_CHAR_LIMIT = 100_000;
 
