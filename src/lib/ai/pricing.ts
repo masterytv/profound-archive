@@ -16,6 +16,10 @@ export interface ModelPrice {
 export const MODEL_PRICES: Record<string, ModelPrice> = {
     // OpenRouter (Anthropic)
     'anthropic/claude-sonnet-4-5': { inputPerM: 3, outputPerM: 15 },
+    // Direct Anthropic. Batch API calls bill at 50% of these — halve at the call site.
+    // claude-sonnet-5 has intro pricing of $2/$10 through 2026-08-31; list price below.
+    'claude-haiku-4-5': { inputPerM: 1, outputPerM: 5 },
+    'claude-sonnet-5': { inputPerM: 3, outputPerM: 15 },
     // OpenRouter (OpenAI passthrough)
     'openai/gpt-4o': { inputPerM: 2.5, outputPerM: 10 },
     'openai/gpt-4o-mini': { inputPerM: 0.15, outputPerM: 0.6 },

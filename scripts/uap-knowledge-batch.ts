@@ -1,25 +1,40 @@
 /**
  * UAP Knowledge Extraction Batch Script
- * 
- * Runs extractUapKnowledge() from uap-knowledge.ts against Tier 2 videos
- * that have transcripts but no extracted knowledge (people_mentioned IS NULL).
- * 
- * Uses Claude Sonnet via OpenRouter for nuanced long-form extraction.
- * 
+ *
+ * Pushes Tier 2 videos that have transcripts but no extracted knowledge
+ * (people_mentioned IS NULL) through the Anthropic Message Batches API —
+ * one batch per run, 50% off standard token prices.
+ *
  * Usage:
  *   npx tsx scripts/uap-knowledge-batch.ts
- *   npx tsx scripts/uap-knowledge-batch.ts --limit 10
- *   npx tsx scripts/uap-knowledge-batch.ts --dry-run
- *   npx tsx scripts/uap-knowledge-batch.ts --offset 50
- * 
- * Note: Sonnet is slower and more expensive than mini. Batch size is 3
- * with 3s delay between to avoid rate limits.
+ *   npx tsx scripts/uap-knowledge-batch.ts --limit 20 --model claude-sonnet-5
+ *   npx tsx scripts/uap-knowledge-batch.ts --dry-run             # no API call, cost estimate only
+ *   npx tsx scripts/uap-knowledge-batch.ts --no-save --out r.json # spend, report, don't touch the DB
+ *   npx tsx scripts/uap-knowledge-batch.ts --resume msgbatch_123  # collect an earlier batch
+ *
+ * Design notes:
+ * - Results come back in arbitrary order, so everything is keyed by custom_id
+ *   (= video_id), never by position.
+ * - A video whose extraction fails in a way a retry can't fix is marked with a
+ *   sentinel row rather than left NULL, so it stops being re-bought every run.
+ *   Transport-level failures (errored/expired/canceled) stay NULL and retry.
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { extractUapKnowledge } from '../src/lib/pipeline/uap-knowledge';
+import Anthropic from '@anthropic-ai/sdk';
+import {
+  buildKnowledgeParams,
+  parseKnowledgeMessage,
+  knowledgeRowUpdate,
+  failedExtractionRowUpdate,
+  getAnthropic,
+  UAP_KNOWLEDGE_MODEL_DEFAULT,
+  UAP_TRANSCRIPT_CHAR_LIMIT,
+} from '../src/lib/pipeline/uap-knowledge';
+import { MODEL_PRICES, estimateCost } from '../src/lib/ai/pricing';
 import * as dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
@@ -30,39 +45,104 @@ const args = process.argv.slice(2);
 function getArgValue(name: string, defaultVal: number): number {
   const idx = args.indexOf(`--${name}`);
   if (idx !== -1 && args[idx + 1]) return parseInt(args[idx + 1], 10);
-  const eq = args.find(a => a.startsWith(`--${name}=`));
+  const eq = args.find((a) => a.startsWith(`--${name}=`));
   if (eq) return parseInt(eq.split('=')[1], 10);
+  return defaultVal;
+}
+
+function getArgString(name: string, defaultVal: string): string {
+  const idx = args.indexOf(`--${name}`);
+  if (idx !== -1 && args[idx + 1]) return args[idx + 1];
+  const eq = args.find((a) => a.startsWith(`--${name}=`));
+  if (eq) return eq.split('=').slice(1).join('=');
   return defaultVal;
 }
 
 const LIMIT = getArgValue('limit', 500);
 const OFFSET = getArgValue('offset', 0);
+const MODEL = getArgString('model', UAP_KNOWLEDGE_MODEL_DEFAULT);
+const MAX_WAIT_MIN = getArgValue('max-wait-minutes', 120);
+const POLL_SECONDS = getArgValue('poll-seconds', 30);
+const RESUME_BATCH = getArgString('resume', '');
+const OUT_FILE = getArgString('out', '');
 const DRY_RUN = args.includes('--dry-run');
-const BATCH_SIZE = 3; // Claude Sonnet is slow — small batches
-const BATCH_DELAY_MS = 3000;
+const NO_SAVE = args.includes('--no-save');
 
-// ─── Main ───────────────────────────────────────────────────────────────────
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
+
+// ─── Cost ────────────────────────────────────────────────────────────────────
+
+/** Batch API is 50% off both input and output tokens. */
+const BATCH_DISCOUNT = 0.5;
+
+function batchCost(model: string, inputTokens: number, outputTokens: number): number {
+  const { costUsd } = estimateCost(model, {
+    prompt_tokens: inputTokens,
+    completion_tokens: outputTokens,
+  });
+  return costUsd * BATCH_DISCOUNT;
+}
+
+const usd = (n: number) => `$${n.toFixed(4)}`;
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface PendingVideo {
+  videoId: string;
+  title: string;
+  transcript: string;
+}
+
+interface VideoResult {
+  video_id: string;
+  title: string;
+  ok: boolean;
+  reason?: string;
+  people?: number;
+  claims?: number;
+  events?: number;
+  programs?: number;
+  technology?: number;
+  consciousness?: number;
+  input_tokens?: number;
+  output_tokens?: number;
+  cost_usd?: number;
+}
+
+// ─── Main ────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
   console.log(`\n🔬 UAP Knowledge Extraction Batch`);
-  console.log(`   Limit: ${LIMIT}`);
-  console.log(`   Offset: ${OFFSET}`);
-  console.log(`   Dry Run: ${DRY_RUN}`);
-  console.log(`   Batch Size: ${BATCH_SIZE}`);
-  console.log(`   Delay: ${BATCH_DELAY_MS}ms\n`);
+  console.log(`   Model:   ${MODEL}`);
+  console.log(`   Limit:   ${LIMIT}`);
+  console.log(`   Offset:  ${OFFSET}`);
+  console.log(`   Dry run: ${DRY_RUN}`);
+  console.log(`   Save:    ${NO_SAVE ? 'NO (results printed only)' : 'yes'}`);
+  if (!MODEL_PRICES[MODEL]) {
+    console.warn(`   ⚠️  No price entry for "${MODEL}" — costs will report as $0.`);
+  }
 
-  // Check OpenRouter key
-  if (!DRY_RUN && !process.env.OPENROUTER_API_KEY) {
-    console.error('❌ Missing OPENROUTER_API_KEY environment variable');
+  if (!DRY_RUN && !process.env.ANTHROPIC_API_KEY) {
+    console.error('\n❌ Missing ANTHROPIC_API_KEY environment variable');
     process.exit(1);
   }
 
-  // Get total counts for status display
+  // Resuming skips selection entirely — the batch already exists upstream.
+  if (RESUME_BATCH) {
+    console.log(`\n♻️  Resuming batch ${RESUME_BATCH}\n`);
+    const client = getAnthropic();
+    const batch = await waitForBatch(client, RESUME_BATCH);
+    if (!batch) process.exit(1);
+    await collectResults(client, RESUME_BATCH, new Map());
+    return;
+  }
+
+  // ─── Status ──────────────────────────────────────────────────────────────
   const { count: totalAnalysis } = await supabase
     .from('uap_analysis')
     .select('*', { count: 'exact', head: true });
@@ -72,13 +152,12 @@ async function main() {
     .select('*', { count: 'exact', head: true })
     .not('people_mentioned', 'is', null);
 
-  console.log(`📊 Analysis Status:`);
+  console.log(`\n📊 Analysis Status:`);
   console.log(`   Total analysis rows: ${totalAnalysis}`);
-  console.log(`   Already extracted: ${alreadyExtracted}`);
-  console.log(`   Pending: ${(totalAnalysis || 0) - (alreadyExtracted || 0)}\n`);
+  console.log(`   Already extracted:   ${alreadyExtracted}`);
+  console.log(`   Pending:             ${(totalAnalysis || 0) - (alreadyExtracted || 0)}\n`);
 
-  // Fetch videos that need knowledge extraction
-  // Join uap_analysis (exists) with uap_vids (has transcript) where people_mentioned IS NULL
+  // ─── Select ──────────────────────────────────────────────────────────────
   const { data: pending, error: fetchError } = await supabase
     .from('uap_analysis')
     .select(`
@@ -99,110 +178,269 @@ async function main() {
     return;
   }
 
-  // Filter to only those with transcripts
-  const eligible = pending.filter((row: any) => {
+  const eligible: PendingVideo[] = [];
+  for (const row of pending as any[]) {
     const vid = row.uap_vids;
-    return vid?.subtitles_punctuated && vid.subtitles_punctuated.length > 100;
-  });
-
-  console.log(`🚀 Processing ${eligible.length} videos (${pending.length} fetched, ${pending.length - eligible.length} skipped for missing transcripts)\n`);
-
-  let processed = 0;
-  let errors = 0;
-  let extracted = 0;
-
-  for (let i = 0; i < eligible.length; i += BATCH_SIZE) {
-    const batch = eligible.slice(i, i + BATCH_SIZE);
-
-    const results = await Promise.allSettled(
-      batch.map(async (row: any) => {
-        const vid = row.uap_vids;
-        const videoId = row.video_id;
-        const title = vid?.title || '';
-        const transcript = vid?.subtitles_punctuated || '';
-
-        if (DRY_RUN) {
-          console.log(`  🔍 Would extract: "${title}" (${videoId}) — ${transcript.length} chars`);
-          return { videoId, extracted: false, dry: true };
-        }
-
-        // Call the knowledge extraction pipeline
-        const knowledge = await extractUapKnowledge(transcript, title);
-
-        if (!knowledge) {
-          console.error(`  ⚠️ Extraction returned null for ${videoId}: "${title}"`);
-          return { videoId, extracted: false };
-        }
-
-        // Write results to uap_analysis
-        const { error: updateError } = await supabase
-          .from('uap_analysis')
-          .update({
-            people_mentioned: knowledge.people_mentioned,
-            claims: knowledge.claims,
-            programs_mentioned: knowledge.programs_mentioned,
-            timeline_events: knowledge.timeline_events,
-            // entities_discussed maps to existing entities column for Tier 2
-            // Only write if not already populated by triad analysis
-            technology_described: knowledge.technology_described,
-            consciousness_connections: knowledge.consciousness_connections,
-            content_safety: knowledge.content_safety,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('video_id', videoId);
-
-        if (updateError) {
-          throw new Error(`DB update failed for ${videoId}: ${updateError.message}`);
-        }
-
-        return {
-          videoId,
-          extracted: true,
-          people: knowledge.people_mentioned.length,
-          claims: knowledge.claims.length,
-          events: knowledge.timeline_events.length,
-          programs: knowledge.programs_mentioned.length,
-        };
-      })
-    );
-
-    // Process results
-    for (const result of results) {
-      if (result.status === 'fulfilled') {
-        processed++;
-        const r = result.value as any;
-        if (r.extracted) {
-          extracted++;
-          console.log(
-            `  ✅ ${r.videoId}: ${r.people} people, ${r.claims} claims, ${r.events} events, ${r.programs} programs`
-          );
-        } else if (r.dry) {
-          extracted++; // Count for dry-run reporting
-        }
-      } else {
-        errors++;
-        console.error(`  ❌ ${result.reason}`);
-      }
-    }
-
-    // Progress log
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(eligible.length / BATCH_SIZE);
-    console.log(
-      `  📦 Batch ${batchNum}/${totalBatches}: ${processed}/${eligible.length} done | ` +
-      `Extracted: ${extracted} | Errors: ${errors}`
-    );
-
-    // Rate limit delay between batches
-    if (i + BATCH_SIZE < eligible.length) {
-      await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
+    if (vid?.subtitles_punctuated && vid.subtitles_punctuated.length > 100) {
+      eligible.push({
+        videoId: row.video_id,
+        title: vid.title || '',
+        transcript: vid.subtitles_punctuated,
+      });
     }
   }
 
-  console.log(`\n✅ Knowledge extraction complete!`);
-  console.log(`   Processed: ${processed}`);
-  console.log(`   Extracted: ${extracted}`);
-  console.log(`   Errors: ${errors}`);
+  const skipped = pending.length - eligible.length;
+  console.log(
+    `🚀 ${eligible.length} eligible (${pending.length} fetched, ${skipped} skipped for missing transcripts)`,
+  );
+
+  if (eligible.length === 0) {
+    console.log('✅ Nothing to submit.');
+    return;
+  }
+
+  // ─── Cost estimate up front ──────────────────────────────────────────────
+  // ~4 chars/token, plus ~2k system-prompt tokens; output assumed ~2.5k/video.
+  const estInput = eligible.reduce(
+    (sum, v) => sum + Math.min(v.transcript.length, UAP_TRANSCRIPT_CHAR_LIMIT) / 4 + 2000,
+    0,
+  );
+  const estOutput = eligible.length * 2500;
+  const estCost = batchCost(MODEL, estInput, estOutput);
+  console.log(
+    `\n💰 Estimated cost: ~${usd(estCost)} ` +
+      `(~${Math.round(estInput / 1000)}k in / ~${Math.round(estOutput / 1000)}k out, batch pricing)`,
+  );
+  console.log(`   Rough estimate — actual cost is reported from returned usage.\n`);
+
+  if (DRY_RUN) {
+    for (const v of eligible.slice(0, 10)) {
+      console.log(`  🔍 Would extract: "${v.title}" (${v.videoId}) — ${v.transcript.length} chars`);
+    }
+    if (eligible.length > 10) console.log(`  … and ${eligible.length - 10} more`);
+    console.log('\n✅ Dry run complete — no API call made.');
+    return;
+  }
+
+  // ─── Submit ──────────────────────────────────────────────────────────────
+  const client = getAnthropic();
+  const byId = new Map(eligible.map((v) => [v.videoId, v]));
+
+  let batchId: string;
+  try {
+    const batch = await client.messages.batches.create({
+      requests: eligible.map((v) => ({
+        custom_id: v.videoId,
+        params: buildKnowledgeParams(v.transcript, v.title, MODEL),
+      })),
+    });
+    batchId = batch.id;
+    console.log(`📤 Submitted batch ${batchId} (${eligible.length} requests)`);
+  } catch (error) {
+    reportFatal(error, 'submitting the batch');
+    process.exit(1);
+  }
+
+  const finished = await waitForBatch(client, batchId);
+  if (!finished) {
+    console.error(
+      `\n⏳ Batch did not finish within ${MAX_WAIT_MIN} minutes. It is still running and already paid for.\n` +
+        `   Collect it later with:\n` +
+        `     npx tsx scripts/uap-knowledge-batch.ts --resume ${batchId}\n`,
+    );
+    process.exit(1);
+  }
+
+  await collectResults(client, batchId, byId);
+}
+
+/**
+ * Polls until the batch ends. Returns false on timeout — the caller reports the
+ * batch id so the run can be collected later instead of the spend being lost.
+ */
+async function waitForBatch(client: Anthropic, batchId: string): Promise<boolean> {
+  const deadline = Date.now() + MAX_WAIT_MIN * 60_000;
+
+  while (Date.now() < deadline) {
+    let batch;
+    try {
+      batch = await client.messages.batches.retrieve(batchId);
+    } catch (error) {
+      reportFatal(error, 'polling the batch');
+      process.exit(1);
+    }
+
+    if (batch.processing_status === 'ended') {
+      const c = batch.request_counts;
+      console.log(
+        `\n✅ Batch ended — succeeded ${c.succeeded}, errored ${c.errored}, ` +
+          `canceled ${c.canceled}, expired ${c.expired}`,
+      );
+      return true;
+    }
+
+    const c = batch.request_counts;
+    console.log(
+      `   ⏳ ${batch.processing_status}: ${c.processing} processing, ${c.succeeded} done, ${c.errored} errored`,
+    );
+    await sleep(POLL_SECONDS * 1000);
+  }
+
+  return false;
+}
+
+/** Streams batch results, writes rows, and prints the run summary. */
+async function collectResults(
+  client: Anthropic,
+  batchId: string,
+  byId: Map<string, PendingVideo>,
+) {
+  const results: VideoResult[] = [];
+  let saved = 0;
+  let markedFailed = 0;
+  let retryable = 0;
+  let inputTokens = 0;
+  let outputTokens = 0;
+
+  console.log('');
+
+  for await (const entry of await client.messages.batches.results(batchId)) {
+    const videoId = entry.custom_id;
+    const title = byId.get(videoId)?.title ?? '';
+
+    // Transport-level failures: leave people_mentioned NULL so the video is
+    // retried on a later run. These are not the treadmill — bad model output is.
+    if (entry.result.type !== 'succeeded') {
+      const detail =
+        entry.result.type === 'errored'
+          ? `${entry.result.error.type}`
+          : entry.result.type;
+      retryable++;
+      results.push({ video_id: videoId, title, ok: false, reason: `retryable: ${detail}` });
+      console.error(`  ↩️  ${videoId}: ${detail} — left pending for retry`);
+      continue;
+    }
+
+    const message = entry.result.message;
+    inputTokens += message.usage.input_tokens;
+    outputTokens += message.usage.output_tokens;
+    const cost = batchCost(message.model, message.usage.input_tokens, message.usage.output_tokens);
+
+    const outcome = parseKnowledgeMessage(message);
+
+    if (!outcome.ok) {
+      markedFailed++;
+      results.push({
+        video_id: videoId,
+        title,
+        ok: false,
+        reason: outcome.reason,
+        input_tokens: message.usage.input_tokens,
+        output_tokens: message.usage.output_tokens,
+        cost_usd: cost,
+      });
+      console.error(`  ⚠️  ${videoId}: ${outcome.reason} — marking failed`);
+
+      if (!NO_SAVE) {
+        const { error } = await supabase
+          .from('uap_analysis')
+          .update(failedExtractionRowUpdate(outcome.reason, message.model))
+          .eq('video_id', videoId);
+        if (error) console.error(`      ❌ sentinel write failed: ${error.message}`);
+      }
+      continue;
+    }
+
+    const k = outcome.data;
+    results.push({
+      video_id: videoId,
+      title,
+      ok: true,
+      people: k.people_mentioned.length,
+      claims: k.claims.length,
+      events: k.timeline_events.length,
+      programs: k.programs_mentioned.length,
+      technology: k.technology_described.length,
+      consciousness: k.consciousness_connections.length,
+      input_tokens: message.usage.input_tokens,
+      output_tokens: message.usage.output_tokens,
+      cost_usd: cost,
+    });
+
+    if (!NO_SAVE) {
+      const { error } = await supabase
+        .from('uap_analysis')
+        .update(knowledgeRowUpdate(k))
+        .eq('video_id', videoId);
+      if (error) {
+        console.error(`  ❌ ${videoId}: DB update failed: ${error.message}`);
+        continue;
+      }
+    }
+
+    saved++;
+    console.log(
+      `  ✅ ${videoId}: ${k.people_mentioned.length} people, ${k.claims.length} claims, ` +
+        `${k.timeline_events.length} events, ${k.programs_mentioned.length} programs`,
+    );
+  }
+
+  const total = results.length;
+  const actualCost = batchCost(MODEL, inputTokens, outputTokens);
+
+  console.log(`\n${'─'.repeat(60)}`);
+  console.log(`Batch:            ${batchId}`);
+  console.log(`Model:            ${MODEL}`);
+  console.log(`Results:          ${total}`);
+  console.log(`Extracted:        ${saved}${NO_SAVE ? ' (not written — --no-save)' : ''}`);
+  console.log(`Marked failed:    ${markedFailed}  (won't be re-bought)`);
+  console.log(`Retryable:        ${retryable}  (still pending)`);
+  console.log(`Tokens:           ${inputTokens.toLocaleString()} in / ${outputTokens.toLocaleString()} out`);
+  console.log(`Actual cost:      ${usd(actualCost)}  (batch pricing)`);
+  if (total > 0) {
+    console.log(`Per video:        ${usd(actualCost / total)}`);
+    console.log(`Success rate:     ${((saved / total) * 100).toFixed(1)}%`);
+  }
+  console.log(`${'─'.repeat(60)}\n`);
+
+  if (OUT_FILE) {
+    fs.writeFileSync(
+      OUT_FILE,
+      JSON.stringify(
+        {
+          batch_id: batchId,
+          model: MODEL,
+          total,
+          saved,
+          marked_failed: markedFailed,
+          retryable,
+          input_tokens: inputTokens,
+          output_tokens: outputTokens,
+          cost_usd: actualCost,
+          results,
+        },
+        null,
+        2,
+      ),
+    );
+    console.log(`📝 Wrote ${OUT_FILE}\n`);
+  }
+}
+
+/** Auth and spend failures are terminal — say so plainly instead of grinding. */
+function reportFatal(error: unknown, whileDoing: string) {
+  if (error instanceof Anthropic.AuthenticationError) {
+    console.error(`\n❌ Authentication failed while ${whileDoing}. Check ANTHROPIC_API_KEY.`);
+  } else if (error instanceof Anthropic.PermissionDeniedError) {
+    console.error(
+      `\n❌ Permission denied while ${whileDoing} — usually the workspace spend limit. Aborting.`,
+    );
+  } else if (error instanceof Anthropic.RateLimitError) {
+    console.error(`\n❌ Rate limited while ${whileDoing}. Try again later.`);
+  } else {
+    console.error(`\n❌ Failed while ${whileDoing}:`, error);
+  }
 }
 
 main().catch((err) => {
