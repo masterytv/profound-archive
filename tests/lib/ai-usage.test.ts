@@ -19,7 +19,7 @@ vi.mock('@supabase/supabase-js', () => ({
     })),
 }));
 
-import { estimateCost, MODEL_PRICES } from '@/lib/ai/pricing';
+import { estimateCost, MODEL_PRICES, normalizeModelKey } from '@/lib/ai/pricing';
 import { logUsage, trackedChat } from '@/lib/ai/usage-tracker';
 import { getBudgetStatus } from '@/lib/ai/budget';
 
@@ -55,6 +55,46 @@ describe('estimateCost', () => {
 
     it('embedding models have zero output price', () => {
         expect(MODEL_PRICES['text-embedding-3-small'].outputPerM).toBe(0);
+    });
+
+    // Regression: unpriced Claude calls are what let a runaway pipeline burn a
+    // monthly limit without appearing on the usage dashboard.
+    it('prices a dated Anthropic snapshot id', () => {
+        // The API answers a claude-sonnet-4-5 request with this string.
+        const est = estimateCost('claude-sonnet-4-5-20250929', {
+            prompt_tokens: 1_000_000,
+            completion_tokens: 1_000_000,
+        });
+        expect(est.costUsd).toBe(18);
+    });
+
+    it('prices an OpenRouter dotted alias', () => {
+        const est = estimateCost('anthropic/claude-sonnet-4.5', {
+            prompt_tokens: 1_000_000,
+            completion_tokens: 0,
+        });
+        expect(est.costUsd).toBe(3);
+    });
+
+    it('prices the batch-era models', () => {
+        expect(estimateCost('claude-haiku-4-5', { prompt_tokens: 1_000_000, completion_tokens: 0 }).costUsd).toBe(1);
+        expect(estimateCost('claude-sonnet-5', { prompt_tokens: 0, completion_tokens: 1_000_000 }).costUsd).toBe(15);
+    });
+
+    it('still returns 0 for a genuinely unknown model', () => {
+        expect(estimateCost('acme/mystery-model-20260101', { prompt_tokens: 1_000_000, completion_tokens: 0 }).costUsd).toBe(0);
+    });
+});
+
+describe('normalizeModelKey', () => {
+    it.each([
+        ['claude-sonnet-4-5-20250929', 'claude-sonnet-4-5'],
+        ['anthropic/claude-sonnet-4.5', 'claude-sonnet-4-5'],
+        ['openai/gpt-4o-mini', 'gpt-4o-mini'],
+        ['gpt-4o', 'gpt-4o'],
+        ['text-embedding-3-small', 'text-embedding-3-small'],
+    ])('%s -> %s', (input, expected) => {
+        expect(normalizeModelKey(input)).toBe(expected);
     });
 });
 

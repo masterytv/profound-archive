@@ -20,6 +20,7 @@ export const MODEL_PRICES: Record<string, ModelPrice> = {
     // claude-sonnet-5 has intro pricing of $2/$10 through 2026-08-31; list price below.
     'claude-haiku-4-5': { inputPerM: 1, outputPerM: 5 },
     'claude-sonnet-5': { inputPerM: 3, outputPerM: 15 },
+    'claude-sonnet-4-5': { inputPerM: 3, outputPerM: 15 }, // blog pipeline
     // OpenRouter (OpenAI passthrough)
     'openai/gpt-4o': { inputPerM: 2.5, outputPerM: 10 },
     'openai/gpt-4o-mini': { inputPerM: 0.15, outputPerM: 0.6 },
@@ -57,6 +58,23 @@ export function estimateQuotaCost(provider: string, quantity: number): { costUsd
     return { costUsd: Math.round(quantity * p.perUnitUsd * 1e6) / 1e6, unit: p.unit };
 }
 
+/**
+ * Reduce a provider's model string to a price-table key.
+ *
+ * Providers don't echo back the string you sent. The Anthropic API answers a
+ * request for `claude-sonnet-4-5` with `claude-sonnet-4-5-20250929`, and
+ * OpenRouter used to answer with `anthropic/claude-sonnet-4.5` (dot, not dash).
+ * Every one of those missed the table and logged $0.00 — which is precisely why
+ * a runaway pipeline could burn a monthly limit without showing up on the
+ * usage dashboard. Lookups try the exact string first, then this.
+ */
+export function normalizeModelKey(model: string): string {
+    return model
+        .replace(/^[a-z0-9-]+\//, '') // provider prefix: anthropic/, openai/
+        .replace(/-\d{8}$/, '')       // dated snapshot: -20250929
+        .replace(/\./g, '-');         // claude-sonnet-4.5 -> claude-sonnet-4-5
+}
+
 export interface TokenUsage {
     prompt_tokens?: number | null;
     completion_tokens?: number | null;
@@ -81,7 +99,8 @@ export function estimateCost(model: string | undefined, usage: TokenUsage | unde
     const completionTokens = usage?.completion_tokens ?? 0;
     const totalTokens = usage?.total_tokens ?? promptTokens + completionTokens;
 
-    const price = model ? MODEL_PRICES[model] : undefined;
+    // Exact match first so historical OpenRouter-keyed rows keep their prices.
+    const price = model ? (MODEL_PRICES[model] ?? MODEL_PRICES[normalizeModelKey(model)]) : undefined;
     if (!price) {
         return { costUsd: 0, isEstimate: true, promptTokens, completionTokens, totalTokens };
     }

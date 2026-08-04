@@ -18,7 +18,7 @@ import { generateHeroImage } from './blog-image';
 import { verifyArticle, type ArticleReference } from './blog-verify';
 import { sanitizeMarkdownLinks, stripMarkdownLinks } from './blog-article';
 import { gatePublishStatus } from './content-quality';
-import { wrapAiClient } from '../ai/usage-tracker';
+import { claudeChat } from '../ai/claude';
 import {
     buildUapDraftSystemPrompt,
     buildUapDraftUserPrompt,
@@ -66,19 +66,6 @@ function getSupabaseAdmin() {
     const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !key) throw new Error('Missing Supabase environment variables');
     return createClient(url, key);
-}
-
-function getOpenRouter() {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error('Missing OPENROUTER_API_KEY environment variable');
-    return wrapAiClient(new OpenAI({
-        apiKey,
-        baseURL: 'https://openrouter.ai/api/v1',
-        defaultHeaders: {
-            'HTTP-Referer': 'https://projectprofound.org',
-            'X-Title': 'Project Profound UAP Blog Pipeline',
-        },
-    }), { provider: 'openrouter', operation: 'uap-blog-article' });
 }
 
 // ─── Step Helpers ─────────────────────────────────────────────────────────────
@@ -256,8 +243,6 @@ async function draftUapArticle(
     research: ResearchResult,
     overusedWarning?: string,
 ): Promise<ArticleDraft> {
-    const openRouter = getOpenRouter();
-
     const researchText = [
         research.rawText,
         research.citations.length > 0
@@ -266,46 +251,38 @@ async function draftUapArticle(
         overusedWarning ?? '',
     ].join('');
 
-    const response = await openRouter.chat.completions.create({
-        model: 'anthropic/claude-sonnet-4-5',
-        messages: [
-            { role: 'system', content: buildUapDraftSystemPrompt() },
-            {
-                role: 'user',
-                content: buildUapDraftUserPrompt({
-                    question: context.question,
-                    consumerQuestion: context.consumerQuestion,
-                    hydePassage: context.hydePassage,
-                    research: researchText,
-                    topChunks: context.topChunks,
-                    authorName: context.authorName,
-                    videoReferences: context.videoReferences,
-                    relatedQuestionSlugs: context.relatedQuestionSlugs,
-                }),
-            },
-            { role: 'assistant', content: '{' },
-        ],
-        max_tokens: 24000,
+    const response = await claudeChat({
+        operation: 'uap-blog-article.draft',
+        system: buildUapDraftSystemPrompt(),
+        user: buildUapDraftUserPrompt({
+            question: context.question,
+            consumerQuestion: context.consumerQuestion,
+            hydePassage: context.hydePassage,
+            research: researchText,
+            topChunks: context.topChunks,
+            authorName: context.authorName,
+            videoReferences: context.videoReferences,
+            relatedQuestionSlugs: context.relatedQuestionSlugs,
+        }),
+        prefill: '{',
+        maxTokens: 24000,
         temperature: 0.7,
     });
 
-    const rawContent = '{' + (response.choices[0]?.message?.content ?? '{}');
-    const cleaned = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    const cleaned = response.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    if (response.truncated) {
+        throw new Error(
+            `TRUNCATION DETECTED: Claude hit max_tokens and stopped mid-output. ` +
+            `Output was ${cleaned.length} chars. The article would be incomplete.`
+        );
+    }
 
     let draft: ArticleDraft;
     try {
         draft = JSON.parse(cleaned);
     } catch {
         throw new Error(`Claude returned invalid JSON: ${cleaned.slice(0, 200)}`);
-    }
-
-    // HARD BLOCK: Never publish a truncated article
-    const finishReason = response.choices[0]?.finish_reason;
-    if (finishReason === 'length') {
-        throw new Error(
-            `TRUNCATION DETECTED: Claude hit max_tokens (finish_reason: "length"). ` +
-            `Output was ${cleaned.length} chars. The article would be incomplete.`
-        );
     }
 
     if (!draft.title || !draft.slug || !draft.body_mdx) {

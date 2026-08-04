@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { generateHyde, slugToQuestion } from '@/lib/questions/question-utils';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { wrapAiClient } from '@/lib/ai/usage-tracker';
+import { claudeChat } from '@/lib/ai/claude';
 import { assertWithinBudget } from '@/lib/ai/budget';
 
 export const dynamic = 'force-dynamic';
@@ -14,17 +15,22 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_KEY!
 );
 
-// OpenRouter client — OpenAI SDK-compatible, just different baseURL + key.
-// Switch model here to change the synthesis model. Wrapped so every call is
-// recorded under the 'questions-autogen' operation (S-13 cost driver).
-const getOpenRouter = () => wrapAiClient(new OpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY!,
-    baseURL: 'https://openrouter.ai/api/v1',
-    defaultHeaders: {
-        'HTTP-Referer': 'https://projectprofound.org',
-        'X-Title': 'Project Profound',
-    },
-}), { provider: 'openrouter', operation: 'questions-autogen' });
+/**
+ * Direct OpenAI, for the embedding step. Wrapped so every call is recorded
+ * under the 'questions-autogen' operation (S-13 cost driver).
+ *
+ * These embeddings used to be routed through OpenRouter and logged as
+ * provider 'openrouter'. That shared one monthly key limit with the blog and
+ * UAP pipelines, and this route lost: between 2026-06-22 and 2026-08-04 it
+ * logged 777 "403 Key limit exceeded" and 406 "402 Insufficient credits"
+ * failures against 703 successes. A direct key removes the shared cap, and the
+ * provider label is now accurate.
+ *
+ * Synthesis is a Claude call and goes through claudeChat().
+ */
+const getOpenAI = () => wrapAiClient(new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY!,
+}), { provider: 'openai', operation: 'questions-autogen' });
 
 /** Format large view counts as readable strings like "1.2M" */
 function formatViewCount(count: number | null | bigint): string {
@@ -171,7 +177,7 @@ export async function GET(
     const { slug } = await params;
 
     try {
-        const openai = getOpenRouter();
+        const openai = getOpenAI();
 
         // ── Step 1: Look up question + ai_query from either table ──────────────
         let question: string;
@@ -442,35 +448,27 @@ Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
         if (!cachedSynthesis) try {
             // Pass an independent signal so the Claude call can't be killed by
             // the route handler's abort (triggered by Turbopack HMR in dev mode).
-            const gptResponse = await getOpenRouter().chat.completions.create(
-                {
-                    model: 'anthropic/claude-sonnet-4-5',
-                    temperature: 0.7,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        {
-                            role: 'user',
-                            content: `Question: ${question}\n\nNDE Accounts:\n\n${contextForGPT}`,
-                        },
-                        // ── Assistant prefill ──────────────────────────────────
-                        // Claude ignores response_format. The only reliable way to
-                        // force JSON output is to start the assistant turn with '{'
-                        // so the model *continues* rather than starting fresh prose.
-                        // The response will be the tail of the JSON (no opening brace),
-                        // so we prepend '{' back before parsing below.
-                        { role: 'assistant', content: '{' },
-                    ],
-                },
-                // Claude Sonnet on OpenRouter is ~2-3× slower than GPT-4o.
-                // Our context (4 videos × 2 chunks) is long; 55s timed out intermittently.
-                // 90s gives adequate headroom without hanging the route for too long.
-                { signal: AbortSignal.timeout(90_000) },
-            );
+            const gptResponse = await claudeChat({
+                operation: 'questions-autogen',
+                temperature: 0.7,
+                system: systemPrompt,
+                user: `Question: ${question}\n\nNDE Accounts:\n\n${contextForGPT}`,
+                // ── Assistant prefill ──────────────────────────────────
+                // Claude ignores response_format. The only reliable way to
+                // force JSON output is to start the assistant turn with '{'
+                // so the model *continues* rather than starting fresh prose.
+                // claudeChat prepends it back, so `text` is the full JSON.
+                prefill: '{',
+                maxTokens: 4000,
+                // Our context (4 videos × 2 chunks) is long; 55s timed out
+                // intermittently. 90s gives headroom without hanging the route.
+                timeoutMs: 90_000,
+            });
 
-
-            // Guard: OpenRouter can return empty choices on rate-limit or content filter
-            if (!gptResponse.choices?.length) {
-                console.error('[Questions API] Empty choices from OpenRouter. Full response:', JSON.stringify(gptResponse).substring(0, 500));
+            // Guard: the model can return nothing on rate-limit or content filter,
+            // in which case `text` is just the prefill.
+            if (gptResponse.text.trim() === '{') {
+                console.error('[Questions API] Empty response from Claude (truncated:', gptResponse.truncated, ')');
                 paragraphs = ['Unable to generate answer at this time.'];
             } else {
                 // Extract JSON by anchoring to the first '{' and last '}' in the response.
@@ -479,9 +477,9 @@ Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
                 //   - ```json ... ``` code fences
                 //   - preamble text like "Here's the JSON:" before the brace
                 //   - trailing notes after the closing brace
-                // The assistant prefill sent '{' as the start; the model response is the
-                // remainder of the JSON. Reconstruct the full JSON string before parsing.
-                const rawContent = '{' + (gptResponse.choices[0].message.content ?? '');
+                // claudeChat already prepended the '{' prefill, so `text` is the
+                // complete JSON string.
+                const rawContent = gptResponse.text;
                 const firstBrace = rawContent.indexOf('{');
                 const lastBrace  = rawContent.lastIndexOf('}');
 
