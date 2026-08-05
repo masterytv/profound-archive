@@ -13,6 +13,7 @@
  */
 
 import OpenAI from 'openai';
+import { wrapAiClient } from './usage-tracker';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ SCORING RULES:
 const getOpenAIClient = () => {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('Missing OPENAI_API_KEY environment variable');
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'classify-experience' });
 };
 
 /**

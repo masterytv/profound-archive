@@ -11,6 +11,7 @@
  */
 
 import OpenAI from 'openai';
+import { wrapAiClient } from './usage-tracker';
 import { z } from 'zod';
 
 // ─── Lazy OpenAI init (avoids build-time env errors — see LEARNINGS.md) ──────
@@ -18,7 +19,7 @@ import { z } from 'zod';
 const getOpenAIClient = () => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY environment variable");
-  return new OpenAI({ apiKey });
+  return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'uap-phenomenology' });
 };
 
 // ─── Enums ───────────────────────────────────────────────────────────────────

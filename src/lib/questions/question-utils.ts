@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { wrapAiClient } from '../ai/usage-tracker';
 
 /**
  * Shared utilities for question processing.
@@ -7,7 +8,7 @@ import OpenAI from 'openai';
  */
 
 // Lazy init — avoids build-time crash when env var is absent (see LEARNINGS.md §4A)
-const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const getOpenAI = () => wrapAiClient(new OpenAI({ apiKey: process.env.OPENAI_API_KEY! }), { provider: 'openai', operation: 'question-utils' });
 
 /** Deterministic slug: lowercase, strip non-alpha, collapse spaces to hyphens */
 export function toSlug(question: string): string {

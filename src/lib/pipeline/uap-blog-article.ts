@@ -13,6 +13,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { wrapAiClient } from '../ai/usage-tracker';
 import { researchQuestion, filterOverusedCitations, getCitationUsageCounts, type ResearchResult } from './blog-research';
 import { generateHeroImage } from './blog-image';
 import { verifyArticle, type ArticleReference } from './blog-verify';
@@ -126,7 +127,7 @@ async function assembleUapContext(questionSlug: string): Promise<UapArticleConte
     let topChunks: UapArticleContext['topChunks'] = [];
     let videoReferences: UapArticleContext['videoReferences'] = [];
     try {
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+        const openai = wrapAiClient(new OpenAI({ apiKey: process.env.OPENAI_API_KEY! }), { provider: 'openai', operation: 'uap-blog-article.embed' });
         const embRes = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: q.ai_query,

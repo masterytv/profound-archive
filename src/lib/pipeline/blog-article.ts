@@ -163,7 +163,7 @@ async function assembleContext(questionSlug: string): Promise<ArticleContext> {
     let videoReferences: ArticleContext['videoReferences'] = [];
     try {
         // Get embedding for the HyDE passage first
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+        const openai = wrapAiClient(new OpenAI({ apiKey: process.env.OPENAI_API_KEY! }), { provider: 'openai', operation: 'blog-article.embed' });
         const embRes = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: q.ai_query,
@@ -903,7 +903,7 @@ async function assembleGuideContext(
     let topChunks: GuideContext['topChunks'] = [];
     let videoReferences: GuideContext['videoReferences'] = [];
     try {
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+        const openai = wrapAiClient(new OpenAI({ apiKey: process.env.OPENAI_API_KEY! }), { provider: 'openai', operation: 'blog-article.embed' });
         const embRes = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: targetQuery,

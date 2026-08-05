@@ -1,5 +1,6 @@
 
 import OpenAI from 'openai';
+import { wrapAiClient } from './usage-tracker';
 
 // Lazy initialization to avoid build-time errors (see LEARNINGS.md)
 const getOpenAIClient = () => {
@@ -7,7 +8,7 @@ const getOpenAIClient = () => {
     if (!apiKey) {
         throw new Error("Missing OPENAI_API_KEY environment variable");
     }
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'transformation' });
 };
 
 export const TRANSFORMATION_ANALYSIS_PROMPT = `You are an academic researcher specializing in near-death experience (NDE) aftereffects and transformation. You will analyze a punctuated transcript of a first-person NDE account and score it using the NDE Transformation Index (NDE-TI), a 10-domain scale measuring the transformation described by the experiencer as resulting from their NDE.

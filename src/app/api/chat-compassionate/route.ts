@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { wrapAiClient } from '@/lib/ai/usage-tracker';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
@@ -23,7 +24,7 @@ const getOpenAIClient = () => {
     if (!apiKey) {
         throw new Error("Missing OPENAI_API_KEY environment variable");
     }
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'chat-compassionate' });
 };
 
 // Initialize Supabase client — lazy to avoid build-time errors (LEARNINGS §4A)
