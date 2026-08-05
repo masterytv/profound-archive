@@ -41,6 +41,7 @@ import {
   UAP_KNOWLEDGE_HOLD_NOTE,
 } from '../src/lib/pipeline/uap-knowledge';
 import { MODEL_PRICES, estimateCost } from '../src/lib/ai/pricing';
+import { isPaused } from '../src/lib/ops/switches';
 import * as dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -129,6 +130,15 @@ async function main() {
   if (UAP_KNOWLEDGE_ON_HOLD) {
     console.error(`\n⛔ ${UAP_KNOWLEDGE_HOLD_NOTE}\n`);
     process.exit(1);
+  }
+
+  // The admin pause switch, honored here rather than at an HTTP route: this
+  // script is launched by the Oracle crontab and by GitHub Actions, neither of
+  // which passes through a route handler. Exit 0 — a pause is a deliberate,
+  // healthy state, and a non-zero exit would read as a failed cron job.
+  if (await isPaused('uap_tier2_intake')) {
+    console.log('\n⏸  uap_tier2_intake is paused via admin cost control — skipping.\n');
+    return;
   }
 
   console.log(`\n🔬 UAP Knowledge Extraction Batch`);
