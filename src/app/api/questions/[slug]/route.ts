@@ -220,6 +220,22 @@ export async function GET(
                 // This makes internal links from blog posts "self-healing" — any
                 // /questions/some-slug URL will auto-generate an answer on first visit.
 
+                // Only mint a question for a slug in the canonical form toSlug()
+                // produces. Every legitimate source — internal blog links,
+                // /api/questions/custom, curated rows — emits lowercase
+                // alphanumerics and hyphens, so this costs the self-healing
+                // behaviour nothing. What it rejects is crawler noise: bots that
+                // resolve an href against /questions/ and request things like
+                // "tel:988" (the crisis line), or double-encoded paths that
+                // arrive as "Is%20dying%20painful%2C". Five such rows exist and
+                // each one is a live, indexable page whose body was generated
+                // from the garbled string. Checked before the rate limiters so
+                // junk consumes neither the 10/hr budget nor a paid call.
+                if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+                    console.warn(`[Questions API] Refusing auto-gen for non-canonical slug: "${slug}"`);
+                    return NextResponse.json({ error: 'Question not found' }, { status: 404 });
+                }
+
                 // Rate limit checks — per-IP first (cheap, in-memory), then the
                 // global persistent cap counted from user_questions (S-13).
                 const ipLimited = checkRateLimit(req, PER_IP_LIMIT);
