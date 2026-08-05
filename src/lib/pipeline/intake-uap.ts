@@ -27,6 +27,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { wrapAiClient } from '../ai/usage-tracker';
 
 import { parseYouTubeUrl, fetchVideoMetadata, fetchChannelMetadata, type VideoMetadata } from '@/lib/youtube/scraper';
 import { fetchCaptions } from '@/lib/youtube/subtitles';
@@ -102,7 +103,7 @@ function getSupabaseAdmin() {
 function getOpenAIClient() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('Missing OPENAI_API_KEY');
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'intake-uap' });
 }
 
 // Classification is handled by imported classifyUapContent() from classify-uap.ts

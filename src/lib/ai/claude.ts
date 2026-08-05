@@ -15,6 +15,15 @@
  * This helper absorbs all three and returns the two things the blog pipeline
  * actually uses: the text, and whether it was cut off. Truncation is fatal
  * everywhere it's checked — a truncated article is a broken article.
+ *
+ * Requests are streamed. Not for incremental output — nothing here consumes
+ * tokens as they arrive — but because the SDK refuses a non-streaming call
+ * whose max_tokens implies a run over 10 minutes (its estimate is
+ * 60min × max_tokens / 128000). The article and story drafts ask for 24000,
+ * which estimates to 11.25 minutes, so they threw before sending a byte.
+ * That ceiling does not apply to streamed requests. `finalMessage()` resolves
+ * to the same Message a non-streaming call returns, usage and stop_reason
+ * included.
  */
 import Anthropic from '@anthropic-ai/sdk';
 import { logUsage } from './usage-tracker';
@@ -72,16 +81,18 @@ export async function claudeChat(args: ClaudeChatArgs): Promise<ClaudeChatResult
     if (args.prefill) messages.push({ role: 'assistant', content: args.prefill });
 
     try {
-        const message = await getClient().messages.create(
-            {
-                model,
-                max_tokens: args.maxTokens,
-                system: args.system,
-                messages,
-                ...(args.temperature !== undefined ? { temperature: args.temperature } : {}),
-            },
-            args.timeoutMs !== undefined ? { timeout: args.timeoutMs } : undefined,
-        );
+        const message = await getClient()
+            .messages.stream(
+                {
+                    model,
+                    max_tokens: args.maxTokens,
+                    system: args.system,
+                    messages,
+                    ...(args.temperature !== undefined ? { temperature: args.temperature } : {}),
+                },
+                args.timeoutMs !== undefined ? { timeout: args.timeoutMs } : undefined,
+            )
+            .finalMessage();
 
         // Anthropic reports input_tokens/output_tokens; the log table and the
         // price table both speak the OpenAI shape.

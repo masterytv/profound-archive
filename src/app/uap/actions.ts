@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { wrapAiClient } from '@/lib/ai/usage-tracker';
 import { headers } from 'next/headers';
 import { isRateLimited, getClientIpFromHeaders } from '@/lib/rate-limit';
 
@@ -68,7 +69,7 @@ export async function getUapChatResponse(question: string): Promise<UapChatRespo
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const openai = new OpenAI({ apiKey: openaiKey });
+    const openai = wrapAiClient(new OpenAI({ apiKey: openaiKey }), { provider: 'openai', operation: 'uap-actions' });
 
     // 1. Embed the question
     const embedResponse = await openai.embeddings.create({

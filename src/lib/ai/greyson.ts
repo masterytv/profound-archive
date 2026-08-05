@@ -1,5 +1,6 @@
 
 import OpenAI from 'openai';
+import { wrapAiClient } from './usage-tracker';
 
 // Initialize OpenAI client
 // Note: In server-side contexts, we can instantiate this here.
@@ -10,7 +11,7 @@ const getOpenAIClient = () => {
     if (!apiKey) {
         throw new Error("Missing OPENAI_API_KEY environment variable");
     }
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'greyson' });
 };
 
 export const GREYSON_ANALYSIS_PROMPT = `You are an expert NDE researcher. Analyze the following NDE account using the Greyson NDE Scale.

@@ -1,5 +1,6 @@
 
 import OpenAI from 'openai';
+import { wrapAiClient } from './usage-tracker';
 
 // Lazy initialization to avoid build-time errors (see LEARNINGS.md)
 const getOpenAIClient = () => {
@@ -7,7 +8,7 @@ const getOpenAIClient = () => {
     if (!apiKey) {
         throw new Error("Missing OPENAI_API_KEY environment variable");
     }
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'journey-flow' });
 };
 
 export const JOURNEY_FLOW_PROMPT = `You are an expert NDE researcher analyzing a video transcript to extract the

@@ -1,11 +1,12 @@
 import OpenAI from 'openai';
+import { wrapAiClient } from './usage-tracker';
 import { z } from 'zod';
 
 // ─── Lazy OpenAI init ────────────────────────────────────────────────────────
 const getOpenAIClient = () => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY environment variable");
-  return new OpenAI({ apiKey });
+  return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'uap-program-intel' });
 };
 
 // ─── LLM Output Normalizer ───────────────────────────────────────────────────

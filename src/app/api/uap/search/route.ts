@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { wrapAiClient } from "@/lib/ai/usage-tracker";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 // Per-IP throttle (S-1): semantic searches bill OpenAI embeddings.
@@ -18,7 +19,7 @@ function getSupabaseClient() {
 function getOpenAIClient() {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OpenAI API Key");
-  return new OpenAI({ apiKey });
+  return wrapAiClient(new OpenAI({ apiKey }), { provider: "openai", operation: "uap-search" });
 }
 
 // ─── POST /api/uap/search ───────────────────────────────────────────────────

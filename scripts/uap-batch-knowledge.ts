@@ -29,6 +29,7 @@ import {
   UAP_KNOWLEDGE_ON_HOLD,
   UAP_KNOWLEDGE_HOLD_NOTE,
 } from '../src/lib/pipeline/uap-knowledge';
+import { isPaused } from '../src/lib/ops/switches';
 
 // ─── Environment ────────────────────────────────────────────────────────────
 
@@ -201,6 +202,13 @@ async function runBatchKnowledgeExtraction() {
   if (UAP_KNOWLEDGE_ON_HOLD) {
     console.error(`\n⛔ ${UAP_KNOWLEDGE_HOLD_NOTE}\n`);
     process.exit(1);
+  }
+
+  // See the same gate in uap-knowledge-batch.ts: cron and pm2 never touch an
+  // HTTP route, so the pause switch has to be read here. Exit 0 on pause.
+  if (await isPaused('uap_tier2_intake')) {
+    console.log('\n⏸  uap_tier2_intake is paused via admin cost control — skipping.\n');
+    return;
   }
 
   console.log('═══════════════════════════════════════════════════════════════');

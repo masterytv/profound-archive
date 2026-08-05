@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { wrapAiClient } from '@/lib/ai/usage-tracker';
 
 // Lazy client creation — avoids crashing during Next.js static page collection
 // when env vars aren't available (Firebase App Hosting build)
@@ -30,7 +31,7 @@ function getSupabaseAdmin() {
 function getOpenAI() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('Missing OPENAI_API_KEY');
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'entity-summaries' });
 }
 
 // ─── Auth ───────────────────────────────────────────────────────────────────

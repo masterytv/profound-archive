@@ -11,6 +11,7 @@
  */
 
 import OpenAI from 'openai';
+import { wrapAiClient } from './usage-tracker';
 
 // Lazy OpenAI client initialization
 const getOpenAIClient = () => {
@@ -18,7 +19,7 @@ const getOpenAIClient = () => {
     if (!apiKey) {
         throw new Error("Missing OPENAI_API_KEY environment variable");
     }
-    return new OpenAI({ apiKey });
+    return wrapAiClient(new OpenAI({ apiKey }), { provider: 'openai', operation: 'uap-summary' });
 };
 
 /**
