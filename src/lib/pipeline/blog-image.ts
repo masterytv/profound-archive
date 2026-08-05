@@ -11,7 +11,7 @@
  * Requires: FAL_API_KEY in environment
  */
 
-import { logQuota } from '@/lib/ai/usage-tracker';
+import { generateFalImage } from '@/lib/pipeline/fal-image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -106,72 +106,6 @@ export function buildImagePrompt(title: string, category: string, tags: string[]
     ].join(' ');
 }
 
-// ─── fal.ai API ───────────────────────────────────────────────────────────────
-
-interface FalResponse {
-    images?: Array<{ url: string; width: number; height: number }>;
-    error?: string;
-}
-
-async function generateWithFal(prompt: string): Promise<{ url: string; width: number; height: number }> {
-    const apiKey = process.env.FAL_API_KEY;
-    if (!apiKey) throw new Error('Missing FAL_API_KEY environment variable');
-
-    // Submit the request
-    const submitRes = await fetch('https://queue.fal.run/fal-ai/flux/dev', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Key ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            prompt,
-            image_size: 'landscape_16_9',  // 1024x576
-            num_inference_steps: 28,
-            guidance_scale: 3.5,
-            num_images: 1,
-            enable_safety_checker: true,
-        }),
-    });
-
-    void logQuota({ provider: 'fal', operation: 'blog-image.fal', quantity: 1, status: submitRes.ok ? 'success' : 'error' });
-    if (!submitRes.ok) {
-        throw new Error(`fal.ai submit error ${submitRes.status}: ${await submitRes.text()}`);
-    }
-
-    const { request_id, status_url } = await submitRes.json() as { request_id: string; status_url: string };
-
-    // Poll for completion (max 3 minutes)
-    const maxAttempts = 36;
-    for (let i = 0; i < maxAttempts; i++) {
-        await new Promise(r => setTimeout(r, 5000)); // 5s between polls
-
-        const pollRes = await fetch(status_url ?? `https://queue.fal.run/fal-ai/flux/dev/requests/${request_id}`, {
-            headers: { 'Authorization': `Key ${apiKey}` },
-        });
-
-        if (!pollRes.ok) continue;
-
-        const pollData = await pollRes.json() as { status: string; response_url?: string };
-
-        if (pollData.status === 'COMPLETED' && pollData.response_url) {
-            const resultRes = await fetch(pollData.response_url, {
-                headers: { 'Authorization': `Key ${apiKey}` },
-            });
-            const result = await resultRes.json() as FalResponse;
-            const img = result.images?.[0];
-            if (!img) throw new Error('fal.ai returned no images');
-            return img;
-        }
-
-        if (pollData.status === 'FAILED') {
-            throw new Error('fal.ai generation failed');
-        }
-    }
-
-    throw new Error('fal.ai timed out after 3 minutes');
-}
-
 // ─── Upload to Supabase Storage ───────────────────────────────────────────────
 
 import { createClient } from '@supabase/supabase-js';
@@ -222,7 +156,7 @@ export async function generateHeroImage(
     const prompt = buildImagePrompt(title, category, tags);
 
     // Generate via fal.ai
-    const generated = await generateWithFal(prompt);
+    const generated = await generateFalImage(prompt, 'blog-image.fal');
 
     // Upload to Supabase Storage (serves from our CDN, not fal.ai's temp URL)
     const publicUrl = await uploadToStorage(generated.url, slug);
