@@ -28,6 +28,7 @@ import { gatePublishStatus } from './content-quality';
 import { wrapAiClient } from '../ai/usage-tracker';
 import { claudeChat } from '../ai/claude';
 import { SEO_REFRESH_PROMPT } from './blog-prompts';
+import { generateFalImage } from './fal-image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -125,58 +126,6 @@ function formatTimestampedTranscript(rawJson: unknown): string {
  */
 function nameToSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-');
-}
-
-// ─── fal.ai Image Generation ─────────────────────────────────────────────────
-
-interface FalResponse {
-    images?: Array<{ url: string; width: number; height: number }>;
-}
-
-async function generateImageWithFal(prompt: string): Promise<{ url: string; width: number; height: number }> {
-    const apiKey = process.env.FAL_API_KEY;
-    if (!apiKey) throw new Error('Missing FAL_API_KEY');
-
-    const submitRes = await fetch('https://queue.fal.run/fal-ai/flux/dev', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Key ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            prompt,
-            image_size: 'landscape_16_9',
-            num_inference_steps: 28,
-            guidance_scale: 3.5,
-            num_images: 1,
-            enable_safety_checker: true,
-        }),
-    });
-
-    if (!submitRes.ok) throw new Error(`fal.ai submit error ${submitRes.status}`);
-
-    const { request_id, status_url } = await submitRes.json() as { request_id: string; status_url: string };
-
-    // Poll for completion (max 3 minutes)
-    for (let i = 0; i < 36; i++) {
-        await new Promise(r => setTimeout(r, 5000));
-        const pollRes = await fetch(status_url ?? `https://queue.fal.run/fal-ai/flux/dev/requests/${request_id}`, {
-            headers: { 'Authorization': `Key ${apiKey}` },
-        });
-        if (!pollRes.ok) continue;
-        const pollData = await pollRes.json() as { status: string; response_url?: string };
-        if (pollData.status === 'COMPLETED' && pollData.response_url) {
-            const resultRes = await fetch(pollData.response_url, {
-                headers: { 'Authorization': `Key ${apiKey}` },
-            });
-            const result = await resultRes.json() as FalResponse;
-            const img = result.images?.[0];
-            if (!img) throw new Error('fal.ai returned no images');
-            return img;
-        }
-        if (pollData.status === 'FAILED') throw new Error('fal.ai generation failed');
-    }
-    throw new Error('fal.ai timed out');
 }
 
 async function uploadToStorage(imageUrl: string, fileName: string): Promise<string> {
@@ -557,7 +506,7 @@ async function generateStoryImages(
     if (draft.image_prompts?.death_scene) {
         deathScenePrompt = buildDeathSceneImagePrompt(draft.image_prompts.death_scene);
         imageJobs.push(
-            generateImageWithFal(deathScenePrompt)
+            generateFalImage(deathScenePrompt, 'blog-story.fal')
                 .then(img => uploadToStorage(img.url, `blog/${slug}-death-scene.webp`))
                 .then(url => ({ type: 'death_scene', url, prompt: deathScenePrompt! }))
         );
@@ -566,7 +515,7 @@ async function generateStoryImages(
     if (draft.image_prompts?.afterlife_encounter) {
         afterlifePrompt = buildAfterlifeEncounterImagePrompt(draft.image_prompts.afterlife_encounter);
         imageJobs.push(
-            generateImageWithFal(afterlifePrompt)
+            generateFalImage(afterlifePrompt, 'blog-story.fal')
                 .then(img => uploadToStorage(img.url, `blog/${slug}-afterlife.webp`))
                 .then(url => ({ type: 'afterlife', url, prompt: afterlifePrompt! }))
         );

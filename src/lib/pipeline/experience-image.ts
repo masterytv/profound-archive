@@ -6,7 +6,9 @@
  *   - POST-TUNNEL: hyper-vivid, luminous ("more real than real")
  *   - RETURN: muted with fading golden afterglow
  *
- * Reuses the same fal.ai pattern as blog-image.ts and blog-story.ts.
+ * Shares the single fal.ai call in fal-image.ts with blog-image.ts and
+ * blog-story.ts. This file used to hold its own copy of that block, which is
+ * how it silently missed spend logging.
  * Images are generated at 16:9 landscape, uploaded to Supabase Storage.
  *
  * Usage:
@@ -19,6 +21,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { generateFalImage } from './fal-image';
 
 // ─── Vibrancy Tiers ──────────────────────────────────────────────────
 
@@ -65,59 +68,6 @@ export function buildExperienceImagePrompt(
     `Subject: ${sceneDescription}.`,
     VIBRANCY_PROMPTS[vibrancy],
   ].join(' ');
-}
-
-// ─── fal.ai Generation ───────────────────────────────────────────────
-
-interface FalResponse {
-  images?: Array<{ url: string; width: number; height: number }>;
-}
-
-async function generateWithFal(prompt: string): Promise<{ url: string; width: number; height: number }> {
-  const apiKey = process.env.FAL_API_KEY;
-  if (!apiKey) throw new Error('Missing FAL_API_KEY');
-
-  const submitRes = await fetch('https://queue.fal.run/fal-ai/flux/dev', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Key ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt,
-      image_size: 'landscape_16_9',
-      num_inference_steps: 28,
-      guidance_scale: 3.5,
-      num_images: 1,
-      enable_safety_checker: true,
-    }),
-  });
-
-  if (!submitRes.ok) throw new Error(`fal.ai submit error ${submitRes.status}`);
-
-  const { request_id, status_url } = await submitRes.json() as { request_id: string; status_url: string };
-
-  // Poll for completion (max 3 minutes)
-  for (let i = 0; i < 36; i++) {
-    await new Promise(r => setTimeout(r, 5000));
-    const pollRes = await fetch(
-      status_url ?? `https://queue.fal.run/fal-ai/flux/dev/requests/${request_id}`,
-      { headers: { 'Authorization': `Key ${apiKey}` } },
-    );
-    if (!pollRes.ok) continue;
-    const pollData = await pollRes.json() as { status: string; response_url?: string };
-    if (pollData.status === 'COMPLETED' && pollData.response_url) {
-      const resultRes = await fetch(pollData.response_url, {
-        headers: { 'Authorization': `Key ${apiKey}` },
-      });
-      const result = await resultRes.json() as FalResponse;
-      const img = result.images?.[0];
-      if (!img) throw new Error('fal.ai returned no images');
-      return img;
-    }
-    if (pollData.status === 'FAILED') throw new Error('fal.ai generation failed');
-  }
-  throw new Error('fal.ai timed out');
 }
 
 // ─── Storage Upload ──────────────────────────────────────────────────
@@ -171,7 +121,7 @@ export async function generateExperienceImage(
   const prompt = buildExperienceImagePrompt(sceneDescription, vibrancy);
   console.log(`[experience-image] Generating ${vibrancy} image: "${sceneDescription.slice(0, 60)}..."`);
 
-  const generated = await generateWithFal(prompt);
+  const generated = await generateFalImage(prompt, 'experience-image.fal');
   const publicUrl = await uploadToStorage(generated.url, storagePath);
 
   console.log(`[experience-image] ✓ Uploaded to ${storagePath}`);
