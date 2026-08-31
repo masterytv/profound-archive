@@ -123,7 +123,7 @@ export default async function FounderPage() {
                                     management consulting. My world was built on the tangible, the measurable,
                                     the kind of stuff you can put in a spreadsheet. If you&apos;d asked me about
                                     my beliefs, I&apos;d have given you the classic non-answer:{" "}
-                                    <em>&quot;spiritual, but not religious.&quot;</em> It was a polite way of
+                                    <em>&quot;spiritual, but not religious.&quot;</em>{" "}It was a polite way of
                                     saying I wanted to believe in something more, but I just... didn&apos;t.
                                 </p>
                                 <p>
@@ -201,7 +201,7 @@ export default async function FounderPage() {
                                 Even during my corporate years, I&apos;d always had an unusual pull toward the
                                 UFO phenomenon. I couldn&apos;t explain it and didn&apos;t talk about it at work,
                                 but it was there: a quiet, persistent tug, like the Richard Dreyfuss character
-                                in <em>Close Encounters</em> who can&apos;t stop sculpting a mountain he&apos;s
+                                in <em>Close Encounters</em>{" "}who can&apos;t stop sculpting a mountain he&apos;s
                                 never seen. I&apos;m not the only one. Millions of people feel that inexplicable
                                 draw toward a subject mainstream culture tells you to laugh off.
                             </p>
@@ -213,12 +213,14 @@ export default async function FounderPage() {
                                 These were objects that moved in ways no conventional aircraft can.
                             </p>
                             <p>
-                                That experience deepened my understanding of consciousness. Because
-                                here&apos;s what I started finding in the data: people who report near-death
-                                experiences and people who report UAP contact describe strikingly similar
-                                phenomena. Entity encounters. Telepathic communication. Time distortion.
-                                Downloads of knowledge they can&apos;t explain. Lasting changes to their
-                                worldview that never fade.
+                                That experience deepened my understanding of consciousness and sent me on a
+                                quest to understand &quot;Experiencers&quot;, people who have experienced
+                                UFO/UAP phenomenon. I ingested tens of thousands of videos to find nearly 7000
+                                first-person experiencer accounts. And here&apos;s what I started finding in
+                                the data: people who report near-death experiences and people who report UAP
+                                contact describe strikingly similar phenomena. Entity encounters. Telepathic
+                                communication. Time distortion. Downloads of knowledge they can&apos;t explain.
+                                Lasting changes to their worldview that never fade.
                             </p>
                             <p>
                                 <strong>
