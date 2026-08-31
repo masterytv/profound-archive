@@ -3,16 +3,18 @@
  * Weekly maintenance pipeline — runs on Oracle via crontab.
  * Replaces GHA weekly-maintenance.yml.
  *
- * Chains three tasks sequentially:
+ * Chains four tasks sequentially:
  *   1. Normalize entities (fuzzy dedup)
  *   2. Recompute channel scores
  *   3. Rebuild visualization caches
+ *   4. Refresh presentation stats (the /research/stats cache)
  *
  * Usage:
- *   npx tsx scripts/weekly-maintenance.ts                 # Run all 3 steps
+ *   npx tsx scripts/weekly-maintenance.ts                 # Run all 4 steps
  *   npx tsx scripts/weekly-maintenance.ts --step normalize # Run only normalize
  *   npx tsx scripts/weekly-maintenance.ts --step scores    # Run only scores
  *   npx tsx scripts/weekly-maintenance.ts --step viz       # Run only viz caches
+ *   npx tsx scripts/weekly-maintenance.ts --step stats     # Run only presentation stats
  *
  * Oracle Crontab:
  *   0 5 * * 0 cd ~/profound-archive && npx tsx scripts/weekly-maintenance.ts >> logs/weekly-maintenance.log 2>&1
@@ -22,6 +24,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { normalizeEntities } from '../src/lib/pipeline/normalize-entities';
 import { recomputeAllChannelScores } from '../src/lib/pipeline/compute-channel-scores';
 import { rebuildAllVizCaches } from '../src/lib/pipeline/rebuild-viz-caches';
+import { refreshPresentationStats } from '../src/lib/pipeline/presentation-stats';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
@@ -70,12 +73,13 @@ async function main() {
         { name: 'Normalize Entities', key: 'normalize', fn: (sb: SupabaseClient) => normalizeEntities(sb, false) },
         { name: 'Recompute Channel Scores', key: 'scores', fn: recomputeAllChannelScores },
         { name: 'Rebuild Viz Caches', key: 'viz', fn: rebuildAllVizCaches },
+        { name: 'Refresh Presentation Stats', key: 'stats', fn: refreshPresentationStats },
     ];
 
     const toRun = step === 'all' ? steps : steps.filter(s => s.key === step);
 
     if (toRun.length === 0) {
-        console.error(`❌ Unknown step: "${step}". Use: normalize, scores, viz, all`);
+        console.error(`❌ Unknown step: "${step}". Use: normalize, scores, viz, stats, all`);
         process.exit(1);
     }
 
