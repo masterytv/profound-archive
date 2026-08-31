@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-    ArrowRight, BarChart3, Database, FlaskConical, Link2,
-    MessageCircle, Mic, Search, Sparkles, User,
+    ArrowRight, Database, FlaskConical, Link2,
+    MessageCircle, Mic, Search, User,
 } from "lucide-react";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { formatCount, getNdeStats, getUapStats } from "@/lib/og/stats";
@@ -67,26 +67,6 @@ export default async function FounderPage() {
         { value: formatCount(nde.videos + uap.videos), label: "Video testimonies archived", note: "First-person accounts" },
     ];
 
-    const statsAvailableNow = [
-        "Archive scale: confirmed NDE accounts, UAP encounter records, and source channels (the live counts on this page)",
-        "Greyson Scale depth scores and NDE confirmation rates across the analyzed corpus",
-        "Transformation Index (NDE-TI) scores — overall and across ten life domains",
-        "Veridical perception (rvNDE) scores on accounts describing verifiable perception",
-        "Experience-type and emotional-tone distributions, per channel and corpus-wide",
-        "Cross-domain aggregates comparing the NDE and UAP corpora",
-    ];
-
-    const statsComputableOnRequest = [
-        "How often communication with encountered beings is described as telepathic rather than spoken",
-        "How many experiencers are greeted by deceased loved ones — and what those loved ones say",
-        "The most common messages delivered across thousands of accounts",
-        "How many accounts describe the experience as “more real than real,” with enhanced clarity during clinical crisis",
-        "Reported aftereffects: psychic and expanded perception, new sense of purpose, vanished fear of death",
-        "Who experiencers report meeting — deceased relatives, guides, beings of light, religious figures by name",
-        "Distressing-experience prevalence and what transformation follows",
-        "Side-by-side NDE vs. UAP “fingerprints”: telepathy, light phenomena, time distortion, knowledge downloads",
-    ];
-
     return (
         <>
             <script
@@ -118,12 +98,12 @@ export default async function FounderPage() {
                         >
                             It Started with a Click.{" "}
                             <em className="bg-gradient-to-r from-violet-500 to-emerald-500 bg-clip-text text-transparent not-italic">
-                                Then It Got Weirder.
+                                Then It Got Weird.
                             </em>
                         </h1>
                         <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
                             I&apos;m Tom Wood. I built Project Profound to answer a question I couldn&apos;t
-                            let go of — with data, transparency, and a lot of stubbornness. This page is my
+                            let go of using data, transparency, and a lot of stubbornness. This page is my
                             story, and a working introduction for podcasters, journalists, and researchers.
                         </p>
                     </div>
@@ -155,16 +135,18 @@ export default async function FounderPage() {
                                     As I listened to this woman describe leaving her body, feeling an ocean of
                                     pure, unconditional love, and perceiving things she couldn&apos;t possibly
                                     have perceived, something broke open inside me. Not intellectually.
-                                    Physically. A sudden, overwhelming euphoria. An instantaneous understanding
+                                    Physically. It first felt like every cell in my body was electrified with a
+                                    sudden, overwhelming euphoria. Then, I had an instantaneous understanding
                                     of everything. I found myself sitting on my couch, muttering to my dog:{" "}
-                                    <strong>&quot;I know this. How do I know this?&quot;</strong>
+                                    <strong>&quot;I know this. I KNOW THIS. How do I know this?&quot;</strong>
                                 </p>
                                 <p>
                                     For three days, I lived in a state of absolute bliss. The world was saturated
-                                    with love — not metaphorical love, the real thing, as real as gravity. Some
-                                    people call it a shared NDE. Others call it a spiritually transformative
-                                    experience. Some might call it a breakdown. Whatever you call it, it changed
-                                    the direction of my life.
+                                    with infinite, conscious, unconditional love that was more real than anything
+                                    I&apos;ve ever experienced. It was an ineffable experience that is diminished
+                                    every time I try to use words to describe it. Some people call it a shared
+                                    NDE. Others call it a spiritually transformative experience. Some might call
+                                    it a breakdown. Whatever you call it, it changed the direction of my life.
                                 </p>
                             </div>
                         </div>
@@ -178,11 +160,11 @@ export default async function FounderPage() {
                         <div className={storyProse}>
                             <p>
                                 My inner analyst kicked in immediately. I didn&apos;t just want to marvel at the
-                                mystery — I needed to find the signal in the noise. That impulse launched a
+                                mystery, I needed to find the signal in the noise. That impulse launched a
                                 multi-year quest. I became a digital archaeologist of consciousness, immersing
-                                myself in thousands of NDE accounts, documenting the patterns — the tunnel, the
-                                life review, the beings of light, the messages of unconditional love — and
-                                building AI tools to analyze them at a scale no individual researcher could.
+                                myself in thousands of NDE accounts, documenting the patterns (the tunnel, the
+                                life review, the beings of light, the messages of unconditional love) and
+                                building tools to analyze them at a scale no individual researcher could.
                             </p>
                             <p>
                                 My hypothesis was simple:{" "}
@@ -218,7 +200,7 @@ export default async function FounderPage() {
                             <p>
                                 Even during my corporate years, I&apos;d always had an unusual pull toward the
                                 UFO phenomenon. I couldn&apos;t explain it and didn&apos;t talk about it at work,
-                                but it was there — a quiet, persistent tug, like the Richard Dreyfuss character
+                                but it was there: a quiet, persistent tug, like the Richard Dreyfuss character
                                 in <em>Close Encounters</em> who can&apos;t stop sculpting a mountain he&apos;s
                                 never seen. I&apos;m not the only one. Millions of people feel that inexplicable
                                 draw toward a subject mainstream culture tells you to laugh off.
@@ -227,11 +209,11 @@ export default async function FounderPage() {
                                 In 2025, I attended the PSI Games International event with Chris Bledsoe, a man
                                 whose contact experiences have been investigated by NASA, the CIA, and multiple
                                 intelligence agencies. During that event, I personally witnessed three
-                                unidentified anomalous phenomena. Not lights, not airplanes, not helicopters —
-                                objects that moved in ways no conventional aircraft can.
+                                unidentified anomalous phenomena. Not lights, not airplanes, not helicopters.
+                                These were objects that moved in ways no conventional aircraft can.
                             </p>
                             <p>
-                                That experience didn&apos;t replace my NDE research. It deepened it. Because
+                                That experience deepened my understanding of consciousness. Because
                                 here&apos;s what I started finding in the data: people who report near-death
                                 experiences and people who report UAP contact describe strikingly similar
                                 phenomena. Entity encounters. Telepathic communication. Time distortion.
@@ -240,8 +222,7 @@ export default async function FounderPage() {
                             </p>
                             <p>
                                 <strong>
-                                    These aren&apos;t two separate mysteries. They&apos;re two windows into the
-                                    same one.
+                                    These two separate mysteries may be a window into a bigger one.
                                 </strong>
                             </p>
                         </div>
@@ -285,52 +266,42 @@ export default async function FounderPage() {
                         </div>
                         <div className={storyProse}>
                             <p>
-                                I tell this story — the skeptic&apos;s click, the three days of bliss, the
-                                archive that grew out of it — and I bring numbers nobody else has. Every account
-                                in the archive is scored with published, transparent instruments, which means
-                                your audience gets patterns from thousands of witnesses, not one guest&apos;s
-                                anecdote.
+                                I&apos;m happy to educate and entertain your audience with the fascinating
+                                facts, stories and implications of consciousness being fundamental to reality.
                             </p>
+                            <p>I can tell my story or retell any number of the thousands we have.</p>
                             <p>
-                                And one offer no other guest can make:{" "}
-                                <strong>
-                                    bring a question, and we&apos;ll ask thousands of experiencers live on air
-                                </strong>{" "}
-                                using the archive&apos;s semantic search.
+                                I can give your audience statistics and facts we already have or calculate new
+                                ones specifically for you.
                             </p>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-6 mt-8">
-                            <div className={card}>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <BarChart3 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100" style={fontSerif}>
-                                        Statistics available today
-                                    </h3>
-                                </div>
-                                <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-300 leading-relaxed list-disc pl-5">
-                                    {statsAvailableNow.map((s) => (
-                                        <li key={s}>{s}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div className={card}>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <Sparkles className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100" style={fontSerif}>
-                                        Computable on request
-                                    </h3>
-                                </div>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
-                                    The archive&apos;s structured analysis lets us calculate audience-specific
-                                    findings for your show — typically within days:
-                                </p>
-                                <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-300 leading-relaxed list-disc pl-5">
-                                    {statsComputableOnRequest.map((s) => (
-                                        <li key={s}>{s}</li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <div className={`${card} mt-8`}>
+                            <p className="font-medium text-slate-800 dark:text-slate-100 mb-4 leading-relaxed">
+                                What do you and your audience want to ask thousands of experiencers? For
+                                example:
+                            </p>
+                            <ul className="space-y-2.5 text-slate-600 dark:text-slate-300 leading-relaxed list-disc pl-5">
+                                <li>
+                                    What percentage of NDErs and UFO/UAP experiencers come back with healing
+                                    abilities?
+                                </li>
+                                <li>How many people see Jesus in NDEs vs UAP encounters?</li>
+                                <li>How common is telepathy in NDEers?</li>
+                                <li>
+                                    What percentage of people experience After Death Communication (mediumship)
+                                    abilities?
+                                </li>
+                                <li>WHAT QUESTION DO YOU HAVE?</li>
+                            </ul>
+                        </div>
+
+                        <div className={`${storyProse} mt-8`}>
+                            <p>
+                                Every account in the archive is scored with published, transparent instruments,
+                                which means your audience gets patterns from thousands of witnesses, not one
+                                guest&apos;s anecdote.
+                            </p>
                         </div>
                     </section>
 
@@ -390,21 +361,19 @@ export default async function FounderPage() {
                         <div className={storyProse}>
                             <p>
                                 Since that night in 2020, I&apos;ve completely changed the direction of my life.
-                                I left consulting and entrepreneurship — the world that paid well and made sense
-                                on a resume. I no longer make a lot of money. I don&apos;t care. Every single
-                                day, I wake up and work on understanding who we are, and on building tools that
-                                make this research accessible to everyone: academics, experiencers, regular
-                                people.
+                                Every single day, I wake up and work on understanding who we are, and on
+                                building tools that make this research accessible to everyone: academics,
+                                experiencers, regular people.
                             </p>
                             <p>
-                                The message emerging from these experiences — NDE and UAP alike — is remarkably
+                                The message emerging from these experiences, NDE and UAP alike, is remarkably
                                 consistent:{" "}
                                 <strong>
                                     we are more connected than we realize, consciousness is more than we&apos;ve
                                     been told, and there is far less to fear than we think.
                                 </strong>{" "}
                                 I believe we&apos;re at the beginning of a profound shift in how humanity
-                                understands itself. And I believe the data supports that.
+                                understands itself.
                             </p>
                             <p className="text-slate-800 dark:text-slate-100 font-medium">
                                 — Tom Wood, Founder, Project Profound
