@@ -543,6 +543,9 @@ export default function UnifiedSiteHeader() {
                     <Link href="/about#connect" className="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
                       Connect
                     </Link>
+                    <Link href="/about/founder" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
+                      <UserIcon className="w-3.5 h-3.5 text-violet-500" /> Founder
+                    </Link>
                     <div className="mx-3 my-1.5 border-t border-slate-200/60 dark:border-slate-700" />
                     <p className="px-4 pb-1 pt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Research</p>
                     <Link href="/research/methodology" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
@@ -879,6 +882,9 @@ export default function UnifiedSiteHeader() {
                           </Link>
                           <Link href="/about#connect" className="block py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
                             Connect
+                          </Link>
+                          <Link href="/about/founder" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <UserIcon className="w-4 h-4 text-violet-600" /> Founder
                           </Link>
                           <div className="mx-1 my-1 border-t border-dashed border-slate-200 dark:border-white/10" />
                           <p className="pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Research</p>
