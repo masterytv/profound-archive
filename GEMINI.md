@@ -30,6 +30,7 @@ Do not guess how this app works. Read these files when touching related systems:
 - 🗄️ `docs/LEARNINGS_ARCHIVE.md` (Historical bugs/pipelines - DO NOT READ by default)
 - 🔐 `docs/ENVIRONMENT.md` (Env var definitions)
 - 🎨 `docs/BRAND.md` (Design guidelines)
+- 📖 `sources/DRIVE_SOURCES.md` (Tom's book & research notes — Google Drive file IDs + how to fetch)
 
 ## 5. Important Rules for AI Code Generation
 1. **Use Existing Patterns:** Look at sibling files before generating new code.

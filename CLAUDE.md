@@ -32,6 +32,13 @@ Before reporting progress, check each claim against an actual command output fro
 The full phased improvement plan and the exact prompts for each phase are in
 FABLE5_IMPROVEMENT_PROMPTS.md at the repo root.
 
+## Book & content sources (Google Drive)
+Tom's book (*The Accidental Mystic*) and project research notes live in Google Drive, NOT
+in this repo — the repo is public and the book text stays private. `sources/DRIVE_SOURCES.md`
+has the folder/doc file IDs and fetch instructions. When a task needs the book or notes,
+read them live with the Google Drive connector tools using those IDs. Never commit book
+content into this repo.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
