@@ -554,6 +554,9 @@ export default function UnifiedSiteHeader() {
                     <Link href="/research/cross-domain" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
                       <Link2 className="w-3.5 h-3.5 text-violet-500" /> Cross-Domain
                     </Link>
+                    <Link href="/research/stats" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setAboutOpen(false)}>
+                      <BarChart3 className="w-3.5 h-3.5 text-violet-500" /> Archive Stats
+                    </Link>
                   </div>
                 )}
               </div>
@@ -893,6 +896,9 @@ export default function UnifiedSiteHeader() {
                           </Link>
                           <Link href="/research/cross-domain" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
                             <Link2 className="w-4 h-4 text-violet-600" /> Cross-Domain
+                          </Link>
+                          <Link href="/research/stats" className="flex items-center gap-3 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={closeMobile}>
+                            <BarChart3 className="w-4 h-4 text-violet-600" /> Archive Stats
                           </Link>
                         </div>
                       )}

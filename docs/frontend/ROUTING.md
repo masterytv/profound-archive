@@ -26,6 +26,7 @@ The application uses the **Next.js 14+ App Router**. Routes are defined by the f
 | `/about` | `src/app/about/page.tsx` | About Project Profound — mission, what we do, contact form | No |
 | `/about/founder` | `src/app/about/founder/page.tsx` | Founder story + media/researcher intro with live archive stats (ISR 1h) | No |
 | `/about/[slug]` | `src/app/about/[slug]/page.tsx` | Author bio pages (tom-wood, micul-love, pamela-harris), force-static | No |
+| `/research/stats` | `src/app/research/stats/page.tsx` | Archive Statistics — weekly-refreshed stat sheet from viz_graph_cache (ISR 1h) | No |
 | `/admin` | `src/app/admin/page.tsx` | Admin Dashboard | **Yes (Admin Role)** |
 
 ## Data Fetching
