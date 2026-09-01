@@ -9,11 +9,62 @@ on:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Snapshot channel scores
+        env:
+          APP_DIRECT_URL: ${{ secrets.APP_DIRECT_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -s -X POST \
-            "${{ secrets.APP_DIRECT_URL }}/api/cron/channel-score-snapshot" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" | jq .
+          set -euo pipefail
+
+          if [ -z "${APP_DIRECT_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::APP_DIRECT_URL and/or CRON_SECRET is not set on this repository."
+            exit 1
+          fi
+
+          # APP_DIRECT_URL is stored as a bare host (the sibling workflows all
+          # prepend the scheme). Normalise either form so a schemeless value
+          # cannot silently fall back to plain HTTP on port 80.
+          BASE="${APP_DIRECT_URL%/}"
+          case "$BASE" in
+            http://*|https://*) ;;
+            *) BASE="https://$BASE" ;;
+          esac
+
+          MAX_ATTEMPTS=3
+          ATTEMPT=1
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
+            HTTP_CODE=$(curl -sS -o /tmp/snapshot.json -w "%{http_code}" -X POST \
+              "$BASE/api/cron/channel-score-snapshot" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --connect-timeout 15 --max-time 280) || HTTP_CODE="000"
+
+            echo "HTTP status: $HTTP_CODE"
+            echo "--- response body ---"
+            cat /tmp/snapshot.json || true
+            echo ""
+            echo "---------------------"
+
+            if [ "$HTTP_CODE" = "200" ]; then
+              # The route returns NextResponse.json() on every path, so a 200 that
+              # is not JSON means the request never reached it (proxy/redirect/error
+              # page) and the snapshot did NOT happen. Fail loudly rather than
+              # reporting a green run for work that never ran.
+              if jq . < /tmp/snapshot.json; then
+                echo "Channel score snapshot completed."
+                exit 0
+              fi
+              echo "::error::HTTP 200 but the body is not JSON - the request did not reach the route (see body above)."
+              exit 1
+            fi
+
+            echo "::warning::Attempt $ATTEMPT failed with status $HTTP_CODE"
+            if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then sleep 10; fi
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          echo "::error::Channel score snapshot failed after $MAX_ATTEMPTS attempts (last status $HTTP_CODE)"
+          exit 1
