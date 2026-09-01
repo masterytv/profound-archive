@@ -10,6 +10,22 @@ import { z } from 'zod';
 // Per-IP throttle (S-1): this route bills OpenAI on every request.
 const RATE_LIMIT = { name: 'chat-compassionate', windowMs: 60_000, max: 10 };
 
+// Generation model, overridable per environment without a code change.
+//
+// `gpt-5.6-luna` replaced `gpt-5-chat-latest` (2026-09): OpenAI has been
+// retiring the `*-chat-latest` aliases (gpt-5.2/5.3 went on 2026-08-10) and the
+// old model was the most expensive in the repo. Luna is ~22x cheaper per
+// message on this route's prompt shape, and benchmarks above the previous
+// generation's flagship, so it is both the cheaper and the better answer.
+//
+// The fallback stays `gpt-4o-mini`: proven in production on the UAP twin, and a
+// different model generation, so one family's outage cannot take out both
+// lanes. If the primary call fails for ANY reason (model retired, this org not
+// entitled to it, a parameter the model rejects, a transient upstream error) we
+// retry once on it rather than showing the client an error bubble.
+const PRIMARY_MODEL = process.env.COMPASSIONATE_CHAT_MODEL || 'gpt-5.6-luna';
+const FALLBACK_MODEL = process.env.COMPASSIONATE_CHAT_FALLBACK_MODEL || 'gpt-4o-mini';
+
 // Request shape (S-12). chatInput is capped — it is embedded and fed to the
 // model verbatim, so an unbounded body is unbounded token spend.
 const BodySchema = z.object({
@@ -30,6 +46,45 @@ const getOpenAIClient = () => {
 // Initialize Supabase client — lazy to avoid build-time errors (LEARNINGS §4A)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const getServiceClient = () => createClient(supabaseUrl, process.env.SUPABASE_SERVICE_KEY!);
+
+// OpenAI SDK errors carry the useful part (status/code/type/param) as own
+// properties; `message` alone rarely says why a call was rejected. Flatten them
+// so one server log line explains the failure.
+function describeError(err: unknown) {
+    const e = err as { status?: number; code?: string; type?: string; param?: string; message?: string };
+    return {
+        status: e?.status,
+        code: e?.code,
+        type: e?.type,
+        param: e?.param,
+        message: e?.message ?? String(err),
+    };
+}
+
+/** Run the completion on PRIMARY_MODEL, retrying once on FALLBACK_MODEL. */
+async function createChatCompletion(openai: OpenAI, messages: any[]) {
+    try {
+        const completion = await openai.chat.completions.create({
+            model: PRIMARY_MODEL,
+            messages,
+            temperature: 0.7, // Slightly creative but grounded
+        });
+        return { completion, model: PRIMARY_MODEL };
+    } catch (primaryError) {
+        if (FALLBACK_MODEL === PRIMARY_MODEL) throw primaryError;
+        console.error(
+            `[chat-compassionate] model "${PRIMARY_MODEL}" failed; retrying on "${FALLBACK_MODEL}"`,
+            describeError(primaryError)
+        );
+        const completion = await openai.chat.completions.create({
+            model: FALLBACK_MODEL,
+            messages,
+            temperature: 0.7,
+            max_tokens: 1200,
+        });
+        return { completion, model: FALLBACK_MODEL };
+    }
+}
 
 export async function POST(req: NextRequest) {
     const limited = checkRateLimit(req, RATE_LIMIT);
@@ -219,14 +274,15 @@ Now, following all your rules and using the context provided, generate your comp
             message: chatInput,
         });
 
-        // 7. Call OpenAI for Chat Completion
-        const completion = await openai.chat.completions.create({
-            model: 'gpt-5-chat-latest', // specific model requested by user
-            messages: messages,
-            temperature: 0.7, // Slightly creative but grounded
-        });
+        // 7. Call OpenAI for Chat Completion (retries on the fallback model)
+        const { completion, model: servedModel } = await createChatCompletion(openai, messages);
+        if (servedModel !== PRIMARY_MODEL) {
+            console.warn(`[chat-compassionate] answered with fallback model "${servedModel}"`);
+        }
 
-        const botResponse = completion.choices[0].message.content || "I apologize, but I couldn't generate a response.";
+        // Guard the indexing: a response with no choices must not throw a
+        // TypeError that the client can only render as a generic error.
+        const botResponse = completion.choices?.[0]?.message?.content || "I apologize, but I couldn't generate a response.";
 
         // 8. Log Bot Response to Supabase
         await Promise.all([
@@ -243,9 +299,10 @@ Now, following all your rules and using the context provided, generate your comp
         return NextResponse.json({ output: botResponse });
 
     } catch (error: any) {
-        console.error('Error in compassionate chat:', error);
+        const detail = describeError(error);
+        console.error('Error in compassionate chat:', detail);
         return NextResponse.json(
-            { message: 'Internal Server Error', error: error.message },
+            { message: 'Internal Server Error', error: detail.message, code: detail.code ?? null },
             { status: 500 }
         );
     }

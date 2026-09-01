@@ -12,7 +12,13 @@ export interface ModelPrice {
     outputPerM: number;
 }
 
-// As of 2026-06. Update when providers change pricing.
+// Shared by the dotted and dash-normalized spellings of each GPT-5.x id below.
+const GPT_56_SOL: ModelPrice = { inputPerM: 5, outputPerM: 30 };
+const GPT_56_TERRA: ModelPrice = { inputPerM: 2, outputPerM: 12 };
+const GPT_56_LUNA: ModelPrice = { inputPerM: 0.2, outputPerM: 1.2 };
+const GPT_55: ModelPrice = { inputPerM: 5, outputPerM: 30 };
+
+// As of 2026-09. Update when providers change pricing.
 export const MODEL_PRICES: Record<string, ModelPrice> = {
     // OpenRouter (Anthropic)
     'anthropic/claude-sonnet-4-5': { inputPerM: 3, outputPerM: 15 },
@@ -27,6 +33,30 @@ export const MODEL_PRICES: Record<string, ModelPrice> = {
     // Direct OpenAI
     'gpt-4o': { inputPerM: 2.5, outputPerM: 10 },
     'gpt-4o-mini': { inputPerM: 0.15, outputPerM: 0.6 },
+    // GPT-5.6 family (GA 2026-07-09). Sol/Terra/Luna are durable capability
+    // tiers, not dated snapshots. Prices below are post-2026-07-30 cut: Luna
+    // -80% ($1/$6 -> $0.20/$1.20), Terra -20% ($2.50/$15 -> $2/$12), Sol flat.
+    // Cached input reads bill at 10% of the input rate on all three.
+    //
+    // Each is listed twice on purpose. normalizeModelKey() rewrites '.' to '-'
+    // (for claude-sonnet-4.5), so a dated snapshot echoed back by the API as
+    // gpt-5.6-luna-20260709 normalizes to gpt-5-6-luna. Without the dashed key
+    // that lookup misses and the call logs $0 — a silent undercount, which is
+    // the one thing this table exists to prevent.
+    'gpt-5.6-sol': GPT_56_SOL,
+    'gpt-5-6-sol': GPT_56_SOL,
+    'gpt-5.6-terra': GPT_56_TERRA,
+    'gpt-5-6-terra': GPT_56_TERRA,
+    'gpt-5.6-luna': GPT_56_LUNA,
+    'gpt-5-6-luna': GPT_56_LUNA,
+    'gpt-5.5': GPT_55,
+    'gpt-5-5': GPT_55,
+    'gpt-5-mini': { inputPerM: 0.25, outputPerM: 2 },
+    'gpt-5-nano': { inputPerM: 0.05, outputPerM: 0.4 },
+    // RETIRED alias, kept so historical api_usage_log rows still price. OpenAI
+    // has been removing the `*-chat-latest` aliases (gpt-5.2/5.3 on 2026-08-10).
+    // This rate predates that and was never re-verified — treat rows priced
+    // against it as approximate.
     'gpt-5-chat-latest': { inputPerM: 5, outputPerM: 15 },
     'text-embedding-3-small': { inputPerM: 0.02, outputPerM: 0 },
     'text-embedding-3-large': { inputPerM: 0.13, outputPerM: 0 },
