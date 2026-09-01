@@ -87,7 +87,7 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
         expect(h.embeddingsCreate).not.toHaveBeenCalled();
     });
 
-    it('happy path: embeds input, retrieves context via nde_chatbot_match, calls gpt-5-chat-latest, returns { output }', async () => {
+    it('happy path: embeds input, retrieves context via nde_chatbot_match, calls gpt-5.6-luna, returns { output }', async () => {
         const res = await post({ sessionId: 's-1', chatInput: 'I saw a light' });
         expect(res.status).toBe(200);
         expect(await res.json()).toEqual({ output: 'A compassionate reply.' });
@@ -103,7 +103,7 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
         });
 
         const completionArgs = h.completionsCreate.mock.calls[0][0];
-        expect(completionArgs.model).toBe('gpt-5-chat-latest');
+        expect(completionArgs.model).toBe('gpt-5.6-luna');
         // Retrieved context is interpolated into the system prompt as <video_N> blocks.
         expect(completionArgs.messages[0].role).toBe('system');
         expect(completionArgs.messages[0].content).toContain('<video_1>A first-person account about light.</video_1>');
@@ -171,7 +171,7 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
 
     it('falls back to gpt-4o-mini when the primary model call fails, instead of surfacing an error', async () => {
         h.completionsCreate.mockRejectedValueOnce(
-            Object.assign(new Error('The model `gpt-5-chat-latest` does not exist'), {
+            Object.assign(new Error('The model `gpt-5.6-luna` does not exist'), {
                 status: 404,
                 code: 'model_not_found',
             })
@@ -182,7 +182,7 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
         expect(await res.json()).toEqual({ output: 'A compassionate reply.' });
 
         expect(h.completionsCreate).toHaveBeenCalledTimes(2);
-        expect(h.completionsCreate.mock.calls[0][0].model).toBe('gpt-5-chat-latest');
+        expect(h.completionsCreate.mock.calls[0][0].model).toBe('gpt-5.6-luna');
         expect(h.completionsCreate.mock.calls[1][0].model).toBe('gpt-4o-mini');
         // The retry answers from the identical prompt, context and history.
         expect(h.completionsCreate.mock.calls[1][0].messages).toEqual(
