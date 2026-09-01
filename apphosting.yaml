@@ -44,6 +44,15 @@ env:
   - variable: OPENAI_API_KEY
     secret: projects/432036554831/secrets/OPENAI_API_KEY/versions/2
 
+  # Compassionate-chat generation model. Both are optional — the route defaults
+  # to gpt-5-chat-latest with a gpt-4o-mini retry when that call fails. Set
+  # COMPASSIONATE_CHAT_MODEL to switch the primary model (e.g. if this org loses
+  # entitlement to a model, or one is retired) without touching route code.
+  # - variable: COMPASSIONATE_CHAT_MODEL
+  #   value: "gpt-4o-mini"
+  # - variable: COMPASSIONATE_CHAT_FALLBACK_MODEL
+  #   value: "gpt-4o-mini"
+
   # Anthropic — Claude drafting for the blog pipeline and questions-autogen.
   # Replaced OPENROUTER_API_KEY (2026-08-04): same models at the same token
   # prices, without OpenRouter's top-up fee or its shared monthly key limit.

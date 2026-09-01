@@ -169,6 +169,52 @@ describe('POST /api/chat-compassionate (current behavior)', () => {
         expect(res.status).toBe(200);
     });
 
+    it('falls back to gpt-4o-mini when the primary model call fails, instead of surfacing an error', async () => {
+        h.completionsCreate.mockRejectedValueOnce(
+            Object.assign(new Error('The model `gpt-5-chat-latest` does not exist'), {
+                status: 404,
+                code: 'model_not_found',
+            })
+        );
+
+        const res = await post({ sessionId: 's-1', chatInput: 'hello' });
+        expect(res.status).toBe(200);
+        expect(await res.json()).toEqual({ output: 'A compassionate reply.' });
+
+        expect(h.completionsCreate).toHaveBeenCalledTimes(2);
+        expect(h.completionsCreate.mock.calls[0][0].model).toBe('gpt-5-chat-latest');
+        expect(h.completionsCreate.mock.calls[1][0].model).toBe('gpt-4o-mini');
+        // The retry answers from the identical prompt, context and history.
+        expect(h.completionsCreate.mock.calls[1][0].messages).toEqual(
+            h.completionsCreate.mock.calls[0][0].messages
+        );
+        // Both turns are still logged once the fallback succeeds.
+        expect(h.insert).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns 500 with the OpenAI error code when the primary AND fallback models both fail', async () => {
+        h.completionsCreate.mockRejectedValue(
+            Object.assign(new Error('You exceeded your current quota'), {
+                status: 429,
+                code: 'insufficient_quota',
+            })
+        );
+
+        const res = await post({ sessionId: 's-1', chatInput: 'hello' });
+        expect(res.status).toBe(500);
+        const body = await res.json();
+        expect(body.error).toBe('You exceeded your current quota');
+        expect(body.code).toBe('insufficient_quota');
+        expect(h.completionsCreate).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not throw when the model returns no choices — it degrades to the canned reply', async () => {
+        h.completionsCreate.mockResolvedValue({ choices: [] });
+        const res = await post({ sessionId: 's-1', chatInput: 'hello' });
+        expect(res.status).toBe(200);
+        expect((await res.json()).output).toBe("I apologize, but I couldn't generate a response.");
+    });
+
     it('documents current behavior: upstream errors return 500 with the internal error message in the body', async () => {
         h.embeddingsCreate.mockRejectedValue(new Error('OpenAI quota exceeded'));
         const res = await post({ sessionId: 's-1', chatInput: 'hello' });
