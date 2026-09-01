@@ -390,7 +390,13 @@ The intake pipeline (Apify caption fetch up to 100s + 7 AI analysis passes) take
 
 **The fix:** GitHub Actions calls the **Firebase App Hosting direct URL** (`APP_DIRECT_URL` secret) instead of the Cloudflare-proxied domain (`projectprofound.org`). This bypasses Cloudflare entirely.
 
-- **Direct URL format:** `https://profound-archive--studio-XXXXXXX.us-east4.hosted.app`
+- **`APP_DIRECT_URL` holds a BARE HOST, with no scheme** — e.g.
+  `profound-archive--studio-XXXXXXX.us-east4.hosted.app`. Callers must prepend
+  `https://` themselves: `"https://${{ secrets.APP_DIRECT_URL }}/api/..."`.
+  Omitting it does **not** fail loudly — curl falls back to plain HTTP on port 80
+  and returns a non-JSON body, which is how `channel-score-snapshot.yml` failed
+  silently for four months (Jun–Sep 2026). This line previously documented the
+  value as including `https://`, which is what produced that bug.
 - **`--max-time 280`** in curl — safely under Cloud Run's `timeoutSeconds: 300`
 - **DO NOT** call `/api/scanner/process` via `projectprofound.org` from automated jobs — Cloudflare will cut the connection at 100s
 - **DO NOT** use fire-and-forget on this endpoint — Cloud Run throttles CPU after the response, stalling the event loop
