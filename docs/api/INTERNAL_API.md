@@ -30,7 +30,7 @@
 3. Calls Supabase RPC `nde_chatbot_match` to find relevant video chunks.
 4. Fetches recent chat history from `nde_chat_logs`.
 5. Constructs prompt with context and history.
-6. Calls OpenAI `gpt-5-chat-latest` (or `COMPASSIONATE_CHAT_MODEL`). If that call throws
+6. Calls OpenAI `gpt-5.6-luna` (or `COMPASSIONATE_CHAT_MODEL`). If that call throws
    for any reason, it retries once on `gpt-4o-mini` (or `COMPASSIONATE_CHAT_FALLBACK_MODEL`)
    and logs the primary model's status/code, so a model-availability problem degrades to a
    cheaper answer rather than a 500. A 500 body now carries `code` alongside `error`.

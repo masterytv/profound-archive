@@ -7,8 +7,9 @@
 - **Purpose:** Generates embeddings for search/RAG and powers the Compassionate Chatbot.
 - **Auth:** API Key (`OPENAI_API_KEY` env var).
 - **Models Used:**
-  - Chat: `gpt-5-chat-latest` (override with `COMPASSIONATE_CHAT_MODEL`), retried once on
-    `gpt-4o-mini` (`COMPASSIONATE_CHAT_FALLBACK_MODEL`) if the primary call fails
+  - Chat: `gpt-5.6-luna` (override with `COMPASSIONATE_CHAT_MODEL`), retried once on
+    `gpt-4o-mini` (`COMPASSIONATE_CHAT_FALLBACK_MODEL`) if the primary call fails.
+    Replaced `gpt-5-chat-latest` in 2026-09 — see `src/lib/ai/pricing.ts` for rates
   - Embeddings: `text-embedding-3-small`
 - **Key Locations:**
   - `src/app/api/chat-compassionate/route.ts`

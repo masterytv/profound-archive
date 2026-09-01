@@ -10,13 +10,20 @@ import { z } from 'zod';
 // Per-IP throttle (S-1): this route bills OpenAI on every request.
 const RATE_LIMIT = { name: 'chat-compassionate', windowMs: 60_000, max: 10 };
 
-// Generation model. `gpt-5-chat-latest` stays the intended model, overridable
-// per environment without a deploy. If the primary call fails for ANY reason
-// (model retired, this org not entitled to it, a parameter the model rejects,
-// a transient upstream error) we retry once on the fallback — the same model
-// the working UAP twin runs — so a model-side problem degrades to a cheaper
-// answer instead of the client's generic "I encountered an error" bubble.
-const PRIMARY_MODEL = process.env.COMPASSIONATE_CHAT_MODEL || 'gpt-5-chat-latest';
+// Generation model, overridable per environment without a code change.
+//
+// `gpt-5.6-luna` replaced `gpt-5-chat-latest` (2026-09): OpenAI has been
+// retiring the `*-chat-latest` aliases (gpt-5.2/5.3 went on 2026-08-10) and the
+// old model was the most expensive in the repo. Luna is ~22x cheaper per
+// message on this route's prompt shape, and benchmarks above the previous
+// generation's flagship, so it is both the cheaper and the better answer.
+//
+// The fallback stays `gpt-4o-mini`: proven in production on the UAP twin, and a
+// different model generation, so one family's outage cannot take out both
+// lanes. If the primary call fails for ANY reason (model retired, this org not
+// entitled to it, a parameter the model rejects, a transient upstream error) we
+// retry once on it rather than showing the client an error bubble.
+const PRIMARY_MODEL = process.env.COMPASSIONATE_CHAT_MODEL || 'gpt-5.6-luna';
 const FALLBACK_MODEL = process.env.COMPASSIONATE_CHAT_FALLBACK_MODEL || 'gpt-4o-mini';
 
 // Request shape (S-12). chatInput is capped — it is embedded and fed to the

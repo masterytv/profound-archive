@@ -76,6 +76,19 @@ describe('estimateCost', () => {
         expect(est.costUsd).toBe(3);
     });
 
+    it('prices the compassionate chat route\'s model, dotted and dash-normalized', () => {
+        // gpt-5.6-luna is $0.20 in / $1.20 out per 1M (post 2026-07-30 cut).
+        expect(estimateCost('gpt-5.6-luna', { prompt_tokens: 1_000_000, completion_tokens: 0 }).costUsd).toBe(0.2);
+        expect(estimateCost('gpt-5.6-luna', { prompt_tokens: 0, completion_tokens: 1_000_000 }).costUsd).toBe(1.2);
+        // A dated snapshot normalizes through '.' -> '-'; it must still price,
+        // otherwise the usage dashboard silently logs the call at $0.
+        expect(normalizeModelKey('gpt-5.6-luna-20260709')).toBe('gpt-5-6-luna');
+        expect(estimateCost('gpt-5.6-luna-20260709', { prompt_tokens: 1_000_000, completion_tokens: 0 }).costUsd).toBe(0.2);
+        // Same guard for the tiers we might switch up to.
+        expect(estimateCost('gpt-5.6-terra-20260709', { prompt_tokens: 1_000_000, completion_tokens: 0 }).costUsd).toBe(2);
+        expect(estimateCost('gpt-5.6-sol-20260709', { prompt_tokens: 0, completion_tokens: 1_000_000 }).costUsd).toBe(30);
+    });
+
     it('prices the batch-era models', () => {
         expect(estimateCost('claude-haiku-4-5', { prompt_tokens: 1_000_000, completion_tokens: 0 }).costUsd).toBe(1);
         expect(estimateCost('claude-sonnet-5', { prompt_tokens: 0, completion_tokens: 1_000_000 }).costUsd).toBe(15);
