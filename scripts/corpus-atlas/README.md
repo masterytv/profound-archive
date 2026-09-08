@@ -191,3 +191,79 @@ Conventions baked into the script:
 
 The curated reading of these tables is `research/corpus-atlas/ATLAS-stats.md`. Re-run `pull.mjs`
 then `aggregate.mjs` to refresh everything; the atlas prose has to be re-checked by hand.
+
+## merge-digests.mjs: level-1 merge, batch digests -> section digests
+
+Folds the batch digests written by `batch-digest.mjs` into "section digests", 20 batches
+(about 800 videos) per section, so the next merge level reads 18 section files instead of
+348 batch files. Each section digest has the same six sections as a batch digest (Themes,
+Standout accounts, Quotes worth keeping, Tensions and contradictions, Rare or unusual,
+Book-angle sparks) and a header line:
+
+```
+Section <domain>-<NN> | batches: <first>-<last> | videos: ~<count>
+```
+
+Groups are consecutive batch files sorted by batch number, `--group-size` (20) per group,
+numbered `NN` from 01. With the 2026-09-08 digests that is nde: 8 sections (the last with
+18 batches) and uap: 10 sections (the last with 10). `videos: ~N` is the number of IDs
+listed in the member batch headers, computed by the script and given to the model as the
+exact first line to emit.
+
+Run (Node 22 needs `NODE_USE_ENV_PROXY=1`; no npm dependencies; needs `OPENAI_API_KEY`;
+no database access):
+
+```bash
+# 1. Preview: groups, member files, estimated input tokens (chars/4) and cost. Writes nothing.
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/merge-digests.mjs --domain nde --dry-run
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/merge-digests.mjs --domain uap --dry-run
+
+# 2. Smoke test: one group, one API call.
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/merge-digests.mjs --domain nde --limit 1
+
+# 3. Full runs (safe to rerun: finished sections are skipped unless --force).
+mkdir -p research/corpus-atlas/logs
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/merge-digests.mjs --domain nde 2>&1 | tee research/corpus-atlas/logs/merge-digests-nde.log
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/merge-digests.mjs --domain uap 2>&1 | tee research/corpus-atlas/logs/merge-digests-uap.log
+```
+
+Flags: `--domain nde|uap` (required), `--in <dir>` (default `research/corpus-atlas/digests`),
+`--out <dir>` (default `research/corpus-atlas/merged`), `--group-size N` (20), `--limit N`
+(first N groups only; numbering unaffected), `--model <id>` (default `gpt-5.6-luna`, falls
+back to `gpt-4o-mini` after the primary's retries are exhausted), `--concurrency N` (3),
+`--force` (regenerate existing sections), `--dry-run`, `--help`.
+
+Outputs:
+
+- `research/corpus-atlas/merged/<domain>/section-NN.md`: the section digest, written
+  atomically; an existing non-empty file is skipped on rerun unless `--force`.
+- `research/corpus-atlas/merged/usage.jsonl`: one line per API call with the group, prompt,
+  completion and reasoning tokens, the model that answered, estimated USD (Luna $0.20/M in,
+  $1.20/M out; 4o-mini $0.15/M, $0.60/M), seconds, attempts, how many of the group's video
+  IDs the section cites, how many of its quotes were found verbatim in the inputs, and any
+  format problems (`sections_ok: false`).
+
+What the model is asked for: 15-30 merged themes ordered by approximate summed count with
+3-5 example IDs each; 15-20 standout accounts; 25-40 quotes copied verbatim from the batch
+digests (trimmed quotes marked with an ellipsis); consolidated tensions with IDs on each
+side; a deduplicated rare-or-unusual list; 10-15 book-angle sparks; video IDs everywhere,
+no em dashes, nothing not present in the inputs; 2,500-3,500 output tokens. Each request is
+about 31-34k prompt tokens (20 digests of roughly 6.3k chars plus the prompt), so a full run
+of both domains is roughly 600k prompt tokens at chars/4 and about $0.20 on Luna.
+
+Behaviour worth knowing:
+
+- Same API code path as `batch-digest.mjs`: exponential backoff on 429/5xx/network errors
+  (honours `Retry-After`, 5 attempts per model, 300 s per request because the prompts are
+  large), in-place fixes for rejected parameters, no `temperature` sent to gpt-5 models.
+- A 429 of type `insufficient_quota` (for example `credit_balance_exhausted`, "You have no
+  credits remaining") is a billing error, not a rate limit: the script does not retry it,
+  does not try the fallback model (same account), stops handing out further groups, prints a
+  STOPPED line and exits with code 3. Add credits and rerun; finished sections are skipped.
+- Validation after each call: exact header line, six headings in order, no en/em dash, at
+  least 40 of the group's video IDs cited, 25 or more quotes, and every quoted string in
+  "Quotes worth keeping" found verbatim in the member batch digests (straight/curly quotes
+  and whitespace normalised, a leading or trailing ellipsis ignored). Problems are logged to
+  the console and to `usage.jsonl`; the file is still written so the next level can decide.
+- The batch headers occasionally list 41 IDs or a truncated ID, so `videos: ~N` is 800-802
+  for a full group rather than exactly 800.
