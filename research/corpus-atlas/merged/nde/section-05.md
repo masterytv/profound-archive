@@ -27,7 +27,6 @@ Counts are sums of per-batch estimates. Motifs no batch counted as a theme, but 
 - **Suicide attempts, overdose and addiction as entry points:** no per-batch count; surfaces in at least 7 batches. Examples: W-y1sD7Kjt4, Wclsh6SX7Dw, YNCXTSffpFU, WJM1A7vW6YU, _s_X_zx3_6o, bKI3jBJM_kE.
 - **Trauma, abuse and violence as context:** no per-batch count; surfaces in at least 6 batches. Examples: Y2FuFg2VGLs, _3d0dt4zQQY, arUlDlZ0NfU, b-OJPx2QiII, WLeMaa80QBQ, aHeKI-aIu8g.
 - **Grief and bereavement as portal:** no per-batch count; surfaces in at least 6 batches. Examples: _we4rXCWm-s, Z7vnMIgoWe0, ac8aq2kzpRg, ZRRZ-cyq2JE, XtwXtlw0AxE, Xd8SifQ8ADE.
-- **Physical healing claims after the experience:** no per-batch count; surfaces in at least 6 batches. Examples: Wo1tnSDRX_4, aoJXWnR_A80, ayefiUgl66Y, aA7359ttlXQ, ZAC5SvEtoNE, XWYbDyESS7k.
 
 ## Standout accounts
 
