@@ -72,3 +72,71 @@ NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/retrieve.mjs \
 NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/retrieve.mjs \
   "telepathic communication from a being during an abduction" --domain uap --source chunks --k 10 --json
 ```
+
+## digest.mjs: batch digests from per-video analysis
+
+Turns the per-video analysis records exported to `scratch/corpus-atlas/*.jsonl` into
+narrative markdown "batch digests" (one per 40 videos) using the OpenAI chat API. The
+digests are the input to the atlas merge step; each one has the same six sections
+(Themes, Standout accounts, Quotes worth keeping, Tensions and contradictions, Rare or
+unusual, Book-angle sparks) and a header line listing the video IDs it covers, so the
+merge step can trace every claim back to a video.
+
+Inputs (JSONL, one row per line; JSON columns may be objects or JSON strings):
+
+| domain | files read |
+|---|---|
+| `nde` | `nde_vids.jsonl` (videoId, title, channelName, date, viewCount, duration, analysis_nde_summary, rvnde_*), `nde_analysis.jsonl` (joined on video_id) |
+| `uap` | `uap_vids.jsonl` (snake_case), `uap_encounters.jsonl` (grouped by video_id, first 3 shown), `uap_video_stats.jsonl` (flags, tone, dominant entity) |
+
+Videos without a summary are skipped. Cards are sorted by video ID and cut into fixed-size
+batches, so batch numbers are stable across reruns as long as the input files do not change.
+
+Run (Node 22 needs `NODE_USE_ENV_PROXY=1` to reach the API in this environment; no npm
+dependencies, needs `OPENAI_API_KEY`):
+
+```bash
+# 1. Preview: card count, batch count, average card size, token and cost estimate. Writes nothing.
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/digest.mjs --domain nde --dry-run
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/digest.mjs --domain uap --dry-run --print-cards 2
+
+# 2. Smoke test: one batch, one API call.
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/digest.mjs --domain nde --limit 1
+
+# 3. Full runs, in the background with logs (safe to rerun: finished batches are skipped).
+mkdir -p research/corpus-atlas/logs
+NODE_USE_ENV_PROXY=1 nohup node scripts/corpus-atlas/digest.mjs --domain nde > research/corpus-atlas/logs/digest-nde.log 2>&1 &
+NODE_USE_ENV_PROXY=1 nohup node scripts/corpus-atlas/digest.mjs --domain uap > research/corpus-atlas/logs/digest-uap.log 2>&1 &
+tail -f research/corpus-atlas/logs/digest-nde.log
+```
+
+Flags: `--domain nde|uap` (required), `--data <dir>` (default `scratch/corpus-atlas`),
+`--out <dir>` (default `research/corpus-atlas/digests`), `--batch-size N` (40),
+`--limit N` (first N batches only), `--model <id>` (default `gpt-5.6-luna`, falls back to
+`gpt-4o-mini` when the primary fails), `--concurrency N` (4), `--force` (regenerate
+existing batches), `--dry-run`, `--print-cards N` (dry-run aid), `--help`.
+
+Outputs:
+
+- `research/corpus-atlas/digests/<domain>/batch-NNN.md`: the digest. Written atomically;
+  an existing non-empty file is skipped on rerun unless `--force`.
+- `research/corpus-atlas/digests/usage.jsonl`: one line per API call with prompt/completion
+  tokens, the model that actually answered, estimated USD (prices mirror
+  `src/lib/ai/pricing.ts`), attempts, and any format problems found in the digest
+  (missing section, wrong header, em dash, too few video IDs cited). The console prints a
+  running total.
+
+Behaviour worth knowing:
+
+- Cards target 2,000-2,800 chars (500-700 tokens) and never exceed 3,200; long NDE cards are
+  trimmed in steps (shorter quotes, fewer quoted elements, fewer entities) before anything
+  is dropped. The dry run reports how many cards needed each trim level.
+- Retries with exponential backoff on 429/5xx/network errors (honours `Retry-After`,
+  up to 5 attempts per model, 120 s per request). A 400 for an unsupported parameter
+  (for example `max_tokens` vs `max_completion_tokens`, or `temperature`) is fixed in the
+  request and logged rather than treated as a model failure.
+- A batch whose digest fails validation is still written (the merge step can decide), but
+  the problem is logged to the console and to `usage.jsonl` (`sections_ok: false`).
+- Tests against the 60-row sample in `scratch/corpus-atlas/sample/` should use
+  `--data scratch/corpus-atlas/sample --out scratch/corpus-atlas/sample-digests` so the
+  sample's batch-001 does not shadow the real batch-001 on the full run.
