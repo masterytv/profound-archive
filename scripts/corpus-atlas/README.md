@@ -148,3 +148,46 @@ Behaviour worth knowing:
 - Tests against the 60-row sample in `scratch/corpus-atlas/sample/` should use
   `--data scratch/corpus-atlas/sample --out scratch/corpus-atlas/sample-digests` so the
   sample's batch-001 does not shadow the real batch-001 on the full run.
+
+## aggregate.mjs
+
+Offline statistics over the JSONL pull in `scratch/corpus-atlas/` (written by `pull.mjs`).
+Node built-ins only; no network, no database, no environment variables. Run it with plain
+`node` from anywhere:
+
+```
+node scripts/corpus-atlas/aggregate.mjs [--in scratch/corpus-atlas] [--out research/corpus-atlas]
+```
+
+It streams every `*.jsonl` file it needs (`nde_vids`, `nde_analysis`, `uap_vids`,
+`uap_encounters`, `uap_video_stats`, `uap_events`, `uap_canonical_*`, `uap_contactee_profiles`,
+`channels`, `uap_channels`, `uap_channel_scores`, `viz_graph_cache`) and writes:
+
+| Output | What it holds |
+| --- | --- |
+| `research/corpus-atlas/stats/nde.json` | Every NDE table (id, title, caption with the denominator, columns, rows), plus `extra` (observed score ranges, heuristic counts, per-channel aggregates) and `top_lists`. |
+| `research/corpus-atlas/stats/uap.json` | Same shape for the UAP domain (encounters, video stats, knowledge base, channels). |
+| `research/corpus-atlas/stats/cross.json` | Cross-domain phenomenology comparison, the site's `viz_graph_cache` cross-domain entry copied in, upload years side by side, channel overlap. |
+| `research/corpus-atlas/stats/channels.json` | Per-channel aggregates for both domains and the channel metadata tables. |
+| `research/corpus-atlas/stats/tables.md` | Every table above rendered as markdown, grouped by domain, with a contents line of table ids. No length cap. |
+| `research/corpus-atlas/appendix-top-lists.md` | Top-25 lists (video id with YouTube link, title, channel, year, views, the relevant score, summary truncated to ~220 chars). |
+
+Conventions baked into the script:
+
+- NDE tables are restricted to confirmed NDEs (`nde_vids` with `isNde=clear_nde`, n=6304) joined to
+  `nde_analysis` on `video_id`; the 518 `nde_analysis` rows for other videos are ignored.
+- Percentages are one decimal over the denominator stated in each table caption ("n=").
+  Where a field is null for some rows, the caption says how many and the table uses non-null rows.
+- Categorical values are trimmed, lowercased, and spaces/hyphens become underscores; no
+  categories are invented. `analysis_failed` rows are excluded from numeric score tables.
+- Bands: Greyson 0-7 / 8-15 / 16-23 / 24-32; NDE transformation 0 / 1-9 / 10-19 / 20-29 / 30-39 / 40-50;
+  rvnde 0-9 / 10-14 / 15-19 / 20-24 / 25-32; UAP evidence 0-9 / 10-12 / 13-15 / 16-18 / 19-30;
+  contact depth 0 / 1-8 / 9-16 / 17-24 / 25-32; UAP transformation 0 / 1-9 / 10-19 / 20-29 / 30-60.
+- The child-experiencer and multiple-NDE lists are regex heuristics over AI summaries and are
+  labelled as such in the output; the repeat-experiencer list matches `experiencerFullName` exactly.
+- `viz_graph_cache` entries are reused for the UAP side of the cross-domain table (their
+  `computed_at` is quoted in the caption); the NDE core-element co-occurrence is recomputed over the
+  current confirmed set and compared with the cached `nde-elements` graph in `cross-nde-elements-cache-vs-now`.
+
+The curated reading of these tables is `research/corpus-atlas/ATLAS-stats.md`. Re-run `pull.mjs`
+then `aggregate.mjs` to refresh everything; the atlas prose has to be re-checked by hand.
