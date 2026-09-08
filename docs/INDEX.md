@@ -50,3 +50,9 @@
 | AI Vibecoding Guide | How to prompt AI effectively | [guides/VIBECODING_GUIDE.md](./guides/VIBECODING_GUIDE.md) |
 | Adding a New Feature | Step-by-step feature workflow | [guides/NEW_FEATURE.md](./guides/NEW_FEATURE.md) |
 | Adding an API Integration | How to add new external API | [guides/NEW_API_INTEGRATION.md](./guides/NEW_API_INTEGRATION.md) |
+
+## Research
+| Document | Description | Path |
+|---|---|---|
+| Corpus Atlas | Statistical and narrative map of the whole archive for book ideation, plus rebuild scripts | [research/corpus-atlas/README.md](../research/corpus-atlas/README.md) |
+| Atlas Site Ideas | Proposed pages and graphs for browsing and searching the atlas | [research/corpus-atlas/SITE-IDEAS.md](../research/corpus-atlas/SITE-IDEAS.md) |
