@@ -73,7 +73,9 @@ NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/retrieve.mjs \
   "telepathic communication from a being during an abduction" --domain uap --source chunks --k 10 --json
 ```
 
-## digest.mjs: batch digests from per-video analysis
+## batch-digest.mjs: batch digests from per-video analysis
+
+(Not to be confused with `digest.mjs` above/below, the read-only viewer for question, blog and profile pulls.)
 
 Turns the per-video analysis records exported to `scratch/corpus-atlas/*.jsonl` into
 narrative markdown "batch digests" (one per 40 videos) using the OpenAI chat API. The
@@ -97,17 +99,17 @@ dependencies, needs `OPENAI_API_KEY`):
 
 ```bash
 # 1. Preview: card count, batch count, average card size, token and cost estimate. Writes nothing.
-NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/digest.mjs --domain nde --dry-run
-NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/digest.mjs --domain uap --dry-run --print-cards 2
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/batch-digest.mjs --domain nde --dry-run
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/batch-digest.mjs --domain uap --dry-run --print-cards 2
 
 # 2. Smoke test: one batch, one API call.
-NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/digest.mjs --domain nde --limit 1
+NODE_USE_ENV_PROXY=1 node scripts/corpus-atlas/batch-digest.mjs --domain nde --limit 1
 
 # 3. Full runs, in the background with logs (safe to rerun: finished batches are skipped).
 mkdir -p research/corpus-atlas/logs
-NODE_USE_ENV_PROXY=1 nohup node scripts/corpus-atlas/digest.mjs --domain nde > research/corpus-atlas/logs/digest-nde.log 2>&1 &
-NODE_USE_ENV_PROXY=1 nohup node scripts/corpus-atlas/digest.mjs --domain uap > research/corpus-atlas/logs/digest-uap.log 2>&1 &
-tail -f research/corpus-atlas/logs/digest-nde.log
+NODE_USE_ENV_PROXY=1 nohup node scripts/corpus-atlas/batch-digest.mjs --domain nde > research/corpus-atlas/logs/batch-digest-nde.log 2>&1 &
+NODE_USE_ENV_PROXY=1 nohup node scripts/corpus-atlas/batch-digest.mjs --domain uap > research/corpus-atlas/logs/batch-digest-uap.log 2>&1 &
+tail -f research/corpus-atlas/logs/batch-digest-nde.log
 ```
 
 Flags: `--domain nde|uap` (required), `--data <dir>` (default `scratch/corpus-atlas`),
@@ -135,6 +137,12 @@ Behaviour worth knowing:
   up to 5 attempts per model, 120 s per request). A 400 for an unsupported parameter
   (for example `max_tokens` vs `max_completion_tokens`, or `temperature`) is fixed in the
   request and logged rather than treated as a model failure.
+- `gpt-5.6-luna` rejects any `temperature` other than the default, so none is sent to gpt-5
+  models (the fallback `gpt-4o-mini` still gets 0.6). Measured on batch-001 of each domain
+  (2026-09-08): about 24k/14k prompt tokens (nde/uap) and 2.0-2.2k completion tokens per
+  batch including 250-300 reasoning tokens, roughly $0.005-0.008 per batch on Luna.
+- UAP cards average ~1.3k chars (most tier 1-2 videos have 0-1 encounters), so
+  `--batch-size 60` is a reasonable choice for that domain if fewer, richer batches are wanted.
 - A batch whose digest fails validation is still written (the merge step can decide), but
   the problem is logged to the console and to `usage.jsonl` (`sections_ok: false`).
 - Tests against the 60-row sample in `scratch/corpus-atlas/sample/` should use
