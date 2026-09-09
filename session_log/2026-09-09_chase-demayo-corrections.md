@@ -61,6 +61,21 @@ Do not delete them.
   "yeah, I know", as if he had done it many times before.
 - The Greyson "border / point of no return" item is left as scored.
 
+## Outcome (2026-09-09, later the same day)
+
+- Tom allowed the two scripts via a local `.claude/settings.json` (the repo ignores `.claude`,
+  so it is not committed). `APPLY=1` ran clean; the backup of original rows was handed to Tom.
+- `regenerate-experiencer-profile.ts 130` → 13 elements, 8 channels, 5 themes. Verified in the
+  database afterwards: one published profile with all 10 videos, trigger cardiac_arrest,
+  no misspellings left in any table, Life Review cleared on 10/10 videos, Choice to Return
+  present on 9/10.
+- Cache: `POST /api/admin/revalidate` with the concrete URL reported success but the page
+  stayed stale, because the route passed `'page'` as the type for a concrete URL under a
+  dynamic route. Passing the pattern `/experiencer/[slug]` worked immediately; the route now
+  omits the type for concrete URLs. Verified on staging: redirects 308 to the new slug, the
+  profile shows the new name, 10 videos across 8 channels, Cardiac Arrest, the website link,
+  and Life Review as "not described".
+
 ## Still worth a look
 - Two summaries contain claims that could not be verified from bmG4atiklV4 and were left:
   7qKrXhpFxo4 ("passed out from depression and injury-related frustration") and QLZB64hBV0U
