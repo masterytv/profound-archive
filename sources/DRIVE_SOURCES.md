@@ -38,7 +38,7 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 | Proof of Love | `1p3wF3ZZ6dNXppgCgpO5XwE9hoETGkRAzjCqlu2Vr8vE` | Related earlier manuscript |
 | Simple Spirituality | `12tlVkJPydkEKgSwaHGlbrvlAp4gZgghoitR_F8i576o` | Related earlier manuscript |
 | Add to Simple Spirituality | `168kk_Y9DLzI5UG7XL9eCJMtIsZiwUngRZ4mm6QifRuU` | Additions for Simple Spirituality |
-| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09 | `1rur-uB4BxLBeZ5e1qI2zXI30ohwtdwCplzF0uKYkgQE` | Ten next-book ideas with chapters, archive video IDs, statistics, and quotes, generated from `research/corpus-atlas/`. Read before starting another ideation round so it builds on this one |
+| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09, final | `100-SRKRupHtTHsTmbElzFDd2mbB0BAvZhScYd7Z7eQE` | Ten next-book ideas with chapters, archive video IDs, statistics, and quotes, generated from `research/corpus-atlas/`. Read before starting another ideation round so it builds on this one. (An earlier, longer draft of the same round is `1rur-uB4BxLBeZ5e1qI2zXI30ohwtdwCplzF0uKYkgQE`; prefer the final.) |
 
 Subfolders: Resources (`1jOnobAHFTzzj0CZGDfPsxVSqvssoCuaf`),
 Rideshare Psychic - TikTok Videos (`1v5fXFMydAwefUraxKMM2dXC2gdOOCW5D`).
