@@ -34,6 +34,7 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 | Book 1 Sections, Round 2 (ten new), 2026-09-09 | `14tBu6IgHPaRofg9epQ2L5ZzKL7Lw4cVzACtc6eiv3wc` | Ten proposed new sections for Book 1 (*You Do Not Have to Die to Know Me*): corpus lines with video IDs and timestamps, masters' lines with attribution status, and a proposed order for all nineteen sections |
 | Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | First drafted section of Book 1 (five lessons on never being alone), written from Round 2 section 10; quotes carry video IDs and timestamps, nothing yet checked against audio |
 | Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | Thirteen title and introduction options for Book 1 (Tom's three plus ten more), each built on a corpus line with its video ID |
+| Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), plus copy for the front-runner title and a title-test plan |
 | Book Testimonials | `15_ByvnyDB9Alar11EG4XYDbZ24wkT5oS9dYwl5p3qNs` | Testimonials (Google Sheet) |
 | Accidendal Mystic - Additional Ideas, Chapters, Covers | `1YIAxKs1A4oWHNgOd2dYDOplxNNi0iHT4yQadovp2RCs` | Extra ideas, chapters, cover concepts (~31 MB, image-heavy) |
 | The Accidental Mystic Podcast | `1Ow7tmEIvRNEOkl4MGQw2q4LwKg8kPUxps1-lwgCI9_Q` | Podcast planning notes |
