@@ -1,0 +1,2517 @@
+{
+ "generated_at": "2026-09-08T14:43:21.892Z",
+ "generator": "scripts/corpus-atlas/aggregate.mjs",
+ "inputs": {
+  "nde_vids": {
+   "rows": 6304,
+   "pulled_at": "2026-09-08T14:25:33.663Z",
+   "filters": "isNde=eq.clear_nde"
+  },
+  "nde_analysis": {
+   "rows": 6822,
+   "pulled_at": "2026-09-08T14:25:42.218Z",
+   "filters": null
+  },
+  "uap_vids": {
+   "rows": 8394,
+   "pulled_at": "2026-09-08T14:25:44.798Z",
+   "filters": "tier=in.(1,2)"
+  },
+  "uap_encounters": {
+   "rows": 7017,
+   "pulled_at": "2026-09-08T14:25:46.823Z",
+   "filters": null
+  },
+  "uap_video_stats": {
+   "rows": 7607,
+   "pulled_at": "2026-09-08T14:25:47.958Z",
+   "filters": null
+  },
+  "question_synthesis": {
+   "rows": 147,
+   "pulled_at": "2026-09-08T14:25:48.091Z",
+   "filters": null
+  },
+  "nde_questions": {
+   "rows": 81,
+   "pulled_at": "2026-09-08T14:25:48.201Z",
+   "filters": null
+  },
+  "user_questions": {
+   "rows": 83,
+   "pulled_at": "2026-09-08T14:25:48.284Z",
+   "filters": null
+  },
+  "blog_posts": {
+   "rows": 231,
+   "pulled_at": "2026-09-08T14:25:48.496Z",
+   "filters": "status=eq.published"
+  },
+  "experiencer_profiles": {
+   "rows": 2820,
+   "pulled_at": "2026-09-08T14:25:49.485Z",
+   "filters": null
+  },
+  "viz_graph_cache": {
+   "rows": 9,
+   "pulled_at": "2026-09-08T14:25:49.784Z",
+   "filters": null
+  },
+  "uap_daily_facts": {
+   "rows": 30,
+   "pulled_at": "2026-09-08T14:26:14.530Z",
+   "filters": null
+  },
+  "channels": {
+   "rows": 55,
+   "pulled_at": "2026-09-08T14:25:49.986Z",
+   "filters": null
+  },
+  "uap_channels": {
+   "rows": 78,
+   "pulled_at": "2026-09-08T14:25:50.076Z",
+   "filters": null
+  },
+  "uap_channel_scores": {
+   "rows": 78,
+   "pulled_at": "2026-09-08T14:25:50.166Z",
+   "filters": null
+  },
+  "uap_canonical_persons": {
+   "rows": 5108,
+   "pulled_at": "2026-09-08T14:25:51.143Z",
+   "filters": null
+  },
+  "uap_canonical_orgs": {
+   "rows": 1824,
+   "pulled_at": "2026-09-08T14:25:51.500Z",
+   "filters": null
+  },
+  "uap_canonical_programs": {
+   "rows": 1810,
+   "pulled_at": "2026-09-08T14:25:51.882Z",
+   "filters": null
+  },
+  "uap_events": {
+   "rows": 831,
+   "pulled_at": "2026-09-08T14:25:52.049Z",
+   "filters": null
+  },
+  "uap_contactee_profiles": {
+   "rows": 3440,
+   "pulled_at": "2026-09-08T14:25:52.980Z",
+   "filters": null
+  }
+ },
+ "normalization": "categorical values are trimmed, lowercased, with spaces and hyphens replaced by underscores unless a table says otherwise; percentages are one decimal over the denominator stated in each caption",
+ "extra": {
+  "nde_channels_table_rows": 55,
+  "uap_channels_table_rows": 78,
+  "uap_channel_scores_rows": 78
+ },
+ "tables": {
+  "ch-nde-country": {
+   "id": "ch-nde-country",
+   "title": "NDE channels (channels table) by country",
+   "caption": "channels rows, n=55",
+   "columns": [
+    "value",
+    "count",
+    "pct"
+   ],
+   "rows": [
+    [
+     "US",
+     33,
+     60
+    ],
+    [
+     "null",
+     11,
+     20
+    ],
+    [
+     "CA",
+     3,
+     5.5
+    ],
+    [
+     "FR",
+     2,
+     3.6
+    ],
+    [
+     "GB",
+     2,
+     3.6
+    ],
+    [
+     "AT",
+     1,
+     1.8
+    ],
+    [
+     "BR",
+     1,
+     1.8
+    ],
+    [
+     "CH",
+     1,
+     1.8
+    ],
+    [
+     "NL",
+     1,
+     1.8
+    ]
+   ]
+  },
+  "ch-uap-grade": {
+   "id": "ch-uap-grade",
+   "title": "UAP channel letter grade",
+   "caption": "uap_channel_scores rows, n=78",
+   "columns": [
+    "value",
+    "count",
+    "pct"
+   ],
+   "rows": [
+    [
+     "F",
+     62,
+     79.5
+    ],
+    [
+     "D",
+     14,
+     17.9
+    ],
+    [
+     "C",
+     2,
+     2.6
+    ]
+   ]
+  },
+  "ch-uap-archetype": {
+   "id": "ch-uap-archetype",
+   "title": "UAP channel primary archetype",
+   "caption": "uap_channel_scores rows, n=78",
+   "columns": [
+    "value",
+    "count",
+    "pct"
+   ],
+   "rows": [
+    [
+     "Interview Hub",
+     20,
+     25.6
+    ],
+    [
+     "Deep Intelligence",
+     17,
+     21.8
+    ],
+    [
+     "Documentary",
+     15,
+     19.2
+    ],
+    [
+     "News & Commentary",
+     14,
+     17.9
+    ],
+    [
+     "First Person Encounters",
+     7,
+     9
+    ],
+    [
+     "null",
+     5,
+     6.4
+    ]
+   ]
+  },
+  "ch-uap-cadence": {
+   "id": "ch-uap-cadence",
+   "title": "UAP channel posting cadence",
+   "caption": "uap_channel_scores rows, n=78",
+   "columns": [
+    "value",
+    "count",
+    "pct"
+   ],
+   "rows": [
+    [
+     "biweekly",
+     61,
+     78.2
+    ],
+    [
+     "weekly",
+     15,
+     19.2
+    ],
+    [
+     "prolific",
+     2,
+     2.6
+    ]
+   ]
+  },
+  "ch-uap-personality": {
+   "id": "ch-uap-personality",
+   "title": "UAP channel personality code",
+   "caption": "uap_channel_scores rows, n=78",
+   "columns": [
+    "value",
+    "count",
+    "pct"
+   ],
+   "rows": [
+    [
+     "EDN",
+     17,
+     21.8
+    ],
+    [
+     "IDA",
+     16,
+     20.5
+    ],
+    [
+     "EBN",
+     11,
+     14.1
+    ],
+    [
+     "EDA",
+     10,
+     12.8
+    ],
+    [
+     "IDN",
+     10,
+     12.8
+    ],
+    [
+     "IBN",
+     8,
+     10.3
+    ],
+    [
+     "EBA",
+     4,
+     5.1
+    ],
+    [
+     "IBA",
+     2,
+     2.6
+    ]
+   ]
+  },
+  "ch-nde-all": {
+   "id": "ch-nde-all",
+   "title": "All NDE channels by confirmed NDE count",
+   "caption": "From nde_vids; n=61 channels",
+   "columns": [
+    "channel",
+    "n",
+    "mean Greyson",
+    "mean transformation",
+    "mean rvnde",
+    "median views",
+    "pct very_positive",
+    "pct distressing journey"
+   ],
+   "rows": [
+    [
+     "Life After Life NDE",
+     615,
+     25.6,
+     30.9,
+     10.7,
+     9019,
+     57.7,
+     2.9
+    ],
+    [
+     "AFINAL, O QUE SOMOS NÓS? / AFTER ALL, WHAT ARE WE?",
+     414,
+     25.2,
+     25.7,
+     10.3,
+     109862,
+     51.2,
+     2.9
+    ],
+    [
+     "NDE Radio with Lee Witting",
+     411,
+     24.5,
+     25.4,
+     12.2,
+     3258,
+     63.5,
+     2.7
+    ],
+    [
+     "Pegi Robinson - NDE TV",
+     395,
+     25.8,
+     29.1,
+     12.1,
+     2031,
+     59.7,
+     3.8
+    ],
+    [
+     "Love Covered Life Podcast",
+     327,
+     25.5,
+     28,
+     10.5,
+     10195,
+     63.9,
+     2.4
+    ],
+    [
+     "NDE Diary",
+     310,
+     27.9,
+     31.2,
+     11.1,
+     15113,
+     74.5,
+     2.6
+    ],
+    [
+     "IANDS",
+     303,
+     23.8,
+     27.3,
+     11.3,
+     5438,
+     55.1,
+     2
+    ],
+    [
+     "The Other Side NDE",
+     254,
+     28.1,
+     31.9,
+     11.7,
+     112839.5,
+     74.8,
+     1.2
+    ],
+    [
+     "Round Trip Death",
+     235,
+     27.1,
+     27.8,
+     12.3,
+     1053,
+     76.2,
+     4.7
+    ],
+    [
+     "Tia Renee",
+     221,
+     27,
+     31.3,
+     12.1,
+     3391,
+     69.2,
+     1.4
+    ],
+    [
+     "Tales Of Resilience",
+     219,
+     26.9,
+     33.1,
+     10.1,
+     2787,
+     65.3,
+     3.7
+    ],
+    [
+     "Beyond with Heather Tesch",
+     185,
+     27.2,
+     28.2,
+     10.7,
+     9632,
+     77.8,
+     1.6
+    ],
+    [
+     "Divine Encounters NDE",
+     169,
+     28.2,
+     31.4,
+     9.6,
+     3486,
+     70.4,
+     0.6
+    ],
+    [
+     "Touching The Afterlife",
+     168,
+     23.6,
+     28.6,
+     8.9,
+     60285,
+     45.2,
+     47
+    ],
+    [
+     "Crossing Over NDE",
+     136,
+     27.2,
+     32.8,
+     11.3,
+     4183,
+     63.2,
+     1.5
+    ],
+    [
+     "Heaven Awaits",
+     128,
+     27.1,
+     25.7,
+     11,
+     5607.5,
+     60.2,
+     5.5
+    ],
+    [
+     "Passion Harvest Podcast",
+     110,
+     26.1,
+     27.6,
+     11.5,
+     5491.5,
+     71.8,
+     3.6
+    ],
+    [
+     "Thanatos TV EN",
+     102,
+     25.7,
+     30.3,
+     11.3,
+     27850.5,
+     45.1,
+     2
+    ],
+    [
+     "Spirit Travels",
+     101,
+     28.2,
+     26.7,
+     13.3,
+     728,
+     66.3,
+     4
+    ],
+    [
+     "HeavenIsReal",
+     94,
+     28.2,
+     29,
+     12.7,
+     176.5,
+     68.1,
+     2.1
+    ],
+    [
+     "T&H - Afterlife",
+     89,
+     29.3,
+     33.2,
+     11.5,
+     34581,
+     91,
+     0
+    ],
+    [
+     "Afterlife Experiences",
+     88,
+     25.6,
+     27.6,
+     11.8,
+     25061.5,
+     29.5,
+     1.1
+    ],
+    [
+     "Beyond the Veil",
+     80,
+     29.4,
+     33.2,
+     11.7,
+     12521.5,
+     83.8,
+     5
+    ],
+    [
+     "Afterlife Atlas",
+     80,
+     25.7,
+     20.1,
+     12.4,
+     795.5,
+     52.5,
+     6.3
+    ],
+    [
+     "Logical-NDE",
+     75,
+     26,
+     29.2,
+     11.9,
+     2255,
+     64,
+     9.3
+    ],
+    [
+     "Real Near Death Experience Stories",
+     74,
+     25.7,
+     24.3,
+     12,
+     120,
+     75.7,
+     5.4
+    ],
+    [
+     "Imagine Heaven Podcast with John Burke",
+     64,
+     26.7,
+     23.1,
+     10.1,
+     28256.5,
+     81.3,
+     10.9
+    ],
+    [
+     "About Freedom Show",
+     64,
+     27.3,
+     31.8,
+     12.1,
+     6406.5,
+     81.3,
+     3.1
+    ],
+    [
+     "NDE Compilations",
+     61,
+     29.7,
+     34.5,
+     11,
+     5380,
+     96.7,
+     0
+    ],
+    [
+     "Confessions EMI-NDE",
+     58,
+     27.9,
+     30.8,
+     9.6,
+     65,
+     79.3,
+     0
+    ],
+    [
+     "Shaman Oaks",
+     50,
+     27.3,
+     31.3,
+     12.5,
+     361361,
+     68,
+     2
+    ],
+    [
+     "CT-IANDS - Near Death Experience Support (NDE)",
+     49,
+     24.4,
+     27.1,
+     11.5,
+     135,
+     61.2,
+     0
+    ],
+    [
+     "NDE Accounts - Afterlife Stories",
+     48,
+     25.3,
+     20.5,
+     12,
+     57059.5,
+     52.1,
+     2.1
+    ],
+    [
+     "Anthony Chene production",
+     47,
+     27.9,
+     35.5,
+     13.7,
+     344382,
+     80.9,
+     2.1
+    ],
+    [
+     "Prioritize Your Life",
+     45,
+     20.2,
+     25,
+     11.2,
+     9320,
+     53.3,
+     0
+    ],
+    [
+     "Outstanding Near-Death Experiences",
+     44,
+     19,
+     19.3,
+     10.7,
+     799,
+     45.5,
+     2.3
+    ],
+    [
+     "Hawaiian IANDS",
+     43,
+     24,
+     29,
+     10.5,
+     287,
+     58.1,
+     0
+    ],
+    [
+     "Life & Beyond",
+     39,
+     27.2,
+     33,
+     9.8,
+     21251,
+     69.2,
+     0
+    ],
+    [
+     "Coming Home",
+     37,
+     26.9,
+     33.3,
+     13.2,
+     776291,
+     86.5,
+     0
+    ],
+    [
+     "IANDS Northern Virginia - NDE Interviews",
+     33,
+     26.2,
+     25.8,
+     10.9,
+     506,
+     69.7,
+     3
+    ],
+    [
+     "NDE Video",
+     31,
+     24.3,
+     27.7,
+     11.5,
+     20440,
+     58.1,
+     0
+    ],
+    [
+     "Lamplighter",
+     30,
+     26.8,
+     31.3,
+     11.2,
+     1281,
+     80,
+     6.7
+    ],
+    [
+     "NewHeaven NewEarth",
+     23,
+     23.8,
+     25.8,
+     11.9,
+     24281,
+     78.3,
+     4.3
+    ],
+    [
+     "Near Death Experiences",
+     21,
+     21.9,
+     15.9,
+     8.2,
+     891,
+     52.4,
+     0
+    ],
+    [
+     "Loss and Found Podcast",
+     16,
+     24.7,
+     30.4,
+     9.6,
+     340.5,
+     68.8,
+     0
+    ],
+    [
+     "NDEs and the Afterlife",
+     13,
+     27.2,
+     24.8,
+     10.5,
+     1612,
+     84.6,
+     0
+    ],
+    [
+     "Near-Death Experiences",
+     12,
+     26.8,
+     29.5,
+     14.7,
+     13759.5,
+     50,
+     16.7
+    ],
+    [
+     "Dorothy Shelton",
+     12,
+     29.3,
+     36.3,
+     10.3,
+     220574,
+     83.3,
+     0
+    ],
+    [
+     "Not the End NDE",
+     11,
+     25.6,
+     29.9,
+     10.4,
+     1855,
+     63.6,
+     0
+    ],
+    [
+     "Heaven Is Real",
+     11,
+     27.7,
+     27.6,
+     11.5,
+     25,
+     36.4,
+     0
+    ],
+    [
+     "Lamplighter NDE",
+     11,
+     25.3,
+     27.1,
+     8.5,
+     392,
+     72.7,
+     18.2
+    ],
+    [
+     "All That Is",
+     10,
+     27.3,
+     29.2,
+     8.6,
+     1734,
+     60,
+     0
+    ],
+    [
+     "Waking Up To Heaven ",
+     7,
+     27.4,
+     34,
+     11,
+     1843,
+     85.7,
+     0
+    ],
+    [
+     "The Paradigm Experience",
+     7,
+     29,
+     32.6,
+     16.3,
+     6259,
+     85.7,
+     0
+    ],
+    [
+     "Near Death Experience Podcast",
+     6,
+     27.5,
+     18,
+     12.3,
+     2377,
+     66.7,
+     0
+    ],
+    [
+     "shaman oaks",
+     6,
+     25,
+     24.7,
+     8.8,
+     53745.5,
+     33.3,
+     0
+    ],
+    [
+     "Realization Lab",
+     2,
+     30,
+     33,
+     7,
+     23607.5,
+     100,
+     0
+    ],
+    [
+     "JeffMara Podcast",
+     2,
+     30,
+     33,
+     7,
+     21077.5,
+     100,
+     0
+    ],
+    [
+     "Eternal Mind",
+     2,
+     30,
+     36,
+     15,
+     118.5,
+     100,
+     0
+    ],
+    [
+     "Muslim NDE",
+     2,
+     22,
+     15,
+     11,
+     0,
+     50,
+     0
+    ],
+    [
+     "T&H Afterlife",
+     1,
+     29,
+     36,
+     7,
+     4776,
+     0,
+     0
+    ]
+   ]
+  },
+  "ch-uap-all": {
+   "id": "ch-uap-all",
+   "title": "All UAP channels by tier 1-2 video count",
+   "caption": "From uap_vids joined to uap_channel_scores by channel name/id; n=80 channels",
+   "columns": [
+    "channel",
+    "n",
+    "pct encounters track",
+    "mean max evidence",
+    "mean max contact depth",
+    "mean max transformation",
+    "mean intelligence value",
+    "median views",
+    "grade",
+    "archetype",
+    "subscribers"
+   ],
+   "rows": [
+    [
+     "Brazil UFO",
+     682,
+     38.7,
+     12.5,
+     13.4,
+     13.8,
+     6.9,
+     681.5,
+     "F",
+     "News & Commentary",
+     20400
+    ],
+    [
+     "Eyes On Cinema",
+     578,
+     76.8,
+     15.7,
+     16.8,
+     16,
+     7.68,
+     19276.5,
+     "F",
+     "Interview Hub",
+     233000
+    ],
+    [
+     "Richard Dolan Intelligent Disclosure ",
+     518,
+     16.6,
+     11.5,
+     15.8,
+     19.2,
+     7.83,
+     34734.5,
+     "F",
+     "Deep Intelligence",
+     193000
+    ],
+    [
+     "Preston Dennett",
+     517,
+     61.5,
+     11.3,
+     19.5,
+     18.7,
+     7.34,
+     8261,
+     "F",
+     "Interview Hub",
+     53000
+    ],
+    [
+     "Mutual UFO Network (MUFON)",
+     405,
+     24.9,
+     13.6,
+     13.7,
+     17.1,
+     7.17,
+     3616,
+     "F",
+     "Deep Intelligence",
+     98800
+    ],
+    [
+     "Lehto Files",
+     351,
+     25.9,
+     14.4,
+     12.5,
+     14.2,
+     7.87,
+     27769.5,
+     "F",
+     "Deep Intelligence",
+     119000
+    ],
+    [
+     "Engaging The Phenomenon",
+     320,
+     26.9,
+     11.3,
+     17.9,
+     19.2,
+     7.34,
+     2848.5,
+     "F",
+     "Deep Intelligence",
+     28100
+    ],
+    [
+     "UFO CENTRAL",
+     313,
+     16.3,
+     13.2,
+     16.4,
+     17.2,
+     7.74,
+     107351,
+     "F",
+     "Documentary",
+     540000
+    ],
+    [
+     "JeffMara Podcast",
+     306,
+     77.5,
+     12.4,
+     27.7,
+     29.2,
+     7.44,
+     19933,
+     "D",
+     "Interview Hub",
+     269000
+    ],
+    [
+     "Project Unity",
+     301,
+     17.6,
+     12.5,
+     18.3,
+     25.4,
+     7.7,
+     11102,
+     "D",
+     "Deep Intelligence",
+     156000
+    ],
+    [
+     "Disclosure Team with Vinnie Adams ",
+     285,
+     30.2,
+     12.7,
+     14.4,
+     15.1,
+     7.91,
+     3319,
+     "F",
+     "Deep Intelligence",
+     23700
+    ],
+    [
+     "Unveiled",
+     242,
+     3.3,
+     10.6,
+     8,
+     null,
+     6.37,
+     25973,
+     "F",
+     "Deep Intelligence",
+     976000
+    ],
+    [
+     "Dr. Steven Greer",
+     225,
+     25.3,
+     16,
+     16.3,
+     16.4,
+     7.98,
+     98062,
+     "F",
+     "News & Commentary",
+     827000
+    ],
+    [
+     "Believe: Paranormal & UFO Podcast",
+     208,
+     86.1,
+     13.8,
+     19,
+     15,
+     7.39,
+     518,
+     "D",
+     "Interview Hub",
+     3400
+    ],
+    [
+     "NewsNation",
+     205,
+     22,
+     13.8,
+     20.5,
+     19.7,
+     8.16,
+     342583,
+     "F",
+     "News & Commentary",
+     2690000
+    ],
+    [
+     "Jeremy Corbell",
+     201,
+     16.4,
+     14.7,
+     14.5,
+     16.7,
+     8.01,
+     100617,
+     "F",
+     "Deep Intelligence",
+     397000
+    ],
+    [
+     "Weird World",
+     199,
+     31.7,
+     15.5,
+     20,
+     18.4,
+     7.57,
+     22874,
+     "F",
+     "Documentary",
+     720000
+    ],
+    [
+     "Sci-Fi Central",
+     172,
+     27.3,
+     13.4,
+     15.8,
+     20.2,
+     7.5,
+     10796,
+     "F",
+     "Documentary",
+     1390000
+    ],
+    [
+     "Experiencer Interviews",
+     167,
+     100,
+     13.6,
+     30.3,
+     29.4,
+     7.81,
+     1202,
+     "C",
+     "Interview Hub",
+     3480
+    ],
+    [
+     "The Good Trouble Show with Matt Ford",
+     153,
+     9.8,
+     13.7,
+     20.8,
+     22.1,
+     8.16,
+     11973,
+     "F",
+     "News & Commentary",
+     139000
+    ],
+    [
+     "Stellar Productions",
+     142,
+     4.9,
+     11,
+     17.5,
+     16,
+     7.87,
+     16008.5,
+     "F",
+     "News & Commentary",
+     69400
+    ],
+    [
+     "Tom Vernon UAP",
+     134,
+     29.9,
+     12.3,
+     17.9,
+     23,
+     7.83,
+     358,
+     "F",
+     "Interview Hub",
+     3500
+    ],
+    [
+     "THAT ONE TIME I WAS ABDUCTED BY ALIENS",
+     113,
+     30.1,
+     10.5,
+     17.7,
+     22.2,
+     6.75,
+     212,
+     "F",
+     "News & Commentary",
+     1210
+    ],
+    [
+     "HauntTV",
+     104,
+     0,
+     null,
+     null,
+     null,
+     8,
+     65936.5,
+     "D",
+     "Documentary",
+     200000
+    ],
+    [
+     "Jesse Michels",
+     98,
+     35.7,
+     14.9,
+     22.4,
+     16.8,
+     8.15,
+     451134,
+     "F",
+     "Deep Intelligence",
+     615000
+    ],
+    [
+     "UFO Congress",
+     92,
+     31.5,
+     15.1,
+     22,
+     22.9,
+     7.77,
+     69,
+     "D",
+     "Deep Intelligence",
+     4430
+    ],
+    [
+     "Area52",
+     91,
+     64.8,
+     14,
+     20.6,
+     17.2,
+     7.96,
+     395402,
+     "F",
+     "Interview Hub",
+     516000
+    ],
+    [
+     "Mantis Encounters",
+     83,
+     77.1,
+     11.8,
+     26.3,
+     19.7,
+     7.19,
+     2052,
+     "D",
+     "First Person Encounters",
+     8140
+    ],
+    [
+     "The UnXplained Zone",
+     80,
+     17.5,
+     13.5,
+     6.7,
+     8.7,
+     7.28,
+     12517.5,
+     "F",
+     "Interview Hub",
+     553000
+    ],
+    [
+     "DMAX UK",
+     77,
+     0,
+     null,
+     null,
+     null,
+     null,
+     25173,
+     "F",
+     "",
+     545000
+    ],
+    [
+     "8 News Now — Las Vegas",
+     68,
+     2.9,
+     15.5,
+     7,
+     null,
+     7.82,
+     151840.5,
+     "F",
+     "Deep Intelligence",
+     443000
+    ],
+    [
+     "UAP Gerb",
+     62,
+     8.1,
+     14.2,
+     14,
+     14,
+     8.21,
+     51927,
+     "F",
+     "News & Commentary",
+     120000
+    ],
+    [
+     "The Why Files",
+     62,
+     17.7,
+     12.1,
+     22.3,
+     17.5,
+     7.85,
+     3761280.5,
+     "F",
+     "Documentary",
+     5840000
+    ],
+    [
+     "Saucer Life",
+     53,
+     11.3,
+     11.3,
+     23.8,
+     11,
+     6.77,
+     195,
+     "F",
+     "Documentary",
+     732
+    ],
+    [
+     "Podcast UFO Live Shows",
+     50,
+     74,
+     14.9,
+     13.9,
+     10.5,
+     7.46,
+     1337,
+     "F",
+     "Interview Hub",
+     37400
+    ],
+    [
+     "Travel Channel",
+     47,
+     70.2,
+     14.7,
+     17.9,
+     15.3,
+     7.23,
+     41589,
+     "F",
+     "Interview Hub",
+     868000
+    ],
+    [
+     "DiscoveryChannelInd",
+     47,
+     0,
+     null,
+     null,
+     null,
+     null,
+     66573,
+     "F",
+     "",
+     1520000
+    ],
+    [
+     "Somes Mist",
+     46,
+     82.6,
+     10.8,
+     17.4,
+     21,
+     6.2,
+     116.5,
+     "F",
+     "First Person Encounters",
+     726
+    ],
+    [
+     "Redacted",
+     44,
+     9.1,
+     8.8,
+     29,
+     24,
+     7.8,
+     262377,
+     "F",
+     "News & Commentary",
+     2880000
+    ],
+    [
+     "Somewhere in the Skies w/ Ryan Sprague",
+     43,
+     97.7,
+     13.7,
+     16.9,
+     13.8,
+     7.86,
+     1602,
+     "F",
+     "First Person Encounters",
+     21900
+    ],
+    [
+     "Absolute Documentaries",
+     42,
+     14.3,
+     12.3,
+     19,
+     32,
+     7.8,
+     21243,
+     "F",
+     "Documentary",
+     554000
+    ],
+    [
+     "Inquiry with Kelly Chase",
+     40,
+     35,
+     9.9,
+     16.7,
+     20.1,
+     7.98,
+     3634.5,
+     "F",
+     "Deep Intelligence",
+     12900
+    ],
+    [
+     "TruthSeekah & Arien",
+     38,
+     65.8,
+     9.2,
+     20.8,
+     19.7,
+     7.05,
+     1697.5,
+     "F",
+     "Interview Hub",
+     132000
+    ],
+    [
+     "Discovery UK",
+     36,
+     0,
+     null,
+     null,
+     null,
+     null,
+     34404.5,
+     "F",
+     "",
+     4900000
+    ],
+    [
+     "SpaceRip",
+     35,
+     2.9,
+     18,
+     13,
+     null,
+     7.83,
+     46491,
+     "F",
+     "Documentary",
+     1000000
+    ],
+    [
+     "Dr Steven Greer Disclosure",
+     33,
+     9.1,
+     13,
+     25.3,
+     16.3,
+     7.88,
+     4913,
+     "F",
+     "News & Commentary",
+     25700
+    ],
+    [
+     "Patterns Tell Stories",
+     31,
+     3.2,
+     7,
+     null,
+     8,
+     7.87,
+     263,
+     "F",
+     "News & Commentary",
+     2150
+    ],
+    [
+     "Secret Origins",
+     30,
+     10,
+     8.3,
+     5,
+     null,
+     7.2,
+     127044.5,
+     "F",
+     "Documentary",
+     565000
+    ],
+    [
+     "European UFOs",
+     23,
+     39.1,
+     13.6,
+     18.6,
+     12,
+     7.57,
+     80,
+     "F",
+     "Deep Intelligence",
+     43
+    ],
+    [
+     "HISTORY",
+     22,
+     45.5,
+     16,
+     13.3,
+     14.5,
+     8.06,
+     224053,
+     "F",
+     "Interview Hub",
+     15300000
+    ],
+    [
+     "Mike Clelland",
+     20,
+     55,
+     9.3,
+     22.6,
+     29,
+     7.16,
+     508.5,
+     "D",
+     "Interview Hub",
+     3230
+    ],
+    [
+     "Merged Podcast",
+     20,
+     35,
+     18,
+     8.3,
+     19.8,
+     7.85,
+     101998,
+     "F",
+     "Deep Intelligence",
+     56100
+    ],
+    [
+     "Camp Gagnon",
+     16,
+     25,
+     14,
+     20,
+     22,
+     7.88,
+     91942.5,
+     "D",
+     "Documentary",
+     514000
+    ],
+    [
+     "Saucers, Spooks and Kooks",
+     15,
+     20,
+     11,
+     18,
+     null,
+     6.9,
+     77,
+     "F",
+     "News & Commentary",
+     1170
+    ],
+    [
+     "Cosmic+",
+     15,
+     100,
+     14.1,
+     14.4,
+     19.9,
+     7.73,
+     6253,
+     "F",
+     "Interview Hub",
+     2540
+    ],
+    [
+     "Disclosure Team",
+     12,
+     8.3,
+     9,
+     3,
+     9,
+     8,
+     970,
+     "",
+     "",
+     ""
+    ],
+    [
+     "J. Horton Films",
+     11,
+     54.5,
+     12,
+     14.8,
+     18,
+     7.82,
+     57412,
+     "F",
+     "First Person Encounters",
+     40000
+    ],
+    [
+     "ParanormalTV",
+     11,
+     100,
+     13.8,
+     14.3,
+     20,
+     8.09,
+     37545,
+     "F",
+     "Interview Hub",
+     25600
+    ],
+    [
+     "National Geographic",
+     9,
+     66.7,
+     16.3,
+     9,
+     8.5,
+     8.56,
+     4592303,
+     "F",
+     "Interview Hub",
+     26100000
+    ],
+    [
+     "IRONCLAD",
+     9,
+     11.1,
+     18,
+     11,
+     null,
+     8.4,
+     19898,
+     "F",
+     "News & Commentary",
+     379000
+    ],
+    [
+     "Motech",
+     9,
+     44.4,
+     15,
+     16.5,
+     13,
+     7.78,
+     40223,
+     "F",
+     "Documentary",
+     275000
+    ],
+    [
+     "The Archivist's Journal",
+     7,
+     28.6,
+     9,
+     7.5,
+     null,
+     8.43,
+     31759,
+     "F",
+     "Deep Intelligence",
+     10500
+    ],
+    [
+     "Cosmosis [Formerly The UFO Rabbit Hole]",
+     3,
+     33.3,
+     null,
+     null,
+     null,
+     null,
+     3324,
+     "",
+     "",
+     ""
+    ],
+    [
+     "Tony Topping UFOs & Alien Encounters",
+     2,
+     100,
+     9.5,
+     24.5,
+     14,
+     8,
+     708.5,
+     "D",
+     "First Person Encounters",
+     2960
+    ],
+    [
+     "YouTube Movies",
+     2,
+     0,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "F",
+     "",
+     346000
+    ],
+    [
+     "PowerfulJRE",
+     2,
+     100,
+     13,
+     17.5,
+     null,
+     8,
+     36611844.5,
+     "F",
+     "Interview Hub",
+     20900000
+    ],
+    [
+     "Danny Jones",
+     2,
+     50,
+     18,
+     25,
+     30,
+     8.5,
+     331926,
+     "D",
+     "First Person Encounters",
+     1230000
+    ],
+    [
+     "Quirk Zone",
+     2,
+     0,
+     null,
+     null,
+     null,
+     7.5,
+     2493,
+     "F",
+     "Documentary",
+     20600
+    ],
+    [
+     "SKYWATCHER",
+     2,
+     50,
+     17,
+     20,
+     13,
+     8,
+     630726.5,
+     "F",
+     "Deep Intelligence",
+     120000
+    ],
+    [
+     "Soft White Underbelly",
+     1,
+     100,
+     11,
+     26,
+     22,
+     8,
+     602104,
+     "D",
+     "First Person Encounters",
+     6900000
+    ],
+    [
+     "Fox News",
+     1,
+     0,
+     null,
+     null,
+     null,
+     7,
+     449081,
+     "F",
+     "News & Commentary",
+     15300000
+    ],
+    [
+     "UAP Files Podcast 🛸",
+     1,
+     100,
+     12,
+     26,
+     25,
+     7,
+     8317,
+     "D",
+     "Interview Hub",
+     49800
+    ],
+    [
+     "UFO CHRONICLES PODCAST",
+     1,
+     0,
+     null,
+     null,
+     null,
+     null,
+     0,
+     "F",
+     "",
+     270
+    ],
+    [
+     "BuzzFeed Unsolved Network",
+     1,
+     0,
+     null,
+     null,
+     null,
+     7,
+     14006397,
+     "F",
+     "Documentary",
+     5350000
+    ],
+    [
+     "Jesse Michels Clips",
+     1,
+     0,
+     null,
+     null,
+     null,
+     8,
+     1305,
+     "D",
+     "Deep Intelligence",
+     82700
+    ],
+    [
+     "Voices of the Past",
+     1,
+     0,
+     14,
+     12,
+     null,
+     5,
+     1314828,
+     "F",
+     "Documentary",
+     1090000
+    ],
+    [
+     "My Dark Path",
+     1,
+     0,
+     null,
+     null,
+     null,
+     8,
+     291178,
+     "D",
+     "Documentary",
+     11900
+    ],
+    [
+     "The CE-5 Initiative",
+     1,
+     0,
+     null,
+     null,
+     null,
+     9,
+     2615,
+     "C",
+     "News & Commentary",
+     1990
+    ],
+    [
+     "Wrinkled Brain",
+     1,
+     100,
+     9,
+     3,
+     null,
+     7,
+     1260,
+     "F",
+     "Interview Hub",
+     277
+    ],
+    [
+     "Contact Redacted",
+     1,
+     100,
+     12,
+     27,
+     null,
+     8,
+     11356,
+     "F",
+     "Interview Hub",
+     11400
+    ]
+   ]
+  },
+  "ch-nde-meta": {
+   "id": "ch-nde-meta",
+   "title": "NDE channels table (metadata)",
+   "caption": "channels rows, n=55",
+   "columns": [
+    "name",
+    "country",
+    "subscribers",
+    "total videos",
+    "total views",
+    "scanner enabled",
+    "hidden"
+   ],
+   "rows": [
+    [
+     "NBC Sports",
+     "US",
+     5300000,
+     46617,
+     5265635591,
+     "false",
+     "false"
+    ],
+    [
+     "The Other Side NDE",
+     "US",
+     518000,
+     405,
+     85381284,
+     "true",
+     "false"
+    ],
+    [
+     "shaman oaks",
+     "US",
+     500000,
+     83,
+     62812506,
+     "true",
+     "false"
+    ],
+    [
+     "AFINAL, O QUE SOMOS NÓS? / AFTER ALL, WHAT ARE WE?",
+     "BR",
+     464000,
+     702,
+     70737940,
+     "true",
+     "false"
+    ],
+    [
+     "Coming Home",
+     "US",
+     431000,
+     215,
+     50390475,
+     "true",
+     "false"
+    ],
+    [
+     "Dorothy Shelton",
+     "GB",
+     294000,
+     38,
+     12833366,
+     "true",
+     "false"
+    ],
+    [
+     "Anthony Chene production",
+     "US",
+     266000,
+     96,
+     37727421,
+     "true",
+     "false"
+    ],
+    [
+     "JeffMara Podcast",
+     "US",
+     260000,
+     2019,
+     60646313,
+     "false",
+     "false"
+    ],
+    [
+     "Touching The Afterlife",
+     "US",
+     222000,
+     205,
+     26825898,
+     "true",
+     "false"
+    ],
+    [
+     "Heaven Awaits",
+     "US",
+     216000,
+     113,
+     801153,
+     "true",
+     "false"
+    ],
+    [
+     "Prioritize Your Life",
+     "US",
+     214000,
+     220,
+     33268204,
+     "true",
+     "false"
+    ],
+    [
+     "AI News & Strategy Daily | Nate B Jones",
+     "",
+     206000,
+     788,
+     11016951,
+     "false",
+     "false"
+    ],
+    [
+     "Life After Life NDE",
+     "US",
+     185000,
+     878,
+     24701673,
+     "false",
+     "true"
+    ],
+    [
+     "Love Covered Life Podcast",
+     "",
+     129000,
+     707,
+     15910082,
+     "true",
+     "false"
+    ],
+    [
+     "The Paradigm Experience",
+     "US",
+     104000,
+     174,
+     15218377,
+     "false",
+     "false"
+    ],
+    [
+     "NDE Accounts - Afterlife Stories",
+     "CA",
+     103000,
+     58,
+     9169605,
+     "true",
+     "false"
+    ],
+    [
+     "NDE Diary",
+     "US",
+     96000,
+     295,
+     14822408,
+     "true",
+     "false"
+    ],
+    [
+     "T&H - Afterlife",
+     "CA",
+     94800,
+     89,
+     9180364,
+     "true",
+     "false"
+    ],
+    [
+     "Beyond with Heather Tesch",
+     "US",
+     77700,
+     720,
+     8113041,
+     "true",
+     "false"
+    ],
+    [
+     "Imagine Heaven Podcast with John Burke",
+     "",
+     71300,
+     138,
+     4269815,
+     "true",
+     "false"
+    ],
+    [
+     "IANDS",
+     "US",
+     70300,
+     422,
+     9124977,
+     "true",
+     "false"
+    ],
+    [
+     "Beyond the Veil",
+     "US",
+     68400,
+     61,
+     6236094,
+     "true",
+     "false"
+    ],
+    [
+     "Afterlife TV with Bob Olson",
+     "",
+     62100,
+     158,
+     7481979,
+     "false",
+     "false"
+    ],
+    [
+     "Life & Beyond",
+     "GB",
+     56600,
+     36,
+     4225814,
+     "true",
+     "false"
+    ],
+    [
+     "Thanatos TV EN",
+     "AT",
+     53700,
+     305,
+     9627695,
+     "true",
+     "false"
+    ],
+    [
+     "Logical-NDE",
+     "US",
+     41600,
+     77,
+     704538,
+     "true",
+     "false"
+    ],
+    [
+     "Passion Harvest Podcast",
+     "",
+     41200,
+     426,
+     4034494,
+     "true",
+     "false"
+    ],
+    [
+     "Afterlife Experiences",
+     "CH",
+     30500,
+     107,
+     4404828,
+     "true",
+     "false"
+    ],
+    [
+     "About Freedom Show",
+     "US",
+     29900,
+     102,
+     2771151,
+     "true",
+     "false"
+    ],
+    [
+     "Tales Of Resilience",
+     "NL",
+     28400,
+     200,
+     3427746,
+     "true",
+     "false"
+    ],
+    [
+     "Crossing Over NDE",
+     "US",
+     25100,
+     181,
+     2705539,
+     "true",
+     "false"
+    ],
+    [
+     "Divine Encounters NDE",
+     "US",
+     21900,
+     186,
+     1909730,
+     "true",
+     "false"
+    ],
+    [
+     "Pegi Robinson - NDE TV",
+     "US",
+     21400,
+     458,
+     3916669,
+     "true",
+     "false"
+    ],
+    [
+     "Tia Renee",
+     "",
+     19300,
+     730,
+     2308409,
+     "true",
+     "false"
+    ],
+    [
+     "NDE Video",
+     "US",
+     17000,
+     39,
+     1796871,
+     "true",
+     "false"
+    ],
+    [
+     "NDE Radio with Lee Witting",
+     "US",
+     14400,
+     644,
+     2745422,
+     "true",
+     "false"
+    ],
+    [
+     "Round Trip Death",
+     "US",
+     11100,
+     219,
+     907233,
+     "true",
+     "false"
+    ],
+    [
+     "Confessions EMI-NDE",
+     "FR",
+     10700,
+     174,
+     190914,
+     "true",
+     "false"
+    ],
+    [
+     "NewHeaven NewEarth",
+     "",
+     9140,
+     32,
+     1630004,
+     "true",
+     "false"
+    ],
+    [
+     "Afterlife Atlas",
+     "US",
+     9040,
+     105,
+     390571,
+     "true",
+     "false"
+    ],
+    [
+     "Spirit Travels",
+     "CA",
+     5920,
+     162,
+     290107,
+     "true",
+     "false"
+    ],
+    [
+     "NDE Compilations",
+     "",
+     4950,
+     68,
+     562350,
+     "true",
+     "false"
+    ],
+    [
+     "Lamplighter NDE",
+     "",
+     4940,
+     101,
+     430895,
+     "true",
+     "false"
+    ],
+    [
+     "Realization Lab",
+     "",
+     3260,
+     113,
+     111806,
+     "false",
+     "false"
+    ],
+    [
+     "Near-Death Experiences",
+     "FR",
+     3050,
+     14,
+     672242,
+     "true",
+     "false"
+    ],
+    [
+     "Loss and Found Podcast",
+     "US",
+     2590,
+     78,
+     228020,
+     "true",
+     "false"
+    ],
+    [
+     "NDEs and the Afterlife",
+     "US",
+     2430,
+     15,
+     298952,
+     "true",
+     "false"
+    ],
+    [
+     "Heaven Is Real",
+     "US",
+     1900,
+     108,
+     77402,
+     "true",
+     "false"
+    ],
+    [
+     "IANDS Northern Virginia - NDE Interviews",
+     "US",
+     1310,
+     39,
+     89147,
+     "true",
+     "false"
+    ],
+    [
+     "Hawaiian IANDS",
+     "US",
+     1280,
+     59,
+     103011,
+     "true",
+     "false"
+    ],
+    [
+     "Outstanding Near-Death Experiences",
+     "US",
+     1250,
+     52,
+     83214,
+     "true",
+     "false"
+    ],
+    [
+     "Near Death Experiences",
+     "",
+     834,
+     28,
+     166234,
+     "true",
+     "false"
+    ],
+    [
+     "Real Near Death Experience Stories",
+     "US",
+     511,
+     78,
+     16439,
+     "true",
+     "false"
+    ],
+    [
+     "Waking Up To Heaven ",
+     "US",
+     499,
+     172,
+     93915,
+     "false",
+     "false"
+    ],
+    [
+     "CT-IANDS - Near Death Experience Support (NDE)",
+     "US",
+     356,
+     62,
+     23475,
+     "true",
+     "false"
+    ]
+   ]
+  }
+ }
+}
