@@ -1,0 +1,1043 @@
+{
+ "generated_at": "2026-09-08T14:43:21.892Z",
+ "generator": "scripts/corpus-atlas/aggregate.mjs",
+ "inputs": {
+  "nde_vids": {
+   "rows": 6304,
+   "pulled_at": "2026-09-08T14:25:33.663Z",
+   "filters": "isNde=eq.clear_nde"
+  },
+  "nde_analysis": {
+   "rows": 6822,
+   "pulled_at": "2026-09-08T14:25:42.218Z",
+   "filters": null
+  },
+  "uap_vids": {
+   "rows": 8394,
+   "pulled_at": "2026-09-08T14:25:44.798Z",
+   "filters": "tier=in.(1,2)"
+  },
+  "uap_encounters": {
+   "rows": 7017,
+   "pulled_at": "2026-09-08T14:25:46.823Z",
+   "filters": null
+  },
+  "uap_video_stats": {
+   "rows": 7607,
+   "pulled_at": "2026-09-08T14:25:47.958Z",
+   "filters": null
+  },
+  "question_synthesis": {
+   "rows": 147,
+   "pulled_at": "2026-09-08T14:25:48.091Z",
+   "filters": null
+  },
+  "nde_questions": {
+   "rows": 81,
+   "pulled_at": "2026-09-08T14:25:48.201Z",
+   "filters": null
+  },
+  "user_questions": {
+   "rows": 83,
+   "pulled_at": "2026-09-08T14:25:48.284Z",
+   "filters": null
+  },
+  "blog_posts": {
+   "rows": 231,
+   "pulled_at": "2026-09-08T14:25:48.496Z",
+   "filters": "status=eq.published"
+  },
+  "experiencer_profiles": {
+   "rows": 2820,
+   "pulled_at": "2026-09-08T14:25:49.485Z",
+   "filters": null
+  },
+  "viz_graph_cache": {
+   "rows": 9,
+   "pulled_at": "2026-09-08T14:25:49.784Z",
+   "filters": null
+  },
+  "uap_daily_facts": {
+   "rows": 30,
+   "pulled_at": "2026-09-08T14:26:14.530Z",
+   "filters": null
+  },
+  "channels": {
+   "rows": 55,
+   "pulled_at": "2026-09-08T14:25:49.986Z",
+   "filters": null
+  },
+  "uap_channels": {
+   "rows": 78,
+   "pulled_at": "2026-09-08T14:25:50.076Z",
+   "filters": null
+  },
+  "uap_channel_scores": {
+   "rows": 78,
+   "pulled_at": "2026-09-08T14:25:50.166Z",
+   "filters": null
+  },
+  "uap_canonical_persons": {
+   "rows": 5108,
+   "pulled_at": "2026-09-08T14:25:51.143Z",
+   "filters": null
+  },
+  "uap_canonical_orgs": {
+   "rows": 1824,
+   "pulled_at": "2026-09-08T14:25:51.500Z",
+   "filters": null
+  },
+  "uap_canonical_programs": {
+   "rows": 1810,
+   "pulled_at": "2026-09-08T14:25:51.882Z",
+   "filters": null
+  },
+  "uap_events": {
+   "rows": 831,
+   "pulled_at": "2026-09-08T14:25:52.049Z",
+   "filters": null
+  },
+  "uap_contactee_profiles": {
+   "rows": 3440,
+   "pulled_at": "2026-09-08T14:25:52.980Z",
+   "filters": null
+  }
+ },
+ "normalization": "categorical values are trimmed, lowercased, with spaces and hyphens replaced by underscores unless a table says otherwise; percentages are one decimal over the denominator stated in each caption",
+ "extra": {
+  "channel_overlap": {
+   "nde_channel_ids": 54,
+   "uap_channel_ids": 78,
+   "shared": 1,
+   "shared_ids": [
+    "UC_c8KysI2G9rAbNyD1dVd6g"
+   ]
+  },
+  "viz_cache": {
+   "channel-constellation": {
+    "computed_at": "2026-05-26T20:51:49.212005+00:00",
+    "row_count": null,
+    "keys": [
+     "channels",
+     "metadata"
+    ],
+    "metadata": {
+     "computedAt": "2026-09-06T05:04:01.811Z",
+     "totalChannels": 78
+    }
+   },
+   "cross-domain": {
+    "computed_at": "2026-07-13T15:09:35.678641+00:00",
+    "row_count": null,
+    "keys": [
+     "nde_total",
+     "uap_total",
+     "dimensions",
+     "generated_at",
+     "overlapping_phenomena"
+    ],
+    "metadata": null
+   },
+   "hynek-space": {
+    "computed_at": "2026-05-26T20:51:35.771577+00:00",
+    "row_count": null,
+    "keys": [
+     "points",
+     "clusters",
+     "metadata"
+    ],
+    "metadata": {
+     "computedAt": "2026-09-06T05:04:07.620Z",
+     "totalPoints": 6650
+    }
+   },
+   "nde-elements": {
+    "computed_at": "2026-05-26T17:22:34.979277+00:00",
+    "row_count": 5093,
+    "keys": [
+     "edges",
+     "nodes",
+     "metadata"
+    ],
+    "metadata": {
+     "computedAt": "2026-05-26 17:22:34.979277+00",
+     "totalExperiences": 5031
+    }
+   },
+   "presentation-stats": {
+    "computed_at": "2026-08-31T22:48:43.561783+00:00",
+    "row_count": null,
+    "keys": [
+     "adc",
+     "bonus",
+     "jesus",
+     "archive",
+     "healing",
+     "telepathy",
+     "generated_at",
+     "transformation"
+    ],
+    "metadata": null
+   },
+   "uap-globe": {
+    "computed_at": "2026-05-26T20:04:29.316085+00:00",
+    "row_count": null,
+    "keys": [
+     "points",
+     "metadata"
+    ],
+    "metadata": {
+     "computedAt": "2026-09-06T05:04:21.030Z",
+     "totalPoints": 104,
+     "totalEncounters": 4513,
+     "unmappedLocations": 51
+    }
+   },
+   "uap-intelligence": {
+    "computed_at": "2026-05-26T19:49:21.949613+00:00",
+    "row_count": null,
+    "keys": [
+     "edges",
+     "nodes",
+     "metadata"
+    ],
+    "metadata": {
+     "computedAt": "2026-05-26T19:49:21.949613+00:00",
+     "totalEdges": 340,
+     "totalNodes": 110,
+     "minMentions": 10,
+     "minSharedVideos": 2
+    }
+   },
+   "uap-phenomenology": {
+    "computed_at": "2026-05-26T19:36:23.494583+00:00",
+    "row_count": null,
+    "keys": [
+     "edges",
+     "nodes",
+     "metadata"
+    ],
+    "metadata": {
+     "computedAt": "2026-09-06T05:04:16.826Z",
+     "minFrequency": 10,
+     "minCooccurrence": 3,
+     "totalEncounters": 5793
+    }
+   },
+   "uap-timeline": {
+    "computed_at": "2026-05-26T21:49:11.338433+00:00",
+    "row_count": null,
+    "keys": [
+     "points",
+     "metadata"
+    ],
+    "metadata": {
+     "yearRange": [
+      66,
+      10000
+     ],
+     "computedAt": "2026-09-06T05:04:13.073Z",
+     "totalPoints": 3601
+    }
+   }
+  }
+ },
+ "tables": {
+  "cross-phenomenology": {
+   "id": "cross-phenomenology",
+   "title": "Cross-domain phenomenology comparison",
+   "caption": "NDE side computed from confirmed NDE videos in this pull; UAP side mixes uap_video_stats/uap_encounters (this pull) with the site's viz_graph_cache (uap-phenomenology computed 2026-09-06T05:04:16.826Z over 5793 encounters; cross-domain computed 2026-09-06T05:04:24.476Z). CAVEAT: the two domains use different coding schemes (15 fixed NDE core elements vs free-form UAP entity/effect coding), so rates are indicative, not equivalent.",
+   "columns": [
+    "phenomenon",
+    "NDE rate",
+    "NDE basis",
+    "UAP rate",
+    "UAP basis"
+   ],
+   "rows": [
+    [
+     "Light (bright light / luminous phenomena)",
+     "60.4% (n=6289)",
+     "core element bright_light",
+     "3.7% light-being entity (n=5793); cache \"luminous craft/entities\" 69%",
+     "uap-phenomenology node entity:light_being; cross-domain cache overlapping_phenomena"
+    ],
+    [
+     "Beings / entities encountered",
+     "93.6% (n=6304)",
+     "entities.encounters non-empty",
+     "63.2% (n=4010 videos with encounters)",
+     "uap_video_stats.dominant_entity_type not none among videos with encounter_count>0"
+    ],
+    [
+     "Telepathic communication",
+     "60.0% of videos (core element); 24.7% of entity encounters (n=12135)",
+     "core element telepathy; entities.encounters.communication_method",
+     "38.5% of coded entity communications (n=3889)",
+     "cross-domain cache Communication Methods dimension"
+    ],
+    [
+     "Time distortion / missing time",
+     "58.8% (n=6289)",
+     "core element time_distortion",
+     "8.7% missing_time effect (n=5793); cache \"dilated time perception\" 27%",
+     "uap-phenomenology node effect:missing_time; cross-domain cache"
+    ],
+    [
+     "Life review",
+     "49.3% (n=6289)",
+     "core element life_review",
+     "not coded",
+     "no UAP equivalent"
+    ],
+    [
+     "Message / knowledge download",
+     "61.5% (n=6289)",
+     "core element knowledge_download",
+     "cache \"noetic knowing\" 40%",
+     "cross-domain cache overlapping_phenomena (denominator not stated in cache)"
+    ],
+    [
+     "Fear during the experience",
+     "16.2% journey has fear_distress (n=5559); 1.5% very_negative tone (n=6304); 4.4% hellish_realm",
+     "journey_sequence elements; overall_tone",
+     "24.1% of coded entity emotional qualities are fear (n=5839); anxiety 2.8%; shock 6.8%",
+     "cross-domain cache Emotional Quality dimension"
+    ],
+    [
+     "Peace / love",
+     "93.0% feelings_of_peace (n=6289)",
+     "core element feelings_of_peace",
+     "1.7% love+peace (n=5839); awe 22.5%; curiosity 21.7%",
+     "cross-domain cache Emotional Quality dimension"
+    ],
+    [
+     "Lasting transformation (any)",
+     "97.0% transformation_score > 0 (n=6295)",
+     "nde_analysis.transformation_score",
+     "38.7% transformation_score > 0 (n=4845 scored encounters; 2172 null)",
+     "uap_encounters.transformation_score"
+    ],
+    [
+     "Lasting transformation (score >= 20)",
+     "90.3% (n=6295)",
+     "Significant or higher",
+     "17.5% (n=4845)",
+     "encounter score >= 20; scales are not equivalent"
+    ],
+    [
+     "Psi / expanded perception afterwards",
+     "43.3% PE domain present (n=6295)",
+     "transformation domain PE",
+     "54.0% has_psi_content (n=7607)",
+     "uap_video_stats.has_psi_content (video mentions psi at all, not necessarily aftereffect)"
+    ],
+    [
+     "Out-of-body sensation",
+     "83.7% (n=6289)",
+     "core element out_of_body",
+     "cache \"kinesthetic displacement\" 9%",
+     "cross-domain cache"
+    ],
+    [
+     "Paralysis",
+     "cache \"inability to move/speak\" 15%",
+     "cross-domain cache",
+     "1.5% paralysis effect (n=5793); cache 1%",
+     "uap-phenomenology node effect:paralysis"
+    ]
+   ]
+  },
+  "cross-cache-overlap": {
+   "id": "cross-cache-overlap",
+   "title": "Site cache: overlapping phenomena (viz_graph_cache cross-domain)",
+   "caption": "Copied from viz_graph_cache viz_id=cross-domain, generated 2026-09-06T05:04:24.476Z; nde_total=6817, uap_total=3974. Percent denominators are the cache's own and are not restated here.",
+   "columns": [
+    "phenomenon",
+    "NDE pct",
+    "NDE label",
+    "UAP pct",
+    "UAP label",
+    "significance"
+   ],
+   "rows": [
+    [
+     "Entity Encounter",
+     55,
+     "Being of light / guide",
+     62,
+     "Non-human intelligence",
+     97
+    ],
+    [
+     "Telepathic Communication",
+     25,
+     "Entity telepathy",
+     36,
+     "Entity telepathy",
+     95
+    ],
+    [
+     "Ontological Shock",
+     65,
+     "Reality reassessment post-NDE",
+     48,
+     "Ontological shock rating",
+     93
+    ],
+    [
+     "Knowledge Download",
+     61,
+     "Knowledge download (core element)",
+     40,
+     "Noetic knowing",
+     92
+    ],
+    [
+     "Altered Consciousness",
+     74,
+     "Enhanced senses (core element)",
+     81,
+     "Trance/altered state",
+     91
+    ],
+    [
+     "Time Distortion",
+     59,
+     "Time distortion (core element)",
+     27,
+     "Dilated time perception",
+     90
+    ],
+    [
+     "Bright Light Phenomena",
+     61,
+     "Bright light (core element)",
+     69,
+     "Luminous craft/entities",
+     88
+    ],
+    [
+     "Out-of-Body Experience",
+     84,
+     "OBE (core element)",
+     9,
+     "Kinesthetic displacement",
+     85
+    ],
+    [
+     "Paralysis/Immobility",
+     15,
+     "Inability to move/speak",
+     1,
+     "Witness paralysis",
+     80
+    ],
+    [
+     "Feelings of Peace/Love",
+     93,
+     "Feelings of peace (core element)",
+     2,
+     "Love/peace emotion",
+     75
+    ]
+   ]
+  },
+  "cross-cache-entity_types_encountered": {
+   "id": "cross-cache-entity_types_encountered",
+   "title": "Site cache: Entity Types Encountered",
+   "caption": "viz_graph_cache cross-domain dimension; nde_n=12562, uap_n=4123",
+   "columns": [
+    "category",
+    "NDE n",
+    "NDE pct",
+    "UAP n",
+    "UAP pct"
+   ],
+   "rows": [
+    [
+     "Religious Figure",
+     3145,
+     25,
+     0,
+     0
+    ],
+    [
+     "Deceased Relative",
+     2682,
+     21.4,
+     0,
+     0
+    ],
+    [
+     "Unknown",
+     1803,
+     14.4,
+     780,
+     18.9
+    ],
+    [
+     "Humanoid",
+     0,
+     0,
+     1731,
+     42
+    ],
+    [
+     "Group",
+     1455,
+     11.6,
+     0,
+     0
+    ],
+    [
+     "Angel",
+     1145,
+     9.1,
+     15,
+     0.4
+    ],
+    [
+     "Guide",
+     1025,
+     8.2,
+     0,
+     0
+    ],
+    [
+     "Light Being",
+     512,
+     4.1,
+     241,
+     5.8
+    ],
+    [
+     "Grey",
+     0,
+     0,
+     644,
+     15.6
+    ],
+    [
+     "Deceased Friend",
+     413,
+     3.3,
+     0,
+     0
+    ],
+    [
+     "Animal",
+     209,
+     1.7,
+     0,
+     0
+    ],
+    [
+     "Mantis",
+     0,
+     0,
+     147,
+     3.6
+    ]
+   ]
+  },
+  "cross-cache-communication_methods": {
+   "id": "cross-cache-communication_methods",
+   "title": "Site cache: Communication Methods",
+   "caption": "viz_graph_cache cross-domain dimension; nde_n=11300, uap_n=3889",
+   "columns": [
+    "category",
+    "NDE n",
+    "NDE pct",
+    "UAP n",
+    "UAP pct"
+   ],
+   "rows": [
+    [
+     "Telepathy",
+     3179,
+     28.1,
+     1498,
+     38.5
+    ],
+    [
+     "Verbal",
+     4227,
+     37.4,
+     429,
+     11
+    ],
+    [
+     "Presence",
+     2276,
+     20.1,
+     52,
+     1.3
+    ],
+    [
+     "Emotional",
+     1359,
+     12,
+     61,
+     1.6
+    ],
+    [
+     "Gesture",
+     92,
+     0.8,
+     18,
+     0.5
+    ],
+    [
+     "Vision",
+     20,
+     0.2,
+     0,
+     0
+    ],
+    [
+     "Technological",
+     0,
+     0,
+     8,
+     0.2
+    ],
+    [
+     "Vibrational",
+     6,
+     0.1,
+     0,
+     0
+    ],
+    [
+     "Other",
+     4,
+     0,
+     0,
+     0
+    ],
+    [
+     "Voice",
+     1,
+     0,
+     0,
+     0
+    ]
+   ]
+  },
+  "cross-cache-emotional_quality": {
+   "id": "cross-cache-emotional_quality",
+   "title": "Site cache: Emotional Quality",
+   "caption": "viz_graph_cache cross-domain dimension; nde_n=12562, uap_n=5839",
+   "columns": [
+    "category",
+    "NDE n",
+    "NDE pct",
+    "UAP n",
+    "UAP pct"
+   ],
+   "rows": [
+    [
+     "Love",
+     8018,
+     63.8,
+     57,
+     1
+    ],
+    [
+     "Peace",
+     1010,
+     8,
+     44,
+     0.8
+    ],
+    [
+     "Joy",
+     157,
+     1.2,
+     57,
+     1
+    ],
+    [
+     "Compassion",
+     106,
+     0.8,
+     11,
+     0.2
+    ],
+    [
+     "Awe",
+     2,
+     0,
+     1312,
+     22.5
+    ],
+    [
+     "Excitement",
+     3,
+     0,
+     384,
+     6.6
+    ],
+    [
+     "Curiosity",
+     3,
+     0,
+     1266,
+     21.7
+    ],
+    [
+     "Neutral",
+     2121,
+     16.9,
+     1,
+     0
+    ],
+    [
+     "Authority",
+     526,
+     4.2,
+     97,
+     1.7
+    ],
+    [
+     "Shock",
+     1,
+     0,
+     397,
+     6.8
+    ],
+    [
+     "Anxiety",
+     19,
+     0.2,
+     162,
+     2.8
+    ],
+    [
+     "Fear",
+     373,
+     3,
+     1407,
+     24.1
+    ]
+   ]
+  },
+  "cross-year": {
+   "id": "cross-year",
+   "title": "Upload year by domain",
+   "caption": "NDE n=6185 dated confirmed videos; UAP n=8394 tier 1-2 videos",
+   "columns": [
+    "year",
+    "NDE n",
+    "NDE pct",
+    "UAP n",
+    "UAP pct"
+   ],
+   "rows": [
+    [
+     "2006",
+     0,
+     0,
+     4,
+     0
+    ],
+    [
+     "2007",
+     0,
+     0,
+     4,
+     0
+    ],
+    [
+     "2008",
+     0,
+     0,
+     3,
+     0
+    ],
+    [
+     "2009",
+     0,
+     0,
+     18,
+     0.2
+    ],
+    [
+     "2010",
+     0,
+     0,
+     90,
+     1.1
+    ],
+    [
+     "2011",
+     28,
+     0.5,
+     62,
+     0.7
+    ],
+    [
+     "2012",
+     11,
+     0.2,
+     33,
+     0.4
+    ],
+    [
+     "2013",
+     25,
+     0.4,
+     81,
+     1
+    ],
+    [
+     "2014",
+     9,
+     0.1,
+     32,
+     0.4
+    ],
+    [
+     "2015",
+     17,
+     0.3,
+     144,
+     1.7
+    ],
+    [
+     "2016",
+     25,
+     0.4,
+     112,
+     1.3
+    ],
+    [
+     "2017",
+     30,
+     0.5,
+     35,
+     0.4
+    ],
+    [
+     "2018",
+     39,
+     0.6,
+     152,
+     1.8
+    ],
+    [
+     "2019",
+     55,
+     0.9,
+     236,
+     2.8
+    ],
+    [
+     "2020",
+     284,
+     4.6,
+     296,
+     3.5
+    ],
+    [
+     "2021",
+     415,
+     6.7,
+     621,
+     7.4
+    ],
+    [
+     "2022",
+     595,
+     9.6,
+     782,
+     9.3
+    ],
+    [
+     "2023",
+     1361,
+     22,
+     1324,
+     15.8
+    ],
+    [
+     "2024",
+     1509,
+     24.4,
+     1454,
+     17.3
+    ],
+    [
+     "2025",
+     1153,
+     18.6,
+     1655,
+     19.7
+    ],
+    [
+     "2026",
+     629,
+     10.2,
+     1256,
+     15
+    ]
+   ]
+  },
+  "cross-size": {
+   "id": "cross-size",
+   "title": "Domain size side by side",
+   "caption": "From this pull",
+   "columns": [
+    "metric",
+    "NDE",
+    "UAP"
+   ],
+   "rows": [
+    [
+     "videos",
+     6304,
+     8394
+    ],
+    [
+     "distinct channels",
+     61,
+     80
+    ],
+    [
+     "median views",
+     6983,
+     13223.5
+    ],
+    [
+     "mean views",
+     67759,
+     141388.2
+    ],
+    [
+     "total views",
+     427152469,
+     1185681440
+    ],
+    [
+     "share of videos with >= 100k views",
+     "12.5%",
+     "16.0%"
+    ],
+    [
+     "first-person share",
+     "n/a (every confirmed NDE video is a first-person account by construction of the isNde filter)",
+     "10.6% content_type=first_person; 10.6% source_type=direct_experiencer"
+    ],
+    [
+     "per-item analysis units",
+     "6304 nde_analysis rows (1 per video)",
+     "7017 uap_encounters rows (0-15 per video)"
+    ]
+   ]
+  },
+  "cross-nde-elements-cache-vs-now": {
+   "id": "cross-nde-elements-cache-vs-now",
+   "title": "NDE core element rates: site cache vs this pull",
+   "caption": "Cache viz_id=nde-elements computed 2026-05-26 17:22:34.979277+00 over 5031 experiences; this pull n=6289 confirmed NDE videos with core_elements",
+   "columns": [
+    "element",
+    "cache pct",
+    "this pull pct",
+    "diff (pts)"
+   ],
+   "rows": [
+    [
+     "out_of_body",
+     85,
+     83.7,
+     -1.3
+    ],
+    [
+     "tunnel",
+     25,
+     23.9,
+     -1.1
+    ],
+    [
+     "bright_light",
+     63,
+     60.4,
+     -2.6
+    ],
+    [
+     "deceased_relatives",
+     41,
+     39.9,
+     -1.1
+    ],
+    [
+     "life_review",
+     52,
+     49.3,
+     -2.7
+    ],
+    [
+     "being_of_light",
+     57,
+     54.7,
+     -2.3
+    ],
+    [
+     "border_boundary",
+     38,
+     37.6,
+     -0.4
+    ],
+    [
+     "feelings_of_peace",
+     94,
+     93,
+     -1
+    ],
+    [
+     "cosmic_unity",
+     60,
+     61.1,
+     1.1
+    ],
+    [
+     "time_distortion",
+     60,
+     58.8,
+     -1.2
+    ],
+    [
+     "enhanced_senses",
+     75,
+     74.1,
+     -0.9
+    ],
+    [
+     "telepathy",
+     60,
+     60,
+     0
+    ],
+    [
+     "otherworldly_realm",
+     75,
+     74.8,
+     -0.2
+    ],
+    [
+     "knowledge_download",
+     61,
+     61.5,
+     0.5
+    ],
+    [
+     "choice_to_return",
+     80,
+     78.4,
+     -1.6
+    ]
+   ]
+  }
+ }
+}

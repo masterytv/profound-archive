@@ -47,6 +47,11 @@ const nextConfig: NextConfig = {
       { source: "/chat", destination: "/chat-compassionate", permanent: true },
       { source: "/chat-2", destination: "/chat-compassionate", permanent: true },
       { source: "/chat-test", destination: "/chat-compassionate", permanent: true },
+      // Dr. Chase Skylar DeMayo had three duplicate experiencer profiles (one
+      // under a caption misspelling). They were merged into the profile whose
+      // slug he asked for; the retired slugs keep working via these redirects.
+      { source: "/experiencer/chase-skyler-deo", destination: "/experiencer/chase-skylar-demayo", permanent: true },
+      { source: "/experiencer/chase-demayo", destination: "/experiencer/chase-skylar-demayo", permanent: true },
     ];
   },
   typescript: {

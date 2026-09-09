@@ -331,15 +331,19 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
         .eq("video_id", id)
         .single();
 
-    // Look up experiencer profile slug for linking
+    // Look up experiencer profile slug for linking. Only published profiles
+    // qualify: merged duplicates are kept unpublished as slug placeholders and
+    // must never win this lookup (the profile page 404s for them).
     let experiencerSlug: string | null = null;
     if (video.experiencerFullName) {
         const { data: profileData } = await supabase
             .from('experiencer_profiles')
             .select('slug')
             .ilike('full_name', video.experiencerFullName.trim())
+            .not('published_at', 'is', null)
+            .order('published_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
         experiencerSlug = profileData?.slug ?? null;
     }
 

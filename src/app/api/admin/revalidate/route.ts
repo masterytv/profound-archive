@@ -37,8 +37,16 @@ export async function POST(request: Request) {
 
     for (const path of pathsToRevalidate) {
       try {
-        // revalidatePath supports 'page' (just the page) or 'layout' (page + children)
-        revalidatePath(path, 'page');
+        // A route pattern ("/experiencer/[slug]") needs the 'page' type and
+        // busts every page under it. A concrete URL ("/experiencer/some-slug")
+        // must be passed WITHOUT a type: with 'page' Next tags it as
+        // "<url>/page", which never matches a dynamic route's cache entry, so
+        // the call reports success but the page stays stale (seen 2026-09-09).
+        if (path.includes('[')) {
+          revalidatePath(path, 'page');
+        } else {
+          revalidatePath(path);
+        }
         results.push({ path, status: 'ok' });
       } catch (err) {
         results.push({
