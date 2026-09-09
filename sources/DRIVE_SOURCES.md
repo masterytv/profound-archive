@@ -31,10 +31,6 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 | Book Outline and Key Ideas/Stories | `13DKRLPIyOnsxZVKQINMZhno8hwDPZ8aQu5BcLvkC6Jg` | Chapter-by-chapter outline, Preface → "Your Next Click" |
 | Notes - The Accidental Mystic | `1OBt3J99nJ7JrUXrox4uaLZ-f6DsF1MABOc3CwSYnYK0` | Working notes for the book |
 | Writing Style and Identity | `1sxFhGH4ZncLsxKSGZmgSS4hloO8b1ZVWXkb7FYNh7Uo` | Voice & style guide — read before writing in Tom's voice |
-| Book 1 Sections, Round 2 (ten new), 2026-09-09 | `14tBu6IgHPaRofg9epQ2L5ZzKL7Lw4cVzACtc6eiv3wc` | Ten proposed new sections for Book 1 (*You Do Not Have to Die to Know Me*): corpus lines with video IDs and timestamps, masters' lines with attribution status, and a proposed order for all nineteen sections |
-| Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | First drafted section of Book 1 (five lessons on never being alone), written from Round 2 section 10; quotes carry video IDs and timestamps, nothing yet checked against audio |
-| Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | Thirteen title and introduction options for Book 1 (Tom's three plus ten more), each built on a corpus line with its video ID |
-| Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), plus copy for the front-runner title and a title-test plan |
 | Book Testimonials | `15_ByvnyDB9Alar11EG4XYDbZ24wkT5oS9dYwl5p3qNs` | Testimonials (Google Sheet) |
 | Accidendal Mystic - Additional Ideas, Chapters, Covers | `1YIAxKs1A4oWHNgOd2dYDOplxNNi0iHT4yQadovp2RCs` | Extra ideas, chapters, cover concepts (~31 MB, image-heavy) |
 | The Accidental Mystic Podcast | `1Ow7tmEIvRNEOkl4MGQw2q4LwKg8kPUxps1-lwgCI9_Q` | Podcast planning notes |
@@ -42,6 +38,21 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 | Proof of Love | `1p3wF3ZZ6dNXppgCgpO5XwE9hoETGkRAzjCqlu2Vr8vE` | Related earlier manuscript |
 | Simple Spirituality | `12tlVkJPydkEKgSwaHGlbrvlAp4gZgghoitR_F8i576o` | Related earlier manuscript |
 | Add to Simple Spirituality | `168kk_Y9DLzI5UG7XL9eCJMtIsZiwUngRZ4mm6QifRuU` | Additions for Simple Spirituality |
+
+### Book 1: *You Do Not Have to Die to Know Me* (working docs)
+
+Sixty short lessons from people who nearly died, the first title from the round-one book ideas.
+All Google Docs in the Book - The Accidental Mystic folder above. The book text lives only in
+Drive; this table holds pointers.
+
+| Doc | File ID | What it is |
+|---|---|---|
+| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09, final | `100-SRKRupHtTHsTmbElzFDd2mbB0BAvZhScYd7Z7eQE` | Ten book ideas generated from the corpus atlas; Book 1 is idea 1, with its original nine sections |
+| Book 1 Working Doc: You Do Not Have to Die to Know Me (topic map), 2026-09-09 | `1S2i43p8kB7TY_TVBXUR7_ups-igPkA3HWCcNR5geyBM` | Market research on the most-shared spiritual quotes, attribution warnings, and a sixteen-topic map with matching corpus lines and video IDs |
+| Book 1 Sections, Round 2 (ten new), 2026-09-09 | `14tBu6IgHPaRofg9epQ2L5ZzKL7Lw4cVzACtc6eiv3wc` | Ten proposed new sections: opening corpus lines with video IDs and timestamps, masters' lines with attribution status, candidate lessons, and a proposed order for all nineteen sections |
+| Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | First drafted section (five lessons on never being alone); quotes carry video IDs and timestamps, nothing yet checked against audio |
+| Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | Thirteen title and introduction options (Tom's three plus ten more), each built on a corpus line with its video ID |
+| Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), copy for the front-runner title, and a title-test plan |
 
 Subfolders: Resources (`1jOnobAHFTzzj0CZGDfPsxVSqvssoCuaf`),
 Rideshare Psychic - TikTok Videos (`1v5fXFMydAwefUraxKMM2dXC2gdOOCW5D`).
@@ -79,5 +90,5 @@ theself-references.pdf (`1AuB9s1mMk7EPmovmMO0wOLwM-8E_100X`).
   the Supabase RAG tables (`nde_chatbot_chunks` via `nde_chatbot_match`), which are
   video-based — they do not see Drive. Ingesting the book into the site is a separate
   feature with schema implications; flag it for Tom before building.
-- Index snapshot: 2026-08-31. When a doc you need isn't listed, do a live `parentId`
+- Index snapshot: 2026-09-09. When a doc you need isn't listed, do a live `parentId`
   listing of the folder rather than assuming it doesn't exist.
