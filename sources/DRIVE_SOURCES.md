@@ -38,6 +38,7 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 | Proof of Love | `1p3wF3ZZ6dNXppgCgpO5XwE9hoETGkRAzjCqlu2Vr8vE` | Related earlier manuscript |
 | Simple Spirituality | `12tlVkJPydkEKgSwaHGlbrvlAp4gZgghoitR_F8i576o` | Related earlier manuscript |
 | Add to Simple Spirituality | `168kk_Y9DLzI5UG7XL9eCJMtIsZiwUngRZ4mm6QifRuU` | Additions for Simple Spirituality |
+| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09 | `1rur-uB4BxLBeZ5e1qI2zXI30ohwtdwCplzF0uKYkgQE` | Ten next-book ideas with chapters, archive video IDs, statistics, and quotes, generated from `research/corpus-atlas/`. Read before starting another ideation round so it builds on this one |
 
 Subfolders: Resources (`1jOnobAHFTzzj0CZGDfPsxVSqvssoCuaf`),
 Rideshare Psychic - TikTok Videos (`1v5fXFMydAwefUraxKMM2dXC2gdOOCW5D`).
@@ -75,5 +76,5 @@ theself-references.pdf (`1AuB9s1mMk7EPmovmMO0wOLwM-8E_100X`).
   the Supabase RAG tables (`nde_chatbot_chunks` via `nde_chatbot_match`), which are
   video-based — they do not see Drive. Ingesting the book into the site is a separate
   feature with schema implications; flag it for Tom before building.
-- Index snapshot: 2026-08-31. When a doc you need isn't listed, do a live `parentId`
+- Index snapshot: 2026-09-09. When a doc you need isn't listed, do a live `parentId`
   listing of the folder rather than assuming it doesn't exist.
