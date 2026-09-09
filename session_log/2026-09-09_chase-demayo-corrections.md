@@ -26,8 +26,8 @@ Trigger: email from Dr. Chase Skylar DeMayo asking us to correct his profile
   every time for the scene where he watches himself as a small child in the garden. That is
   not a review of life events (the site's own definition: "Reviewed life events or life
   flash"). **Choice to Return** was marked present on 9 videos; in every telling he is told
-  "you have to go back" and agrees without argument — no choice is offered (site definition:
-  "Given choice to stay or return").
+  "you have to go back" and answers "yeah, I know". Tom's call: that is a choice to return,
+  keep it.
 
 ## What was changed
 
@@ -51,15 +51,17 @@ sync (`experiencer-sync.ts`) creates a profile whenever a name has no exact matc
 slug-collision guard is what stops "Chase DeMayo" / "Chase Skyler Deo" from being recreated.
 Do not delete them.
 
-## Judgment calls to confirm with Tom
+## Decisions (confirmed by Tom, 2026-09-09)
 
 - Display name is "Dr. Chase Skylar DeMayo" everywhere (profile, video pages, metadata);
   narrative summaries use "Chase Skylar DeMayo" without the title.
+- Trigger: cardiac arrest during medical care at Langley AFB, on every video.
 - Life Review → not present; Greyson life-review item → 0 (totals drop by 1–2 points).
-- Choice to Return → not present; the "you have to go back" journey step is dropped where a
-  literal return step follows, otherwise relabelled "return".
-- The Greyson "border / point of no return" item (2/2 for flatlining) is also an
-  interpretation and was left unchanged.
+- Choice to Return → **kept as present**. Jesus told him he had to go back and he answered
+  "yeah, I know", as if he had done it many times before.
+- The Greyson "border / point of no return" item is left as scored.
+
+## Still worth a look
 - Two summaries contain claims that could not be verified from bmG4atiklV4 and were left:
   7qKrXhpFxo4 ("passed out from depression and injury-related frustration") and QLZB64hBV0U
   ("Air Force journalist", "fainting from oversleeping").

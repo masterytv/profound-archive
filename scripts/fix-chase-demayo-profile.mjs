@@ -13,11 +13,12 @@
  *   1. nde_vids (10 videos): experiencerFullName -> display name; fixes the name in the
  *      summaries, caption transcripts and NDE justification; fixes his age (20) and, where a
  *      summary said "knee surgery", the trigger wording; appends a dated researcher note.
- *   2. nde_analysis (10 videos): trigger_category -> cardiac_arrest; life_review and
- *      choice_to_return marked not present (he describes seeing himself as a young child and
- *      being told to return, not a life review or a choice offered); the Greyson life-review
- *      item set to 0 with the total adjusted; journey steps relabelled; fingerprint vectors
- *      updated where present.
+ *   2. nde_analysis (10 videos): trigger_category -> cardiac_arrest; life_review marked not
+ *      present (he describes seeing himself as a young child, not a review of life events);
+ *      the Greyson life-review item set to 0 with the total adjusted; the journey steps that
+ *      were labelled life_review relabelled or dropped; fingerprint vectors updated where
+ *      present. Choice to Return is kept: Jesus told him he had to go back and he answered
+ *      "yeah, I know" (Tom's call, 2026-09-09). The Greyson point-of-no-return item is kept too.
  *   3. nde_chatbot_chunks / nde_punctuated_embeddings: name fixed in chunk text (the FTS
  *      search_vector is trigger-maintained; embeddings are left as-is).
  *   4. blog_posts #85: source_experiencer_slug -> chase-skylar-demayo; age 19 -> 20 in
@@ -125,7 +126,7 @@ const SUMMARY_EDITS = {
 const TRIGGER_DESC = 'Cardiac arrest from an air embolism during hospital care at Langley Air Force Base, Virginia, on April 1, 2008, while serving in the U.S. Air Force.';
 const TRIGGER_FIX_DESC = new Set(['bmG4atiklV4', 'OsMqrwiKwc8', 'Uk6ZUikZ-K0']); // the three that said "surgery"
 const LR_REASON = "Not scored: he describes seeing himself as a young child playing in the garden and being reminded of how he used to be, not scenes from his past returning to him. Corrected after the experiencer's review.";
-const RESEARCHER_NOTE = `${NOTE_DATE}: Corrected at the experiencer's request (email from Dr. Chase Skylar DeMayo): name spelling fixed in experiencer name, summary and transcript (auto-captions had "Skyler Deo"/"DeMaio"/"Dimeo"); trigger set to cardiac_arrest (not surgery); NDE date April 1, 2008 at age 20, Langley AFB. Life Review and Choice to Return marked not present in core elements (he describes seeing himself as a young child and being told to return, not a review of life events or a choice offered); Greyson life-review item set to 0.`;
+const RESEARCHER_NOTE = `${NOTE_DATE}: Corrected at the experiencer's request (email from Dr. Chase Skylar DeMayo): name spelling fixed in experiencer name, summary and transcript (auto-captions had "Skyler Deo"/"DeMaio"/"Dimeo"); trigger set to cardiac_arrest (not surgery); NDE date April 1, 2008 at age 20, Langley AFB. Life Review marked not present in core elements (he describes seeing himself as a young child, not a review of life events); Greyson life-review item set to 0. Choice to Return kept as present.`;
 
 // ── 1. nde_vids ────────────────────────────────────────────────────────────
 const vidCols = 'videoId,experiencerFullName,analysis_nde_summary,isNdeJustification,subtitles_punctuated,subtitles_cleaned,subtitles,raw_timestamped_punctuated,raw_timestamped_subtitles,raw_timestamped_subtitles_cleaned,nde_analysis_html,analysis_researcher_notes';
@@ -162,7 +163,7 @@ for (const a of an) {
   if (TRIGGER_FIX_DESC.has(a.video_id)) { if (a.trigger_description !== TRIGGER_DESC) u.trigger_description = TRIGGER_DESC; }
   else { const d = fixNames(a.trigger_description); if (d !== a.trigger_description) u.trigger_description = d; }
 
-  const ce = (a.core_elements || []).map((e) => (e.name === 'life_review' || e.name === 'choice_to_return') ? { ...e, present: false, confidence: 0, quote: '' } : e);
+  const ce = (a.core_elements || []).map((e) => e.name === 'life_review' ? { ...e, present: false, confidence: 0, quote: '' } : e);
   if (JSON.stringify(ce) !== JSON.stringify(a.core_elements)) u.core_elements = ce;
 
   const gb = JSON.parse(JSON.stringify(a.greyson_breakdown || {}));
@@ -174,28 +175,22 @@ for (const a of an) {
   }
 
   const js = (a.journey_sequence || []).slice().sort((x, y) => x.order - y.order);
-  const hasLaterReturn = (i) => js.slice(i + 1).some((s) => s.element === 'return' || s.element === 'sudden_return');
   const out = [];
-  js.forEach((s, i) => {
+  js.forEach((s) => {
     if (s.element === 'life_review') {
       // Two of these steps are him watching the medical team; the rest are the "younger self" scene.
       if (/nurses|doctors|watching me die|facial expressions/i.test(s.excerpt || '')) out.push({ ...s, element: 'observing_body' });
       return; // "younger self" scene — no matching taxonomy element; drop the step
-    }
-    if (s.element === 'choice_to_return') {
-      if (hasLaterReturn(i)) return; // the literal "back in my body" step already follows
-      out.push({ ...s, element: 'return' });
-      return;
     }
     out.push(s);
   });
   const renum = out.map((s, i) => ({ ...s, order: i + 1 }));
   if (JSON.stringify(renum) !== JSON.stringify(js)) u.journey_sequence = renum;
 
-  // 27-dim fingerprint: index 4 = life_review, index 14 = choice_to_return (src/lib/ai/fingerprint.ts)
+  // 27-dim fingerprint: index 4 = life_review (src/lib/ai/fingerprint.ts)
   if (a.experience_fingerprint) {
     const vec = JSON.parse(a.experience_fingerprint);
-    if (vec[4] !== 0 || vec[14] !== 0) { vec[4] = 0; vec[14] = 0; u.experience_fingerprint = JSON.stringify(vec); }
+    if (vec[4] !== 0) { vec[4] = 0; u.experience_fingerprint = JSON.stringify(vec); }
   }
   const html = fixNames(a.analysis_report_html);
   if (html && html !== a.analysis_report_html) u.analysis_report_html = html;
