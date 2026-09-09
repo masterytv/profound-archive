@@ -39,23 +39,44 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 | Simple Spirituality | `12tlVkJPydkEKgSwaHGlbrvlAp4gZgghoitR_F8i576o` | Related earlier manuscript |
 | Add to Simple Spirituality | `168kk_Y9DLzI5UG7XL9eCJMtIsZiwUngRZ4mm6QifRuU` | Additions for Simple Spirituality |
 
-### Book 1: *You Do Not Have to Die to Know Me* (working docs)
-
-Sixty short lessons from people who nearly died, the first title from the round-one book ideas.
-All Google Docs in the Book - The Accidental Mystic folder above. The book text lives only in
-Drive; this table holds pointers.
-
-| Doc | File ID | What it is |
-|---|---|---|
-| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09, final | `100-SRKRupHtTHsTmbElzFDd2mbB0BAvZhScYd7Z7eQE` | Ten book ideas generated from the corpus atlas; Book 1 is idea 1, with its original nine sections |
-| Book 1 Working Doc: You Do Not Have to Die to Know Me (topic map), 2026-09-09 | `1S2i43p8kB7TY_TVBXUR7_ups-igPkA3HWCcNR5geyBM` | Market research on the most-shared spiritual quotes, attribution warnings, and a sixteen-topic map with matching corpus lines and video IDs |
-| Book 1 Sections, Round 2 (ten new), 2026-09-09 | `14tBu6IgHPaRofg9epQ2L5ZzKL7Lw4cVzACtc6eiv3wc` | Ten proposed new sections: opening corpus lines with video IDs and timestamps, masters' lines with attribution status, candidate lessons, and a proposed order for all nineteen sections |
-| Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | First drafted section (five lessons on never being alone); quotes carry video IDs and timestamps, nothing yet checked against audio |
-| Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | Thirteen title and introduction options (Tom's three plus ten more), each built on a corpus line with its video ID |
-| Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), copy for the front-runner title, and a title-test plan |
-
 Subfolders: Resources (`1jOnobAHFTzzj0CZGDfPsxVSqvssoCuaf`),
 Rideshare Psychic - TikTok Videos (`1v5fXFMydAwefUraxKMM2dXC2gdOOCW5D`).
+
+## Book 1: *You Do Not Have to Die to Know Me*
+
+Sixty short lessons from people who nearly died, the first title from the round-one book ideas.
+Folder: [Book 1](https://drive.google.com/drive/folders/1FvRB-EyCHQtodPbsuElQnGRC7b--sye1) under
+Project Profound, folder ID `1FvRB-EyCHQtodPbsuElQnGRC7b--sye1`. The book text lives only in
+Drive; this section holds pointers and status.
+
+The folder mirrors the site's branches. Sections are files, folders are environments, promotion
+is a move:
+
+| Folder | ID | Holds |
+|---|---|---|
+| dev | `123f-KgxrQv8jClfV9kOUMqktkArXfdLS` | Brainstorm docs: ideas, topic map, section proposals, drafts, titles. Anything can change. |
+| staging | `11TvKz_EyDoBserFA89B_mYec7pC8VZlm` | One Google Doc per settled section, named to sort in order (S01, S02, ...). Tom's copy is the truth. AI revisions arrive as a new doc; the old one moves to a staging/archive subfolder. |
+| production | `1TrVuU6m4JMFLZICGVa-0W8rvenIx4fSL` | Sections Tom has promoted. Not touched without an explicit ask. |
+
+Working rules for AI sessions:
+
+- The Drive tool cannot edit a doc's text. It can create, copy, rename, move, trash, and read
+  (comments included). So never regenerate a doc Tom may have edited: read it fresh, write the
+  revision as a new doc, move the old one aside, and say what changed.
+- "approve S01" = create the section doc in staging from the dev draft. "revise S01" = read the
+  live doc and its comments, create v2, archive v1. "assemble" = create one reading copy from the
+  live staging sections in order, trashing the previous assembled copy. "promote S01" = copy the
+  live doc into production.
+- Keep the Status column below current (dev, staging, production) and add a row for every new doc.
+
+| Doc (Google Doc) | File ID | Status | What it is |
+|---|---|---|---|
+| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09, final | `100-SRKRupHtTHsTmbElzFDd2mbB0BAvZhScYd7Z7eQE` | dev | Ten book ideas generated from the corpus atlas; Book 1 is idea 1, with its original nine sections |
+| Book 1 Working Doc: You Do Not Have to Die to Know Me (topic map), 2026-09-09 | `1S2i43p8kB7TY_TVBXUR7_ups-igPkA3HWCcNR5geyBM` | dev | Market research on the most-shared spiritual quotes, attribution warnings, and a sixteen-topic map with matching corpus lines and video IDs |
+| Book 1 Sections, Round 2 (ten new), 2026-09-09 | `14tBu6IgHPaRofg9epQ2L5ZzKL7Lw4cVzACtc6eiv3wc` | dev | Ten proposed new sections: opening corpus lines with video IDs and timestamps, masters' lines with attribution status, candidate lessons, and a proposed order for all nineteen sections |
+| Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | dev | First drafted section (five lessons on never being alone); quotes carry video IDs and timestamps, nothing yet checked against audio |
+| Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | dev | Thirteen title and introduction options (Tom's three plus ten more), each built on a corpus line with its video ID |
+| Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | dev | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), copy for the front-runner title, and a title-test plan |
 
 ## Project Profound — parent Drive folder
 
@@ -67,6 +88,7 @@ Subfolders (list live with `parentId = '<id>'` for current contents):
 | Folder | ID |
 |---|---|
 | Book - Elsewhere | `1HekkjAtxMNbiumzAYQgx1Xx0rwB6IonW` |
+| Book 1 (dev / staging / production, see the Book 1 section above) | `1FvRB-EyCHQtodPbsuElQnGRC7b--sye1` |
 | NDE Research Project | `1MKEFhP5TEA8EFaauX-h6F4mx9RE-cUoL` |
 | rvNDE Scale | `178g3Dw0HFhNaNFE9nvsPVb5b58JDPp_j` |
 | NDE-TI | `1NIwMIfMxNoVEblncxdwCN1bqmWgu1kXi` |
