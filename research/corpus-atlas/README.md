@@ -26,6 +26,7 @@ Every video ID in these files opens as `https://www.youtube.com/watch?v=<id>`, a
 |---|---|
 | `ATLAS-stats.md` | Curated statistical atlas, about 9k words |
 | `ATLAS-narrative.md` | Curated narrative atlas built from the section digests |
+| `narrative/intro.md`, `narrative/nde.md`, `narrative/uap.md`, `narrative/cross-domain.md` | The four parts that `ATLAS-narrative.md` concatenates; edit a part and re-concatenate rather than editing the assembled file |
 | `appendix-top-lists.md` | Top-25 lists by score, views, distressing, child, veridical, evidence, contact depth, era |
 | `appendix-syntheses.md` | What the 147 cached Big Question answers, 231 blog posts, and 30 daily facts already say; questions nobody has asked |
 | `appendix-experiencers.md` | Theme frequencies across 2,820 NDE profiles, top experiencers, contactees, people worth a deeper look |
