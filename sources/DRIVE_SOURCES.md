@@ -77,6 +77,7 @@ Working rules for AI sessions:
 | Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | dev | First drafted section (five lessons on never being alone); quotes carry video IDs and timestamps, nothing yet checked against audio |
 | Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | dev | Thirteen title and introduction options (Tom's three plus ten more), each built on a corpus line with its video ID |
 | Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | dev | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), copy for the front-runner title, and a title-test plan |
+| S01 Not Even a Millisecond | `18GfTJ58PbcQ9KMgoeIa9290UKO86goDYQ0D10a_AbTM` | staging | Live section doc, approved 2026-09-09 from the dev draft (five lessons, sources under each); Tom's copy is the truth |
 
 ## Project Profound — parent Drive folder
 
