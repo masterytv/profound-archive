@@ -26,6 +26,9 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 | Doc (Google Doc unless noted) | File ID | What it is |
 |---|---|---|
 | The Accidental Mystic | `1lc1JzqWTBVy7EMWGUK6aLYkdtbVuNLSS7M-RI6FEdUw` | Primary manuscript (most recently edited version) |
+| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09, final | `100-SRKRupHtTHsTmbElzFDd2mbB0BAvZhScYd7Z7eQE` | Ten book ideas generated from `research/corpus-atlas/` (round one, final version) |
+| Book Ideas, Round 2 (from the Corpus Atlas), 2026-09-09 | `1gpA69VmelMys8yYnMYNywWqyKEqIZjHkaRB66t3IZEQ` | Ten more book ideas from the corpus atlas (round two); does not repeat round one's titles |
+| Book 1 Working Doc: You Do Not Have to Die to Know Me (topic map), 2026-09-09 | `1S2i43p8kB7TY_TVBXUR7_ups-igPkA3HWCcNR5geyBM` | Working doc for round one's book 1: most-shared masters' quotes by topic, matching corpus lines with video IDs and timestamps, title notes |
 | The Accidental Mystic - Paperback | `1YnGdLAq-bqDlxhnfXdbKMaLOT38wv-IHnwKkSHfS7m0` | Paperback edition variant |
 | The Accidental Mystic - Revised by AI | `1d5EY8Sr2jrmx3jJBeRrhRNgmy4y7hBsisGJEVYSNtdE` | Much shorter AI-revised draft (partial) |
 | Book Outline and Key Ideas/Stories | `13DKRLPIyOnsxZVKQINMZhno8hwDPZ8aQu5BcLvkC6Jg` | Chapter-by-chapter outline, Preface → "Your Next Click" |
