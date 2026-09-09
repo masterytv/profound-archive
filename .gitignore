@@ -43,6 +43,8 @@ next-env.d.ts
 .npm-cache/
 test*.*
 scripts/test*.ts
+# backups written by one-off data-correction scripts
+scripts/.fix-*-backup-*.json
 get_errors.*
 get_errs.*
 
