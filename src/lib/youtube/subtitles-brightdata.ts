@@ -27,6 +27,19 @@
  * which maps 1:1 onto CaptionSegment. The record also carries full video
  * metadata (views, subscribers, title, date_posted) — unused here, but a
  * future option to reduce YouTube Data API quota.
+ *
+ * ── Upstream schema change (2026-09-14) ──────────────────────────────────────
+ * Bright Data added a `comments[]` array to this dataset's output (subfields:
+ * comment, user_handle, date, likes, num_replies, user_url). It is additive, so
+ * nothing here breaks — we read only the transcript fields. The one thing worth
+ * watching is SIZE: pollSnapshot buffers the whole snapshot body as text and
+ * then parses it, so a heavily-commented video now costs more memory and
+ * bandwidth per record. The poll logs the body size (and warns past
+ * BODY_SIZE_WARN_BYTES) so we can tell from real traffic whether it's worth
+ * trimming the payload at the source via the trigger endpoint's output-field
+ * selection. Don't add that trimming blind — requesting the wrong field names
+ * yields records with no formatted_transcript, which silently breaks every
+ * transcript fetch.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -42,6 +55,8 @@ const POLL_INTERVAL_MS = 20_000;
 const JOB_TIMEOUT_MS = 8 * 60_000;
 // Pending snapshots older than this are considered stale → fresh trigger.
 const PENDING_MAX_AGE_MS = 24 * 60 * 60_000;
+// Snapshot bodies above this get a warning — see the 2026-09-14 note above.
+const BODY_SIZE_WARN_BYTES = 2 * 1024 * 1024;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -59,6 +74,12 @@ interface BrightDataRecord {
     formatted_transcript?: BrightDataTranscriptEntry[] | null;
     /** Sometimes a plain code ("en"), sometimes an object like { code, name }. */
     transcript_language?: string | { code?: string; name?: string } | null;
+    /**
+     * Added upstream 2026-09-14; deliberately ignored. Typed as unknown so it is
+     * clear this schema is current and the field was a choice, not an oversight.
+     * Its only cost here is payload size (see the header note).
+     */
+    comments?: unknown;
     error?: string;
     error_code?: string;
 }
@@ -231,7 +252,11 @@ async function pollSnapshot(
             return { kind: 'done', result: fail('no_captions', false, 'Transcript entries were all empty') };
         }
 
-        console.log(`[BrightData] ✅ ${segments.length} segments for ${videoId} (lang: ${languageOf(record)})`);
+        const bodyBytes = Buffer.byteLength(body, 'utf8');
+        console.log(`[BrightData] ✅ ${segments.length} segments for ${videoId} (lang: ${languageOf(record)}, snapshot ${(bodyBytes / 1024).toFixed(0)}KB)`);
+        if (bodyBytes > BODY_SIZE_WARN_BYTES) {
+            console.warn(`[BrightData] Snapshot body for ${videoId} is ${(bodyBytes / 1024 / 1024).toFixed(1)}MB — likely the upstream comments[] field; consider trimming output fields at trigger time.`);
+        }
 
         // 1 record consumed per successful scrape.
         void logQuota({ provider: 'brightdata', operation: 'brightdata.transcript', quantity: 1, metadata: { videoId } });
