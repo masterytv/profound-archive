@@ -74,6 +74,7 @@ Working rules for AI sessions:
 | Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09, final | `100-SRKRupHtTHsTmbElzFDd2mbB0BAvZhScYd7Z7eQE` | dev | Ten book ideas generated from the corpus atlas; Book 1 is idea 1, with its original nine sections |
 | Book 1 Working Doc: You Do Not Have to Die to Know Me (topic map), 2026-09-09 | `1S2i43p8kB7TY_TVBXUR7_ups-igPkA3HWCcNR5geyBM` | dev | Market research on the most-shared spiritual quotes, attribution warnings, and a sixteen-topic map with matching corpus lines and video IDs |
 | Book 1 Sections, Round 2 (ten new), 2026-09-09 | `14tBu6IgHPaRofg9epQ2L5ZzKL7Lw4cVzACtc6eiv3wc` | dev | Ten proposed new sections: opening corpus lines with video IDs and timestamps, masters' lines with attribution status, candidate lessons, and a proposed order for all nineteen sections |
+| Book 1 Sections, Round 2 (ten new), 2026-09-14 | `1xz6EcmHukx24u7Abl2gYMb3pQIVeKBDwEjCOeznxr_w` | dev | Second pass at the same brief with a fresh transcript search: keeps S01 as settled, renames six of the other nine sections on sharper on-camera lines, adds a six-move order for all nineteen, and lists both passes side by side |
 | Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | dev | First drafted section (five lessons on never being alone); quotes carry video IDs and timestamps, nothing yet checked against audio |
 | Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | dev | Thirteen title and introduction options (Tom's three plus ten more), each built on a corpus line with its video ID |
 | Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | dev | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), copy for the front-runner title, and a title-test plan |
@@ -113,5 +114,5 @@ theself-references.pdf (`1AuB9s1mMk7EPmovmMO0wOLwM-8E_100X`).
   the Supabase RAG tables (`nde_chatbot_chunks` via `nde_chatbot_match`), which are
   video-based — they do not see Drive. Ingesting the book into the site is a separate
   feature with schema implications; flag it for Tom before building.
-- Index snapshot: 2026-09-09. When a doc you need isn't listed, do a live `parentId`
+- Index snapshot: 2026-09-14. When a doc you need isn't listed, do a live `parentId`
   listing of the folder rather than assuming it doesn't exist.
