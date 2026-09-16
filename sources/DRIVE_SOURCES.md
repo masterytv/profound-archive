@@ -80,6 +80,18 @@ Working rules for AI sessions:
 | Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | dev | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), copy for the front-runner title, and a title-test plan |
 | S01 Not Even a Millisecond | `18GfTJ58PbcQ9KMgoeIa9290UKO86goDYQ0D10a_AbTM` | staging | Live section doc, approved 2026-09-09 from the dev draft (five lessons, sources under each); Tom's copy is the truth |
 
+## Book — *Proof of (After)Life* (working title)
+
+Folder: [Book - Proof of (After)Life](https://drive.google.com/drive/folders/1zrkHq9AeAfra1NFKvQ2qO888GzYMrKOT)
+— folder ID `1zrkHq9AeAfra1NFKvQ2qO888GzYMrKOT` (under Project Profound). Earlier working title:
+*Proof of Afterlife: Near-Death Experiences with Veridical Evidence*. A separate book from Book 1
+above. The research text lives only in Drive; this section holds pointers.
+
+| Doc (Google Doc) | File ID | What it is |
+|---|---|---|
+| Return_from_Death_Before_1900 | `1ngZgCCmuYEcYqsJDuJiDqo-lyPBB7FumZCDY393tmS4` | Research file (2026-09-15): 100+ pre-1900 return-from-death accounts across Christianity, Islam, the secular/medical record, Buddhism, ancient and indigenous folk traditions, Hinduism and Judaism. Each entry has Account / Summary / Source, a veridical flag (source-reported corroboration), a confidence grade and a "Verified at" link; veridical cases come first in each section. A markdown copy also lives in the Claude Project "Project Profound" as `claude/nde-historical-accounts-by-tradition.md`. |
+| Proof of Afterlife - Book Idea | `174NjLfpONiG3B2xnzwJZyuCpxjdSKO_bq1tNoUgfNv4` | Book concept note (2026-09-15). Currently sits in the Book 1 `production` folder (`1TrVuU6m4JMFLZICGVa-0W8rvenIx4fSL`), not in this book's folder. |
+
 ## Project Profound — parent Drive folder
 
 Folder: [Project Profound](https://drive.google.com/drive/folders/1yBmBejNystVWkvaokveg5nMiY-giGRTA)
@@ -91,6 +103,7 @@ Subfolders (list live with `parentId = '<id>'` for current contents):
 |---|---|
 | Book - Elsewhere | `1HekkjAtxMNbiumzAYQgx1Xx0rwB6IonW` |
 | Book 1 (dev / staging / production, see the Book 1 section above) | `1FvRB-EyCHQtodPbsuElQnGRC7b--sye1` |
+| Book - Proof of (After)Life (see section above) | `1zrkHq9AeAfra1NFKvQ2qO888GzYMrKOT` |
 | NDE Research Project | `1MKEFhP5TEA8EFaauX-h6F4mx9RE-cUoL` |
 | rvNDE Scale | `178g3Dw0HFhNaNFE9nvsPVb5b58JDPp_j` |
 | NDE-TI | `1NIwMIfMxNoVEblncxdwCN1bqmWgu1kXi` |
@@ -114,5 +127,5 @@ theself-references.pdf (`1AuB9s1mMk7EPmovmMO0wOLwM-8E_100X`).
   the Supabase RAG tables (`nde_chatbot_chunks` via `nde_chatbot_match`), which are
   video-based — they do not see Drive. Ingesting the book into the site is a separate
   feature with schema implications; flag it for Tom before building.
-- Index snapshot: 2026-09-14. When a doc you need isn't listed, do a live `parentId`
+- Index snapshot: 2026-09-16. When a doc you need isn't listed, do a live `parentId`
   listing of the folder rather than assuming it doesn't exist.
