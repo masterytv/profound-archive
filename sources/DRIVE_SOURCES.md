@@ -42,6 +42,56 @@ Folder: [Book - The Accidental Mystic](https://drive.google.com/drive/folders/1u
 Subfolders: Resources (`1jOnobAHFTzzj0CZGDfPsxVSqvssoCuaf`),
 Rideshare Psychic - TikTok Videos (`1v5fXFMydAwefUraxKMM2dXC2gdOOCW5D`).
 
+## Book 1: *You Do Not Have to Die to Know Me*
+
+Sixty short lessons from people who nearly died, the first title from the round-one book ideas.
+Folder: [Book 1](https://drive.google.com/drive/folders/1FvRB-EyCHQtodPbsuElQnGRC7b--sye1) under
+Project Profound, folder ID `1FvRB-EyCHQtodPbsuElQnGRC7b--sye1`. The book text lives only in
+Drive; this section holds pointers and status.
+
+The folder mirrors the site's branches. Sections are files, folders are environments, promotion
+is a move:
+
+| Folder | ID | Holds |
+|---|---|---|
+| dev | `123f-KgxrQv8jClfV9kOUMqktkArXfdLS` | Brainstorm docs: ideas, topic map, section proposals, drafts, titles. Anything can change. |
+| staging | `11TvKz_EyDoBserFA89B_mYec7pC8VZlm` | One Google Doc per settled section, named to sort in order (S01, S02, ...). Tom's copy is the truth. AI revisions arrive as a new doc; the old one moves to a staging/archive subfolder. |
+| production | `1TrVuU6m4JMFLZICGVa-0W8rvenIx4fSL` | Sections Tom has promoted. Not touched without an explicit ask. |
+
+Working rules for AI sessions:
+
+- The Drive tool cannot edit a doc's text. It can create, copy, rename, move, trash, and read
+  (comments included). So never regenerate a doc Tom may have edited: read it fresh, write the
+  revision as a new doc, move the old one aside, and say what changed.
+- "approve S01" = create the section doc in staging from the dev draft. "revise S01" = read the
+  live doc and its comments, create v2, archive v1. "assemble" = create one reading copy from the
+  live staging sections in order, trashing the previous assembled copy. "promote S01" = copy the
+  live doc into production.
+- Keep the Status column below current (dev, staging, production) and add a row for every new doc.
+
+| Doc (Google Doc) | File ID | Status | What it is |
+|---|---|---|---|
+| Book Ideas, Round 1 (from the Corpus Atlas), 2026-09-09, final | `100-SRKRupHtTHsTmbElzFDd2mbB0BAvZhScYd7Z7eQE` | dev | Ten book ideas generated from the corpus atlas; Book 1 is idea 1, with its original nine sections |
+| Book 1 Working Doc: You Do Not Have to Die to Know Me (topic map), 2026-09-09 | `1S2i43p8kB7TY_TVBXUR7_ups-igPkA3HWCcNR5geyBM` | dev | Market research on the most-shared spiritual quotes, attribution warnings, and a sixteen-topic map with matching corpus lines and video IDs |
+| Book 1 Sections, Round 2 (ten new), 2026-09-09 | `14tBu6IgHPaRofg9epQ2L5ZzKL7Lw4cVzACtc6eiv3wc` | dev | Ten proposed new sections: opening corpus lines with video IDs and timestamps, masters' lines with attribution status, candidate lessons, and a proposed order for all nineteen sections |
+| Book 1 Sections, Round 2 (ten new), 2026-09-14, v2 | `1R9WPe9wKuCvqMM3Tk06NoJnv10Ov_L__lULRFDIs8Gc` | dev | Second pass at the same brief with a fresh transcript search: keeps S01 as settled, renames six of the other nine sections on sharper on-camera lines, adds a six-move order for all nineteen, and lists both passes side by side. v2 corrects the section 11 gist and the order numbering; v1 (`1xz6EcmHukx24u7Abl2gYMb3pQIVeKBDwEjCOeznxr_w`) is in Drive trash |
+| Book 1 Section Draft: Not Even a Millisecond, 2026-09-09 | `1KISTylEEhGRgXSeGLnNexBj0aVkuaMy17U6JAAyvhbY` | dev | First drafted section (five lessons on never being alone); quotes carry video IDs and timestamps, nothing yet checked against audio |
+| Book 1 Title Options, 2026-09-09 | `1vbEsXsn6B__puyk1FkYEsxwEOzltCYe5esQjLxdLzaw` | dev | Thirteen title and introduction options (Tom's three plus ten more), each built on a corpus line with its video ID |
+| Book 1 Marketing Titles, 2026-09-09 | `1ObbFXTy4WPw81SED1zNdYUlkgprCapbumIHxWjGat_w` | dev | Ten buyer-facing titles with back-cover descriptions (pull, surprise, promise, buyer, risk), copy for the front-runner title, and a title-test plan |
+| S01 Not Even a Millisecond | `18GfTJ58PbcQ9KMgoeIa9290UKO86goDYQ0D10a_AbTM` | staging | Live section doc, approved 2026-09-09 from the dev draft (five lessons, sources under each); Tom's copy is the truth |
+
+## Book — *Proof of (After)Life* (working title)
+
+Folder: [Book - Proof of (After)Life](https://drive.google.com/drive/folders/1zrkHq9AeAfra1NFKvQ2qO888GzYMrKOT)
+— folder ID `1zrkHq9AeAfra1NFKvQ2qO888GzYMrKOT` (under Project Profound). Earlier working title:
+*Proof of Afterlife: Near-Death Experiences with Veridical Evidence*. A separate book from Book 1
+above. The research text lives only in Drive; this section holds pointers.
+
+| Doc (Google Doc) | File ID | What it is |
+|---|---|---|
+| Return_from_Death_Before_1900 | `1ngZgCCmuYEcYqsJDuJiDqo-lyPBB7FumZCDY393tmS4` | Research file (2026-09-15): 100+ pre-1900 return-from-death accounts across Christianity, Islam, the secular/medical record, Buddhism, ancient and indigenous folk traditions, Hinduism and Judaism. Each entry has Account / Summary / Source, a veridical flag (source-reported corroboration), a confidence grade and a "Verified at" link; veridical cases come first in each section. A markdown copy also lives in the Claude Project "Project Profound" as `claude/nde-historical-accounts-by-tradition.md`. |
+| Proof of Afterlife - Book Idea | `174NjLfpONiG3B2xnzwJZyuCpxjdSKO_bq1tNoUgfNv4` | Book concept note (2026-09-15). Currently sits in the Book 1 `production` folder (`1TrVuU6m4JMFLZICGVa-0W8rvenIx4fSL`), not in this book's folder. |
+
 ## Project Profound — parent Drive folder
 
 Folder: [Project Profound](https://drive.google.com/drive/folders/1yBmBejNystVWkvaokveg5nMiY-giGRTA)
@@ -52,6 +102,8 @@ Subfolders (list live with `parentId = '<id>'` for current contents):
 | Folder | ID |
 |---|---|
 | Book - Elsewhere | `1HekkjAtxMNbiumzAYQgx1Xx0rwB6IonW` |
+| Book 1 (dev / staging / production, see the Book 1 section above) | `1FvRB-EyCHQtodPbsuElQnGRC7b--sye1` |
+| Book - Proof of (After)Life (see section above) | `1zrkHq9AeAfra1NFKvQ2qO888GzYMrKOT` |
 | NDE Research Project | `1MKEFhP5TEA8EFaauX-h6F4mx9RE-cUoL` |
 | rvNDE Scale | `178g3Dw0HFhNaNFE9nvsPVb5b58JDPp_j` |
 | NDE-TI | `1NIwMIfMxNoVEblncxdwCN1bqmWgu1kXi` |
@@ -75,5 +127,5 @@ theself-references.pdf (`1AuB9s1mMk7EPmovmMO0wOLwM-8E_100X`).
   the Supabase RAG tables (`nde_chatbot_chunks` via `nde_chatbot_match`), which are
   video-based — they do not see Drive. Ingesting the book into the site is a separate
   feature with schema implications; flag it for Tom before building.
-- Index snapshot: 2026-08-31. When a doc you need isn't listed, do a live `parentId`
+- Index snapshot: 2026-09-16. When a doc you need isn't listed, do a live `parentId`
   listing of the folder rather than assuming it doesn't exist.
