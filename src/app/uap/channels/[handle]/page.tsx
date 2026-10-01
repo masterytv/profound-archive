@@ -161,12 +161,12 @@ async function getAllChannelScoresForMap() {
   })) as ChannelScorePoint[];
 }
 
-// Fetch trajectory data: 12-month-ago score snapshot for this channel
+// Fetch trajectory data: last month's score snapshot for this channel
 async function getChannelTrajectory(channelId: string): Promise<TrajectoryData> {
   const supabase = buildClient();
   const now = new Date();
-  // 12 months ago, first of that month
-  const targetDate = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+  // Previous month, first of that month
+  const targetDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const targetMonth = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-01`;
 
   const { data } = await supabase
@@ -894,7 +894,7 @@ export default async function UapChannelDetailPage({
                 {trajectoryData[channel.channel_id] && channelScores && (
                   <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/[0.03] rounded-lg p-3 border border-slate-200/40 dark:border-white/5">
                     <p>
-                      <strong className="text-slate-700 dark:text-slate-300">12-Month Trajectory:</strong>{" "}
+                      <strong className="text-slate-700 dark:text-slate-300">1-Month Trajectory:</strong>{" "}
                       {(() => {
                         const prev = trajectoryData[channel.channel_id];
                         const currI = Number(channelScores.intelligence_value);
