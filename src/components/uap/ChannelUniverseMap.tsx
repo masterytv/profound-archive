@@ -31,7 +31,7 @@ export interface ChannelScorePoint {
   avatar_url: string | null;
 }
 
-/** Historical position for trajectory arrows: maps channel_id to its 12-month-ago position */
+/** Historical position for trajectory arrows: maps channel_id to its position one month ago */
 export interface TrajectoryData {
   [channelId: string]: {
     prevIntelligence: number;
@@ -47,7 +47,7 @@ interface ChannelUniverseMapProps {
   compact?: boolean;
   /** Quadrant to highlight: topLeft, topRight, bottomLeft, bottomRight */
   highlightedQuadrant?: string | null;
-  /** Historical positions for trajectory arrows. Maps channel_id to 12-month-ago position */
+  /** Historical positions for trajectory arrows. Maps channel_id to position one month ago */
   trajectories?: TrajectoryData;
 }
 

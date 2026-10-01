@@ -56,11 +56,11 @@ async function getAllChannelScores(): Promise<ChannelScorePoint[]> {
     })) as ChannelScorePoint[];
 }
 
-// Fetch 12-month-ago snapshots for ALL channels (for trajectory arrows)
+// Fetch last month's snapshots for ALL channels (for trajectory arrows)
 async function getAllChannelTrajectories(): Promise<TrajectoryData> {
   const supabase = buildClient();
   const now = new Date();
-  const targetDate = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+  const targetDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const targetMonth = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-01`;
 
   const { data } = await supabase
