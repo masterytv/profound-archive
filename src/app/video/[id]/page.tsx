@@ -316,12 +316,17 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
     // Return 404 for videos from hidden (defunct) channels
     const { data: channelHidden } = await supabase
         .from('channels')
-        .select('hidden')
+        .select('hidden, name')
         .eq('channel_id', video.channelId)
         .single();
     if (channelHidden?.hidden) {
         notFound();
     }
+
+    // The per-video channelName/channelUrl are snapshots from intake time; prefer the
+    // channels table name and the permanent /channel/{id} link (survive renames).
+    const channelName = channelHidden?.name || video.channelName;
+    const channelUrl = video.channelId ? `https://www.youtube.com/channel/${video.channelId}` : video.channelUrl;
 
     const { data: analysis } = await supabase
         .from("nde_analysis")
@@ -394,8 +399,8 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
                         embedUrl: `https://www.youtube.com/embed/${video.videoId}`,
                         publisher: {
                             "@type": "Organization",
-                            name: video.channelName ?? "Unknown Channel",
-                            url: video.channelUrl ?? undefined,
+                            name: channelName ?? "Unknown Channel",
+                            url: channelUrl ?? undefined,
                         },
                         ...(analysis?.total_greyson_score ? {
                             about: {
@@ -457,15 +462,15 @@ export default async function VideoPageV2({ params, searchParams }: VideoPagePro
 
                             {/* Metadata row: channel · date · views · experiencer */}
                             <div className="flex flex-wrap items-center gap-3 text-sm">
-                                {video.channelName && (
+                                {channelName && (
                                     <Link
-                                        href={video.channelId ? `/channel/${video.channelId}` : (video.channelUrl || "#")}
+                                        href={video.channelId ? `/channel/${video.channelId}` : (channelUrl || "#")}
                                         className="flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                     >
                                         <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                                            {video.channelName.charAt(0)}
+                                            {channelName.charAt(0)}
                                         </div>
-                                        {video.channelName}
+                                        {channelName}
                                     </Link>
                                 )}
 

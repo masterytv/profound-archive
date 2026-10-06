@@ -27,6 +27,7 @@
 import { discoverNewVideos, getExistingVideoIds } from './discover';
 import { processVideoIntake } from '../pipeline/intake';
 import { isPaused } from '../ops/switches';
+import { refreshChannelIdentities } from './channel-identity';
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -382,13 +383,24 @@ export async function runDiscoverAllChannels(supabase: any): Promise<DiscoverAll
 
     const { data: channels, error: channelError } = await supabase
         .from('channels')
-        .select('channel_id, name, uploads_playlist_id')
+        .select('channel_id, name, custom_url, uploads_playlist_id')
         .eq('scanner_enabled', true)
         .order('name');
 
     if (channelError) throw new Error(`Channel fetch: ${channelError.message}`);
     if (!channels || channels.length === 0) {
         return { channelsScanned: 0, channelsWithNewVideos: 0, totalDiscovered: 0, totalQueued: 0, durationMs: 0, perChannel: [] };
+    }
+
+    // Pick up channel renames / @handle changes (1 quota unit per 50 channels).
+    // Non-fatal: a failure here must never block discovery.
+    try {
+        const changes = await refreshChannelIdentities(supabase, channels);
+        if (changes.length > 0) {
+            console.log(`[DiscoverAll] Refreshed identity for ${changes.length} renamed channel(s)`);
+        }
+    } catch (err: any) {
+        console.error('[DiscoverAll] Channel identity refresh failed:', err.message);
     }
 
     // Load all existing video IDs + already-queued IDs once (avoids N round-trips)
