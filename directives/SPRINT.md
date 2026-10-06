@@ -1129,9 +1129,10 @@ For every UAP file you create:
 > "This channel moved 15% higher on the Intelligence axis since last year."
 
 - [x] Story 14.1.1: Add historical score snapshots — monthly snapshot table `uap_channel_score_history` storing Intelligence Value + Credibility per channel per month. GHA cron to snapshot monthly. API route `POST /api/cron/channel-score-snapshot` (0.5d) ✅ 2026-05-21
-- [x] Story 14.1.2: Update `ChannelUniverseMap` — render trajectory arrow from 12-month-ago position to current position via `Customized` SVG layer. Arrow color: green if improved, gray if declined. Only shows for ≥2 unit movement. Forwarded through `InteractiveUniverseSection` and both map variants (0.5d) ✅ 2026-05-21
+- [x] Story 14.1.2: Update `ChannelUniverseMap` — render trajectory arrow from last month's position (was 12-month-ago; changed 2026-10-01) to current position via `Customized` SVG layer. Arrow color: green if improved, gray if declined. Only shows for ≥2 unit movement. Forwarded through `InteractiveUniverseSection` and both map variants (0.5d) ✅ 2026-05-21
 - [x] Story 14.1.3: Add trajectory narrative to channel detail — "Intelligence Value moved up X%. Speaker Credibility held steady." Shown below universe map when historical data exists (0.25d) ✅ 2026-05-21
 - **Done when:** Channel universe map shows trajectory arrows for channels with ≥2 months of history.
+- **2026-10-01 note:** The snapshot cron never succeeded until 2026-10-01 (missing `https://`, then the route read `SUPABASE_SERVICE_ROLE_KEY` while App Hosting sets `SUPABASE_SERVICE_KEY`; fixed bcc5b9d). First snapshot: 79 channels for 2026-10. Comparison switched to month-over-month (2fe2cc4). **Verify:** arrows render after the 2026-11-01 run.
 
 ---
 
