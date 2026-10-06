@@ -43,15 +43,18 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { channelId } = await params
     const supabase = await createClient()
-    const { data } = await supabase
-        .from('nde_vids')
-        .select('channelName')
-        .eq('channelId', channelId)
-        .eq('isNde', 'clear_nde')
-        .limit(1)
-        .single()
+    const [{ data: channel }, { data }] = await Promise.all([
+        supabase.from('channels').select('name').eq('channel_id', channelId).maybeSingle(),
+        supabase
+            .from('nde_vids')
+            .select('channelName')
+            .eq('channelId', channelId)
+            .eq('isNde', 'clear_nde')
+            .limit(1)
+            .maybeSingle(),
+    ])
 
-    const name = data?.channelName || 'Channel'
+    const name = channel?.name || data?.channelName || 'Channel'
     return {
         title: `${name} | NDE Channels | Project Profound`,
         description: `Browse all near-death experience videos from ${name}. Watch NDE testimonials, afterlife accounts, and consciousness research.`,
@@ -84,7 +87,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
     // Fetch enriched channel data (avatar, banner, description, hidden flag)
     const { data: channelEnriched } = await supabase
         .from('channels')
-        .select('avatar_url, banner_url, description, country, subscriber_count, hidden')
+        .select('name, avatar_url, banner_url, description, country, subscriber_count, hidden')
         .eq('channel_id', channelId)
         .single()
 
@@ -92,6 +95,12 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
     if (channelEnriched?.hidden) {
         notFound()
     }
+
+    // Per-video channelName/channelUrl are snapshots from intake time and go stale when a
+    // channel renames itself or changes its @handle. Prefer the channels table for the name,
+    // and link by channel ID, which YouTube never changes.
+    const channelName = channelEnriched?.name || channelMeta.channelName
+    const youtubeChannelUrl = `https://www.youtube.com/channel/${channelId}`
 
     // Use enriched subscriber count (from YouTube API) as primary source
     const subscriberCount = channelEnriched?.subscriber_count || channelMeta.numberOfSubscribers || 0
@@ -195,7 +204,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                         <ChevronRight className="w-3.5 h-3.5" />
                         <Link href="/channels" className="hover:text-blue-600 transition-colors">Channels</Link>
                         <ChevronRight className="w-3.5 h-3.5" />
-                        <span className="text-slate-700 dark:text-slate-200 font-medium">{channelMeta.channelName}</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-medium">{channelName}</span>
                     </nav>
 
                     <div className="flex flex-col sm:flex-row items-start gap-5">
@@ -203,14 +212,14 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                         {channelEnriched?.avatar_url ? (
                             <Image
                                 src={channelEnriched.avatar_url}
-                                alt={channelMeta.channelName || 'Channel'}
+                                alt={channelName || 'Channel'}
                                 width={64}
                                 height={64}
                                 className="rounded-2xl shrink-0 shadow-lg"
                             />
                         ) : (
                             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-2xl font-bold shadow-lg">
-                                {channelMeta.channelName?.charAt(0).toUpperCase()}
+                                {channelName?.charAt(0).toUpperCase()}
                             </div>
                         )}
 
@@ -219,7 +228,7 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                                 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mb-2"
                                 style={{ fontFamily: "'Crimson Pro', Georgia, serif" }}
                             >
-                                {channelMeta.channelName}
+                                {channelName}
                             </h1>
 
                             {/* Stats row */}
@@ -241,17 +250,15 @@ export default async function ChannelDetailPage({ params, searchParams }: PagePr
                             </div>
 
                             {/* YouTube link */}
-                            {channelMeta.channelUrl && (
-                                <a
-                                    href={channelMeta.channelUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                                >
-                                    View on YouTube
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                </a>
-                            )}
+                            <a
+                                href={youtubeChannelUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                            >
+                                View on YouTube
+                                <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
                         </div>
                     </div>
 
