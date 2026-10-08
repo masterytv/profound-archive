@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { Music, Play, X } from "lucide-react";
-import { FEATURED_VIDEO, markFeaturedVideoSeen, trackFeaturedVideo } from "@/lib/featured-video";
+import { FEATURED_VIDEO, trackFeaturedVideo } from "@/lib/featured-video";
 import { FeaturedVideoPlayer } from "./FeaturedVideoPlayer";
 
 /** Strip under the /nde hero search: a single line that expands into the player. */
 export function MusicVideoStrip() {
     const [open, setOpen] = useState(false);
+
+    if (!FEATURED_VIDEO.enabled) return null;
 
     if (open) {
         return (
@@ -36,7 +38,6 @@ export function MusicVideoStrip() {
                 type="button"
                 onClick={() => {
                     trackFeaturedVideo("open", "nde_strip");
-                    markFeaturedVideoSeen();
                     setOpen(true);
                 }}
                 className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white font-medium px-4 py-1.5 shadow-sm transition-colors"
