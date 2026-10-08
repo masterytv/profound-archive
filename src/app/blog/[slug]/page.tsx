@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, Clock, Calendar, Tag, ExternalLink, BookOpen, Pencil } from "lucide-react";
 import { markdownToHtml } from "@/lib/markdown";
 import MicroFeedback from "@/components/micro-feedback";
+import { MusicVideoCard } from "@/components/featured-video/MusicVideoCard";
 
 export const revalidate = 86400; // ISR: revalidate once per day
 
@@ -363,6 +364,9 @@ export default async function BlogPostPage({
                             />
                         );
                     })()}
+
+                    {/* Featured music video */}
+                    <MusicVideoCard />
 
                     {/* Tags */}
                     {post.tags && post.tags.length > 0 && (

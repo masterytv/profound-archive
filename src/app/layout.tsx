@@ -12,6 +12,7 @@ import { Suspense } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 import CookieConsent from '@/components/cookie-consent';
 import ConsentGatedScripts from '@/components/consent-gated-scripts';
+import { MusicVideoBanner } from '@/components/featured-video/MusicVideoBanner';
 
 const siteTitle = 'Project Profound: Near Death Experiences and Consciousness';
 const siteDescription = 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences.';
@@ -60,6 +61,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <MusicVideoBanner />
           <SiteHeader />
           <main className="flex-grow">{children}</main>
           <SiteFooter />
