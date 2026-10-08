@@ -1,14 +1,36 @@
 import { describe, it, expect } from 'vitest';
-import { FEATURED_VIDEO, isBannerActive } from '@/lib/featured-video';
+import { FEATURED_VIDEO, isNdeSectionPath } from '@/lib/featured-video';
 
-describe('isBannerActive', () => {
-    it('is active up to and including the last promotion day', () => {
-        expect(isBannerActive(new Date('2026-10-08T12:00:00Z'))).toBe(true);
-        expect(isBannerActive(new Date(`${FEATURED_VIDEO.bannerUntil}T23:00:00Z`))).toBe(true);
+describe('isNdeSectionPath', () => {
+    it.each([
+        '/nde',
+        '/video/eQ86fFWLvys',
+        '/video-explore',
+        '/experiencer/scott-drummond',
+        '/channels',
+        '/channel/UCSrjs9KcP-Tg9wSKjsWS-jw',
+        '/blog/hell-real-place-nde-evidence',
+        '/explore/greyson',
+        '/search3',
+        '/questions/what-is-a-life-review',
+        '/visualize/nde-elements',
+    ])('shows the banner on NDE page %s', (path) => {
+        expect(isNdeSectionPath(path)).toBe(true);
     });
 
-    it('switches off after the promotion window', () => {
-        expect(isBannerActive(new Date('2026-11-20T00:00:01Z'))).toBe(false);
+    it.each([
+        '/',
+        '/uap',
+        '/uap/video/abc',
+        '/uap/blog/some-post',
+        '/visualize',
+        '/visualize/uap-timeline',
+        '/about',
+        '/admin',
+        '/login',
+        '/videos-not-a-real-prefix',
+    ])('hides the banner on non-NDE page %s', (path) => {
+        expect(isNdeSectionPath(path)).toBe(false);
     });
 });
 

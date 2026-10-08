@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Play } from "lucide-react";
 import {
     FEATURED_VIDEO,
-    markFeaturedVideoSeen,
     trackFeaturedVideo,
     type FeaturedVideoPlacement,
 } from "@/lib/featured-video";
@@ -26,7 +25,6 @@ export function FeaturedVideoPlayer({ placement, autoStart = false }: FeaturedVi
 
     const play = () => {
         trackFeaturedVideo("play", placement);
-        markFeaturedVideoSeen();
         setIsPlaying(true);
     };
 

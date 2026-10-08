@@ -4,6 +4,8 @@ import { FeaturedVideoPlayer } from "./FeaturedVideoPlayer";
 
 /** End-of-article card on NDE blog posts. */
 export function MusicVideoCard() {
+    if (!FEATURED_VIDEO.enabled) return null;
+
     return (
         <aside
             aria-labelledby="music-video-card-heading"

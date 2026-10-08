@@ -1,12 +1,13 @@
 /**
  * Featured video — Project Profound's own NDE music video.
  *
- * Promoted in three places: a site-wide dismissible banner, a strip under the
- * /nde hero search, and a card at the end of every NDE blog post. Deliberately
+ * Promoted in three places: a persistent banner across the NDE section, a strip
+ * under the /nde hero search, and a card at the end of every NDE blog post. Deliberately
  * kept out of nde_vids: it's a song, not a testimony, and must not skew the
  * archive's channel stats or search.
  *
- * To swap or retire the promotion, edit this file only.
+ * To swap or retire the promotion, edit this file only (set `enabled: false`
+ * to remove the banner, strip and blog card everywhere).
  */
 
 export const FEATURED_VIDEO = {
@@ -16,12 +17,30 @@ export const FEATURED_VIDEO = {
     tagline: 'A song about what really matters',
     buttonLabel: 'NDE Music Video',
     youtubeUrl: 'https://www.youtube.com/watch?v=eQ86fFWLvys',
-    /** The site-wide banner stops showing after this date (the /nde strip and blog card stay). */
-    bannerUntil: '2026-11-19',
+    /** Master switch: false removes the banner, /nde strip and blog card everywhere. */
+    enabled: true,
 } as const;
 
-/** localStorage key: set when a visitor dismisses the banner or plays the video. */
-export const FEATURED_VIDEO_SEEN_KEY = `pp-featured-video-seen:${FEATURED_VIDEO.videoId}`;
+/**
+ * The NDE section — the pages in the header's "Explore NDE" menu plus the NDE
+ * detail pages they lead to. The banner shows on these and nowhere else
+ * (not on /uap, the homepage, about, admin or auth pages).
+ */
+export const NDE_SECTION_PREFIXES = [
+    '/nde',
+    '/search', '/search2', '/search3',
+    '/video', '/video-2025', '/video-explore', '/explore',
+    '/experiencer', '/experiencers', '/experience',
+    '/channel', '/channels',
+    '/scale', '/compass', '/questions', '/chat-compassionate',
+    '/blog',
+    '/visualize/nde-elements',
+] as const;
+
+/** Whether a path belongs to the NDE section (exact prefix match or a sub-path of one). */
+export function isNdeSectionPath(pathname: string): boolean {
+    return NDE_SECTION_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
 
 export type FeaturedVideoPlacement = 'banner' | 'nde_strip' | 'blog_card';
 
@@ -30,7 +49,7 @@ export type FeaturedVideoPlacement = 'banner' | 'nde_strip' | 'blog_card';
  * Reported as `featured_video` with `action` + `placement` params so plays per
  * placement can be compared in GA.
  */
-export function trackFeaturedVideo(action: 'open' | 'play' | 'dismiss', placement: FeaturedVideoPlacement): void {
+export function trackFeaturedVideo(action: 'open' | 'play', placement: FeaturedVideoPlacement): void {
     if (typeof window === 'undefined') return;
     const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
     if (typeof gtag !== 'function') return;
@@ -39,26 +58,4 @@ export function trackFeaturedVideo(action: 'open' | 'play' | 'dismiss', placemen
         placement,
         video_id: FEATURED_VIDEO.videoId,
     });
-}
-
-/** Remember that this visitor has seen/dismissed the promotion. Never throws. */
-export function markFeaturedVideoSeen(): void {
-    try {
-        window.localStorage.setItem(FEATURED_VIDEO_SEEN_KEY, '1');
-    } catch {
-        // Private mode / blocked storage — the banner just shows again next visit.
-    }
-}
-
-export function hasSeenFeaturedVideo(): boolean {
-    try {
-        return window.localStorage.getItem(FEATURED_VIDEO_SEEN_KEY) === '1';
-    } catch {
-        return false;
-    }
-}
-
-/** Whether the site-wide banner is still within its promotion window. */
-export function isBannerActive(now: Date = new Date()): boolean {
-    return now <= new Date(`${FEATURED_VIDEO.bannerUntil}T23:59:59Z`);
 }
