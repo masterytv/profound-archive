@@ -8,6 +8,7 @@ import {
 import { HeroSearchBar } from "@/components/home/HeroSearchBar";
 import { ChannelCard } from "@/components/channels/ChannelCard";
 import { ExperiencerCard, type ExperiencerProfile } from "@/components/experiencer/ExperiencerCard";
+import { MusicVideoStrip } from "@/components/featured-video/MusicVideoStrip";
 import Link from "next/link";
 
 // --- ISR: revalidate every 3 hours (10800 seconds) ---
@@ -231,6 +232,9 @@ export default async function HomeAlt1() {
                     <div className="max-w-2xl mx-auto mb-12">
                         <HeroSearchBar />
                     </div>
+
+                    {/* Featured music video */}
+                    <MusicVideoStrip />
 
                     {/* Stats ribbon */}
                     <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-sm">
