@@ -1,7 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { AI_BOT_UA } from "@/lib/seo/ai-bots";
 
 export async function proxy(request: NextRequest) {
+    // Turn away AI crawlers before any rendering or DB work. robots.txt stays
+    // readable so the polite ones can see they're disallowed.
+    if (request.nextUrl.pathname !== "/robots.txt" && AI_BOT_UA.test(request.headers.get("user-agent") ?? "")) {
+        return new NextResponse(null, { status: 403 });
+    }
+
     // S-9: no per-request logging here — session-cookie fragments and user
     // emails must never be written to hosting logs.
     let supabaseResponse = NextResponse.next({
