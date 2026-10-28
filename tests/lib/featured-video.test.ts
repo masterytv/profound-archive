@@ -4,7 +4,7 @@ import { FEATURED_VIDEO, isNdeSectionPath } from '@/lib/featured-video';
 describe('isNdeSectionPath', () => {
     it.each([
         '/nde',
-        '/video/PWy_BCQLD1A',
+        '/video/p6yv6QDeYKo',
         '/video-explore',
         '/experiencer/scott-drummond',
         '/channels',

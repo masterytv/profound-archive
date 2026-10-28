@@ -11,12 +11,12 @@
  */
 
 export const FEATURED_VIDEO = {
-    videoId: 'PWy_BCQLD1A',
+    videoId: 'p6yv6QDeYKo',
     title: 'It Was You – A Song About What Really Matters (Near-Death Experience Music Video)',
     shortTitle: 'It Was You',
     tagline: 'A song about what really matters',
     buttonLabel: 'NDE Music Video',
-    youtubeUrl: 'https://www.youtube.com/watch?v=PWy_BCQLD1A',
+    youtubeUrl: 'https://www.youtube.com/watch?v=p6yv6QDeYKo',
     /** Master switch: false removes the banner, /nde strip and blog card everywhere. */
     enabled: true,
 } as const;

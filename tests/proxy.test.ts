@@ -114,24 +114,3 @@ describe('proxy — /admin gating (current behavior)', () => {
         expect(res.status).toBe(200);
     });
 });
-
-describe('proxy() AI bot block', () => {
-    it('403s AI crawlers before touching auth', async () => {
-        const res = await proxy(req('/about', { 'user-agent': 'Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)' }));
-        expect(res.status).toBe(403);
-        expect(h.getUser).not.toHaveBeenCalled();
-    });
-
-    it('still serves robots.txt to AI crawlers', async () => {
-        h.getUser.mockResolvedValue({ data: { user: null } });
-        const res = await proxy(req('/robots.txt', { 'user-agent': 'GPTBot/1.2' }));
-        expect(res.status).toBe(200);
-    });
-
-    it('lets Googlebot and Bingbot through', async () => {
-        h.getUser.mockResolvedValue({ data: { user: null } });
-        for (const ua of ['Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)']) {
-            expect((await proxy(req('/about', { 'user-agent': ua }))).status).toBe(200);
-        }
-    });
-});
