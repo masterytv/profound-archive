@@ -2,11 +2,12 @@
  * AI crawlers / agents we turn away. Search crawlers (Googlebot, Bingbot) are
  * deliberately NOT here — none of these tokens appear in their user agents.
  *
- * Used twice: robots.ts disallows them (polite bots obey), and proxy.ts
- * returns 403 for matching user agents before any page renders (for the ones
- * that ignore robots.txt). Google-Extended and Applebot-Extended are
- * robots.txt-only tokens — they opt out of AI training without touching
- * Google/Apple search.
+ * Consumed by robots.ts (polite bots obey). Hard blocking happens at
+ * Cloudflare (Security → Configure AI bot policies), NOT in the app: App
+ * Hosting rewrites every request's User-Agent to "Google" before it reaches
+ * Next, so user-agent checks in proxy.ts can never match (docs/LEARNINGS.md).
+ * Google-Extended and Applebot-Extended are robots.txt-only tokens — they opt
+ * out of AI training without touching Google/Apple search.
  */
 export const AI_BOTS = [
     'GPTBot', 'ChatGPT-User', 'OAI-SearchBot',
@@ -19,5 +20,3 @@ export const AI_BOTS = [
     // Heavy SEO-tool crawlers — not search engines, just load.
     'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'DataForSeoBot', 'BLEXBot',
 ];
-
-export const AI_BOT_UA = new RegExp(AI_BOTS.join('|'), 'i');

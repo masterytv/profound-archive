@@ -1,14 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { AI_BOT_UA } from "@/lib/seo/ai-bots";
 
 export async function proxy(request: NextRequest) {
-    // Turn away AI crawlers before any rendering or DB work. robots.txt stays
-    // readable so the polite ones can see they're disallowed.
-    if (request.nextUrl.pathname !== "/robots.txt" && AI_BOT_UA.test(request.headers.get("user-agent") ?? "")) {
-        return new NextResponse(null, { status: 403 });
-    }
-
     // S-9: no per-request logging here — session-cookie fragments and user
     // emails must never be written to hosting logs.
     let supabaseResponse = NextResponse.next({
@@ -83,12 +76,6 @@ export async function proxy(request: NextRequest) {
             return redirectResponse;
         }
     }
-
-    // TEMP diagnostic (Oct 2026): proves whether App Hosting runs this proxy.
-    // If the header is missing in production, the proxy isn't running there.
-    supabaseResponse.headers.set("x-pp-proxy", "1");
-    supabaseResponse.headers.set("x-pp-ua", (request.headers.get("user-agent") ?? "(none)").slice(0, 200));
-    supabaseResponse.headers.set("x-pp-h", [...request.headers.keys()].join(","));
 
     // IMPORTANT: You *must* return the supabaseResponse object as-is.
     // If you're creating a new response object, copy over all cookies.
