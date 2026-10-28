@@ -1,12 +1,14 @@
 /**
  * Staging noindex flag (NOINDEX_SITE) — set only in apphosting.staging.yaml.
  * Verifies the shared helper and that robots.txt flips to disallow-all on
- * staging while production keeps the allow-all + sitemap behavior.
+ * staging while production allows search crawlers, blocks AI bots, and
+ * keeps the sitemap.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 import { shouldNoindex } from '@/lib/seo/indexing';
 import robots from '@/app/robots';
+import { AI_BOTS } from '@/lib/seo/ai-bots';
 
 afterEach(() => {
     vi.unstubAllEnvs();
@@ -32,10 +34,13 @@ describe('shouldNoindex()', () => {
 });
 
 describe('robots.txt', () => {
-    it('allows all crawlers and advertises the sitemap in production', () => {
+    it('blocks AI bots, allows everyone else, and advertises the sitemap in production', () => {
         delete process.env.NOINDEX_SITE;
         expect(robots()).toEqual({
-            rules: { userAgent: '*', allow: '/' },
+            rules: [
+                { userAgent: AI_BOTS, disallow: '/' },
+                { userAgent: '*', allow: '/' },
+            ],
             sitemap: 'https://projectprofound.org/sitemap.xml',
         });
     });
