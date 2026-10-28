@@ -84,6 +84,10 @@ export async function proxy(request: NextRequest) {
         }
     }
 
+    // TEMP diagnostic (Oct 2026): proves whether App Hosting runs this proxy.
+    // If the header is missing in production, the proxy isn't running there.
+    supabaseResponse.headers.set("x-pp-proxy", "1");
+
     // IMPORTANT: You *must* return the supabaseResponse object as-is.
     // If you're creating a new response object, copy over all cookies.
     return supabaseResponse;
