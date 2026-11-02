@@ -36,6 +36,27 @@ function toSlug(name: string): string {
     .trim();
 }
 
+const normalize = (text: string | null) =>
+  (text || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+const containsWords = (text: string, words: string) => ` ${text} `.includes(` ${words} `);
+
+/**
+ * Hosts get credited as the experiencer on videos where they interview someone
+ * else, so the credit alone isn't enough: the title or description must name
+ * them, and on their own channel only the title counts.
+ */
+function namesExperiencer(
+  video: { title: string | null; description: string | null; channelName: string | null },
+  name: string,
+): boolean {
+  const fullName = normalize(name);
+  if (containsWords(normalize(video.title), fullName)) return true;
+
+  const surname = fullName.split(' ').pop()!;
+  return !containsWords(normalize(video.channelName), surname)
+    && containsWords(normalize(video.description), fullName);
+}
+
 /**
  * Other NDE videos credited to this name. A single word like "Dave" can't tell
  * two people apart, so only full names pull in other videos.
@@ -45,11 +66,11 @@ async function findVideoIdsByName(supabase: SupabaseClient, name: string): Promi
 
   const { data } = await supabase
     .from('nde_vids')
-    .select('videoId')
+    .select('videoId, title, description, channelName')
     .ilike('experiencerFullName', name)
     .in('isNde', ['clear_nde', 'possible_nde']);
 
-  return (data || []).map((v: any) => v.videoId);
+  return (data || []).filter((v: any) => namesExperiencer(v, name)).map((v: any) => v.videoId);
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────

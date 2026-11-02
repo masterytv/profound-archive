@@ -18,7 +18,11 @@ vi.mock('../../src/lib/pipeline/experiencer-profile', () => ({
 
 import { syncExperiencerProfile } from '@/lib/pipeline/experiencer-sync';
 
-function fakeSupabase(profile: { id: number; slug: string; full_name: string; video_ids: string[] }, sameName: string[]) {
+type VideoRow = { videoId: string; title: string; description: string; channelName: string };
+
+function fakeSupabase(profile: { id: number; slug: string; full_name: string; video_ids: string[] }, sameName: (string | VideoRow)[]) {
+    const rows = sameName.map((v) =>
+        typeof v === 'string' ? { videoId: v, title: `Talk with ${profile.full_name}`, description: '', channelName: 'IANDS' } : v);
     const update = vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) }));
     const videoQuery = vi.fn();
     const from = vi.fn((table: string) => {
@@ -33,7 +37,7 @@ function fakeSupabase(profile: { id: number; slug: string; full_name: string; vi
         videoQuery();
         return {
             select: () => ({
-                ilike: () => ({ in: async () => ({ data: sameName.map((videoId) => ({ videoId })) }) }),
+                ilike: () => ({ in: async () => ({ data: rows }) }),
             }),
         };
     });
@@ -80,6 +84,25 @@ describe('syncExperiencerProfile — existing profile', () => {
 
         expect(update).not.toHaveBeenCalled();
         expect(result).toMatchObject({ updated: false, videoCount: 2 });
+    });
+
+    it('leaves out same-name videos that do not name the person, like interviews they host', async () => {
+        const channel = 'Pegi Robinson - NDE TV';
+        const { client, update } = fakeSupabase(
+            { id: 3, slug: 'pegi-robinson', full_name: 'Pegi Robinson', video_ids: ['a'] },
+            [
+                { videoId: 'guest-interview', title: 'NDE TV presents Trapper Jack', description: 'Hosted by Pegi Robinson', channelName: channel },
+                { videoId: 'own-story', title: 'NDE TV Host Pegi Robinson sharing her NDE', description: '', channelName: channel },
+                { videoId: 'named-in-description', title: 'She drowned at five', description: 'Pegi Robinson shares her story', channelName: 'IANDS' },
+                { videoId: 'not-named', title: 'She drowned at five', description: '', channelName: 'IANDS' },
+            ],
+        );
+
+        await syncExperiencerProfile(client, 'Pegi Robinson', 'new');
+
+        expect(update).toHaveBeenCalledWith(expect.objectContaining({
+            video_ids: ['a', 'new', 'own-story', 'named-in-description'],
+        }));
     });
 
     it('links only the new video for a single-word name', async () => {
