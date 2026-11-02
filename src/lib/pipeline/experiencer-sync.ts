@@ -36,15 +36,31 @@ function toSlug(name: string): string {
     .trim();
 }
 
+/**
+ * Other NDE videos credited to this name. A single word like "Dave" can't tell
+ * two people apart, so only full names pull in other videos.
+ */
+async function findVideoIdsByName(supabase: SupabaseClient, name: string): Promise<string[]> {
+  if (!name.includes(' ')) return [];
+
+  const { data } = await supabase
+    .from('nde_vids')
+    .select('videoId')
+    .ilike('experiencerFullName', name)
+    .in('isNde', ['clear_nde', 'possible_nde']);
+
+  return (data || []).map((v: any) => v.videoId);
+}
+
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 /**
  * Sync an experiencer profile after a video is processed.
- * 
+ *
  * 1. Checks if a profile already exists for this name (case-insensitive)
- * 2. If exists → ensures the new videoId is in video_ids, re-enriches
+ * 2. If exists → adds this videoId and any other videos for this name, re-enriches
  * 3. If not → gathers all video_ids for this name, creates stub, enriches
- * 
+ *
  * @param supabase - Admin client with service role key
  * @param experiencerFullName - The AI-extracted experiencer name
  * @param videoId - The just-processed video ID
@@ -69,10 +85,15 @@ export async function syncExperiencerProfile(
     .maybeSingle();
 
   if (existingProfile) {
-    // Profile exists — ensure video_ids includes this new videoId
+    // Profile exists — ensure video_ids includes this videoId and its same-name videos
     const currentVideoIds: string[] = existingProfile.video_ids || [];
-    
-    if (currentVideoIds.includes(videoId)) {
+    const updatedVideoIds = Array.from(new Set([
+      ...currentVideoIds,
+      videoId,
+      ...await findVideoIdsByName(supabase, trimmedName),
+    ]));
+
+    if (updatedVideoIds.length === currentVideoIds.length) {
       // Already linked — just re-enrich to refresh data
       const enrichResult = await generateExperiencerProfile(supabase, existingProfile.id);
       return {
@@ -86,8 +107,7 @@ export async function syncExperiencerProfile(
       };
     }
 
-    // New video for existing experiencer — append to video_ids
-    const updatedVideoIds = [...currentVideoIds, videoId];
+    // New videos for existing experiencer — save to video_ids
     const { error: updateError } = await supabase
       .from('experiencer_profiles')
       .update({ 
@@ -114,21 +134,15 @@ export async function syncExperiencerProfile(
       slug: existingProfile.slug,
       profileId: existingProfile.id,
       videoCount: updatedVideoIds.length,
-      message: `Added video, now ${updatedVideoIds.length} videos. ${enrichResult.message}`,
+      message: `Added ${updatedVideoIds.length - currentVideoIds.length} video(s), now ${updatedVideoIds.length} videos. ${enrichResult.message}`,
     };
   }
 
   // 2. Profile doesn't exist — gather ALL videos for this experiencer name
   //    (there may be other videos with the same name already in the DB)
-  const { data: allVideos } = await supabase
-    .from('nde_vids')
-    .select('videoId')
-    .ilike('experiencerFullName', trimmedName)
-    .in('isNde', ['clear_nde', 'possible_nde']);
-
   const allVideoIds = Array.from(
     new Set([
-      ...(allVideos || []).map((v: any) => v.videoId),
+      ...await findVideoIdsByName(supabase, trimmedName),
       videoId, // Ensure the current video is always included
     ])
   );

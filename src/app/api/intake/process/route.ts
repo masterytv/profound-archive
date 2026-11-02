@@ -105,7 +105,9 @@ export async function POST(request: Request) {
         const { error: updateError } = await supabase
             .from('jobs')
             .update({
-                status: result.status,
+                // jobs_status_check only allows 'complete' and 'failed' as end states.
+                // The real outcome (already_exists, not_profound, ...) lives in `result`.
+                status: result.status === 'failed' ? 'failed' : 'complete',
                 video_title: result.title || null,
                 video_id: result.videoId || null,
                 error_message: result.error || null,
@@ -114,8 +116,9 @@ export async function POST(request: Request) {
             })
             .eq('id', jobId);
 
+        // Without a saved end state the admin page polls forever, so let the catch mark it failed.
         if (updateError) {
-            console.error(`[Intake Process] Failed to update job ${jobId}:`, updateError);
+            throw new Error(`Failed to save job result: ${updateError.message}`);
         }
 
         console.log(`[Intake Process] Job ${jobId} finished with status: ${result.status}`);
