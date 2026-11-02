@@ -111,6 +111,12 @@ const resultBadge: Record<string, {
         cardClass: 'bg-amber-50 border-amber-200',
         iconBgClass: 'bg-amber-100',
     },
+    caption_fetch_failed: {
+        label: 'Caption Fetch Failed — Try Again',
+        icon: <AlertTriangle className="w-5 h-5 text-amber-600" />,
+        cardClass: 'bg-amber-50 border-amber-200',
+        iconBgClass: 'bg-amber-100',
+    },
     failed: {
         label: 'Processing Failed',
         icon: <XCircle className="w-5 h-5 text-red-500" />,
@@ -125,10 +131,12 @@ const resultBadge: Record<string, {
     },
 };
 
-// Terminal statuses that stop polling
-const TERMINAL_STATUSES = new Set([
-    'complete', 'failed', 'not_profound', 'no_captions', 'already_exists', 'is_short'
-]);
+// Terminal statuses that stop polling. A job only ever ends as one of these;
+// the pipeline's actual outcome (already_exists, not_profound, ...) is in job.result.
+const TERMINAL_STATUSES = new Set(['complete', 'failed']);
+
+// Well past Cloud Run's 600s request timeout, after which no result can arrive
+const POLL_LIMIT_MS = 15 * 60 * 1000;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -170,6 +178,13 @@ export default function IntakePage() {
 
         // Poll every 3 seconds
         pollRef.current = setInterval(async () => {
+            if (Date.now() - startTime > POLL_LIMIT_MS) {
+                stopPolling();
+                setIsLoading(false);
+                setError(`No result after 15 minutes, so the server probably stopped before saving one. The video may still have been processed. Job ID: ${id}`);
+                return;
+            }
+
             try {
                 const res = await fetch(`/api/intake?jobId=${id}`);
                 if (!res.ok) {
