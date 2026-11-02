@@ -274,7 +274,8 @@ export async function generateExperiencerProfile(
   const allElements: HighlightElement[] = [];
   for (const video of videos) {
     const analysis = analysisMap.get(video.videoId);
-    if (!analysis?.core_elements) continue;
+    // A failed analysis stores { error, timestamp } here instead of a list
+    if (!Array.isArray(analysis?.core_elements)) continue;
 
     const segments = subtitleMap.get(video.videoId) || null;
     const elements = analysis.core_elements as CoreElement[];
