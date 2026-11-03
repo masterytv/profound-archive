@@ -7,7 +7,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const h = vi.hoisted(() => ({
     generateExperiencerProfile: vi.fn(),
+    revalidatePath: vi.fn(),
 }));
+
+vi.mock('next/cache', () => ({ revalidatePath: h.revalidatePath }));
 
 vi.mock('@/lib/pipeline/experiencer-profile', () => ({
     generateExperiencerProfile: h.generateExperiencerProfile,
@@ -16,7 +19,7 @@ vi.mock('../../src/lib/pipeline/experiencer-profile', () => ({
     generateExperiencerProfile: h.generateExperiencerProfile,
 }));
 
-import { syncExperiencerProfile } from '@/lib/pipeline/experiencer-sync';
+import { syncExperiencerProfile, refreshExperiencerPages } from '@/lib/pipeline/experiencer-sync';
 
 type VideoRow = { videoId: string; title: string; description: string; channelName: string };
 
@@ -115,5 +118,32 @@ describe('syncExperiencerProfile — existing profile', () => {
 
         expect(videoQuery).not.toHaveBeenCalled();
         expect(update).toHaveBeenCalledWith(expect.objectContaining({ video_ids: ['a', 'new'] }));
+    });
+});
+
+// The profile page caches for 24h, so a newly linked video stayed invisible
+// (Nancy Rynes, Nov 2026) until intake started revalidating it.
+describe('refreshExperiencerPages', () => {
+    const base = { created: false, updated: true, enriched: true, slug: 'nancy-rynes', profileId: 7, videoCount: 2, message: '' };
+
+    it('revalidates the concrete profile URL with no route type', () => {
+        expect(refreshExperiencerPages(base)).toBe(true);
+        expect(h.revalidatePath).toHaveBeenCalledTimes(1);
+        expect(h.revalidatePath).toHaveBeenCalledWith('/experiencer/nancy-rynes');
+    });
+
+    it('also revalidates the directory when the profile is new', () => {
+        refreshExperiencerPages({ ...base, created: true, updated: false });
+        expect(h.revalidatePath).toHaveBeenCalledWith('/experiencer');
+    });
+
+    it('skips when no profile was linked', () => {
+        expect(refreshExperiencerPages({ ...base, slug: '', profileId: 0 })).toBe(false);
+        expect(h.revalidatePath).not.toHaveBeenCalled();
+    });
+
+    it('returns false outside a Next request instead of throwing', () => {
+        h.revalidatePath.mockImplementationOnce(() => { throw new Error('static generation store missing'); });
+        expect(refreshExperiencerPages(base)).toBe(false);
     });
 });
