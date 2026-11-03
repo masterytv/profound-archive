@@ -20,8 +20,8 @@ Clip links open at the moment found by search. Quotes in this document are the p
 | Video | Views (2026-11-03) | What it tells us |
 | --- | --- | --- |
 | [The Deathbed Doctor: Weeks Before Death, Patients Start Having Visions (The Diary Of A CEO, 2026-10-19)](https://www.youtube.com/watch?v=GlaSnROMqRY) | 4,584,038 | Deathbed visions are the hottest adjacent topic right now. Top comments are first-hand "my mother saw her mother" stories with thousands of likes. |
-| [What Nobody Tells You About Death | The Living Feel It Too (The Why Files, 2026-03-27)](https://www.youtube.com/watch?v=xauvaJ1kTBo) | 1,990,856 | Shared-death experiences reached a mainstream mystery channel. |
-| [What Happens After Death? | Does Aatma really Exist? (Dhruv Rathee, 2026-07-19)](https://www.youtube.com/watch?v=fFMcolWgD3w) | 15,200,678 | Mass-market "what happens after death" explainers reach tens of millions. |
+| [What Nobody Tells You About Death \| The Living Feel It Too (The Why Files, 2026-03-27)](https://www.youtube.com/watch?v=xauvaJ1kTBo) | 1,990,856 | Shared-death experiences reached a mainstream mystery channel. |
+| [What Happens After Death? \| Does Aatma really Exist? (Dhruv Rathee, 2026-07-19)](https://www.youtube.com/watch?v=fFMcolWgD3w) | 15,200,678 | Mass-market "what happens after death" explainers reach tens of millions. |
 | [What you'll see when you die (The Opening, 2026-05-15)](https://www.youtube.com/watch?v=KJg1-FCweWI) | 2,617,798 | Generic "what you'll see" titles still work. |
 | [A Nurse's Near-Death Experience: A Life Review That Changed Everything (Coming Home, 2026-01-29)](https://www.youtube.com/watch?v=Qbvs1ncHcwo) | 1,728,944 | Long, calm, single-experiencer interviews about the life review do 1M+. |
 | [What happens when you die? John Burke has studied 1,500 people who died and came back (Nicholas John, 2025-07-30)](https://www.youtube.com/watch?v=MtEVHv3i5Ec) | 1,381,963 | "Someone studied 1,500 / 2,000 / 5,000 NDEs" is a proven title shape. Project Profound can say 6,454. |
