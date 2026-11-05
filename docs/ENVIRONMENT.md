@@ -33,6 +33,7 @@
 | Variable | Description | Scope |
 |---|---|---|
 | `CRON_SECRET` | Bearer token for authenticating internal cron/scheduler calls | Server-only |
+| `SHORTMAKER_API_KEY` | Bearer key for the read-only Short Maker research API (`/api/research/cases`, `/api/research/counts`). Unset = the API answers 401 | Server-only |
 
 ### Supabase Vault Secrets (pg_cron scheduler)
 The UAP Video Processor runs via `pg_cron` inside Supabase (replaces unreliable GitHub Actions cron — see migration `20260513_001_pg_cron_uap_processor.sql`).
