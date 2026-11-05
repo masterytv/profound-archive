@@ -10,6 +10,7 @@
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
+import { revalidatePath } from 'next/cache';
 import { generateExperiencerProfile } from './experiencer-profile';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -71,6 +72,24 @@ async function findVideoIdsByName(supabase: SupabaseClient, name: string): Promi
     .in('isNde', ['clear_nde', 'possible_nde']);
 
   return (data || []).filter((v: any) => namesExperiencer(v, name)).map((v: any) => v.videoId);
+}
+
+/**
+ * Rebuild the cached profile page (and the directory, for a new profile) so a
+ * newly linked video shows now instead of after the 24h revalidate window.
+ * Pass a concrete URL with no type: `revalidatePath(url, 'page')` never
+ * matches a dynamic route's cache entry (see api/admin/revalidate).
+ * Only works inside a Next request; standalone scripts get `false` back.
+ */
+export function refreshExperiencerPages(result: ExperiencerSyncResult): boolean {
+  if (!result.profileId || !result.slug) return false;
+  try {
+    revalidatePath(`/experiencer/${result.slug}`);
+    if (result.created) revalidatePath('/experiencer');
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────

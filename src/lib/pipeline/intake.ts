@@ -35,7 +35,7 @@ import { analyzeJourneyFlow } from '@/lib/ai/journey-flow';
 import { analyzeCvndeScore } from '@/lib/ai/cvnde';
 import { generateNdeSummary } from '@/lib/ai/nde-summary';
 import { buildFingerprint } from '@/lib/ai/fingerprint';
-import { syncExperiencerProfile } from '@/lib/pipeline/experiencer-sync';
+import { syncExperiencerProfile, refreshExperiencerPages } from '@/lib/pipeline/experiencer-sync';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -409,6 +409,9 @@ export async function processVideoIntake(
                             : `Profile exists: /experiencer/${syncResult.slug}`,
                     Date.now() - startSync
                 );
+                const refreshed = refreshExperiencerPages(syncResult);
+                logStep('Refresh Experiencer Page', refreshed ? 'success' : 'skipped',
+                    refreshed ? `Revalidated /experiencer/${syncResult.slug}` : 'No linked profile or not in a request');
             } catch (syncErr: any) {
                 // Non-fatal — don't block the pipeline for profile sync failures
                 logStep('Sync Experiencer Profile', 'failed', syncErr.message, Date.now() - startSync);
