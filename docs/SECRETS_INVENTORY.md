@@ -53,7 +53,7 @@ Priority order = blast radius × likely exposure. Rotate top-down.
 | 11 | `SUPADATA_API_KEY` | Supadata | Transcript fallback | SM, VM | ⬜ | ⬜ | Pending |
 | 12 | `ELEVENLABS_API_KEY` | ElevenLabs | Referenced in code (TTS?) — **sub was cancelled** | ? | ⬜ | ⬜ | **Decide: re-key or remove code** (account under `awetomatic@`) |
 | 13 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Telegram | Alerts/notifications | SM | n/a | ⬜ | Pending |
-| 14 | `SHORTMAKER_API_KEY` | self | Read-only Short Maker research API (`src/lib/research/shortmaker/auth.ts`); the same value is `PP_API_KEY` in Short Maker's Vercel env | SM (to create) | n/a | ⬜ new | Pending — Tom creates it; then map it in `apphosting.yaml` |
+| 14 | `SHORTMAKER_API_KEY` | self | Read-only Short Maker research API (`src/lib/research/shortmaker/auth.ts`); the same value is `PP_API_KEY` in Short Maker's Vercel env | SM `v1` | n/a | ✅ 2026-11-05 | Created by Tom; mapped in `apphosting.yaml` (inherited by staging) |
 | 14 | `GA_CLIENT_EMAIL` / `GA_PRIVATE_KEY` | Google service account (`project-profound-analytics@…`) | Analytics dashboard | SM | n/a | ⬜ | **Service-account key — high value, verify not leaked** |
 | 15 | `TYPESENSE_API_KEY` | Typesense | **DEAD** — Typesense removed from stack | — | — | n/a | 🗑 Remove dead code refs |
 

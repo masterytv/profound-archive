@@ -62,6 +62,11 @@ env:
   - variable: ANTHROPIC_API_KEY
     secret: projects/432036554831/secrets/ANTHROPIC_API_KEY/versions/1
 
+  # Short Maker's read-only research API (src/lib/research/shortmaker/auth.ts); the same value is
+  # PP_API_KEY in Short Maker's Vercel env. Pinned to a numeric version (docs/LEARNINGS.md §5).
+  - variable: SHORTMAKER_API_KEY
+    secret: projects/432036554831/secrets/SHORTMAKER_API_KEY/versions/1
+
   # Secret for securing Cron/Automated jobs
   - variable: CRON_SECRET
     secret: projects/432036554831/secrets/CRON_SECRET/versions/3
