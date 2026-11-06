@@ -1,0 +1,21 @@
+# Kept out of the knowledge graph to avoid paying for semantic extraction of bulk/generated text.
+# Code is always parsed (free AST); these are large generated corpus digests, logs and images.
+research/corpus-atlas/digests/
+research/corpus-atlas/merged/
+research/corpus-atlas/merged-openai/
+research/corpus-atlas/stats/
+logs/
+session_log/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+# Duplicates or raw dumps of other docs
+research/corpus-atlas/narrative/
+execution/afterlife-map/research/mined-heads.txt
+execution/afterlife-map/research/mined-phrases.txt
+.gemini_push_content.txt
+GEMINI_OLD_FEB2026.md
+docs/LEARNINGS_OLD_BLOATED.md
