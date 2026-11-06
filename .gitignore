@@ -74,3 +74,7 @@ logs/
 # Afterlife-map working data: 200MB+ of corpus dumps and sampled audit packets pulled from
 # the shared DB. Regenerable with execution/afterlife-map/00-dump-corpus.mjs — never commit.
 /scratch/
+
+# graphify: machine-specific interpreter/root paths (re-created on each run)
+graphify-out/.graphify_python
+graphify-out/.graphify_root
