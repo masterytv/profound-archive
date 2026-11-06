@@ -62,9 +62,19 @@ triad-output.log
 # pipeline runtime state + logs (Oracle VM writes these into the repo dir)
 logs/
 
-# Claude Code local state: worktrees, machine-specific hook paths, personal settings
-.claude/
+# Claude Code local state: worktrees, machine-specific hook paths, personal settings.
+# Exception: the project-scoped graphify skill, its hooks and its CLAUDE.md pointer are shared.
+.claude/*
+!.claude/CLAUDE.md
+!.claude/settings.json
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/graphify/
 
 # Afterlife-map working data: 200MB+ of corpus dumps and sampled audit packets pulled from
 # the shared DB. Regenerable with execution/afterlife-map/00-dump-corpus.mjs — never commit.
 /scratch/
+
+# graphify: machine-specific interpreter/root paths (re-created on each run)
+graphify-out/.graphify_python
+graphify-out/.graphify_root
