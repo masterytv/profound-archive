@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "apphosting.yaml": {
-    "mtime": 1794243413.4743724,
-    "seen": 1794246636.97431,
-    "ast_hash": "617f893cb8d12eb5c64d087536c6cdd3",
+    "mtime": 1794250774.212837,
+    "seen": 1794251276.1126766,
+    "ast_hash": "edce2558382ddbdd7c4d95551398a670",
     "semantic_hash": ""
   },
   "components.json": {
@@ -2040,10 +2040,10 @@
     "semantic_hash": "3e2d529de64b0a20ddff874726f38445"
   },
   "src/app/layout.tsx": {
-    "mtime": 1794231337.64476,
-    "seen": 1794242091.6559556,
-    "ast_hash": "2f2ff15db931fe5b1a2e8fad90cd84c6",
-    "semantic_hash": "2f2ff15db931fe5b1a2e8fad90cd84c6"
+    "mtime": 1794251022.2216616,
+    "seen": 1794251276.123,
+    "ast_hash": "3a15a12ca7b1b08bce04cdd111f39023",
+    "semantic_hash": ""
   },
   "src/app/llms.txt/route.ts": {
     "mtime": 1794231337.64476,
@@ -3522,10 +3522,10 @@
     "semantic_hash": "0b8fb484cf602fe973d2e0f2f39973fb"
   },
   "src/components/unified-site-header.tsx": {
-    "mtime": 1794231337.6600912,
-    "seen": 1794242091.6562264,
-    "ast_hash": "4b818bc0c3346628a0147639c64d8e57",
-    "semantic_hash": "4b818bc0c3346628a0147639c64d8e57"
+    "mtime": 1794251142.7536888,
+    "seen": 1794251276.1292887,
+    "ast_hash": "9ad19312a059301be5af418a993c0349",
+    "semantic_hash": ""
   },
   "src/components/video-explore/AdvancedFilters.tsx": {
     "mtime": 1794231337.6600912,
@@ -5652,9 +5652,9 @@
     "semantic_hash": ""
   },
   "docs/share/SETUP.md": {
-    "mtime": 1794249809.655725,
-    "seen": 1794249900.1149607,
-    "ast_hash": "b2cb0371386fac73cb77af2bd8431a7b",
+    "mtime": 1794251265.8408663,
+    "seen": 1794251276.134314,
+    "ast_hash": "79185429cff66edf7188722591be11cc",
     "semantic_hash": ""
   },
   "scripts/share/requirements.txt": {
@@ -5685,6 +5685,18 @@
     "mtime": 1794249822.2527251,
     "seen": 1794249900.1047952,
     "ast_hash": "4816db8a705174b75b66e753ddcbfcd6",
+    "semantic_hash": ""
+  },
+  "src/components/share/ShareBanner.tsx": {
+    "mtime": 1794250845.8762517,
+    "seen": 1794251276.1276588,
+    "ast_hash": "819b368849dbee4db48a455876ba6eed",
+    "semantic_hash": ""
+  },
+  "tests/lib/share-banner.test.ts": {
+    "mtime": 1794250774.2186198,
+    "seen": 1794251276.1330545,
+    "ast_hash": "30808fe8b56ed68e38e4606f0e356d91",
     "semantic_hash": ""
   },
   "package-lock.json": {
