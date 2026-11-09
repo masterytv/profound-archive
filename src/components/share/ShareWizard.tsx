@@ -170,7 +170,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                 intro_channel_ids: introMode === 'selected' ? [...selected] : [],
                 text: mediaKind === 'text' ? text : null,
             });
-            if (!created.ok || !created.data) throw new Error(created.ok ? 'Could not save your story.' : created.error);
+            if (!created.ok || !created.data) throw new Error(created.ok ? 'Could not save your experience.' : created.error);
             const { storyId, uploadPrefix } = created.data;
 
             if (mediaKind !== 'text') {
@@ -187,7 +187,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
             if (!submitted.ok) throw new Error(submitted.error);
             router.push(`/share/my-experiences/${storyId}`);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Something went wrong. Your story was not lost: please try again.');
+            setError(err instanceof Error ? err.message : 'Something went wrong. Your experience was not lost: please try again.');
             setBusy(false);
             setProgress(null);
         }

@@ -16,7 +16,7 @@ export const MAX_MEDIA_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB (bucket limit)
 export const MAX_TEXT_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 export const MAX_TEXT_CHARS = 200_000;
 
-export const STORIES_PER_DAY = 5;
+export const STORIES_PER_DAY = 10; // raised from 5 for testing (Tom, 2026-11-09)
 export const INTROS_PER_WEEK = 10;
 export const INVITE_TTL_DAYS = 7;
 export const INTRO_TTL_DAYS = 14;
