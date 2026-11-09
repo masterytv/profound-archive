@@ -50,9 +50,12 @@ export default async function SharePage() {
                         <p className="flex gap-2"><Globe className="h-5 w-5 text-indigo-500 shrink-0" /> What you share is published on projectprofound.org and the Project Profound YouTube channel.</p>
                         <p className="flex gap-2"><Lock className="h-5 w-5 text-indigo-500 shrink-0" /> You choose whether your name is shown. Your contact details are never public.</p>
                     </div>
-                    <Link href="/login?returnTo=/share" className="inline-flex items-center rounded-lg bg-indigo-600 px-5 py-3 text-white font-medium hover:bg-indigo-700">
-                        Sign in to share
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-4">
+                        <Link href="/login?returnTo=/share" className="inline-flex items-center rounded-lg bg-indigo-600 px-5 py-3 text-white font-medium hover:bg-indigo-700">
+                            Sign in to share
+                        </Link>
+                        <Link href="/experiences" className="text-indigo-600 underline">Watch, listen to or read shared experiences</Link>
+                    </div>
                     <p className="text-sm text-slate-500">
                         Signing in lets you come back, edit or delete your story later. You can sign in with Google or with a link sent to your email. Read the{' '}
                         <Link href="/share/agreement" className="underline">Experiencer Agreement</Link>.
@@ -72,8 +75,9 @@ async function ShareWizardLoader({ userId, defaultName }: { userId: string; defa
     ]);
     return (
         <>
-            <p className="text-sm">
-                <Link href="/share/my-stories" className="text-indigo-600 underline">My stories</Link>
+            <p className="text-sm flex flex-wrap gap-x-5 gap-y-1">
+                <Link href="/share/my-experiences" className="text-indigo-600 underline">My experiences</Link>
+                <Link href="/experiences" className="text-indigo-600 underline">All shared experiences</Link>
             </p>
             <ShareWizard
                 needsAgreement={!accepted}

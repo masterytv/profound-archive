@@ -174,7 +174,7 @@ function revalidateStory(story: Pick<OwnStory, 'slug'>) {
     try {
         revalidatePath('/experiences');
         revalidatePath(`/experiences/${story.slug}`);
-        revalidatePath('/share/my-stories');
+        revalidatePath('/share/my-experiences');
     } catch {
         /* outside a request (webhook/cron) revalidation is best-effort */
     }

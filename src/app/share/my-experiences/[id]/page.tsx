@@ -15,7 +15,7 @@ export default async function MyStoryPage({ params }: { params: Promise<{ id: st
     if (!isShareEnabled()) notFound();
     const { id } = await params;
     const user = await currentUser();
-    if (!user) redirect(`/login?returnTo=/share/my-stories/${id}`);
+    if (!user) redirect(`/login?returnTo=/share/my-experiences/${id}`);
 
     let story: OwnStory;
     try {
@@ -34,7 +34,7 @@ export default async function MyStoryPage({ params }: { params: Promise<{ id: st
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-12 space-y-6">
-            <Link href="/share/my-stories" className="text-sm text-indigo-600 underline">← My stories</Link>
+            <Link href="/share/my-experiences" className="text-sm text-indigo-600 underline">← My experiences</Link>
             {story.status === 'held' && (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-500/10 p-4 space-y-2 text-amber-900 dark:text-amber-100">
                     <p>Thank you for sharing. Because your story touches on some very painful moments, a member of our team will look at it with care before it appears. You don&apos;t need to do anything.</p>

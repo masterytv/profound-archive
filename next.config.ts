@@ -50,6 +50,9 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/quiz", destination: "/compass", permanent: true },
+      // Share Your Experience: "My stories" was renamed "My experiences" (links in sent emails).
+      { source: "/share/my-stories", destination: "/share/my-experiences", permanent: true },
+      { source: "/share/my-stories/:id", destination: "/share/my-experiences/:id", permanent: true },
       { source: "/quiz/types", destination: "/compass/types", permanent: true },
       // The old webhook-backed chat pages were removed; every inbound link
       // (footer, header, video page, EndCard) lands on the native chat instead.

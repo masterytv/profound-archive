@@ -78,7 +78,7 @@ so a long story may take an hour or more. The job stops at 300 minutes and conti
 5. `/admin/share/channels` → invite your own second email to a channel → open the link signed in as that email →
    accept the code of conduct → `/channels/directory` lists stories that opted in → **Request an introduction** →
    the experiencer email gets Accept/Decline.
-6. **Delete** a story in My stories: it vanishes from `/experiences` and its files are removed from the bucket.
+6. **Delete** a story in My experiences: it vanishes from `/experiences` and its files are removed from the bucket.
 7. Run the workflow by hand with `app_url` = `https://staging.projectprofound.org`: staging test stories get a
    narration (Listen tab) but are **never** uploaded to YouTube.
 
