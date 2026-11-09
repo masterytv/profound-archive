@@ -90,3 +90,30 @@ export function publicDisplayName(story: { display_mode: string; display_name: s
     if (name) return name;
     return `Anonymous #${story.anon_number}`;
 }
+
+function sentences(text: string): string[] {
+    return (text.replace(/\s+/g, ' ').trim().match(/[^.!?]+(?:[.!?]+["'”’)\]]*|$)\s*/g) ?? []).map((x) => x.trim()).filter(Boolean);
+}
+
+/**
+ * Gemini sometimes merges the writer's paragraphs into one despite being told
+ * not to. If the suggestion has fewer paragraphs than the original, put the
+ * breaks back where the writer had them, matching sentence by sentence. If the
+ * sentence counts don't line up (the editor split or joined sentences), the
+ * suggestion is returned unchanged.
+ */
+export function restoreParagraphs(original: string, suggested: string): string {
+    const origParas = original.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+    const sugParas = suggested.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+    if (origParas.length <= 1 || sugParas.length >= origParas.length) return suggested;
+    const counts = origParas.map((p) => sentences(p).length);
+    const sugSentences = sentences(suggested);
+    if (counts.some((c) => c === 0) || counts.reduce((a, b) => a + b, 0) !== sugSentences.length) return suggested;
+    const out: string[] = [];
+    let k = 0;
+    for (const c of counts) {
+        out.push(sugSentences.slice(k, k + c).join(' '));
+        k += c;
+    }
+    return out.join('\n\n');
+}

@@ -3,6 +3,7 @@
  * rejects each section, so the prompt must never add facts or change voice.
  */
 import { geminiConfigured, geminiJson } from '@/lib/ai/gemini';
+import { restoreParagraphs } from './text';
 
 export interface EditorResult {
     title: string;
@@ -15,7 +16,8 @@ const STYLE_SYSTEM = `You are a gentle copy editor for Project Profound, a site 
 
 Suggest LIGHT edits only:
 - fix spelling, punctuation and obvious typos;
-- break run-on text into readable paragraphs (use a blank line between paragraphs);
+- KEEP THE WRITER'S PARAGRAPHS: every paragraph break in the original (a blank line) must stay exactly where it is. Never merge paragraphs, never join short lines into one paragraph;
+- you may split a very long paragraph (a wall of text) into shorter ones; separate paragraphs with a blank line (two newline characters);
 - remove filler words from speech transcripts ("um", "uh", repeated false starts);
 - never add facts, feelings, interpretations or religious language the person did not use;
 - never change the meaning, the order of events, or the person's voice and phrasing;
@@ -59,7 +61,7 @@ function cleanEdits(sections: string[], edits: EditorResult['edits']): EditorRes
     return (edits ?? []).filter((e) => {
         if (!Number.isInteger(e.section_index) || e.section_index < 0 || e.section_index >= sections.length) return false;
         if (seen.has(e.section_index)) return false;
-        const suggested = unescapeModelText(e.suggested ?? '').trim();
+        const suggested = restoreParagraphs(sections[e.section_index] ?? '', unescapeModelText(e.suggested ?? '')).trim();
         if (!suggested || suggested === sections[e.section_index].trim()) return false;
         seen.add(e.section_index);
         e.suggested = suggested;
