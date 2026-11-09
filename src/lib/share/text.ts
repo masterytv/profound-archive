@@ -80,7 +80,13 @@ export function wordCount(text: string | null | undefined): number {
     return (text ?? '').trim().split(/\s+/).filter(Boolean).length;
 }
 
+/**
+ * The name shown publicly. 'named': the full name. 'anonymous' (full name not
+ * shared): the name they chose to show instead (first name, initials, a
+ * nickname), or "Anonymous #N" if they left it blank.
+ */
 export function publicDisplayName(story: { display_mode: string; display_name: string | null; anon_number: number | string }): string {
-    if (story.display_mode === 'named' && story.display_name) return story.display_name;
+    const name = story.display_name?.trim();
+    if (name) return name;
     return `Anonymous #${story.anon_number}`;
 }

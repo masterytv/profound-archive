@@ -4,7 +4,7 @@
  */
 
 /** Current Experiencer Agreement version. Bump it when /share/agreement changes. */
-export const AGREEMENT_VERSION = '2026-11-09';
+export const AGREEMENT_VERSION = '2026-11-09b'; // b: hiding your name no longer limits audio/video
 /** Current channel-member code of conduct version (/channels/conduct). */
 export const CONDUCT_VERSION = '2026-11-09';
 

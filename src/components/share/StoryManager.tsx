@@ -76,7 +76,7 @@ export default function StoryManager({ story, sections, suggestions: initial, me
             <header className="space-y-1">
                 <h1 className="text-3xl font-serif">{story.title || 'Your story'}</h1>
                 <p className="text-slate-500">
-                    {story.displayMode === 'named' ? `Shown as ${story.displayName}` : 'Shown as Anonymous'} · shared as {story.mediaKind === 'file' ? 'a document' : story.mediaKind}
+                    Shown as {story.displayName || 'Anonymous'} · shared as {story.mediaKind === 'file' ? 'a document' : story.mediaKind}
                 </p>
             </header>
 
@@ -85,7 +85,6 @@ export default function StoryManager({ story, sections, suggestions: initial, me
             ) : (
                 <div>
                     <audio src={mediaUrl} controls className="w-full" />
-                    {story.displayMode === 'anonymous' && <p className="text-xs text-slate-500 mt-1">Only you can hear this recording. It is never published.</p>}
                 </div>
             ))}
 
@@ -194,26 +193,36 @@ export default function StoryManager({ story, sections, suggestions: initial, me
                 <section className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
                     <h2 className="text-lg font-serif">How you&apos;re named</h2>
                     <p className="text-slate-600 dark:text-slate-300">
-                        {story.displayMode === 'named' ? <>Shown as <b>{story.displayName}</b>.</> : <>Shown as <b>Anonymous</b>. Your name is not shown anywhere.</>}
+                        {story.displayMode === 'named' ? (
+                            <>Your full name is shared: <b>{story.displayName}</b>.</>
+                        ) : (
+                            <>Your full name is not shared. Shown as <b>{story.displayName || 'Anonymous'}</b>.</>
+                        )}
                     </p>
                     <div className="flex flex-wrap gap-2 items-center">
-                        <input className={`${input} max-w-xs`} placeholder="Name to show" value={nameDraft} maxLength={80} onChange={(e) => setNameDraft(e.target.value)} />
+                        <input
+                            className={`${input} max-w-xs`}
+                            placeholder={story.displayMode === 'named' ? 'Full name' : 'First name, initials or nickname (optional)'}
+                            value={nameDraft}
+                            maxLength={80}
+                            onChange={(e) => setNameDraft(e.target.value)}
+                        />
                         <Button
                             variant="outline"
-                            disabled={busy !== null || !nameDraft.trim() || (story.displayMode === 'named' && nameDraft.trim() === story.displayName)}
-                            onClick={() => run('named', () => changeDisplayModeAction(story.id, 'named', nameDraft))}
+                            disabled={busy !== null || nameDraft.trim() === (story.displayName ?? '') || (story.displayMode === 'named' && !nameDraft.trim())}
+                            onClick={() => run('rename', () => changeDisplayModeAction(story.id, story.displayMode, nameDraft))}
                         >
-                            {story.displayMode === 'named' ? 'Change name' : 'Show my name'}
+                            Update name
                         </Button>
                     </div>
-                    {story.displayMode === 'named' && (
-                        story.mediaKind === 'video' ? (
-                            <p className="text-sm text-slate-500">This story is a video, which shows your face and voice, so it can&apos;t be made anonymous. You can delete it instead.</p>
-                        ) : (
-                            <Button variant="outline" disabled={busy !== null} onClick={() => run('anon', () => changeDisplayModeAction(story.id, 'anonymous', ''))}>
-                                Make this story anonymous instead
-                            </Button>
-                        )
+                    {story.displayMode === 'named' ? (
+                        <Button variant="outline" disabled={busy !== null} onClick={() => run('anon', () => changeDisplayModeAction(story.id, 'anonymous', ''))}>
+                            Stop sharing my full name
+                        </Button>
+                    ) : (
+                        <Button variant="outline" disabled={busy !== null || !nameDraft.trim()} onClick={() => run('named', () => changeDisplayModeAction(story.id, 'named', nameDraft))}>
+                            Share the name above as my full name
+                        </Button>
                     )}
                     {story.youtubeVideoId && <p className="text-xs text-slate-500">Changing this takes the YouTube version down within 24 hours and posts a new one.</p>}
                 </section>

@@ -76,8 +76,9 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
     const [agreed, setAgreed] = useState(false);
 
     // Identity
-    const [mode, setMode] = useState<'named' | 'anonymous'>('anonymous');
+    const [mode, setMode] = useState<'named' | 'anonymous'>('named');
     const [displayName, setDisplayName] = useState(defaultName);
+    const [shownName, setShownName] = useState('');
 
     // Method + content
     const [method, setMethod] = useState<Method | null>(null);
@@ -145,7 +146,6 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
         if (!f) return;
         const kind = kindForFile(f);
         if (!kind) return setFileError('Please choose an audio file, a video file, or a .txt, .md, .pdf or .docx document.');
-        if (kind === 'video' && mode === 'anonymous') return setFileError('Anonymous stories can be shared as text or audio. To share a video, choose "Show my name".');
         if (kind === 'file' && f.size > MAX_TEXT_FILE) return setFileError('Documents can be up to 10 MB.');
         if (f.size > MAX_MEDIA) return setFileError('Files can be up to 5 GB.');
     }
@@ -157,7 +157,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
         try {
             const created = await createDraftAction({
                 display_mode: mode,
-                display_name: mode === 'named' ? displayName : null,
+                display_name: mode === 'named' ? displayName : shownName.trim() || null,
                 experience_type: experienceType as 'nde',
                 title: title || null,
                 year_approx: year ? Number(year) : null,
@@ -221,7 +221,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                 <div className="space-y-4">
                     <div className={`${box} space-y-3 text-slate-700 dark:text-slate-300`}>
                         <p className="flex gap-2"><ShieldCheck className="h-5 w-5 text-indigo-500 shrink-0" /> <span><b>Sharing is public.</b> Your story will appear on projectprofound.org and on the Project Profound YouTube channel.</span></p>
-                        <p>You can keep two things private: <b>your name</b> (choose Anonymous) and <b>your contact details</b>, which are never shown publicly.</p>
+                        <p>You can keep two things private: <b>your full name</b> and <b>your contact details</b>, which are never shown publicly.</p>
                         <p>Your story and any recording are stored on servers in the <b>United States</b>. You can edit your story or delete it completely at any time.</p>
                         <p>
                             Please read the full{' '}
@@ -247,38 +247,38 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
 
             {step === 'identity' && (
                 <div className="space-y-4">
-                    <label className={`${box} flex gap-3 cursor-pointer ${mode === 'anonymous' ? 'ring-2 ring-indigo-500' : ''}`}>
-                        <input
-                            type="radio"
-                            name="mode"
-                            className="mt-1"
-                            checked={mode === 'anonymous'}
-                            onChange={() => {
-                                setMode('anonymous');
-                                // Anonymous stories can't be video: drop a video choice made earlier.
-                                if (method === 'record-video') { setMethod(null); setRecording(null); }
-                                if (file && kindForFile(file) === 'video') setFile(null);
-                            }}
-                        />
-                        <span>
-                            <b>Keep me anonymous</b>
-                            <span className="block text-sm text-slate-500">Your story appears as &ldquo;Anonymous #&hellip;&rdquo;. You can share by writing or with your voice; your voice is never published: we publish the text and a version read by a synthetic voice.</span>
-                        </span>
-                    </label>
                     <label className={`${box} flex gap-3 cursor-pointer ${mode === 'named' ? 'ring-2 ring-indigo-500' : ''}`}>
                         <input type="radio" name="mode" className="mt-1" checked={mode === 'named'} onChange={() => setMode('named')} />
                         <span>
-                            <b>Show my name</b>
-                            <span className="block text-sm text-slate-500">Your name appears with your story and on your own experiencer page. You can share by writing, audio or video.</span>
+                            <b>Share my full name</b>
+                            <span className="block text-sm text-slate-500">Your name appears with your story and on your own experiencer page.</span>
                         </span>
                     </label>
-                    {mode === 'named' && (
+                    <label className={`${box} flex gap-3 cursor-pointer ${mode === 'anonymous' ? 'ring-2 ring-indigo-500' : ''}`}>
+                        <input type="radio" name="mode" className="mt-1" checked={mode === 'anonymous'} onChange={() => setMode('anonymous')} />
+                        <span>
+                            <b>Don&apos;t share my full name publicly</b>
+                            <span className="block text-sm text-slate-500">You can show a first name, initials or a nickname instead, or nothing at all (&ldquo;Anonymous #&hellip;&rdquo;).</span>
+                        </span>
+                    </label>
+                    {mode === 'named' ? (
                         <div>
-                            <label className={label} htmlFor="displayName">Name to show</label>
-                            <input id="displayName" className={input} value={displayName} maxLength={80} onChange={(e) => setDisplayName(e.target.value)} placeholder="e.g. Maria L." />
+                            <label className={label} htmlFor="displayName">Your full name</label>
+                            <input id="displayName" className={input} value={displayName} maxLength={80} onChange={(e) => setDisplayName(e.target.value)} placeholder="e.g. Maria Lopez" />
+                        </div>
+                    ) : (
+                        <div>
+                            <label className={label} htmlFor="shownName">Name to show instead (optional)</label>
+                            <input id="shownName" className={input} value={shownName} maxLength={80} onChange={(e) => setShownName(e.target.value)} placeholder="e.g. Maria, M.L., or leave blank" />
                         </div>
                     )}
-                    <p className="text-sm text-slate-500 flex gap-2"><Info className="h-4 w-4 shrink-0 mt-0.5" /> Your email and any contact details are never shown publicly, whichever you choose.</p>
+                    <p className="text-sm text-slate-500 flex gap-2">
+                        <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                        <span>
+                            Your email and contact details are never shown publicly, whichever you choose.
+                            {mode === 'anonymous' && ' If you share a video or a voice recording, it is published as recorded, so people may recognise your face or voice.'}
+                        </span>
+                    </p>
                 </div>
             )}
 
@@ -288,8 +288,8 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                         {([
                             ['type', 'Write it', 'Type your story here.', PenLine],
                             ['record-audio', 'Record your voice', 'Speak into your microphone.', Mic],
-                            ...(mode === 'named' ? [['record-video', 'Record a video', 'Use your camera.', Video] as const] : []),
-                            ['upload', 'Upload a file', mode === 'named' ? 'Audio, video or a document.' : 'Audio or a document.', Upload],
+                            ['record-video', 'Record a video', 'Use your camera.', Video],
+                            ['upload', 'Upload a file', 'Audio, video or a document.', Upload],
                         ] as const).map(([value, name, hint, Icon]) => (
                             <button
                                 key={value}
@@ -303,18 +303,6 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                             </button>
                         ))}
                     </div>
-
-                    {mode === 'anonymous' && (
-                        <p className="text-sm text-slate-500 flex gap-2">
-                            <Video className="h-4 w-4 shrink-0 mt-0.5" />
-                            <span>
-                                Want to share on video? A video shows your face and voice, so it can only be shared with your name.{' '}
-                                <button type="button" className="text-indigo-600 underline" onClick={() => { setStepIndex(steps.indexOf('identity')); setMode('named'); }}>
-                                    Show my name instead
-                                </button>
-                            </span>
-                        </p>
-                    )}
 
                     {method === 'type' && (
                         <div className="space-y-2">
@@ -343,7 +331,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                         <div className={`${box} space-y-2`}>
                             <input
                                 type="file"
-                                accept={mode === 'named' ? 'audio/*,video/*,.txt,.md,.pdf,.docx' : 'audio/*,.txt,.md,.pdf,.docx'}
+                                accept="audio/*,video/*,.txt,.md,.pdf,.docx"
                                 onChange={(e) => chooseFile(e.target.files?.[0] ?? null)}
                             />
                             {file && !fileError && (
@@ -393,7 +381,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                         </div>
                     </div>
                     {mode === 'anonymous' && (
-                        <p className="text-sm text-slate-500">Tip: to stay anonymous, avoid naming people, towns, hospitals or employers in your story.</p>
+                        <p className="text-sm text-slate-500">Tip: to keep your identity private, avoid naming people, towns, hospitals or employers in your story.</p>
                     )}
                 </div>
             )}
@@ -452,7 +440,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
             {step === 'submit' && (
                 <div className="space-y-4">
                     <div className={`${box} space-y-2 text-slate-700 dark:text-slate-300`}>
-                        <p><b>Shown as:</b> {mode === 'named' ? displayName : 'Anonymous'}</p>
+                        <p><b>Shown as:</b> {mode === 'named' ? displayName : shownName.trim() || 'Anonymous #…'}</p>
                         <p><b>Shared by:</b> {mediaKind === 'text' ? 'writing' : mediaKind === 'file' ? `document (${file?.name})` : mediaKind === 'audio' ? 'audio' : 'video'}</p>
                         <p><b>Introductions:</b> {introMode === 'none' ? 'no' : introMode === 'all' ? 'any vetted channel' : `${selected.size} chosen channel(s)`}</p>
                     </div>

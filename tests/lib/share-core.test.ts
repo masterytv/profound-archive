@@ -37,9 +37,11 @@ describe('share text helpers', () => {
         expect(slugify('Ça va — très bien')).toBe('ca-va-tres-bien');
     });
 
-    it('shows a name only for named stories', () => {
-        expect(publicDisplayName({ display_mode: 'named', display_name: 'Maria L.', anon_number: 7 })).toBe('Maria L.');
-        expect(publicDisplayName({ display_mode: 'anonymous', display_name: 'Maria L.', anon_number: 7 })).toBe('Anonymous #7');
+    it('shows the full name, the chosen name, or Anonymous #N', () => {
+        expect(publicDisplayName({ display_mode: 'named', display_name: 'Maria Lopez', anon_number: 7 })).toBe('Maria Lopez');
+        expect(publicDisplayName({ display_mode: 'anonymous', display_name: 'Maria', anon_number: 7 })).toBe('Maria');
+        expect(publicDisplayName({ display_mode: 'anonymous', display_name: null, anon_number: 7 })).toBe('Anonymous #7');
+        expect(publicDisplayName({ display_mode: 'anonymous', display_name: '  ', anon_number: 7 })).toBe('Anonymous #7');
     });
 });
 
@@ -59,14 +61,12 @@ describe('library tabs (Watch / Listen / Read)', () => {
         expect(f.listen).toBe('u/s/orig.webm');
     });
 
-    it('anonymous audio NEVER publishes the original voice', () => {
-        const before = libraryFormats({ ...base, display_mode: 'anonymous', media_kind: 'audio' });
-        expect(before.listen).toBeNull();
-        expect(before.tabs).toEqual(['read']);
-        const after = libraryFormats({ ...base, narration_path: 'u/s/narration-1.mp3', display_mode: 'anonymous', media_kind: 'audio' });
-        expect(after.listen).toBe('u/s/narration-1.mp3');
-        expect(after.listenIsSynthetic).toBe(true);
-        expect(after.watch).toBeNull();
+    it('not sharing the full name does not change the formats (Tom, 2026-11-09)', () => {
+        const audio = libraryFormats({ ...base, display_mode: 'anonymous', media_kind: 'audio' });
+        expect(audio.tabs).toEqual(['listen', 'read']);
+        expect(audio.listenIsSynthetic).toBe(false);
+        const video = libraryFormats({ ...base, display_mode: 'anonymous', media_kind: 'video' });
+        expect(video.tabs).toEqual(['watch', 'listen', 'read']);
     });
 
     it('text stories are Read, plus a labelled synthetic Listen once narrated', () => {
@@ -79,7 +79,8 @@ describe('library tabs (Watch / Listen / Read)', () => {
     it('knows which stories need narration', () => {
         expect(needsNarration({ ...base, display_mode: 'named', media_kind: 'video' })).toBe(false);
         expect(needsNarration({ ...base, display_mode: 'named', media_kind: 'audio' })).toBe(false);
-        expect(needsNarration({ ...base, display_mode: 'anonymous', media_kind: 'audio' })).toBe(true);
+        expect(needsNarration({ ...base, display_mode: 'anonymous', media_kind: 'audio' })).toBe(false);
+        expect(needsNarration({ ...base, display_mode: 'anonymous', media_kind: 'text' })).toBe(true);
         expect(needsNarration({ ...base, display_mode: 'named', media_kind: 'text' })).toBe(true);
         expect(needsNarration({ ...base, narration_path: 'x', display_mode: 'named', media_kind: 'text' })).toBe(false);
     });

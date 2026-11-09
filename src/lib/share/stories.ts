@@ -112,9 +112,6 @@ export const draftSchema = z
         if (v.display_mode === 'named' && !v.display_name) {
             ctx.addIssue({ code: 'custom', path: ['display_name'], message: 'Please enter the name to show with your story.' });
         }
-        if (v.display_mode === 'anonymous' && v.media_kind === 'video') {
-            ctx.addIssue({ code: 'custom', path: ['media_kind'], message: 'Anonymous stories can be shared as text or audio, not video.' });
-        }
         if (v.media_kind === 'text' && (!v.text || v.text.length < 20)) {
             ctx.addIssue({ code: 'custom', path: ['text'], message: 'Please write a little more before continuing.' });
         }
@@ -229,7 +226,8 @@ export async function createDraft(userId: string, raw: DraftInput): Promise<{ st
             slug: storySlug(input.title),
             status: 'draft',
             display_mode: input.display_mode,
-            display_name: input.display_mode === 'named' ? input.display_name : null,
+            // Named: the full name. Not named: an optional first name / initials / nickname.
+            display_name: input.display_name,
             experience_type: input.experience_type,
             title: input.title,
             year_approx: input.year_approx ?? null,
@@ -556,11 +554,12 @@ export async function ensureExperiencerProfile(userId: string, displayName: stri
 export async function changeDisplayMode(userId: string, storyId: string, mode: 'named' | 'anonymous', displayName?: string | null) {
     const story = await getOwnStory(userId, storyId);
     if (mode === story.display_mode) {
-        // Same mode: a named story can still change the name it shows.
+        // Same mode: change the name it shows (full name, or the name shown instead).
         const name = (displayName ?? '').trim().slice(0, 80);
-        if (mode !== 'named' || !name || name === story.display_name) return;
-        await update(storyId, { display_name: name });
-        await db().from('experiencer_profiles').update({ full_name: name }).eq('user_id', userId);
+        if (mode === 'named' && !name) return;
+        if ((name || null) === story.display_name) return;
+        await update(storyId, { display_name: name || null });
+        if (mode === 'named') await db().from('experiencer_profiles').update({ full_name: name }).eq('user_id', userId);
         if (story.youtube_video_id) {
             await queueYoutubeRemoval(story.youtube_video_id);
             await update(storyId, { youtube_video_id: null, youtube_status: 'pending' });
@@ -568,16 +567,15 @@ export async function changeDisplayMode(userId: string, storyId: string, mode: '
         revalidateStory(story);
         return;
     }
-    if (mode === 'anonymous' && story.media_kind === 'video') {
-        throw new Error('A video shows your face and voice, so it can\'t be made anonymous. You can delete it instead.');
-    }
     if (mode === 'named') {
         const name = (displayName ?? '').trim().slice(0, 80);
         if (!name) throw new Error('Please enter the name to show.');
         const profileId = story.status === 'published' ? await ensureExperiencerProfile(userId, name) : story.experiencer_profile_id;
         await update(storyId, { display_mode: 'named', display_name: name, experiencer_profile_id: profileId });
     } else {
-        await update(storyId, { display_mode: 'anonymous', display_name: null, experiencer_profile_id: null });
+        // The full name is never kept on a story that no longer shares it.
+        const shown = (displayName ?? '').trim().slice(0, 80) || null;
+        await update(storyId, { display_mode: 'anonymous', display_name: shown, experiencer_profile_id: null });
     }
     // Whatever is on YouTube shows the old identity: take it down and re-upload.
     if (story.youtube_video_id) {

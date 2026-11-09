@@ -134,7 +134,7 @@ export async function buildQueue(limit = 10): Promise<{ items: QueueItem[]; remo
         }
         const sign = async (p: string | null) => (p ? (await storage.createSignedUrl(p, 6 * 3600)).data?.signedUrl ?? null : null);
         const named = story.display_mode === 'named';
-        const usesOriginal = named && (story.media_kind === 'audio' || story.media_kind === 'video');
+        const usesOriginal = story.media_kind === 'audio' || story.media_kind === 'video';
         const synthetic = !usesOriginal;
         items.push({
             storyId: story.id,
@@ -148,7 +148,7 @@ export async function buildQueue(limit = 10): Promise<{ items: QueueItem[]; remo
             narrationUpload,
             narrationUrl: await sign(story.narration_path),
             mediaUrl: usesOriginal ? await sign(story.media_path) : null,
-            imageUrl: story.media_kind === 'video' && named ? null : await ensureImage(story),
+            imageUrl: story.media_kind === 'video' ? null : await ensureImage(story),
             upload: wantsUpload,
             markSkipped: story.is_test && story.youtube_status === 'pending',
             youtube: wantsUpload ? youtubeMeta(story, synthetic) : null,
