@@ -97,4 +97,10 @@ Before promoting, confirm:
 
 Promotion is a human step: open a pull request from `staging` into `main` on GitHub and merge it.
 Not required for launch, but needed for the full feature: §3 (Resend open tracking), §4–5 (YouTube + the daily
-GitHub Action, which also narrates written stories and purges staging test data).
+GitHub Action, which also narrates written stories).
+
+**Daily clean-up** runs on its own via `.github/workflows/share-maintenance.yml` (uses the existing
+`APP_DIRECT_URL` and `CRON_SECRET` repo secrets): expires unanswered introductions after 14 days, deletes removed
+experiences and abandoned drafts after 30 days, and staging test experiences after 7 days (files included).
+Scheduled workflows run from the default branch, so it starts once this reaches `main`; run it by hand from the
+Actions tab any time.
