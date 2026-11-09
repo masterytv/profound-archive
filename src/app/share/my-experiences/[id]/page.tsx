@@ -6,7 +6,7 @@ import { currentUser, shareAdmin } from '@/lib/share/db';
 import { getIntroPreferences, getOwnStory, listSuggestions, type OwnStory } from '@/lib/share/stories';
 import { listFeaturedChannels } from '@/lib/share/channels';
 import PromoteSection from '@/components/share/PromoteSection';
-import { splitSections } from '@/lib/share/text';
+import { restoreParagraphs, splitSections } from '@/lib/share/text';
 import { SUPPORT_RESOURCES } from '@/lib/share/crisis';
 import { unescapeModelText } from '@/lib/share/suggestions';
 import StoryManager from '@/components/share/StoryManager';
@@ -71,7 +71,7 @@ export default async function MyStoryPage({ params }: { params: Promise<{ id: st
                     youtubeVideoId: story.youtube_video_id,
                 }}
                 sections={sections}
-                suggestions={suggestions.map((s) => ({ id: s.id, sectionIndex: s.section_index, suggested: unescapeModelText(s.suggested), reason: s.reason ?? '', status: s.status }))}
+                suggestions={suggestions.map((s) => ({ id: s.id, sectionIndex: s.section_index, suggested: restoreParagraphs(sections[s.section_index] ?? '', unescapeModelText(s.suggested)), reason: s.reason ?? '', status: s.status }))}
                 mediaUrl={mediaUrl}
                 promote={
                     introPrefs ? (

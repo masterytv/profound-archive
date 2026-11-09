@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { splitSections, assembleText, storySlug, publicDisplayName, slugify } from '@/lib/share/text';
+import { splitSections, assembleText, storySlug, publicDisplayName, slugify, restoreParagraphs } from '@/lib/share/text';
 import { libraryFormats, needsNarration } from '@/lib/share/library';
 import { storyNeedsCrisisHold } from '@/lib/share/crisis';
 import { hashToken, newToken, sameHash } from '@/lib/share/tokens';
@@ -123,5 +123,32 @@ describe('model text clean-up', () => {
         expect(unescapeModelText('This is a long story.\\n\\nI want to start')).toBe('This is a long story.\n\nI want to start');
         expect(unescapeModelText('a\\r\\nb\\n\\n\\n\\nc')).toBe('a\nb\n\nc');
         expect(unescapeModelText('already\n\nfine')).toBe('already\n\nfine');
+    });
+});
+
+describe('restoreParagraphs (Gemini merged the paragraphs)', () => {
+    const original = [
+        'this is a long story.',
+        "I want to start off by saying I didn't believe this could happen to me.",
+        'I took too mch asprin and it gave me a headache. Then i passed out and hit my head. Then i saw my body from above. Then I entered a long tunnel of light.',
+        'Eventually i met these beings of light. They were amazig and loving. They told me I had to go back.',
+        "I didn't want to go back but they said I had agreed to it in order to learn.",
+        'When I got back I was in my body in complete pain.',
+        "But since that encounter I've been ore  loving to everyon in my lufe",
+    ].join('\n\n');
+    const merged =
+        "This is a long story. I want to start off by saying I didn't believe this could happen to me. I took too much aspirin and it gave me a headache. Then I passed out and hit my head. Then I saw my body from above. Then I entered a long tunnel of light. Eventually I met these beings of light. They were amazing and loving. They told me I had to go back. I didn't want to go back but they said I had agreed to it in order to learn. When I got back I was in my body in complete pain. But since that encounter I've been more loving to everyone in my life.";
+
+    it("puts Tom's seven paragraphs back", () => {
+        const fixed = restoreParagraphs(original, merged).split('\n\n');
+        expect(fixed).toHaveLength(7);
+        expect(fixed[0]).toBe('This is a long story.');
+        expect(fixed[2]).toBe('I took too much aspirin and it gave me a headache. Then I passed out and hit my head. Then I saw my body from above. Then I entered a long tunnel of light.');
+        expect(fixed[6]).toBe("But since that encounter I've been more loving to everyone in my life.");
+    });
+    it('leaves the suggestion alone when it already has the paragraphs, or sentences do not line up', () => {
+        expect(restoreParagraphs('A.\n\nB.', 'A!\n\nB!')).toBe('A!\n\nB!');
+        expect(restoreParagraphs('One. Two.\n\nThree.', 'One two three.')).toBe('One two three.');
+        expect(restoreParagraphs('Just one paragraph.', 'Just one paragraph, edited.')).toBe('Just one paragraph, edited.');
     });
 });
