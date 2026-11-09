@@ -26,3 +26,13 @@ env:
   # forwarded host). Staging is noindexed, so this has no SEO impact.
   - variable: NEXT_PUBLIC_SITE_URL
     value: "https://staging.projectprofound.org"
+
+  # Share Your Experience (directives/PRD-SHARE-YOUR-EXPERIENCE.md).
+  # SHARE_ENV=staging marks every row staging writes as is_test, because
+  # staging and production share one database; production never shows or acts
+  # on is_test rows. Flip SHARE_ENABLED to "true" only AFTER Tom has run the
+  # share migrations (supabase/migrations/20261109_00*.sql). See docs/share/SETUP.md.
+  - variable: SHARE_ENV
+    value: "staging"
+  - variable: SHARE_ENABLED
+    value: "false"

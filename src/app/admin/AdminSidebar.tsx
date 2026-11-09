@@ -65,6 +65,8 @@ const NDE_NAV: NavSection[] = [
     title: "Engagement",
     items: [
       { label: "Users", href: "/admin/users", icon: Users },
+      { label: "Shared Stories", href: "/admin/share", icon: Users, iconColor: "text-indigo-500" },
+      { label: "Channel Invites", href: "/admin/share/channels", icon: Mail, indent: true },
       { label: "Email CRM", href: "/admin/email", icon: Mail, iconColor: "text-purple-500" },
       { label: "Email Templates", href: "/admin/email/templates", icon: Mail, indent: true },
       { label: "CES Feedback", href: "/admin/ces", icon: BarChart3, iconColor: "text-blue-500" },

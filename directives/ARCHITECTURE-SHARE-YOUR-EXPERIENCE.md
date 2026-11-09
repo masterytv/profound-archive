@@ -1,6 +1,8 @@
 # ARCHITECTURE: Share Your Experience
 
-**Status:** v0.2, **approved by Tom 2026-11-09**. Build in progress.
+**Status:** v0.3, **approved by Tom 2026-11-09**. Built (V1); setup steps in `docs/share/SETUP.md`.
+
+> **As built (differences from the plan below):** uploads use `tus-js-client` directly (not Uppy) with an in-house recorder (`src/components/share/Recorder.tsx`); public pages read through a column whitelist in server code (`src/lib/share/public.ts`) instead of a database view; staging rows are marked `is_test` (no `test/` path prefix); Gemini is called through its REST API (`src/lib/ai/gemini.ts`), no SDK.
 **PRD:** `PRD-SHARE-YOUR-EXPERIENCE.md` v0.3 (approved).
 **Rule that shapes everything:** staging and production share one Supabase database. Every table, bucket, policy and cron below is a **production change that Tom runs**. Agents write the migration files and never apply them.
 
