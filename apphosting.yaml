@@ -110,3 +110,15 @@ env:
   # fal.ai — hero image generation for blog articles
   - variable: FAL_API_KEY
     secret: projects/432036554831/secrets/FAL_API_KEY/versions/1
+
+  # Share Your Experience (docs/share/SETUP.md). Created by Tom 2026-11-09.
+  # Gemini: light editor suggestions + crisis softening.
+  - variable: GEMINI_API_KEY
+    secret: projects/432036554831/secrets/GEMINI_API_KEY/versions/1
+
+  # AssemblyAI: transcription of shared audio/video; the webhook secret is
+  # sent back by AssemblyAI on /api/share/webhooks/assemblyai.
+  - variable: ASSEMBLYAI_API_KEY
+    secret: projects/432036554831/secrets/ASSEMBLYAI_API_KEY/versions/1
+  - variable: ASSEMBLYAI_WEBHOOK_SECRET
+    secret: projects/432036554831/secrets/ASSEMBLYAI_WEBHOOK_SECRET/versions/1
