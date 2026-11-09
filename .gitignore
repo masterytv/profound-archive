@@ -78,3 +78,5 @@ logs/
 # graphify: machine-specific interpreter/root paths (re-created on each run)
 graphify-out/.graphify_python
 graphify-out/.graphify_root
+# graphify: per-session hook counters written by the Claude Code hooks (local state)
+graphify-out/cache/hook_sessions/
