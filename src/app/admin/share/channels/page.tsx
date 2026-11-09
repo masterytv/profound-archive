@@ -8,7 +8,8 @@ import { AdminInviteActions, AdminMemberRevoke } from '@/components/share/AdminC
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminShareChannelsPage() {
+export default async function AdminShareChannelsPage({ searchParams }: { searchParams: Promise<{ email?: string; cid?: string; cname?: string }> }) {
+    const sp = await searchParams;
     const db = shareAdmin();
     const [channels, invitesRes, membersRes, introsRes] = await Promise.all([
         listFeaturedChannels().catch(() => []),
@@ -36,7 +37,11 @@ export default async function AdminShareChannelsPage() {
 
             <section className="space-y-3">
                 <h2 className="text-lg font-semibold">Send an invite</h2>
-                <InviteForm channels={channels.map((c) => ({ channel_id: c.channel_id, name: c.name, vertical: c.vertical }))} />
+                <InviteForm
+                    channels={channels.map((c) => ({ channel_id: c.channel_id, name: c.name, vertical: c.vertical }))}
+                    initialEmail={sp.email ?? ''}
+                    initialChannel={sp.cid && sp.cname ? { channel_id: sp.cid, name: sp.cname, vertical: 'other' } : null}
+                />
             </section>
 
             <section className="space-y-3">

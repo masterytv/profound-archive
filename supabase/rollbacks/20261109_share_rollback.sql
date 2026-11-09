@@ -1,4 +1,4 @@
--- Rollback for the Share Your Experience migrations (20261109_001..003).
+-- Rollback for the Share Your Experience migrations (20261109_001..005).
 -- DESTRUCTIVE: deletes every shared story, agreement, invite and intro.
 -- Empty the story-media bucket first (Storage UI or API); SQL can't delete
 -- the stored files themselves.
@@ -13,6 +13,7 @@ DELETE FROM storage.buckets WHERE id = 'story-media';
 DROP INDEX IF EXISTS public.experiencer_profiles_user_id_key;
 ALTER TABLE public.experiencer_profiles DROP COLUMN IF EXISTS user_id;
 
+DROP TABLE IF EXISTS public.channel_contacts;
 DROP TABLE IF EXISTS public.share_youtube_removals;
 DROP TABLE IF EXISTS public.share_intro_requests;
 DROP TABLE IF EXISTS public.share_channel_invites;

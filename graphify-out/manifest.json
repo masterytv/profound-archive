@@ -1080,9 +1080,9 @@
     "semantic_hash": "0cf01d2a243084650092d02fc0bf3d36"
   },
   "src/app/admin/AdminSidebar.tsx": {
-    "mtime": 1794251995.7392733,
-    "seen": 1794253135.6283252,
-    "ast_hash": "6ec182a0f9c6780b125bcbb633d280db",
+    "mtime": 1794261024.449017,
+    "seen": 1794261175.687722,
+    "ast_hash": "0b2d654d7e4c56090059c5803c7af53b",
     "semantic_hash": ""
   },
   "src/app/admin/actions.ts": {
@@ -5334,9 +5334,9 @@
     "semantic_hash": ""
   },
   "src/app/admin/share/channels/page.tsx": {
-    "mtime": 1794251995.7428722,
-    "seen": 1794253135.6290214,
-    "ast_hash": "1e0ac053356b0776da0262b1eac72958",
+    "mtime": 1794261024.4500332,
+    "seen": 1794261175.6884327,
+    "ast_hash": "588e42dfb5673af6b959832446fb817d",
     "semantic_hash": ""
   },
   "src/app/admin/share/page.tsx": {
@@ -5472,9 +5472,9 @@
     "semantic_hash": ""
   },
   "src/components/share/InviteForm.tsx": {
-    "mtime": 1794255460.4272964,
-    "seen": 1794255505.6657052,
-    "ast_hash": "7ed66104de3e1a309ed2a9114f676e6d",
+    "mtime": 1794261024.4508593,
+    "seen": 1794261175.700822,
+    "ast_hash": "f36f0bdc2172a724a118e097626baa91",
     "semantic_hash": ""
   },
   "src/components/share/Recorder.tsx": {
@@ -5646,9 +5646,9 @@
     "semantic_hash": ""
   },
   "docs/share/SETUP.md": {
-    "mtime": 1794260360.2359502,
-    "seen": 1794260381.53558,
-    "ast_hash": "517271d53e4f87980e061c56143cd38d",
+    "mtime": 1794261166.1196384,
+    "seen": 1794261175.711015,
+    "ast_hash": "f39bb6846030b280aa617c535942f0e7",
     "semantic_hash": ""
   },
   "scripts/share/requirements.txt": {
@@ -5691,6 +5691,36 @@
     "mtime": 1794260334.933637,
     "seen": 1794260381.5173793,
     "ast_hash": "b604c0f736b6c4555d20bd2b6dddf8ec",
+    "semantic_hash": ""
+  },
+  "src/app/admin/channel-contacts/actions.ts": {
+    "mtime": 1794260969.7588158,
+    "seen": 1794261175.687905,
+    "ast_hash": "fd3c1c5ad3216ad7201d19338870ae0a",
+    "semantic_hash": ""
+  },
+  "src/app/admin/channel-contacts/page.tsx": {
+    "mtime": 1794260969.7612653,
+    "seen": 1794261175.6879084,
+    "ast_hash": "52d7da017d57b1ebb83c9ae7793e938d",
+    "semantic_hash": ""
+  },
+  "src/components/share/ChannelContactsTable.tsx": {
+    "mtime": 1794261014.6300724,
+    "seen": 1794261175.7006283,
+    "ast_hash": "5c1d656ac7e5547e16e705f8fb267bac",
+    "semantic_hash": ""
+  },
+  "src/lib/share/contacts.ts": {
+    "mtime": 1794260950.7572362,
+    "seen": 1794261175.7075608,
+    "ast_hash": "8e670ac7c3032e0e51e680a99c921a94",
+    "semantic_hash": ""
+  },
+  "tests/lib/share-contacts.test.ts": {
+    "mtime": 1794261072.7460759,
+    "seen": 1794261175.7091637,
+    "ast_hash": "d6755f193d7164e3f5cd1e2f23e80a36",
     "semantic_hash": ""
   },
   "package-lock.json": {

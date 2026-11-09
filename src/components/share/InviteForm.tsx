@@ -17,11 +17,11 @@ function channelRef(input: string): string | null {
     return handle ? `@${handle[1].toLowerCase()}` : null;
 }
 
-export default function InviteForm({ channels }: { channels: Channel[] }) {
+export default function InviteForm({ channels, initialEmail = '', initialChannel = null }: { channels: Channel[]; initialEmail?: string; initialChannel?: Channel | null }) {
     const router = useRouter();
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(initialEmail);
     const [query, setQuery] = useState('');
-    const [chosen, setChosen] = useState<Channel[]>([]);
+    const [chosen, setChosen] = useState<Channel[]>(initialChannel ? [channels.find((c) => c.channel_id === initialChannel.channel_id) ?? initialChannel] : []);
     const [busy, setBusy] = useState(false);
     const [msg, setMsg] = useState<string | null>(null);
     const [customName, setCustomName] = useState('');
