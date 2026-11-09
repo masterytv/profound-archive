@@ -56,7 +56,8 @@ export function gmailComposeUrl(email: string, subject = ''): string {
 export async function listChannelRows(): Promise<{ rows: ChannelRow[]; tableMissing: boolean }> {
     const [nde, uap, contactsRes, membersRes] = await Promise.all([
         db().rpc('get_channel_stats'),
-        db().from('uap_channels').select('channel_id, channel_name, custom_url, subscriber_count, video_count, hidden').eq('hidden', false),
+        // Same source as the public /uap/channels page. (uap_channels.video_count is not kept up to date.)
+        db().rpc('get_uap_channel_stats'),
         db().from('channel_contacts').select('*'),
         db().from('share_channel_members').select('user_id, channel_id, channel_name').is('revoked_at', null),
     ]);
@@ -84,7 +85,6 @@ export async function listChannelRows(): Promise<{ rows: ChannelRow[]; tableMiss
         map.set(c.channel_id, r);
     }
     for (const c of (uap.data ?? []) as Array<{ channel_id: string; channel_name: string; video_count: number | null; subscriber_count: number | null }>) {
-        if (!c.video_count) continue;
         const r = map.get(c.channel_id) ?? blank(c.channel_id, c.channel_name);
         r.channelType = r.channelType === 'nde' ? 'both' : 'uap';
         r.ppVideos += Number(c.video_count ?? 0);
