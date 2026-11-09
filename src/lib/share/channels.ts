@@ -36,7 +36,8 @@ export interface ChannelOption {
 export async function listFeaturedChannels(): Promise<ChannelOption[]> {
     const [nde, uap] = await Promise.all([
         db().rpc('get_channel_stats'),
-        db().from('uap_channels').select('channel_id, channel_name, subscriber_count, hidden, video_count').eq('hidden', false).gt('video_count', 0),
+        // Same source as the public /uap/channels page. (uap_channels.video_count is not kept up to date.)
+        db().rpc('get_uap_channel_stats'),
     ]);
     const out = new Map<string, ChannelOption>();
     for (const c of (nde.data ?? []) as Array<{ channel_id: string; channel_name: string; subscriber_count: number | null }>) {
