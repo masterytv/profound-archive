@@ -110,7 +110,7 @@ export const draftSchema = z
     })
     .superRefine((v, ctx) => {
         if (v.display_mode === 'named' && !v.display_name) {
-            ctx.addIssue({ code: 'custom', path: ['display_name'], message: 'Please enter the name to show with your story.' });
+            ctx.addIssue({ code: 'custom', path: ['display_name'], message: 'Please enter the name to show with your experience.' });
         }
         if (v.media_kind === 'text' && (!v.text || v.text.length < 20)) {
             ctx.addIssue({ code: 'custom', path: ['text'], message: 'Please write a little more before continuing.' });
@@ -141,7 +141,7 @@ const db = () => shareAdmin();
 export async function getOwnStory(userId: string, storyId: string): Promise<OwnStory> {
     const { data, error } = await db().from('share_stories').select('*').eq('id', storyId).maybeSingle();
     if (error) throw new Error(error.message);
-    if (!data || data.user_id !== userId) throw new Error('Story not found.');
+    if (!data || data.user_id !== userId) throw new Error('Experience not found.');
     return data as OwnStory;
 }
 
@@ -216,7 +216,7 @@ export async function createDraft(userId: string, raw: DraftInput): Promise<{ st
         .eq('user_id', userId)
         .gte('created_at', since);
     if ((count ?? 0) >= STORIES_PER_DAY) {
-        throw new Error(`You can share up to ${STORIES_PER_DAY} stories a day. Please come back tomorrow.`);
+        throw new Error(`You can share up to ${STORIES_PER_DAY} experiences a day. Please come back tomorrow.`);
     }
 
     const { data, error } = await db()
@@ -243,7 +243,7 @@ export async function createDraft(userId: string, raw: DraftInput): Promise<{ st
         })
         .select('*')
         .single();
-    if (error || !data) throw new Error(error?.message ?? 'Could not save your story.');
+    if (error || !data) throw new Error(error?.message ?? 'Could not save your experience.');
     const story = data as OwnStory;
 
     if (input.intro_mode === 'selected' && input.intro_channel_ids.length) {
@@ -262,7 +262,7 @@ export async function createDraft(userId: string, raw: DraftInput): Promise<{ st
  */
 export async function attachMedia(userId: string, storyId: string, path: string, mime: string) {
     const story = await getOwnStory(userId, storyId);
-    if (story.status !== 'draft') throw new Error('This story has already been submitted.');
+    if (story.status !== 'draft') throw new Error('This experience has already been submitted.');
     const prefix = `${userId}/${storyId}/`;
     if (!path.startsWith(prefix) || path.includes('..')) throw new Error('Invalid upload path.');
     const clean = baseMime(mime);
@@ -282,12 +282,12 @@ export async function submitStory(userId: string, storyId: string): Promise<OwnS
     if (story.status !== 'draft') return story.status;
 
     if (story.media_kind === 'text') {
-        if (!story.original_text) throw new Error('Your story is empty.');
+        if (!story.original_text) throw new Error('Your experience is empty.');
         await prepareReview(story.id, story.original_text);
         return 'reviewing';
     }
 
-    if (!story.media_path) throw new Error('Please upload or record your story first.');
+    if (!story.media_path) throw new Error('Please upload or record your experience first.');
 
     if (story.media_kind === 'file') {
         const { data, error } = await db().storage.from(MEDIA_BUCKET).download(story.media_path);
@@ -397,7 +397,7 @@ export async function setSuggestionStatus(userId: string, suggestionId: number, 
     const { data } = await db().from('share_edit_suggestions').select('id, story_id, kind').eq('id', suggestionId).maybeSingle();
     if (!data || data.kind !== 'style') throw new Error('Suggestion not found.');
     const story = await getOwnStory(userId, data.story_id);
-    if (story.status !== 'reviewing') throw new Error('This story is not being reviewed.');
+    if (story.status !== 'reviewing') throw new Error('This experience is not being reviewed.');
     const { error } = await db().from('share_edit_suggestions').update({ status }).eq('id', suggestionId);
     if (error) throw new Error(error.message);
 }
@@ -411,9 +411,9 @@ export async function setSuggestionStatus(userId: string, suggestionId: number, 
  */
 export async function finishReview(userId: string, storyId: string, opts: { title?: string | null; text: string }): Promise<'published' | 'held'> {
     const story = await getOwnStory(userId, storyId);
-    if (story.status !== 'reviewing') throw new Error('This story is not ready to publish.');
+    if (story.status !== 'reviewing') throw new Error('This experience is not ready to publish.');
     const body = opts.text.replace(/\r\n?/g, '\n').replace(/\n{3,}/g, '\n\n').trim().slice(0, MAX_TEXT_CHARS);
-    if (body.length < 20) throw new Error('Your story is empty.');
+    if (body.length < 20) throw new Error('Your experience is empty.');
     const title = (opts.title ?? story.title ?? '').trim().slice(0, 120) || 'My experience';
     return publishOrHold({ ...story, title }, body);
 }
@@ -421,9 +421,9 @@ export async function finishReview(userId: string, storyId: string, opts: { titl
 /** Edit the text of an already-published story (republishes, re-checks). */
 export async function editStoryText(userId: string, storyId: string, newText: string, newTitle?: string | null): Promise<'published' | 'held'> {
     const story = await getOwnStory(userId, storyId);
-    if (!['published', 'held'].includes(story.status)) throw new Error('Only published stories can be edited here.');
+    if (!['published', 'held'].includes(story.status)) throw new Error('Only published experiences can be edited here.');
     const text = newText.replace(/\r\n?/g, '\n').trim().slice(0, MAX_TEXT_CHARS);
-    if (text.length < 20) throw new Error('Your story is too short.');
+    if (text.length < 20) throw new Error('Your experience is too short.');
     const title = (newTitle ?? story.title ?? '').trim().slice(0, 120) || story.title || 'My experience';
     return publishOrHold({ ...story, title }, text);
 }
@@ -514,7 +514,7 @@ export async function adminReleaseHeld(storyId: string, args: { acceptedIds: num
 
 export async function adminSetRemoved(storyId: string, removed: boolean) {
     const story = await getStoryById(storyId);
-    if (!story) throw new Error('Story not found.');
+    if (!story) throw new Error('Experience not found.');
     await update(storyId, { status: removed ? 'removed' : story.body_text ? 'published' : 'reviewing' });
     if (removed && story.youtube_video_id) await queueYoutubeRemoval(story.youtube_video_id);
     if (removed) await update(storyId, { youtube_video_id: null, youtube_status: 'pending' });
