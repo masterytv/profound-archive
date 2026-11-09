@@ -14,14 +14,8 @@ import {
     submitStoryAction,
 } from '@/app/share/actions';
 
-export interface ChannelChoice {
-    channel_id: string;
-    name: string;
-    vertical: 'nde' | 'uap';
-}
-
 type Method = 'type' | 'record-audio' | 'record-video' | 'upload';
-type Step = 'agreement' | 'identity' | 'method' | 'details' | 'intros' | 'submit';
+type Step = 'agreement' | 'identity' | 'method' | 'details' | 'submit';
 
 const EXPERIENCE_TYPES = [
     ['nde', 'Near-death experience (NDE)'],
@@ -63,11 +57,11 @@ const box = 'rounded-xl border border-slate-200 dark:border-slate-700 p-4';
 const input = 'w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-base';
 const label = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
 
-export default function ShareWizard({ needsAgreement, channels, defaultName }: { needsAgreement: boolean; channels: ChannelChoice[]; defaultName: string }) {
+export default function ShareWizard({ needsAgreement, defaultName }: { needsAgreement: boolean; defaultName: string }) {
     const router = useRouter();
     const steps: Step[] = needsAgreement
-        ? ['agreement', 'identity', 'method', 'details', 'intros', 'submit']
-        : ['identity', 'method', 'details', 'intros', 'submit'];
+        ? ['agreement', 'identity', 'method', 'details', 'submit']
+        : ['identity', 'method', 'details', 'submit'];
     const [stepIndex, setStepIndex] = useState(0);
     const step = steps[stepIndex];
 
@@ -94,12 +88,6 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
     const [country, setCountry] = useState('');
     const [region, setRegion] = useState('');
     const [language, setLanguage] = useState('en');
-    const [appearance, setAppearance] = useState<'camera' | 'audio_only' | 'none'>('none');
-
-    // Intros
-    const [introMode, setIntroMode] = useState<'none' | 'all' | 'selected'>('none');
-    const [selected, setSelected] = useState<Set<string>>(new Set());
-    const [channelQuery, setChannelQuery] = useState('');
 
     // Submit
     const [busy, setBusy] = useState(false);
@@ -117,10 +105,6 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
         ((method === 'record-audio' || method === 'record-video') && recording !== null) ||
         (method === 'upload' && file !== null && fileKind !== null && !fileError);
 
-    const filteredChannels = useMemo(() => {
-        const q = channelQuery.trim().toLowerCase();
-        return q ? channels.filter((c) => c.name.toLowerCase().includes(q)) : channels;
-    }, [channels, channelQuery]);
 
     function next() {
         setError(null);
@@ -164,10 +148,11 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                 country: country || null,
                 region: region || null,
                 language,
-                appearance_pref: appearance,
+                // Introductions to channels are offered after publishing (My experiences).
+                appearance_pref: 'none',
                 media_kind: mediaKind,
-                intro_mode: introMode,
-                intro_channel_ids: introMode === 'selected' ? [...selected] : [],
+                intro_mode: 'none',
+                intro_channel_ids: [],
                 text: mediaKind === 'text' ? text : null,
             });
             if (!created.ok || !created.data) throw new Error(created.ok ? 'Could not save your experience.' : created.error);
@@ -198,7 +183,6 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
         identity: 'Your name',
         method: 'How would you like to share?',
         details: 'A few details',
-        intros: 'Introductions to channels',
         submit: 'Ready to share',
     };
 
@@ -386,63 +370,11 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                 </div>
             )}
 
-            {step === 'intros' && (
-                <div className="space-y-4">
-                    <p className="text-slate-600 dark:text-slate-300">
-                        Project Profound works with YouTube channels that interview experiencers. If you&apos;re open to it, vetted channels can see a short summary of your story (never your contact details) and ask us to introduce you. You decide each time.
-                    </p>
-                    {(['none', 'all', 'selected'] as const).map((v) => (
-                        <label key={v} className={`${box} flex gap-3 cursor-pointer ${introMode === v ? 'ring-2 ring-indigo-500' : ''}`}>
-                            <input type="radio" name="intro" className="mt-1" checked={introMode === v} onChange={() => setIntroMode(v)} />
-                            <span>
-                                {v === 'none' && <b>No, thank you</b>}
-                                {v === 'all' && <b>Yes, any channel Project Profound has vetted</b>}
-                                {v === 'selected' && <b>Yes, but only channels I choose</b>}
-                            </span>
-                        </label>
-                    ))}
-                    {introMode !== 'none' && (
-                        <div>
-                            <label className={label}>Would you appear on camera?</label>
-                            <select className={input} value={appearance} onChange={(e) => setAppearance(e.target.value as typeof appearance)}>
-                                <option value="none">Not sure yet</option>
-                                <option value="camera">Yes, on camera</option>
-                                <option value="audio_only">Audio only</option>
-                            </select>
-                        </div>
-                    )}
-                    {introMode === 'selected' && (
-                        <div className={`${box} space-y-2`}>
-                            <input className={input} placeholder="Search channels" value={channelQuery} onChange={(e) => setChannelQuery(e.target.value)} />
-                            <p className="text-xs text-slate-500">{selected.size} selected</p>
-                            <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
-                                {filteredChannels.map((c) => (
-                                    <label key={c.channel_id} className="flex items-center gap-3 py-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={selected.has(c.channel_id)}
-                                            onChange={(e) => {
-                                                const n = new Set(selected);
-                                                if (e.target.checked) n.add(c.channel_id); else n.delete(c.channel_id);
-                                                setSelected(n);
-                                            }}
-                                        />
-                                        <span className="flex-1">{c.name}</span>
-                                        <span className="text-xs uppercase text-slate-400">{c.vertical}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
-
             {step === 'submit' && (
                 <div className="space-y-4">
                     <div className={`${box} space-y-2 text-slate-700 dark:text-slate-300`}>
                         <p><b>Shown as:</b> {mode === 'named' ? displayName : shownName.trim() || 'Anonymous #…'}</p>
                         <p><b>Shared by:</b> {mediaKind === 'text' ? 'writing' : mediaKind === 'file' ? `document (${file?.name})` : mediaKind === 'audio' ? 'audio' : 'video'}</p>
-                        <p><b>Introductions:</b> {introMode === 'none' ? 'no' : introMode === 'all' ? 'any vetted channel' : `${selected.size} chosen channel(s)`}</p>
                     </div>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
                         Next, we {mediaKind === 'audio' || mediaKind === 'video' ? 'turn your recording into text, then ' : ''}suggest a few light edits (spelling, paragraphs, a title) for you to accept or reject. Your story is published when you finish reviewing.
@@ -474,8 +406,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                         onClick={next}
                         disabled={
                             (step === 'identity' && mode === 'named' && !displayName.trim()) ||
-                            (step === 'method' && !contentReady) ||
-                            (step === 'intros' && introMode === 'selected' && selected.size === 0)
+                            (step === 'method' && !contentReady)
                         }
                         className="gap-2"
                     >

@@ -614,3 +614,53 @@ export async function deleteOwnStory(userId: string, storyId: string) {
     const story = await getOwnStory(userId, storyId);
     await deleteStoryCompletely(story);
 }
+
+// ─── Introductions to channels (offered after publishing) ──────────────────
+
+export const introPrefsSchema = z
+    .object({
+        intro_mode: z.enum(['none', 'all', 'selected']),
+        channel_ids: z.array(z.string().trim().min(1).max(64)).max(300).default([]),
+        appearance_pref: z.enum(['camera', 'audio_only', 'none']).default('none'),
+        phone: z.string().trim().max(40).optional().default(''),
+        website: z.string().trim().max(200).optional().default(''),
+        other: z.string().trim().max(300).optional().default(''),
+    })
+    .superRefine((v, ctx) => {
+        if (v.intro_mode === 'selected' && v.channel_ids.length === 0) {
+            ctx.addIssue({ code: 'custom', path: ['channel_ids'], message: 'Choose at least one channel, or pick "any vetted channel".' });
+        }
+    });
+
+export async function getIntroPreferences(userId: string, storyId: string) {
+    const story = await getOwnStory(userId, storyId);
+    const [{ data: links }, { data: contacts }] = await Promise.all([
+        db().from('share_intro_channels').select('channel_id').eq('story_id', storyId),
+        db().from('share_contacts').select('phone, website, other').eq('user_id', userId).maybeSingle(),
+    ]);
+    return {
+        introMode: story.intro_mode,
+        channelIds: (links ?? []).map((l) => l.channel_id as string),
+        appearancePref: story.appearance_pref as 'camera' | 'audio_only' | 'none',
+        phone: contacts?.phone ?? '',
+        website: contacts?.website ?? '',
+        other: contacts?.other ?? '',
+    };
+}
+
+/** Save whether (and to which channels) this experience may be introduced, plus optional contact details. */
+export async function updateIntroPreferences(userId: string, storyId: string, raw: z.input<typeof introPrefsSchema>) {
+    const v = introPrefsSchema.parse(raw);
+    await getOwnStory(userId, storyId);
+    await update(storyId, { intro_mode: v.intro_mode, appearance_pref: v.appearance_pref });
+    await db().from('share_intro_channels').delete().eq('story_id', storyId);
+    if (v.intro_mode === 'selected') {
+        const rows = [...new Set(v.channel_ids)].map((channel_id) => ({ story_id: storyId, channel_id }));
+        const { error } = await db().from('share_intro_channels').insert(rows);
+        if (error) throw new Error(error.message);
+    }
+    const { error } = await db()
+        .from('share_contacts')
+        .upsert({ user_id: userId, phone: v.phone || null, website: v.website || null, other: v.other || null, updated_at: new Date().toISOString() });
+    if (error) throw new Error(error.message);
+}

@@ -5,7 +5,6 @@ import { PenLine, Mic, Video, Upload, Lock, Globe } from 'lucide-react';
 import { AGREEMENT_VERSION, isShareEnabled } from '@/lib/share/config';
 import { currentUser } from '@/lib/share/db';
 import { hasAcceptedAgreement } from '@/lib/share/stories';
-import { listFeaturedChannels } from '@/lib/share/channels';
 import ShareWizard from '@/components/share/ShareWizard';
 
 export const dynamic = 'force-dynamic';
@@ -69,10 +68,7 @@ export default async function SharePage() {
 }
 
 async function ShareWizardLoader({ userId, defaultName }: { userId: string; defaultName: string }) {
-    const [accepted, channels] = await Promise.all([
-        hasAcceptedAgreement(userId, 'experiencer', AGREEMENT_VERSION),
-        listFeaturedChannels().catch(() => []),
-    ]);
+    const accepted = await hasAcceptedAgreement(userId, 'experiencer', AGREEMENT_VERSION);
     return (
         <>
             <p className="text-sm flex flex-wrap gap-x-5 gap-y-1">
@@ -82,7 +78,6 @@ async function ShareWizardLoader({ userId, defaultName }: { userId: string; defa
             <ShareWizard
                 needsAgreement={!accepted}
                 defaultName={defaultName}
-                channels={channels.map((c) => ({ channel_id: c.channel_id, name: c.name, vertical: c.vertical }))}
             />
         </>
     );

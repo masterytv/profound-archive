@@ -6,7 +6,7 @@
  */
 import { z } from 'zod';
 import { AGREEMENT_VERSION, isShareEnabled } from '@/lib/share/config';
-import { currentUser, shareAdmin } from '@/lib/share/db';
+import { currentUser } from '@/lib/share/db';
 import {
     attachMedia,
     changeDisplayMode,
@@ -17,7 +17,9 @@ import {
     recordAgreement,
     setSuggestionStatus,
     submitStory,
+    updateIntroPreferences,
     type DraftInput,
+    type introPrefsSchema,
 } from '@/lib/share/stories';
 import { respondToIntro } from '@/lib/share/channels';
 
@@ -129,27 +131,6 @@ export async function deleteStoryAction(storyId: string): Promise<ActionResult> 
     }
 }
 
-const contactSchema = z.object({
-    phone: z.string().trim().max(40).optional().default(''),
-    website: z.string().trim().max(200).optional().default(''),
-    other: z.string().trim().max(300).optional().default(''),
-});
-
-/** Optional extra contact details. Visible only to PP admins, and shared only in an accepted introduction. */
-export async function saveContactsAction(input: z.input<typeof contactSchema>): Promise<ActionResult> {
-    try {
-        const user = await signedInUser();
-        const v = contactSchema.parse(input);
-        const { error } = await shareAdmin()
-            .from('share_contacts')
-            .upsert({ user_id: user.id, phone: v.phone || null, website: v.website || null, other: v.other || null, updated_at: new Date().toISOString() });
-        if (error) throw new Error(error.message);
-        return { ok: true };
-    } catch (err) {
-        return fail(err);
-    }
-}
-
 /** Accept/decline from the emailed link. The token is the credential (no sign-in needed). */
 export async function respondToIntroAction(
     token: string,
@@ -159,6 +140,17 @@ export async function respondToIntroAction(
     try {
         if (!isShareEnabled()) throw new Error('Sharing is not open yet.');
         await respondToIntro(token, choice, extras);
+        return { ok: true };
+    } catch (err) {
+        return fail(err);
+    }
+}
+
+/** After publishing: open (or not) to introductions from YouTube channels, plus optional contact details. */
+export async function updateIntroPreferencesAction(storyId: string, input: z.input<typeof introPrefsSchema>): Promise<ActionResult> {
+    try {
+        const user = await signedInUser();
+        await updateIntroPreferences(user.id, storyId, input);
         return { ok: true };
     } catch (err) {
         return fail(err);
