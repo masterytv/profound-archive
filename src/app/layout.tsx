@@ -13,6 +13,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 import CookieConsent from '@/components/cookie-consent';
 import ConsentGatedScripts from '@/components/consent-gated-scripts';
 import { MusicVideoBanner } from '@/components/featured-video/MusicVideoBanner';
+import ShareBanner from '@/components/share/ShareBanner';
+import { isShareEnabled } from '@/lib/share/config';
 
 const siteTitle = 'Project Profound: Near Death Experiences and Consciousness';
 const siteDescription = 'Search and Chat with 5000+ First-Person Accounts of Near Death Experiences.';
@@ -61,8 +63,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          {/* Share Your Experience: site-wide, above the music-video bar on NDE pages */}
+          {isShareEnabled() && <ShareBanner />}
           <MusicVideoBanner />
-          <SiteHeader />
+          <SiteHeader shareEnabled={isShareEnabled()} />
           <main className="flex-grow">{children}</main>
           <SiteFooter />
           <ChatPopup />

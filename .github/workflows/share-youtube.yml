@@ -1,0 +1,66 @@
+# Share Your Experience: daily narration + YouTube batch, and maintenance.
+# See directives/ARCHITECTURE-SHARE-YOUR-EXPERIENCE.md §4.5.
+#
+# The job only talks to the app (/api/share/jobs/*, /api/cron/share-maintenance)
+# with CRON_SECRET, uploads narration through one-off signed URLs, and uploads
+# to YouTube with PP's own Google Cloud project. It never sees database keys.
+#
+# Repo secrets / variables needed (see docs/share/SETUP.md):
+#   secrets.CRON_SECRET, secrets.SHARE_NARRATOR_SAMPLE_URL,
+#   secrets.YOUTUBE_CLIENT_ID, secrets.YOUTUBE_CLIENT_SECRET, secrets.YOUTUBE_REFRESH_TOKEN
+#   vars.SHARE_JOB_APP_URL (default https://projectprofound.org), vars.SHARE_JOB_ENABLED ('true' to run on schedule)
+name: share-youtube
+
+on:
+  schedule:
+    - cron: '23 4 * * *' # daily 04:23 UTC (≈ 11:23 pm Eastern)
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: App to process (production or staging)
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: share-youtube
+  cancel-in-progress: false
+
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || vars.SHARE_JOB_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    env:
+      APP_URL: ${{ inputs.app_url || vars.SHARE_JOB_APP_URL || 'https://projectprofound.org' }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      SHARE_NARRATOR_SAMPLE_URL: ${{ secrets.SHARE_NARRATOR_SAMPLE_URL }}
+      YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+      YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+      YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+      SHARE_JOB_BUDGET_MINUTES: '300'
+      PYTHONUNBUFFERED: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+      TORCH_INDEX: https://download.pytorch.org/whl/cpu
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: scripts/share/requirements.txt
+      - name: Audio/video tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libsndfile1
+      - name: Model cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-chatterbox-v1
+      - name: Install (PyTorch for CPU first, as in Short Maker)
+        run: |
+          pip install --index-url "$TORCH_INDEX" torch==2.6.0 torchaudio==2.6.0
+          pip install -r scripts/share/requirements.txt
+      - name: Narrate, render, upload, remove
+        run: python scripts/share/youtube_job.py
