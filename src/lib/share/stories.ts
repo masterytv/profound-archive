@@ -25,6 +25,7 @@ import {
 import { assembleText, slugify, splitSections, storySlug } from './text';
 import { storyNeedsCrisisHold } from './crisis';
 import { crisisSoftening, editorSuggestions } from './suggestions';
+import { geminiConfigured } from '@/lib/ai/gemini';
 import { assemblyConfigured, deleteRemoteTranscript, fetchTranscript, submitTranscription } from './assemblyai';
 import { extractText } from './extract';
 import { sendEmail } from './send';
@@ -342,6 +343,8 @@ export async function prepareReview(storyId: string, text: string): Promise<void
     const sections = splitSections(text);
     let title: string | null = null;
     let summary: string | null = null;
+    // Why there are no suggestions, if there are none (shown to the person and in /admin/share).
+    let note: string | null = geminiConfigured() ? null : 'Editor suggestions are not available yet (GEMINI_API_KEY is not set).';
 
     try {
         const result = await editorSuggestions(sections);
@@ -368,13 +371,15 @@ export async function prepareReview(storyId: string, text: string): Promise<void
         }
     } catch (err) {
         // Suggestions are a nicety: never block a story on them.
-        console.error('[share] editor suggestions failed:', err instanceof Error ? err.message : err);
+        const message = err instanceof Error ? err.message : String(err);
+        console.error('[share] editor suggestions failed:', message);
+        note = `Editor suggestions failed: ${message.slice(0, 300)}`;
     }
 
     const { data } = await db().from('share_stories').select('title, summary').eq('id', storyId).single();
     await update(storyId, {
         status: 'reviewing',
-        processing_error: null,
+        processing_error: note,
         title: data?.title || title,
         summary: data?.summary || summary,
     });
@@ -401,14 +406,16 @@ export async function setSuggestionStatus(userId: string, suggestionId: number, 
 
 // ─── Publish / hold ─────────────────────────────────────────────────────────
 
-/** The experiencer finishes review: assemble the text and publish (or hold). */
-export async function finishReview(userId: string, storyId: string, opts: { title?: string | null } = {}): Promise<'published' | 'held'> {
+/**
+ * The experiencer finishes review and publishes (or the story is held).
+ * The final text comes from the review page: their own edits plus any
+ * suggestions they accepted. It is their story, so we take their text.
+ */
+export async function finishReview(userId: string, storyId: string, opts: { title?: string | null; text: string }): Promise<'published' | 'held'> {
     const story = await getOwnStory(userId, storyId);
     if (story.status !== 'reviewing') throw new Error('This story is not ready to publish.');
-    const sections = splitSections(story.original_text ?? '');
-    const suggestions = await listSuggestions(storyId, 'style');
-    const body = assembleText(sections, suggestions);
-    if (!body.trim()) throw new Error('Your story is empty.');
+    const body = opts.text.replace(/\r\n?/g, '\n').replace(/\n{3,}/g, '\n\n').trim().slice(0, MAX_TEXT_CHARS);
+    if (body.length < 20) throw new Error('Your story is empty.');
     const title = (opts.title ?? story.title ?? '').trim().slice(0, 120) || 'My experience';
     return publishOrHold({ ...story, title }, body);
 }
@@ -548,7 +555,19 @@ export async function ensureExperiencerProfile(userId: string, displayName: stri
 
 export async function changeDisplayMode(userId: string, storyId: string, mode: 'named' | 'anonymous', displayName?: string | null) {
     const story = await getOwnStory(userId, storyId);
-    if (mode === story.display_mode) return;
+    if (mode === story.display_mode) {
+        // Same mode: a named story can still change the name it shows.
+        const name = (displayName ?? '').trim().slice(0, 80);
+        if (mode !== 'named' || !name || name === story.display_name) return;
+        await update(storyId, { display_name: name });
+        await db().from('experiencer_profiles').update({ full_name: name }).eq('user_id', userId);
+        if (story.youtube_video_id) {
+            await queueYoutubeRemoval(story.youtube_video_id);
+            await update(storyId, { youtube_video_id: null, youtube_status: 'pending' });
+        }
+        revalidateStory(story);
+        return;
+    }
     if (mode === 'anonymous' && story.media_kind === 'video') {
         throw new Error('A video shows your face and voice, so it can\'t be made anonymous. You can delete it instead.');
     }

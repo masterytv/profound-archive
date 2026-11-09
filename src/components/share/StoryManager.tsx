@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Check, X, Loader2, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { wordDiff } from '@/lib/share/diff';
 import {
     changeDisplayModeAction,
     deleteStoryAction,
@@ -56,8 +57,14 @@ export default function StoryManager({ story, sections, suggestions: initial, me
         router.refresh();
     }
 
-    async function decide(id: number, status: 'accepted' | 'rejected') {
-        setSuggestions((s) => s.map((x) => (x.id === id ? { ...x, status } : x)));
+    // The text of each section as it will be published: starts as written,
+    // switches to the suggestion on Accept, and can be edited freely.
+    const [texts, setTexts] = useState<string[]>(sections);
+
+    async function decide(id: number, sectionIndex: number, status: 'accepted' | 'rejected') {
+        const s = suggestions.find((x) => x.id === id);
+        setSuggestions((all) => all.map((x) => (x.id === id ? { ...x, status } : x)));
+        if (s) setTexts((t) => t.map((x, k) => (k === sectionIndex ? (status === 'accepted' ? s.suggested : sections[sectionIndex]) : x)));
         const res = await setSuggestionAction(id, status);
         if (!res.ok) setError(res.error);
     }
@@ -93,48 +100,61 @@ export default function StoryManager({ story, sections, suggestions: initial, me
 
             {story.status === 'reviewing' && (
                 <section className="space-y-5">
-                    <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 p-4 text-sm text-indigo-900 dark:text-indigo-100">
-                        Our editor suggested a few light changes. For each one, choose <b>Accept</b> or <b>Keep mine</b>. Anything you don&apos;t accept stays exactly as you wrote it.
+                    <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 p-4 text-sm text-indigo-900 dark:text-indigo-100 space-y-1">
+                        {suggestions.length > 0 ? (
+                            <p>
+                                Our editor suggested {suggestions.length === 1 ? 'one light change' : `${suggestions.length} light changes`}. Where you see one, compare it with what you wrote (
+                                <span className="bg-emerald-100 dark:bg-emerald-500/20 px-1 rounded">added</span>{' '}
+                                <span className="line-through text-red-600">removed</span>) and choose <b>Accept</b> or <b>Keep mine</b>.
+                            </p>
+                        ) : (
+                            <p>{story.processingError ? 'Editor suggestions aren’t available right now.' : 'Our editor didn’t suggest any changes.'}</p>
+                        )}
+                        <p>You can also edit any paragraph yourself below before you publish.</p>
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1" htmlFor="title">Title</label>
-                        <input id="title" className={input} value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} />
+                        <input id="title" className={input} value={title} maxLength={120} placeholder="Give your story a title" onChange={(e) => setTitle(e.target.value)} />
                     </div>
                     <ol className="space-y-4">
                         {sections.map((sec, i) => {
                             const s = bySection.get(i);
                             return (
                                 <li key={i} className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3">
-                                    {!s ? (
-                                        <p className="whitespace-pre-wrap font-serif leading-relaxed">{sec}</p>
-                                    ) : (
-                                        <>
-                                            <div className="grid gap-3 md:grid-cols-2">
-                                                <div>
-                                                    <p className="text-xs uppercase text-slate-400 mb-1">What you wrote</p>
-                                                    <p className={`whitespace-pre-wrap font-serif leading-relaxed ${s.status === 'accepted' ? 'opacity-50' : ''}`}>{sec}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs uppercase text-slate-400 mb-1">Suggested</p>
-                                                    <p className={`whitespace-pre-wrap font-serif leading-relaxed ${s.status === 'rejected' ? 'opacity-50' : ''}`}>{s.suggested}</p>
-                                                </div>
-                                            </div>
+                                    {s && (
+                                        <div className="space-y-2">
+                                            <p className="text-xs uppercase text-slate-400">Editor&apos;s suggestion (changes marked)</p>
+                                            <p className="whitespace-pre-wrap font-serif leading-relaxed rounded-lg bg-slate-50 dark:bg-slate-800/60 p-3">
+                                                {wordDiff(sec, s.suggested).map((part, k) =>
+                                                    part.kind === 'same' ? (
+                                                        <span key={k}>{part.text}</span>
+                                                    ) : part.kind === 'added' ? (
+                                                        <span key={k} className="bg-emerald-100 dark:bg-emerald-500/20 rounded">{part.text}</span>
+                                                    ) : (
+                                                        <span key={k} className="line-through text-red-600">{part.text}</span>
+                                                    ),
+                                                )}
+                                            </p>
                                             {s.reason && <p className="text-xs text-slate-500">Why: {s.reason}</p>}
                                             <div className="flex gap-2">
-                                                <Button size="sm" variant={s.status === 'accepted' ? 'default' : 'outline'} onClick={() => decide(s.id, 'accepted')} className="gap-1"><Check className="h-4 w-4" /> Accept</Button>
-                                                <Button size="sm" variant={s.status === 'rejected' ? 'default' : 'outline'} onClick={() => decide(s.id, 'rejected')} className="gap-1"><X className="h-4 w-4" /> Keep mine</Button>
+                                                <Button size="sm" variant={s.status === 'accepted' ? 'default' : 'outline'} onClick={() => decide(s.id, i, 'accepted')} className="gap-1"><Check className="h-4 w-4" /> Accept</Button>
+                                                <Button size="sm" variant={s.status === 'rejected' ? 'default' : 'outline'} onClick={() => decide(s.id, i, 'rejected')} className="gap-1"><X className="h-4 w-4" /> Keep mine</Button>
                                             </div>
-                                        </>
+                                        </div>
                                     )}
+                                    <div>
+                                        <p className="text-xs uppercase text-slate-400 mb-1">{s ? (s.status === 'accepted' ? 'Your text (with the suggestion)' : 'Your text') : 'Your text'}. You can edit it here</p>
+                                        <AutoTextarea value={texts[i]} onChange={(v) => setTexts((t) => t.map((x, k) => (k === i ? v : x)))} />
+                                    </div>
                                 </li>
                             );
                         })}
                     </ol>
                     <div className="flex justify-end">
                         <Button
-                            disabled={busy !== null}
+                            disabled={busy !== null || !texts.join('').trim()}
                             className="gap-2"
-                            onClick={() => run('publish', () => finishReviewAction(story.id, title))}
+                            onClick={() => run('publish', () => finishReviewAction(story.id, title, texts.map((t) => t.trim()).filter(Boolean).join('\n\n')))}
                         >
                             {busy === 'publish' && <Loader2 className="h-4 w-4 animate-spin" />} Publish my story
                         </Button>
@@ -173,21 +193,27 @@ export default function StoryManager({ story, sections, suggestions: initial, me
             {story.status !== 'removed' && (
                 <section className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
                     <h2 className="text-lg font-serif">How you&apos;re named</h2>
-                    {story.displayMode === 'named' ? (
+                    <p className="text-slate-600 dark:text-slate-300">
+                        {story.displayMode === 'named' ? <>Shown as <b>{story.displayName}</b>.</> : <>Shown as <b>Anonymous</b>. Your name is not shown anywhere.</>}
+                    </p>
+                    <div className="flex flex-wrap gap-2 items-center">
+                        <input className={`${input} max-w-xs`} placeholder="Name to show" value={nameDraft} maxLength={80} onChange={(e) => setNameDraft(e.target.value)} />
+                        <Button
+                            variant="outline"
+                            disabled={busy !== null || !nameDraft.trim() || (story.displayMode === 'named' && nameDraft.trim() === story.displayName)}
+                            onClick={() => run('named', () => changeDisplayModeAction(story.id, 'named', nameDraft))}
+                        >
+                            {story.displayMode === 'named' ? 'Change name' : 'Show my name'}
+                        </Button>
+                    </div>
+                    {story.displayMode === 'named' && (
                         story.mediaKind === 'video' ? (
                             <p className="text-sm text-slate-500">This story is a video, which shows your face and voice, so it can&apos;t be made anonymous. You can delete it instead.</p>
                         ) : (
                             <Button variant="outline" disabled={busy !== null} onClick={() => run('anon', () => changeDisplayModeAction(story.id, 'anonymous', ''))}>
-                                Make this story anonymous
+                                Make this story anonymous instead
                             </Button>
                         )
-                    ) : (
-                        <div className="flex flex-wrap gap-2 items-center">
-                            <input className={`${input} max-w-xs`} placeholder="Name to show" value={nameDraft} maxLength={80} onChange={(e) => setNameDraft(e.target.value)} />
-                            <Button variant="outline" disabled={busy !== null || !nameDraft.trim()} onClick={() => run('named', () => changeDisplayModeAction(story.id, 'named', nameDraft))}>
-                                Show my name
-                            </Button>
-                        </div>
                     )}
                     {story.youtubeVideoId && <p className="text-xs text-slate-500">Changing this takes the YouTube version down within 24 hours and posts a new one.</p>}
                 </section>
@@ -215,5 +241,18 @@ export default function StoryManager({ story, sections, suggestions: initial, me
 
             {error && <p className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{error}</p>}
         </div>
+    );
+}
+
+/** A textarea that grows with its content, so long paragraphs are easy to edit. */
+function AutoTextarea({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+    return (
+        <textarea
+            className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 font-serif leading-relaxed min-h-[8rem]"
+            style={{ fieldSizing: 'content' } as CSSProperties}
+            rows={Math.min(30, Math.max(4, Math.ceil(value.length / 80) + value.split('\n').length))}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+        />
     );
 }

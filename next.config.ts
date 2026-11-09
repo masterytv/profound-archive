@@ -20,9 +20,9 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://yt3.googleusercontent.com https://vnycavclrndjwmpaugju.supabase.co https://images.unsplash.com https://placehold.co https://picsum.photos https://*.filekitcdn.com https://unpkg.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "frame-src 'self' https://www.youtube.com",
+              "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
               "connect-src 'self' https://vnycavclrndjwmpaugju.supabase.co wss://vnycavclrndjwmpaugju.supabase.co https://api.openai.com https://www.google-analytics.com https://region1.google-analytics.com https://cloudflareinsights.com https://cdn.jsdelivr.net",
-              "media-src 'self' https://vnycavclrndjwmpaugju.supabase.co data:",
+              "media-src 'self' https://vnycavclrndjwmpaugju.supabase.co data: blob:",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
@@ -33,8 +33,17 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
+      },
+      // Camera and microphone stay blocked everywhere except /share, where
+      // experiencers record their story in the browser (Share Your Experience).
+      {
+        source: '/:path((?!share(?:/|$)).*)',
+        headers: [{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' }],
+      },
+      {
+        source: '/share/:path*',
+        headers: [{ key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=()' }],
       },
     ];
   },

@@ -304,6 +304,18 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
                         ))}
                     </div>
 
+                    {mode === 'anonymous' && (
+                        <p className="text-sm text-slate-500 flex gap-2">
+                            <Video className="h-4 w-4 shrink-0 mt-0.5" />
+                            <span>
+                                Want to share on video? A video shows your face and voice, so it can only be shared with your name.{' '}
+                                <button type="button" className="text-indigo-600 underline" onClick={() => { setStepIndex(steps.indexOf('identity')); setMode('named'); }}>
+                                    Show my name instead
+                                </button>
+                            </span>
+                        </p>
+                    )}
+
                     {method === 'type' && (
                         <div className="space-y-2">
                             <p className="text-sm text-slate-500">Take your time. It may help to describe what was happening <b>before</b>, what you experienced <b>during</b>, and how it has affected you <b>after</b>. There is no minimum length.</p>
