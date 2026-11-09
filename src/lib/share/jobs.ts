@@ -197,8 +197,8 @@ export async function applyRemovalResult(videoId: string, ok: boolean, error?: s
         .eq('youtube_video_id', videoId);
 }
 
-/** Daily: expire intros, purge removed stories after 30 days, purge staging test data after 7. */
-export async function runMaintenance(): Promise<{ expiredIntros: number; purgedRemoved: number; purgedTest: number }> {
+/** Daily: expire intros; purge removed stories and abandoned drafts after 30 days, staging test data after 7. */
+export async function runMaintenance(): Promise<{ expiredIntros: number; purgedRemoved: number; purgedTest: number; purgedDrafts: number }> {
     const expiredIntros = await expireOldIntros();
     const purge = async (stories: OwnStory[]) => {
         let n = 0;
@@ -218,6 +218,9 @@ export async function runMaintenance(): Promise<{ expiredIntros: number; purgedR
     const purgedRemoved = await purge((removed ?? []) as OwnStory[]);
     const { data: tests } = await db().from('share_stories').select('*').eq('is_test', true).lt('created_at', weekAgo).limit(50);
     const purgedTest = await purge((tests ?? []) as OwnStory[]);
+    // Drafts never submitted (e.g. an upload finished but the person never came back).
+    const { data: drafts } = await db().from('share_stories').select('*').eq('status', 'draft').lt('created_at', monthAgo).limit(50);
+    const purgedDrafts = await purge((drafts ?? []) as OwnStory[]);
     await db().from('share_channel_invites').delete().eq('is_test', true).lt('created_at', weekAgo);
-    return { expiredIntros, purgedRemoved, purgedTest };
+    return { expiredIntros, purgedRemoved, purgedTest, purgedDrafts };
 }

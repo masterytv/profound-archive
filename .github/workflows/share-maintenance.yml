@@ -1,0 +1,38 @@
+# Share Your Experience: daily clean-up (runs on its own, no YouTube setup needed).
+#   - expires introduction requests unanswered after 14 days (and tells the channel)
+#   - deletes removed experiences and abandoned drafts after 30 days (files included)
+#   - deletes staging test experiences after 7 days
+# Calls POST /api/cron/share-maintenance on the production app with CRON_SECRET,
+# like the other cron workflows. Scheduled workflows run from the default branch,
+# so this starts once it reaches main.
+name: share-maintenance
+
+on:
+  schedule:
+    - cron: '41 9 * * *' # daily 09:41 UTC (≈ 4:41 am Eastern)
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Run share maintenance
+        env:
+          APP_DIRECT_URL: ${{ secrets.APP_DIRECT_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_DIRECT_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::APP_DIRECT_URL and/or CRON_SECRET is not set on this repository."
+            exit 1
+          fi
+          BASE="${APP_DIRECT_URL%/}"
+          case "$BASE" in http://*|https://*) ;; *) BASE="https://$BASE" ;; esac
+          HTTP_CODE=$(curl -sS -o /tmp/out.json -w "%{http_code}" --max-time 300 -X POST \
+            "$BASE/api/cron/share-maintenance" -H "x-cron-secret: $CRON_SECRET")
+          echo "HTTP $HTTP_CODE: $(cat /tmp/out.json)"
+          [ "$HTTP_CODE" = "200" ] || { echo "::error::share-maintenance failed"; exit 1; }
