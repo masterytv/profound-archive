@@ -67,7 +67,7 @@ flowchart TD
 - **F6. Not sharing the full name hides the name only.** Everyone can share by text, audio or video, and recordings are published as recorded; the agreement and the wizard say plainly that a face or voice can be recognised. Written stories get a labelled synthetic narration (`src/lib/pipeline/experience-tts.ts` fallback) and an AI illustration.
 
 ### 5.3 Sharing a story
-- **F7. Four ways to share:** type; record audio in the browser; record video in the browser (Named only); upload text (`.txt .md .pdf .docx`, max about 10 MB), audio or video.
+- **F7. Four ways to share:** type; record audio in the browser; record video in the browser; upload text (`.txt .md .pdf .docx`, max about 10 MB), audio or video.
 - **F8. Re-takes stay in the browser.** A recording stays on the person's device until they press "Use this one". Discarded takes never reach PP. *AC:* no upload request happens before that button is pressed.
 - **F9. Long-video guidance.** When someone chooses browser video, the screen says: "For recordings longer than a few minutes, recording with your phone's camera app and uploading the file is more reliable."
 - **F10. Direct upload to private storage.** Files go straight from the browser to a new **private** Supabase Storage bucket via resumable (TUS) upload (Uppy). They never pass through the Next.js server, which has a ~32 MB request cap. Uploaded text files are shown only as extracted text, never served as the original file.
