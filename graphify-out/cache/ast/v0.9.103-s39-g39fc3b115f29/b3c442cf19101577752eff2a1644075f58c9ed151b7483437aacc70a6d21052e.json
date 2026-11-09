@@ -1,1 +1,0 @@
-{"nodes": [{"id": "$graphify-root$_supabase_migrations_20260601_daily_maintenance_schedules_sql", "label": "20260601_daily_maintenance_schedules.sql", "file_type": "code", "source_file": "supabase/migrations/20260601_daily_maintenance_schedules.sql", "source_location": null}], "edges": []}

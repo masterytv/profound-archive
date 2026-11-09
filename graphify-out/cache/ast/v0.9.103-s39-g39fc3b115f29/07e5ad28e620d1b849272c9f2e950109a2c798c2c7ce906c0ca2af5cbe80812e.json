@@ -1,1 +1,0 @@
-{"nodes": [{"id": "$graphify-root$_supabase_migrations_20260519_fix_search_path_all_functions_sql", "label": "20260519_fix_search_path_all_functions.sql", "file_type": "code", "source_file": "supabase/migrations/20260519_fix_search_path_all_functions.sql", "source_location": null}], "edges": []}
