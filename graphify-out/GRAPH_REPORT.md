@@ -1,7 +1,7 @@
 # Graph Report - profound-archive  (2026-11-09)
 
 ## Corpus Check
-- 958 files · ~1,154,522 words
+- 958 files · ~1,154,537 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 7, .nix 1, .csv 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `850dd3c6`
+- Built from commit: `edb6ae51`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -2309,10 +2309,10 @@ Nodes (3): GET(), revalidate, serviceClient()
   methodology/METHODOLOGY.md · relation: references
 - `UAP Content Classifier (classify-uap.ts)` → `Content Classifier Requirement (Claude prefill)`  [AMBIGUOUS]
   directives/ARCHITECTURE.md · relation: implements
-- `UAP Pipeline Execution Order` → `UAP Intake Orchestrator (uap-intake.ts)`  [AMBIGUOUS]
-  directives/PRD.md · relation: conceptually_related_to
 - `UAP Evidence Strength Scale (UAP-ESS)` → `UAP-ESS (methodology summary)`  [AMBIGUOUS]
   methodology/METHODOLOGY.md · relation: references
+- `UAP Intake Orchestrator (uap-intake.ts)` → `UAP Pipeline Execution Order`  [AMBIGUOUS]
+  directives/PRD.md · relation: conceptually_related_to
 - `Supabase Vault secrets (uap_processor_url, uap_processor_cron_secret)` → `Oracle Crontab Schedule`  [AMBIGUOUS]
   docs/IMPROVEMENT_PLAN.md · relation: conceptually_related_to
 - `Cloudflare 100s timeout constraint` → `Infrastructure (Next.js, Supabase pgvector, OpenAI)`  [AMBIGUOUS]
@@ -2331,13 +2331,13 @@ Nodes (3): GET(), revalidate, serviceClient()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `next` connect `next` to `shadcn UI Primitives`, `Search Result Cards & Buttons`, `NDE Score Cards`, `wrapAiClient`, `JSON-LD & Methodology Pages`, `app/page.tsx`, `UAP Entity Detail Pages`, `contacts.ts`, `MusicVideoBanner.tsx`, `lucide-react`, `app/experiencer/[slug]/page.tsx`, `Admin Blog Generation`, `UAP Video Explorer`, `UAP Channel Detail`, `UAP Knowledge-Base Directories`, `app/video/[id]/page.tsx`, `app/channels/page.tsx`, `archetypes.ts`, `ExplorerControls.tsx`, `NDE Video Explorer`, `uap-blog-article.ts`, `match-quote-timestamp.ts`, `uap/experiencer/[slug]/page.tsx`, `logQuota()`, `experiencer-profile.ts`, `createClient`, `stories.ts`, `isAdminUser()`, `pipeline/presentation-stats.ts`, `[category]/page.tsx`, `dependencies`, `nde-batch-analysis.ts`, `metadata.ts`, `stats.ts`, `[slug]/route.ts`, `app/share/actions.ts`, `ChatbotEditor`, `checkRateLimit`, `phenomenology-entities.ts`, `questions/[slug]/page.tsx`, `hasValidCronSecret`, `getBudgetStatus`, `app/questions/page.tsx`, `operations/route.ts`, `compute-channel-scores.ts`, `components.tsx`, `[channelId]/page.tsx`, `package.json`, `EncounterTaxonomy.tsx`, `uap-intelligence-graph.tsx`, `rebuild-viz-caches.ts`, `isDebugBypass`, `ChannelUniverseMap.tsx`, `normalize-entities.ts`, `bulk-generate-contactee-profiles.ts`, `uap/video/[id]/page.tsx`, `experience/[slug]/page.tsx`, `uap-timeline-graph.tsx`, `isShareEnabled`, `cross-domain/page.tsx`, `UapResearchBreakdown.tsx`, `app/uap/channels/page.tsx`, `ces-feedback-widget.tsx`, `utils.ts`, `consent-gated-scripts.tsx`, `user-row.tsx`, `shortmaker-research.test.ts`, `chat-compassionate/route.ts`, `afterlife-map.tsx`, `EmailCrmClient.tsx`, `dashboard/page.tsx`, `scanner/route.ts`, `experience/types.ts`, `ContentDNA.tsx`, `greyson.ts`, `admin/share/actions.ts`, `unsubscribe/page.tsx`, `channels.ts`, `preview/route.ts`, `journey-flow.ts`, `hynek-space-graph.tsx`, `timeline/page.tsx`, `intake.ts`, `channels.ts`, `channel-constellation-graph.tsx`, `core-elements.ts`, `uap/actions.ts`, `uap-phenomenology-graph.tsx`, `@supabase/ssr`, `buildFingerprint`, `analytics-dashboard.tsx`, `generate-entity-summaries/route.ts`, `ChannelScorecard.tsx`, `globe-graph.tsx`, `unified-site-header.tsx`, `jobs.ts`, `feedback-digest/route.ts`, `AllTypesClient.tsx`, `TriadScoresPanel.tsx`, `uap/experiencer/page.tsx`, `[series]/page.tsx`, `ScoreBadges.tsx`, `ces/page.tsx`, `[token]/page.tsx`, `admin/blog/[id]/route.ts`, `zod`, `rate-limit.ts`, `chat-popup.tsx`, `people/[slug]/page.tsx`, `robots.ts`, `logo-preview/page.tsx`, `resources/page.tsx`, `[id]/route.tsx`, `api/intake/process/route.ts`, `about-new/page.tsx`, `channel/[id]/route.ts`, `AdminSidebar.tsx`, `cron/route.ts`, `search3/route.ts`, `uap/search/route.ts`, `assemblyai/route.ts`, `admin/uap/page.tsx`, `uap/questions/page.tsx`, `admin/scanner/page.tsx`, `broadcast/route.ts`, `admin/scanner/pending/page.tsx`, `experiencer/[id]/route.ts`, `explore/page.tsx`, `channel-constellation/route.ts`, `uap-globe/route.ts`?**
-  _High betweenness centrality (0.246) - this node is a cross-community bridge._
+  _High betweenness centrality (0.253) - this node is a cross-community bridge._
 - **What connects `RFC-4180`, `RFC-6749`, `Barbara Bartolome` to the rest of the system?**
   _332 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Bundled Phenomenology Batch Script` be split into smaller, more focused modules?**
   _Cohesion score 0.009666803784450843 - nodes in this community are weakly interconnected._
 - **Why does `@supabase/supabase-js` connect `bulk-generate-contactee-profiles.ts` to `Search Result Cards & Buttons`, `wrapAiClient`, `JSON-LD & Methodology Pages`, `app/page.tsx`, `UAP Entity Detail Pages`, `next`, `app/experiencer/[slug]/page.tsx`, `UAP Triad Scoring`, `Admin Blog Generation`, `UAP Channel Detail`, `UAP Knowledge-Base Directories`, `build-case.ts`, `uap-blog-article.ts`, `match-quote-timestamp.ts`, `uap-seed-events.ts`, `uap/experiencer/[slug]/page.tsx`, `uap-phenomenology.ts`, `logQuota()`, `blog-story.ts`, `shortmaker/types.ts`, `blog-article.ts`, `experiencer-profile.ts`, `createClient`, `isAdminUser()`, `pipeline/presentation-stats.ts`, `entity-sync.ts`, `00-dump-corpus.mjs`, `dependencies`, `nde-batch-analysis.ts`, `stats.ts`, `[slug]/route.ts`, `usage-tracker.ts`, `checkRateLimit`, `phenomenology-entities.ts`, `questions/[slug]/page.tsx`, `hasValidCronSecret`, `getBudgetStatus`, `operations/route.ts`, `cross-domain-data.ts`, `uap-knowledge-batch.ts`, `dotenv`, `compute-channel-scores.ts`, `components.tsx`, `package.json`, `rapid-process.ts`, `rebuild-viz-caches.ts`, `uap-generate-facts.mjs`, `isDebugBypass`, `ChannelUniverseMap.tsx`, `normalize-entities.ts`, `generate-penny-audio.ts`, `tick.ts`, `blog-image.ts`, `uap/video/[id]/page.tsx`, `isShareEnabled`, `uap-build-canonical-persons.mjs`, `cross-domain/page.tsx`, `app/uap/channels/page.tsx`, `uap-batch-knowledge.ts`, `utils.ts`, `chat-compassionate/route.ts`, `dashboard/page.tsx`, `scanner/route.ts`, `greyson.ts`, `uap-contactee-dedup.ts`, `preview/route.ts`, `punctuate-uap.ts`, `journey-flow.ts`, `uap-encounter-context.ts`, `timeline/page.tsx`, `intake.ts`, `core-elements.ts`, `uap/actions.ts`, `@supabase/ssr`, `buildFingerprint`, `generate-entity-summaries/route.ts`, `unified-site-header.tsx`, `feedback-digest/route.ts`, `uap-event-backfill.ts`, `seed-questions-bulk.ts`, `[series]/page.tsx`, `ces/page.tsx`, `admin/blog/[id]/route.ts`, `zod`, `ref_fs`, `rate-limit.ts`, `ref_path`, `enrich-channels.ts`, `people/[slug]/page.tsx`, `matcher.ts`, `seed-questions-v2.ts`, `intake-uap.ts`, `[id]/route.tsx`, `uap-seed-questions.ts`, `api/intake/process/route.ts`, `channel/[id]/route.ts`, `cron/route.ts`, `search3/route.ts`, `uap/search/route.ts`, `admin/uap/page.tsx`, `broadcast/route.ts`, `sendFirstStory.ts`, `experiencer/[id]/route.ts`, `channel-constellation/route.ts`, `uap-globe/route.ts`?**
-  _High betweenness centrality (0.235) - this node is a cross-community bridge._
+  _High betweenness centrality (0.198) - this node is a cross-community bridge._
 - **Should `shadcn UI Primitives` be split into smaller, more focused modules?**
   _Cohesion score 0.04481792717086835 - nodes in this community are weakly interconnected._
 
