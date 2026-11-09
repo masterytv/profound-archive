@@ -37,7 +37,7 @@ export default async function AdminSharePage({ searchParams }: { searchParams: P
         <div className="space-y-6">
             <header className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Shared stories</h1>
+                    <h1 className="text-2xl font-bold">Shared experiences</h1>
                     <p className="text-sm text-slate-500">
                         Share Your Experience. Flag SHARE_ENABLED is <b>{isShareEnabled() ? 'on' : 'off'}</b>.{' '}
                         {visibleTestValues().includes(true) ? 'Showing test (staging) and real rows.' : 'Showing real rows only.'}
@@ -45,7 +45,7 @@ export default async function AdminSharePage({ searchParams }: { searchParams: P
                 </div>
                 <Link href="/admin/share/channels" className="text-sm underline">Channel invites &amp; introductions →</Link>
             </header>
-            {error && <p className="text-red-600 text-sm">Could not load stories: {error.message}. Have the share migrations been run?</p>}
+            {error && <p className="text-red-600 text-sm">Could not load experiences: {error.message}. Have the share migrations been run?</p>}
             <nav className="flex flex-wrap gap-2 text-sm">
                 {FILTERS.map((f) => (
                     <Link key={f} href={`/admin/share?status=${f}`} className={`rounded-full px-3 py-1 border ${status === f ? 'bg-slate-900 text-white' : ''}`}>

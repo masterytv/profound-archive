@@ -28,7 +28,7 @@ export default async function AdminShareChannelsPage() {
     return (
         <div className="space-y-10">
             <header>
-                <Link href="/admin/share" className="text-sm underline">← Shared stories</Link>
+                <Link href="/admin/share" className="text-sm underline">← Shared experiences</Link>
                 <h1 className="text-2xl font-bold mt-2">Channel invites &amp; introductions</h1>
                 <p className="text-sm text-slate-500">Invite a channel owner only after you&apos;ve spoken with them. The invite link works once, only for that email, for 7 days.</p>
             </header>
