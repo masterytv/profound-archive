@@ -13,6 +13,7 @@ Run in order, in the Supabase SQL editor, then run the "Verify" query at the bot
 2. `supabase/migrations/20261109_002_experiencer_profiles_user_id.sql`: links named storytellers' profiles to their accounts
 3. `supabase/migrations/20261109_003_share_storage_bucket.sql`: private `story-media` bucket + storage access rules
 4. `supabase/migrations/20261109_004_share_allow_video_without_full_name.sql`: lets people share video without their full name
+5. `supabase/migrations/20261109_005_channel_contacts.sql`: the admin **Channels & Contacts** table (`/admin/channel-contacts`)
 
 Then, in the Supabase dashboard: **Storage → Settings → Upload file size limit → at least 5 GB**
 (the project-wide limit applies before the bucket's own 5 GB limit).
