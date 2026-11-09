@@ -32,7 +32,8 @@ env:
   # staging and production share one database; production never shows or acts
   # on is_test rows. Flip SHARE_ENABLED to "true" only AFTER Tom has run the
   # share migrations (supabase/migrations/20261109_00*.sql). See docs/share/SETUP.md.
+  # Migrations run by Tom on 2026-11-09, so it is on for staging.
   - variable: SHARE_ENV
     value: "staging"
   - variable: SHARE_ENABLED
-    value: "false"
+    value: "true"
