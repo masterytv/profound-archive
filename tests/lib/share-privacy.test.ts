@@ -159,3 +159,13 @@ describe('introduction preferences (after publishing)', () => {
         expect(introPrefsSchema.safeParse({ intro_mode: 'all', phone: 'x'.repeat(41) }).success).toBe(false);
     });
 });
+
+describe('channel references typed by an admin', () => {
+    it('accepts YouTube links, @handles and channel IDs', async () => {
+        const { normalizeChannelRef } = await import('@/lib/share/channels');
+        expect(normalizeChannelRef('https://www.youtube.com/@projectprofound')).toBe('@projectprofound');
+        expect(normalizeChannelRef('@ProjectProfound')).toBe('@projectprofound');
+        expect(normalizeChannelRef('https://www.youtube.com/channel/UCbtV5L8TVB0zQ9khThGApLw')).toBe('UCbtV5L8TVB0zQ9khThGApLw');
+        expect(normalizeChannelRef('not a url with spaces')).toBeNull();
+    });
+});

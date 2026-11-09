@@ -8,7 +8,7 @@ import { updateIntroPreferencesAction } from '@/app/share/actions';
 export interface ChannelChoice {
     channel_id: string;
     name: string;
-    vertical: 'nde' | 'uap';
+    vertical: 'nde' | 'uap' | 'other';
 }
 
 export interface IntroPrefs {
