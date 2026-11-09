@@ -30,13 +30,13 @@ const CRISIS_SYSTEM = `You help Project Profound publish a person's experience w
 Only return an edit for a section that contains such wording.`;
 
 const EDITS_SCHEMA = {
-    type: 'array',
+    type: 'ARRAY',
     items: {
-        type: 'object',
+        type: 'OBJECT',
         properties: {
-            section_index: { type: 'integer' },
-            suggested: { type: 'string' },
-            reason: { type: 'string' },
+            section_index: { type: 'INTEGER' },
+            suggested: { type: 'STRING' },
+            reason: { type: 'STRING' },
         },
         required: ['section_index', 'suggested', 'reason'],
     },
@@ -66,10 +66,10 @@ export async function editorSuggestions(sections: string[]): Promise<EditorResul
         prompt: `Here is the story, split into numbered sections.\n\n${numbered(sections)}`,
         operation: 'share.editor-suggestions',
         responseSchema: {
-            type: 'object',
+            type: 'OBJECT',
             properties: {
-                title: { type: 'string' },
-                summary: { type: 'string' },
+                title: { type: 'STRING' },
+                summary: { type: 'STRING' },
                 edits: EDITS_SCHEMA,
             },
             required: ['title', 'summary', 'edits'],
@@ -89,7 +89,7 @@ export async function crisisSoftening(sections: string[]): Promise<{ edits: Edit
         system: CRISIS_SYSTEM,
         prompt: numbered(sections),
         operation: 'share.crisis-softening',
-        responseSchema: { type: 'object', properties: { edits: EDITS_SCHEMA }, required: ['edits'] },
+        responseSchema: { type: 'OBJECT', properties: { edits: EDITS_SCHEMA }, required: ['edits'] },
     });
     return { edits: cleanEdits(sections, data.edits), model };
 }

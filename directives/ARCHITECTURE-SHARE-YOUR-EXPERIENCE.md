@@ -113,12 +113,11 @@ stateDiagram-v2
 
 | Shared as | Watch | Listen | Read |
 |---|---|---|---|
-| Video (named) | original video | the video's audio track | transcript (edited) |
-| Audio (named) | – | original audio | transcript (edited) |
-| Audio (anonymous) | – | synthetic narration, labelled | transcript (edited) |
-| Text / file (any) | – | synthetic narration, labelled (once generated) | text |
+| Video | original video | the video's audio track | transcript (edited) |
+| Audio | – | original audio | transcript (edited) |
+| Text / file | – | synthetic narration, labelled (once generated) | text |
 
-Originals (audio and video) are **kept** privately, even for anonymous stories, and deleted only when the person deletes the story. An anonymous person's own voice is never published.
+Whether the full name is shared doesn't change this (Tom, 2026-11-09: "don't share my full name" hides the name only). Originals are kept privately until the person deletes the story. Migration `20261109_004` drops the old "no video without the full name" constraint.
 
 ### 4.5 Daily YouTube batch (GitHub Actions)
 `.github/workflows/share-youtube.yml` runs once a day, using the same pattern as Short Maker's `voice.yml`/`render.yml`.

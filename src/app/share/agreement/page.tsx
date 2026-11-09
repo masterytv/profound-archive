@@ -25,15 +25,18 @@ export default function AgreementPage() {
                 Project Profound YouTube channel. We may also quote it on Project Profound&apos;s other channels (for example social media or
                 newsletters), always crediting it the way you chose.
             </p>
-            <p>If you share a video, the video itself is published, including your face and voice.</p>
+            <p>If you share a video or a voice recording, it is published as recorded, including your face and voice.</p>
 
             <h2>2. What stays private</h2>
             <ul>
-                <li><strong>Your name</strong>, if you choose &ldquo;Keep me anonymous&rdquo;. Your story then appears as &ldquo;Anonymous #&hellip;&rdquo;.</li>
+                <li><strong>Your full name</strong>, if you choose &ldquo;Don&apos;t share my full name publicly&rdquo;. Your story then appears under a first name, initials or nickname you choose, or as &ldquo;Anonymous #&hellip;&rdquo;.</li>
                 <li><strong>Your contact details</strong> (your email address and anything else you add) are never shown publicly, in any case.</li>
-                <li>If you share anonymously with your voice, <strong>your own voice is never published</strong>. We publish the text, and a version read aloud by a synthetic (computer-generated) voice, clearly labelled as such.</li>
             </ul>
-            <p>Please avoid naming people, towns, hospitals or employers if you want to stay anonymous: we can&apos;t protect details you include in the story itself.</p>
+            <p>
+                Not sharing your full name does not hide your face or voice: people who know you may recognise you in a video or recording.
+                If that matters to you, share in writing instead. Please also avoid naming people, towns, hospitals or employers: we can&apos;t
+                protect details you include in the story itself.
+            </p>
 
             <h2>3. Where your data is stored and who processes it</h2>
             <p>
@@ -44,7 +47,7 @@ export default function AgreementPage() {
                 <li><strong>AssemblyAI</strong> (USA) turns audio and video into text. We delete the copy on their side as soon as the text is ready.</li>
                 <li><strong>Google Gemini</strong> suggests light edits (spelling, paragraphs, a title, a short summary) that you accept or reject, and helps us edit stories that mention self-harm before they are published.</li>
                 <li><strong>fal.ai</strong> creates an illustration for stories shared without video. It receives a short description, not your story or your name.</li>
-                <li>A <strong>synthetic voice</strong> reads stories shared in writing, and anonymous audio stories, aloud. This runs on our own build servers (GitHub).</li>
+                <li>A <strong>synthetic voice</strong> reads stories shared in writing aloud, clearly labelled as such. This runs on our own build servers (GitHub).</li>
                 <li><strong>YouTube</strong> (Google) hosts the published video version.</li>
                 <li><strong>Resend</strong> sends our emails. Introduction emails record whether they were opened, so we can tell a channel when a request went unanswered.</li>
             </ul>

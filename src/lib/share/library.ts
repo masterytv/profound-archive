@@ -2,14 +2,14 @@
  * Which library tabs (Watch / Listen / Read) a story appears in, and what
  * plays in each. ARCHITECTURE §4.4a:
  *
- * | Shared as          | Watch          | Listen                         | Read        |
- * |--------------------|----------------|--------------------------------|-------------|
- * | Video (named)      | original video | the video's audio track        | transcript  |
- * | Audio (named)      | –              | original audio                 | transcript  |
- * | Audio (anonymous)  | –              | synthetic narration, labelled  | transcript  |
- * | Text / file (any)  | –              | synthetic narration, labelled  | text        |
+ * | Shared as   | Watch          | Listen                         | Read        |
+ * |-------------|----------------|--------------------------------|-------------|
+ * | Video       | original video | the video's audio track        | transcript  |
+ * | Audio       | –              | original audio                 | transcript  |
+ * | Text / file | –              | synthetic narration, labelled  | text        |
  *
- * An anonymous person's own voice is never published.
+ * Whether the full name is shared doesn't change this (Tom, 2026-11-09):
+ * "don't share my full name" hides the name only, not the recording.
  */
 export type LibraryTab = 'watch' | 'listen' | 'read';
 
@@ -33,15 +33,14 @@ export interface LibraryFormats {
 }
 
 export function libraryFormats(s: LibraryInput): LibraryFormats {
-    const named = s.display_mode === 'named';
     let watch: string | null = null;
     let listen: string | null = null;
     let listenIsSynthetic = false;
 
-    if (s.media_kind === 'video' && named && s.media_path) {
+    if (s.media_kind === 'video' && s.media_path) {
         watch = s.media_path;
         listen = s.media_path; // the browser plays the video's audio track
-    } else if (s.media_kind === 'audio' && named && s.media_path) {
+    } else if (s.media_kind === 'audio' && s.media_path) {
         listen = s.media_path;
     } else if (s.narration_path) {
         listen = s.narration_path;
@@ -59,7 +58,6 @@ export function libraryFormats(s: LibraryInput): LibraryFormats {
 /** Does this story still need a synthetic narration generated? */
 export function needsNarration(s: LibraryInput): boolean {
     if (s.narration_path) return false;
-    const named = s.display_mode === 'named';
-    if (named && (s.media_kind === 'video' || s.media_kind === 'audio')) return false;
+    if (s.media_kind === 'video' || s.media_kind === 'audio') return false;
     return Boolean(s.body_text && s.body_text.trim());
 }

@@ -17,7 +17,9 @@ const row: StoryRow = {
     slug: 'my-story-abcd1234',
     status: 'published',
     display_mode: 'anonymous',
-    display_name: 'Secret Name',
+    // A story that doesn't share the full name only ever stores the name chosen
+    // to show instead (or null); the full name is never written to it.
+    display_name: null,
     anon_number: 104,
     experience_type: 'nde',
     title: 'A light',
@@ -47,16 +49,16 @@ describe('public story whitelist', () => {
         }
     });
 
-    it('anonymous stories expose no name, no country, no profile and no original voice', () => {
+    it('stories without the full name expose no country and no profile link', () => {
         const s = toPublicStory(row);
         const json = JSON.stringify(s);
         expect(s.displayName).toBe('Anonymous #104');
-        expect(json).not.toContain('Secret Name');
         expect(json).not.toContain('Ireland');
-        expect(json).not.toContain('original-voice');
         expect(s.place).toBe('Western Europe');
         expect(s.experiencerProfileId).toBeNull();
-        expect(s.listenPath).toBeNull();
+        // Their own recording is published (only the name is withheld).
+        expect(s.listenPath).toBe(row.media_path);
+        expect(toPublicStory({ ...row, display_name: 'Maria' }).displayName).toBe('Maria');
     });
 
     it('named stories show the name and country', () => {
@@ -77,7 +79,7 @@ describe('channel directory entry', () => {
         expect(Object.keys(e).sort()).toEqual(
             ['appearancePref', 'displayName', 'eligibleChannels', 'experienceType', 'language', 'place', 'publishedAt', 'slug', 'storyId', 'summary', 'title'].sort(),
         );
-        expect(JSON.stringify(e)).not.toContain('Secret Name');
+        expect(e.displayName).toBe('Anonymous #104');
         expect(JSON.stringify(e)).not.toContain('Ireland');
     });
 });
@@ -87,8 +89,9 @@ describe('draft validation', () => {
     it('accepts a valid named audio draft', () => {
         expect(draftSchema.safeParse(ok).success).toBe(true);
     });
-    it('rejects anonymous video', () => {
-        expect(draftSchema.safeParse({ ...ok, display_mode: 'anonymous', media_kind: 'video' }).success).toBe(false);
+    it('allows video without the full name, with or without a shown name', () => {
+        expect(draftSchema.safeParse({ ...ok, display_mode: 'anonymous', display_name: null, media_kind: 'video' }).success).toBe(true);
+        expect(draftSchema.safeParse({ ...ok, display_mode: 'anonymous', display_name: 'Maria', media_kind: 'video' }).success).toBe(true);
     });
     it('requires a name for named stories', () => {
         expect(draftSchema.safeParse({ ...ok, display_name: '' }).success).toBe(false);
@@ -125,7 +128,7 @@ describe('daily job content', () => {
         const meta = youtubeMeta({ ...row, summary: 'S', title: 'T' }, true);
         expect(meta.title).toBe('T | Anonymous #104');
         expect(meta.description).toContain('synthetic');
-        expect(meta.description).not.toContain('Secret Name');
+        expect(meta.description).toContain('by Anonymous #104');
         expect(meta.title.length).toBeLessThanOrEqual(100);
     });
 });

@@ -89,10 +89,10 @@ export async function setSuggestionAction(suggestionId: number, status: 'accepte
     }
 }
 
-export async function finishReviewAction(storyId: string, title: string): Promise<ActionResult<{ status: 'published' | 'held' }>> {
+export async function finishReviewAction(storyId: string, title: string, text: string): Promise<ActionResult<{ status: 'published' | 'held' }>> {
     try {
         const user = await signedInUser();
-        const status = await finishReview(user.id, storyId, { title });
+        const status = await finishReview(user.id, storyId, { title, text });
         return { ok: true, data: { status } };
     } catch (err) {
         return fail(err);
