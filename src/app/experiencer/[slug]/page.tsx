@@ -13,6 +13,7 @@ import MicroFeedback from "@/components/micro-feedback";
 export const revalidate = 86400;
 
 import AdminProfileActions from "@/components/experiencer/admin-profile-actions";
+import SharedStoriesSection from "@/components/share/SharedStoriesSection";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -574,6 +575,9 @@ export default async function ExperiencerProfilePage({
                     {/* ═══════════════════════════════════════════════════════
                          FULL-WIDTH SECTIONS BELOW TWO-COLUMN GRID
                        ═══════════════════════════════════════════════════════ */}
+
+                    {/* Stories shared directly with Project Profound (Share Your Experience) */}
+                    <SharedStoriesSection profileId={profile.id} />
 
                     {/* Channels — full width 2-col grid */}
                     {profile.channel_appearances && profile.channel_appearances.length > 0 && (
