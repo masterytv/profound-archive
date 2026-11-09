@@ -83,3 +83,18 @@ so a long story may take an hour or more. The job stops at 300 minutes and conti
    narration (Listen tab) but are **never** uploaded to YouTube.
 
 Staging test rows, invites and files are purged automatically after 7 days by the daily maintenance call.
+
+## 7. Going live (staging → main)
+
+`apphosting.yaml` sets `SHARE_ENABLED: "true"`, so production switches the feature on as soon as `staging` is
+promoted to `main`. The site-wide banner and the "Share Your Experience" menu item appear only when it is on.
+Before promoting, confirm:
+
+1. The 4 migrations ran (shared database: already true for staging = production).
+2. Supabase **Storage → Settings → Upload file size limit** is at least 5 GB.
+3. Staging tests pass (written, audio, video, delete). Staging rows are `is_test` and never show in production.
+4. Production must **not** set `SHARE_ENV` (only `apphosting.staging.yaml` does).
+
+Promotion is a human step: open a pull request from `staging` into `main` on GitHub and merge it.
+Not required for launch, but needed for the full feature: §3 (Resend open tracking), §4–5 (YouTube + the daily
+GitHub Action, which also narrates written stories and purges staging test data).

@@ -122,3 +122,8 @@ env:
     secret: projects/432036554831/secrets/ASSEMBLYAI_API_KEY/versions/1
   - variable: ASSEMBLYAI_WEBHOOK_SECRET
     secret: projects/432036554831/secrets/ASSEMBLYAI_WEBHOOK_SECRET/versions/1
+
+  # Share Your Experience: switched on for production (Tom, 2026-11-09).
+  # Production must NOT set SHARE_ENV (that marks rows as staging test data).
+  - variable: SHARE_ENABLED
+    value: "true"
