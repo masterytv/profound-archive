@@ -46,12 +46,20 @@ function numbered(sections: string[]): string {
     return sections.map((s, i) => `<section index="${i}">\n${s}\n</section>`).join('\n\n');
 }
 
+/**
+ * Gemini sometimes returns line breaks as the two characters "\\n" inside its
+ * JSON strings (double-escaped). Turn those back into real line breaks.
+ */
+export function unescapeModelText(text: string): string {
+    return text.replace(/\\r\\n|\\n/g, '\n').replace(/\\t/g, ' ').replace(/\n{3,}/g, '\n\n');
+}
+
 function cleanEdits(sections: string[], edits: EditorResult['edits']): EditorResult['edits'] {
     const seen = new Set<number>();
     return (edits ?? []).filter((e) => {
         if (!Number.isInteger(e.section_index) || e.section_index < 0 || e.section_index >= sections.length) return false;
         if (seen.has(e.section_index)) return false;
-        const suggested = (e.suggested ?? '').trim();
+        const suggested = unescapeModelText(e.suggested ?? '').trim();
         if (!suggested || suggested === sections[e.section_index].trim()) return false;
         seen.add(e.section_index);
         e.suggested = suggested;
@@ -76,8 +84,8 @@ export async function editorSuggestions(sections: string[]): Promise<EditorResul
         },
     });
     return {
-        title: (data.title ?? '').trim().slice(0, 120),
-        summary: (data.summary ?? '').trim().slice(0, 800),
+        title: unescapeModelText(data.title ?? '').replace(/\s+/g, ' ').trim().slice(0, 120),
+        summary: unescapeModelText(data.summary ?? '').trim().slice(0, 800),
         edits: cleanEdits(sections, data.edits),
         model,
     };

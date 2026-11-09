@@ -116,3 +116,12 @@ describe('transcripts and extracted text', () => {
         expect(normalizeExtracted('a\r\n\r\n\r\n\r\nb  \n\u0000c')).toBe('a\n\nb\nc');
     });
 });
+
+describe('model text clean-up', () => {
+    it('turns double-escaped line breaks from Gemini into real ones', async () => {
+        const { unescapeModelText } = await import('@/lib/share/suggestions');
+        expect(unescapeModelText('This is a long story.\\n\\nI want to start')).toBe('This is a long story.\n\nI want to start');
+        expect(unescapeModelText('a\\r\\nb\\n\\n\\n\\nc')).toBe('a\nb\n\nc');
+        expect(unescapeModelText('already\n\nfine')).toBe('already\n\nfine');
+    });
+});
