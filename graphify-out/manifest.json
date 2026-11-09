@@ -5472,9 +5472,9 @@
     "semantic_hash": ""
   },
   "src/components/share/InviteForm.tsx": {
-    "mtime": 1794241812.9925442,
-    "seen": 1794242091.6561477,
-    "ast_hash": "2a473ccb35e10c66868473a1ce44ea3b",
+    "mtime": 1794255460.4272964,
+    "seen": 1794255505.6657052,
+    "ast_hash": "7ed66104de3e1a309ed2a9114f676e6d",
     "semantic_hash": ""
   },
   "src/components/share/Recorder.tsx": {
@@ -5520,9 +5520,9 @@
     "semantic_hash": ""
   },
   "src/lib/share/channels.ts": {
-    "mtime": 1794241812.9937959,
-    "seen": 1794242091.6563594,
-    "ast_hash": "9d5c8b2cb1f56e4d15781df9879c009e",
+    "mtime": 1794255460.4229703,
+    "seen": 1794255505.670065,
+    "ast_hash": "c42384a44c30dd83060194e9a7a81330",
     "semantic_hash": ""
   },
   "src/lib/share/config.ts": {
@@ -5622,9 +5622,9 @@
     "semantic_hash": ""
   },
   "tests/lib/share-privacy.test.ts": {
-    "mtime": 1794253425.812296,
-    "seen": 1794253465.894375,
-    "ast_hash": "64202834317eeb1b1d40a2df8e31822e",
+    "mtime": 1794255460.4272964,
+    "seen": 1794255505.6710637,
+    "ast_hash": "a8807593561b541ddba7cf309db1aa44",
     "semantic_hash": ""
   },
   ".claude/CLAUDE.md": {
@@ -5682,9 +5682,9 @@
     "semantic_hash": ""
   },
   "src/components/share/PromoteSection.tsx": {
-    "mtime": 1794253373.6402926,
-    "seen": 1794253465.8889165,
-    "ast_hash": "3ec25ea28132aeb55ecaf24f11b8fd4f",
+    "mtime": 1794255460.4235957,
+    "seen": 1794255505.6657095,
+    "ast_hash": "2aea49a7f179a5f6fdefc833cf5c6f94",
     "semantic_hash": ""
   },
   "package-lock.json": {
