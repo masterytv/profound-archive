@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Check, X, Loader2, Trash2, ExternalLink } from 'lucide-react';
@@ -61,6 +61,13 @@ export default function StoryManager({ story, sections, suggestions: initial, me
     // switches to the suggestion on Accept, and can be edited freely.
     const [texts, setTexts] = useState<string[]>(sections);
 
+    // While the recording is being transcribed, check for the result on our own.
+    useEffect(() => {
+        if (story.status !== 'processing') return;
+        const timer = setInterval(() => router.refresh(), 15_000);
+        return () => clearInterval(timer);
+    }, [story.status, router]);
+
     async function decide(id: number, sectionIndex: number, status: 'accepted' | 'rejected') {
         const s = suggestions.find((x) => x.id === id);
         setSuggestions((all) => all.map((x) => (x.id === id ? { ...x, status } : x)));
@@ -91,7 +98,7 @@ export default function StoryManager({ story, sections, suggestions: initial, me
             {story.status === 'processing' && (
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-5 space-y-2">
                     <p className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> We&apos;re turning your recording into text. This usually takes a few minutes.</p>
-                    <p className="text-sm text-slate-500">We&apos;ll email you when it&apos;s ready to review. You can close this page.</p>
+                    <p className="text-sm text-slate-500">This page updates by itself when it&apos;s ready, and we&apos;ll also email you. You can close this page.</p>
                     {story.processingError && <p className="text-sm text-amber-700">Note: {story.processingError} Our team has been notified.</p>}
                     <Button variant="outline" size="sm" onClick={() => router.refresh()}>Check again</Button>
                 </div>
@@ -143,7 +150,7 @@ export default function StoryManager({ story, sections, suggestions: initial, me
                                     )}
                                     <div>
                                         <p className="text-xs uppercase text-slate-400 mb-1">{s ? (s.status === 'accepted' ? 'Your text (with the suggestion)' : 'Your text') : 'Your text'}. You can edit it here</p>
-                                        <AutoTextarea value={texts[i]} onChange={(v) => setTexts((t) => t.map((x, k) => (k === i ? v : x)))} />
+                                        <AutoTextarea value={texts[i] ?? sec} onChange={(v) => setTexts((t) => t.map((x, k) => (k === i ? v : x)))} />
                                     </div>
                                 </li>
                             );
@@ -259,7 +266,7 @@ function AutoTextarea({ value, onChange }: { value: string; onChange: (v: string
         <textarea
             className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 font-serif leading-relaxed min-h-[8rem]"
             style={{ fieldSizing: 'content' } as CSSProperties}
-            rows={Math.min(30, Math.max(4, Math.ceil(value.length / 80) + value.split('\n').length))}
+            rows={Math.min(30, Math.max(4, Math.ceil((value ?? '').length / 80) + (value ?? '').split('\n').length))}
             value={value}
             onChange={(e) => onChange(e.target.value)}
         />

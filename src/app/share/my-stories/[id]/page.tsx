@@ -46,7 +46,10 @@ export default async function MyStoryPage({ params }: { params: Promise<{ id: st
                     </ul>
                 </div>
             )}
+            {/* Keyed by status/version: when processing → reviewing (or any change), the
+                client state (editable paragraphs) is rebuilt from fresh data. */}
             <StoryManager
+                key={`${story.status}:${story.updated_at}`}
                 story={{
                     id: story.id,
                     slug: story.slug,
