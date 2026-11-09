@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Check, X, Loader2, Trash2, ExternalLink } from 'lucide-react';
@@ -35,7 +35,7 @@ interface SuggestionView {
 
 const input = 'w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2';
 
-export default function StoryManager({ story, sections, suggestions: initial, mediaUrl }: { story: StoryView; sections: string[]; suggestions: SuggestionView[]; mediaUrl: string | null }) {
+export default function StoryManager({ story, sections, suggestions: initial, mediaUrl, promote }: { story: StoryView; sections: string[]; suggestions: SuggestionView[]; mediaUrl: string | null; promote?: ReactNode }) {
     const router = useRouter();
     const [suggestions, setSuggestions] = useState(initial);
     const [title, setTitle] = useState(story.title);
@@ -189,6 +189,7 @@ export default function StoryManager({ story, sections, suggestions: initial, me
                             Published. <Link href={`/experiences/${story.slug}`} className="underline inline-flex items-center gap-1">See it on the site <ExternalLink className="h-3 w-3" /></Link>
                         </p>
                     )}
+                    {story.status === 'published' && promote}
                     {!editing ? (
                         <>
                             <div className="whitespace-pre-wrap font-serif leading-relaxed rounded-xl border border-slate-200 dark:border-slate-700 p-4">{story.bodyText}</div>

@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { isShareEnabled, MEDIA_BUCKET } from '@/lib/share/config';
 import { currentUser, shareAdmin } from '@/lib/share/db';
-import { getOwnStory, listSuggestions, type OwnStory } from '@/lib/share/stories';
+import { getIntroPreferences, getOwnStory, listSuggestions, type OwnStory } from '@/lib/share/stories';
+import { listFeaturedChannels } from '@/lib/share/channels';
+import PromoteSection from '@/components/share/PromoteSection';
 import { splitSections } from '@/lib/share/text';
 import { SUPPORT_RESOURCES } from '@/lib/share/crisis';
 import { unescapeModelText } from '@/lib/share/suggestions';
@@ -27,6 +29,11 @@ export default async function MyStoryPage({ params }: { params: Promise<{ id: st
 
     const suggestions = story.status === 'reviewing' ? await listSuggestions(story.id, 'style') : [];
     const sections = story.status === 'reviewing' ? splitSections(story.original_text ?? '') : [];
+    // Once published: offer introductions to vetted YouTube channels.
+    const [introPrefs, channels] =
+        story.status === 'published'
+            ? await Promise.all([getIntroPreferences(user.id, story.id), listFeaturedChannels().catch(() => [])])
+            : [null, []];
     let mediaUrl: string | null = null;
     if (story.media_path && story.media_kind !== 'file') {
         const { data } = await shareAdmin().storage.from(MEDIA_BUCKET).createSignedUrl(story.media_path, 3600);
@@ -66,6 +73,16 @@ export default async function MyStoryPage({ params }: { params: Promise<{ id: st
                 sections={sections}
                 suggestions={suggestions.map((s) => ({ id: s.id, sectionIndex: s.section_index, suggested: unescapeModelText(s.suggested), reason: s.reason ?? '', status: s.status }))}
                 mediaUrl={mediaUrl}
+                promote={
+                    introPrefs ? (
+                        <PromoteSection
+                            storyId={story.id}
+                            userEmail={user.email ?? ''}
+                            initial={introPrefs}
+                            channels={channels.map((c) => ({ channel_id: c.channel_id, name: c.name, vertical: c.vertical }))}
+                        />
+                    ) : null
+                }
             />
         </div>
     );

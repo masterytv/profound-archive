@@ -148,3 +148,14 @@ describe('Resend (Svix) webhook signature', () => {
         expect(verifySvix(secret, headers('v1,AAAA'), body, ts)).toBe(false);
     });
 });
+
+describe('introduction preferences (after publishing)', () => {
+    it('requires at least one channel when choosing specific channels', async () => {
+        const { introPrefsSchema } = await import('@/lib/share/stories');
+        expect(introPrefsSchema.safeParse({ intro_mode: 'selected', channel_ids: [] }).success).toBe(false);
+        expect(introPrefsSchema.safeParse({ intro_mode: 'selected', channel_ids: ['UC1'] }).success).toBe(true);
+        expect(introPrefsSchema.safeParse({ intro_mode: 'all', phone: '555 0100' }).success).toBe(true);
+        expect(introPrefsSchema.safeParse({ intro_mode: 'none' }).success).toBe(true);
+        expect(introPrefsSchema.safeParse({ intro_mode: 'all', phone: 'x'.repeat(41) }).success).toBe(false);
+    });
+});

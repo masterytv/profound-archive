@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { isShareEnabled } from '@/lib/share/config';
-import { currentUser, shareAdmin } from '@/lib/share/db';
+import { currentUser } from '@/lib/share/db';
 import { listOwnStories } from '@/lib/share/stories';
 import { publicDisplayName } from '@/lib/share/text';
-import ContactsForm from '@/components/share/ContactsForm';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'My experiences | Project Profound', robots: { index: false } };
@@ -23,11 +22,7 @@ export default async function MyStoriesPage() {
     if (!isShareEnabled()) notFound();
     const user = await currentUser();
     if (!user) redirect('/login?returnTo=/share/my-experiences');
-    const [stories, contactsRes] = await Promise.all([
-        listOwnStories(user.id),
-        shareAdmin().from('share_contacts').select('phone, website, other').eq('user_id', user.id).maybeSingle(),
-    ]);
-    const contacts = contactsRes.data ?? { phone: null, website: null, other: null };
+    const stories = await listOwnStories(user.id);
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-12 space-y-10">
@@ -62,13 +57,6 @@ export default async function MyStoriesPage() {
                 </ul>
             )}
 
-            <section className="space-y-3">
-                <h2 className="text-xl font-serif">Contact details for introductions (optional)</h2>
-                <p className="text-sm text-slate-500">
-                    Never shown publicly. If you accept an introduction to a channel, you can choose to include these in the introduction email. Your sign-in email ({user.email}) is always included in an accepted introduction.
-                </p>
-                <ContactsForm initial={{ phone: contacts.phone ?? '', website: contacts.website ?? '', other: contacts.other ?? '' }} />
-            </section>
         </div>
     );
 }
