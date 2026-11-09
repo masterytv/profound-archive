@@ -34,7 +34,7 @@ export async function adminDeleteAction(storyId: string): Promise<Result> {
     try {
         await requireAdmin();
         const story = await getStoryById(storyId);
-        if (!story) throw new Error('Story not found.');
+        if (!story) throw new Error('Experience not found.');
         await deleteStoryCompletely(story);
         revalidatePath('/admin/share');
         return { ok: true };
@@ -48,10 +48,10 @@ export async function retryProcessingAction(storyId: string): Promise<Result> {
     try {
         await requireAdmin();
         const story = await getStoryById(storyId);
-        if (!story) throw new Error('Story not found.');
+        if (!story) throw new Error('Experience not found.');
         if (story.status === 'processing' && story.transcript_id) await completeTranscription(story.transcript_id);
         else if (story.status === 'reviewing' && story.original_text) await prepareReview(story.id, story.original_text);
-        else throw new Error('Nothing to retry for this story.');
+        else throw new Error('Nothing to retry for this experience.');
         revalidatePath('/admin/share');
         return { ok: true };
     } catch (err) {

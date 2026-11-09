@@ -487,7 +487,7 @@ async function prepareCrisisEdits(storyId: string, body: string) {
 /** Admin: publish a held story with the chosen crisis edits (or a full manual text). */
 export async function adminReleaseHeld(storyId: string, args: { acceptedIds: number[]; manualText?: string | null }) {
     const story = await getStoryById(storyId);
-    if (!story || story.status !== 'held') throw new Error('Story is not held.');
+    if (!story || story.status !== 'held') throw new Error('This experience is not held.');
     let body: string;
     if (args.manualText && args.manualText.trim()) {
         body = args.manualText.replace(/\r\n?/g, '\n').trim();

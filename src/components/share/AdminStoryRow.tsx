@@ -125,7 +125,7 @@ export default function AdminStoryRow({ story, held }: { story: Row; held: Held 
                         size="sm"
                         variant="destructive"
                         disabled={busy !== null}
-                        onClick={() => confirm('Delete this story and all its files permanently?') && run('delete', () => adminDeleteAction(story.id))}
+                        onClick={() => confirm('Delete this experience and all its files permanently?') && run('delete', () => adminDeleteAction(story.id))}
                     >
                         Delete permanently
                     </Button>
