@@ -79,7 +79,7 @@ flowchart TD
 - **F13. Website: publish immediately** at `/experiences/[slug]`, tagged "Shared directly with Project Profound". Named stories also appear on the person's `/experiencer/[slug]` page.
 - **F14. Crisis hold.** Run `src/lib/questions/crisis-detection.ts` on the final text. If it triggers, show support resources to the person at once and **set the story aside for editing**. Gemini drafts a version with crisis wording softened (e.g. "suicide"); an admin approves or adjusts it, then it publishes. Held stories never go to YouTube unedited. The person is told their story will appear after a check.
 - **F15. YouTube: daily batch.** Published stories are queued and posted to the PP YouTube channel once a day, so a bad one can be pulled before upload.
-- **F16. Removal.** The experiencer can delete their story from "My stories" at any time; this is a **full delete** of the media, transcript and text. Admins can remove any story. *AC:* website removal is immediate, and the YouTube video is removed within 24 hours.
+- **F16. Removal.** The experiencer can delete their story from "My experiences" at any time; this is a **full delete** of the media, transcript and text. Admins can remove any story. *AC:* website removal is immediate, and the YouTube video is removed within 24 hours.
 
 ### 5.5 Channel introductions
 - **F17. Opt-in at submit:** "Open to introductions from channels?" No / Yes, all channels / Yes, these channels (searchable list of PP's channels).

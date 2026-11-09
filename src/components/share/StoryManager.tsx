@@ -246,7 +246,7 @@ export default function StoryManager({ story, sections, suggestions: initial, me
                             variant="destructive"
                             disabled={busy !== null}
                             className="gap-2"
-                            onClick={() => run('delete', () => deleteStoryAction(story.id), () => router.push('/share/my-stories'))}
+                            onClick={() => run('delete', () => deleteStoryAction(story.id), () => router.push('/share/my-experiences'))}
                         >
                             {busy === 'delete' && <Loader2 className="h-4 w-4 animate-spin" />} Yes, delete everything
                         </Button>

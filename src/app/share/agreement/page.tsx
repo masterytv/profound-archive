@@ -63,7 +63,7 @@ export default function AgreementPage() {
             <h2>5. Changing your mind</h2>
             <p>
                 You can edit your story, change whether your name is shown, or <strong>delete it completely</strong> at any time from
-                <Link href="/share/my-stories"> My stories</Link>. Deleting removes your recording, transcript and text from our systems. It
+                <Link href="/share/my-experiences"> My experiences</Link>. Deleting removes your recording, transcript and text from our systems. It
                 disappears from the website immediately and from YouTube within 24 hours.
             </p>
             <p>

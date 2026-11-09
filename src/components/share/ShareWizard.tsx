@@ -185,7 +185,7 @@ export default function ShareWizard({ needsAgreement, channels, defaultName }: {
 
             const submitted = await submitStoryAction(storyId);
             if (!submitted.ok) throw new Error(submitted.error);
-            router.push(`/share/my-stories/${storyId}`);
+            router.push(`/share/my-experiences/${storyId}`);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Something went wrong. Your story was not lost: please try again.');
             setBusy(false);

@@ -34,7 +34,7 @@ export interface Email {
 }
 
 export function storyReadyEmail(to: string): Email {
-    const url = `${siteUrl()}/share/my-stories`;
+    const url = `${siteUrl()}/share/my-experiences`;
     return {
         from: INTRO_FROM,
         to: [to],
@@ -46,13 +46,13 @@ export function storyReadyEmail(to: string): Email {
 }
 
 export function storyHeldEmail(to: string): Email {
-    const url = `${siteUrl()}/share/my-stories`;
+    const url = `${siteUrl()}/share/my-experiences`;
     return {
         from: INTRO_FROM,
         to: [to],
         replyTo: SHARE_REPLY_TO,
         subject: 'Your story will appear after a quick check',
-        html: layout('Thank you for sharing', p('Your story touches on some very painful moments, so a member of our team will look at it with care before it appears on the site. You don\'t need to do anything.') + p('If you are struggling right now, please reach out: in the US call or text <b>988</b>, in the UK and Ireland call Samaritans on <b>116 123</b>, or find a helpline in your country at <a href="https://findahelpline.com">findahelpline.com</a>.') + button(url, 'My stories')),
+        html: layout('Thank you for sharing', p('Your story touches on some very painful moments, so a member of our team will look at it with care before it appears on the site. You don\'t need to do anything.') + p('If you are struggling right now, please reach out: in the US call or text <b>988</b>, in the UK and Ireland call Samaritans on <b>116 123</b>, or find a helpline in your country at <a href="https://findahelpline.com">findahelpline.com</a>.') + button(url, 'My experiences')),
         text: `Thank you for sharing. Your story will appear after a quick check by our team. If you are struggling, call or text 988 (US), Samaritans 116 123 (UK/IE), or visit findahelpline.com. ${url}`,
     };
 }

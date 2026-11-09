@@ -28,7 +28,7 @@ export default function IntroResponse({ token, channelName, note, initialChoice 
             <p><b>{channelName}</b>, a YouTube channel vetted by Project Profound, would like to be introduced to you. Their message:</p>
             <blockquote className="border-l-4 border-indigo-200 pl-4 italic whitespace-pre-wrap text-slate-700 dark:text-slate-300">{note}</blockquote>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-                If you accept, we send one email to you both. It includes your sign-in email address, plus anything you tick below (from the contact details you saved in My stories). If you decline, we let them know politely.
+                If you accept, we send one email to you both. It includes your sign-in email address, plus anything you tick below (from the contact details you saved in My experiences). If you decline, we let them know politely.
             </p>
             <div className="space-y-2 text-sm">
                 {(['phone', 'website', 'other'] as const).map((k) => (
