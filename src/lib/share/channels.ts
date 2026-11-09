@@ -27,7 +27,8 @@ const db = () => shareAdmin();
 export interface ChannelOption {
     channel_id: string;
     name: string;
-    vertical: 'nde' | 'uap';
+    /** 'other': a channel added by hand in an invite (not in PP's video database). */
+    vertical: 'nde' | 'uap' | 'other';
     subscribers: number;
 }
 
@@ -52,7 +53,24 @@ export async function listFeaturedChannels(): Promise<ChannelOption[]> {
         const { data: hidden } = await db().from('channels').select('channel_id').in('channel_id', ids).eq('hidden', true);
         for (const h of hidden ?? []) out.delete(h.channel_id as string);
     }
+    // Channels added by hand in an invite (e.g. a podcast with no videos on PP yet).
+    const { data: members } = await db().from('share_channel_members').select('channel_id, channel_name').is('revoked_at', null);
+    for (const m of (members ?? []) as Array<{ channel_id: string; channel_name: string | null }>) {
+        if (!out.has(m.channel_id)) out.set(m.channel_id, { channel_id: m.channel_id, name: m.channel_name ?? m.channel_id, vertical: 'other', subscribers: 0 });
+    }
     return [...out.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Turn what an admin pastes (a YouTube channel URL, an @handle, or a UC… channel
+ * ID) into the channel_id we store. Returns null if it isn't recognisable.
+ */
+export function normalizeChannelRef(input: string): string | null {
+    const s = input.trim();
+    const id = s.match(/(UC[\w-]{22})/);
+    if (id) return id[1];
+    const handle = s.match(/(?:youtube\.com\/)?@([\w.-]{3,30})/i) ?? s.match(/^([\w.-]{3,30})$/);
+    return handle ? `@${handle[1].toLowerCase()}` : null;
 }
 
 // ─── Membership ────────────────────────────────────────────────────────────
