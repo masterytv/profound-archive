@@ -121,3 +121,11 @@ export function paramsObject(searchParams: URLSearchParams): Record<string, stri
 export function formatIssues(error: z.ZodError): string {
     return error.issues.map((i) => (i.path.length ? `${i.path.join('.')}: ${i.message}` : i.message)).join('; ');
 }
+
+/** The experiencer list: published profiles by total views, a page at a time. */
+export const ExperiencersParamsSchema = z.object({
+    page: num(1, 10_000).transform((n) => Math.floor(n ?? 1)),
+    limit: num(1, 200).transform((n) => Math.floor(n ?? 100)),
+});
+
+export type ExperiencersParams = z.infer<typeof ExperiencersParamsSchema>;

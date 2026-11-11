@@ -131,6 +131,39 @@ export const CountsResponseSchema = z.object({
     example_video_ids: z.array(z.string()),
 });
 
+/** One of an experiencer's videos, as the experiencer list gives it (no transcript or coding). */
+export const ExperiencerVideoSchema = z.object({
+    video_id: z.string(),
+    title: z.string().nullable(),
+    channel_name: z.string().nullable(),
+    channel_url: z.string().nullable(),
+    video_url: z.string(),
+    pp_url: z.string(),
+    views: z.number().nullable(),
+    published_at: z.string().nullable(),
+    summary: z.string().nullable(),
+    safety_flags: z.array(z.string()),
+});
+
+/** A published experiencer profile, as on projectprofound.org/experiencer. */
+export const ExperiencerSchema = z.object({
+    slug: z.string(),
+    name: z.string(),
+    profile_url: z.string(),
+    total_views: z.number(),
+    /** Their videos the API can serve (hidden channels and non-NDE videos left out), most viewed first. */
+    videos: z.array(ExperiencerVideoSchema),
+});
+
+export const ExperiencersResponseSchema = z.object({
+    api_version: z.literal(API_VERSION),
+    /** Published profiles in all, for paging. */
+    total: z.number(),
+    page: z.number(),
+    limit: z.number(),
+    experiencers: z.array(ExperiencerSchema),
+});
+
 export type Moment = z.infer<typeof MomentSchema>;
 export type CaseElement = z.infer<typeof ElementSchema>;
 export type Case = z.infer<typeof CaseSchema>;
@@ -138,6 +171,9 @@ export type CaseDetail = z.infer<typeof CaseDetailSchema>;
 export type SearchResponse = z.infer<typeof SearchResponseSchema>;
 export type CaseResponse = z.infer<typeof CaseResponseSchema>;
 export type CountsResponse = z.infer<typeof CountsResponseSchema>;
+export type ExperiencerVideo = z.infer<typeof ExperiencerVideoSchema>;
+export type Experiencer = z.infer<typeof ExperiencerSchema>;
+export type ExperiencersResponse = z.infer<typeof ExperiencersResponseSchema>;
 
 /** Labels for the 15 standard core elements (same wording as the experiencer pages). */
 export const ELEMENT_LABELS: Record<string, string> = {
