@@ -48,12 +48,14 @@ vi.mock('@/lib/ai/usage-tracker', () => ({ wrapAiClient: (c: unknown) => c }));
 import { GET as searchGET } from '@/app/api/research/cases/route';
 import { GET as caseGET } from '@/app/api/research/cases/[videoId]/route';
 import { GET as countsGET } from '@/app/api/research/counts/route';
+import { GET as experiencersGET } from '@/app/api/research/experiencers/route';
 import { resetRateLimit } from '@/lib/rate-limit';
 import { clearCountsCache } from '@/lib/research/shortmaker/counts';
 import { clipWords, mergeRankingsForTest } from './shortmaker-helpers';
 import {
     CaseResponseSchema,
     CountsResponseSchema,
+    ExperiencersResponseSchema,
     SearchResponseSchema,
 } from '@/lib/research/shortmaker/types';
 
@@ -308,6 +310,54 @@ describe('GET /api/research/counts', () => {
         for (const q of ['', '?element=life_review&phrase=hello', '?element=nope', '?entity_type=martian']) {
             expect((await countsGET(get(`/api/research/counts${q}`))).status).toBe(400);
         }
+    });
+});
+
+describe('GET /api/research/experiencers', () => {
+    const LIST = [
+        { slug: 'bob-example', full_name: 'Bob Example', video_ids: [ID_B, ID_HIDDEN], total_views: '5009' },
+        { slug: 'anne-example', full_name: 'Anne Example', video_ids: [ID_A, 'zzzzzzzzzzz'], total_views: 100 },
+        { slug: 'no-name', full_name: '  ', video_ids: [], total_views: 1 },
+    ];
+    let profileCalls: Call[][] = [];
+    beforeEach(() => {
+        profileCalls = [];
+        h.handler = ((table: string, calls: Call[]) => {
+            if (table !== 'experiencer_profiles') return defaultHandler(table, calls);
+            profileCalls.push(calls);
+            const head = calls.some((c) => c.method === 'select' && (c.args[1] as { head?: boolean } | undefined)?.head);
+            return head ? { data: null, error: null, count: 2536 } : { data: LIST, error: null };
+        }) as Handler;
+    });
+
+    it('needs the key', async () => {
+        expect((await experiencersGET(get('/api/research/experiencers', {}))).status).toBe(401);
+    });
+
+    it('lists published profiles by total views, with their served videos most viewed first', async () => {
+        const res = await experiencersGET(get('/api/research/experiencers?page=2&limit=50'));
+        expect(res.status).toBe(200);
+        expect(res.headers.get('cache-control')).toBe('no-store');
+        const body = ExperiencersResponseSchema.parse(await res.json());
+        expect(body).toMatchObject({ total: 2536, page: 2, limit: 50 });
+        expect(body.experiencers.map((e) => e.slug)).toEqual(['bob-example', 'anne-example']);
+        const [bob, anne] = body.experiencers;
+        expect(bob.total_views).toBe(5009);
+        // The hidden channel's video is left out; flags come from the analysis.
+        expect(bob.videos.map((v) => v.video_id)).toEqual([ID_B]);
+        expect(bob.videos[0].safety_flags).toEqual(['suicide_related']);
+        expect(anne.profile_url).toBe('https://projectprofound.org/experiencer/anne-example');
+        expect(anne.videos[0]).toMatchObject({ video_id: ID_A, channel_name: 'Chan One', channel_url: 'https://www.youtube.com/@chanone', views: 100, published_at: '2024-05-02', pp_url: `https://projectprofound.org/video/${ID_A}` });
+        const list = profileCalls.find((calls) => calls.some((c) => c.method === 'range'))!;
+        expect(list.find((c) => c.method === 'range')?.args).toEqual([50, 99]);
+        expect(list.find((c) => c.method === 'order')?.args[0]).toBe('total_views');
+        expect(list.some((c) => c.method === 'not' && c.args[0] === 'published_at')).toBe(true);
+    });
+
+    it('validates paging and returns 503 when the database fails', async () => {
+        expect((await experiencersGET(get('/api/research/experiencers?limit=500'))).status).toBe(400);
+        h.handler = () => ({ data: null, error: { message: 'boom' } });
+        expect((await experiencersGET(get('/api/research/experiencers'))).status).toBe(503);
     });
 });
 
