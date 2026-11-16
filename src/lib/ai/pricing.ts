@@ -106,10 +106,19 @@ export function normalizeModelKey(model: string): string {
 }
 
 export interface TokenUsage {
+    /** All input tokens, cached ones included. */
     prompt_tokens?: number | null;
     completion_tokens?: number | null;
     total_tokens?: number | null;
+    /** Of prompt_tokens: written to Anthropic's prompt cache (5-minute TTL), billed at 1.25x input. */
+    cache_write_tokens?: number | null;
+    /** Of prompt_tokens: read from Anthropic's prompt cache, billed at 0.1x input. */
+    cache_read_tokens?: number | null;
 }
+
+/** Anthropic prompt-caching multipliers on the input price (5-minute writes; reads). */
+export const CACHE_WRITE_FACTOR = 1.25;
+export const CACHE_READ_FACTOR = 0.1;
 
 export interface CostEstimate {
     costUsd: number;
@@ -135,8 +144,11 @@ export function estimateCost(model: string | undefined, usage: TokenUsage | unde
         return { costUsd: 0, isEstimate: true, promptTokens, completionTokens, totalTokens };
     }
 
+    const cacheWrite = usage?.cache_write_tokens ?? 0;
+    const cacheRead = usage?.cache_read_tokens ?? 0;
+    const plainInput = Math.max(0, promptTokens - cacheWrite - cacheRead);
     const costUsd =
-        (promptTokens / 1_000_000) * price.inputPerM +
+        ((plainInput + cacheWrite * CACHE_WRITE_FACTOR + cacheRead * CACHE_READ_FACTOR) / 1_000_000) * price.inputPerM +
         (completionTokens / 1_000_000) * price.outputPerM;
 
     // Round to 6 dp to match the column scale.
