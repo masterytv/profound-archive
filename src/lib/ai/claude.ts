@@ -86,7 +86,9 @@ export async function claudeChat(args: ClaudeChatArgs): Promise<ClaudeChatResult
                 {
                     model,
                     max_tokens: args.maxTokens,
-                    system: args.system,
+                    // Cached: batch runs send the same system prompt for every article, so
+                    // after the first it is read back at a tenth of the input price.
+                    system: [{ type: 'text', text: args.system, cache_control: { type: 'ephemeral' } }],
                     messages,
                     ...(args.temperature !== undefined ? { temperature: args.temperature } : {}),
                 },
@@ -101,8 +103,13 @@ export async function claudeChat(args: ClaudeChatArgs): Promise<ClaudeChatResult
             model: message.model ?? model,
             operation: args.operation,
             usage: {
-                prompt_tokens: message.usage.input_tokens,
+                prompt_tokens:
+                    message.usage.input_tokens +
+                    (message.usage.cache_creation_input_tokens ?? 0) +
+                    (message.usage.cache_read_input_tokens ?? 0),
                 completion_tokens: message.usage.output_tokens,
+                cache_write_tokens: message.usage.cache_creation_input_tokens ?? 0,
+                cache_read_tokens: message.usage.cache_read_input_tokens ?? 0,
             },
             status: 'success',
         });

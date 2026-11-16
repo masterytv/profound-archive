@@ -94,6 +94,18 @@ describe('estimateCost', () => {
         expect(estimateCost('claude-sonnet-5', { prompt_tokens: 0, completion_tokens: 1_000_000 }).costUsd).toBe(15);
     });
 
+    it('prices Anthropic prompt-cache writes at 1.25x and reads at 0.1x input', () => {
+        const est = estimateCost('claude-sonnet-4-5-20250929', {
+            prompt_tokens: 3_000_000,
+            completion_tokens: 0,
+            cache_write_tokens: 1_000_000,
+            cache_read_tokens: 1_000_000,
+        });
+        // $3 plain + $3.75 written + $0.30 read
+        expect(est.costUsd).toBe(7.05);
+        expect(est.promptTokens).toBe(3_000_000);
+    });
+
     it('still returns 0 for a genuinely unknown model', () => {
         expect(estimateCost('acme/mystery-model-20260101', { prompt_tokens: 1_000_000, completion_tokens: 0 }).costUsd).toBe(0);
     });
