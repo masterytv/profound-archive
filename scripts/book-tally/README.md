@@ -122,8 +122,8 @@ Haiku (all 81 questions)
    │  flagged if: stance is no or mixed, OR confidence < 70, OR quote failed, OR invalid
    ▼
 Sonnet re-check (flagged questions only, blind to Haiku's answer)
-   │  agrees with Haiku → final
-   │  disagrees, or Haiku answer was invalid
+   │  agrees with Haiku → final, using whichever agreeing quote verified
+   │  disagrees, Haiku answer invalid, or neither agreeing quote verified
    ▼
 Opus arbiter (sees both earlier answers as "Reader A / Reader B", order randomised)
    → final, with its own quote
@@ -134,7 +134,10 @@ Opus arbiter (sees both earlier answers as "Reader A / Reader B", order randomis
 - A final non-`not_addressed` answer with an unverified quote is **excluded** from tallies. It is
   counted in an `n_excluded` column.
 - A Haiku answer that is not flagged (`yes` or `not_addressed`, confidence ≥ 70, quote verified)
-  is not re-checked. The gold set (below) measures how accurate those are.
+  is not re-checked. **The checking is therefore asymmetric.** Every `no` and `mixed` gets a
+  second reading, but a confident `yes` does not. The gold set (below) reports precision per
+  stance so that this asymmetry can be judged. The pilot (both models on every answer) shows how
+  often Sonnet would have disagreed with confident Haiku `yes` answers.
 
 **Pilot (before any full run).** 100 random videos (seeded) are coded independently by Haiku and
 by Sonnet. The pilot report gives:
@@ -176,6 +179,8 @@ go through the full pipeline.
 - **Timestamps.** Video-moment links come from aligning the quote with the raw caption track. They
   are a convenience and play no part in validation.
 - **No sampling temperature control**; see §2.
+- **Names.** People with the same normalised full name and no curated profile are treated as one
+  person. A first name on its own never identifies a person.
 
 ## 6. Running it
 
