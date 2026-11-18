@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:book-tally": "vitest run --config scripts/book-tally/vitest.config.ts",
     "warm": "ts-node --project scripts/tsconfig.json scripts/warm-questions.ts",
     "warm:prod": "ts-node --project scripts/tsconfig.json scripts/warm-questions.ts --url=https://projectprofound.org"
   },

@@ -1,0 +1,143 @@
+/**
+ * Person rollup (SPEC "Job 2" 7.). Pure: takes already-read rows.
+ *
+ * Per person per question, over that person's videos' answers with status 'final':
+ * not_addressed is ignored; none addressed -> not_addressed; all addressed equal -> that
+ * stance; any conflict or any mixed -> mixed. Each person counts once.
+ * (Haiku-only resolution: rows carry `flagged`; see haiku.ts.)
+ * Answers with any other status (unverified, invalid, pending_*) are excluded and counted
+ * in n_excluded_unverified_cells (with a status breakdown; cell counts, not persons). A person with no 'final' answer for a
+ * question is not in that question's denominators (n_persons_all_excluded counts them).
+ */
+import { wilson } from '../lib/stats';
+import type { Stance } from './answers';
+
+export interface FinalRow {
+  video_id: string; question_id: number; stance: Stance | null; status: string;
+  /** Haiku-only resolution: a counted answer the full pipeline would have sent for a re-check (no, mixed, confidence < 70). */
+  flagged?: boolean;
+}
+export interface QuestionMeta { id: number; category: string | null; consumer_question: string }
+
+export function combineStances(stances: readonly Stance[]): Stance {
+  const addressed = stances.filter((s) => s !== 'not_addressed');
+  if (addressed.length === 0) return 'not_addressed';
+  if (addressed.some((s) => s === 'mixed')) return 'mixed';
+  return addressed.every((s) => s === addressed[0]) ? addressed[0] : 'mixed';
+}
+
+export interface TallyRow {
+  question_id: number;
+  category: string | null;
+  consumer_question: string;
+  n_persons: number;
+  n_yes: number; pct_yes: number | null;
+  n_no: number; pct_no: number | null;
+  n_mixed: number; pct_mixed: number | null;
+  n_not_addressed: number; pct_not_addressed: number | null;
+  n_addressed: number;
+  pct_yes_of_addressed: number | null; yes_ci_lo: number | null; yes_ci_hi: number | null;
+  pct_no_of_addressed: number | null; no_ci_lo: number | null; no_ci_hi: number | null;
+  pct_mixed_of_addressed: number | null; mixed_ci_lo: number | null; mixed_ci_hi: number | null;
+  /** Person-level: persons with no 'final' answer for this question (only excluded cells). */
+  n_persons_all_excluded: number;
+  /** Person-level: persons none of whose NDE videos has a usable transcript (same for every question). */
+  n_persons_no_transcript: number;
+  /** Video-cell counts (a person with several videos contributes several cells). */
+  n_excluded_unverified_cells: number;
+  n_excl_unverified_cells: number;
+  n_excl_invalid_cells: number;
+  n_excl_pending_cells: number;
+  /** Haiku-only resolution: counted video-cells that would have been flagged for re-check (never re-checked). */
+  n_unchecked_flagged_cells: number;
+  /** Haiku-only resolution: excluded unverified_quote cells by the model's ORIGINAL stance (a stance-dependent quote-failure rate would bias the tally unseen). Cell counts; no person-level variant, since one person's cells can differ. */
+  n_excl_unverified_yes: number;
+  n_excl_unverified_no: number;
+  n_excl_unverified_mixed: number;
+  /** Haiku-only resolution: counted persons with at least one such unchecked flagged cell for this question. */
+  n_persons_with_unchecked_flagged: number;
+}
+
+/** Extra columns of the haiku-only CSVs (the `resolution` column is added by rollup.ts). */
+export const HAIKU_EXTRA_HEADERS: Array<keyof TallyRow> = [
+  'n_persons_with_unchecked_flagged', 'n_unchecked_flagged_cells', 'n_excl_unverified_yes', 'n_excl_unverified_no', 'n_excl_unverified_mixed',
+];
+
+export const TALLY_HEADERS: Array<keyof TallyRow> = [
+  'question_id', 'category', 'consumer_question', 'n_persons',
+  'n_yes', 'pct_yes', 'n_no', 'pct_no', 'n_mixed', 'pct_mixed', 'n_not_addressed', 'pct_not_addressed',
+  'n_addressed',
+  'pct_yes_of_addressed', 'yes_ci_lo', 'yes_ci_hi',
+  'pct_no_of_addressed', 'no_ci_lo', 'no_ci_hi',
+  'pct_mixed_of_addressed', 'mixed_ci_lo', 'mixed_ci_hi',
+  'n_persons_all_excluded', 'n_persons_no_transcript',
+  'n_excluded_unverified_cells', 'n_excl_unverified_cells', 'n_excl_invalid_cells', 'n_excl_pending_cells',
+];
+
+const pct = (k: number, n: number): number | null => (n > 0 ? (100 * k) / n : null);
+const pct1 = (x: number | null): number | null => (x === null ? null : 100 * x);
+
+/**
+ * @param personOf video id -> person key. In per-video (sensitivity) mode pass an identity map.
+ * Videos missing from personOf are an error (the caller must have asserted full mapping).
+ */
+export function tallyByQuestion(
+  rows: readonly FinalRow[],
+  personOf: ReadonlyMap<string, string>,
+  questions: readonly QuestionMeta[],
+  opts: { noTranscriptPersons?: number } = {},
+): TallyRow[] {
+  // question -> person -> {final stances, excluded counts}
+  type Cell = { final: Stance[]; unverified: number; invalid: number; pending: number; flagged: number; unvByStance: Record<'yes' | 'no' | 'mixed', number> };
+  const byQ = new Map<number, Map<string, Cell>>();
+  for (const r of rows) {
+    const person = personOf.get(r.video_id);
+    if (person === undefined) throw new Error(`tally: video ${r.video_id} has no person mapping`);
+    let m = byQ.get(r.question_id);
+    if (!m) byQ.set(r.question_id, (m = new Map()));
+    let c = m.get(person);
+    if (!c) m.set(person, (c = { final: [], unverified: 0, invalid: 0, pending: 0, flagged: 0, unvByStance: { yes: 0, no: 0, mixed: 0 } }));
+    if (r.status === 'final' && r.stance) { c.final.push(r.stance); if (r.flagged) c.flagged++; }
+    else if (r.status === 'unverified') {
+      c.unverified++;
+      if (r.stance === 'yes' || r.stance === 'no' || r.stance === 'mixed') c.unvByStance[r.stance]++;
+    }
+    else if (r.status === 'invalid') c.invalid++;
+    else c.pending++;
+  }
+  return questions.map((q): TallyRow => {
+    const m = byQ.get(q.id) ?? new Map<string, Cell>();
+    const n = { yes: 0, no: 0, mixed: 0, not_addressed: 0 };
+    let persons = 0, allExcluded = 0, unv = 0, inv = 0, pend = 0, flagCells = 0, flagPersons = 0;
+    const unvS = { yes: 0, no: 0, mixed: 0 };
+    for (const c of m.values()) {
+      for (const k of ['yes', 'no', 'mixed'] as const) unvS[k] += c.unvByStance[k];
+      unv += c.unverified; inv += c.invalid; pend += c.pending;
+      if (c.final.length === 0) { allExcluded++; continue; }
+      persons++;
+      flagCells += c.flagged;
+      if (c.flagged > 0) flagPersons++;
+      n[combineStances(c.final)]++;
+    }
+    const addressed = n.yes + n.no + n.mixed;
+    const wy = wilson(n.yes, addressed), wn = wilson(n.no, addressed), wm = wilson(n.mixed, addressed);
+    return {
+      question_id: q.id, category: q.category, consumer_question: q.consumer_question,
+      n_persons: persons,
+      n_yes: n.yes, pct_yes: pct(n.yes, persons),
+      n_no: n.no, pct_no: pct(n.no, persons),
+      n_mixed: n.mixed, pct_mixed: pct(n.mixed, persons),
+      n_not_addressed: n.not_addressed, pct_not_addressed: pct(n.not_addressed, persons),
+      n_addressed: addressed,
+      pct_yes_of_addressed: pct1(wy.p), yes_ci_lo: pct1(wy.lo), yes_ci_hi: pct1(wy.hi),
+      pct_no_of_addressed: pct1(wn.p), no_ci_lo: pct1(wn.lo), no_ci_hi: pct1(wn.hi),
+      pct_mixed_of_addressed: pct1(wm.p), mixed_ci_lo: pct1(wm.lo), mixed_ci_hi: pct1(wm.hi),
+      n_persons_all_excluded: allExcluded,
+      n_persons_no_transcript: opts.noTranscriptPersons ?? 0,
+      n_excluded_unverified_cells: unv + inv + pend,
+      n_excl_unverified_cells: unv, n_excl_invalid_cells: inv, n_excl_pending_cells: pend,
+      n_unchecked_flagged_cells: flagCells, n_persons_with_unchecked_flagged: flagPersons,
+      n_excl_unverified_yes: unvS.yes, n_excl_unverified_no: unvS.no, n_excl_unverified_mixed: unvS.mixed,
+    };
+  });
+}
