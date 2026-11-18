@@ -108,6 +108,8 @@ export interface PlannedLink {
 export interface LinkPlan {
   links: PlannedLink[];
   ambiguous: Array<{ video_id: string; via: 'exact' | 'core'; profile_ids: number[] }>;
+  /** NDE videos listed in two or more profiles' video_ids (links are written for each; a human decides). */
+  multiProfile: Array<{ video_id: string; profile_ids: number[] }>;
   /** Unlinked, unnamed (or unusable-name) videos. These are the name-extraction targets. */
   anonVideoIds: string[];
   stats: Record<string, number>;
@@ -141,11 +143,11 @@ export function planLinks(input: {
   };
 
   const inProfile = new Set<string>();
-  const profileCount = new Map<string, number>();
+  const profileIds = new Map<string, number[]>();
   for (const p of [...input.profiles].sort((a, b) => a.id - b.id)) {
     for (const vid of new Set(p.video_ids ?? [])) {
       inProfile.add(vid);
-      profileCount.set(vid, (profileCount.get(vid) ?? 0) + 1);
+      (profileIds.get(vid) ?? profileIds.set(vid, []).get(vid)!).push(p.id);
       if (!nde.has(vid)) { stats.profile_video_ids_not_in_nde_set++; continue; }
       if (!input.videos.has(vid)) continue;
       links.push({
@@ -155,7 +157,11 @@ export function planLinks(input: {
       stats.profile_links++;
     }
   }
-  for (const c of profileCount.values()) if (c > 1) stats.videos_in_more_than_one_profile++;
+  const multiProfile: LinkPlan['multiProfile'] = [];
+  for (const [vid, ids] of [...profileIds.entries()].sort(([a], [b]) => (a < b ? -1 : 1))) {
+    if (ids.length > 1 && nde.has(vid) && input.videos.has(vid)) multiProfile.push({ video_id: vid, profile_ids: ids });
+  }
+  stats.videos_in_more_than_one_profile = multiProfile.length;
 
   const ambiguous: LinkPlan['ambiguous'] = [];
   const anonVideoIds: string[] = [];
@@ -196,7 +202,7 @@ export function planLinks(input: {
       anonVideoIds.push(vid);
     }
   }
-  return { links, ambiguous, anonVideoIds, stats };
+  return { links, ambiguous, multiProfile, anonVideoIds, stats };
 }
 
 // ---- persons and candidate pairs ----------------------------------------------------------
@@ -354,6 +360,7 @@ export function findCandidatePairs(persons: Person[], map?: Map<string, string>)
       rule,
       features: {
         rule,
+        keys: [a.key, b.key],
         names: [a.name, b.name],
         slugs: [a.slug, b.slug],
         profile_ids: [a.profile_id, b.profile_id],
@@ -420,4 +427,73 @@ export function nameInQuote(name: string, quote: string): boolean {
   if (nameTokens.length === 0) return false;
   const q = ` ${quoteNormalize(quote)} `;
   return q.includes(` ${nameTokens.join(' ')} `);
+}
+
+// ---- invariants -------------------------------------------------------------------------
+
+/**
+ * Every NDE video present in nde_vids must end up with a profile link, or exactly one baseline
+ * link (named:/anon:), never both and never neither, so the bt_unmapped_nde_videos view is
+ * empty. Returns the violating video ids (empty = invariant holds).
+ */
+export function linkInvariantViolations(plan: LinkPlan, ndeVideoIds: string[], videos: Map<string, VideoMeta>): string[] {
+  const profile = new Map<string, number>();
+  const baseline = new Map<string, number>();
+  for (const l of plan.links) {
+    const m = l.source === 'profile_video_ids' ? profile : l.source === 'baseline' ? baseline : null;
+    if (m) m.set(l.video_id, (m.get(l.video_id) ?? 0) + 1);
+  }
+  const bad: string[] = [];
+  for (const v of ndeVideoIds) {
+    if (!videos.has(v)) continue;
+    const p = profile.get(v) ?? 0;
+    const b = baseline.get(v) ?? 0;
+    if (!((p >= 1 && b === 0) || (p === 0 && b === 1))) bad.push(v);
+  }
+  return bad;
+}
+
+export interface OrientedSide { key: string; name: string | null; slug: string | null; profile_id: number | null; channels: string[] }
+
+/**
+ * Side-a / side-b view of a stored candidate in the orientation of its key_a / key_b columns
+ * (insertCandidates may swap a pair when the database collation orders keys differently).
+ */
+export function orientCandidate(c: { key_a: string; key_b: string; features: Record<string, unknown> }): [OrientedSide, OrientedSide] {
+  const f = c.features as {
+    keys?: string[]; names?: Array<string | null>; slugs?: Array<string | null>;
+    profile_ids?: Array<number | null>; channels?: string[][];
+  };
+  const keys = f.keys ?? [c.key_a, c.key_b];
+  const side = (key: string): OrientedSide => {
+    const i = Math.max(0, keys.indexOf(key));
+    return { key, name: f.names?.[i] ?? null, slug: f.slugs?.[i] ?? null, profile_id: f.profile_ids?.[i] ?? null, channels: f.channels?.[i] ?? [] };
+  };
+  return [side(c.key_a), side(c.key_b)];
+}
+
+// ---- self-stated names -> person -------------------------------------------------------------
+
+export type SelfNameClass =
+  | { kind: 'first_name_only' }
+  | { kind: 'unusable' }
+  | { kind: 'profile'; level: 'exact' | 'core'; profileId: number }
+  | { kind: 'ambiguous'; profileIds: number[] }
+  | { kind: 'named'; key: string };
+
+/**
+ * What a verified self-stated name may link to. A name that normalizes to one token (first
+ * name only) never creates or joins a named:* key (the video stays anon:<id>); placeholders are
+ * unusable; a name matching one profile (exact, else core) proposes that profile; matching
+ * several is ambiguous (no link); otherwise it proposes named:<exact_key>.
+ */
+export function classifySelfName(name: string, idx: ProfileIndex): SelfNameClass {
+  const key = exactKey(name);
+  if (!key) return { kind: 'unusable' };
+  if (!key.includes(' ')) return { kind: 'first_name_only' };
+  if (PLACEHOLDER_NAMES.has(key)) return { kind: 'unusable' };
+  const m = matchName(name, idx);
+  if (m.level === 'exact' || m.level === 'core') return { kind: 'profile', level: m.level, profileId: m.profileId };
+  if (m.level === 'ambiguous') return { kind: 'ambiguous', profileIds: m.profileIds };
+  return { kind: 'named', key };
 }

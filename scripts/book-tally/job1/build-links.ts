@@ -16,7 +16,7 @@ import path from 'path';
 import { btInsert, selectAll } from '../lib/supabase';
 import { CliError, finishRun, isDirectRun, helpText, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, type Deps, type OptDef } from './cli';
 import { loadWorld } from './data';
-import { planLinks, type PlannedLink } from './logic';
+import { linkInvariantViolations, planLinks, type PlannedLink } from './logic';
 
 const SCRIPT = 'job1/build-links.ts';
 const OPTIONS: Record<string, OptDef> = {
@@ -34,6 +34,8 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
 
   const world = await loadWorld(db);
   const plan = planLinks(world);
+  const violations = linkInvariantViolations(plan, world.ndeVideoIds, world.videos);
+  if (violations.length) throw new CliError(`invariant violated: ${violations.length} NDE video(s) would be left unmapped or double-baselined`);
   const namedSizes = new Map<string, number>();
   for (const l of plan.links) if (l.person_key.startsWith('named:')) namedSizes.set(l.person_key, (namedSizes.get(l.person_key) ?? 0) + 1);
   const sizes = [...namedSizes.values()];
@@ -64,7 +66,11 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   log('named persons (baseline): ' + JSON.stringify(named));
   log(`planned links: ${plan.links.length} ${JSON.stringify(bySource(plan.links))}`);
   log(`already in bt_person_links: ${plan.links.length - newLinks.length}; to insert: ${newLinks.length} ${JSON.stringify(bySource(newLinks))}`);
+  if (plan.stats.nde_videos_missing_in_nde_vids) log(`WARNING: ${plan.stats.nde_videos_missing_in_nde_vids} NDE video(s) have no nde_vids row and cannot be linked`);
   log(`ambiguous name matches (not linked): ${plan.ambiguous.length}`);
+  if (plan.multiProfile.length) {
+    log(`WARNING: ${plan.multiProfile.length} NDE video(s) are listed in 2+ profiles' video_ids; links are written for each profile and the videos are listed as 'multi_profile' in out/link_proposals_review.csv for a human decision`);
+  }
   log(`unnamed unlinked NDE videos (name-extraction targets): ${plan.anonVideoIds.length}`);
   if (dry) return log('dry-run: nothing written');
 
@@ -90,6 +96,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     const report = {
       run_id: runId, stats: plan.stats, named,
       ambiguous: plan.ambiguous,
+      multi_profile: plan.multiProfile,
       pending_core_links: plan.links.filter((l) => !l.autoAcceptBy).length,
     };
     mkdirSync(ctx.outDir, { recursive: true });

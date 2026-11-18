@@ -33,8 +33,12 @@ export interface Ctx {
 }
 
 export function makeCtx(deps: Deps = {}): Ctx {
+  let db: Db | undefined = deps.db;
   return {
-    db: deps.db ?? createServiceClient(),
+    // Lazy: --help and argument errors must work without Supabase credentials.
+    get db(): Db {
+      return (db ??= createServiceClient());
+    },
     makeClient: deps.makeClient ?? (() => createAnthropicClient().client),
     log: deps.log ?? ((l) => console.log(l)),
     now: deps.now ?? (() => new Date()),

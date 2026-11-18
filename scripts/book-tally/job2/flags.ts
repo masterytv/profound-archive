@@ -33,13 +33,9 @@ export function stancesAgree(first: AnswerLite, recheck: AnswerLite): boolean {
   return first.valid && recheck.valid && first.stance !== null && first.stance === recheck.stance;
 }
 
-/** The arbiter is needed when the first answer was flagged, a recheck exists, and they do not agree. */
-export function needsArbiter(first: AnswerLite, recheck: AnswerLite | undefined): boolean {
-  return isFlagged(first) && recheck !== undefined && !stancesAgree(first, recheck);
-}
-
 export type ResolvedBy = 'first' | 'recheck' | 'arbiter';
-export type FinalStatus = 'final' | 'unverified' | 'invalid' | 'pending_recheck' | 'pending_arbiter';
+/** Statuses of the SQL view bt_final_stances. */
+export type FinalStatus = 'final' | 'unverified' | 'pending_recheck' | 'pending_arbiter';
 
 export interface Resolution {
   resolvedBy: ResolvedBy | null;
@@ -47,24 +43,32 @@ export interface Resolution {
   status: FinalStatus;
 }
 
-/** Mirror of bt_final_stances for one (video, question). */
+/** ok(x): valid AND (not_addressed OR verified quote). */
+export function isOk(a: AnswerLite): boolean {
+  return a.valid && (a.stance === 'not_addressed' || (a.stance !== null && a.quoteVerified));
+}
+
+/**
+ * Mirror of bt_final_stances for one (video, question):
+ *  - unflagged first answer -> final = first;
+ *  - flagged, no recheck -> pending_recheck;
+ *  - recheck agrees (both valid, same stance): ok(recheck) -> recheck; else ok(first) -> first;
+ *  - otherwise the arbiter: none yet -> pending_arbiter; ok(arbiter) -> final; else 'unverified'.
+ */
 export function resolveFinal(first: AnswerLite, recheck?: AnswerLite, arbiter?: AnswerLite): Resolution {
-  let resolvedBy: ResolvedBy | null = null;
-  let chosen: AnswerLite | null = null;
-  if (!isFlagged(first)) {
-    resolvedBy = 'first';
-    chosen = first;
-  } else if (recheck && stancesAgree(first, recheck)) {
-    resolvedBy = 'recheck';
-    chosen = recheck;
-  } else if (recheck && arbiter) {
-    resolvedBy = 'arbiter';
-    chosen = arbiter;
+  if (!isFlagged(first)) return { resolvedBy: 'first', chosen: first, status: 'final' };
+  if (!recheck) return { resolvedBy: null, chosen: null, status: 'pending_recheck' };
+  if (stancesAgree(first, recheck)) {
+    if (isOk(recheck)) return { resolvedBy: 'recheck', chosen: recheck, status: 'final' };
+    if (isOk(first)) return { resolvedBy: 'first', chosen: first, status: 'final' };
   }
-  if (!chosen) return { resolvedBy: null, chosen: null, status: recheck ? 'pending_arbiter' : 'pending_recheck' };
-  if (!chosen.valid) return { resolvedBy, chosen, status: 'invalid' };
-  if (chosen.stance !== 'not_addressed' && !chosen.quoteVerified) return { resolvedBy, chosen, status: 'unverified' };
-  return { resolvedBy, chosen, status: 'final' };
+  if (!arbiter) return { resolvedBy: null, chosen: null, status: 'pending_arbiter' };
+  return { resolvedBy: 'arbiter', chosen: arbiter, status: isOk(arbiter) ? 'final' : 'unverified' };
+}
+
+/** The arbiter is needed exactly when the resolution is pending_arbiter. */
+export function needsArbiter(first: AnswerLite, recheck: AnswerLite | undefined, arbiter?: AnswerLite): boolean {
+  return resolveFinal(first, recheck, arbiter).status === 'pending_arbiter';
 }
 
 // ---- arbiter disputes and blinding ----
