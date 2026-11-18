@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { checkExtraction, createSelfNameLinks } from '../job1/extract-names';
-import { nameInQuote, type ProfileRow } from '../job1/logic';
+import { nameInQuote, selfIntroducerBefore, SELF_INTRODUCERS, type ProfileRow } from '../job1/logic';
 import { makeCtx } from '../job1/cli';
 import { fakeDb } from './job1-fakes';
 
@@ -27,7 +27,40 @@ describe('nameInQuote', () => {
   });
 });
 
+describe('selfIntroducerBefore (first-person introducer immediately before the name)', () => {
+  it('accepts each introducer; "I\'m" normalizes to "im" (apostrophes deleted)', () => {
+    for (const intro of ['My name is', "My name's", "I'm", 'Im', 'I am', 'This is', 'Call me', 'They call me', 'hello and I am', 'well, my name is']) {
+      expect(selfIntroducerBefore('Jane Smith', `${intro} Jane Smith and I live in Ohio`), intro).toBe(true);
+    }
+    expect(SELF_INTRODUCERS).toContain('i m');
+  });
+  it('skips honorifics between the introducer and the name', () => {
+    expect(selfIntroducerBefore('Jane Smith', 'my name is Dr. Jane Smith and I live in Ohio')).toBe(true);
+  });
+  it('rejects a name that is merely mentioned (host introduction, thanks, other people)', () => {
+    for (const q of ['my guest today is Jane Smith and she lives in Ohio', 'thank you so much Jane Smith for coming on today', 'my daughter Jane Smith was in the room', 'her name is Jane Smith and she told me']) {
+      expect(selfIntroducerBefore('Jane Smith', q), q).toBe(false);
+    }
+  });
+  it('requires the introducer IMMEDIATELY before; any occurrence of the name may satisfy it', () => {
+    expect(selfIntroducerBefore('Jane Smith', 'my name is really Jane Smith and I live in Ohio')).toBe(false);
+    expect(selfIntroducerBefore('Jane Smith', 'Jane Smith said hello and then I am Jane Smith myself')).toBe(true);
+  });
+});
+
 describe('checkExtraction', () => {
+  it("quote verifies and contains the name but it is not self-introduced -> quote_verified=false, error 'no_self_introducer'", () => {
+    const tr = 'The host said thank you so much Jane Smith for coming on today and then I began my story about the accident.';
+    const c = checkExtraction({ name: 'Jane Smith', quote: 'thank you so much Jane Smith for coming on today' }, tr);
+    expect(c).toMatchObject({ valid: true, quote_verified: false, name_in_quote: true, error: 'no_self_introducer', name: 'Jane Smith' });
+    const ok = checkExtraction({ name: 'Jane Smith', quote: 'Hello my name is Jane Smith and I live in Ohio' }, 'Hello my name is Jane Smith and I live in Ohio near the lake.');
+    expect(ok).toMatchObject({ quote_verified: true, error: null });
+  });
+  it('a bare 4-token self-introduction fails the 5-token minimum (documented limit)', () => {
+    const c = checkExtraction({ name: 'Jane Smith', quote: 'I am Jane Smith' }, 'Well I am Jane Smith and this is my story.');
+    expect(c.quote_verified).toBe(false);
+    expect(c.error).toMatch(/too_short/);
+  });
   const ok = "Hi, I'm Pat O'Brien, and this is the story of the night my heart stopped.";
   it('verified quote and name inside the quote', () => {
     const c = checkExtraction({ name: "Pat O'Brien", quote: ok }, TRANSCRIPT);

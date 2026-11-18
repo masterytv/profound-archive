@@ -9,8 +9,8 @@
  */
 import { createHash } from 'crypto';
 import type Anthropic from '@anthropic-ai/sdk';
-import type { RequestParams } from '../lib/batch';
-import { BATCH_DISCOUNT, formatUsd, requestCost } from '../lib/cost';
+import { realBatchIds, unresolvedMarkers, type RequestParams } from '../lib/batch';
+import { BATCH_DISCOUNT, ceilingCost, estimateOutputTokens, formatUsd, requestCost, THINKING_ALLOWANCE, familyOf } from '../lib/cost';
 import { stableStringify } from '../lib/prompts';
 import { CliError, getRun, type RunRow } from './cli';
 import type { Db } from '../lib/supabase';
@@ -43,19 +43,34 @@ export function assertDigestMatches(run: RunRow, digest: string): void {
   }
 }
 
-export function assertResumable(run: RunRow | null, resumeId: string, expect: RunExpect): RunRow {
+export function assertResumable(run: RunRow | null, resumeId: string, expect: Pick<RunExpect, 'job' | 'pass'>): RunRow {
   if (!run || run.id !== resumeId) throw new CliError(`no run "${resumeId}" found`);
   if (run.job !== expect.job || run.pass !== expect.pass) throw new CliError(`run ${run.id} is ${run.job}/${run.pass}, expected ${expect.job}/${expect.pass}`);
-  if (!['submitted', 'collecting'].includes(run.status) || !run.batch_ids?.length) {
-    throw new CliError(`run ${run.id} cannot be resumed (status "${run.status}", ${run.batch_ids?.length ?? 0} batch ids)`);
+  const real = realBatchIds(run.batch_ids).length;
+  const unresolved = unresolvedMarkers(run.batch_ids ?? []).length;
+  if (!['submitting', 'submitted', 'collecting'].includes(run.status) || (real === 0 && unresolved === 0)) {
+    throw new CliError(`run ${run.id} cannot be resumed (status "${run.status}", ${real} batch ids, ${unresolved} unresolved submission markers)`);
   }
   return run;
+}
+
+/** Refuses when an estimated id has gained a result since the estimate (the estimate no longer describes the spend). */
+export function assertNothingDoneSince(done: string[], what: string): void {
+  if (done.length > 0) {
+    throw new SpendGateError(`refusing to spend: ${done.length} estimated ${what} already have a result since the estimate (e.g. ${done.slice(0, 3).join(', ')}); run --estimate again`);
+  }
 }
 
 export async function loadRunForConfirm(db: Db, confirmId: string | undefined, expect: RunExpect): Promise<RunRow> {
   // Validate the argument before any read; a missing id never reaches the database.
   if (!confirmId) assertSpendConfirmed(null, confirmId, expect);
   return assertSpendConfirmed(await getRun(db, confirmId!), confirmId, expect);
+}
+
+/** Reads the run named by --confirm-spend without gating on status (the caller recovers 'submitting' runs). */
+export async function peekRun(db: Db, confirmId: string | undefined): Promise<RunRow | null> {
+  if (!confirmId) return null;
+  return getRun(db, confirmId);
 }
 
 // ---- digest / sizes ---------------------------------------------------------------------
@@ -169,11 +184,20 @@ export interface Estimate {
   counted_requests: number;
   strata: number;
   input_tokens: number;
+  /** Per-request input tokens (measured, or extrapolated for unsampled requests); used for retry budgets. */
+  per_request_input_tokens: Record<string, number>;
   expected_output_tokens: number;
   expected_output_tokens_per_request: number;
+  thinking_allowance_per_request: number;
+  visible_tokens_per_request: number;
   max_output_tokens_per_request: number;
+  max_attempts: number;
+  /** Expected cost of ONE attempt of every request. */
   cost_usd: number;
+  /** Every response at max_tokens, first attempt only. */
   worst_case_cost_usd: number;
+  /** Hard ceiling: every request on every attempt, max_tokens doubling per attempt (lib/cost.ceilingCost). */
+  ceiling_usd: number;
   batch_discount: number;
   digest: string;
   assumptions: string;
@@ -185,10 +209,10 @@ export interface EstimateOptions {
   effort: string;
   items: EstItem[];
   counter: TokenCounter & { fellBack?: () => boolean };
-  /** Assumed average output tokens per request (stated in the printed estimate). */
-  expectedOutputTokens: number;
-  outputAssumption: string;
+  /** Visible (answer) output tokens per request; thinking is added from lib/cost.THINKING_ALLOWANCE. */
+  visibleTokensPerRequest: number;
   maxTokens: number;
+  maxAttempts: number;
   /** Count every request when there are at most this many; otherwise sample. Default 1000. */
   countAllUpTo?: number;
   sampleSize?: number;
@@ -208,8 +232,11 @@ export async function estimateSpend(o: EstimateOptions): Promise<Estimate> {
   const measured = new Map(plan.sample.map((idx, k) => [idx, counted[k]]));
   const perItem = all ? o.items.map((_, i) => measured.get(i)!) : extrapolateTokens(chars, plan, measured);
   const input = perItem.reduce((a, b) => a + b, 0);
-  const cost = perItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: o.expectedOutputTokens }), 0);
+  const thinking = THINKING_ALLOWANCE[familyOf(o.model)];
+  const expectedPer = estimateOutputTokens(o.model, 1, o.visibleTokensPerRequest);
+  const cost = perItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: expectedPer }), 0);
   const worst = perItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: o.maxTokens }), 0);
+  const ceiling = ceilingCost({ model: o.model, requests: perItem.map((t) => ({ inputTokens: t })), maxTokens: o.maxTokens, maxAttempts: o.maxAttempts, doubling: true });
   return {
     method: all ? 'count_tokens_all' : 'count_tokens_stratified_sample',
     model: o.model,
@@ -218,14 +245,21 @@ export async function estimateSpend(o: EstimateOptions): Promise<Estimate> {
     counted_requests: plan.sample.length,
     strata: plan.strata.length,
     input_tokens: input,
-    expected_output_tokens: o.expectedOutputTokens * n,
-    expected_output_tokens_per_request: o.expectedOutputTokens,
+    per_request_input_tokens: Object.fromEntries(o.items.map((it, i) => [it.key, perItem[i]])),
+    expected_output_tokens: expectedPer * n,
+    expected_output_tokens_per_request: expectedPer,
+    thinking_allowance_per_request: thinking,
+    visible_tokens_per_request: o.visibleTokensPerRequest,
     max_output_tokens_per_request: o.maxTokens,
+    max_attempts: o.maxAttempts,
     cost_usd: cost,
     worst_case_cost_usd: worst,
+    ceiling_usd: ceiling,
     batch_discount: BATCH_DISCOUNT,
     digest: requestDigest(o.items),
-    assumptions: o.outputAssumption,
+    assumptions:
+      `adaptive thinking is on for these models and is billed as OUTPUT tokens; assumed ${thinking} thinking tokens (lib/cost.THINKING_ALLOWANCE, a guess to be replaced by observed usage) ` +
+      `+ ~${o.visibleTokensPerRequest} visible tokens per request`,
     count_without_output_config: o.counter.fellBack?.() ?? false,
   };
 }
@@ -235,7 +269,8 @@ export function printEstimate(log: (l: string) => void, runId: string, e: Estima
   log(`  requests:               ${e.requests}`);
   log(`  input tokens:           ${e.input_tokens} (${e.method === 'count_tokens_all' ? `counted exactly on all ${e.counted_requests} requests` : `extrapolated from a stratified sample of ${e.counted_requests} requests in ${e.strata} strata`}${e.count_without_output_config ? '; count_tokens rejected output_config so it is excluded from the count' : ''})`);
   log(`  expected output tokens: ${e.expected_output_tokens} (${e.expected_output_tokens_per_request}/request; ${e.assumptions})`);
-  log(`  expected cost:          ${formatUsd(e.cost_usd)}`);
-  log(`  worst-case cost:        ${formatUsd(e.worst_case_cost_usd)} (every response at max_tokens=${e.max_output_tokens_per_request})`);
+  log(`  expected cost:          ${formatUsd(e.cost_usd)} (one attempt per request)`);
+  log(`  first-attempt worst:    ${formatUsd(e.worst_case_cost_usd)} (every response at max_tokens=${e.max_output_tokens_per_request})`);
+  log(`  HARD CEILING:           ${formatUsd(e.ceiling_usd)} (every request on all ${e.max_attempts} attempts, max_tokens doubling per attempt)`);
   log(`  to submit:              --confirm-spend ${runId}`);
 }

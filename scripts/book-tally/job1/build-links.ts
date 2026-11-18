@@ -16,7 +16,8 @@ import path from 'path';
 import { btInsert, selectAll } from '../lib/supabase';
 import { CliError, finishRun, isDirectRun, helpText, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, type Deps, type OptDef } from './cli';
 import { loadWorld } from './data';
-import { linkInvariantViolations, planLinks, type PlannedLink } from './logic';
+import { toCsv } from './csv';
+import { findLinkDrift, linkInvariantViolations, planLinks, type PlannedLink } from './logic';
 
 const SCRIPT = 'job1/build-links.ts';
 const OPTIONS: Record<string, OptDef> = {
@@ -50,9 +51,12 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     () => log('note: bt_person_links not found (migration not applied); treating as empty'),
   );
   const existingDecisions = await readOrEmpty(
-    () => selectAll<{ id: number; link_id: number }>(db, 'bt_link_decisions', 'id, link_id', { orderBy: 'id' }),
+    () => selectAll<{ id: number; link_id: number; decision: string; decided_by: string }>(db, 'bt_link_decisions', 'id, link_id, decision, decided_by', { orderBy: 'id' }),
     () => log('note: bt_link_decisions not found; treating as empty'),
   );
+  const latestDecision = new Map<number, { decision: string; decided_by: string }>();
+  for (const d of existingDecisions) latestDecision.set(d.link_id, d); // ascending id: last wins
+  const drift = findLinkDrift(plan.links, existingLinks, latestDecision);
   const have = new Map(existingLinks.map((l) => [linkKey(l), l.id]));
   const decided = new Set(existingDecisions.map((d) => d.link_id));
   const newLinks = plan.links.filter((l) => !have.has(linkKey(l)));
@@ -71,11 +75,12 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   if (plan.multiProfile.length) {
     log(`WARNING: ${plan.multiProfile.length} NDE video(s) are listed in 2+ profiles' video_ids; links are written for each profile and the videos are listed as 'multi_profile' in out/link_proposals_review.csv for a human decision`);
   }
+  log(`drift: ${drift.length} accepted link(s) in the database are no longer in the current plan${drift.length ? ' (written to out/link_drift.csv; NOT reverted automatically)' : ''}`);
   log(`unnamed unlinked NDE videos (name-extraction targets): ${plan.anonVideoIds.length}`);
   if (dry) return log('dry-run: nothing written');
 
   const runId = newRunId('j1l', ctx.now());
-  await startRun(db, { id: runId, job: 'other', params: { script: 'build-links', stats: plan.stats, named, ambiguous: plan.ambiguous.length }, script: SCRIPT });
+  await startRun(db, { id: runId, job: 'other', params: { script: 'build-links', stats: plan.stats, named, ambiguous: plan.ambiguous.length, drift: drift.length }, script: SCRIPT });
   try {
     const rows = newLinks.map((l) => ({
       video_id: l.video_id, person_key: l.person_key, profile_id: l.profile_id, source: l.source,
@@ -101,6 +106,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     };
     mkdirSync(ctx.outDir, { recursive: true });
     writeFileSync(path.join(ctx.outDir, 'build_links_report.json'), JSON.stringify(report, null, 2));
+    writeFileSync(path.join(ctx.outDir, 'link_drift.csv'), toCsv(['link_id', 'video_id', 'person_key', 'source', 'decided_by', 'reason', 'planned_person_keys'], drift as unknown as Array<Record<string, unknown>>));
     await finishRun(db, runId, 'completed', undefined, ctx.now());
     log(`run ${runId} completed`);
   } catch (e) {

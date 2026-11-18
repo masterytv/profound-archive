@@ -6,8 +6,10 @@
  *                   Sonnet judgment; Sonnet is blind to Haiku (same input, no verdict shown)
  *
  * Spend gate: `--estimate` prints requests / tokens / cost and records a bt_runs row with status
- * 'estimated'; `--confirm-spend <run_id>` submits exactly those requests. `--resume <run_id>`
- * collects the results of an already submitted run (no new spend). The Sonnet stage needs its
+ * 'estimated'; `--confirm-spend <run_id>` submits exactly those requests through lib/batch.submitGuarded
+ * (status lock + durable pending marker, no auto-retry of the create call). `--resume <run_id>` collects
+ * an already submitted run (no new spend); `--resume <run_id> --adopt-batch <id>` records a batch whose
+ * submission response was lost. Retry batches are checked against the approved ceiling (--confirm-retries). The Sonnet stage needs its
  * own estimate after Haiku has finished.
  *
  * Decisions (only INSERTs into bt_merge_decisions; a candidate that already has any decision,
@@ -20,20 +22,21 @@ import { messageText } from '../lib/batch';
 import { MODELS } from '../lib/cost';
 import { loadPrompt, PROMPTS_DIR } from '../lib/prompts';
 import { btInsert, selectAll } from '../lib/supabase';
-import { resumeRun, submitRun, usageSummary, type CollectedRow } from './batch-run';
+import { approvedBudget, confirmGate, prepareResume, resumeRun, submitRun, usageSummary, type CollectedRow } from './batch-run';
+import { MAX_ATTEMPTS } from '../lib/batch';
 import { CliError, finishRun, type RunRow, getRun, helpText, intOpt, isDirectRun, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, str, type Ctx, type Deps, type OptDef } from './cli';
 import { ensurePrompt } from './data';
 import { decideFromVerdicts, type Verdict } from './logic';
 import { parseModelJson, type JsonSchema } from './schema';
-import { assertDigestMatches, assertResumable, estimateSpend, loadRunForConfirm, printEstimate, requestDigest, sdkTokenCounter, type EstItem, type TokenCounter } from './spend';
+import { assertDigestMatches, assertNothingDoneSince, assertResumable, estimateSpend, printEstimate, requestDigest, sdkTokenCounter, type EstItem, type TokenCounter } from './spend';
 import { buildParams, type Effort } from '../lib/batch';
 
 const SCRIPT = 'job1/judge-pairs.ts';
 export const PROMPT_NAME = 'pair-judge-v1';
-export const MAX_TOKENS = 2048;
-/** ~1-3 sentences of reason + verdict JSON; deliberately generous. Worst case is also printed. */
-export const EXPECTED_OUTPUT_TOKENS = 120;
-export const OUTPUT_ASSUMPTION = 'assumes ~120 output tokens per response (verdict + 1-3 sentence reason, no extended thinking)';
+/** Room for adaptive thinking (billed as output) plus the ~100-token answer. */
+export const MAX_TOKENS = 8192;
+/** Visible answer: verdict + 1-3 sentence reason. Thinking is added from lib/cost.THINKING_ALLOWANCE. */
+export const VISIBLE_TOKENS = 120;
 
 const OPTIONS: Record<string, OptDef> = {
   stage: { type: 'string', help: 'haiku | sonnet (default haiku)' },
@@ -43,7 +46,9 @@ const OPTIONS: Record<string, OptDef> = {
   effort: { type: 'string', help: 'low|medium|high|xhigh|max (default medium)' },
   limit: { type: 'string', help: 'only judge the first N candidates by id (trial runs)' },
   'sample-size': { type: 'string', help: 'force a stratified token-count sample of this size (min 50) instead of counting all' },
-  'max-attempts': { type: 'string', help: 'attempts for errored/expired requests (default 2)' },
+  'max-attempts': { type: 'string', help: 'attempts per request incl. retries, fixed at --estimate time and part of the approved ceiling (default 3)' },
+  'confirm-retries': { type: 'string', help: 'run_id: allow retry batches beyond the approved ceiling for this run' },
+  'adopt-batch': { type: 'string', help: 'with --resume: record this existing batch id for a run whose submission response was lost (verified before adopting)' },
   'dry-run': { type: 'boolean', help: 'offline: build requests and print counts; no API call, no DB write' },
 };
 
@@ -133,8 +138,9 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const effort = (str(v.effort) ?? 'medium') as Effort;
   if (!['low', 'medium', 'high', 'xhigh', 'max'].includes(effort)) throw new CliError('--effort must be low|medium|high|xhigh|max');
   const limit = intOpt(v.limit, 'limit');
-  const maxAttempts = intOpt(v['max-attempts'], 'max-attempts') ?? 2;
-  if (maxAttempts < 1 || maxAttempts > 3) throw new CliError('--max-attempts must be 1..3');
+  const maxAttempts = intOpt(v['max-attempts'], 'max-attempts') ?? MAX_ATTEMPTS;
+  if (maxAttempts < 1 || maxAttempts > MAX_ATTEMPTS) throw new CliError(`--max-attempts must be 1..${MAX_ATTEMPTS}`);
+  if (str(v['adopt-batch']) && !str(v.resume)) throw new CliError('--adopt-batch requires --resume <run_id>');
   const modes = [v.estimate === true, !!str(v['confirm-spend']), !!str(v.resume), v['dry-run'] === true].filter(Boolean).length;
   if (modes === 0) throw new CliError('refusing to run: choose --dry-run, --estimate, --confirm-spend <run_id> or --resume <run_id> (no paid call is made without a confirmed estimate)');
   if (modes > 1) throw new CliError('choose only one of --dry-run, --estimate, --confirm-spend, --resume');
@@ -145,7 +151,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
 
   // Spend gate first: nothing below this block runs for a bad --confirm-spend.
   let confirmRun: RunRow | null = null;
-  if (str(v['confirm-spend'])) confirmRun = await loadRunForConfirm(db, str(v['confirm-spend']), expect);
+  if (str(v['confirm-spend'])) confirmRun = await confirmGate(ctx, str(v['confirm-spend']), expect);
 
   const { cands, judgments } = await readAll(ctx);
   const latest = latestJudgments(judgments);
@@ -161,8 +167,10 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   if (str(v.resume)) {
     const run = assertResumable(await getRun(db, str(v.resume)!), str(v.resume)!, expect);
     const handler = makeHandler(ctx, run.id, stage, model, await ensurePrompt(db, prompt, schema), schema, judgments);
-    const out = await resumeRun({ ctx, client: ctx.makeClient(), runId: run.id, model, pass: stage, batchIds: run.batch_ids, onCollected: handler.onCollected });
-    return finish(ctx, run.id, stage, out, handler.stats, maxAttempts);
+    const client = ctx.makeClient();
+    const batchIds = await prepareResume(ctx, client, run.id, str(v['adopt-batch']));
+    const out = await resumeRun({ ctx, client, runId: run.id, model, pass: stage, batchIds, onCollected: handler.onCollected });
+    return finish(ctx, run.id, stage, out, handler.stats);
   }
 
   if (confirmRun) {
@@ -170,13 +178,20 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     const wanted = new Set(ids);
     const picked = cands.filter((c) => wanted.has(c.id)).sort((a, b) => a.id - b.id);
     if (picked.length !== ids.length) throw new CliError('some estimated candidates no longer exist');
+    assertNothingDoneSince(ids.filter((id) => latest.get(id)?.[stage]).map(String), `candidates (stage ${stage})`);
     const items = buildJudgeItems(picked, stage, ((confirmRun.effort ?? effort) as Effort), system, schema);
     assertDigestMatches(confirmRun, requestDigest(items));
     const promptHash = await ensurePrompt(db, prompt, schema);
     const handler = makeHandler(ctx, confirmRun.id, stage, model, promptHash, schema, judgments);
     log(`confirmed spend for run ${confirmRun.id}: ${items.length} requests, estimated ${JSON.stringify({ cost_usd: confirmRun.estimate?.cost_usd })}`);
-    const out = await submitRun({ ctx, client: ctx.makeClient(), runId: confirmRun.id, model, pass: stage, items, maxAttempts, onCollected: handler.onCollected });
-    return finish(ctx, confirmRun.id, stage, out, handler.stats, maxAttempts);
+    const budget = approvedBudget(confirmRun);
+    log(`approved ceiling ${budget.ceilingUsd}; up to ${budget.maxAttempts} attempt(s) per request`);
+    const out = await submitRun({
+      ctx, client: ctx.makeClient(), runId: confirmRun.id, model, pass: stage, items, maxAttempts: budget.maxAttempts,
+      ceilingUsd: budget.ceilingUsd, perKeyInputTokens: budget.perKeyInputTokens, confirmRetries: str(v['confirm-retries']) === confirmRun.id,
+      onCollected: handler.onCollected,
+    });
+    return finish(ctx, confirmRun.id, stage, out, handler.stats);
   }
 
   // --estimate
@@ -190,13 +205,13 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const client = ctx.makeClient();
   const counter: TokenCounter = sdkTokenCounter(client);
   const est = await estimateSpend({
-    model, effort, items, counter, expectedOutputTokens: EXPECTED_OUTPUT_TOKENS, outputAssumption: OUTPUT_ASSUMPTION,
-    maxTokens: MAX_TOKENS, sampleSize: intOpt(v['sample-size'], 'sample-size'), forceSample: v['sample-size'] !== undefined,
+    model, effort, items, counter, visibleTokensPerRequest: VISIBLE_TOKENS,
+    maxTokens: MAX_TOKENS, maxAttempts, sampleSize: intOpt(v['sample-size'], 'sample-size'), forceSample: v['sample-size'] !== undefined,
   });
   const runId = newRunId(stage === 'haiku' ? 'j1h' : 'j1s', ctx.now());
   await startRun(db, {
     id: runId, job: 'pair_judge', pass: stage, model, effort, status: 'estimated',
-    params: { stage, prompt: PROMPT_NAME, candidate_ids: todo.map((c) => c.id), limit: limit ?? null },
+    params: { stage, prompt: PROMPT_NAME, candidate_ids: todo.map((c) => c.id), limit: limit ?? null, max_attempts: maxAttempts },
     estimate: { ...est }, script: SCRIPT,
   });
   printEstimate(log, runId, est);
@@ -230,7 +245,7 @@ function makeHandler(ctx: Ctx, runId: string, stage: Stage, model: string, promp
   };
 }
 
-async function finish(ctx: Ctx, runId: string, stage: Stage, out: Awaited<ReturnType<typeof submitRun>>, stats: ReturnType<typeof makeHandler>['stats'], _maxAttempts: number) {
+async function finish(ctx: Ctx, runId: string, stage: Stage, out: Awaited<ReturnType<typeof submitRun>>, stats: ReturnType<typeof makeHandler>['stats']) {
   const { log, db } = ctx;
   const usage = usageSummary(out.usage);
   log(`run ${runId}: judged ${stats.judged}, invalid ${stats.invalid}, truncated ${stats.truncated}, not succeeded ${stats.not_succeeded}, unresolved after retries ${out.unresolved.length}`);

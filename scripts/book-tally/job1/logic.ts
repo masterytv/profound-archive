@@ -1,6 +1,19 @@
 /**
  * Pure Job 1 logic (no I/O): name matching, link planning, candidate pairs,
  * judging outcome, name-in-quote check. Everything here is unit-tested.
+ *
+ * Notes for the README (method limits a reviewer should be told):
+ *  - Candidate rule 2 (same first name AND Jaro-Winkler(last) >= 0.90) compares CANONICAL first
+ *    names, so a nickname family counts as "the same first name" (bill/will/liam/... are all
+ *    "william"). It therefore also pairs different people who merely have different last names
+ *    that are spelled alike. This is deliberately broad: candidates only enter judging, they
+ *    never merge anything by themselves.
+ *  - A self-stated name needs a verified quote of at least 5 normalized tokens (lib/quote).
+ *    Apostrophes are deleted, so "I'm Jane Smith" is 3 tokens and a bare 4-token self-introduction
+ *    ("my name is Jane Smith" = 5 tokens passes; "I am Jane Smith" = 4 tokens does not) fails the
+ *    minimum unless the model quotes more surrounding words. This under-reports self-names; it
+ *    never invents them.
+ *  - The name must also be preceded immediately by a first-person introducer (SELF_INTRODUCERS).
  */
 import {
   candidatePairRule, canonicalFirst, coreKey, exactKey, HONORIFICS, isInitialOf, jaroWinkler,
@@ -427,10 +440,38 @@ export function decideFromVerdicts(haiku: Verdict | undefined | null, sonnet: Ve
  * comparison is consistent with quote verification (apostrophes are deleted on both sides).
  */
 export function nameInQuote(name: string, quote: string): boolean {
+  return nameRunIndexes(name, quote).length > 0;
+}
+
+/** First-person introducers accepted immediately before a self-stated name (normalized, apostrophes deleted: "I'm" -> "im"). */
+export const SELF_INTRODUCERS = ['my name is', 'my names', 'i m', 'im', 'i am', 'this is', 'call me', 'they call me'] as const;
+
+/**
+ * True iff, at some occurrence of the name inside the quote, the tokens immediately before it
+ * (skipping honorifics such as "Dr") end with a first-person introducer. A name merely
+ * mentioned ("my guest today is Jane Smith", "thanks Jane Smith") does not pass.
+ */
+export function selfIntroducerBefore(name: string, quote: string): boolean {
+  const qt = tokenize(quoteNormalize(quote));
+  for (const start of nameRunIndexes(name, quote)) {
+    let j = start;
+    while (j > 0 && HONORIFICS.has(qt[j - 1])) j--;
+    const before = qt.slice(0, j).join(' ');
+    if (SELF_INTRODUCERS.some((p) => before === p || before.endsWith(` ${p}`))) return true;
+  }
+  return false;
+}
+
+/** Token indexes in the normalized quote where the name's token run starts. */
+function nameRunIndexes(name: string, quote: string): number[] {
   const nameTokens = tokenize(quoteNormalize(name)).filter((t) => !HONORIFICS.has(t));
-  if (nameTokens.length === 0) return false;
-  const q = ` ${quoteNormalize(quote)} `;
-  return q.includes(` ${nameTokens.join(' ')} `);
+  if (nameTokens.length === 0) return [];
+  const qt = tokenize(quoteNormalize(quote));
+  const out: number[] = [];
+  for (let i = 0; i + nameTokens.length <= qt.length; i++) {
+    if (nameTokens.every((t, k) => qt[i + k] === t)) out.push(i);
+  }
+  return out;
 }
 
 // ---- invariants -------------------------------------------------------------------------
@@ -500,4 +541,51 @@ export function classifySelfName(name: string, idx: ProfileIndex): SelfNameClass
   if (m.level === 'exact' || m.level === 'core') return { kind: 'profile', level: m.level, profileId: m.profileId };
   if (m.level === 'ambiguous') return { kind: 'ambiguous', profileIds: m.profileIds };
   return { kind: 'named', key };
+}
+
+// ---- drift ---------------------------------------------------------------------------------
+
+export interface DriftRow {
+  link_id: number;
+  video_id: string;
+  person_key: string;
+  source: string;
+  decided_by: string;
+  reason: string;
+  planned_person_keys: string;
+}
+
+const DRIFT_SOURCES = new Set(['profile_video_ids', 'exact_name_match', 'baseline']);
+
+/**
+ * Accepted links in the database that the CURRENT plan would not produce (the video left a
+ * profile, a name changed, ...). Only sources build-links generates are considered
+ * (transcript_self_name links are not part of the plan). Reported, never auto-reverted.
+ */
+export function findLinkDrift(
+  planned: PlannedLink[],
+  existing: Array<{ id: number; video_id: string; person_key: string; source: string }>,
+  latest: Map<number, { decision: string; decided_by: string }>,
+): DriftRow[] {
+  const want = new Set(planned.map((l) => `${l.video_id}\u0000${l.person_key}\u0000${l.source}`));
+  const byVideo = new Map<string, PlannedLink[]>();
+  for (const l of planned) (byVideo.get(l.video_id) ?? byVideo.set(l.video_id, []).get(l.video_id)!).push(l);
+  const out: DriftRow[] = [];
+  for (const l of existing) {
+    if (!DRIFT_SOURCES.has(l.source)) continue;
+    const d = latest.get(l.id);
+    if (!d || d.decision !== 'accept') continue;
+    if (want.has(`${l.video_id}\u0000${l.person_key}\u0000${l.source}`)) continue;
+    const now = byVideo.get(l.video_id) ?? [];
+    const reason = l.source === 'profile_video_ids'
+      ? 'no_longer_listed_in_profile_video_ids'
+      : l.source === 'exact_name_match'
+        ? 'name_no_longer_matches_this_profile'
+        : now.some((p) => p.source === 'profile_video_ids') ? 'video_now_in_a_profile' : 'name_changed';
+    out.push({
+      link_id: l.id, video_id: l.video_id, person_key: l.person_key, source: l.source, decided_by: d.decided_by, reason,
+      planned_person_keys: now.map((p) => p.person_key).join(' | '),
+    });
+  }
+  return out.sort((a, b) => a.link_id - b.link_id);
 }

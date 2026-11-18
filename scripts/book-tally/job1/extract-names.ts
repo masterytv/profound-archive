@@ -21,18 +21,20 @@ import { btInsert, selectAll } from '../lib/supabase';
 import { fetchTranscripts, type TranscriptSource } from '../lib/transcript';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { resumeRun, submitRun, usageSummary, type CollectedRow } from './batch-run';
+import { MAX_ATTEMPTS } from '../lib/batch';
+import { approvedBudget, confirmGate, prepareResume, resumeRun, submitRun, usageSummary, type CollectedRow } from './batch-run';
 import { CliError, finishRun, getRun, helpText, intOpt, isDirectRun, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, str, type Ctx, type Deps, type OptDef } from './cli';
 import { ensurePrompt, loadProfiles, loadWorld } from './data';
-import { classifySelfName, indexProfiles, nameInQuote, planLinks, type ProfileRow } from './logic';
+import { classifySelfName, indexProfiles, nameInQuote, planLinks, selfIntroducerBefore, type ProfileRow } from './logic';
 import { parseModelJson, type JsonSchema } from './schema';
-import { assertDigestMatches, assertResumable, estimateSpend, loadRunForConfirm, printEstimate, requestDigest, sdkTokenCounter, type EstItem } from './spend';
+import { assertDigestMatches, assertNothingDoneSince, assertResumable, estimateSpend, printEstimate, requestDigest, sdkTokenCounter, type EstItem } from './spend';
 
 const SCRIPT = 'job1/extract-names.ts';
 export const PROMPT_NAME = 'name-extract-v1';
-export const MAX_TOKENS = 1024;
-export const EXPECTED_OUTPUT_TOKENS = 80;
-export const OUTPUT_ASSUMPTION = 'assumes ~80 output tokens per response (name + quote JSON, or nulls), no extended thinking';
+/** Room for adaptive thinking (billed as output) plus the answer. */
+export const MAX_TOKENS = 8192;
+/** Visible answer: name + quote JSON (or nulls). Thinking is added from lib/cost.THINKING_ALLOWANCE. */
+export const VISIBLE_TOKENS = 80;
 const MODEL = MODELS.haiku;
 
 const OPTIONS: Record<string, OptDef> = {
@@ -43,7 +45,9 @@ const OPTIONS: Record<string, OptDef> = {
   'include-unusable-names': { type: 'boolean', help: 'also target videos whose metadata name is a single token or placeholder (default: only blank names)' },
   limit: { type: 'string', help: 'only the first N target videos (trial runs)' },
   'sample-size': { type: 'string', help: 'force a stratified token-count sample of this size (min 50) instead of counting all' },
-  'max-attempts': { type: 'string', help: 'attempts for errored/expired requests (default 2)' },
+  'max-attempts': { type: 'string', help: 'attempts per request incl. retries, fixed at --estimate time and part of the approved ceiling (default 3)' },
+  'confirm-retries': { type: 'string', help: 'run_id: allow retry batches beyond the approved ceiling for this run' },
+  'adopt-batch': { type: 'string', help: 'with --resume: record this existing batch id for a run whose submission response was lost (verified before adopting)' },
   'dry-run': { type: 'boolean', help: 'offline: list target counts and transcript availability; no API call, no DB write' },
 };
 
@@ -82,9 +86,18 @@ export function checkExtraction(
   }
   if (answer.quote === null || answer.quote.trim() === '') return bad('name without quote');
   const v = verifyQuote(answer.quote, transcript);
+  const inQuote = nameInQuote(name, answer.quote);
+  // The name must be introduced in the first person immediately before it; a mere mention
+  // ("my guest today is ...") is rejected. Stored with quote_verified=false, error 'no_self_introducer'.
+  const introduced = !v.verified || !inQuote || selfIntroducerBefore(name, answer.quote);
   return {
-    valid: true, error: v.verified ? null : `quote not verified: ${v.reason}`, name, quote: answer.quote,
-    quote_verified: v.verified, name_in_quote: nameInQuote(name, answer.quote), quote_norm_offset: v.offset,
+    valid: true,
+    error: !v.verified ? `quote not verified: ${v.reason}` : !introduced ? 'no_self_introducer' : null,
+    name,
+    quote: answer.quote,
+    quote_verified: v.verified && introduced,
+    name_in_quote: inQuote,
+    quote_norm_offset: v.offset,
   };
 }
 
@@ -128,8 +141,9 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const effort = (str(v.effort) ?? 'medium') as Effort;
   if (!['low', 'medium', 'high', 'xhigh', 'max'].includes(effort)) throw new CliError('--effort must be low|medium|high|xhigh|max');
   const limit = intOpt(v.limit, 'limit');
-  const maxAttempts = intOpt(v['max-attempts'], 'max-attempts') ?? 2;
-  if (maxAttempts < 1 || maxAttempts > 3) throw new CliError('--max-attempts must be 1..3');
+  const maxAttempts = intOpt(v['max-attempts'], 'max-attempts') ?? MAX_ATTEMPTS;
+  if (maxAttempts < 1 || maxAttempts > MAX_ATTEMPTS) throw new CliError(`--max-attempts must be 1..${MAX_ATTEMPTS}`);
+  if (str(v['adopt-batch']) && !str(v.resume)) throw new CliError('--adopt-batch requires --resume <run_id>');
   const modes = [v.estimate === true, !!str(v['confirm-spend']), !!str(v.resume), v['dry-run'] === true].filter(Boolean).length;
   if (modes === 0) throw new CliError('refusing to run: choose --dry-run, --estimate, --confirm-spend <run_id> or --resume <run_id> (no paid call is made without a confirmed estimate)');
   if (modes > 1) throw new CliError('choose only one of --dry-run, --estimate, --confirm-spend, --resume');
@@ -138,24 +152,34 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const { prompt, schema, promptHash } = loadNamePrompt();
 
   // Spend gate first: nothing below runs for a bad --confirm-spend.
-  const confirmRun = str(v['confirm-spend']) ? await loadRunForConfirm(db, str(v['confirm-spend']), expect) : null;
+  const confirmRun = str(v['confirm-spend']) ? await confirmGate(ctx, str(v['confirm-spend']), expect) : null;
 
   if (str(v.resume)) {
     const run = assertResumable(await getRun(db, str(v.resume)!), str(v.resume)!, expect);
     const ids = (run.params.video_ids ?? []) as string[];
     const built = await buildNameItems(ctx, ids, (run.effort ?? effort) as Effort);
     const handler = await makeHandler(ctx, run.id, await ensurePrompt(db, prompt, schema), built.transcripts);
-    const out = await resumeRun({ ctx, client: ctx.makeClient(), runId: run.id, model: MODEL, pass: 'haiku', batchIds: run.batch_ids, onCollected: handler.onCollected });
+    const client = ctx.makeClient();
+    const batchIds = await prepareResume(ctx, client, run.id, str(v['adopt-batch']));
+    const out = await resumeRun({ ctx, client, runId: run.id, model: MODEL, pass: 'haiku', batchIds, onCollected: handler.onCollected });
     return finish(ctx, run.id, out, handler.stats);
   }
 
   if (confirmRun) {
     const ids = (confirmRun.params.video_ids ?? []) as string[];
+    const doneNow = new Set((await readExtractions(ctx)).filter((x) => x.valid && x.prompt_hash === promptHash && x.model === MODEL).map((x) => x.video_id));
+    assertNothingDoneSince(ids.filter((id) => doneNow.has(id)), 'videos (name extraction)');
     const built = await buildNameItems(ctx, ids, (confirmRun.effort ?? effort) as Effort);
     assertDigestMatches(confirmRun, requestDigest(built.items));
     const handler = await makeHandler(ctx, confirmRun.id, await ensurePrompt(db, prompt, schema), built.transcripts);
     log(`confirmed spend for run ${confirmRun.id}: ${built.items.length} requests, estimated cost_usd ${String(confirmRun.estimate?.cost_usd)}`);
-    const out = await submitRun({ ctx, client: ctx.makeClient(), runId: confirmRun.id, model: MODEL, pass: 'haiku', items: built.items, maxAttempts, onCollected: handler.onCollected });
+    const budget = approvedBudget(confirmRun);
+    log(`approved ceiling ${budget.ceilingUsd}; up to ${budget.maxAttempts} attempt(s) per request`);
+    const out = await submitRun({
+      ctx, client: ctx.makeClient(), runId: confirmRun.id, model: MODEL, pass: 'haiku', items: built.items, maxAttempts: budget.maxAttempts,
+      ceilingUsd: budget.ceilingUsd, perKeyInputTokens: budget.perKeyInputTokens, confirmRetries: str(v['confirm-retries']) === confirmRun.id,
+      onCollected: handler.onCollected,
+    });
     return finish(ctx, confirmRun.id, out, handler.stats);
   }
 
@@ -178,13 +202,13 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
 
   const client = ctx.makeClient();
   const est = await estimateSpend({
-    model: MODEL, effort, items: built.items, counter: sdkTokenCounter(client), expectedOutputTokens: EXPECTED_OUTPUT_TOKENS,
-    outputAssumption: OUTPUT_ASSUMPTION, maxTokens: MAX_TOKENS, sampleSize: intOpt(v['sample-size'], 'sample-size'), forceSample: v['sample-size'] !== undefined,
+    model: MODEL, effort, items: built.items, counter: sdkTokenCounter(client), visibleTokensPerRequest: VISIBLE_TOKENS,
+    maxTokens: MAX_TOKENS, maxAttempts, sampleSize: intOpt(v['sample-size'], 'sample-size'), forceSample: v['sample-size'] !== undefined,
   });
   const runId = newRunId('j1n', ctx.now());
   await startRun(db, {
     id: runId, job: 'name_extract', pass: 'haiku', model: MODEL, effort, status: 'estimated',
-    params: { prompt: PROMPT_NAME, include_unusable_names: v['include-unusable-names'] === true, video_ids: built.items.map((i) => i.key), missing_transcripts: built.missing.length, limit: limit ?? null },
+    params: { prompt: PROMPT_NAME, include_unusable_names: v['include-unusable-names'] === true, video_ids: built.items.map((i) => i.key), missing_transcripts: built.missing.length, limit: limit ?? null, max_attempts: maxAttempts },
     estimate: { ...est }, script: SCRIPT,
   });
   printEstimate(log, runId, est);

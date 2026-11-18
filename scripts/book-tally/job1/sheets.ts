@@ -8,8 +8,11 @@ export const LINK_DECISION_COL = 'decision (accept/reject)';
 export const PAIR_HEADERS = [
   'pair_id', 'key_a', 'key_b', 'name_a', 'slug_a', 'profile_id_a', 'name_b', 'slug_b', 'profile_id_b', 'rule',
   'channels_a', 'channels_b', 'haiku_verdict', 'haiku_reason', 'sonnet_verdict', 'sonnet_reason',
-  'current_decision', PAIR_DECISION_COL, 'note',
+  'flag', 'component', 'current_decision', PAIR_DECISION_COL, 'note',
 ];
+
+/** Marker for a decision cell that cannot be imported (no link row exists). Treated as blank by import. */
+export const NOT_APPLICABLE = 'n/a';
 export const LINK_HEADERS = [
   'kind', 'link_id', 'video_id', 'video_title', 'youtube_url', 'experiencer_name', 'proposed_profile_id',
   'proposed_profile_slug', 'proposed_profile_name', 'other_profile_ids', 'current_decision', LINK_DECISION_COL, 'note',
@@ -62,7 +65,7 @@ export function parseDecisionSheet(text: string): ParsedSheet {
   rows.forEach((r, i) => {
     const line = i + 2;
     const raw = (r[decCol] ?? '').trim().toLowerCase();
-    if (raw === '') { blank++; return; }
+    if (raw === '' || raw === NOT_APPLICABLE) { blank++; return; }
     if (!ALLOWED[kind].includes(raw)) { problems.push(`line ${line}: decision is not one of ${ALLOWED[kind].join('/')}`); return; }
     const idText = (r[idCol] ?? '').trim();
     if (!/^\d+$/.test(idText)) { problems.push(`line ${line}: ${idCol} missing or not a number`); return; }
@@ -115,4 +118,24 @@ export function planImport(sheet: ParsedSheet, known: Map<number, KnownTarget>, 
     insert.push({ id: r.id, decision: r.decision, note: r.note === '' ? null : r.note });
   }
   return { insert, skippedSame, problems };
+}
+
+export interface LinkLite { id: number; video_id: string }
+
+/**
+ * Videos in `scope` that would have NO accepted link after applying `changes` to the current
+ * latest decisions (a link counts only when its latest decision is 'accept'; 'revert' and
+ * 'reject' do not). Pure: used by import-decisions to refuse a file that would unmap a video.
+ */
+export function unmappedAfter(
+  links: LinkLite[],
+  latestDecision: Map<number, string>,
+  changes: Array<{ id: number; decision: string }>,
+  scope: Set<string>,
+): string[] {
+  const state = new Map(latestDecision);
+  for (const c of changes) state.set(c.id, c.decision);
+  const accepted = new Set<string>();
+  for (const l of links) if (state.get(l.id) === 'accept') accepted.add(l.video_id);
+  return [...scope].filter((v) => !accepted.has(v)).sort();
 }

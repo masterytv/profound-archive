@@ -7,12 +7,14 @@
  * decided_by is always 'human'. The whole file is validated first (ids exist, cross-check
  * columns agree, only the allowed words) and refused as a whole if anything is off. Only INSERTs;
  * a later row supersedes an earlier decision, so corrections are re-imports. Re-importing the
- * same file inserts nothing.
+ * same file inserts nothing. A link sheet is also refused when applying it would leave any NDE
+ * video it touches without an accepted link (the resulting map is simulated first). Rows marked
+ * 'n/a' (no link row exists) are skipped.
  */
 import { readFileSync } from 'fs';
-import { btInsert, selectAll } from '../lib/supabase';
+import { btInsert, readNdeVideoIds, selectAll } from '../lib/supabase';
 import { CliError, finishRun, helpText, isDirectRun, makeCtx, newRunId, parseCli, runCli, startRun, str, type Deps, type OptDef } from './cli';
-import { planImport, parseDecisionSheet, type KnownTarget, type LatestDecision } from './sheets';
+import { parseDecisionSheet, planImport, unmappedAfter, type KnownTarget, type LatestDecision, type LinkLite } from './sheets';
 
 const SCRIPT = 'job1/import-decisions.ts';
 const OPTIONS: Record<string, OptDef> = {
@@ -31,16 +33,29 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
 
   const sheet = parseDecisionSheet(readFileSync(file, 'utf8'));
   const known = new Map<number, KnownTarget>();
+  const allLinks: LinkLite[] = [];
   const latest = new Map<number, LatestDecision>();
   if (sheet.kind === 'merge') {
     for (const c of await selectAll<{ id: number; key_a: string; key_b: string }>(db, 'bt_merge_candidates', 'id, key_a, key_b', { orderBy: 'id' })) known.set(c.id, { keyA: c.key_a, keyB: c.key_b });
     for (const d of await selectAll<{ id: number; candidate_id: number; decision: string; decided_by: string }>(db, 'bt_merge_decisions', 'id, candidate_id, decision, decided_by', { orderBy: 'id' })) latest.set(d.candidate_id, d);
   } else {
-    for (const l of await selectAll<{ id: number; video_id: string }>(db, 'bt_person_links', 'id, video_id', { orderBy: 'id' })) known.set(l.id, { videoId: l.video_id });
+    for (const l of await selectAll<{ id: number; video_id: string }>(db, 'bt_person_links', 'id, video_id', { orderBy: 'id' })) {
+      known.set(l.id, { videoId: l.video_id });
+      allLinks.push(l);
+    }
     for (const d of await selectAll<{ id: number; link_id: number; decision: string; decided_by: string }>(db, 'bt_link_decisions', 'id, link_id, decision, decided_by', { orderBy: 'id' })) latest.set(d.link_id, d);
   }
   const plan = planImport(sheet, known, latest);
   if (plan.problems.length) throw new CliError(`refusing to import (${plan.problems.length} problem(s)):\n  ${plan.problems.slice(0, 50).join('\n  ')}`);
+  if (sheet.kind === 'link' && plan.insert.length > 0) {
+    // Simulate the resulting map: no NDE video touched by this file may be left without an accepted link.
+    const nde = new Set(await readNdeVideoIds(db));
+    const scope = new Set(plan.insert.map((r) => known.get(r.id)!.videoId!).filter((v) => nde.has(v)));
+    const unmapped = unmappedAfter(allLinks, new Map([...latest].map(([id, d]) => [id, d.decision])), plan.insert.map((r) => ({ id: r.id, decision: r.decision })), scope);
+    if (unmapped.length) {
+      throw new CliError(`refusing to import: applying this file would leave ${unmapped.length} NDE video(s) with no accepted link (e.g. ${unmapped.slice(0, 5).join(', ')}). Accept another link for each, or drop the reject.`);
+    }
+  }
   const counts: Record<string, number> = {};
   for (const r of plan.insert) counts[r.decision] = (counts[r.decision] ?? 0) + 1;
   log(`sheet type: ${sheet.kind}; marked rows: ${sheet.rows.length}; blank (undecided): ${sheet.blank}; already imported: ${plan.skippedSame}; to insert: ${plan.insert.length} ${JSON.stringify(counts)}`);

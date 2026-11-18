@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { requestCost } from '../lib/cost';
+import { ceilingCost, requestCost, THINKING_ALLOWANCE } from '../lib/cost';
+import { realBatchIds, unresolvedMarkers } from '../lib/batch';
+import { createGuardedClient } from '../lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { main as judge, type CandidateRow } from '../job1/judge-pairs';
 import { CliError, makeCtx } from '../job1/cli';
 import {
@@ -7,7 +10,7 @@ import {
   requestDigest, SpendGateError, type EstItem,
 } from '../job1/spend';
 import type { RunRow } from '../job1/cli';
-import { fakeAnthropic, fakeDb, type Row } from './job1-fakes';
+import { fakeAnthropic, fakeDb, textMessage, type Row } from './job1-fakes';
 
 const run = (over: Partial<RunRow> = {}): RunRow => ({
   id: 'j1h-1', job: 'pair_judge', pass: 'haiku', model: 'claude-haiku-5-5', effort: 'medium', status: 'estimated',
@@ -53,20 +56,28 @@ describe('estimate arithmetic', () => {
     expect(requestDigest(a)).toBe(requestDigest([...a].reverse()));
     expect(requestDigest(a)).not.toBe(requestDigest([item('a', 'x'), item('b', 'z')]));
   });
-  it('counts every request when there are few, prices with the batch discount', async () => {
+  it('counts every request when there are few; output = thinking allowance + visible; prices with the batch discount; ceiling covers all attempts', async () => {
     const items = [item('a', 'x'.repeat(400)), item('b', 'y'.repeat(800))];
     const counter = async (p: EstItem['params']) => requestChars(p) * 2;
-    const e = await estimateSpend({ model: 'claude-haiku-5-5', effort: 'medium', items, counter, expectedOutputTokens: 50, outputAssumption: 'a', maxTokens: 100 });
+    const e = await estimateSpend({ model: 'claude-haiku-5-5', effort: 'medium', items, counter, visibleTokensPerRequest: 50, maxTokens: 8192, maxAttempts: 3 });
     expect(e.method).toBe('count_tokens_all');
     expect(e.counted_requests).toBe(2);
     const toks = items.map((i) => requestChars(i.params) * 2);
     expect(e.input_tokens).toBe(toks[0] + toks[1]);
-    expect(e.expected_output_tokens).toBe(100);
-    const expected = toks.reduce((s, t) => s + requestCost('claude-haiku-5-5', { inputTokens: t, outputTokens: 50 }), 0);
-    expect(e.cost_usd).toBeCloseTo(expected, 8);
-    expect(e.worst_case_cost_usd).toBeGreaterThan(e.cost_usd);
+    expect(e.per_request_input_tokens).toEqual({ a: toks[0], b: toks[1] });
+    const perReq = THINKING_ALLOWANCE.haiku + 50;
+    expect(e.expected_output_tokens_per_request).toBe(perReq);
+    expect(e.expected_output_tokens).toBe(perReq * 2);
+    expect(e.assumptions).toMatch(/adaptive thinking is on .* billed as OUTPUT/);
+    expect(e.assumptions).not.toMatch(/no extended thinking/);
     // Haiku $0.10/MTok input, $0.50/MTok output, 50% batch discount
-    expect(e.cost_usd).toBeCloseTo(((toks[0] + toks[1]) * 0.1 + 100 * 0.5) / 1e6 / 2, 9);
+    expect(e.cost_usd).toBeCloseTo(((toks[0] + toks[1]) * 0.1 + perReq * 2 * 0.5) / 1e6 / 2, 9);
+    expect(e.cost_usd).toBeCloseTo(toks.reduce((s, t) => s + requestCost('claude-haiku-5-5', { inputTokens: t, outputTokens: perReq }), 0), 9);
+    expect(e.worst_case_cost_usd).toBeGreaterThan(e.cost_usd);
+    const ceiling = ceilingCost({ model: 'claude-haiku-5-5', requests: toks.map((t) => ({ inputTokens: t })), maxTokens: 8192, maxAttempts: 3, doubling: true });
+    expect(e.ceiling_usd).toBeCloseTo(ceiling, 9);
+    expect(e.ceiling_usd).toBeGreaterThan(e.worst_case_cost_usd * 2); // 1x + 2x + 4x output at max_tokens
+    expect(e.max_attempts).toBe(3);
   });
   it('stratified sample: >= 50 counted, deterministic, every stratum represented, exact when tokens are proportional to chars', async () => {
     const items = Array.from({ length: 300 }, (_, i) => item(`k${String(i).padStart(3, '0')}`, 'z'.repeat(100 + i * 37)));
@@ -77,12 +88,13 @@ describe('estimate arithmetic', () => {
     expect(plan.strata).toHaveLength(10);
     for (const st of plan.strata) expect(st.some((i) => plan.sample.includes(i))).toBe(true);
     const calls = vi.fn(async (p: EstItem['params']) => Math.round(requestChars(p) / 4));
-    const e = await estimateSpend({ model: 'claude-haiku-5-5', effort: 'medium', items, counter: calls, expectedOutputTokens: 10, outputAssumption: 'a', maxTokens: 50, forceSample: true, sampleSize: 60 });
+    const e = await estimateSpend({ model: 'claude-haiku-5-5', effort: 'medium', items, counter: calls, visibleTokensPerRequest: 10, maxTokens: 50, maxAttempts: 2, forceSample: true, sampleSize: 60 });
     expect(e.method).toBe('count_tokens_stratified_sample');
     expect(calls.mock.calls.length).toBe(e.counted_requests);
     expect(e.counted_requests).toBeLessThan(300);
     const truth = chars.reduce((s, c) => s + Math.round(c / 4), 0);
     expect(Math.abs(e.input_tokens - truth) / truth).toBeLessThan(0.01);
+    expect(Object.keys(e.per_request_input_tokens)).toHaveLength(300);
   });
   it('extrapolation uses measured values for counted items and the stratum ratio for the rest', () => {
     const chars = [100, 200, 300, 400];
@@ -104,12 +116,14 @@ const verdictFor = (customId: string, v: Record<number, string>) => {
 
 function harness(seed: Record<string, Row[]>, respond: (cid: string, p: Record<string, unknown>) => string | null, model: string, extra: Partial<Parameters<typeof fakeAnthropic>[0]> = {}) {
   const fake = fakeDb(seed);
+  // every job1 script here runs through the real write guard (lib/supabase.createGuardedClient)
+  const guarded = createGuardedClient(fake.db as unknown as SupabaseClient);
   const api = fakeAnthropic({ respond, model, ...extra });
   const makeClient = vi.fn(() => api.client);
   const logs: string[] = [];
   let tick = 0;
-  const call = (argv: string[]) => judge(argv, { db: fake.db, makeClient, log: (l) => logs.push(l), now: () => new Date(Date.UTC(2026, 10, 18, 10, 0, tick++)), sleep: async () => undefined });
-  return { fake, api, makeClient, logs, call };
+  const call = (argv: string[]) => judge(argv, { db: guarded, makeClient, log: (l) => logs.push(l), now: () => new Date(Date.UTC(2026, 10, 18, 10, 0, tick++)), sleep: async () => undefined });
+  return { fake, guarded, api, makeClient, logs, call };
 }
 
 describe('judge-pairs spend gate (mock DB + mock Anthropic)', () => {
@@ -143,11 +157,15 @@ describe('judge-pairs spend gate (mock DB + mock Anthropic)', () => {
     expect(h.api.create).not.toHaveBeenCalled();
     const runRow = h.fake.tables.bt_runs[0] as Row & { estimate: Record<string, number | string> };
     expect(runRow).toMatchObject({ status: 'estimated', job: 'pair_judge', pass: 'haiku', model: 'claude-haiku-5-5' });
-    expect(runRow.estimate).toMatchObject({ requests: 5, method: 'count_tokens_all', expected_output_tokens: 600 });
+    expect(runRow.estimate).toMatchObject({ requests: 5, method: 'count_tokens_all', expected_output_tokens: 5 * (THINKING_ALLOWANCE.haiku + 120), max_attempts: 3 });
+    expect(runRow.estimate.ceiling_usd).toBeGreaterThan(Number(runRow.estimate.cost_usd));
+    expect(runRow.params).toMatchObject({ max_attempts: 3 });
     const out = h.logs.join('\n');
     expect(out).toMatch(/requests:\s+5/);
     expect(out).toMatch(/input tokens:\s+\d+/);
-    expect(out).toMatch(/expected output tokens:\s+600 .*assumes ~120 output tokens/);
+    expect(out).toMatch(/expected output tokens:\s+10600 .*adaptive thinking is on/);
+    expect(out).toMatch(/HARD CEILING:\s+\$/);
+    expect(out).toMatch(/expected cost:/);
     expect(out).toMatch(new RegExp(`--confirm-spend ${String(runRow.id)}`));
     // the requests carry no temperature, structured output via output_config.format, explicit effort
   });
@@ -167,7 +185,9 @@ describe('judge-pairs spend gate (mock DB + mock Anthropic)', () => {
     }
     const runRow = h.fake.tables.bt_runs[0];
     expect(runRow.status).toBe('completed');
-    expect(runRow.batch_ids).toEqual(['batch_1']);
+    expect(realBatchIds(runRow.batch_ids as string[])).toEqual(['batch_1']);
+    expect((runRow.batch_ids as string[])[0]).toMatch(/^pending:/); // durable marker written BEFORE batches.create
+    expect(unresolvedMarkers(runRow.batch_ids as string[])).toEqual([]);
     expect(h.fake.tables.bt_merge_judgments).toHaveLength(4);
     expect(h.fake.tables.bt_raw_responses).toHaveLength(4);
     expect(h.fake.tables.bt_prompts).toHaveLength(1);
@@ -235,7 +255,8 @@ describe('judge-pairs spend gate (mock DB + mock Anthropic)', () => {
     expect(h.api.batchRequests.map((r) => r.custom_id).filter((c) => c.includes('_c2_'))).toHaveLength(2);
     expect(h.api.batchRequests.map((r) => r.custom_id).some((c) => c.endsWith('_haiku_2'))).toBe(true);
     expect(h.fake.tables.bt_merge_judgments).toHaveLength(2);
-    expect(h.fake.tables.bt_runs[0].batch_ids).toEqual(['batch_1', 'batch_2']);
+    expect(realBatchIds(h.fake.tables.bt_runs[0].batch_ids as string[])).toEqual(['batch_1', 'batch_2']);
+    expect(h.logs.join('\n')).toMatch(/unresolved after retries 0/);
   });
 
   it('crash after batch creation: run stays "submitted" with its batch id; --resume collects idempotently', async () => {
@@ -244,12 +265,13 @@ describe('judge-pairs spend gate (mock DB + mock Anthropic)', () => {
     await crash.call(['--estimate']);
     const id = String(crash.fake.tables.bt_runs[0].id);
     await expect(crash.call(['--confirm-spend', id])).rejects.toThrow(/simulated crash/);
-    expect(crash.fake.tables.bt_runs[0]).toMatchObject({ status: 'submitted', batch_ids: ['batch_1'] });
+    expect(crash.fake.tables.bt_runs[0]).toMatchObject({ status: 'submitted' });
+    expect(realBatchIds(crash.fake.tables.bt_runs[0].batch_ids as string[])).toEqual(['batch_1']);
 
     // new process, same database: resume with a client that can see the batch
     const api2 = fakeAnthropic({ respond, model: 'claude-haiku-5-5', seed: { batch_1: crash.api.batchRequests } });
     const logs: string[] = [];
-    const deps = { db: crash.fake.db, makeClient: () => api2.client, log: (l: string) => logs.push(l), now: () => new Date('2026-11-18T12:00:00Z'), sleep: async () => undefined };
+    const deps = { db: crash.guarded, makeClient: () => api2.client, log: (l: string) => logs.push(l), now: () => new Date('2026-11-18T12:00:00Z'), sleep: async () => undefined };
     await judge(['--resume', id], deps);
     expect(api2.create).not.toHaveBeenCalled();
     expect(crash.fake.tables.bt_merge_judgments).toHaveLength(2);
@@ -274,5 +296,155 @@ describe('makeCtx', () => {
   it('does not touch Supabase until db is used (--help works without credentials)', () => {
     const ctx = makeCtx({ log: () => undefined });
     expect(ctx.outDir).toMatch(/out$/);
+  });
+});
+
+describe('guarded submission (lib/batch.submitGuarded) through judge-pairs', () => {
+  const ok = (cid: string) => verdictFor(cid, { 1: 'same', 2: 'same' });
+
+  it('the guarded client really is in the path: non-bt tables are select-only', () => {
+    const h = harness({ nde_vids: [{ videoId: 'v' }], bt_merge_candidates: candidates(1) }, ok, 'claude-haiku-5-5');
+    expect(() => h.guarded.from('nde_vids').insert({ videoId: 'x' } as never)).toThrow(/only bt_ tables may be written/);
+    expect(() => h.guarded.rpc('anything')).toThrow(/allowlist/);
+  });
+
+  it('batches.create is called with maxRetries 0 after the status flipped to submitting with a marker', async () => {
+    const h = harness({ bt_merge_candidates: candidates(2) }, ok, 'claude-haiku-5-5');
+    await h.call(['--estimate']);
+    let seenStatus = '';
+    let seenIds: string[] = [];
+    h.api.create.mockImplementationOnce(async (body: { requests: unknown[] }, opts: unknown) => {
+      seenStatus = String(h.fake.tables.bt_runs[0].status);
+      seenIds = h.fake.tables.bt_runs[0].batch_ids as string[];
+      expect(opts).toEqual({ maxRetries: 0 });
+      return { id: 'batch_x', processing_status: 'in_progress' } as never;
+    });
+    // create returns a batch the fake knows nothing about; collect will find no results, which is fine for this check
+    await h.call(['--confirm-spend', String(h.fake.tables.bt_runs[0].id)]).catch(() => undefined);
+    expect(seenStatus).toBe('submitting');
+    expect(seenIds).toHaveLength(1);
+    expect(seenIds[0]).toMatch(/^pending:2026-11-18T[\d:.]+Z:2:[0-9a-f]{12}$/);
+  });
+
+  it('create failed: run stays "submitting"; the next confirm resolves the marker (voids it) and resubmits', async () => {
+    const h = harness({ bt_merge_candidates: candidates(2) }, ok, 'claude-haiku-5-5', { createMode: (n) => (n === 1 ? 'fail' : 'ok') });
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/stays "submitting"/);
+    expect(h.fake.tables.bt_runs[0].status).toBe('submitting');
+    expect(unresolvedMarkers(h.fake.tables.bt_runs[0].batch_ids as string[])).toHaveLength(1);
+    expect(h.fake.tables.bt_merge_judgments ?? []).toEqual([]);
+
+    await h.call(['--confirm-spend', id]); // resolvePending -> no such batch -> void -> back to estimated -> submit
+    expect(h.api.create).toHaveBeenCalledTimes(2);
+    const ids = h.fake.tables.bt_runs[0].batch_ids as string[];
+    expect(ids.some((e) => e.startsWith('void:'))).toBe(true);
+    expect(realBatchIds(ids)).toEqual(['batch_2']);
+    expect(h.fake.tables.bt_runs[0].status).toBe('completed');
+    expect(h.fake.tables.bt_merge_judgments).toHaveLength(2);
+  });
+
+  it('response lost but batch created: the next confirm adopts the existing batch and does NOT resubmit; --resume collects it', async () => {
+    const h = harness({ bt_merge_candidates: candidates(2) }, ok, 'claude-haiku-5-5', { createMode: (n) => (n === 1 ? 'lost' : 'ok') });
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/stays "submitting"/);
+    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/found at the API and recorded; collect it with --resume/);
+    expect(h.api.create).toHaveBeenCalledTimes(1);
+    expect(realBatchIds(h.fake.tables.bt_runs[0].batch_ids as string[])).toEqual(['batch_1']);
+    expect(h.fake.tables.bt_runs[0].status).toBe('submitted');
+    await h.call(['--resume', id]);
+    expect(h.fake.tables.bt_merge_judgments).toHaveLength(2);
+    expect(h.api.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('--adopt-batch records a human-chosen batch after verification; a wrong batch id is refused; needs --resume', async () => {
+    const h = harness({ bt_merge_candidates: candidates(2) }, ok, 'claude-haiku-5-5', { createMode: (n) => (n === 1 ? 'lost' : 'ok') });
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/stays "submitting"/);
+    await expect(h.call(['--adopt-batch', 'batch_1'])).rejects.toThrow(/requires --resume/);
+    await expect(h.call(['--resume', id, '--adopt-batch', 'batch_99'])).rejects.toThrow(/refusing to adopt/);
+    expect(realBatchIds(h.fake.tables.bt_runs[0].batch_ids as string[])).toEqual([]);
+    await h.call(['--resume', id, '--adopt-batch', 'batch_1']);
+    expect(realBatchIds(h.fake.tables.bt_runs[0].batch_ids as string[])).toEqual(['batch_1']);
+    expect(h.fake.tables.bt_merge_judgments).toHaveLength(2);
+    expect(h.fake.tables.bt_runs[0].status).toBe('completed');
+  });
+
+  it('refuses to start when the run is no longer "estimated" (compare-and-set): nothing is sent', async () => {
+    const h = harness({ bt_merge_candidates: candidates(2) }, ok, 'claude-haiku-5-5');
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    h.fake.tables.bt_runs[0].status = 'submitting'; // another process got there first
+    h.fake.tables.bt_runs[0].batch_ids = ['pending:2026-11-18T10:00:00.000Z:2:aaaaaaaaaaaa', 'batch_other'];
+    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/not "estimated"|found at the API|no recorded batch|no such/i);
+    expect(h.api.create).not.toHaveBeenCalled();
+  });
+
+  it('retry batches are checked against the approved ceiling; --confirm-retries <run> overrides', async () => {
+    const respond = (cid: string) => (cid.endsWith('_c2_haiku_1') ? null : ok(cid));
+    const h = harness({ bt_merge_candidates: candidates(2) }, respond, 'claude-haiku-5-5');
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    (h.fake.tables.bt_runs[0].estimate as Record<string, number>).ceiling_usd = 0.00001; // human approved a tiny ceiling
+    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/Retry budget exceeded/);
+    expect(h.api.create).toHaveBeenCalledTimes(1); // the retry batch was never created
+    expect(h.fake.tables.bt_merge_judgments).toHaveLength(1); // first attempt's good result was kept
+
+    const h2 = harness({ bt_merge_candidates: candidates(2) }, respond, 'claude-haiku-5-5');
+    await h2.call(['--estimate']);
+    const id2 = String(h2.fake.tables.bt_runs[0].id);
+    (h2.fake.tables.bt_runs[0].estimate as Record<string, number>).ceiling_usd = 0.00001;
+    await expect(h2.call(['--confirm-spend', id2, '--confirm-retries', 'some-other-run'])).rejects.toThrow(/Retry budget exceeded/);
+  });
+
+  it('--confirm-retries naming this run lets the retry batch through', async () => {
+    const respond = (cid: string) => (cid.endsWith('_c2_haiku_1') ? null : ok(cid));
+    const h = harness({ bt_merge_candidates: candidates(2) }, respond, 'claude-haiku-5-5');
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    (h.fake.tables.bt_runs[0].estimate as Record<string, number>).ceiling_usd = 0.00001;
+    await h.call(['--confirm-spend', id, '--confirm-retries', id]);
+    expect(h.api.create).toHaveBeenCalledTimes(2);
+    expect(h.fake.tables.bt_merge_judgments).toHaveLength(2);
+  });
+
+  it('truncated results are retried with a doubled max_tokens, then recorded', async () => {
+    let first = true;
+    const h = harness({ bt_merge_candidates: candidates(1) }, (cid) => ok(cid), 'claude-haiku-5-5');
+    h.api.results.mockImplementation(async (bid: string) => ({
+      async *[Symbol.asyncIterator]() {
+        for (const r of h.api.batches.get(bid) ?? []) {
+          const trunc = first;
+          first = false;
+          yield { custom_id: r.custom_id, result: { type: 'succeeded', message: { ...textMessage('claude-haiku-5-5', trunc ? '{"verdict":"sa' : ok(r.custom_id), trunc ? 'max_tokens' : 'end_turn') } } };
+        }
+      },
+    }) as never);
+    await h.call(['--estimate']);
+    await h.call(['--confirm-spend', String(h.fake.tables.bt_runs[0].id)]);
+    expect(h.api.create).toHaveBeenCalledTimes(2);
+    expect(h.api.batchRequests[0].params.max_tokens).toBe(8192);
+    expect(h.api.batchRequests[1].params.max_tokens).toBe(16384);
+    expect(h.fake.tables.bt_merge_judgments).toHaveLength(1);
+  });
+
+  it('refuses to submit when an estimated candidate gained a judgment at that stage since the estimate', async () => {
+    const h = harness({ bt_merge_candidates: candidates(3) }, ok, 'claude-haiku-5-5');
+    await h.call(['--estimate']);
+    h.fake.tables.bt_merge_judgments = [{ id: 1, candidate_id: 2, judge: 'haiku', verdict: 'same', reason: 'x', raw_response_id: null, run_id: 'other' }];
+    await expect(h.call(['--confirm-spend', String(h.fake.tables.bt_runs[0].id)])).rejects.toThrow(/already have a result since the estimate/);
+    expect(h.api.create).not.toHaveBeenCalled();
+  });
+
+  it('unresolved count reflects the FINAL outcome per request, not an accumulation across attempts', async () => {
+    const respond = (cid: string) => (cid.includes('_c2_') ? null : ok(cid)); // c2 never succeeds
+    const h = harness({ bt_merge_candidates: candidates(2) }, respond, 'claude-haiku-5-5');
+    await h.call(['--estimate']);
+    await h.call(['--confirm-spend', String(h.fake.tables.bt_runs[0].id)]);
+    expect(h.logs.join('\n')).toMatch(/unresolved after retries 1/);
+    expect(h.api.create).toHaveBeenCalledTimes(3); // attempts 1..3 for c2 (attempt 1 had both)
+    expect((h.fake.tables.bt_runs[0].actual_usage as { unresolved: number }).unresolved).toBe(1);
   });
 });

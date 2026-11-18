@@ -40,8 +40,9 @@ export function fakeDb(seed: Record<string, Row[]> = {}, opts: FakeDbOptions = {
     private from_ = 0;
     private to_ = Infinity;
     private selectAfterInsert = false;
+    private selectAfterUpdate = false;
     constructor(private table: string) {}
-    select(cols = '*') { if (this.op === 'insert') { this.selectAfterInsert = true; } this.cols = cols; return this; }
+    select(cols = '*') { if (this.op === 'insert') this.selectAfterInsert = true; if (this.op === 'update') this.selectAfterUpdate = true; this.cols = cols; return this; }
     insert(rows: Row | Row[]) { this.op = 'insert'; this.rows = Array.isArray(rows) ? rows : [rows]; return this; }
     update(patch: Row) { this.op = 'update'; this.patch = patch; return this; }
     eq(col: string, val: unknown) { this.filters.push((r) => r[col] === val); return this; }
@@ -75,7 +76,7 @@ export function fakeDb(seed: Record<string, Row[]> = {}, opts: FakeDbOptions = {
       if (this.op === 'update') {
         rows.forEach((r) => Object.assign(r, this.patch));
         ops.push({ table: t, op: 'update', n: rows.length });
-        return { data: null, error: null };
+        return { data: this.selectAfterUpdate ? rows.map((r) => this.project(r)) : null, error: null };
       }
       if (this.orderBy) {
         const { col, asc } = this.orderBy;
@@ -111,6 +112,13 @@ export interface FakeClientOptions {
   seed?: Record<string, Array<{ custom_id: string; params: Record<string, any> }>>;
   /** Make batches.results throw (simulates a crash after the batch was created). */
   crashOnResults?: boolean;
+  /**
+   * batches.create behaviour per call number (1-based): 'fail' = reject before anything is created,
+   * 'lost' = the batch IS created but the response is lost (rejects). Default: always succeeds.
+   */
+  createMode?: (call: number) => 'ok' | 'fail' | 'lost';
+  /** Clock for batch created_at (default 2026-11-18T10:00:30Z). */
+  clock?: () => Date;
 }
 
 /** Fake Anthropic client. `batchRequests` records every submitted request (custom_id + params). */
@@ -120,12 +128,23 @@ export function fakeAnthropic(o: FakeClientOptions) {
   const countTokens = vi.fn(async (p: Record<string, any>) => ({
     input_tokens: Math.ceil((JSON.stringify(p.system ?? '').length + JSON.stringify(p.messages ?? '').length) / 4),
   }));
-  const create = vi.fn(async (body: { requests: Array<{ custom_id: string; params: Record<string, any> }> }) => {
+  const create = vi.fn(async (body: { requests: Array<{ custom_id: string; params: Record<string, any> }> }, _opts?: unknown) => {
+    const mode = o.createMode?.(create.mock.calls.length) ?? 'ok';
+    if (mode === 'fail') throw new Error('network down');
     batchRequests.push(...body.requests);
     const id = `batch_${create.mock.calls.length}`;
     batches.set(id, body.requests);
+    if (mode === 'lost') throw new Error('response lost');
     return { id, processing_status: 'in_progress' };
   });
+  const clock = o.clock ?? (() => new Date(Date.UTC(2026, 10, 18, 10, 0, 30)));
+  const list = vi.fn((_p?: unknown) => ({
+    async *[Symbol.asyncIterator]() {
+      for (const [id, reqs] of [...batches.entries()].reverse()) {
+        yield { id, created_at: clock().toISOString(), request_counts: { processing: reqs.length, succeeded: 0, errored: 0, canceled: 0, expired: 0 } };
+      }
+    },
+  }));
   const retrieve = vi.fn(async (id: string) => ({ id, processing_status: 'ended', request_counts: {} }));
   const results = vi.fn(async (id: string) => ({
     async *[Symbol.asyncIterator]() {
@@ -138,6 +157,6 @@ export function fakeAnthropic(o: FakeClientOptions) {
       }
     },
   }));
-  const client = { messages: { countTokens, batches: { create, retrieve, results } } } as unknown as Anthropic;
-  return { client, countTokens, create, retrieve, results, batchRequests, batches };
+  const client = { messages: { countTokens, batches: { create, retrieve, results, list } } } as unknown as Anthropic;
+  return { client, countTokens, create, retrieve, results, list, batchRequests, batches };
 }
