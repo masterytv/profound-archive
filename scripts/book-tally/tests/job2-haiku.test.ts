@@ -285,7 +285,7 @@ describe('haiku gold: selection, sheet, report, no-spend path', () => {
     }
   });
 
-  it('sheet: pilot-disjoint complete videos, every counted claim + 3 seeded not_addressed, would_be_flagged, confidence, quote, t= link; report splits precision', async () => {
+  it('sheet: pilot-disjoint complete videos, every counted claim + up to 3 seeded not_addressed, would_be_flagged, confidence, quote, t= link; report splits precision', async () => {
     const h = harness();
     await h.firstPass();
     // give claims a timestamp so the link carries t=
@@ -302,7 +302,12 @@ describe('haiku gold: selection, sheet, report, no-spend path', () => {
     const nde = h.db.rows('nde_analysis').map((r) => r.video_id as string);
     const pilotIds = pilotOrder(nde, 20261118).slice(0, 4);
     expect(goldIds.filter((v) => pilotIds.includes(v))).toEqual([]);
-    expect(sheet).toHaveLength(3 * (2 + 3)); // q1 yes + q2 no counted; q3 (unverified quote) excluded; 3 not_addressed per video
+    // q1 yes + q2 no counted; q3 (unverified quote) excluded; the fixture has only 2 not_addressed
+    // cells per video (q4, q5), fewer than NA_ROWS_PER_VIDEO = 3, so all of them are on the sheet
+    expect(sheet).toHaveLength(3 * (2 + 2));
+    for (const v of goldIds) {
+      expect(sheet.filter((r) => r.video_id === v && r.final_stance === 'not_addressed').map((r) => r.question_id).sort()).toEqual(['4', '5']);
+    }
     expect(sheet.some((r) => r.question_id === '3')).toBe(false);
     expect(Object.keys(sheet[0])).toEqual(['video_id', 'title', 'question_id', 'category', 'question', 'final_stance', 'confidence', 'quote', 'youtube_link', 'deciding_model', 'deciding_pass', 'answer_id', 'would_be_flagged', 'correct (Y/N)', 'quote_is_experiencer (Y/N)', 'note']);
     const claims = sheet.filter((r) => r.final_stance !== 'not_addressed');
@@ -329,7 +334,7 @@ describe('haiku gold: selection, sheet, report, no-spend path', () => {
     const file = path.join(h.outDir, 'marked.csv');
     writeFileSync(file, csv);
     await importGold(['--file', file], h.deps);
-    expect(h.db.rows('bt_gold_marks')).toHaveLength(15);
+    expect(h.db.rows('bt_gold_marks')).toHaveLength(sheet.length); // one mark per sheet row (12)
     await goldReport(args, h.deps);
     const rep = h.read('gold_report_haiku_only.md');
     expect(rep).toMatch(/no second model re-checked them/);
