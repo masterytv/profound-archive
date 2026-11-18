@@ -195,6 +195,10 @@ CREATE TABLE public.bt_stance_answers (
     raw_response_id    bigint REFERENCES public.bt_raw_responses(id),
     valid              boolean NOT NULL DEFAULT true,   -- false: schema/coverage failure, stance NULL
     error              text,
+    -- Lineage: recheck rows point at the first-pass answer that flagged them; arbiter rows
+    -- at the first-pass answer and (when one exists) the recheck answer they arbitrate.
+    trigger_answer_id  bigint REFERENCES public.bt_stance_answers(id),
+    recheck_answer_id  bigint REFERENCES public.bt_stance_answers(id),
     created_at         timestamptz NOT NULL DEFAULT now(),
     -- Silence is never 'no', and no claim without a quote.
     CONSTRAINT bt_stance_answers_claim_needs_quote CHECK (
@@ -203,9 +207,19 @@ CREATE TABLE public.bt_stance_answers (
     CONSTRAINT bt_stance_answers_valid_complete CHECK (
         NOT valid OR (stance IS NOT NULL AND confidence IS NOT NULL)
     ),
+    CONSTRAINT bt_stance_answers_quote_not_blank CHECK (quote IS NULL OR length(btrim(quote)) > 0),
+    CONSTRAINT bt_stance_answers_verified_has_offset CHECK (NOT quote_verified OR quote_norm_offset IS NOT NULL),
+    CONSTRAINT bt_stance_answers_lineage_first_pilot CHECK (
+        pass NOT IN ('first','pilot') OR (trigger_answer_id IS NULL AND recheck_answer_id IS NULL)
+    ),
+    CONSTRAINT bt_stance_answers_lineage_recheck CHECK (
+        pass <> 'recheck' OR (trigger_answer_id IS NOT NULL AND recheck_answer_id IS NULL)
+    ),
+    CONSTRAINT bt_stance_answers_lineage_arbiter CHECK (pass <> 'arbiter' OR trigger_answer_id IS NOT NULL),
     CONSTRAINT bt_stance_answers_cell_key UNIQUE (run_id, video_id, question_id, pass, attempt, model)
 );
-CREATE INDEX bt_stance_answers_cell_idx     ON public.bt_stance_answers (video_id, question_id, pass, attempt DESC, id DESC);
+CREATE INDEX bt_stance_answers_cell_idx     ON public.bt_stance_answers (video_id, question_id, pass, id DESC);
+CREATE INDEX bt_stance_answers_trigger_idx  ON public.bt_stance_answers (trigger_answer_id, pass, id DESC);
 CREATE INDEX bt_stance_answers_run_idx      ON public.bt_stance_answers (run_id);
 CREATE INDEX bt_stance_answers_question_idx ON public.bt_stance_answers (question_id);
 
@@ -228,7 +242,7 @@ CREATE INDEX bt_gold_marks_cell_idx ON public.bt_gold_marks (video_id, question_
 -- ============================================================
 -- Immutability: append-only, except bt_runs bookkeeping columns
 -- ============================================================
-CREATE OR REPLACE FUNCTION public.bt_block_mutation() RETURNS trigger
+CREATE FUNCTION public.bt_block_mutation() RETURNS trigger
 LANGUAGE plpgsql SET search_path = public, pg_temp AS $fn$
 BEGIN
     RAISE EXCEPTION 'bt_* tables are append-only: % on % is not permitted; append a newer row instead',
@@ -237,7 +251,7 @@ BEGIN
 END;
 $fn$;
 
-CREATE OR REPLACE FUNCTION public.bt_runs_guard_update() RETURNS trigger
+CREATE FUNCTION public.bt_runs_guard_update() RETURNS trigger
 LANGUAGE plpgsql SET search_path = public, pg_temp AS $fn$
 BEGIN
     IF (to_jsonb(NEW) - ARRAY['status','actual_usage','batch_ids','finished_at'])
@@ -252,7 +266,8 @@ $fn$;
 
 DO $do$
 DECLARE
-    t text;
+    t   text;
+    seq text;
 BEGIN
     FOREACH t IN ARRAY ARRAY[
         'bt_runs','bt_prompts','bt_raw_responses','bt_person_links','bt_link_decisions',
@@ -262,6 +277,14 @@ BEGIN
         -- RLS on, no policies: only the service role (BYPASSRLS) can touch these.
         EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
         EXECUTE format('REVOKE ALL ON public.%I FROM anon, authenticated', t);
+        seq := NULL;
+        IF EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_schema = 'public' AND table_name = t AND column_name = 'id') THEN
+            seq := pg_get_serial_sequence(format('public.%I', t), 'id');
+        END IF;
+        IF seq IS NOT NULL THEN
+            EXECUTE format('REVOKE ALL ON SEQUENCE %s FROM anon, authenticated', seq);
+        END IF;
 
         -- DELETE and TRUNCATE are blocked everywhere.
         EXECUTE format(
@@ -301,8 +324,9 @@ FROM public.bt_merge_decisions
 ORDER BY candidate_id, id DESC;
 
 -- Connected components of the graph whose edges are candidates whose LATEST
--- decision is 'merge'. canonical_key = lexicographically smallest key in the
--- component. Transitive: A~B and B~C puts A, B, C in one person.
+-- decision is 'merge' (transitive: A~B and B~C puts A, B, C in one person).
+-- canonical_key preference: profile: over named: over anon:, and among profile:
+-- keys the lowest NUMERIC id (profile:9 beats profile:100); then lexicographic.
 CREATE VIEW public.bt_person_canonical WITH (security_invoker = true) AS
 WITH RECURSIVE edges AS (
     SELECT c.key_a AS a, c.key_b AS b
@@ -322,9 +346,12 @@ reach(person_key, reached_key) AS (
     FROM reach r
     JOIN edges e ON e.a = r.reached_key
 )
-SELECT person_key, min(reached_key) AS canonical_key
+SELECT DISTINCT ON (person_key) person_key, reached_key AS canonical_key
 FROM reach
-GROUP BY person_key;
+ORDER BY person_key,
+         CASE split_part(reached_key, ':', 1) WHEN 'profile' THEN 1 WHEN 'named' THEN 2 ELSE 3 END,
+         CASE WHEN reached_key ~ '^profile:[0-9]+$' THEN substr(reached_key, 9)::bigint END NULLS LAST,
+         reached_key;
 
 -- video -> person. Only links whose latest decision is 'accept' count
 -- ('revert' returns a link to pending; no decision = pending). If a video has
@@ -355,54 +382,85 @@ SELECT c.video_id,
 FROM chosen c
 LEFT JOIN public.bt_person_canonical pc ON pc.person_key = c.linked_person_key;
 
--- Latest row per (video, question, pass) for the three production passes
--- (attempt DESC, id DESC: a re-run attempt supersedes an earlier one).
--- Pass 'pilot' is deliberately excluded from final resolution.
-CREATE VIEW public.bt_latest_stance_answers WITH (security_invoker = true) AS
-SELECT DISTINCT ON (video_id, question_id, pass) *
-FROM public.bt_stance_answers
-WHERE pass IN ('first','recheck','arbiter')
-ORDER BY video_id, question_id, pass, attempt DESC, id DESC;
+-- Unmapped NDE videos: the NDE set (nde_analysis.experience_type = 'nde') minus every
+-- video that has an accepted link. The rollup asserts this is empty before tallying.
+CREATE VIEW public.bt_unmapped_nde_videos WITH (security_invoker = true) AS
+SELECT a.video_id
+FROM public.nde_analysis a
+WHERE a.experience_type = 'nde'
+  AND NOT EXISTS (SELECT 1 FROM public.bt_effective_person_map m WHERE m.video_id = a.video_id);
 
--- Final stance per (video, question): first -> recheck -> arbiter.
---   flagged (first pass needs a second reader): invalid OR stance in (no, mixed)
---           OR confidence < 70 OR (stance <> not_addressed AND quote unverified).
---   unflagged first answer      -> resolved_by 'first'
---   flagged, recheck agrees     -> resolved_by 'recheck' (blind Sonnet; stances equal)
---   flagged, recheck disagrees or either side invalid -> resolved_by 'arbiter'
---   status: final | unverified (non-not_addressed with unverified quote: EXCLUDED
---           from tallies, counted in n_excluded) | invalid | pending_recheck | pending_arbiter.
+-- Final stance per (video, question). Lineage, not attempt numbers, ties passes together:
+--   f = latest first-pass row (max id) for the cell; every later pass must point at it
+--       through trigger_answer_id, so rows belonging to an older first row are ignored.
+--   r = latest recheck (max id) with trigger_answer_id = f.id
+--   a = latest arbiter (max id) with trigger_answer_id = f.id
+-- ok(x) = x is valid AND (stance = not_addressed OR its quote is verified).
+-- flagged(f) = f invalid OR stance in (no, mixed) OR confidence < 70 OR NOT ok(f).
+--   not flagged                      -> final = f
+--   flagged, no recheck              -> pending_recheck
+--   recheck agrees (both valid, same stance) and ok(r) -> final = r (recheck preferred)
+--                                    and ok(f) only      -> final = f (its verified quote)
+--   neither ok / recheck differs / either invalid -> arbiter:
+--       no arbiter -> pending_arbiter; ok(a) -> final = a; otherwise unverified
+--       (an invalid arbiter row also lands here; it is excluded from tallies).
+-- deciding_pass = pass of the row supplying final_answer_id/stance/quote (NULL while pending).
 -- Tallies must use status = 'final' only.
 CREATE VIEW public.bt_final_stances WITH (security_invoker = true) AS
 WITH f AS (
-    SELECT a.*,
-           (   NOT a.valid
-            OR a.stance IN ('no','mixed')
-            OR a.confidence < 70
-            OR (a.stance <> 'not_addressed' AND NOT a.quote_verified)
-           ) AS flagged
-    FROM public.bt_latest_stance_answers a
-    WHERE a.pass = 'first'
+    SELECT DISTINCT ON (x.video_id, x.question_id)
+           x.*,
+           (   NOT x.valid
+            OR x.stance IN ('no','mixed')
+            OR x.confidence < 70
+            OR (x.stance <> 'not_addressed' AND NOT x.quote_verified)
+           ) AS flagged,
+           (x.valid AND (x.stance = 'not_addressed' OR x.quote_verified)) AS ok
+    FROM public.bt_stance_answers x
+    WHERE x.pass = 'first'
+    ORDER BY x.video_id, x.question_id, x.id DESC
 ),
-r AS (SELECT * FROM public.bt_latest_stance_answers WHERE pass = 'recheck'),
-a AS (SELECT * FROM public.bt_latest_stance_answers WHERE pass = 'arbiter'),
-resolved AS (
+r AS (
+    SELECT DISTINCT ON (x.trigger_answer_id)
+           x.*, (x.valid AND (x.stance = 'not_addressed' OR x.quote_verified)) AS ok
+    FROM public.bt_stance_answers x
+    WHERE x.pass = 'recheck'
+    ORDER BY x.trigger_answer_id, x.id DESC
+),
+a AS (
+    SELECT DISTINCT ON (x.trigger_answer_id)
+           x.*, (x.valid AND (x.stance = 'not_addressed' OR x.quote_verified)) AS ok
+    FROM public.bt_stance_answers x
+    WHERE x.pass = 'arbiter'
+    ORDER BY x.trigger_answer_id, x.id DESC
+),
+j AS (
     SELECT f.video_id, f.question_id, f.flagged,
            f.id AS first_answer_id, r.id AS recheck_answer_id, a.id AS arbiter_answer_id,
-           CASE
-               WHEN NOT f.flagged THEN 'first'
-               WHEN r.id IS NOT NULL AND r.valid AND f.valid AND r.stance = f.stance THEN 'recheck'
-               WHEN r.id IS NOT NULL AND a.id IS NOT NULL THEN 'arbiter'
-           END AS resolved_by,
-           CASE
-               WHEN NOT f.flagged THEN f.id
-               WHEN r.id IS NOT NULL AND r.valid AND f.valid AND r.stance = f.stance THEN r.id
-               WHEN r.id IS NOT NULL AND a.id IS NOT NULL THEN a.id
-           END AS chosen_id,
-           (r.id IS NULL) AS awaiting_recheck
+           COALESCE(r.id IS NOT NULL AND r.valid AND f.valid AND r.stance = f.stance, false) AS agree,
+           f.ok AS f_ok, r.ok AS r_ok, a.ok AS a_ok
     FROM f
-    LEFT JOIN r ON r.video_id = f.video_id AND r.question_id = f.question_id
-    LEFT JOIN a ON a.video_id = f.video_id AND a.question_id = f.question_id
+    LEFT JOIN r ON r.trigger_answer_id = f.id
+    LEFT JOIN a ON a.trigger_answer_id = f.id
+),
+resolved AS (
+    SELECT j.*,
+           CASE
+               WHEN NOT j.flagged THEN j.first_answer_id
+               WHEN j.recheck_answer_id IS NULL THEN NULL
+               WHEN j.agree AND j.r_ok THEN j.recheck_answer_id
+               WHEN j.agree AND j.f_ok THEN j.first_answer_id
+               WHEN j.arbiter_answer_id IS NOT NULL THEN j.arbiter_answer_id
+           END AS final_answer_id,
+           CASE
+               WHEN NOT j.flagged THEN 'final'
+               WHEN j.recheck_answer_id IS NULL THEN 'pending_recheck'
+               WHEN j.agree AND (j.r_ok OR j.f_ok) THEN 'final'
+               WHEN j.arbiter_answer_id IS NULL THEN 'pending_arbiter'
+               WHEN j.a_ok THEN 'final'
+               ELSE 'unverified'
+           END AS status
+    FROM j
 )
 SELECT rs.video_id,
        rs.question_id,
@@ -414,25 +472,19 @@ SELECT rs.video_id,
        c.start_seconds,
        c.model            AS deciding_model,
        c.model_version    AS deciding_model_version,
-       rs.resolved_by,
+       c.pass             AS deciding_pass,
        rs.flagged,
        rs.first_answer_id,
        rs.recheck_answer_id,
        rs.arbiter_answer_id,
-       c.id               AS answer_id,
-       CASE
-           WHEN rs.chosen_id IS NULL THEN
-               CASE WHEN rs.awaiting_recheck THEN 'pending_recheck' ELSE 'pending_arbiter' END
-           WHEN NOT c.valid THEN 'invalid'
-           WHEN c.stance <> 'not_addressed' AND NOT c.quote_verified THEN 'unverified'
-           ELSE 'final'
-       END AS status
+       rs.final_answer_id,
+       rs.status
 FROM resolved rs
-LEFT JOIN public.bt_stance_answers c ON c.id = rs.chosen_id;
+LEFT JOIN public.bt_stance_answers c ON c.id = rs.final_answer_id;
 
 REVOKE ALL ON public.bt_latest_link_decision, public.bt_latest_merge_decision,
               public.bt_person_canonical, public.bt_effective_person_map,
-              public.bt_latest_stance_answers, public.bt_final_stances
+              public.bt_unmapped_nde_videos, public.bt_final_stances
     FROM anon, authenticated;
 
 COMMIT;

@@ -21,9 +21,11 @@ END $$;
 CREATE TABLE public.nde_vids("videoId" text PRIMARY KEY);
 CREATE TABLE public.nde_questions(id integer PRIMARY KEY);
 CREATE TABLE public.experiencer_profiles(id bigint PRIMARY KEY);
+CREATE TABLE public.nde_analysis(video_id text PRIMARY KEY, experience_type text);
 INSERT INTO nde_vids VALUES ('v1'),('v2'),('v3'),('v4');
 INSERT INTO nde_questions VALUES (1),(2),(3),(4),(5);
 INSERT INTO experiencer_profiles VALUES (10),(11),(12);
+INSERT INTO nde_analysis VALUES ('v1','nde'),('v2','nde'),('v3','nde'),('v4','nde'),('v5','nde'),('v6','nde'),('v7','nde'),('u1','nde'),('u2','nde'),('s1','ste');
 SQL
 $P -f "$ROOT/supabase/migrations/20261118_001_book_tally.sql"
 $P -f "$ROOT/supabase/rollbacks/20261118_001_book_tally_rollback.sql"

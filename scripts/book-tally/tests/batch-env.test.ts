@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildParams, chunkRequests, classifyResult, createBatch, makeCustomId, parseCustomId, type BatchRequest,
+  MAX_ATTEMPTS, buildParams, chunkRequests, classifyResult, createBatch, makeCustomId, parseCustomId, raiseMaxTokens,
+  selectRetries, type BatchRequest,
 } from '../lib/batch';
 import { ANTHROPIC_BASE_URL, createAnthropicClient, getAnthropicKey, getSupabaseConfig } from '../lib/env';
 
@@ -45,12 +46,48 @@ describe('batch helpers', () => {
     expect(() => makeCustomId({ run: 'r', key: 'k'.repeat(70), pass: 'first', attempt: 1 })).toThrow(/custom_id/);
     expect(() => makeCustomId({ run: 'r:x', key: 'k', pass: 'first', attempt: 1 })).toThrow();
   });
-  it('classifies all four result kinds', () => {
-    const msg = { id: 'm' } as never;
-    expect(classifyResult({ custom_id: 'a', result: { type: 'succeeded', message: msg } })).toMatchObject({ kind: 'succeeded' });
-    expect(classifyResult({ custom_id: 'a', result: { type: 'errored', error: { type: 'error', error: { type: 'x', message: 'm' } } } as never })).toMatchObject({ kind: 'errored' });
-    expect(classifyResult({ custom_id: 'a', result: { type: 'canceled' } }).kind).toBe('canceled');
-    expect(classifyResult({ custom_id: 'a', result: { type: 'expired' } }).kind).toBe('expired');
+  const ok = (stop: string | null) => ({ id: 'm', stop_reason: stop, content: [], usage: {} }) as never;
+  const errored = (type: string, extra: object = {}) =>
+    ({ type: 'errored', error: { type: 'error', error: { type, message: 'm' } , ...extra } }) as never;
+
+  it('classifies succeeded, expired and canceled results', () => {
+    expect(classifyResult({ custom_id: 'a', result: { type: 'succeeded', message: ok('end_turn') } })).toMatchObject({ kind: 'succeeded', stopReason: 'end_turn', retryable: false });
+    expect(classifyResult({ custom_id: 'a', result: { type: 'canceled' } })).toMatchObject({ kind: 'canceled', retryable: true });
+    expect(classifyResult({ custom_id: 'a', result: { type: 'expired' } })).toMatchObject({ kind: 'expired', retryable: true });
+  });
+  it('retries only transient error types or 5xx; everything else is terminal', () => {
+    for (const t of ['overloaded_error', 'api_error', 'rate_limit_error']) {
+      expect(classifyResult({ custom_id: 'a', result: errored(t) })).toMatchObject({ kind: 'errored', errorType: t, retryable: true, retryReason: 'transient' });
+    }
+    for (const t of ['invalid_request_error', 'authentication_error', 'permission_error', 'not_found_error', 'billing_error']) {
+      expect(classifyResult({ custom_id: 'a', result: errored(t) })).toMatchObject({ kind: 'errored', errorType: t, retryable: false });
+    }
+    expect(classifyResult({ custom_id: 'a', result: errored('weird_error', { status: 503 }) }).retryable).toBe(true);
+    expect(classifyResult({ custom_id: 'a', result: errored('weird_error', { status: 400 }) }).retryable).toBe(false);
+  });
+  it('max_tokens truncation is its own retryable outcome, not an invalid answer', () => {
+    const r = classifyResult({ custom_id: 'a', result: { type: 'succeeded', message: ok('max_tokens') } });
+    expect(r).toMatchObject({ kind: 'truncated', stopReason: 'max_tokens', retryable: true, retryReason: 'truncated' });
+    expect(r.message).toBeDefined();
+    expect(raiseMaxTokens(4000)).toBe(8000);
+    expect(raiseMaxTokens(60_000)).toBe(64_000);
+  });
+  it('selectRetries applies the attempt cap and keeps terminal errors out of the retry list', () => {
+    const run = 'run1';
+    const res = (key: string, attempt: number, r: unknown) =>
+      classifyResult({ custom_id: makeCustomId({ run, key, pass: 'first', attempt }), result: r as never });
+    const results = [
+      res('v1', 1, { type: 'expired' }),
+      res('v2', 2, errored('overloaded_error')),
+      res('v3', MAX_ATTEMPTS, errored('rate_limit_error')),
+      res('v4', 1, errored('invalid_request_error')),
+      res('v5', 1, { type: 'succeeded', message: ok('max_tokens') }),
+      res('v6', 1, { type: 'succeeded', message: ok('end_turn') }),
+    ];
+    const { retry, terminal } = selectRetries(results, run);
+    expect(retry.map((x) => [x.parts.key, x.nextAttempt, x.reason])).toEqual([['v1', 2, 'transient'], ['v2', 3, 'transient'], ['v5', 2, 'truncated']]);
+    expect(terminal.map((x) => [x.parts.key, x.why])).toEqual([['v3', 'attempts_exhausted'], ['v4', 'non_retryable']]);
+    expect(MAX_ATTEMPTS).toBe(3);
   });
   it('chunkRequests respects count and byte limits', () => {
     const reqs = Array.from({ length: 10 }, (_, i) => ({ custom_id: `r_${i}_first_1`, params: { model: 'm', max_tokens: 1, messages: [{ role: 'user', content: 'x'.repeat(100) }] } })) as BatchRequest[];

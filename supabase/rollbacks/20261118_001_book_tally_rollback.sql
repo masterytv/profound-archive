@@ -6,7 +6,7 @@
 
 BEGIN;
 DROP VIEW IF EXISTS public.bt_final_stances;
-DROP VIEW IF EXISTS public.bt_latest_stance_answers;
+DROP VIEW IF EXISTS public.bt_unmapped_nde_videos;
 DROP VIEW IF EXISTS public.bt_effective_person_map;
 DROP VIEW IF EXISTS public.bt_person_canonical;
 DROP VIEW IF EXISTS public.bt_latest_merge_decision;

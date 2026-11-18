@@ -3,8 +3,15 @@ import { alignTimestamp, normalize, prepareTranscript, verifyQuote } from '../li
 
 describe('normalize', () => {
   it('maps curly quotes, dashes and strips punctuation', () => {
-    expect(normalize('I couldn’t believe it — really!')).toBe('i couldn t believe it really');
+    expect(normalize('I couldn’t believe it — really!')).toBe('i couldnt believe it really');
     expect(normalize('“Hello,” she said.')).toBe('hello she said');
+  });
+  it('deletes apostrophes (straight, curly, modifier letter) instead of splitting on them', () => {
+    expect(normalize("don't")).toBe('dont');
+    expect(normalize('don'+String.fromCharCode(0x2019)+'t')).toBe('dont');
+    expect(normalize('don'+String.fromCharCode(0x02BC)+'t')).toBe('dont');
+    expect(normalize('rock'+String.fromCharCode(0x2018)+'n'+String.fromCharCode(0x2019)+'roll')).toBe('rocknroll');
+    expect(normalize("I didn't, I don't")).toBe('i didnt i dont');
   });
   it('strips diacritics and lowercases', () => {
     expect(normalize('Café Résumé NAÏVE')).toBe('cafe resume naive');
@@ -32,7 +39,7 @@ describe('verifyQuote', () => {
   });
   it('tolerates curly quotes, accents, punctuation and whitespace differences', () => {
     expect(verifyQuote('I couldn’t   breathe. THEN I felt myself', T).verified).toBe(true);
-    expect(verifyQuote('i couldnt breathe then i felt', T).verified).toBe(false); // "couldnt" != "couldn t"
+    expect(verifyQuote('i couldnt breathe then i felt', T).verified).toBe(true); // apostrophe deleted on both sides
     expect(verifyQuote('Thén I felt myself rise up', T).verified).toBe(true);
   });
   it('rejects quotes under 5 tokens', () => {
@@ -41,10 +48,18 @@ describe('verifyQuote', () => {
     expect(r.reason).toBe('too_short');
     expect(verifyQuote('was in the hospital and', T).verified).toBe(true); // exactly 5
   });
-  it('rejects ellipsis-joined quotes even if each part is in the transcript', () => {
-    expect(verifyQuote('I was in the hospital ... I felt myself rise', T).reason).toBe('ellipsis');
-    expect(verifyQuote('I was in the hospital … I felt myself rise', T).reason).toBe('ellipsis');
+  it('has no ellipsis special-casing: a gap-joined quote fails because it is not contiguous', () => {
+    expect(verifyQuote('I was in the hospital ... I felt myself rise', T).reason).toBe('not_found');
+    expect(verifyQuote('I was in the hospital … I felt myself rise', T).reason).toBe('not_found');
     expect(verifyQuote('I was in the hospital [...] I felt myself rise', T).verified).toBe(false);
+  });
+  it('an ellipsis whose surrounding text is itself contiguous in the transcript still verifies', () => {
+    expect(verifyQuote('I was in the ... hospital and I couldn’t breathe', T).verified).toBe(true);
+  });
+  it('counts "I didn’t, I don’t" as 4 tokens and rejects it', () => {
+    const r = verifyQuote("I didn't, I don't", "I didn't, I don't, I really don't");
+    expect(r.tokens).toBe(4);
+    expect(r.reason).toBe('too_short');
   });
   it('rejects non-contiguous and reordered text', () => {
     expect(verifyQuote('I was in the hospital I felt myself rise', T).reason).toBe('not_found');
@@ -83,6 +98,16 @@ describe('alignTimestamp', () => {
     expect(alignTimestamp('nothing like this is in the captions at all', segs)).toBeNull();
     expect(alignTimestamp('I felt myself rise up', null)).toBeNull();
     expect(alignTimestamp('I felt myself', segs)).toBeNull();
+  });
+  it('skips null and malformed segment elements instead of throwing', () => {
+    const messy = [
+      null, undefined, 42, 'str', { start: 1 }, { start: 'x', text: 7 },
+      { start: 0, duration: 2, text: 'so I was in the hospital' },
+      { start: 5, duration: 3, text: 'I felt myself rise up' },
+      { start: 8, duration: 2, text: 'out of my body' },
+    ] as never;
+    expect(alignTimestamp('I felt myself rise up out of my body', messy)).toBe(5);
+    expect(alignTimestamp('I felt myself rise up out of my body', [null, { start: 1 }] as never)).toBeNull();
   });
   it('uses only the first 6 tokens (tail may differ from raw captions)', () => {
     expect(alignTimestamp('I felt myself rise up out DIFFERENT TAIL words', segs)).toBe(5);

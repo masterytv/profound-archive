@@ -12,11 +12,64 @@ import { getSupabaseConfig, type Env } from './env';
 
 export type Db = SupabaseClient;
 
-export function createServiceClient(env: Env = process.env): Db {
-  const cfg = getSupabaseConfig(env);
-  return createClient(cfg.url, cfg.serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
+/** RPC functions a job script may call. Empty by default: any rpc() call throws. */
+export const READ_ONLY_RPC_ALLOWLIST: ReadonlySet<string> = new Set<string>();
+
+const WRITE_OPS = new Set(['insert', 'update', 'upsert', 'delete']);
+const BT_TABLE_NAME = /^bt_[a-z][a-z0-9_]*$/;
+
+export interface GuardOptions {
+  /** Function names rpc() may call (must be read-only in the database). */
+  rpcAllowlist?: ReadonlySet<string>;
+}
+
+/**
+ * Wraps a Supabase client so job code cannot write outside bt_*:
+ *  - from(t) for a non-bt_ table exposes ONLY select(); insert/update/upsert/delete throw
+ *  - rpc(name) throws unless `name` is in the explicit read-only allowlist (empty by default)
+ *  - every other client member (schema, storage, functions, auth, channel, ...) is unavailable,
+ *    so there is no side door around from()/rpc().
+ * bt_ tables are fully accessible here; the database itself enforces append-only there.
+ */
+export function createGuardedClient(real: SupabaseClient, opts: GuardOptions = {}): Db {
+  const allow = opts.rpcAllowlist ?? READ_ONLY_RPC_ALLOWLIST;
+  const from = (table: string) => {
+    const builder = real.from(table);
+    if (BT_TABLE_NAME.test(table)) return builder;
+    return new Proxy(builder, {
+      get(target, prop) {
+        if (prop === 'select') return target.select.bind(target);
+        if (typeof prop === 'string' && WRITE_OPS.has(prop)) {
+          return () => {
+            throw new Error(`Refusing ${prop} on "${table}": only bt_ tables may be written`);
+          };
+        }
+        if (typeof prop === 'symbol' || prop === 'then') return undefined;
+        throw new Error(`"${String(prop)}" is not available on non-bt_ table "${table}" (read-only: select only)`);
+      },
+    });
+  };
+  const rpc = (name: string, ...rest: unknown[]) => {
+    if (!allow.has(name)) throw new Error(`rpc("${name}") is not in the read-only allowlist`);
+    return (real.rpc as (n: string, ...r: unknown[]) => unknown)(name, ...rest);
+  };
+  return new Proxy({} as SupabaseClient, {
+    get(_t, prop) {
+      if (prop === 'from') return from;
+      if (prop === 'rpc') return rpc;
+      if (typeof prop === 'symbol' || prop === 'then') return undefined;
+      throw new Error(`Supabase client member "${String(prop)}" is not available through the guarded client`);
+    },
   });
+}
+
+/** Service-role client, always wrapped by the write guard. */
+export function createServiceClient(env: Env = process.env, opts: GuardOptions = {}): Db {
+  const cfg = getSupabaseConfig(env);
+  return createGuardedClient(
+    createClient(cfg.url, cfg.serviceKey, { auth: { persistSession: false, autoRefreshToken: false } }),
+    opts,
+  );
 }
 
 const BT_TABLE = /^bt_[a-z][a-z0-9_]*$/;

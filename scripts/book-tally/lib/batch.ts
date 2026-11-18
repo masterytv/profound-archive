@@ -142,31 +142,101 @@ export async function pollBatch(client: Anthropic, batchId: string, opts: PollOp
   }
 }
 
-export type ResultKind = 'succeeded' | 'errored' | 'canceled' | 'expired';
+/** Attempts per (cell, pass): the original submission plus at most two retries. */
+export const MAX_ATTEMPTS = 3;
+
+/** API error types worth retrying; everything else (invalid_request_error, ...) is terminal. */
+export const RETRYABLE_ERROR_TYPES = new Set(['overloaded_error', 'api_error', 'rate_limit_error']);
+
+/**
+ * succeeded : finished normally (stop_reason end_turn / stop_sequence / ...; see stopReason)
+ * truncated : succeeded but stop_reason === 'max_tokens'; output may be cut off. The caller
+ *             retries with a higher max_tokens (never treat it as an invalid model answer).
+ * errored   : per-request error; retryable only for RETRYABLE_ERROR_TYPES or 5xx
+ * canceled / expired : retryable
+ */
+export type ResultKind = 'succeeded' | 'truncated' | 'errored' | 'canceled' | 'expired';
 
 export interface ClassifiedResult {
   customId: string;
   kind: ResultKind;
-  /** Present when kind === 'succeeded'. */
+  /** Present for 'succeeded' and 'truncated'. */
   message?: Anthropic.Messages.Message;
   /** Present when kind === 'errored'. */
   error?: unknown;
+  /** API error type for 'errored' results, when present. */
+  errorType?: string;
+  /** stop_reason of a succeeded/truncated message (null if the API sent none). */
+  stopReason?: string | null;
+  /** Whether a new attempt could change the outcome (attempt cap NOT applied here; see selectRetries). */
+  retryable: boolean;
+  /** Why: 'transient' (expired/canceled/overloaded/api/rate-limit/5xx) or 'truncated' (raise max_tokens). */
+  retryReason?: 'transient' | 'truncated';
+}
+
+function errorInfo(error: unknown): { type?: string; status?: number } {
+  const e = error as { error?: { type?: unknown }; type?: unknown; status?: unknown } | null | undefined;
+  const inner = typeof e?.error?.type === 'string' ? e.error.type : typeof e?.type === 'string' && e.type !== 'error' ? e.type : undefined;
+  const status = typeof e?.status === 'number' ? e.status : undefined;
+  return { type: inner, status };
 }
 
 export function classifyResult(r: Anthropic.Messages.MessageBatchIndividualResponse): ClassifiedResult {
   const res = r.result;
   switch (res.type) {
-    case 'succeeded':
-      return { customId: r.custom_id, kind: 'succeeded', message: res.message };
-    case 'errored':
-      return { customId: r.custom_id, kind: 'errored', error: res.error };
+    case 'succeeded': {
+      const stopReason = res.message.stop_reason ?? null;
+      if (stopReason === 'max_tokens') {
+        return { customId: r.custom_id, kind: 'truncated', message: res.message, stopReason, retryable: true, retryReason: 'truncated' };
+      }
+      return { customId: r.custom_id, kind: 'succeeded', message: res.message, stopReason, retryable: false };
+    }
+    case 'errored': {
+      const { type, status } = errorInfo(res.error);
+      const retryable = (type !== undefined && RETRYABLE_ERROR_TYPES.has(type)) || (status !== undefined && status >= 500);
+      return {
+        customId: r.custom_id, kind: 'errored', error: res.error, errorType: type, retryable,
+        ...(retryable ? { retryReason: 'transient' as const } : {}),
+      };
+    }
     case 'canceled':
-      return { customId: r.custom_id, kind: 'canceled' };
+      return { customId: r.custom_id, kind: 'canceled', retryable: true, retryReason: 'transient' };
     case 'expired':
-      return { customId: r.custom_id, kind: 'expired' };
+      return { customId: r.custom_id, kind: 'expired', retryable: true, retryReason: 'transient' };
     default:
       throw new Error(`unknown batch result type for ${r.custom_id}`);
   }
+}
+
+/**
+ * Splits non-succeeded results into those to resubmit (retryable AND attempt < maxAttempts)
+ * and those that stay terminal (non-retryable errors, or retries exhausted). The attempt
+ * number is read from the custom_id (see makeCustomId). Truncated results are returned
+ * in `retry` too; the caller must raise max_tokens for them (see `reason`).
+ */
+export function selectRetries(
+  results: Iterable<ClassifiedResult>,
+  run: string,
+  maxAttempts = MAX_ATTEMPTS,
+): {
+  retry: Array<{ result: ClassifiedResult; parts: CustomIdParts; nextAttempt: number; reason: 'transient' | 'truncated' }>;
+  terminal: Array<{ result: ClassifiedResult; parts: CustomIdParts; why: 'non_retryable' | 'attempts_exhausted' }>;
+} {
+  const retry: ReturnType<typeof selectRetries>['retry'] = [];
+  const terminal: ReturnType<typeof selectRetries>['terminal'] = [];
+  for (const result of results) {
+    if (result.kind === 'succeeded') continue;
+    const parts = parseCustomId(result.customId, run);
+    if (!result.retryable) terminal.push({ result, parts, why: 'non_retryable' });
+    else if (parts.attempt >= maxAttempts) terminal.push({ result, parts, why: 'attempts_exhausted' });
+    else retry.push({ result, parts, nextAttempt: parts.attempt + 1, reason: result.retryReason ?? 'transient' });
+  }
+  return { retry, terminal };
+}
+
+/** Larger max_tokens for a truncated request's retry (doubles, capped). */
+export function raiseMaxTokens(current: number, cap = 64_000): number {
+  return Math.min(cap, Math.max(current + 1, current * 2));
 }
 
 /** Streams results of an ended batch, classified, in whatever order the API returns them. */
@@ -184,7 +254,11 @@ export function messageText(m: Anthropic.Messages.Message): string {
 export interface CollectedBatch {
   batch: MessageBatch;
   results: Map<string, ClassifiedResult>;
-  /** custom_ids that errored, expired or were canceled: resubmit in a new batch (attempt + 1). */
+  /**
+   * custom_ids whose result may be worth another attempt (expired, canceled, transient
+   * errors, truncated). Apply the attempt cap with selectRetries(); terminal errors
+   * such as invalid_request_error are not listed.
+   */
   retryable: string[];
 }
 
@@ -205,7 +279,7 @@ export async function collectBatch(client: Anthropic, batchId: string, opts: Pol
   const retryable: string[] = [];
   for await (const r of streamResults(client, batchId)) {
     results.set(r.customId, r);
-    if (r.kind !== 'succeeded') retryable.push(r.customId);
+    if (r.retryable) retryable.push(r.customId);
   }
   return { batch, results, retryable };
 }
