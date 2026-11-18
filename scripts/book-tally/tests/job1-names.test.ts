@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkExtraction, createSelfNameLinks } from '../job1/extract-names';
+import { checkExtraction, createSelfNameLinks, isUsableSelfName } from '../job1/extract-names';
 import { nameInQuote, selfIntroducerBefore, SELF_INTRODUCERS, type ProfileRow } from '../job1/logic';
 import { makeCtx } from '../job1/cli';
 import { fakeDb } from './job1-fakes';
@@ -29,16 +29,17 @@ describe('nameInQuote', () => {
 
 describe('selfIntroducerBefore (first-person introducer immediately before the name)', () => {
   it('accepts each introducer; "I\'m" normalizes to "im" (apostrophes deleted)', () => {
-    for (const intro of ['My name is', "My name's", "I'm", 'Im', 'I am', 'This is', 'Call me', 'They call me', 'hello and I am', 'well, my name is']) {
+    for (const intro of ['My name is', "My name's", "I'm", 'Im', 'I am', 'Call me', 'They call me', 'hello and I am', 'well, my name is']) {
       expect(selfIntroducerBefore('Jane Smith', `${intro} Jane Smith and I live in Ohio`), intro).toBe(true);
     }
     expect(SELF_INTRODUCERS).toContain('i m');
+    expect(SELF_INTRODUCERS).not.toContain('this is');
   });
   it('skips honorifics between the introducer and the name', () => {
     expect(selfIntroducerBefore('Jane Smith', 'my name is Dr. Jane Smith and I live in Ohio')).toBe(true);
   });
   it('rejects a name that is merely mentioned (host introduction, thanks, other people)', () => {
-    for (const q of ['my guest today is Jane Smith and she lives in Ohio', 'thank you so much Jane Smith for coming on today', 'my daughter Jane Smith was in the room', 'her name is Jane Smith and she told me']) {
+    for (const q of ['my guest today is Jane Smith and she lives in Ohio', 'thank you so much Jane Smith for coming on today', 'my daughter Jane Smith was in the room', 'her name is Jane Smith and she told me', 'this is Jane Smith and she is my guest', 'And this is Jane Smith joining us']) {
       expect(selfIntroducerBefore('Jane Smith', q), q).toBe(false);
     }
   });
@@ -49,10 +50,12 @@ describe('selfIntroducerBefore (first-person introducer immediately before the n
 });
 
 describe('checkExtraction', () => {
-  it("quote verifies and contains the name but it is not self-introduced -> quote_verified=false, error 'no_self_introducer'", () => {
+  it("quote verifies and contains the name but it is not self-introduced -> quote_verified=true, error 'no_self_introducer', unusable", () => {
     const tr = 'The host said thank you so much Jane Smith for coming on today and then I began my story about the accident.';
     const c = checkExtraction({ name: 'Jane Smith', quote: 'thank you so much Jane Smith for coming on today' }, tr);
-    expect(c).toMatchObject({ valid: true, quote_verified: false, name_in_quote: true, error: 'no_self_introducer', name: 'Jane Smith' });
+    // quote_verified reflects ONLY the quote check; the missing introducer is recorded in `error`
+    expect(c).toMatchObject({ valid: true, quote_verified: true, name_in_quote: true, error: 'no_self_introducer', name: 'Jane Smith' });
+    expect(isUsableSelfName({ ...c, valid: true })).toBe(false);
     const ok = checkExtraction({ name: 'Jane Smith', quote: 'Hello my name is Jane Smith and I live in Ohio' }, 'Hello my name is Jane Smith and I live in Ohio near the lake.');
     expect(ok).toMatchObject({ quote_verified: true, error: null });
   });
@@ -94,13 +97,14 @@ describe('createSelfNameLinks (mock database)', () => {
   });
   it('pending links only for verified multi-token names; first-name-only never joins a named: key; idempotent', async () => {
     const fake = fakeDb({
-      nde_vids: ['a', 'b', 'c', 'd', 'e'].map((videoId) => ({ videoId })),
+      nde_vids: ['a', 'b', 'c', 'd', 'e', 'f'].map((videoId) => ({ videoId })),
       bt_name_extractions: [
         ext(1, 'a', 'Pat OBrien'), // matches profile 7 exactly
         ext(2, 'b', 'Zed Quark'), // new named person
         ext(3, 'c', 'Sarah'), // first name only
         ext(4, 'd', 'Mary Jones', { quote_verified: false }), // not verified
         ext(5, 'e', 'Lee Roy', { name_in_quote: false }), // name not in quote
+        ext(6, 'f', 'Jane Roe', { error: 'no_self_introducer' }), // quote verified, but a host mention
       ],
       experiencer_profiles: [{ id: 7 }],
     });

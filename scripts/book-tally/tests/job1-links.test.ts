@@ -39,6 +39,18 @@ describe('matchName', () => {
     const dup = indexProfiles([prof(1, 'Ann Poe'), prof(2, 'Ann Poe')]);
     expect(matchName('Ann Poe', dup)).toEqual({ level: 'ambiguous', via: 'exact', profileIds: [1, 2] });
   });
+  it('titles and generational suffixes do not count as name tokens: "John Jr." is single-token', () => {
+    for (const n of ['John Jr.', 'Dr. John', 'Mrs. Mary III', 'John Sr']) {
+      expect(usableNameKey(n), n).toBeNull();
+      expect(matchName(n, idx), n).toEqual({ level: 'none' });
+      expect(classifySelfName(n, idx), n).toEqual({ kind: 'first_name_only' });
+    }
+    expect(usableNameKey('Zed Quark Jr.')).toBe('zed quark jr');
+    expect(classifySelfName('Zed Quark Jr.', idx)).toEqual({ kind: 'named', key: 'zed quark jr' });
+    const p = planLinks({ ndeVideoIds: ['x'], profiles: [], videos: new Map([['x', vid('x', 'John Jr.')]]) });
+    expect(p.links.map((l) => l.person_key)).toEqual(['anon:x']);
+    expect(p.anonVideoIds).toEqual(['x']);
+  });
   it('none: no match, blank, placeholder or single-token names', () => {
     for (const n of ['Zed Quark', null, '', '  ', 'Anonymous', 'Cher', 'Unknown Person']) expect(matchName(n, idx)).toEqual({ level: 'none' });
     expect(usableNameKey('Cher')).toBeNull();

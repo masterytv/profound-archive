@@ -70,7 +70,7 @@ describe('extract-names (mock DB + mock Anthropic)', () => {
 
     const ex = Object.fromEntries(h.fake.tables.bt_name_extractions.map((e) => [e.video_id, e]));
     expect(Object.keys(ex).sort()).toEqual(vids);
-    expect(ex.a5).toMatchObject({ name: 'Jane Roe', quote_verified: false, name_in_quote: true, error: 'no_self_introducer', valid: true });
+    expect(ex.a5).toMatchObject({ name: 'Jane Roe', quote_verified: true, name_in_quote: true, error: 'no_self_introducer', valid: true });
     expect(ex.a1).toMatchObject({ valid: true, quote_verified: true, name_in_quote: true, transcript_source: 'subtitles_punctuated', model_version: 'claude-haiku-5-5' });
     expect(ex.a2).toMatchObject({ quote_verified: true, name_in_quote: true, name: 'Sarah' });
     expect(ex.a3).toMatchObject({ name: null, quote: null, valid: true });

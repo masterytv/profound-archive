@@ -7,7 +7,7 @@ import { main as judge, type CandidateRow } from '../job1/judge-pairs';
 import { CliError, makeCtx } from '../job1/cli';
 import {
   assertDigestMatches, assertResumable, assertSpendConfirmed, estimateSpend, extrapolateTokens, planSample, requestChars,
-  requestDigest, SpendGateError, type EstItem,
+  findOverlappingRuns, requestDigest, SpendGateError, type EstItem,
 } from '../job1/spend';
 import type { RunRow } from '../job1/cli';
 import { fakeAnthropic, fakeDb, textMessage, type Row } from './job1-fakes';
@@ -79,7 +79,7 @@ describe('estimate arithmetic', () => {
     expect(e.ceiling_usd).toBeGreaterThan(e.worst_case_cost_usd * 2); // 1x + 2x + 4x output at max_tokens
     expect(e.max_attempts).toBe(3);
   });
-  it('stratified sample: >= 50 counted, deterministic, every stratum represented, exact when tokens are proportional to chars', async () => {
+  it('tokens are counted for ALL requests (exact ceiling); a sample may only shape the expected-cost line', async () => {
     const items = Array.from({ length: 300 }, (_, i) => item(`k${String(i).padStart(3, '0')}`, 'z'.repeat(100 + i * 37)));
     const chars = items.map((i) => requestChars(i.params));
     const plan = planSample(chars, 10); // asks for fewer than 50: clamped up
@@ -87,14 +87,19 @@ describe('estimate arithmetic', () => {
     expect(planSample(chars, 10).sample).toEqual(plan.sample);
     expect(plan.strata).toHaveLength(10);
     for (const st of plan.strata) expect(st.some((i) => plan.sample.includes(i))).toBe(true);
-    const calls = vi.fn(async (p: EstItem['params']) => Math.round(requestChars(p) / 4));
+    // deliberately NOT proportional to chars, so an extrapolated ceiling would be wrong
+    const tok = (p: EstItem['params']) => (requestChars(p) % 7) * 1000 + 5;
+    const calls = vi.fn(async (p: EstItem['params']) => tok(p));
     const e = await estimateSpend({ model: 'claude-haiku-5-5', effort: 'medium', items, counter: calls, visibleTokensPerRequest: 10, maxTokens: 50, maxAttempts: 2, forceSample: true, sampleSize: 60 });
-    expect(e.method).toBe('count_tokens_stratified_sample');
-    expect(calls.mock.calls.length).toBe(e.counted_requests);
-    expect(e.counted_requests).toBeLessThan(300);
-    const truth = chars.reduce((s, c) => s + Math.round(c / 4), 0);
-    expect(Math.abs(e.input_tokens - truth) / truth).toBeLessThan(0.01);
+    expect(e.method).toBe('count_tokens_all_expected_cost_from_sample');
+    expect(calls.mock.calls.length).toBe(300); // every request counted
+    expect(e.counted_requests).toBe(300);
+    expect(e.expected_cost_sample_size).toBeGreaterThanOrEqual(50);
+    expect(e.expected_cost_sample_size).toBeLessThan(300);
+    const exact = items.map((i) => tok(i.params));
+    expect(e.input_tokens).toBe(exact.reduce((a, b) => a + b, 0));
     expect(Object.keys(e.per_request_input_tokens)).toHaveLength(300);
+    expect(e.ceiling_usd).toBeCloseTo(ceilingCost({ model: 'claude-haiku-5-5', requests: exact.map((t) => ({ inputTokens: t })), maxTokens: 50, maxAttempts: 2, doubling: true }), 9);
   });
   it('extrapolation uses measured values for counted items and the stratum ratio for the rest', () => {
     const chars = [100, 200, 300, 400];
@@ -299,6 +304,18 @@ describe('makeCtx', () => {
   });
 });
 
+describe('findOverlappingRuns', () => {
+  const r = (id: string, status: string, ids: number[], over: Record<string, unknown> = {}) => ({ id, job: 'pair_judge', pass: 'haiku', status, params: { candidate_ids: ids }, ...over });
+  it('only same job+stage runs in submitting/submitted/collecting with shared ids count', () => {
+    const me = r('me', 'estimated', [1, 2, 3]);
+    const runs = [
+      r('a', 'submitted', [3, 4]), r('b', 'completed', [1]), r('c', 'estimated', [1]), r('d', 'submitting', [9]),
+      r('e', 'collecting', [2], { pass: 'sonnet' }), r('f', 'collecting', [1, 2], { job: 'name_extract' }), me,
+    ] as never[];
+    expect(findOverlappingRuns(runs, me as never, 'candidate_ids')).toEqual([{ id: 'a', status: 'submitted', overlap: 1 }]);
+  });
+});
+
 describe('guarded submission (lib/batch.submitGuarded) through judge-pairs', () => {
   const ok = (cid: string) => verdictFor(cid, { 1: 'same', 2: 'same' });
 
@@ -326,22 +343,72 @@ describe('guarded submission (lib/batch.submitGuarded) through judge-pairs', () 
     expect(seenIds[0]).toMatch(/^pending:2026-11-18T[\d:.]+Z:2:[0-9a-f]{12}$/);
   });
 
-  it('create failed: run stays "submitting"; the next confirm resolves the marker (voids it) and resubmits', async () => {
+  it('create failed: the next confirm does NOT resubmit (marker unresolved: not_found); --void-pending is refused until 30 min, then releases it and the run can be re-confirmed', async () => {
+    let offset = 0;
     const h = harness({ bt_merge_candidates: candidates(2) }, ok, 'claude-haiku-5-5', { createMode: (n) => (n === 1 ? 'fail' : 'ok') });
-    await h.call(['--estimate']);
+    const call = (argv: string[]) => judge(argv, { db: h.guarded, makeClient: h.makeClient, log: (l) => h.logs.push(l), now: () => new Date(Date.UTC(2026, 10, 18, 10, 0, 0) + offset), sleep: async () => undefined });
+    await call(['--estimate']);
     const id = String(h.fake.tables.bt_runs[0].id);
-    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/stays "submitting"/);
+    await expect(call(['--confirm-spend', id])).rejects.toThrow(/stays "submitting"/);
     expect(h.fake.tables.bt_runs[0].status).toBe('submitting');
-    expect(unresolvedMarkers(h.fake.tables.bt_runs[0].batch_ids as string[])).toHaveLength(1);
-    expect(h.fake.tables.bt_merge_judgments ?? []).toEqual([]);
+    const marker = unresolvedMarkers(h.fake.tables.bt_runs[0].batch_ids as string[])[0].raw;
 
-    await h.call(['--confirm-spend', id]); // resolvePending -> no such batch -> void -> back to estimated -> submit
+    offset = 5 * 60_000; // five minutes later: batch list shows nothing, but that is not proof
+    await expect(call(['--confirm-spend', id])).rejects.toThrow(/NOTHING is resubmitted.*--void-pending/s);
+    await expect(call(['--resume', id])).rejects.toThrow(/unresolved submission marker/);
+    expect(h.api.create).toHaveBeenCalledTimes(1);
+    expect(h.fake.tables.bt_runs[0].status).toBe('submitting');
+    await expect(call(['--resume', id, '--void-pending', marker])).rejects.toThrow(/refusing to void: marker is 5 min old/);
+    await expect(call(['--resume', id, '--void-pending', 'pending:nonsense'])).rejects.toThrow(/not an unresolved pending marker/);
+
+    offset = 31 * 60_000;
+    await call(['--resume', id, '--void-pending', marker]);
+    expect(h.fake.tables.bt_runs[0].status).toBe('estimated');
+    expect((h.fake.tables.bt_runs[0].batch_ids as string[]).some((e) => e.startsWith('void:'))).toBe(true);
+    await call(['--confirm-spend', id]);
     expect(h.api.create).toHaveBeenCalledTimes(2);
-    const ids = h.fake.tables.bt_runs[0].batch_ids as string[];
-    expect(ids.some((e) => e.startsWith('void:'))).toBe(true);
-    expect(realBatchIds(ids)).toEqual(['batch_2']);
+    expect(realBatchIds(h.fake.tables.bt_runs[0].batch_ids as string[])).toEqual(['batch_2']);
     expect(h.fake.tables.bt_runs[0].status).toBe('completed');
     expect(h.fake.tables.bt_merge_judgments).toHaveLength(2);
+  });
+
+  it('--void-pending is refused when a batch now matches the marker (adopt it instead)', async () => {
+    let offset = 0;
+    const h = harness({ bt_merge_candidates: candidates(2) }, ok, 'claude-haiku-5-5', { createMode: (n) => (n === 1 ? 'lost' : 'ok') });
+    const call = (argv: string[]) => judge(argv, { db: h.guarded, makeClient: h.makeClient, log: () => undefined, now: () => new Date(Date.UTC(2026, 10, 18, 10, 0, 0) + offset), sleep: async () => undefined });
+    await call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    await expect(call(['--confirm-spend', id])).rejects.toThrow(/stays "submitting"/);
+    const marker = unresolvedMarkers(h.fake.tables.bt_runs[0].batch_ids as string[])[0].raw;
+    offset = 40 * 60_000;
+    await expect(call(['--resume', id, '--void-pending', marker])).rejects.toThrow(/refusing to void: 1 batch\(es\) now match/);
+  });
+
+  it('a retry batch is not submitted while an earlier marker is unresolved', async () => {
+    const respond = (cid: string) => (cid.endsWith('_c2_haiku_1') ? null : ok(cid));
+    const h = harness({ bt_merge_candidates: candidates(2) }, respond, 'claude-haiku-5-5');
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    // an old unresolved marker sits in batch_ids when the retry is about to be queued
+    const orig = h.api.retrieve.getMockImplementation()!;
+    let injected = false;
+    h.api.retrieve.mockImplementation(async (bid: string) => {
+      if (!injected) { injected = true; (h.fake.tables.bt_runs[0].batch_ids as string[]).push('pending:2026-11-18T09:00:00.000Z:2:aaaaaaaaaaaa'); }
+      return orig(bid);
+    });
+    await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/unresolved submission marker/);
+    expect(h.api.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses to confirm while another in-flight run of the same job and stage overlaps its requests', async () => {
+    const h = harness({ bt_merge_candidates: candidates(3) }, ok, 'claude-haiku-5-5', { crashOnResults: true });
+    await h.call(['--estimate']);
+    await h.call(['--estimate']);
+    const [a, b] = h.fake.tables.bt_runs.map((r) => String(r.id));
+    await expect(h.call(['--confirm-spend', a])).rejects.toThrow(/simulated crash/); // A stays "submitted"
+    expect(h.fake.tables.bt_runs[0].status).toBe('submitted');
+    await expect(h.call(['--confirm-spend', b])).rejects.toThrow(/overlap this run's requests: .*\(submitted, 3 shared\)/);
+    expect(h.api.create).toHaveBeenCalledTimes(1);
   });
 
   it('response lost but batch created: the next confirm adopts the existing batch and does NOT resubmit; --resume collects it', async () => {
@@ -363,7 +430,7 @@ describe('guarded submission (lib/batch.submitGuarded) through judge-pairs', () 
     await h.call(['--estimate']);
     const id = String(h.fake.tables.bt_runs[0].id);
     await expect(h.call(['--confirm-spend', id])).rejects.toThrow(/stays "submitting"/);
-    await expect(h.call(['--adopt-batch', 'batch_1'])).rejects.toThrow(/requires --resume/);
+    await expect(h.call(['--adopt-batch', 'batch_1'])).rejects.toThrow(/require --resume/);
     await expect(h.call(['--resume', id, '--adopt-batch', 'batch_99'])).rejects.toThrow(/refusing to adopt/);
     expect(realBatchIds(h.fake.tables.bt_runs[0].batch_ids as string[])).toEqual([]);
     await h.call(['--resume', id, '--adopt-batch', 'batch_1']);
