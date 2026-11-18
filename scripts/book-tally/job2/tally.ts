@@ -4,6 +4,7 @@
  * Per person per question, over that person's videos' answers with status 'final':
  * not_addressed is ignored; none addressed -> not_addressed; all addressed equal -> that
  * stance; any conflict or any mixed -> mixed. Each person counts once.
+ * (Haiku-only resolution: rows carry `flagged`; see haiku.ts.)
  * Answers with any other status (unverified, invalid, pending_*) are excluded and counted
  * in n_excluded_unverified_cells (with a status breakdown; cell counts, not persons). A person with no 'final' answer for a
  * question is not in that question's denominators (n_persons_all_excluded counts them).
@@ -11,7 +12,11 @@
 import { wilson } from '../lib/stats';
 import type { Stance } from './answers';
 
-export interface FinalRow { video_id: string; question_id: number; stance: Stance | null; status: string }
+export interface FinalRow {
+  video_id: string; question_id: number; stance: Stance | null; status: string;
+  /** Haiku-only resolution: a counted answer the full pipeline would have sent for a re-check (no, mixed, confidence < 70). */
+  flagged?: boolean;
+}
 export interface QuestionMeta { id: number; category: string | null; consumer_question: string }
 
 export function combineStances(stances: readonly Stance[]): Stance {
@@ -43,7 +48,14 @@ export interface TallyRow {
   n_excl_unverified_cells: number;
   n_excl_invalid_cells: number;
   n_excl_pending_cells: number;
+  /** Haiku-only resolution: counted video-cells that would have been flagged for re-check (never re-checked). */
+  n_unchecked_flagged_cells: number;
+  /** Haiku-only resolution: counted persons with at least one such unchecked flagged cell for this question. */
+  n_persons_with_unchecked_flagged: number;
 }
+
+/** Extra columns of the haiku-only CSVs (the `resolution` column is added by rollup.ts). */
+export const HAIKU_EXTRA_HEADERS: Array<keyof TallyRow> = ['n_persons_with_unchecked_flagged', 'n_unchecked_flagged_cells'];
 
 export const TALLY_HEADERS: Array<keyof TallyRow> = [
   'question_id', 'category', 'consumer_question', 'n_persons',
@@ -70,7 +82,7 @@ export function tallyByQuestion(
   opts: { noTranscriptPersons?: number } = {},
 ): TallyRow[] {
   // question -> person -> {final stances, excluded counts}
-  type Cell = { final: Stance[]; unverified: number; invalid: number; pending: number };
+  type Cell = { final: Stance[]; unverified: number; invalid: number; pending: number; flagged: number };
   const byQ = new Map<number, Map<string, Cell>>();
   for (const r of rows) {
     const person = personOf.get(r.video_id);
@@ -78,8 +90,8 @@ export function tallyByQuestion(
     let m = byQ.get(r.question_id);
     if (!m) byQ.set(r.question_id, (m = new Map()));
     let c = m.get(person);
-    if (!c) m.set(person, (c = { final: [], unverified: 0, invalid: 0, pending: 0 }));
-    if (r.status === 'final' && r.stance) c.final.push(r.stance);
+    if (!c) m.set(person, (c = { final: [], unverified: 0, invalid: 0, pending: 0, flagged: 0 }));
+    if (r.status === 'final' && r.stance) { c.final.push(r.stance); if (r.flagged) c.flagged++; }
     else if (r.status === 'unverified') c.unverified++;
     else if (r.status === 'invalid') c.invalid++;
     else c.pending++;
@@ -87,11 +99,13 @@ export function tallyByQuestion(
   return questions.map((q): TallyRow => {
     const m = byQ.get(q.id) ?? new Map<string, Cell>();
     const n = { yes: 0, no: 0, mixed: 0, not_addressed: 0 };
-    let persons = 0, allExcluded = 0, unv = 0, inv = 0, pend = 0;
+    let persons = 0, allExcluded = 0, unv = 0, inv = 0, pend = 0, flagCells = 0, flagPersons = 0;
     for (const c of m.values()) {
       unv += c.unverified; inv += c.invalid; pend += c.pending;
       if (c.final.length === 0) { allExcluded++; continue; }
       persons++;
+      flagCells += c.flagged;
+      if (c.flagged > 0) flagPersons++;
       n[combineStances(c.final)]++;
     }
     const addressed = n.yes + n.no + n.mixed;
@@ -111,6 +125,7 @@ export function tallyByQuestion(
       n_persons_no_transcript: opts.noTranscriptPersons ?? 0,
       n_excluded_unverified_cells: unv + inv + pend,
       n_excl_unverified_cells: unv, n_excl_invalid_cells: inv, n_excl_pending_cells: pend,
+      n_unchecked_flagged_cells: flagCells, n_persons_with_unchecked_flagged: flagPersons,
     };
   });
 }
