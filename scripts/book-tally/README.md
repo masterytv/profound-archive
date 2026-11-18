@@ -178,6 +178,70 @@ go through the full pipeline.
   addressed the question has a Wilson 95% interval.
 - A sensitivity table counts each video separately.
 
+## Haiku-only results (current scope)
+
+**What was run.** Because of the budget, every NDE video was coded once, by the smallest and
+cheapest model (Haiku). The second reading by a larger model (Sonnet re-check) and the third
+opinion for disagreements (Opus arbiter) were **not run**. They may be added later if funding
+allows. The code that would run them is unchanged, and the full-corpus run of either pass needs
+an extra, deliberately long flag (`--i-understand-this-is-the-expensive-pass`) on top of the
+usual spend confirmation, so it cannot be started by accident. The pilot (100 videos coded by
+both Haiku and Sonnet) may still be run and measures how often the two models agree.
+
+**What is checked.**
+- Every answer is validated in code against the output format, and answers must cover every question.
+- Every answer other than `not_addressed` must carry a quote that is found word for word in the
+  transcript (after normalising case, punctuation and whitespace). An answer whose quote is not
+  found is **left out** and reported as `unverified_quote`. A malformed or incomplete answer is
+  left out and reported as `invalid`. The tally files show both counts per question.
+- Humans review a 25-video gold set. That produces precision per stance (how often a counted
+  answer was right) with 95% intervals.
+
+**What is not checked.** No answer was independently re-checked by a second model. In the full
+design every `no`, every `mixed` and every answer with confidence below 70 would have been sent
+for a second and, when the readers disagreed, a third reading. In the Haiku-only mode those
+answers are **counted anyway**, so that the tally is not biased toward `yes`. (Counting only
+what survives the full pipeline would silently drop most `no` and `mixed` answers.) The cost is
+that their accuracy rests on Haiku alone. The files therefore show, per question, how many
+counted answers *would have been* flagged for a re-check:
+`n_unchecked_flagged_cells` (video-level) and `n_persons_with_unchecked_flagged`
+(person-level). Read a question with a large share of such answers as less certain.
+
+**How to read the numbers.** Every CSV row carries `resolution = haiku_first_pass_unchecked`
+and every file name ends in `_haiku_only`. The gold report (`gold_report_haiku_only.md`) gives
+the evidence for how far the numbers can be trusted:
+- precision for `yes`, `no` and `mixed`, each with Wilson 95% interval and n;
+- precision split by `would_be_flagged` (Y/N), to show how much worse the answers that would
+  normally have been re-checked are;
+- precision by confidence band (below 70, 70 to 89, 90 and above);
+- how often a sampled `not_addressed` answer was right (missed answers).
+
+Do not publish a per-question figure that the gold set cannot support: with 25 videos the
+intervals are wide.
+
+**Gold set in this mode.** 25 videos are chosen by the same seeded sampler as before, disjoint
+from the pilot, from videos that already have a complete first-pass row set. Building the
+sheet therefore costs nothing after the full first pass (`run-stance --gold
+--resolution haiku-first-pass` reports "NO SPEND NEEDED"; if any sampled video lacks first-pass
+rows it plans only the Haiku first pass for those, through the normal estimate and confirm gate,
+and never plans a re-check). The sheet holds every counted non-`not_addressed` answer plus up
+to 3 random `not_addressed` answers per video, with confidence, quote, a link to the moment in
+the video and `would_be_flagged`. Build the final sheet only after the full first pass has
+finished: while some videos are still missing the sample can change.
+
+```bash
+R="npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job2"
+$R/rollup.ts --resolution haiku-first-pass          # out/tally_by_question_haiku_only.csv, *_sensitivity_per_video_haiku_only.csv, tally_report_haiku_only.md
+$R/gold-sheet.ts --resolution haiku-first-pass      # out/gold_review_haiku_only.csv
+$R/import-gold.ts --file out/gold_review_haiku_only.csv
+$R/gold-report.ts --resolution haiku-first-pass     # out/gold_report_haiku_only.md
+```
+
+The default (`--resolution full`) behaves exactly as before and still refuses to tally while
+re-check or arbiter cells are pending. The Haiku-only rollup does not refuse on pending cells
+(they are expected) but still refuses on unmapped videos, Job 1 merge conflicts, and videos
+with an incomplete first pass unless `--allow-partial` is given.
+
 ## 5. Known limitations (read before citing)
 
 - **Speaker attribution.** Captions don't mark who is speaking. Code can prove a quote is in the
@@ -191,6 +255,8 @@ go through the full pipeline.
   caption it was checked against.
 - **Timestamps.** Video-moment links come from aligning the quote with the raw caption track. They
   are a convenience and play no part in validation.
+- **Haiku-only answers are unchecked** (current scope): see the section above. Precision comes
+  from the gold set alone.
 - **No sampling temperature control**; see §2.
 - **Names.** People with the same normalised full name and no curated profile are treated as one
   person. A first name on its own never identifies a person.

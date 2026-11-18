@@ -145,6 +145,43 @@ Stances: `yes | no | mixed | not_addressed`. Silence is never `no`.
    n_excluded_unverified, and among-addressed shares with n and Wilson 95% CI. A sensitivity
    CSV repeats this counting each video as its own person.
 
+8. **Haiku-only resolution (current scope; budget decision).** Only the Haiku first pass runs on
+   all NDE videos; the Sonnet recheck and Opus arbiter full runs do NOT run (a funder may add
+   them later). Because `bt_final_stances` leaves every no / mixed / confidence < 70 / failed-quote
+   cell `pending_recheck` (a tally of it would hold only yes and not_addressed), the resolution
+   `haiku-first-pass` is computed in TypeScript (`job2/haiku.ts`) from `bt_stance_answers`
+   (`pass='first'`, latest row = max id per (video, question), active questions only);
+   `bt_final_stances` is not used in this mode.
+   - Counted iff `valid` AND (`stance = 'not_addressed'` OR `quote_verified`). Excluded and
+     reported with counts: `invalid`, `unverified_quote`. Among counted answers, those that the
+     full pipeline would have flagged (no, mixed, confidence < 70) are reported per question as
+     `n_unchecked_flagged_cells` (cells) and `n_persons_with_unchecked_flagged` (persons).
+   - `rollup.ts --resolution haiku-first-pass|full` (default `full`, behaviour unchanged). Haiku
+     mode: no pending refusal; still refuses on unmapped videos and merge conflicts, and on any
+     NDE video with a transcript that lacks a complete first-pass row set (one row per active
+     question) unless `--allow-partial`. Outputs `tally_by_question_haiku_only.csv`,
+     `tally_by_question_sensitivity_per_video_haiku_only.csv`, `tally_report_haiku_only.md`;
+     every CSV row has `resolution = haiku_first_pass_unchecked`; the report states that no answer
+     was independently re-checked by a second model and points to the gold set.
+   - Gold: `gold-sheet.ts --resolution haiku-first-pass` takes `--gold-n` (25) videos in the
+     existing seeded gold order, disjoint from the pilot (recomputed pilot sample plus any stored
+     pilot run), among NDE videos with a complete first-pass row set, so it costs nothing after
+     the full first pass. Rows: every counted non-not_addressed first-pass answer plus up to 3
+     seeded not_addressed rows per video, with confidence, quote, `t=` link and `would_be_flagged`
+     (Y/N), in `out/gold_review_haiku_only.csv` (importable by `import-gold.ts --file`).
+     `gold-report.ts --resolution haiku-first-pass` writes `out/gold_report_haiku_only.md`:
+     precision per stance with Wilson CI and n, split by `would_be_flagged` and by confidence band
+     (< 70, 70-89, >= 90).
+   - `run-stance --gold --resolution haiku-first-pass`: same sampler; if every sampled video
+     already has a complete first-pass row set nothing is estimated or spent ("NO SPEND NEEDED");
+     otherwise only the Haiku first pass is planned for the missing videos (bt_runs params carry
+     `resolution`), through the usual estimate/confirm gate. Combining it with `--pass
+     recheck|arbiter` is refused.
+   - Guard: `run-stance --confirm-spend` for a full-corpus recheck/arbiter group (including when
+     only the group id is given) additionally requires
+     `--i-understand-this-is-the-expensive-pass`. The pilot's Sonnet arm and gold-set passes are
+     unaffected.
+
 ## Statistics (`lib/stats.ts`)
 Cohen's kappa κ = (p_o − p_e)/(1 − p_e) over the 4 categories; κ undefined (report "n/a")
 when p_e = 1. Wilson score interval for proportions. Unit-tested against hand-computed values.
@@ -157,8 +194,8 @@ scripts/book-tally/
   data/      nicknames.json
   lib/       env.ts supabase.ts transcript.ts quote.ts names.ts batch.ts cost.ts stats.ts prompts.ts
   job1/      build-links.ts find-pairs.ts judge-pairs.ts extract-names.ts export-review.ts import-decisions.ts
-  job2/      run-stance.ts (--pilot|--gold|--full, --pass first|recheck|arbiter) pilot-report.ts
-             gold-sheet.ts import-gold.ts gold-report.ts rollup.ts
+  job2/      run-stance.ts (--pilot|--gold|--full, --pass first|recheck|arbiter, --resolution) pilot-report.ts
+             gold-sheet.ts import-gold.ts gold-report.ts rollup.ts haiku.ts (Haiku-only resolution)
   tests/     *.test.ts (synthetic fixtures only)
   out/       (gitignored)
 ```

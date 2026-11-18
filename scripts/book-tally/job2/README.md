@@ -24,3 +24,11 @@ incomplete coverage (`--allow-partial`); overrides are written into the CSV head
 Notes: no sampling parameters are sent (current models reject temperature); effort defaults are haiku
 medium, sonnet medium, opus high. Recheck/arbiter requests do not set cache_control (their system prompt is
 unique per video). Output goes to `scripts/book-tally/out/` (gitignored); logs print counts only.
+
+Haiku-only scope (current): only `--full --pass first` runs. `--full --pass recheck|arbiter` additionally
+needs `--i-understand-this-is-the-expensive-pass` with `--confirm-spend` (checked against the stored group,
+so omitting `--full/--pass` does not bypass it). `--resolution haiku-first-pass` on `rollup.ts`,
+`gold-sheet.ts`, `gold-report.ts` and `run-stance.ts --gold` selects the Haiku-only resolution (outputs
+suffixed `_haiku_only`; see README "Haiku-only results (current scope)"). Gold in this mode needs no
+spend once the first pass is complete: `run-stance --gold --resolution haiku-first-pass` says
+"NO SPEND NEEDED" and writes nothing.

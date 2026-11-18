@@ -302,7 +302,7 @@ describe('haiku gold: selection, sheet, report, no-spend path', () => {
     const nde = h.db.rows('nde_analysis').map((r) => r.video_id as string);
     const pilotIds = pilotOrder(nde, 20261118).slice(0, 4);
     expect(goldIds.filter((v) => pilotIds.includes(v))).toEqual([]);
-    expect(sheet).toHaveLength(3 * (2 + 3)); // q1 yes + q2 no counted; q3 (unverified quote) excluded; 3 not_addressed per video
+    expect(sheet).toHaveLength(3 * (2 + 2)); // q1 yes + q2 no counted; q3 (unverified quote) excluded; the only 2 not_addressed cells (q4, q5) per video (cap is 3)
     expect(sheet.some((r) => r.question_id === '3')).toBe(false);
     expect(Object.keys(sheet[0])).toEqual(['video_id', 'title', 'question_id', 'category', 'question', 'final_stance', 'confidence', 'quote', 'youtube_link', 'deciding_model', 'deciding_pass', 'answer_id', 'would_be_flagged', 'correct (Y/N)', 'quote_is_experiencer (Y/N)', 'note']);
     const claims = sheet.filter((r) => r.final_stance !== 'not_addressed');
@@ -329,7 +329,7 @@ describe('haiku gold: selection, sheet, report, no-spend path', () => {
     const file = path.join(h.outDir, 'marked.csv');
     writeFileSync(file, csv);
     await importGold(['--file', file], h.deps);
-    expect(h.db.rows('bt_gold_marks')).toHaveLength(15);
+    expect(h.db.rows('bt_gold_marks')).toHaveLength(12);
     await goldReport(args, h.deps);
     const rep = h.read('gold_report_haiku_only.md');
     expect(rep).toMatch(/no second model re-checked them/);

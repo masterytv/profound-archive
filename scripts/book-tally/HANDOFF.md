@@ -53,8 +53,8 @@ Prefix every command with
 5. **If the pilot ran**, run `job2/pilot-report.ts --group <id>` and report kappa, agreement, quote
    failure rate and cost. Stop for the owner.
 6. **After the first pass:**
-   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner `out/gold_review.csv`.
-   - After the owner marks it, run `import-gold.ts` and then `gold-report.ts`.
+   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner `out/gold_review_haiku_only.csv`.
+   - After the owner marks it, run `import-gold.ts --file out/gold_review_haiku_only.csv` and then `gold-report.ts --resolution haiku-first-pass`.
 7. **Job 1 review CSVs:** `job1/export-review.ts`. The owner marks them, then run
    `import-decisions.ts`.
 8. **Rollup:** `job2/rollup.ts --resolution haiku-first-pass`, only after the gold report and the
