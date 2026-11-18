@@ -286,11 +286,15 @@ export async function selectAllKeyset<T extends Record<string, unknown> = Record
 export interface QuestionRow {
   id: number;
   category: string | null;
-  /** The consumer-facing wording used in prompts and tallies (SPEC: consumer_question). nde_questions has no other text column. */
-  consumer_question: string | null;
+  /** The consumer-facing wording used in prompts and tallies (SPEC: consumer_question). NOT NULL in the live table. */
+  consumer_question: string;
 }
 
-/** Active question bank (id, category, consumer_question). */
+/**
+ * Active question bank (id, category, consumer_question). The live nde_questions table has no
+ * `question` column (checked 2026-11-18: id integer, slug, category, category_label,
+ * consumer_question NOT NULL, ai_query NOT NULL, ...), so consumer_question is the only wording.
+ */
 export function readActiveQuestions(db: Db): Promise<QuestionRow[]> {
   return selectAll<QuestionRow>(db, 'nde_questions', 'id, category, consumer_question', {
     orderBy: 'id',

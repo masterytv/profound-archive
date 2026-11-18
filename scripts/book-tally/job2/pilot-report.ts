@@ -124,7 +124,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const nVideos = intOpt(v['n-videos'], 'n-videos') ?? (await readNdeVideoIds(db)).length;
   const projection = projectPilot(pilot, nVideos);
   const qs = await readActiveQuestions(db);
-  const meta = new Map(qs.map((q) => [q.id, { category: q.category, question: q.consumer_question ?? '' }]));
+  const meta = new Map(qs.map((q) => [q.id, { category: q.category, question: q.consumer_question }]));
   const dir = ensureOutDir(ctx);
   writeFileSync(path.join(dir, 'pilot_report.md'), renderPilotMarkdown(pilot, projection, nVideos));
   writeFileSync(path.join(dir, 'pilot_per_question.csv'), toCsv(PER_QUESTION_HEADERS, perQuestionRows(pilot.stats.perQuestion, meta)));

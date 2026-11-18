@@ -232,7 +232,7 @@ describe('gold pipeline, review sheet, marks, rollup', () => {
     // gold recheck (blind Sonnet on flagged questions only; per-video system prompt is not cached)
     const before = h.client.created.length;
     await h.run(['--gold', '--pass', 'recheck', '--estimate']);
-    await h.run(['--gold', '--pass', 'recheck', '--confirm-spend', h.groupOf()]);
+    await h.run(['--gold', '--pass', 'recheck', '--confirm-spend', h.groupOf(), '--i-understand-this-is-the-expensive-pass']);
     const rcReqs = h.client.created.slice(before).flatMap((b) => b.requests);
     expect(rcReqs).toHaveLength(3);
     expect(rcReqs[0].params.model).toBe('claude-sonnet-5-5');
@@ -249,7 +249,7 @@ describe('gold pipeline, review sheet, marks, rollup', () => {
     // arbiter refuses while cells still await a recheck? (none do) and runs Opus with A/B blinding
     const before2 = h.client.created.length;
     await h.run(['--gold', '--pass', 'arbiter', '--estimate']);
-    await h.run(['--gold', '--pass', 'arbiter', '--confirm-spend', h.groupOf()]);
+    await h.run(['--gold', '--pass', 'arbiter', '--confirm-spend', h.groupOf(), '--i-understand-this-is-the-expensive-pass']);
     const arReqs = h.client.created.slice(before2).flatMap((b) => b.requests);
     expect(arReqs).toHaveLength(3);
     expect(arReqs[0].params.model).toBe('claude-opus-5-5');

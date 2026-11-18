@@ -5,7 +5,7 @@ repo-root CLAUDE.md.
 
 ## Owner's decisions
 - **Budget: Haiku only.** Run Job 1 and the Job 2 Haiku first pass. **Do NOT run the Job 2 full
-  Sonnet re-check or the Opus arbiter** (`run-stance --full --pass recheck|arbiter`). They may be
+  Sonnet re-check or the Opus arbiter** (`run-stance --gold|--full --pass recheck|arbiter`). They may be
   funded later by a publisher. The code requires an extra flag for those passes; never pass it.
 - **Results.** Publish Job 2 results with `--resolution haiku-first-pass` (rollup and gold sheet).
   The resolution is labelled "unchecked by a second model". Gold-set precision from the owner's
@@ -37,11 +37,18 @@ repo-root CLAUDE.md.
 Prefix every command with
 `npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/`.
 
-1. **Haiku-only mode: reviewed and APPROVED** at 5ceb8b9. The follow-up (quote-failure
-   breakdown by stance, gold fixes) landed in cd80e71, with 454 tests passing. Nothing to do.
+1. **DONE: the Haiku-only mode is reviewed.** The independent reviewer returned APPROVE in round 3
+   (at e3802a6, branch `claude/focused-meitner-j5bscj`) after two rounds of fixes: the expensive-pass
+   guard now covers gold recheck/arbiter too, and the Haiku gold report uses only marks on the
+   rebuilt sheet rows and refuses unless every row is marked. Its two optional nits were applied
+   afterwards (a partial report goes to `out/gold_report_haiku_only_PARTIAL.md`).
 2. **Run the free estimates** (no spend). Each writes a `bt_runs` row with status `estimated`:
-   - `job1/judge-pairs.ts --estimate` (Haiku stage)
-   - `job1/extract-names.ts --estimate`
+   - DONE `job1/judge-pairs.ts --estimate` (Haiku stage): run `j1h-20261118151446`, 473 requests,
+     446,681 input tokens, expected $0.27, ceiling $6.85.
+   - DONE `job1/extract-names.ts --estimate`: run `j1n-20261118151539`, 639 requests (blank names
+     only; 612 more single-token/placeholder names need `--include-unusable-names`), 4,262,192 input
+     tokens, expected $0.55, ceiling $9.80.
+   - Prices in `lib/cost.ts` were checked against the live pricing page on 2026-11-18 and match.
    - `job2/run-stance.ts --pilot --estimate` (optional pilot)
    - `job2/run-stance.ts --full --pass first --estimate`. This counts 6,054 requests with the free
      count_tokens endpoint, which is slow. Run it in the background.
@@ -52,8 +59,10 @@ Prefix every command with
 5. **If the pilot ran**, run `job2/pilot-report.ts --group <id>` and report kappa, agreement, quote
    failure rate and cost. Stop for the owner.
 6. **After the first pass:**
-   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner `out/gold_review_haiku_only.csv`.
-   - After the owner marks it, run `import-gold.ts --file out/gold_review_haiku_only.csv` and then `gold-report.ts --resolution haiku-first-pass`.
+   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner
+     `out/gold_review_haiku_only.csv`.
+   - After the owner marks it, run `job2/import-gold.ts --file <marked csv>` and then
+     `job2/gold-report.ts --resolution haiku-first-pass` (same --seed/--pilot-n/--gold-n as the sheet).
 7. **Job 1 review CSVs:** `job1/export-review.ts`. The owner marks them, then run
    `import-decisions.ts`.
 8. **Rollup:** `job2/rollup.ts --resolution haiku-first-pass`, only after the gold report and the

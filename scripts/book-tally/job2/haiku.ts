@@ -18,6 +18,7 @@ import { VIEW_VIDEO_CHUNK } from './db';
 import { isFlagged, type AnswerLite } from './flags';
 import type { Stance } from './answers';
 import { wilson, type Proportion } from '../lib/stats';
+import { NA_ROWS_PER_VIDEO, selectGoldRows } from './gold';
 import type { FinalRow } from './tally';
 
 export type Resolution = 'full' | 'haiku-first-pass';
@@ -143,4 +144,14 @@ export function quoteFailureByStance(cells: readonly HaikuCell[]): Record<'yes' 
     out[st] = wilson(sel.filter((c) => c.category === 'unverified_quote').length, sel.length);
   }
   return out;
+}
+
+/**
+ * The exact cells on the Haiku-only gold sheet: every counted non-not_addressed answer plus
+ * NA_ROWS_PER_VIDEO seeded not_addressed rows per video (all if fewer). Deterministic; shared by
+ * gold-sheet (which writes it) and gold-report (which checks the marks cover it), so they cannot drift.
+ */
+export function haikuGoldSheetCells(cells: readonly HaikuCell[], seed: number): Array<HaikuCell & { stance: Stance; status: string }> {
+  const counted = cells.filter((c) => c.category === 'counted');
+  return selectGoldRows(counted.map((c) => ({ ...c, stance: c.stance as Stance, status: 'final' })), seed, NA_ROWS_PER_VIDEO);
 }
