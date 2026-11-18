@@ -1,0 +1,28 @@
+name: NDE of the Week (newsletter draft)
+
+# Makes the weekly newsletter as a Resend broadcast DRAFT (src/app/api/email/weekly-draft/route.ts). Nothing is
+# sent to subscribers: Tom reads the draft in Resend and presses Send. Thursdays 13:17 UTC (8:17 am EST, 9:17 am
+# EDT). Run by hand from the Actions tab to make this week's draft now; a second run the same day does nothing.
+
+on:
+  schedule:
+    - cron: '17 13 * * 4'
+  workflow_dispatch: {}
+
+jobs:
+  draft:
+    name: Make the weekly draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ask the app for the draft
+        run: |
+          body=$(curl -s --max-time 120 -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://projectprofound.org/api/email/weekly-draft")
+          code=$(echo "$body" | tail -n1)
+          echo "$body" | head -n -1
+          if [ "$code" != "200" ]; then
+            echo "::error::weekly-draft returned HTTP $code"
+            exit 1
+          fi

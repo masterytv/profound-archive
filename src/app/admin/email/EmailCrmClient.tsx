@@ -39,6 +39,7 @@ const FREQ_LABELS: Record<string, string> = {
 const NEWSLETTER_ENTRIES: { id: string; icon: string; label: string }[] = [
   { id: "newsletter_nde", icon: "✦", label: "NDE Newsletter" },
   { id: "newsletter_uap", icon: "◎", label: "UAP Newsletter" },
+  { id: "newsletter_swc", icon: "☼", label: "Soul Wisdom sign-ups" },
 ];
 
 // ── Stat Card ─────────────────────────────────────────────────────────────

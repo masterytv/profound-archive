@@ -1,0 +1,1633 @@
+{
+  "version": "codebook-v1",
+  "approved": "2026-11-18",
+  "max_choices": 3,
+  "counts_as_answer": "What the experiencer experienced, or learned from their NDE, whether during it or afterwards through the understanding or connection it gave them, at any point in the account. Not: beliefs they say they held only before the NDE, things only an interviewer or host says, or other people's accounts.",
+  "facts": [
+    {
+      "key": "f0",
+      "type": "mc",
+      "ask": "What brought on the NDE?",
+      "choices": [
+        {
+          "code": "illness",
+          "label": "Illness"
+        },
+        {
+          "code": "surgery_medical_procedure",
+          "label": "Surgery or a medical procedure"
+        },
+        {
+          "code": "cardiac_arrest",
+          "label": "Cardiac arrest"
+        },
+        {
+          "code": "accident",
+          "label": "Accident"
+        },
+        {
+          "code": "drowning",
+          "label": "Drowning"
+        },
+        {
+          "code": "childbirth_pregnancy",
+          "label": "Childbirth or pregnancy"
+        },
+        {
+          "code": "violence",
+          "label": "Violence (assault, stabbing, shooting, attempted murder)"
+        },
+        {
+          "code": "suicide_attempt",
+          "label": "Suicide attempt"
+        },
+        {
+          "code": "overdose_addiction",
+          "label": "Overdose or addiction"
+        }
+      ]
+    },
+    {
+      "key": "f1",
+      "type": "yn",
+      "ask": "Is this true of the experiencer: The NDE came suddenly, without warning (accident, sudden collapse), not during an expected or gradual decline?",
+      "yes_means": "The NDE came suddenly, without warning (accident, sudden collapse), not during an expected or gradual decline",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "key": "f2",
+      "type": "yn",
+      "ask": "Is this true of the experiencer: The experiencer was in severe pain or suffering just before the NDE?",
+      "yes_means": "The experiencer was in severe pain or suffering just before the NDE",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "key": "f3",
+      "type": "yn",
+      "ask": "Is this true of the experiencer: The experiencer was deeply depressed or very afraid just before the NDE?",
+      "yes_means": "The experiencer was deeply depressed or very afraid just before the NDE",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "key": "f4",
+      "type": "yn",
+      "ask": "Is this true of the experiencer: The experiencer was an atheist or nonreligious before the NDE?",
+      "yes_means": "The experiencer was an atheist or nonreligious before the NDE",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "key": "f5",
+      "type": "yn",
+      "ask": "Is this true of the experiencer: The experiencer had left the religion they were raised in before the NDE?",
+      "yes_means": "The experiencer had left the religion they were raised in before the NDE",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "key": "f6",
+      "type": "yn",
+      "ask": "Is this true of the experiencer: All or part of the NDE was frightening or hellish?",
+      "yes_means": "All or part of the NDE was frightening or hellish",
+      "no_means": null,
+      "mixed_means": null
+    }
+  ],
+  "items": [
+    {
+      "question_id": 1,
+      "question": "Are our loved ones really there to greet us when we die?",
+      "first_run_addressed": 2332,
+      "key": "q1",
+      "part": null,
+      "type": "yn",
+      "ask": "Are our loved ones really there to greet us when we die?",
+      "yes_means": "deceased loved ones were there to greet them",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 2,
+      "question": "Will I recognize the people I've lost, and will they look the way I remember?",
+      "first_run_addressed": 1049,
+      "key": "q2a",
+      "part": "a",
+      "type": "yn",
+      "ask": "Did the experiencer recognize deceased loved ones?",
+      "yes_means": "they recognized deceased loved ones",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 2,
+      "question": "Will I recognize the people I've lost, and will they look the way I remember?",
+      "first_run_addressed": 1049,
+      "key": "q2b",
+      "part": "b",
+      "type": "mc",
+      "ask": "How did deceased loved ones look?",
+      "choices": [
+        {
+          "code": "remembered",
+          "label": "As remembered"
+        },
+        {
+          "code": "younger_prime",
+          "label": "Younger or in their prime"
+        },
+        {
+          "code": "healed_healthy_free_illness",
+          "label": "Healed, healthy, free of illness or injury"
+        },
+        {
+          "code": "light_presence_without_clear",
+          "label": "As light or a presence without a clear body"
+        },
+        {
+          "code": "known_feeling_knowing_not",
+          "label": "Known by feeling or knowing, not by appearance"
+        }
+      ]
+    },
+    {
+      "question_id": 3,
+      "question": "Do the people who've crossed over know what's happening in my life right now?",
+      "first_run_addressed": 391,
+      "key": "q3",
+      "part": null,
+      "type": "yn",
+      "ask": "Do the people who've crossed over know what's happening in my life right now?",
+      "yes_means": "the dead know what is happening in the lives of the living",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 4,
+      "question": "I never got to say goodbye — does my loved one know what they meant to me?",
+      "first_run_addressed": 65,
+      "key": "q4",
+      "part": null,
+      "type": "yn",
+      "ask": "I never got to say goodbye — does my loved one know what they meant to me?",
+      "yes_means": "the deceased know what they meant to those left behind",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 5,
+      "question": "Is the love between us still personal and deep, or does it become something universal and impersonal?",
+      "first_run_addressed": 558,
+      "key": "q5",
+      "part": null,
+      "type": "yn",
+      "ask": "Does love between particular people stay personal on the other side?",
+      "yes_means": "stays personal",
+      "no_means": "becomes only universal and impersonal",
+      "mixed_means": "both"
+    },
+    {
+      "question_id": 6,
+      "question": "If my spouse remarries after I die, who are they with on the other side?",
+      "first_run_addressed": 2,
+      "key": "q6",
+      "part": null,
+      "type": "mc",
+      "ask": "If my spouse remarries after I die, who are they with on the other side?",
+      "choices": [
+        {
+          "code": "relationships_continue_without_jealousy",
+          "label": "Relationships continue without jealousy or exclusivity"
+        },
+        {
+          "code": "each_people_love_soulmate",
+          "label": "Each is with the people they love, or a soulmate"
+        },
+        {
+          "code": "earthly_marriage_does_not",
+          "label": "Earthly marriage does not carry over in the same way"
+        }
+      ]
+    },
+    {
+      "question_id": 7,
+      "question": "Can deceased loved ones come to escort us when it's our time to cross over?",
+      "first_run_addressed": 838,
+      "key": "q7",
+      "part": null,
+      "type": "yn",
+      "ask": "Can deceased loved ones come to escort us when it's our time to cross over?",
+      "yes_means": "a loved one came, or would come, to escort them across",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 8,
+      "question": "What if someone who hurt or abused me in life is waiting on the other side?",
+      "first_run_addressed": 68,
+      "key": "q8",
+      "part": null,
+      "type": "mc",
+      "ask": "What if someone who hurt or abused me in life is waiting on the other side?",
+      "choices": [
+        {
+          "code": "made_peace_forgave_each",
+          "label": "They made peace or forgave each other"
+        },
+        {
+          "code": "that_person_was_loved",
+          "label": "That person was loved, accepted or welcomed there"
+        },
+        {
+          "code": "that_person_helped_supported",
+          "label": "That person helped or supported them"
+        },
+        {
+          "code": "that_person_was_dark",
+          "label": "That person was in a dark or lower place"
+        },
+        {
+          "code": "were_kept_away_protected",
+          "label": "They were kept away or protected from that person"
+        }
+      ]
+    },
+    {
+      "question_id": 9,
+      "question": "What if my loved one has already reincarnated by the time I die — will I ever see them again?",
+      "first_run_addressed": 16,
+      "key": "q9",
+      "part": null,
+      "type": "yn",
+      "ask": "Can a loved one who has reincarnated still be met again?",
+      "yes_means": "a loved one who has reincarnated can still be met again",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 10,
+      "question": "Do pets have souls, and will mine really be waiting for me when I die?",
+      "first_run_addressed": 301,
+      "key": "q10",
+      "part": null,
+      "type": "yn",
+      "ask": "Do pets have souls, and will mine really be waiting for me when I die?",
+      "yes_means": "their pets were there or waiting for them",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 11,
+      "question": "Will my pet be young, healthy, and free from the suffering of their final days?",
+      "first_run_addressed": 47,
+      "key": "q11",
+      "part": null,
+      "type": "yn",
+      "ask": "Will my pet be young, healthy, and free from the suffering of their final days?",
+      "yes_means": "pets on the other side are young, healthy and free of suffering",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 12,
+      "question": "Did my pet understand why I had to let them go?",
+      "first_run_addressed": 4,
+      "key": "q12",
+      "part": null,
+      "type": "yn",
+      "ask": "Did my pet understand why I had to let them go?",
+      "yes_means": "pets understood why they were let go",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 13,
+      "question": "Will all the different pets I've loved throughout my life be there?",
+      "first_run_addressed": 80,
+      "key": "q13",
+      "part": null,
+      "type": "yn",
+      "ask": "Will all the different pets I've loved throughout my life be there?",
+      "yes_means": "several of the pets they loved were there",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 14,
+      "question": "Who is looking after my pet right now while they wait for me?",
+      "first_run_addressed": 10,
+      "key": "q14",
+      "part": null,
+      "type": "mc",
+      "ask": "Who is looking after my pet right now while they wait for me?",
+      "choices": [
+        {
+          "code": "deceased_loved_one",
+          "label": "A deceased loved one"
+        },
+        {
+          "code": "caretaker_guide_angel",
+          "label": "A caretaker, guide or angel"
+        },
+        {
+          "code": "jesus_god",
+          "label": "Jesus or God"
+        },
+        {
+          "code": "are_other_animals",
+          "label": "They are with other animals"
+        }
+      ]
+    },
+    {
+      "question_id": 15,
+      "question": "Have NDE experiencers ever encountered animals during their experience?",
+      "first_run_addressed": 988,
+      "key": "q15",
+      "part": null,
+      "type": "yn",
+      "ask": "Have NDE experiencers ever encountered animals during their experience?",
+      "yes_means": "they met animals during the NDE",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 16,
+      "question": "Where does the soul of a miscarried or stillborn baby go?",
+      "first_run_addressed": 113,
+      "key": "q16",
+      "part": null,
+      "type": "mc",
+      "ask": "Where does the soul of a miscarried or stillborn baby go?",
+      "choices": [
+        {
+          "code": "place_where_babies_children",
+          "label": "A place where babies and children are loved and cared for"
+        },
+        {
+          "code": "god_jesus_angels",
+          "label": "With God, Jesus or angels"
+        },
+        {
+          "code": "deceased_family",
+          "label": "With deceased family"
+        },
+        {
+          "code": "grow_up_there",
+          "label": "They grow up there"
+        },
+        {
+          "code": "stay_close_parents",
+          "label": "They stay close to their parents"
+        },
+        {
+          "code": "can_return_reincarnate",
+          "label": "They can return or reincarnate"
+        }
+      ]
+    },
+    {
+      "question_id": 17,
+      "question": "Will my child be waiting as the baby I lost, or will they have grown up on the other side?",
+      "first_run_addressed": 107,
+      "key": "q17",
+      "part": null,
+      "type": "mc",
+      "ask": "Will my child be waiting as the baby I lost, or will they have grown up on the other side?",
+      "choices": [
+        {
+          "code": "grown_up_older_than",
+          "label": "Grown up, older than when they died"
+        },
+        {
+          "code": "age_were_when_died",
+          "label": "The age they were when they died"
+        },
+        {
+          "code": "growing_up_there_over",
+          "label": "Growing up there over time"
+        },
+        {
+          "code": "appeared_different_ages",
+          "label": "Appeared at different ages"
+        }
+      ]
+    },
+    {
+      "question_id": 18,
+      "question": "Will I get the chance to raise and be close to the child I never got to raise here?",
+      "first_run_addressed": 13,
+      "key": "q18",
+      "part": null,
+      "type": "yn",
+      "ask": "Will I get the chance to raise and be close to the child I never got to raise here?",
+      "yes_means": "parents can raise, or be close to, a child they lost",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 19,
+      "question": "Is my child frightened or alone in the afterlife, or are they safe and loved?",
+      "first_run_addressed": 191,
+      "key": "q19",
+      "part": null,
+      "type": "yn",
+      "ask": "Are children who die safe and loved on the other side?",
+      "yes_means": "safe and loved",
+      "no_means": "frightened or alone",
+      "mixed_means": null
+    },
+    {
+      "question_id": 20,
+      "question": "Do deceased relatives look after children who cross over before their parents arrive?",
+      "first_run_addressed": 55,
+      "key": "q20",
+      "part": null,
+      "type": "yn",
+      "ask": "Do deceased relatives look after children who cross over before their parents arrive?",
+      "yes_means": "deceased relatives look after children who die",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 21,
+      "question": "Why would a loving God allow a child to suffer and die?",
+      "first_run_addressed": 43,
+      "key": "q21",
+      "part": null,
+      "type": "mc",
+      "ask": "Why would a loving God allow a child to suffer and die?",
+      "choices": [
+        {
+          "code": "part_larger_plan",
+          "label": "Part of a larger plan"
+        },
+        {
+          "code": "soul_chose_before_birth",
+          "label": "The soul chose it before birth"
+        },
+        {
+          "code": "so_that_others_can",
+          "label": "So that others can learn or grow"
+        },
+        {
+          "code": "free_will_god_does",
+          "label": "Free will, God does not intervene"
+        },
+        {
+          "code": "caused_evil_not_god",
+          "label": "Caused by evil, not by God"
+        },
+        {
+          "code": "no_reason_given_understood",
+          "label": "No reason given or understood"
+        }
+      ]
+    },
+    {
+      "question_id": 22,
+      "question": "What happens to someone who dies by suicide — are they punished, or met with compassion?",
+      "first_run_addressed": 212,
+      "key": "q22",
+      "part": null,
+      "type": "yn",
+      "ask": "Are people who die by suicide met with compassion?",
+      "yes_means": "compassion",
+      "no_means": "punished",
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f0",
+        "choice": "suicide_attempt"
+      }
+    },
+    {
+      "question_id": 23,
+      "question": "Does someone who takes their own life regret it when they cross over?",
+      "first_run_addressed": 50,
+      "key": "q23",
+      "part": null,
+      "type": "yn",
+      "ask": "Does someone who takes their own life regret it when they cross over?",
+      "yes_means": "they regretted it, or were shown it was a mistake",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f0",
+        "choice": "suicide_attempt"
+      }
+    },
+    {
+      "question_id": 25,
+      "question": "If someone was murdered or died violently, is their soul protected before the worst of it?",
+      "first_run_addressed": 68,
+      "key": "q25",
+      "part": null,
+      "type": "yn",
+      "ask": "If someone was murdered or died violently, is their soul protected before the worst of it?",
+      "yes_means": "the soul left, or was protected, before the worst of the violence",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f0",
+        "choice": "violence"
+      }
+    },
+    {
+      "question_id": 26,
+      "question": "Do people who die suddenly — in accidents or without warning — get extra help crossing over?",
+      "first_run_addressed": 69,
+      "key": "q26",
+      "part": null,
+      "type": "yn",
+      "ask": "Do people who die suddenly — in accidents or without warning — get extra help crossing over?",
+      "yes_means": "they had help crossing over",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f1"
+      }
+    },
+    {
+      "question_id": 27,
+      "question": "Can a soul get stuck after a violent death without realizing they've died?",
+      "first_run_addressed": 103,
+      "key": "q27",
+      "part": null,
+      "type": "yn",
+      "ask": "Can a soul get stuck after a violent death without realizing they've died?",
+      "yes_means": "a soul can get stuck without realizing it has died",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f0",
+        "choice": "violence"
+      }
+    },
+    {
+      "question_id": 28,
+      "question": "If someone dies from addiction or overdose, do they find clarity on the other side?",
+      "first_run_addressed": 28,
+      "key": "q28",
+      "part": null,
+      "type": "yn",
+      "ask": "If someone dies from addiction or overdose, do they find clarity on the other side?",
+      "yes_means": "they found clarity",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f0",
+        "choice": "overdose_addiction"
+      }
+    },
+    {
+      "question_id": 29,
+      "question": "Can someone who died in terrible suffering still find complete peace and healing?",
+      "first_run_addressed": 743,
+      "key": "q29",
+      "part": null,
+      "type": "yn",
+      "ask": "Can someone who died in terrible suffering still find complete peace and healing?",
+      "yes_means": "found peace and healing",
+      "no_means": "more terror or suffering",
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f2"
+      }
+    },
+    {
+      "question_id": 40,
+      "question": "If I die suddenly — in a crash or in my sleep — will I understand what happened?",
+      "first_run_addressed": 966,
+      "key": "q40",
+      "part": null,
+      "type": "yn",
+      "ask": "If I die suddenly — in a crash or in my sleep — will I understand what happened?",
+      "yes_means": "they understood what had happened to them",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f1"
+      }
+    },
+    {
+      "question_id": 30,
+      "question": "When lights flicker, coins appear, or I see my loved one's favorite bird — is that really them contacting me?",
+      "first_run_addressed": 322,
+      "key": "q30",
+      "part": null,
+      "type": "yn",
+      "ask": "Can signs such as flickering lights, coins appearing, or a loved one's favorite bird be real contact from the dead?",
+      "yes_means": "real contact",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 31,
+      "question": "Why hasn't my deceased loved one visited me in a dream — are they unable to, or upset with me?",
+      "first_run_addressed": 2,
+      "key": "q31",
+      "part": null,
+      "type": "mc",
+      "ask": "Why hasn't my deceased loved one visited me in a dream — are they unable to, or upset with me?",
+      "choices": [
+        {
+          "code": "are_able_not_upset",
+          "label": "They are able to and not upset; it depends on the living person"
+        },
+        {
+          "code": "are_upset",
+          "label": "They are upset"
+        },
+        {
+          "code": "are_unable",
+          "label": "They are unable to"
+        }
+      ]
+    },
+    {
+      "question_id": 32,
+      "question": "Can the people who've crossed over actually hear me when I talk to them out loud?",
+      "first_run_addressed": 188,
+      "key": "q32",
+      "part": null,
+      "type": "yn",
+      "ask": "Can the people who've crossed over actually hear me when I talk to them out loud?",
+      "yes_means": "the dead hear the living",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 33,
+      "question": "Does my constant grief disturb the peace of the people I've lost — should I try to let go?",
+      "first_run_addressed": 65,
+      "key": "q33",
+      "part": null,
+      "type": "yn",
+      "ask": "Does my constant grief disturb the peace of the people I've lost — should I try to let go?",
+      "yes_means": "grief does affect, or hold back, the dead",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 34,
+      "question": "Are mediums really communicating with deceased loved ones, or just reading our emotions?",
+      "first_run_addressed": 330,
+      "key": "q34",
+      "part": null,
+      "type": "yn",
+      "ask": "Can mediums genuinely communicate with the dead?",
+      "yes_means": "genuine",
+      "no_means": "not genuine",
+      "mixed_means": null
+    },
+    {
+      "question_id": 35,
+      "question": "How do I tell the difference between a genuine sign from a loved one and just a coincidence?",
+      "first_run_addressed": 33,
+      "key": "q35",
+      "part": null,
+      "type": "mc",
+      "ask": "How do I tell the difference between a genuine sign from a loved one and just a coincidence?",
+      "choices": [
+        {
+          "code": "inner_knowing_feeling",
+          "label": "An inner knowing or feeling"
+        },
+        {
+          "code": "ask_specific_sign",
+          "label": "Ask for a specific sign"
+        },
+        {
+          "code": "comes_quickly_unexpectedly",
+          "label": "It comes quickly or unexpectedly"
+        },
+        {
+          "code": "repeats",
+          "label": "It repeats"
+        },
+        {
+          "code": "there_are_no_coincidences",
+          "label": "There are no coincidences"
+        },
+        {
+          "code": "trust_first_impression",
+          "label": "Trust the first impression"
+        }
+      ]
+    },
+    {
+      "question_id": 36,
+      "question": "If I start to heal and feel happy again, will my deceased loved one think I've moved on and forgotten them?",
+      "first_run_addressed": 28,
+      "key": "q36",
+      "part": null,
+      "type": "yn",
+      "ask": "If I start to heal and feel happy again, will my deceased loved one think I've moved on and forgotten them?",
+      "yes_means": "the dead would feel forgotten",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 37,
+      "question": "Is dying painful, or do people feel peace at the end?",
+      "first_run_addressed": 3244,
+      "key": "q37",
+      "part": null,
+      "type": "yn",
+      "ask": "Was the moment of dying peaceful rather than painful?",
+      "yes_means": "peaceful",
+      "no_means": "painful",
+      "mixed_means": null
+    },
+    {
+      "question_id": 38,
+      "question": "Will I panic and feel terror as I die, or does calm come over you?",
+      "first_run_addressed": 3340,
+      "key": "q38",
+      "part": null,
+      "type": "yn",
+      "ask": "Did peace come over them as they died?",
+      "yes_means": "calm or peace",
+      "no_means": "panic or terror",
+      "mixed_means": null
+    },
+    {
+      "question_id": 39,
+      "question": "What does it feel like in the first moments after leaving the body?",
+      "first_run_addressed": 4718,
+      "key": "q39",
+      "part": null,
+      "type": "mc",
+      "ask": "What does it feel like in the first moments after leaving the body?",
+      "choices": [
+        {
+          "code": "peace_calm",
+          "label": "Peace or calm"
+        },
+        {
+          "code": "lightness_floating_freedom",
+          "label": "Lightness, floating or freedom"
+        },
+        {
+          "code": "watching_body_from_outside",
+          "label": "Watching their body from outside"
+        },
+        {
+          "code": "no_pain",
+          "label": "No pain"
+        },
+        {
+          "code": "sharper_awareness_clarity",
+          "label": "Sharper awareness or clarity"
+        },
+        {
+          "code": "joy_bliss",
+          "label": "Joy or bliss"
+        },
+        {
+          "code": "confusion",
+          "label": "Confusion"
+        },
+        {
+          "code": "fear_distress",
+          "label": "Fear or distress"
+        },
+        {
+          "code": "time_stopped_changed",
+          "label": "Time stopped or changed"
+        }
+      ]
+    },
+    {
+      "question_id": 41,
+      "question": "Will someone be there to meet me, or could I die completely alone?",
+      "first_run_addressed": 3307,
+      "key": "q41",
+      "part": null,
+      "type": "yn",
+      "ask": "Was someone there to meet them?",
+      "yes_means": "met (a person, being or presence)",
+      "no_means": "alone",
+      "mixed_means": null
+    },
+    {
+      "question_id": 42,
+      "question": "What if I'm aware but unable to move or speak as my body shuts down?",
+      "first_run_addressed": 1057,
+      "key": "q42",
+      "part": null,
+      "type": "mc",
+      "ask": "What if I'm aware but unable to move or speak as my body shuts down?",
+      "choices": [
+        {
+          "code": "could_hear_what_was",
+          "label": "Could hear what was happening"
+        },
+        {
+          "code": "was_aware_surroundings",
+          "label": "Was aware of their surroundings"
+        },
+        {
+          "code": "tried_but_could_not",
+          "label": "Tried but could not move or speak"
+        },
+        {
+          "code": "felt_fear_panic",
+          "label": "Felt fear or panic"
+        },
+        {
+          "code": "felt_calm",
+          "label": "Felt calm"
+        },
+        {
+          "code": "wanted_tell_others_were",
+          "label": "Wanted to tell others they were all right"
+        }
+      ]
+    },
+    {
+      "question_id": 43,
+      "question": "Do people who have NDEs actually lose their fear of death afterward?",
+      "first_run_addressed": 1268,
+      "key": "q43",
+      "part": null,
+      "type": "yn",
+      "ask": "Do people who have NDEs actually lose their fear of death afterward?",
+      "yes_means": "they lost their fear of death",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 44,
+      "question": "Will I have to relive everything I've ever done — especially the things I'm most ashamed of?",
+      "first_run_addressed": 1820,
+      "key": "q44",
+      "part": null,
+      "type": "yn",
+      "ask": "Will I have to relive everything I've ever done — especially the things I'm most ashamed of?",
+      "yes_means": "they relived all, or most, of their life, including what they were ashamed of",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 45,
+      "question": "Do you feel the pain you caused others, exactly as they experienced it?",
+      "first_run_addressed": 635,
+      "key": "q45",
+      "part": null,
+      "type": "mc",
+      "ask": "Do you feel the pain you caused others, exactly as they experienced it?",
+      "choices": [
+        {
+          "code": "felt_what_others_felt",
+          "label": "Felt what others felt, as they felt it"
+        },
+        {
+          "code": "felt_more_intensely_than",
+          "label": "Felt it more intensely than the others did"
+        },
+        {
+          "code": "saw_others_point_view",
+          "label": "Saw others' point of view without feeling it"
+        },
+        {
+          "code": "also_felt_joy_good",
+          "label": "Also felt the joy or good they caused"
+        },
+        {
+          "code": "felt_no_pain_only",
+          "label": "Felt no pain, only understanding"
+        }
+      ]
+    },
+    {
+      "question_id": 46,
+      "question": "Is the life review meant to punish, or to help a soul understand and heal?",
+      "first_run_addressed": 1020,
+      "key": "q46",
+      "part": null,
+      "type": "yn",
+      "ask": "Is the life review for understanding and healing, not punishment?",
+      "yes_means": "understanding and healing",
+      "no_means": "punishment",
+      "mixed_means": null
+    },
+    {
+      "question_id": 47,
+      "question": "Does God judge me during the life review, or am I the one doing the judging?",
+      "first_run_addressed": 734,
+      "key": "q47",
+      "part": null,
+      "type": "mc",
+      "ask": "Does God judge me during the life review, or am I the one doing the judging?",
+      "choices": [
+        {
+          "code": "judged_themselves",
+          "label": "They judged themselves"
+        },
+        {
+          "code": "no_judgment_all_only",
+          "label": "No judgment at all, only love"
+        },
+        {
+          "code": "judged_god_being",
+          "label": "Judged by God or a being"
+        },
+        {
+          "code": "reviewed_loving_being_who",
+          "label": "Reviewed it with a loving being who did not judge"
+        }
+      ]
+    },
+    {
+      "question_id": 48,
+      "question": "What if I'm so ashamed of what I see that I can't forgive myself?",
+      "first_run_addressed": 57,
+      "key": "q48",
+      "part": null,
+      "type": "yn",
+      "ask": "Were they able to forgive themselves for what they saw?",
+      "yes_means": "they were able to forgive themselves for what they saw",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 49,
+      "question": "Do small, forgotten acts of kindness show up during the life review and matter?",
+      "first_run_addressed": 390,
+      "key": "q49",
+      "part": null,
+      "type": "yn",
+      "ask": "Do small, forgotten acts of kindness show up during the life review and matter?",
+      "yes_means": "small kindnesses appeared and mattered",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 50,
+      "question": "If I've already made amends for my worst mistakes, does that change how the life review feels?",
+      "first_run_addressed": 13,
+      "key": "q50",
+      "part": null,
+      "type": "yn",
+      "ask": "If I've already made amends for my worst mistakes, does that change how the life review feels?",
+      "yes_means": "making amends changed the life review",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 51,
+      "question": "Is hell a real place, or is it a story religion invented to control people through fear?",
+      "first_run_addressed": 724,
+      "key": "q51",
+      "part": null,
+      "type": "yn",
+      "ask": "Is hell a real place?",
+      "yes_means": "real",
+      "no_means": "not real or invented",
+      "mixed_means": "for example, a state of mind rather than a place"
+    },
+    {
+      "question_id": 52,
+      "question": "What happens to genuinely evil people — murderers, abusers — do they face real consequences?",
+      "first_run_addressed": 324,
+      "key": "q52",
+      "part": null,
+      "type": "mc",
+      "ask": "What happens to genuinely evil people — murderers, abusers — do they face real consequences?",
+      "choices": [
+        {
+          "code": "face_what_did_life",
+          "label": "Face what they did in a life review"
+        },
+        {
+          "code": "feel_pain_caused",
+          "label": "Feel the pain they caused"
+        },
+        {
+          "code": "go_dark_hellish_place",
+          "label": "Go to a dark or hellish place"
+        },
+        {
+          "code": "consequences_later_lives",
+          "label": "Consequences in later lives (karma)"
+        },
+        {
+          "code": "are_still_loved_can",
+          "label": "They are still loved and can heal"
+        },
+        {
+          "code": "eternal_punishment",
+          "label": "Eternal punishment"
+        }
+      ]
+    },
+    {
+      "question_id": 53,
+      "question": "I've done things I'm deeply ashamed of — does that mean I'm going to hell?",
+      "first_run_addressed": 518,
+      "key": "q53",
+      "part": null,
+      "type": "yn",
+      "ask": "I've done things I'm deeply ashamed of — does that mean I'm going to hell?",
+      "yes_means": "shameful acts lead to hell",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 54,
+      "question": "Some people describe dark and terrifying NDEs — what causes those, and could that happen to anyone?",
+      "first_run_addressed": 369,
+      "key": "q54a",
+      "part": "a",
+      "type": "mc",
+      "ask": "What causes frightening or hellish NDEs?",
+      "choices": [
+        {
+          "code": "own_actions_way_life",
+          "label": "Their own actions or way of life"
+        },
+        {
+          "code": "state_mind_death",
+          "label": "Their state of mind at death (anger, fear, despair)"
+        },
+        {
+          "code": "beliefs_expectations",
+          "label": "Beliefs or expectations"
+        },
+        {
+          "code": "addiction_attachments",
+          "label": "Addiction or attachments"
+        },
+        {
+          "code": "evil_beings_spiritual_attack",
+          "label": "Evil beings or a spiritual attack"
+        },
+        {
+          "code": "body_s_physical_distress",
+          "label": "The body's physical distress"
+        }
+      ]
+    },
+    {
+      "question_id": 54,
+      "question": "Some people describe dark and terrifying NDEs — what causes those, and could that happen to anyone?",
+      "first_run_addressed": 369,
+      "key": "q54b",
+      "part": "b",
+      "type": "yn",
+      "ask": "Could a frightening or hellish NDE happen to anyone?",
+      "yes_means": "it could happen to anyone",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 55,
+      "question": "If someone dies while deeply depressed or afraid, could their mental state pull them into a dark experience?",
+      "first_run_addressed": 244,
+      "key": "q55",
+      "part": null,
+      "type": "yn",
+      "ask": "If someone dies while deeply depressed or afraid, could their mental state pull them into a dark experience?",
+      "yes_means": "their state of mind led to a dark experience",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f3"
+      }
+    },
+    {
+      "question_id": 56,
+      "question": "Is there always a way out if someone ends up in a frightening or hellish NDE?",
+      "first_run_addressed": 363,
+      "key": "q56",
+      "part": null,
+      "type": "yn",
+      "ask": "Is there always a way out if someone ends up in a frightening or hellish NDE?",
+      "yes_means": "there was a way out",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f6"
+      }
+    },
+    {
+      "question_id": 57,
+      "question": "Will I still feel like \"me\" — with my personality, my sense of humor, my memories?",
+      "first_run_addressed": 1704,
+      "key": "q57",
+      "part": null,
+      "type": "yn",
+      "ask": "Will I still feel like \"me\" — with my personality, my sense of humor, my memories?",
+      "yes_means": "they still felt like themselves",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 58,
+      "question": "If my loved one had dementia or brain damage when they died, is their mind fully restored?",
+      "first_run_addressed": 19,
+      "key": "q58",
+      "part": null,
+      "type": "yn",
+      "ask": "If my loved one had dementia or brain damage when they died, is their mind fully restored?",
+      "yes_means": "the mind is fully restored",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 59,
+      "question": "Does my identity dissolve into a cosmic \"oneness\" where I disappear — or do I stay myself?",
+      "first_run_addressed": 1879,
+      "key": "q59",
+      "part": null,
+      "type": "mc",
+      "ask": "Does my identity dissolve into a cosmic \"oneness\" where I disappear — or do I stay myself?",
+      "choices": [
+        {
+          "code": "stayed_themselves",
+          "label": "Stayed themselves"
+        },
+        {
+          "code": "merged_into_oneness_no",
+          "label": "Merged into oneness, no separate self"
+        },
+        {
+          "code": "both_once_one_everything",
+          "label": "Both at once: one with everything and still themselves"
+        },
+        {
+          "code": "became_larger_higher_self",
+          "label": "Became a larger, higher self"
+        }
+      ]
+    },
+    {
+      "question_id": 60,
+      "question": "Do people keep their sense of gender, their appearance, and the things that made them who they are?",
+      "first_run_addressed": 349,
+      "key": "q60",
+      "part": null,
+      "type": "mc",
+      "ask": "Do people keep their sense of gender, their appearance, and the things that made them who they are?",
+      "choices": [
+        {
+          "code": "looked_like_themselves_better",
+          "label": "Looked like themselves, or a better version"
+        },
+        {
+          "code": "no_body_gender_form",
+          "label": "No body, gender or form"
+        },
+        {
+          "code": "gender_does_not_belong",
+          "label": "Gender does not belong to the soul"
+        },
+        {
+          "code": "kept_personality",
+          "label": "Kept their personality"
+        },
+        {
+          "code": "others_appeared_life_often",
+          "label": "Others appeared as in life, often younger or healthy"
+        }
+      ]
+    },
+    {
+      "question_id": 61,
+      "question": "If I've lived past lives, which version of \"me\" am I in the afterlife?",
+      "first_run_addressed": 79,
+      "key": "q61",
+      "part": null,
+      "type": "mc",
+      "ask": "If I've lived past lives, which version of \"me\" am I in the afterlife?",
+      "choices": [
+        {
+          "code": "soul_that_holds_all",
+          "label": "The soul that holds all the lives"
+        },
+        {
+          "code": "self_this_life",
+          "label": "The self of this life"
+        },
+        {
+          "code": "none_past_lives",
+          "label": "None of the past lives"
+        },
+        {
+          "code": "saw_many_past_lives",
+          "label": "They saw many past lives"
+        },
+        {
+          "code": "lives_happen_same_time",
+          "label": "Lives happen at the same time"
+        }
+      ]
+    },
+    {
+      "question_id": 62,
+      "question": "Is consciousness actually separate from the brain — can it survive after the brain has stopped?",
+      "first_run_addressed": 4099,
+      "key": "q62",
+      "part": null,
+      "type": "yn",
+      "ask": "Is consciousness actually separate from the brain — can it survive after the brain has stopped?",
+      "yes_means": "consciousness continued without the brain or body",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 63,
+      "question": "Do atheists and nonreligious people have beautiful, loving NDEs too?",
+      "first_run_addressed": 173,
+      "key": "q63",
+      "part": null,
+      "type": "yn",
+      "ask": "Do atheists and nonreligious people have beautiful, loving NDEs too?",
+      "yes_means": "their NDE was beautiful or loving",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f4"
+      }
+    },
+    {
+      "question_id": 64,
+      "question": "Why do people from different religions encounter different beings — Jesus, Hindu gods, ancestors?",
+      "first_run_addressed": 281,
+      "key": "q64",
+      "part": null,
+      "type": "mc",
+      "ask": "Why do people from different religions encounter different beings — Jesus, Hindu gods, ancestors?",
+      "choices": [
+        {
+          "code": "same_divine_source_different",
+          "label": "The same divine source in different forms"
+        },
+        {
+          "code": "beings_appear_according_beliefs",
+          "label": "Beings appear according to beliefs or expectations"
+        },
+        {
+          "code": "each_person_sees_what",
+          "label": "Each person sees what they need"
+        },
+        {
+          "code": "religions_are_different_paths",
+          "label": "Religions are different paths to one truth"
+        },
+        {
+          "code": "seen_through_one_s",
+          "label": "Seen through one's own culture"
+        }
+      ]
+    },
+    {
+      "question_id": 65,
+      "question": "If I followed the wrong religion my whole life, will I be turned away?",
+      "first_run_addressed": 319,
+      "key": "q65",
+      "part": null,
+      "type": "yn",
+      "ask": "If I followed the wrong religion my whole life, will I be turned away?",
+      "yes_means": "people are turned away for following the wrong religion",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 66,
+      "question": "Does God care more about what I believed, or how I actually treated people?",
+      "first_run_addressed": 616,
+      "key": "q66",
+      "part": null,
+      "type": "yn",
+      "ask": "Does how a person treated others matter more than what they believed?",
+      "yes_means": "how they treated others",
+      "no_means": "what they believed",
+      "mixed_means": null
+    },
+    {
+      "question_id": 67,
+      "question": "If God is real and loving, why is there so much horrific suffering in the world?",
+      "first_run_addressed": 252,
+      "key": "q67",
+      "part": null,
+      "type": "mc",
+      "ask": "If God is real and loving, why is there so much horrific suffering in the world?",
+      "choices": [
+        {
+          "code": "free_will_human_choices",
+          "label": "Free will and human choices"
+        },
+        {
+          "code": "souls_choose_growth",
+          "label": "Souls choose it for growth"
+        },
+        {
+          "code": "part_greater_plan",
+          "label": "Part of a greater plan"
+        },
+        {
+          "code": "suffering_teaches_helps_people",
+          "label": "Suffering teaches and helps people grow"
+        },
+        {
+          "code": "caused_evil_forces",
+          "label": "Caused by evil forces"
+        },
+        {
+          "code": "no_answer_given",
+          "label": "No answer given"
+        }
+      ]
+    },
+    {
+      "question_id": 68,
+      "question": "I left the faith I was raised in — will I face consequences for that when I die?",
+      "first_run_addressed": 51,
+      "key": "q68",
+      "part": null,
+      "type": "yn",
+      "ask": "I left the faith I was raised in — will I face consequences for that when I die?",
+      "yes_means": "they faced consequences for leaving their faith",
+      "no_means": null,
+      "mixed_means": null,
+      "subgroup": {
+        "fact": "f5"
+      }
+    },
+    {
+      "question_id": 69,
+      "question": "What does the afterlife actually look like, according to people who've been there?",
+      "first_run_addressed": 4530,
+      "key": "q69",
+      "part": null,
+      "type": "mc",
+      "ask": "What does the afterlife actually look like, according to people who've been there?",
+      "choices": [
+        {
+          "code": "bright_loving_light",
+          "label": "Bright or loving light"
+        },
+        {
+          "code": "landscapes",
+          "label": "Landscapes (meadows, flowers, hills, gardens)"
+        },
+        {
+          "code": "water",
+          "label": "Water (rivers, lakes)"
+        },
+        {
+          "code": "cities_buildings_golden_streets",
+          "label": "Cities, buildings or golden streets"
+        },
+        {
+          "code": "darkness_void_space",
+          "label": "Darkness, a void or space"
+        },
+        {
+          "code": "colors_beyond_earthly_ones",
+          "label": "Colors beyond earthly ones"
+        },
+        {
+          "code": "tunnel",
+          "label": "A tunnel"
+        },
+        {
+          "code": "formless_cosmic_realm",
+          "label": "A formless or cosmic realm"
+        }
+      ]
+    },
+    {
+      "question_id": 70,
+      "question": "Can you still enjoy pleasures there — music, laughter, a sense of touch?",
+      "first_run_addressed": 1255,
+      "key": "q70",
+      "part": null,
+      "type": "yn",
+      "ask": "Can you still enjoy pleasures there — music, laughter, a sense of touch?",
+      "yes_means": "they enjoyed pleasures such as music, laughter or touch",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 71,
+      "question": "Does eternity get boring, or is there always something meaningful to experience?",
+      "first_run_addressed": 255,
+      "key": "q71",
+      "part": null,
+      "type": "yn",
+      "ask": "Is there always something meaningful to experience on the other side?",
+      "yes_means": "meaningful",
+      "no_means": "boring",
+      "mixed_means": null
+    },
+    {
+      "question_id": 72,
+      "question": "How does time work — will it feel like my loved ones arrive moments after me, even if decades pass on Earth?",
+      "first_run_addressed": 715,
+      "key": "q72",
+      "part": null,
+      "type": "yn",
+      "ask": "Does time work differently on the other side?",
+      "yes_means": "differently (or no time)",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 73,
+      "question": "Can you explore other worlds or dimensions from the other side?",
+      "first_run_addressed": 1023,
+      "key": "q73",
+      "part": null,
+      "type": "yn",
+      "ask": "Can you explore other worlds or dimensions from the other side?",
+      "yes_means": "they explored, or could explore, other worlds or dimensions",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 74,
+      "question": "Are the colors and sensations really beyond anything we can perceive as humans?",
+      "first_run_addressed": 1482,
+      "key": "q74",
+      "part": null,
+      "type": "yn",
+      "ask": "Are the colors and sensations really beyond anything we can perceive as humans?",
+      "yes_means": "colors or sensations were beyond earthly ones",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 75,
+      "question": "Will I finally be able to rest? I am so tired from this life.",
+      "first_run_addressed": 269,
+      "key": "q75",
+      "part": null,
+      "type": "yn",
+      "ask": "Will I finally be able to rest? I am so tired from this life.",
+      "yes_means": "they found rest",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 76,
+      "question": "If the afterlife is so beautiful and full of love, why do we come to Earth at all?",
+      "first_run_addressed": 1649,
+      "key": "q76",
+      "part": null,
+      "type": "mc",
+      "ask": "If the afterlife is so beautiful and full of love, why do we come to Earth at all?",
+      "choices": [
+        {
+          "code": "learn_grow",
+          "label": "To learn or grow"
+        },
+        {
+          "code": "love",
+          "label": "To love"
+        },
+        {
+          "code": "experience_physical_life",
+          "label": "To experience physical life"
+        },
+        {
+          "code": "serve_help_others",
+          "label": "To serve or help others"
+        },
+        {
+          "code": "soul_s_evolution",
+          "label": "For the soul's evolution"
+        },
+        {
+          "code": "test",
+          "label": "As a test"
+        },
+        {
+          "code": "remember_who_we_really",
+          "label": "To remember who we really are"
+        },
+        {
+          "code": "clear_karma",
+          "label": "To clear karma"
+        }
+      ]
+    },
+    {
+      "question_id": 77,
+      "question": "Did I choose this life — including the suffering — before I was born?",
+      "first_run_addressed": 1187,
+      "key": "q77",
+      "part": null,
+      "type": "yn",
+      "ask": "Did I choose this life — including the suffering — before I was born?",
+      "yes_means": "they chose their life before birth",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 78,
+      "question": "What is the actual purpose of my life from a soul's perspective?",
+      "first_run_addressed": 3040,
+      "key": "q78",
+      "part": null,
+      "type": "mc",
+      "ask": "What is the actual purpose of my life from a soul's perspective?",
+      "choices": [
+        {
+          "code": "love",
+          "label": "To love"
+        },
+        {
+          "code": "learn_grow",
+          "label": "To learn or grow"
+        },
+        {
+          "code": "experience_life",
+          "label": "To experience life"
+        },
+        {
+          "code": "serve_help_others",
+          "label": "To serve or help others"
+        },
+        {
+          "code": "specific_personal_mission",
+          "label": "A specific personal mission"
+        },
+        {
+          "code": "remember_awaken_who_we",
+          "label": "To remember or awaken to who we are"
+        },
+        {
+          "code": "clear_karma",
+          "label": "To clear karma"
+        }
+      ]
+    },
+    {
+      "question_id": 79,
+      "question": "When I die, will I finally understand why everything happened the way it did?",
+      "first_run_addressed": 697,
+      "key": "q79",
+      "part": null,
+      "type": "yn",
+      "ask": "When I die, will I finally understand why everything happened the way it did?",
+      "yes_means": "they understood why things happened as they did",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 80,
+      "question": "Do people come back from NDEs struggling and depressed because they miss the peace of the other side?",
+      "first_run_addressed": 985,
+      "key": "q80",
+      "part": null,
+      "type": "yn",
+      "ask": "Do people come back from NDEs struggling and depressed because they miss the peace of the other side?",
+      "yes_means": "they came back struggling because they missed the other side",
+      "no_means": null,
+      "mixed_means": null
+    },
+    {
+      "question_id": 81,
+      "question": "If souls choose their lives for growth, why would anyone choose abuse, illness, or tragedy?",
+      "first_run_addressed": 363,
+      "key": "q81",
+      "part": null,
+      "type": "mc",
+      "ask": "If souls choose their lives for growth, why would anyone choose abuse, illness, or tragedy?",
+      "choices": [
+        {
+          "code": "growth_lesson",
+          "label": "For growth or a lesson"
+        },
+        {
+          "code": "learn_compassion_another_specific",
+          "label": "To learn compassion or another specific quality"
+        },
+        {
+          "code": "was_planned_before_birth",
+          "label": "It was planned before birth"
+        },
+        {
+          "code": "clear_karma",
+          "label": "To clear karma"
+        },
+        {
+          "code": "help_others_through",
+          "label": "To help others through it"
+        },
+        {
+          "code": "not_chosen",
+          "label": "It is not chosen"
+        }
+      ]
+    }
+  ],
+  "merged": {
+    "q24": "q22"
+  }
+}

@@ -79,7 +79,7 @@ export default function RootLayout({
           </Suspense>
           <Toaster />
           {/* ── Cookie Consent & Conditional Scripts ────────────────── */}
-          {/* GA4 and ConvertKit now only load AFTER user consent (GDPR) */}
+          {/* GA4 under Consent Mode v2 (components/consent-gated-scripts.tsx) */}
           <CookieConsent />
           <ConsentGatedScripts />
         </ThemeProvider>

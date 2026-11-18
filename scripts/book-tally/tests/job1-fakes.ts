@@ -108,6 +108,8 @@ export interface FakeClientOptions {
   respond: (customId: string, params: Record<string, unknown>) => string | null;
   model: string;
   stopReason?: string;
+  /** Per-request stop reason (e.g. 'max_tokens' to simulate truncation); overrides stopReason. */
+  stopFor?: (customId: string, params: Record<string, unknown>) => string | undefined;
   /** Pre-existing batches (id -> requests), for resume tests. */
   seed?: Record<string, Array<{ custom_id: string; params: Record<string, any> }>>;
   /** Make batches.results throw (simulates a crash after the batch was created). */
@@ -153,7 +155,7 @@ export function fakeAnthropic(o: FakeClientOptions) {
         const text = o.respond(r.custom_id, r.params);
         yield text === null
           ? { custom_id: r.custom_id, result: { type: 'errored', error: { type: 'error', error: { type: 'api_error', message: 'x' } } } }
-          : { custom_id: r.custom_id, result: { type: 'succeeded', message: textMessage(o.model, text, o.stopReason) } };
+          : { custom_id: r.custom_id, result: { type: 'succeeded', message: textMessage(o.model, text, o.stopFor?.(r.custom_id, r.params) ?? o.stopReason) } };
       }
     },
   }));

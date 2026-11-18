@@ -15,8 +15,8 @@
  *                                  only the Haiku first pass, through the normal estimate/confirm gate.
  *                                  Never plans or runs recheck/arbiter.
  *   --i-understand-this-is-the-expensive-pass
- *                                  required in addition to --confirm-spend for a full-corpus
- *                                  recheck/arbiter group (Sonnet/Opus). The pilot's Sonnet arm is unaffected.
+ *                                  required in addition to --confirm-spend for ANY recheck/arbiter
+ *                                  group, gold or full (Sonnet/Opus). The pilot's Sonnet arm is unaffected.
  * Nothing is submitted without --confirm-spend matching an estimate whose request digest still
  * equals the rebuilt requests.
  */
@@ -35,7 +35,7 @@ export const OPTIONS: Record<string, OptDef> = {
   full: { type: 'boolean', help: 'all NDE videos not already completed for the pass' },
   pass: { type: 'string', help: 'first (default) | recheck | arbiter' },
   resolution: { type: 'string', help: 'full (default) | haiku-first-pass: Haiku-only scope; with --gold needs no recheck/arbiter and usually no spend' },
-  [EXPENSIVE_FLAG]: { type: 'boolean', help: 'required with --confirm-spend for a full-corpus recheck/arbiter group (the expensive Sonnet/Opus passes)' },
+  [EXPENSIVE_FLAG]: { type: 'boolean', help: 'required with --confirm-spend for any recheck/arbiter group, gold or full (the expensive Sonnet/Opus passes)' },
   estimate: { type: 'boolean', help: 'print the cost estimate and record it; spends nothing' },
   'dry-run': { type: 'boolean', help: 'offline estimate (no API call, no DB write)' },
   'confirm-spend': { type: 'string', help: 'group id printed by --estimate; required to submit' },
@@ -50,6 +50,7 @@ export const OPTIONS: Record<string, OptDef> = {
   'assumed-visible-per-question': { type: 'string', help: 'visible output tokens per answered question (default: pilot actuals, else 32/60/70)' },
   'adopt-batch': { type: 'string', help: 'with --confirm-spend: batch id to adopt for a run left in "submitting" after a lost create response' },
   'confirm-retries': { type: 'string', help: 'group id: allow retries beyond the approved ceiling' },
+  'budget-usd': { type: 'string', help: 'with --estimate: cap the group\'s approved ceiling at this many USD, split across its runs (refused if below the first-attempt worst case); retries must fit under it' },
   'void-pending': { type: 'string', help: 'with --confirm-spend: pending marker (>= 30 min old) confirmed by a human to have produced no batch' },
   cancel: { type: 'string', help: 'group id of a never-submitted estimate to cancel' },
   'poll-seconds': { type: 'string', help: 'batch poll interval (default 30)' },
@@ -88,8 +89,9 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const haiku = resolution === 'haiku-first-pass';
   if (haiku && pass !== 'first') throw new CliError('--resolution haiku-first-pass only ever runs the Haiku first pass; it cannot be combined with --pass recheck or --pass arbiter');
   const ack = v[EXPENSIVE_FLAG] === true;
-  if (confirm && mode === 'full' && pass !== 'first' && !ack) {
-    throw new CliError(`refusing to spend: --pass ${pass} --full is the expensive full-corpus pass; it needs --${EXPENSIVE_FLAG} in addition to --confirm-spend`);
+  if (haiku && mode === 'pilot') throw new CliError('--resolution haiku-first-pass does not apply to --pilot: the pilot always runs Haiku AND Sonnet (it is the inter-model agreement measure). Run the pilot without --resolution, and only if the owner approved it.');
+  if (confirm && mode !== 'pilot' && pass !== 'first' && !ack) {
+    throw new CliError(`refusing to spend: --pass ${pass} is the expensive Sonnet/Opus pass (any mode but --pilot); it needs --${EXPENSIVE_FLAG} in addition to --confirm-spend`);
   }
 
   if (confirm) {
@@ -131,6 +133,8 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     ...(visOverride !== undefined ? { visiblePerQuestion: { pilot: visOverride, first: visOverride, recheck: visOverride, arbiter: visOverride } } : {}),
     source: outOverride !== undefined || visOverride !== undefined ? `command-line override (base: ${base.source})` : base.source,
   };
+  const budgetUsd = numOpt(v['budget-usd'], 'budget-usd');
+  if (budgetUsd !== undefined && !(budgetUsd > 0)) throw new CliError('--budget-usd must be a positive number of USD');
   const group: Group = {
     mode, pass, kind, seed,
     maxTokens: intOpt(v['max-tokens'], 'max-tokens') ?? DEFAULT_MAX_TOKENS,
@@ -141,6 +145,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     },
     plan: made.plan,
     ...(haiku && mode === 'gold' ? { resolution: 'haiku-first-pass' as const } : {}),
+    ...(budgetUsd !== undefined ? { budgetUsd } : {}),
   };
   const questions = await loadQuestions(db);
   const res = await runEstimate(
