@@ -123,6 +123,23 @@ class Query implements PromiseLike<{ data: any; error: any }> {
     return rows.map((r) => Object.fromEntries(specs.map((s) => [s.name, getPath(r, s.path)])));
   }
 
+  /**
+   * Like the real database, a select that names a column no row of the table has is an error
+   * (not a silent undefined). Checked only when the table has fixture rows, against the top-level
+   * column of each selected path.
+   */
+  private missingColumn(table: string, cols: string): string | null {
+    if (cols.trim() === '*') return null;
+    const all = this.db.rows(table);
+    if (all.length === 0) return null;
+    for (const c of cols.split(',').map((x) => x.trim())) {
+      const m = /^([A-Za-z0-9_]+):(.+)$/.exec(c);
+      const root = (m ? m[2] : c).split(/->>|->/)[0].trim();
+      if (!all.some((r) => Object.prototype.hasOwnProperty.call(r, root))) return root;
+    }
+    return null;
+  }
+
   private exec(): { data: any; error: any } {
     const t = this.table;
     if (this.op === 'insert') {
@@ -153,6 +170,8 @@ class Query implements PromiseLike<{ data: any; error: any }> {
     let rows = this.db.rows(t).filter((r) => this.filters.every((f) => f(r)));
     if (this.orderCol) rows = [...rows].sort((a, b) => (a[this.orderCol!] < b[this.orderCol!] ? -1 : a[this.orderCol!] > b[this.orderCol!] ? 1 : 0));
     if (this.rng) rows = rows.slice(this.rng[0], this.rng[1] + 1);
+    const missing = this.missingColumn(t, this.cols);
+    if (missing) return { data: null, error: { message: `column ${t}.${missing} does not exist` } };
     return { data: this.project(rows, this.cols), error: null };
   }
 

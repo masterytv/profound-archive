@@ -210,6 +210,40 @@ export function ceilingCost(c: CeilingInput): number {
   return total;
 }
 
+/**
+ * Applies an owner-set dollar budget to a run's approved ceiling.
+ *
+ * Without a budget the ceiling is the all-attempts figure from ceilingCost. With one, the stored
+ * ceiling becomes min(all-attempts ceiling, budget): the first batch can never cost more than
+ * `firstAttemptWorstUsd` (every response at max_tokens), and every retry batch is then admitted
+ * only while spent + queued worst case <= the stored ceiling (assertRetryBudget). So a run
+ * cannot spend more than its budget unless a human passes --confirm-retries.
+ * Refuses a budget below the first-attempt worst case, which the first batch alone could exceed.
+ */
+export function cappedCeiling(o: { uncappedUsd: number; firstAttemptWorstUsd: number; budgetUsd?: number; label?: string }): number {
+  if (o.budgetUsd === undefined) return o.uncappedUsd;
+  if (!Number.isFinite(o.budgetUsd) || o.budgetUsd <= 0) throw new Error(`budget must be a positive number of USD (got ${o.budgetUsd})`);
+  if (o.budgetUsd + 1e-9 < o.firstAttemptWorstUsd) {
+    throw new Error(
+      `${o.label ? `${o.label}: ` : ''}budget ${formatUsd(o.budgetUsd)} is below the first-attempt worst case ` +
+        `${formatUsd(o.firstAttemptWorstUsd)} (every response at max_tokens), which the first batch alone could reach. ` +
+        'Raise the budget or lower max_tokens.',
+    );
+  }
+  return Math.min(o.uncappedUsd, o.budgetUsd);
+}
+
+/**
+ * Splits one budget across the runs of a group in proportion to each run's first-attempt worst
+ * case, so every share covers its run's first batch whenever the total does. Returns the shares
+ * in input order (they sum to the budget).
+ */
+export function splitBudget(budgetUsd: number, firstAttemptWorstUsd: readonly number[]): number[] {
+  const total = firstAttemptWorstUsd.reduce((a, b) => a + b, 0);
+  if (!(total > 0)) throw new Error('splitBudget: first-attempt worst cases must sum to more than 0');
+  return firstAttemptWorstUsd.map((w) => (budgetUsd * w) / total);
+}
+
 export interface ProjectionResult {
   perRequestUsd: number;
   totalUsd: number;

@@ -11,7 +11,7 @@ import { neutralizeFormula, toCsv } from './csv';
 import { fetchStanceRuns } from './db';
 import { NA_ROWS_PER_VIDEO, selectGoldRows, youtubeLink } from './gold';
 import { completeEligible, goldIdsFromRuns, haikuGoldSample, incompleteSkipped } from './plan';
-import { HAIKU_SUFFIX, fetchFirstPassAnswers, haikuCells, parseResolution } from './haiku';
+import { HAIKU_SUFFIX, fetchFirstPassAnswers, haikuCells, haikuGoldSheetCells, parseResolution } from './haiku';
 import type { Stance } from './answers';
 
 const OPTIONS: Record<string, OptDef> = {
@@ -68,8 +68,7 @@ async function haikuSheet(ctx: Ctx, db: Db, seed: number, pilotN: number, goldN:
   if (s.chosen.length < goldN) throw new CliError(`only ${s.chosen.length} pilot-disjoint NDE videos with a complete first-pass row set (need ${goldN}); finish the first pass first`);
   const incomplete = await incompleteSkipped(db, s.skipped); // videos without a transcript never get rows and do not make the selection unstable
   if (incomplete.length) ctx.log(`WARNING: ${incomplete.length} earlier candidates in the seeded order have a transcript but lack a complete first-pass row set and were skipped; the selection will change when they complete. Build the final sheet after the full first pass.`);
-  const cells = haikuCells(await fetchFirstPassAnswers(db, s.chosen, 25), qIds).filter((c) => c.category === 'counted');
-  const chosen = selectGoldRows(cells.map((c) => ({ ...c, stance: c.stance as Stance, status: 'final' })), seed, NA_ROWS_PER_VIDEO);
+  const chosen = haikuGoldSheetCells(haikuCells(await fetchFirstPassAnswers(db, s.chosen, 25), qIds), seed);
   const detail = new Map<number, { quote: string | null; start_seconds: number | null; model: string }>();
   const aids = chosen.map((c) => c.id);
   for (let i = 0; i < aids.length; i += 200) {
@@ -86,7 +85,7 @@ async function haikuSheet(ctx: Ctx, db: Db, seed: number, pilotN: number, goldN:
       title: neutralizeFormula(titles.get(r.video_id) ?? ''),
       question_id: r.question_id,
       category: q?.category ?? '',
-      question: neutralizeFormula(q?.consumer_question ?? q?.question ?? ''),
+      question: neutralizeFormula(q?.consumer_question ?? ''),
       final_stance: r.stance,
       confidence: r.confidence,
       quote: d?.quote ? neutralizeFormula(d.quote) : '',
@@ -143,7 +142,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
       title: neutralizeFormula(titles.get(r.video_id) ?? ''),
       question_id: r.question_id,
       category: q?.category ?? '',
-      question: neutralizeFormula(q?.consumer_question ?? q?.question ?? ''),
+      question: neutralizeFormula(q?.consumer_question ?? ''),
       final_stance: r.stance,
       confidence: r.confidence,
       quote: r.quote ? neutralizeFormula(r.quote) : '',

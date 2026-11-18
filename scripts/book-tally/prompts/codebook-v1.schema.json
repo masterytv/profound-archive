@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": { "type": "string" },
+          "addressed": { "type": "boolean" },
+          "stance": { "type": "string", "enum": ["yes", "no", "mixed", "none"] },
+          "quote": { "type": ["string", "null"] },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "string" },
+                "quote": { "type": "string" },
+                "other_text": { "type": ["string", "null"] }
+              },
+              "required": ["code", "quote", "other_text"],
+              "additionalProperties": false
+            }
+          },
+          "confidence": { "type": "integer" }
+        },
+        "required": ["key", "addressed", "stance", "quote", "choices", "confidence"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["items"],
+  "additionalProperties": false
+}

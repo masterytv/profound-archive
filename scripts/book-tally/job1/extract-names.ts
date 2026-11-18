@@ -23,7 +23,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { MAX_ATTEMPTS } from '../lib/batch';
 import { approvedBudget, confirmGate, prepareResume, resumeRun, submitRun, usageSummary, voidPendingCommand, type CollectedRow } from './batch-run';
-import { CliError, finishRun, getRun, helpText, intOpt, isDirectRun, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, str, type Ctx, type Deps, type OptDef } from './cli';
+import { CliError, finishRun, getRun, helpText, intOpt, isDirectRun, usdOpt, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, str, type Ctx, type Deps, type OptDef } from './cli';
 import { ensurePrompt, loadProfiles, loadWorld } from './data';
 import { classifySelfName, indexProfiles, nameInQuote, planLinks, selfIntroducerBefore, type ProfileRow } from './logic';
 import { parseModelJson, type JsonSchema } from './schema';
@@ -47,6 +47,7 @@ const OPTIONS: Record<string, OptDef> = {
   'sample-size': { type: 'string', help: 'base the EXPECTED-cost line on a stratified sample of this size (min 50); tokens are still counted for ALL requests because the ceiling needs exact counts' },
   'max-attempts': { type: 'string', help: 'attempts per request incl. retries, fixed at --estimate time and part of the approved ceiling (default 3)' },
   'confirm-retries': { type: 'string', help: 'run_id: allow retry batches beyond the approved ceiling for this run' },
+  'budget-usd': { type: 'string', help: 'with --estimate: cap the approved ceiling at this many USD (refused if below the first-attempt worst case); retries must fit under it' },
   'void-pending': { type: 'string', help: 'with --resume: release an UNRESOLVED pending submission marker (batch not found at the API); allowed only >= 30 min after the marker, never automatic' },
   'adopt-batch': { type: 'string', help: 'with --resume: record this existing batch id for a run whose submission response was lost (verified before adopting)' },
   'dry-run': { type: 'boolean', help: 'offline: list target counts and transcript availability; no API call, no DB write' },
@@ -217,6 +218,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const est = await estimateSpend({
     model: MODEL, effort, items: built.items, counter: sdkTokenCounter(client), visibleTokensPerRequest: VISIBLE_TOKENS,
     maxTokens: MAX_TOKENS, maxAttempts, sampleSize: intOpt(v['sample-size'], 'sample-size'), forceSample: v['sample-size'] !== undefined,
+    budgetUsd: usdOpt(v['budget-usd'], 'budget-usd'),
   });
   const runId = newRunId('j1n', ctx.now());
   await startRun(db, {

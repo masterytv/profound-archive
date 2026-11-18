@@ -91,6 +91,15 @@ export function intOpt(v: string | boolean | undefined, name: string): number | 
   return Number(s);
 }
 
+/** A positive USD amount (e.g. --budget-usd 12.50). */
+export function usdOpt(v: string | boolean | undefined, name: string): number | undefined {
+  const s = str(v);
+  if (s === undefined) return undefined;
+  const n = Number(s);
+  if (!/^\d+(\.\d+)?$/.test(s) || !(n > 0)) throw new CliError(`--${name} must be a positive number of USD`);
+  return n;
+}
+
 /** True when the module is the process entry point (works under ts-node / tsx, false under vitest). */
 export function isDirectRun(file: string): boolean {
   const argv1 = process.argv[1] ?? '';

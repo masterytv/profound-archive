@@ -38,6 +38,18 @@ limits what the code can check (see §5).
 | Second opinion | Claude Sonnet 5.5 (`claude-sonnet-5-5`) | Stronger reader; re-checks the answers most likely to be wrong |
 | Arbiter | Claude Opus 5.5 (`claude-opus-5-5`) | Strongest model; decides only where the first two disagree |
 
+**Current scope: Haiku only.** For budget reasons, only the first pass (Haiku) is run on the whole
+corpus. The Sonnet second opinion and the Opus arbiter described below are built and tested but **not
+run**. Published Job 2 figures therefore use the *Haiku-only resolution* (`--resolution
+haiku-first-pass`), labelled `haiku_first_pass_unchecked` in every output:
+- an answer is counted if it is valid and is either `not_addressed` or has a quote that code found in
+  the transcript; a claim whose quote was not found is excluded and reported, never counted;
+- answers the full pipeline would have sent for a second opinion (`no`, `mixed`, or confidence below
+  70) are counted, flagged, and reported as such, because no second model checked them;
+- the accuracy evidence is the gold set ("Gold set" in §4): a human marks the counted Haiku answers of 25
+  seeded videos, and precision is reported overall, per stance, by the flag and by confidence band, each
+  with its n and a Wilson 95% interval. No figure is published before that report.
+
 - All calls go through Anthropic's **Message Batches API**.
 - **Temperature.** The protocol asked for temperature 0, but these models reject any non-default
   sampling parameter (the API returns an error). So no temperature is sent and outputs are not
@@ -160,7 +172,8 @@ by Sonnet. The pilot report gives:
 - actual cost, and a full-run cost projected from the pilot's real token usage.
 
 **Gold set (before anything is published).** 25 more random videos (seeded, none from the pilot)
-go through the full pipeline.
+go through the full pipeline. (Haiku-only scope: first pass only, and the sheet holds the counted
+Haiku answers; see "Current scope" in §2. The report refuses to run until every sheet row is marked.)
 - A human marks each answer right or wrong, and whether the quote is the experiencer's own words.
   The review sheet links to the moment in the video where caption timestamps exist.
 - The sheet has every non-`not_addressed` answer, plus 3 random `not_addressed` answers per video
@@ -280,6 +293,14 @@ Prerequisites:
     billed as output;
   - a hard *ceiling*: every request at its maximum output, across all permitted retry attempts.
 - Retries that would go beyond the approved ceiling need a separate `--confirm-retries`.
+- **Budget cap.** `--estimate --budget-usd <USD>` (on `judge-pairs`, `extract-names` and
+  `run-stance`) replaces the all-attempts ceiling with that dollar cap when it is lower. The
+  estimate is refused if the cap is below the *first-attempt worst case* (every request once, every
+  response at `max_tokens`), because the first batch alone could cost that much. After the
+  first batch, retries run only while the money actually spent plus the retries' worst case stays
+  within the cap, so the run cannot spend more than the cap without `--confirm-retries`. For
+  `run-stance` the budget covers the whole group (the pilot's Haiku and Sonnet runs) and is split
+  between the runs in proportion to their first-attempt worst cases. The budget is part of the group id.
 - Submission locks the run before the batch is created.
 - If the program crashes after a batch was created but before it was recorded, it never
   resubmits on its own. It finds and adopts the existing batch. If it can't find the batch, it

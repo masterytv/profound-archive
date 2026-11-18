@@ -20,7 +20,7 @@ import {
   fetchRunsByGroup, fetchStanceRuns, insertRunsIfAbsent, type AnswerRecord, type RawRef, type RunRow,
 } from './db';
 import {
-  DEFAULT_OUTPUT_ASSUMPTION, assertSpendConfirmed, estimateExact, queuedRetriesWorstUsd, fingerprint, fingerprintLine, groupId,
+  DEFAULT_OUTPUT_ASSUMPTION, applyBudget, assertSpendConfirmed, estimateExact, queuedRetriesWorstUsd, fingerprint, fingerprintLine, groupId,
   outputTokensFor, runIdFor, sha256, type ModelEstimate, type OutputAssumption, type TokenItem,
 } from './estimate';
 import { buildDisputes, firstPassIsReaderA } from './flags';
@@ -45,6 +45,8 @@ export interface Group {
   plan: Plan;
   /** Set for the Haiku-only gold first pass (run-stance --resolution haiku-first-pass); stored in bt_runs.params. */
   resolution?: 'haiku-first-pass';
+  /** Owner-set dollar cap for the whole group (run-stance --budget-usd); see estimate.applyBudget. */
+  budgetUsd?: number;
 }
 
 export interface BuildCtx {
@@ -263,11 +265,13 @@ export function formatEstimateLines(group: string, g: Group, ests: RunEstimate[]
       `  ${e.model} effort=${e.effort}: ${s.requests} requests, ${s.inputTokens.toLocaleString('en-US')} input tokens, ` +
       `${s.outputTokens.toLocaleString('en-US')} assumed output tokens incl. thinking (${Math.round(s.outputTokens / Math.max(1, s.requests))}/request), ` +
       `expected cost ${formatUsd(s.costUsd)} (${formatUsd(s.costUsdNoCacheWrite)} if no cache-write premium), ` +
-      `HARD CEILING ${formatUsd(s.ceilingUsd)} (every attempt at max_tokens=${g.maxTokens}, doubling)`,
+      (s.budgetUsd !== null && s.budgetUsd !== undefined
+        ? `HARD CEILING ${formatUsd(s.ceilingUsd)} (budget cap; first batch at most ${formatUsd(s.firstAttemptWorstUsd)} with every response at max_tokens=${g.maxTokens}; uncapped all-attempts ${formatUsd(s.uncappedCeilingUsd)} not approved)`
+        : `HARD CEILING ${formatUsd(s.ceilingUsd)} (every attempt at max_tokens=${g.maxTokens}, doubling)`),
     );
     out.push(`    token count: ${e.tokenMethod}`);
   }
-  out.push(`  TOTAL expected ${formatUsd(total)}; hard ceiling ${formatUsd(ceiling)} (batch prices, 50% discount)`);
+  out.push(`  TOTAL expected ${formatUsd(total)}; hard ceiling ${formatUsd(ceiling)} (batch prices, 50% discount)${g.budgetUsd !== undefined ? `; budget ${formatUsd(g.budgetUsd)}: retries run only while spent + their worst case stays within each run's cap` : ''}`);
   out.push(`  output assumption: ${assumption.source}`);
   out.push('  Cache note: batch cache hits are best-effort, so no cache reads are assumed; shared system prompts are priced as cache writes (upper bound).');
   out.push(`  Retries (truncation/transient) beyond the ceiling need --confirm-retries ${group}.`);
@@ -292,6 +296,8 @@ export async function runEstimate(
   const families = familiesOf(g.kind);
   const ests: RunEstimate[] = [];
   for (const f of families) ests.push(await estimateRun(bc, g, f, req.options, client, ctx.log));
+  const capped = applyBudget(ests.map((e) => e.estimate), g.budgetUsd);
+  ests.forEach((e, i) => { e.estimate = capped[i]; });
   const skipped = [...new Set(ests.flatMap((e) => e.missing))].sort();
   const shas: Record<string, string> = {};
   for (const e of ests) e.shas.forEach((v, k) => { shas[k] = v; });
@@ -302,7 +308,11 @@ export async function runEstimate(
     transcriptSha: shas,
   };
   const fp = fingerprint(ests.map((e) => e.fingerprint));
-  const assumptionsKey = JSON.stringify({ a: req.options.assumption, dry: req.options.dryRun, mt: g.maxTokens, ...(g.resolution ? { res: g.resolution } : {}) });
+  const assumptionsKey = JSON.stringify({
+    a: req.options.assumption, dry: req.options.dryRun, mt: g.maxTokens,
+    ...(g.resolution ? { res: g.resolution } : {}),
+    ...(g.budgetUsd !== undefined ? { budget: g.budgetUsd } : {}),
+  });
   const group = groupId(g.mode, g.kind, fp, assumptionsKey);
 
   // S4: refuse to overlap a non-terminal run of the same pass (the same group is the idempotent re-estimate).
@@ -329,6 +339,7 @@ export async function runEstimate(
     params: {
       group, mode: g.mode, kind: g.kind, pass: g.pass, seed: g.seed, maxTokens: g.maxTokens, plan: finalPlan,
       ...(g.resolution ? { resolution: g.resolution } : {}),
+      ...(g.budgetUsd !== undefined ? { budgetUsd: g.budgetUsd } : {}),
       effort: g.effort, family: e.family,
     },
     estimate: {
@@ -681,9 +692,13 @@ export interface ExecResult { group: string; runs: Array<{ id: string; unresolve
 
 export const EXPENSIVE_FLAG = 'i-understand-this-is-the-expensive-pass';
 
-/** A stored group that is the full-corpus recheck or arbiter pass. */
+/**
+ * A stored group that runs the recheck (Sonnet) or arbiter (Opus) pass, in ANY mode except the
+ * pilot (gold included: the gold recheck/arbiter is Sonnet/Opus spend too, and the Haiku-only
+ * scope never runs it). The pilot's Sonnet arm is the one Sonnet run that needs no extra flag.
+ */
 export function isExpensiveGroup(params: { mode?: string; pass?: string }): boolean {
-  return params.mode === 'full' && (params.pass === 'recheck' || params.pass === 'arbiter');
+  return params.mode !== 'pilot' && (params.pass === 'recheck' || params.pass === 'arbiter');
 }
 
 /** Entry point for --confirm-spend: verifies the gate, submits, collects, validates, stores. */
@@ -705,7 +720,7 @@ export async function executeGroup(
     throw new CliError(`refusing to spend: group ${group} is mode=${p0.mode} pass=${p0.pass}, which does not match the flags given`);
   }
   if (isExpensiveGroup(p0) && opts.expensiveAck !== true) {
-    throw new CliError(`refusing to spend: group ${group} is the full-corpus ${p0.pass} pass (Sonnet/Opus on every flagged cell; this is the expensive pass and is NOT part of the current Haiku-only scope). Re-run with --confirm-spend ${group} --${EXPENSIVE_FLAG} only if you mean it.`);
+    throw new CliError(`refusing to spend: group ${group} is the ${p0.mode} ${p0.pass} pass (Sonnet/Opus on flagged cells; this is the expensive pass and is NOT part of the current Haiku-only scope). Re-run with --confirm-spend ${group} --${EXPENSIVE_FLAG} only if you mean it.`);
   }
   for (const r of runs) {
     if (!['estimated', 'submitting', 'submitted', 'collecting', 'completed'].includes(r.status)) {

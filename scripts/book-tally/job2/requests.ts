@@ -29,8 +29,15 @@ export function toPromptQuestions(rows: readonly QuestionRow[]): PromptQuestion[
     .map((r) => ({
       question_id: r.id,
       category: r.category,
-      question: (r.consumer_question && r.consumer_question.trim() !== '' ? r.consumer_question : r.question).trim(),
+      question: wordingOf(r),
     }));
+}
+
+/** The prompt wording of a question: its consumer_question. A blank one is an error, never silently replaced. */
+export function wordingOf(r: Pick<QuestionRow, 'id' | 'consumer_question'>): string {
+  const w = (r.consumer_question ?? '').trim();
+  if (w === '') throw new Error(`nde_questions id ${r.id} is active but has a blank consumer_question; fix the question bank before building prompts`);
+  return w;
 }
 
 /** One JSON object per line inside a JSON array: stable and readable. */

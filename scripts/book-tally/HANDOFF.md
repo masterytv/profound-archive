@@ -3,9 +3,59 @@
 Read this first in a new session. Then read README.md and SPEC.md, and the "Working rules" in the
 repo-root CLAUDE.md.
 
+## LATEST (2026-11-18, evening): read this before the older sections below
+- **Budget: $75 total** (raised from $50 by the owner). Spent so far: **$16.13**.
+  - Job 1 pair judging: `j1h-20261118154545`, $0.05.
+  - Job 1 name extraction: `j1n-20261118154610`, $0.23.
+  - Job 2 pilot: `pilot-ea3c3348`, $2.48. Kappa 0.633, agreement 91.7%.
+  - Job 2 full first pass: `full-first-1858d601`, $13.37, 6,054 videos.
+  - Every paid run is estimated with `--budget-usd <cap>`, and the owner approves the cap.
+- **Job 2 is being REDESIGNED; do not publish any stance-v1 tally.** The yes/no/mixed coding only
+  works for real yes/no questions. On either/or and open questions (for example Q37, Q38, Q39, Q78)
+  Haiku's "yes" mixes opposite answers. New design, decided by the owner:
+  - Step 1 for every question: is it addressed in this account? A quote is required.
+  - Step 2 depends on the question's type:
+    - yes/no: yes, no or mixed;
+    - multiple choice: 1 to 3 answers from a fixed list, plus "other". Several answers per person
+      are allowed, so shares can exceed 100%, and reports must say so;
+    - conditional: reported among people with a fact such as a violent death or a suicide attempt.
+      These facts are coded once per video.
+- **Codebook v1 is APPROVED** (`codebook/codebook-v1.md`; machine copy `codebook-v1.json` from
+  `generate-v1.py`).
+  - Q24 is merged into Q22.
+  - Answers count when they are "what the experiencer experienced or learned from the NDE, during
+    it or after". Beliefs held only before the NDE don't count.
+  - Q30's wording names the signs (a reviewer fix).
+- **Job 3 (codebook coding) is BUILT** in `job3/`. Independent review: APPROVE (commit cc84f16).
+  - `run-codebook.ts`: estimate, `--confirm-spend`, `--resume`, `--sample`, `--budget-usd`.
+  - `rollup.ts`: person tally, per-video sensitivity, report.
+  - `gold-sheet.ts`, `import-gold.ts`, `gold-report.ts`: commit 7780163, labelled WIP. It is the
+    final, verified version (554 tests pass), even though its message says WIP.
+  - Tests: `tests/job3-*.test.ts`. Local-Postgres suite: `tests/sql/run-local-pg.sh`, which needs
+    `runuser -u postgres` and a PGRUN directory postgres can write.
+- **Migration `20261118_002_book_tally_codebook.sql` is NOT APPLIED yet**: the owner applies it.
+  It adds only `bt_coded_answers` and `bt_coded_gold_marks`. Verification queries are at its end.
+- **Next steps:**
+  1. After the owner applies 002, check read-only that both tables exist and are empty.
+  2. Trial: `job3/run-codebook.ts --estimate --sample 40 --budget-usd <cap>`, then the owner's yes,
+     then `--confirm-spend`.
+  3. Inspect the trial: output tokens (recalibrate `VISIBLE_TOKENS`), truncation, "other" rates,
+     and a sample of answers.
+  4. Full run (estimate with a cap, then the owner's yes).
+  5. `job3/gold-sheet.ts`. Build an interactive marking page for the owner, as for stance-v1.
+     Owner marks, then `import-gold.ts`, then `gold-report.ts`.
+  6. `job3/rollup.ts`.
+- **Gold marking is paused.** The interactive sheet https://claude.ai/artifact/5t1QCp9VCp1C13j7wjVcEZ
+  is for stance-v1 and is superseded. It holds at most a few owner marks; don't import them.
+- **Job 1 Sonnet pair check**: the owner hasn't decided. Haiku judged 186 pairs same, 285 unsure and
+  2 different. Estimate `j1s-20261118164623` is uncapped; re-estimate with `--budget-usd` before any
+  submit.
+- The other session's branch `claude/focused-meitner-j5bscj` was merged into
+  `claude/project-profound-research-data-s2tx22` (PR #86). That branch is the base for this work.
+
 ## Owner's decisions
 - **Budget: Haiku only.** Run Job 1 and the Job 2 Haiku first pass. **Do NOT run the Job 2 full
-  Sonnet re-check or the Opus arbiter** (`run-stance --full --pass recheck|arbiter`). They may be
+  Sonnet re-check or the Opus arbiter** (`run-stance --gold|--full --pass recheck|arbiter`). They may be
   funded later by a publisher. The code requires an extra flag for those passes; never pass it.
 - **Results.** Publish Job 2 results with `--resolution haiku-first-pass` (rollup and gold sheet).
   The resolution is labelled "unchecked by a second model". Gold-set precision from the owner's
@@ -37,11 +87,18 @@ repo-root CLAUDE.md.
 Prefix every command with
 `npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/`.
 
-1. **Haiku-only mode: reviewed and APPROVED** at 5ceb8b9. The follow-up (quote-failure
-   breakdown by stance, gold fixes) landed in cd80e71, with 454 tests passing. Nothing to do.
+1. **DONE: the Haiku-only mode is reviewed.** The independent reviewer returned APPROVE in round 3
+   (at e3802a6, branch `claude/focused-meitner-j5bscj`) after two rounds of fixes: the expensive-pass
+   guard now covers gold recheck/arbiter too, and the Haiku gold report uses only marks on the
+   rebuilt sheet rows and refuses unless every row is marked. Its two optional nits were applied
+   afterwards (a partial report goes to `out/gold_report_haiku_only_PARTIAL.md`).
 2. **Run the free estimates** (no spend). Each writes a `bt_runs` row with status `estimated`:
-   - `job1/judge-pairs.ts --estimate` (Haiku stage)
-   - `job1/extract-names.ts --estimate`
+   - DONE `job1/judge-pairs.ts --estimate` (Haiku stage): run `j1h-20261118151446`, 473 requests,
+     446,681 input tokens, expected $0.27, ceiling $6.85.
+   - DONE `job1/extract-names.ts --estimate`: run `j1n-20261118151539`, 639 requests (blank names
+     only; 612 more single-token/placeholder names need `--include-unusable-names`), 4,262,192 input
+     tokens, expected $0.55, ceiling $9.80.
+   - Prices in `lib/cost.ts` were checked against the live pricing page on 2026-11-18 and match.
    - `job2/run-stance.ts --pilot --estimate` (optional pilot)
    - `job2/run-stance.ts --full --pass first --estimate`. This counts 6,054 requests with the free
      count_tokens endpoint, which is slow. Run it in the background.
@@ -52,8 +109,10 @@ Prefix every command with
 5. **If the pilot ran**, run `job2/pilot-report.ts --group <id>` and report kappa, agreement, quote
    failure rate and cost. Stop for the owner.
 6. **After the first pass:**
-   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner `out/gold_review_haiku_only.csv`.
-   - After the owner marks it, run `import-gold.ts --file out/gold_review_haiku_only.csv` and then `gold-report.ts --resolution haiku-first-pass`.
+   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner
+     `out/gold_review_haiku_only.csv`.
+   - After the owner marks it, run `job2/import-gold.ts --file <marked csv>` and then
+     `job2/gold-report.ts --resolution haiku-first-pass` (same --seed/--pilot-n/--gold-n as the sheet).
 7. **Job 1 review CSVs:** `job1/export-review.ts`. The owner marks them, then run
    `import-decisions.ts`.
 8. **Rollup:** `job2/rollup.ts --resolution haiku-first-pass`, only after the gold report and the

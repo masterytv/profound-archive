@@ -1,3 +1,4 @@
+import { cappedCeiling, splitBudget } from '../lib/cost';
 import { describe, expect, it } from 'vitest';
 import {
   MODELS, THINKING_ALLOWANCE, addUsage, assertRetryBudget, ceilingCost, costFromUsage, emptyTotals, estimateCost,
@@ -144,5 +145,28 @@ describe('assertRetryBudget', () => {
   });
   it('explicit confirmedRetries lets it through', () => {
     expect(() => assertRetryBudget({ approvedCeilingUsd: 10, spentUsd: 9, queuedWorstUsd: 50, confirmedRetries: true })).not.toThrow();
+  });
+});
+
+describe('budget cap (--budget-usd)', () => {
+  it('leaves the all-attempts ceiling alone without a budget', () => {
+    expect(cappedCeiling({ uncappedUsd: 183.86, firstAttemptWorstUsd: 28.6 })).toBe(183.86);
+  });
+  it('caps the ceiling at the budget, never above the all-attempts figure', () => {
+    expect(cappedCeiling({ uncappedUsd: 183.86, firstAttemptWorstUsd: 28.6, budgetUsd: 35 })).toBe(35);
+    expect(cappedCeiling({ uncappedUsd: 6.85, firstAttemptWorstUsd: 0.99, budgetUsd: 10 })).toBe(6.85);
+    expect(cappedCeiling({ uncappedUsd: 10, firstAttemptWorstUsd: 2, budgetUsd: 2 })).toBe(2);
+  });
+  it('refuses a budget the first batch alone could exceed, or a non-positive one', () => {
+    expect(() => cappedCeiling({ uncappedUsd: 183.86, firstAttemptWorstUsd: 28.6, budgetUsd: 28.5, label: 'full' }))
+      .toThrow(/full: budget \$28\.50 is below the first-attempt worst case \$28\.60/);
+    expect(() => cappedCeiling({ uncappedUsd: 1, firstAttemptWorstUsd: 0.5, budgetUsd: 0 })).toThrow(/positive/);
+    expect(() => cappedCeiling({ uncappedUsd: 1, firstAttemptWorstUsd: 0.5, budgetUsd: NaN })).toThrow(/positive/);
+  });
+  it('splits a group budget in proportion to first-attempt worst cases', () => {
+    const shares = splitBudget(12, [1, 3]);
+    expect(shares).toEqual([3, 9]);
+    expect(shares.reduce((a, b) => a + b, 0)).toBeCloseTo(12, 12);
+    expect(() => splitBudget(5, [0, 0])).toThrow(/more than 0/);
   });
 });
