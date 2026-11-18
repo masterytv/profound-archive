@@ -20,15 +20,15 @@ const OPTIONS: Record<string, OptDef> = {
   'allow-unmarked': { type: 'boolean', help: 'haiku-first-pass: write the report even if some sheet rows have no mark (the report then states the coverage); default is to refuse' },
 };
 
-export interface SheetCoverage { marked: number; rows: number; videosWithoutMarks: number }
+export interface SheetCoverage { marked: number; rows: number; videosWithoutMarks: number; videosWithRows?: number }
 
 export function renderHaikuGoldMarkdown(h: HaikuGoldStats, nVideos: number, dropped = 0, coverage?: SheetCoverage): string {
   const s = h.base;
   const partial = coverage && coverage.marked < coverage.rows;
   const L = [
-    '# Gold-set report (Haiku-only, unchecked answers)', '',
+    partial ? '# PARTIAL gold-set report (Haiku-only, unchecked answers): NOT FOR PUBLICATION' : '# Gold-set report (Haiku-only, unchecked answers)', '',
     'The answers measured here are the unchecked first-pass answers of one model (Haiku): no second model re-checked them. This report is the only measure of how reliable they are. A human reviewer judged each sampled answer against the video.', '',
-    `${s.nMarked} reviewed cells over ${nVideos} gold videos (latest mark per cell). Intervals are Wilson 95%.${dropped ? ` ${dropped} imported marks were left out because they do not refer to a row of the Haiku-only gold sheet, i.e. to the current, counted first-pass Haiku answer of a sheet cell (for example marks from a full-mode gold sheet, or on an answer that was later superseded).` : ''}`, '',
+    `${s.nMarked} reviewed cells over ${nVideos} gold videos${coverage?.videosWithRows !== undefined && coverage.videosWithRows !== nVideos ? ` (${coverage.videosWithRows} of them have answers to review; the others have no counted answer)` : ''} (latest mark per cell). Intervals are Wilson 95%.${dropped ? ` ${dropped} imported marks were left out because they do not refer to a row of the Haiku-only gold sheet, i.e. to the current, counted first-pass Haiku answer of a sheet cell (for example marks from a full-mode gold sheet, or on an answer that was later superseded).` : ''}`, '',
     ...(coverage ? [`Coverage: ${coverage.marked} of ${coverage.rows} sheet rows marked.`, ''] : []),
     ...(partial ? [`**WARNING: partial coverage.** ${coverage!.rows - coverage!.marked} sheet rows have no mark${coverage!.videosWithoutMarks ? ` (${coverage!.videosWithoutMarks} gold videos have none at all)` : ''}. The figures below rest on the rows the reviewer chose to mark, which may not be representative. Do not publish them as the gold-set precision.`, ''] : []),
     '## Precision per stance', '', '| stance | precision (correct / n) |', '|---|---|',
@@ -100,15 +100,17 @@ async function haikuReport(ctx: Ctx, db: Db, seed: number, pilotN: number, goldN
   const unmarkedRows = sheet.filter((c) => !markedCells.has(`${c.video_id}\u0000${c.question_id}`));
   const sheetVideos = new Set(sheet.map((c) => c.video_id));
   const videosWithoutMarks = s.chosen.filter((v) => sheetVideos.has(v) && !videosMarked.has(v));
-  const coverage: SheetCoverage = { marked: sheet.length - unmarkedRows.length, rows: sheet.length, videosWithoutMarks: videosWithoutMarks.length };
+  const coverage: SheetCoverage = { marked: sheet.length - unmarkedRows.length, rows: sheet.length, videosWithoutMarks: videosWithoutMarks.length, videosWithRows: sheetVideos.size };
   if (unmarkedRows.length && !allowUnmarked) {
     throw new CliError(`${unmarkedRows.length} of the ${sheet.length} rows of the Haiku-only gold sheet have no usable mark${videosWithoutMarks.length ? `; ${videosWithoutMarks.length} gold videos have none at all (e.g. ${videosWithoutMarks.slice(0, 5).join(', ')})` : ''}. Either rows were left blank or not imported (import-gold skips rows with a blank "correct" cell), or the gold selection is not the one the marked sheet was built from (seed / pilot-n / gold-n differ, a pilot run was added, or first-pass rows changed). Mark every row and import again, or pass --allow-unmarked to report on the marked subset with its coverage stated. No report was written.`);
   }
   if (dropped) ctx.log(`NOTE: ${dropped} imported marks on these videos are not on a row of the Haiku-only gold sheet and were left out (see the report).`);
   if (unmarkedRows.length) ctx.log(`WARNING: --allow-unmarked: ${unmarkedRows.length} of ${sheet.length} sheet rows have no mark; the report says so and its figures must not be published as the gold-set precision.`);
   const stats = haikuGoldStats(marks);
-  writeFileSync(path.join(ensureOutDir(ctx), `gold_report${HAIKU_SUFFIX}.md`), renderHaikuGoldMarkdown(stats, s.chosen.length, dropped, coverage));
-  ctx.log(`wrote out/gold_report${HAIKU_SUFFIX}.md (${stats.base.nMarked} cells; ${coverage.marked} of ${coverage.rows} sheet rows marked; all-claims precision ${fmtProportion(stats.base.allClaims)}; ${dropped} marks left out)`);
+  // A partial report never takes the published file name (the rollup report points at that name).
+  const file = `gold_report${HAIKU_SUFFIX}${unmarkedRows.length ? '_PARTIAL' : ''}.md`;
+  writeFileSync(path.join(ensureOutDir(ctx), file), renderHaikuGoldMarkdown(stats, s.chosen.length, dropped, coverage));
+  ctx.log(`wrote out/${file} (${stats.base.nMarked} cells; ${coverage.marked} of ${coverage.rows} sheet rows marked; all-claims precision ${fmtProportion(stats.base.allClaims)}; ${dropped} marks left out)`);
 }
 
 export function renderGoldMarkdown(s: GoldStats, nVideos: number): string {

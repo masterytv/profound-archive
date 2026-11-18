@@ -5910,9 +5910,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/gold-report.ts": {
-    "mtime": 1795015407.8914032,
-    "seen": 1795015439.5762725,
-    "ast_hash": "9a638d5d1de86919f60c0984807f58ff",
+    "mtime": 1795015519.1039855,
+    "seen": 1795015554.7960613,
+    "ast_hash": "70d92507450ce3c51e7e59f40cf40ba7",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/gold-sheet.ts": {
@@ -6342,15 +6342,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-haiku.test.ts": {
-    "mtime": 1795015397.0264504,
-    "seen": 1795015439.5772343,
-    "ast_hash": "2743e9aa98da9b58fb00a93552afd45b",
+    "mtime": 1795015519.1044726,
+    "seen": 1795015554.7970712,
+    "ast_hash": "502b3b4bbcb0d9559dc5229514efab85",
     "semantic_hash": ""
   },
   "scripts/book-tally/HANDOFF.md": {
-    "mtime": 1795015180.0624828,
-    "seen": 1795015219.9983718,
-    "ast_hash": "57255722f658cb20db4a39eb25941dcb",
+    "mtime": 1795015545.8665934,
+    "seen": 1795015554.8140998,
+    "ast_hash": "6caa76bdfd52dd6f644f2ef71f04a2c5",
     "semantic_hash": ""
   },
   "package-lock.json": {

@@ -444,7 +444,8 @@ describe('review round 1 fixes', () => {
     // its sheet row (the new answer) is now unmarked: refused by default
     await expect(goldReport(args, h.deps)).rejects.toThrow(/1 of the 12 rows of the Haiku-only gold sheet have no usable mark/);
     await goldReport([...args, '--allow-unmarked'], h.deps);
-    rep = h.read('gold_report_haiku_only.md');
+    rep = h.read('gold_report_haiku_only_PARTIAL.md');
+    expect(rep).toMatch(/^# PARTIAL gold-set report \(Haiku-only, unchecked answers\): NOT FOR PUBLICATION/);
     expect(rep).toMatch(/\| all non-not_addressed answers \| 100\.0% \(5\/5;/);
     expect(rep).toMatch(/2 imported marks were left out/);
     expect(rep).toContain('Coverage: 11 of 12 sheet rows marked.');
@@ -476,7 +477,9 @@ describe('review round 1 fixes', () => {
     await expect(goldReport(args, h.deps)).rejects.toThrow(/3 of the 12 rows of the Haiku-only gold sheet have no usable mark\. Either rows were left blank/);
     expect(() => h.read('gold_report_haiku_only.md')).toThrow();
     await goldReport([...args, '--allow-unmarked'], h.deps);
-    const rep = h.read('gold_report_haiku_only.md');
+    expect(() => h.read('gold_report_haiku_only.md')).toThrow();   // the published name is never written by a partial run
+    const rep = h.read('gold_report_haiku_only_PARTIAL.md');
+    expect(rep).toMatch(/^# PARTIAL gold-set report/);
     expect(rep).toContain('Coverage: 9 of 12 sheet rows marked.');
     expect(rep).toMatch(/WARNING: partial coverage\.\*\* 3 sheet rows have no mark\. /);
     expect(rep).toMatch(/\| Y \| n\/a \(n=0\)/);   // every flagged (q2) row was the one left blank

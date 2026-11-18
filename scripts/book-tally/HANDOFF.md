@@ -37,12 +37,18 @@ repo-root CLAUDE.md.
 Prefix every command with
 `npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/`.
 
-1. **Check the Haiku-only mode is reviewed.** `job2/haiku.ts`, rollup and gold-sheet
-   `--resolution haiku-first-pass`. If no APPROVE from a reviewer is recorded in git history or in
-   PR masterytv/profound-archive#82, have the reviewer agent review it first.
+1. **DONE: the Haiku-only mode is reviewed.** The independent reviewer returned APPROVE in round 3
+   (at e3802a6, branch `claude/focused-meitner-j5bscj`) after two rounds of fixes: the expensive-pass
+   guard now covers gold recheck/arbiter too, and the Haiku gold report uses only marks on the
+   rebuilt sheet rows and refuses unless every row is marked. Its two optional nits were applied
+   afterwards (a partial report goes to `out/gold_report_haiku_only_PARTIAL.md`).
 2. **Run the free estimates** (no spend). Each writes a `bt_runs` row with status `estimated`:
-   - `job1/judge-pairs.ts --estimate` (Haiku stage)
-   - `job1/extract-names.ts --estimate`
+   - DONE `job1/judge-pairs.ts --estimate` (Haiku stage): run `j1h-20261118151446`, 473 requests,
+     446,681 input tokens, expected $0.27, ceiling $6.85.
+   - DONE `job1/extract-names.ts --estimate`: run `j1n-20261118151539`, 639 requests (blank names
+     only; 612 more single-token/placeholder names need `--include-unusable-names`), 4,262,192 input
+     tokens, expected $0.55, ceiling $9.80.
+   - Prices in `lib/cost.ts` were checked against the live pricing page on 2026-11-18 and match.
    - `job2/run-stance.ts --pilot --estimate` (optional pilot)
    - `job2/run-stance.ts --full --pass first --estimate`. This counts 6,054 requests with the free
      count_tokens endpoint, which is slow. Run it in the background.
