@@ -57,6 +57,15 @@ repo-root CLAUDE.md.
     stratified `review_order` (`job3/review-order.ts`). Each block of 20 holds 8 yes/no questions,
     6 multiple-choice questions, 3 facts and 3 not-addressed rows. The page shows block 1 first,
     and "Show the next 20" adds more.
+  - **Excluded channel.** "Life After Life NDE" (UC6G-0YOhL4dNkex8Vw5pqWw) was deleted from YouTube;
+    the owner found it during review. That is 531 NDE videos, listed in
+    `codebook/excluded-channels.json`. Rollup, run-codebook, gold-sheet and gold-report skip them.
+    The live nde_* tables are untouched. 62 sheet rows (3 videos) are flagged `excluded`; the review
+    order is unchanged.
+  - **First gold import:** 32 marks (cards 1-40 minus 8 unavailable) went into bt_coded_gold_marks
+    on 2026-11-18. The report, `gold-report.ts --first 40`, shows everything correct except one
+    fact (f5) and 2 of 28 quotes that are not the experiencer's own words. The owner continues
+    with block 3 (cards 41-60).
   - Report on what was marked with `gold-report.ts --first <N>`, using whole blocks: 20, 40, ...
     It refuses if any of the first N is unmarked. Its "By review group" table holds the unbiased
     per-group figures; the combined figures mix sampling rates.

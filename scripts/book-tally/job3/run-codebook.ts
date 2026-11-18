@@ -27,6 +27,7 @@ import { assertDigestMatches, assertNoOverlappingRuns, assertNothingDoneSince, a
 import { seededShuffle } from '../job2/sampling';
 import { allItems, CODEBOOK_VERSION, loadCodebookPrompt, type CodebookPrompt } from './codebook';
 import { checkCodedResponse, REJECTED_PREFIX, type ModelEntry } from './validate';
+import { readExcludedVideoIds } from './exclusions';
 
 const SCRIPT = 'job3/run-codebook.ts';
 const MODEL = MODELS.haiku;
@@ -244,7 +245,8 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   }
 
   // --dry-run and --estimate
-  const nde = await readNdeVideoIds(db);
+  const excludedIds = await readExcludedVideoIds(db);
+  const nde = (await readNdeVideoIds(db)).filter((id) => !excludedIds.has(id));
   const done = await codedVideos(ctx, cp.promptHash);
   const sampleN = intOpt(v.sample, 'sample');
   const seed = intOpt(v.seed, 'seed') ?? 20261118;

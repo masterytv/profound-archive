@@ -17,6 +17,7 @@
  * joined with " | "; mark columns left blank for the owner). The files hold model-returned quotes: out/
  * is gitignored. Logs print counts only, never quote text.
  */
+import { readExcludedVideoIds } from './exclusions';
 import { reviewOrder, stratumOf, BLOCK_SIZE, REVIEW_MIX, type Stratum } from './review-order';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
@@ -173,6 +174,8 @@ export interface SheetRow {
   /** 0-based position in the seeded, stratified review order (job3/review-order.ts). */
   review_order: number;
   stratum: Stratum;
+  /** The video's channel is in codebook/excluded-channels.json (no longer available): not reviewed, not counted. */
+  excluded: boolean;
 }
 
 export function stanceLabel(item: CodeItem, stance: 'yes' | 'no' | 'mixed'): string {
@@ -181,7 +184,7 @@ export function stanceLabel(item: CodeItem, stance: 'yes' | 'no' | 'mixed'): str
 }
 
 /** `link(quote)` returns the youtube link for a quote (timestamp when it can be aligned). */
-export function buildSheetRow(sel: SelectedRow, title: string, link: (quote: string | null) => string): Omit<SheetRow, 'review_order' | 'stratum'> {
+export function buildSheetRow(sel: SelectedRow, title: string, link: (quote: string | null) => string): Omit<SheetRow, 'review_order' | 'stratum' | 'excluded'> {
   const { item, row, outcome } = sel;
   const base = {
     coded_answer_id: row.id, video_id: row.video_id, title, item_key: item.key, question_id: item.question_id ?? null,
@@ -204,7 +207,7 @@ export function buildSheetRow(sel: SelectedRow, title: string, link: (quote: str
 export const MARK_COLUMNS = ['addressed_correct', 'answer_correct', 'wrong_choices', 'missing_answer', 'quote_is_experiencer', 'note'] as const;
 
 export const SHEET_HEADERS = [
-  'review_order', 'stratum', 'coded_answer_id', 'video_id', 'title', 'item_key', 'question_id', 'ask', 'question', 'type', 'outcome',
+  'review_order', 'stratum', 'excluded', 'coded_answer_id', 'video_id', 'title', 'item_key', 'question_id', 'ask', 'question', 'type', 'outcome',
   'answer', 'answer_codes', 'quote', 'youtube_link', 'confidence', ...MARK_COLUMNS,
 ] as const;
 
@@ -217,7 +220,7 @@ export function csvRecord(r: SheetRow): Record<string, unknown> {
   const quote = mc ? r.answers.map((a) => a.quote).join(' | ') : r.quote ?? '';
   const link = mc ? r.answers.map((a) => a.youtube_link).join(' | ') : r.youtube_link ?? '';
   return {
-    review_order: r.review_order + 1, stratum: r.stratum, coded_answer_id: r.coded_answer_id, video_id: r.video_id, title: neutralizeFormula(r.title), item_key: r.item_key, question_id: r.question_id ?? '',
+    review_order: r.review_order + 1, stratum: r.stratum, excluded: r.excluded ? 'Y' : '', coded_answer_id: r.coded_answer_id, video_id: r.video_id, title: neutralizeFormula(r.title), item_key: r.item_key, question_id: r.question_id ?? '',
     ask: neutralizeFormula(r.ask), question: neutralizeFormula(r.question ?? ''), type: r.type, outcome: r.outcome,
     answer: neutralizeFormula(answer), answer_codes: mc ? r.answers.map((a) => a.code).join(' ') : '', quote: neutralizeFormula(quote), youtube_link: link,
     confidence: r.confidence ?? '', addressed_correct: '', answer_correct: '', wrong_choices: '', missing_answer: '', quote_is_experiencer: '', note: '',
@@ -267,13 +270,14 @@ export function selectionOrder(sel: GoldSelection): Map<number, number> {
 /** Titles and timestamp links for a selection (reads nde_vids; the transcript never leaves this function). */
 export async function buildSheet(db: Db, sel: GoldSelection): Promise<SheetRow[]> {
   const titles = await readTitles(db, sel.videoIds);
+  const excluded = await readExcludedVideoIds(db);
   const order = selectionOrder(sel);
   const out: SheetRow[] = [];
   for (const v of sel.videoIds) {
     const segments = (await fetchTranscript(db, v, true))?.timestamped ?? null;
     const link = (quote: string | null) => youtubeUrl(v, quote ? alignTimestamp(quote, segments) : null);
     for (const s of sel.rows.filter((x) => x.row.video_id === v)) {
-      out.push({ ...buildSheetRow(s, titles.get(v) ?? '', link), review_order: order.get(s.row.id)!, stratum: stratumOf(orderInput(s)) });
+      out.push({ ...buildSheetRow(s, titles.get(v) ?? '', link), review_order: order.get(s.row.id)!, stratum: stratumOf(orderInput(s)), excluded: excluded.has(v) });
     }
   }
   return out.sort((a, b) => a.review_order - b.review_order);

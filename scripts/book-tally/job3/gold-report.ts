@@ -26,6 +26,7 @@ import { CliError, helpText, isDirectRun, makeCtx, parseCli, runCli, type Deps, 
 import { loadCodebookPrompt } from './codebook';
 import { GOLD_OPTIONS, goldParams, selectGold, selectionOrder, type GoldSelection } from './gold-sheet';
 import { BLOCK_SIZE, REVIEW_MIX, STRATA, stratumOf, type Stratum } from './review-order';
+import { readExcludedVideoIds } from './exclusions';
 import { intOpt } from '../job1/cli';
 import { latestMarkByAnswer, MARK_SELECT, readMarksByAnswer, type DbMark } from './import-gold';
 import { countedChoices } from './validate';
@@ -131,7 +132,7 @@ export function fmt(p: Proportion): string {
   return `${f(p.p)}% (${p.k}/${p.n}; Wilson 95% CI ${f(p.lo)}-${f(p.hi)}%)`;
 }
 
-export interface SampleInfo { first: number; sheetRows: number; byStratum: Record<Stratum, GoldStats> }
+export interface SampleInfo { first: number; sheetRows: number; byStratum: Record<Stratum, GoldStats>; excludedInRange?: number; firstPositions?: number }
 
 /** Per review stratum: the figures that are unbiased under the stratified review sample. */
 export function stratumSection(sample: SampleInfo): string[] {
@@ -139,7 +140,7 @@ export function stratumSection(sample: SampleInfo): string[] {
   const b = sample.byStratum;
   return [
     '## By review group (the reliable figures for a review sample)', '',
-    `Cards 1 to ${sample.first} of the seeded review order over the ${sample.sheetRows}-row sheet. Each block of ${BLOCK_SIZE} holds ` +
+    `Cards 1 to ${sample.firstPositions ?? sample.first} of the seeded review order (${sample.first} reviewed${sample.excludedInRange ? `; ${sample.excludedInRange} skipped because their video is no longer available` : ''}) over the ${sample.sheetRows}-row sheet. Each block of ${BLOCK_SIZE} holds ` +
     `${REVIEW_MIX.yes_no} yes/no, ${REVIEW_MIX.multiple_choice} multiple-choice, ${REVIEW_MIX.fact} fact and ${REVIEW_MIX.not_addressed} not-addressed cards, ` +
     'each drawn at random within its group. The groups are sampled at different rates, so read these per-group figures, not the combined ones above.', '',
     '| group | measure | result (k/n) |', '|---|---|---|',
@@ -164,7 +165,7 @@ export function renderReport(s: GoldStats, h: { codebookVersion: string; promptH
   const ids = (xs: readonly number[]) => (xs.length ? xs.slice(0, 50).join(', ') + (xs.length > 50 ? `, ... (${xs.length} in all)` : '') : 'none');
   return [
     partial ? '# Codebook gold-set report: PARTIAL, NOT FOR PUBLICATION' : '# Codebook gold-set report', '',
-    ...(sample ? [`**Review sample:** the first ${sample.first} cards of the seeded review order (of ${sample.sheetRows} on the sheet).`, '', ...stratumSection(sample)] : []),
+    ...(sample ? [`**Review sample:** the first ${sample.firstPositions ?? sample.first} cards of the seeded review order (${sample.first} reviewed, of ${sample.sheetRows} available on the sheet).`, '', ...stratumSection(sample)] : []),
     ...(partial ? [`**NOT FOR PUBLICATION.** ${s.unmarkedIds.length} of ${s.rows} sheet rows have no mark. The figures below rest on the rows the owner chose to mark, which may not be representative.`, ''] : []),
     `Codebook ${h.codebookVersion}, prompt ${h.promptHash.slice(0, 12)}. ${h.videos} videos; sheet built with n=${h.params.n}, seed=${h.params.seed}, na-per-video=${h.params.naPerVideo}. ` +
     'The owner judged each sampled answer against the video; the latest mark per coded answer is used. Every figure is a proportion with k/n and a Wilson 95% interval.', '',
@@ -223,15 +224,21 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const p = goldParams(v);
   const sel = await selectGold(ctx.db, loadCodebookPrompt(), p);
   if (sel.rows.length === 0) throw new CliError('the gold sheet is empty (no eligible videos)');
-  const allRows = reportRows(sel);
-  const first = intOpt(v.first, 'first');
+  // The review order is computed over the whole selection (so it never moves), then rows of excluded
+  // channels (videos no longer available) are dropped: they need no mark and are not counted.
   const order = selectionOrder(sel);
+  const excludedVideos = await readExcludedVideoIds(ctx.db);
+  const excludedIds = new Set(sel.rows.filter((s) => excludedVideos.has(s.row.video_id)).map((s) => s.row.id));
+  const allRows = reportRows(sel).filter((r) => !excludedIds.has(r.coded_answer_id));
+  const first = intOpt(v.first, 'first');
   const rows = first === undefined ? allRows : allRows.filter((r) => order.get(r.coded_answer_id)! < first);
+  if (excludedIds.size) ctx.log(`${excludedIds.size} sheet rows belong to excluded channels (videos no longer available): not counted`);
   if (first !== undefined && (first < 1 || rows.length === 0)) throw new CliError('--first must be at least 1');
   const { marks, extraMarkIds } = await readSheetMarks(ctx.db, sel, allRows);
   const stats = goldStats(rows, marks, extraMarkIds);
   const sample: SampleInfo | undefined = first === undefined ? undefined : {
-    first: rows.length, sheetRows: allRows.length,
+    first: rows.length, sheetRows: allRows.length, firstPositions: first,
+    excludedInRange: [...excludedIds].filter((id) => order.get(id)! < first).length,
     byStratum: Object.fromEntries(STRATA.map((k) => [k, goldStats(rows.filter((r) => stratumOf(r) === k), marks)])) as Record<Stratum, GoldStats>,
   };
   const partial = stats.unmarkedIds.length > 0;

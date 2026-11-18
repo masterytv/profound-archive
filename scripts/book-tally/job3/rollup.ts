@@ -17,6 +17,7 @@ import { findMergeConflicts, type MergeConflict } from '../job1/merge-conflicts'
 import { toCsv } from '../job2/csv';
 import { loadCodebookPrompt, type Codebook } from './codebook';
 import { RUN_KIND } from './run-codebook';
+import { loadExcludedChannels, readExcludedVideoIds } from './exclusions';
 import { tallyAll, tallyCsvRows, TALLY_HEADERS, type ItemTally, type TallyInputRow, type TallyResult } from './tally';
 
 const OPTIONS: Record<string, OptDef> = {
@@ -34,11 +35,12 @@ export const NOTICE =
 const pct = (x: number | null) => (x === null ? 'n/a' : `${(100 * x).toFixed(1)}%`);
 const ci = (lo: number | null, hi: number | null) => (lo === null || hi === null ? '' : ` (95% CI ${(100 * lo).toFixed(1)}–${(100 * hi).toFixed(1)}%)`);
 
-export function reportMarkdown(cb: Codebook, res: TallyResult, meta: { runs: string[]; partialVideos: number; nde: number }): string {
+export function reportMarkdown(cb: Codebook, res: TallyResult, meta: { runs: string[]; partialVideos: number; nde: number; excluded?: { videos: number; channels: string[] } }): string {
   const byKey = new Map([...cb.facts, ...cb.items].map((i) => [i.key, i]));
   const lines: string[] = [
     `# Codebook tally (${cb.version})`, '', NOTICE, '',
-    `Runs: ${meta.runs.join(', ')}. NDE videos: ${meta.nde}; coded: ${res.n_videos_coded}; people (Job 1 person map): ${res.n_people}.`,
+    `Runs: ${meta.runs.join(', ')}. NDE videos analysed: ${meta.nde}; coded: ${res.n_videos_coded}; people (Job 1 person map): ${res.n_people}.`,
+    ...(meta.excluded?.videos ? ['', `Excluded: ${meta.excluded.videos} NDE videos of channel(s) no longer available (${meta.excluded.channels.join('; ')}), listed in codebook/excluded-channels.json.`] : []),
     ...(meta.partialVideos ? ['', `**PARTIAL:** ${meta.partialVideos} NDE videos with a transcript are not coded yet. Do not publish these figures.`] : []),
     '',
     'How to read: "addressed" is the share of people who speak to the question, out of those whose answer counted or who did not address it ',
@@ -82,7 +84,11 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
   const done = runs.filter((r) => r.status === 'completed');
   if (done.length === 0) throw new CliError('no completed codebook run with the current prompt');
 
-  const nde = await readNdeVideoIds(db);
+  const ndeAll = await readNdeVideoIds(db);
+  const excludedChannels = loadExcludedChannels();
+  const excludedIds = await readExcludedVideoIds(db, excludedChannels);
+  const nde = ndeAll.filter((id) => !excludedIds.has(id));
+  const nExcluded = ndeAll.length - nde.length;
   const unmapped = await selectAllKeyset<{ video_id: string }>(db, 'bt_unmapped_nde_videos', 'video_id', 'video_id');
   if (unmapped.length) throw new CliError(`${unmapped.length} NDE videos have no accepted person link (bt_unmapped_nde_videos is not empty); finish Job 1 first`);
   const conflicts = await (deps.findMergeConflicts ?? findMergeConflicts)(db);
@@ -99,10 +105,10 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
     );
     for (const x of got) rows.push(x);
   }
-  const codedVideos = new Set(rows.map((r) => r.video_id));
+  const codedVideos = new Set(rows.map((r) => r.video_id).filter((v) => ndeSet.has(v)));
   const noTranscript = new Set(done.flatMap((r) => (r.params?.no_transcript_ids as string[] | undefined) ?? []));
   const uncoded = nde.filter((id) => !codedVideos.has(id) && !noTranscript.has(id));
-  ctx.log(`runs: ${done.map((r) => r.id).join(', ')}; rows: ${rows.length}; NDE videos coded: ${codedVideos.size} of ${nde.length}`);
+  ctx.log(`runs: ${done.map((r) => r.id).join(', ')}; rows: ${rows.length}; NDE videos analysed: ${nde.length} (${nExcluded} excluded by excluded-channels.json)`);
   if (uncoded.length && v['allow-partial'] !== true) {
     throw new CliError(`${uncoded.length} NDE videos are not coded yet (run the full pass, or pass --allow-partial for a clearly marked partial tally)`);
   }
@@ -114,7 +120,7 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
   const suffix = uncoded.length ? '_PARTIAL' : '';
   writeFileSync(path.join(dir, `coded_tally_by_item${suffix}.csv`), toCsv(TALLY_HEADERS, tallyCsvRows(cp.codebook, res)));
   writeFileSync(path.join(dir, `coded_tally_per_video${suffix}.csv`), toCsv(TALLY_HEADERS, tallyCsvRows(cp.codebook, perVideo)));
-  writeFileSync(path.join(dir, `coded_tally_report${suffix}.md`), reportMarkdown(cp.codebook, res, { runs: done.map((r) => r.id), partialVideos: uncoded.length, nde: nde.length }));
+  writeFileSync(path.join(dir, `coded_tally_report${suffix}.md`), reportMarkdown(cp.codebook, res, { runs: done.map((r) => r.id), partialVideos: uncoded.length, nde: nde.length, excluded: { videos: nExcluded, channels: excludedChannels.map((c) => `${c.name}: ${c.reason.split(';')[0]}`) } }));
   ctx.log(`wrote coded_tally_by_item${suffix}.csv, coded_tally_per_video${suffix}.csv and coded_tally_report${suffix}.md (${res.n_people} people, ${res.n_videos_coded} videos)`);
 }
 

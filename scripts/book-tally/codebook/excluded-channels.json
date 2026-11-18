@@ -1,0 +1,11 @@
+{
+  "note": "Channels whose videos are left out of the book-tally analysis (Job 3 coding, tallies, gold set). The live tables nde_vids and nde_analysis are NOT changed. Add a channel with its reason; never remove one without the owner's decision.",
+  "channels": [
+    {
+      "channel_id": "UC6G-0YOhL4dNkex8Vw5pqWw",
+      "name": "Life After Life NDE",
+      "reason": "Channel deleted from YouTube; its videos are no longer available. Owner reported it on 2026-11-18 while reviewing the gold set; 3 sheet videos and 4 more sampled videos of the channel returned 404 from YouTube oEmbed (a live control video returned 200).",
+      "excluded_on": "2026-11-18"
+    }
+  ]
+}

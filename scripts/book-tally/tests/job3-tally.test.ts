@@ -134,6 +134,15 @@ describe('job3/rollup (fake DB)', () => {
     expect(pv).toMatchObject({ n_people: '3', n_answer: '1' });
   });
 
+  it('leaves out videos of channels in excluded-channels.json and says so', async () => {
+    const r = run(world({ nde_vids: [{ videoId: 'v3', channelId: 'UC6G-0YOhL4dNkex8Vw5pqWw' }, { videoId: 'v1', channelId: 'other' }] }));
+    await r.p;
+    const rows = parseCsv(readFileSync(path.join(r.outDir, 'coded_tally_by_item.csv'), 'utf8'));
+    expect(rows.find((x) => x.item_key === 'q38' && x.answer === 'yes')).toMatchObject({ n_people: '1' }); // anon:v3 is gone
+    expect(readFileSync(path.join(r.outDir, 'coded_tally_report.md'), 'utf8')).toMatch(/Excluded: 1 NDE videos of channel\(s\) no longer available \(Life After Life NDE/);
+    expect(r.logs.join('\n')).toMatch(/1 excluded by excluded-channels.json/);
+  });
+
   it('refuses while a video is uncoded (unless --allow-partial, which marks every file PARTIAL)', async () => {
     const db = () => world({ nde_analysis: ['v1', 'v2', 'v3', 'v4'].map((v) => ({ video_id: v, experience_type: 'nde' })) });
     await expect(run(db()).p).rejects.toThrow(/1 NDE videos are not coded yet/);
