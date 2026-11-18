@@ -3,6 +3,39 @@
 Read this first in a new session. Then read README.md and SPEC.md, and the "Working rules" in the
 repo-root CLAUDE.md.
 
+## LATEST (2026-11-18, evening): read this before the older sections below
+- **Budget: $75 total** (raised from $50 by the owner). Spent so far: **$16.13**.
+  - Job 1 pair judging: `j1h-20261118154545`, $0.05.
+  - Job 1 name extraction: `j1n-20261118154610`, $0.23.
+  - Job 2 pilot: `pilot-ea3c3348`, $2.48. Kappa 0.633, agreement 91.7%.
+  - Job 2 full first pass: `full-first-1858d601`, $13.37, 6,054 videos.
+  - Every paid run is estimated with `--budget-usd <cap>`, and the owner approves the cap.
+- **Job 2 is being REDESIGNED; do not publish any stance-v1 tally.** The yes/no/mixed coding only
+  works for real yes/no questions. On either/or and open questions (for example Q37, Q38, Q39, Q78)
+  Haiku's "yes" mixes opposite answers. New design, decided by the owner:
+  - Step 1 for every question: is it addressed in this account? A quote is required.
+  - Step 2 depends on the question's type:
+    - yes/no: yes, no or mixed;
+    - multiple choice: 1 to 3 answers from a fixed list, plus "other". Several answers per person
+      are allowed, so shares can exceed 100%, and reports must say so;
+    - conditional: reported among people with a fact such as a violent death or a suicide attempt.
+      These facts are coded once per video.
+- **Codebook draft**: `codebook/codebook-v1-DRAFT.md`, waiting for the owner's review. After
+  approval:
+  1. new prompt and schema version;
+  2. a NEW migration with new tables (the current `bt_stance_answers` CHECK allows only
+     yes/no/mixed/not_addressed). The owner applies migrations; never run one yourself;
+  3. rollup, gold sheet and reports for the new types;
+  4. estimate, then the owner's yes, then a full Haiku re-run;
+  5. a new gold sheet.
+- **Gold marking is paused.** The interactive sheet https://claude.ai/artifact/5t1QCp9VCp1C13j7wjVcEZ
+  is for stance-v1 and is superseded. It holds at most a few owner marks; don't import them.
+- **Job 1 Sonnet pair check**: the owner hasn't decided. Haiku judged 186 pairs same, 285 unsure and
+  2 different. Estimate `j1s-20261118164623` is uncapped; re-estimate with `--budget-usd` before any
+  submit.
+- The other session's branch `claude/focused-meitner-j5bscj` was merged into
+  `claude/project-profound-research-data-s2tx22` (PR #86). That branch is the base for this work.
+
 ## Owner's decisions
 - **Budget: Haiku only.** Run Job 1 and the Job 2 Haiku first pass. **Do NOT run the Job 2 full
   Sonnet re-check or the Opus arbiter** (`run-stance --gold|--full --pass recheck|arbiter`). They may be
