@@ -105,3 +105,38 @@ export function youtubeLink(videoId: string, startSeconds: number | null | undef
     ? `${base}&t=${Math.max(0, Math.floor(Number(startSeconds)))}s`
     : base;
 }
+
+// ---- Haiku-only gold set: precision split by would_be_flagged and confidence band ----
+
+export type ConfidenceBand = '<70' | '70-89' | '>=90';
+export const CONFIDENCE_BANDS: readonly ConfidenceBand[] = ['<70', '70-89', '>=90'];
+
+export function confidenceBand(c: number): ConfidenceBand {
+  return c < 70 ? '<70' : c < 90 ? '70-89' : '>=90';
+}
+
+/** A gold mark joined with the first-pass answer it judged. */
+export interface HaikuMark extends GoldMark {
+  confidence: number | null;
+  /** Would the full pipeline have flagged this answer for a re-check (no, mixed, confidence < 70). */
+  wouldBeFlagged: boolean;
+}
+
+export interface HaikuGoldStats {
+  base: GoldStats;
+  /** Precision over yes/no/mixed marks, split by would_be_flagged (Y = flagged, N = unflagged). */
+  byFlag: { flagged: Proportion; unflagged: Proportion };
+  /** Precision over yes/no/mixed marks by the answer's own confidence band; marks without a confidence are excluded. */
+  byBand: Record<ConfidenceBand, Proportion>;
+}
+
+export function haikuGoldStats(marks: readonly HaikuMark[]): HaikuGoldStats {
+  const latest = latestMarks(marks);
+  const claims = latest.filter((m) => m.final_stance !== 'not_addressed');
+  const prec = (sel: readonly HaikuMark[]) => wilson(sel.filter((m) => m.correct).length, sel.length);
+  return {
+    base: goldStats(marks),
+    byFlag: { flagged: prec(claims.filter((m) => m.wouldBeFlagged)), unflagged: prec(claims.filter((m) => !m.wouldBeFlagged)) },
+    byBand: Object.fromEntries(CONFIDENCE_BANDS.map((b) => [b, prec(claims.filter((m) => m.confidence !== null && confidenceBand(m.confidence) === b))])) as Record<ConfidenceBand, Proportion>,
+  };
+}
