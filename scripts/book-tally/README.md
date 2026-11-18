@@ -125,7 +125,7 @@ not_addressed. Silence is never a no."* Full prompts are in [`prompts/`](prompts
   transcript, at least 5 words long. Ellipses and joined fragments fail. There is no fuzzy
   matching.
 
-An answer whose quote fails is marked `quote_verified = false` and re-run. **An answer is never
+An answer whose quote fails is marked `quote_verified = false` and sent to the Sonnet re-check. **An answer is never
 counted without a matching quote.**
 
 **Escalation.**
@@ -145,7 +145,7 @@ Opus arbiter (sees both earlier answers as "Reader A / Reader B", order randomis
 - All three answers are kept. The final answer is chosen by the database view
   `bt_final_stances`.
 - A final non-`not_addressed` answer with an unverified quote is **excluded** from tallies. It is
-  counted in an `n_excluded` column.
+  counted in the `n_excluded_unverified_cells` column, which is broken down into unverified, invalid and pending.
 - A Haiku answer that is not flagged (`yes` or `not_addressed`, confidence ≥ 70, quote verified)
   is not re-checked. **The checking is therefore asymmetric.** Every `no` and `mixed` gets a
   second reading, but a confident `yes` does not. The gold set (below) reports precision per
@@ -215,7 +215,7 @@ Prerequisites:
   refuses and asks a person to `--adopt-batch` or, after 30 minutes, `--void-pending`.
 
 **Every paid step is gated.** You run it with `--estimate`, which prints the token and dollar
-estimate and records it as a run. Only `--confirm-spend <run_id>` then submits it.
+estimate and records it as a run. Only `--confirm-spend <id>` (the run id for Job 1, the group id that Job 2's estimate prints) then submits it.
 
 ```bash
 npm run test:book-tally                                   # unit tests (no API, no DB)
@@ -223,7 +223,7 @@ npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/
 npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job1/find-pairs.ts --dry-run
 npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job1/judge-pairs.ts --estimate
 npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job2/run-stance.ts --pilot --estimate
-npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job2/pilot-report.ts --run <run_id>
+npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job2/pilot-report.ts --group <group_id>
 ```
 
 Outputs (CSV and reports) are written to `scripts/book-tally/out/`. That folder is not committed,
