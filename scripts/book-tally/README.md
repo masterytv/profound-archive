@@ -280,6 +280,14 @@ Prerequisites:
     billed as output;
   - a hard *ceiling*: every request at its maximum output, across all permitted retry attempts.
 - Retries that would go beyond the approved ceiling need a separate `--confirm-retries`.
+- **Budget cap.** `--estimate --budget-usd <USD>` (on `judge-pairs`, `extract-names` and
+  `run-stance`) replaces the all-attempts ceiling with that dollar cap when it is lower. The
+  estimate is refused if the cap is below the *first-attempt worst case* (every request once, every
+  response at `max_tokens`), because the first batch alone could cost that much. After the
+  first batch, retries run only while the money actually spent plus the retries' worst case stays
+  within the cap, so the run cannot spend more than the cap without `--confirm-retries`. For
+  `run-stance` the budget covers the whole group (the pilot's Haiku and Sonnet runs) and is split
+  between the runs in proportion to their first-attempt worst cases. The budget is part of the group id.
 - Submission locks the run before the batch is created.
 - If the program crashes after a batch was created but before it was recorded, it never
   resubmits on its own. It finds and adopts the existing batch. If it can't find the batch, it

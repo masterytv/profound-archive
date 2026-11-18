@@ -495,6 +495,66 @@ describe('retry budget (B2)', () => {
   });
 });
 
+describe('run-stance --budget-usd', () => {
+  /** Sonnet's first attempt bills max_tokens of output on every video and truncates one (retried at double max_tokens). */
+  const spendy = (truncKey: () => string): Responder => (cid, params) => {
+    const attempt = Number(cid.split('_').pop());
+    const isSonnetFirst = params.model.includes('sonnet') && attempt === 1;
+    if (isSonnetFirst && cid.includes(`_${truncKey()}_`)) {
+      const m = { ...message(params.model, []), stop_reason: 'max_tokens', content: [{ type: 'text', text: '{"answers":[' }] } as any;
+      m.usage = { ...m.usage, output_tokens: params.max_tokens };
+      return { type: 'succeeded', message: m };
+    }
+    const r = standard(cid, params) as { type: 'succeeded'; message: any };
+    if (isSonnetFirst) r.message.usage.output_tokens = params.max_tokens;
+    return r;
+  };
+
+  it('caps each run at its share, changes the group id, and refuses a budget below the first batch', async () => {
+    const free = harness();
+    await free.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const freeGroup = free.groupOf();
+    const freeRuns = free.db.rows('bt_runs');
+    const firstWorst = freeRuns.reduce((s, r) => s + r.estimate.firstAttemptWorstUsd, 0);
+
+    const h = harness();
+    await expect(h.run(['--pilot', '--pilot-n', '2', '--estimate', '--budget-usd', String(firstWorst * 0.9)])).rejects.toThrow(/below the first-attempt worst case/);
+    expect(h.db.rows('bt_runs')).toHaveLength(0);
+    const budget = Math.ceil(firstWorst * 1.1 * 1e6) / 1e6;
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate', '--budget-usd', String(budget)]);
+    expect(h.groupOf()).not.toBe(freeGroup);
+    const runs = h.db.rows('bt_runs');
+    const sum = runs.reduce((s, r) => s + r.estimate.ceiling_usd, 0);
+    expect(sum).toBeLessThanOrEqual(budget + 1e-9);
+    for (const r of runs) {
+      expect(r.estimate.ceiling_usd).toBeGreaterThanOrEqual(r.estimate.firstAttemptWorstUsd);
+      expect(r.estimate.uncappedCeilingUsd).toBeGreaterThan(r.estimate.ceiling_usd);
+      expect(r.params.budgetUsd).toBe(budget);
+    }
+    expect(h.logs.join('\n')).toMatch(/HARD CEILING \$[0-9.]+ \(budget cap; first batch at most/);
+  });
+
+  it('a retry that fits the uncapped ceiling is refused under a tight budget until --confirm-retries', async () => {
+    let key = '';
+    const free = harness(spendy(() => key));
+    await free.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const fg = free.groupOf();
+    key = free.db.rows('bt_runs')[0].params.plan.videoIds[0];
+    await free.run(['--pilot', '--confirm-spend', fg]);
+    expect(free.client.created).toHaveLength(3); // retry admitted under the all-attempts ceiling
+    const firstWorst = free.db.rows('bt_runs').reduce((s, r) => s + r.estimate.firstAttemptWorstUsd, 0);
+
+    const h = harness(spendy(() => key));
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate', '--budget-usd', String(Math.ceil(firstWorst * 1.01 * 1e6) / 1e6)]);
+    const g = h.groupOf();
+    key = h.db.rows('bt_runs')[0].params.plan.videoIds[0];
+    await expect(h.run(['--pilot', '--confirm-spend', g])).rejects.toThrow(/Retry budget exceeded/);
+    expect(h.client.created).toHaveLength(2); // the first batches only
+    await h.run(['--pilot', '--confirm-spend', g, '--confirm-retries', g]);
+    expect(h.client.created).toHaveLength(3);
+  });
+});
+
 describe('answer rows are all-or-nothing per raw response (S3)', () => {
   it('stops when a raw response has only some of its answer rows', async () => {
     const h = harness();
