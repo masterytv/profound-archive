@@ -51,12 +51,16 @@ describe('buildAnswerRows', () => {
 describe('request construction', () => {
   const prompts = loadStancePrompts();
   const qs = toPromptQuestions([
-    { id: 2, category: 'b', consumer_question: 'Did you see a light?', question: 'curated 2' },
-    { id: 1, category: 'a', consumer_question: null, question: 'Curated fallback text' },
+    { id: 2, category: 'b', consumer_question: 'Did you see a light?' },
+    { id: 1, category: 'a', consumer_question: '  Did you feel peace?  ' },
   ]);
-  it('orders questions by id, prefers consumer_question, falls back to question', () => {
-    expect(qs.map((q) => [q.question_id, q.question])).toEqual([[1, 'Curated fallback text'], [2, 'Did you see a light?']]);
+  it('orders questions by id and uses the trimmed consumer_question', () => {
+    expect(qs.map((q) => [q.question_id, q.question])).toEqual([[1, 'Did you feel peace?'], [2, 'Did you see a light?']]);
     expect(renderQuestionsJson(qs).split('\n')).toHaveLength(4);
+  });
+  it('refuses a question with no consumer_question (nde_questions has no fallback column)', () => {
+    expect(() => toPromptQuestions([{ id: 3, category: 'c', consumer_question: null }])).toThrow(/id 3 has no consumer_question/);
+    expect(() => toPromptQuestions([{ id: 4, category: 'c', consumer_question: '   ' }])).toThrow(/id 4/);
   });
   it('renders the stance prompt with the question list and no leftover placeholder', () => {
     const r = renderStancePrompt(prompts, qs);

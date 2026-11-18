@@ -163,7 +163,7 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
 
   const resolution = parseResolution(str(v.resolution));
   const qs: QuestionMeta[] = (await readActiveQuestions(db)).map((q) => ({
-    id: q.id, category: q.category, consumer_question: q.consumer_question ?? q.question,
+    id: q.id, category: q.category, consumer_question: q.consumer_question ?? '',
   }));
   if (resolution === 'haiku-first-pass') {
     await haikuRollup(ctx, db, { nde, ndeSet, personOf, qs, allowPartial: v['allow-partial'] === true, allowPending: v['allow-pending'] === true });
