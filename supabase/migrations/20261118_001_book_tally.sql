@@ -10,6 +10,12 @@
 -- the live app's deletes); video / question / profile ids are validated in
 -- code at write time (scripts/book-tally/lib/supabase.ts). FKs among bt_*
 -- tables are kept. Tom runs it deliberately.
+--
+-- DEPENDENCY WARNING: the view public.bt_unmapped_nde_videos reads public.nde_analysis
+-- (columns video_id, experience_type; read-only, no data is written). A future DROP TABLE or
+-- ALTER COLUMN ... TYPE on nde_analysis.video_id / nde_analysis.experience_type will fail while
+-- that view exists: DROP or recreate bt_unmapped_nde_videos first. DROP TABLE nde_analysis ...
+-- CASCADE would silently drop the view (the rollup would then fail loudly, not miscount).
 -- Rollback: supabase/rollbacks/20261118_001_book_tally_rollback.sql
 --
 -- Access model:

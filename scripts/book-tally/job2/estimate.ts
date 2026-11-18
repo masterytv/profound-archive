@@ -50,6 +50,8 @@ export function runIdFor(group: string, family: ModelFamily): string {
 // ---------- cost estimate ----------
 
 export interface TokenItem {
+  /** Request key (video id) the counted tokens belong to; stored per key so retries can be priced exactly. */
+  key?: string;
   /** Total prompt tokens (system + transcript + framing) from messages.countTokens. */
   promptTokens: number;
   /** Tokens of the system prompt alone (the cache_control prefix). */
@@ -69,6 +71,42 @@ export function itemCost(model: string, it: TokenItem): number {
 /** Same without the cache-write premium (every prompt token billed as plain input). */
 export function itemCostNoCacheWrite(model: string, it: TokenItem): number {
   return requestCost(model, { inputTokens: it.promptTokens, outputTokens: it.outputTokens });
+}
+
+/** What a run's stored estimate must carry to price a retry batch per request. */
+export interface RetryPricing {
+  /** Counted prompt tokens per request key (messages.countTokens), stored in bt_runs.estimate. */
+  promptTokensByKey?: Record<string, number> | null;
+  systemTokens?: number | null;
+  cached?: boolean | null;
+  meanPromptTokens?: number | null;
+}
+
+/** Counted prompt tokens for one key; falls back to the largest counted request (never to a mean). */
+export function promptTokensFor(key: string, p: RetryPricing): number {
+  const by = p.promptTokensByKey ?? {};
+  if (typeof by[key] === 'number') return by[key];
+  const all = Object.values(by).filter((v) => typeof v === 'number');
+  if (all.length) return Math.max(...all);
+  if (typeof p.meanPromptTokens === 'number' && p.meanPromptTokens > 0) return p.meanPromptTokens;
+  throw new Error(`the run's estimate has no counted prompt tokens for "${key}"; re-estimate before retrying`);
+}
+
+/**
+ * Worst-case cost of a retry batch: each queued request priced on ITS OWN counted prompt tokens
+ * (so Haiku's >100K long-context tier applies per request) with output at that attempt's max_tokens.
+ */
+export function queuedRetriesWorstUsd(
+  model: string,
+  retries: ReadonlyArray<{ key: string; maxTokens: number }>,
+  p: RetryPricing,
+): number {
+  return retries.reduce((sum, r) => sum + itemCost(model, {
+    promptTokens: promptTokensFor(r.key, p),
+    systemTokens: p.systemTokens ?? 0,
+    cached: p.cached === true,
+    outputTokens: r.maxTokens,
+  }), 0);
 }
 
 /** Hard ceiling for ONE request: every attempt used, every output at max_tokens (doubling). */

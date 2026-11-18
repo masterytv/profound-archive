@@ -30,6 +30,37 @@ export interface Transcript {
   timestamped?: TimestampedSegment[] | null;
 }
 
+/**
+ * Extracts caption segments from nde_vids.raw_timestamped_subtitles, which live data stores as
+ * jsonb in several shapes (port of getTimestampedSegments in src/app/video/[id]/page.tsx):
+ *   A  { data: [...segments] }   (pipeline standard)
+ *   B  [...segments]             (older rows)
+ *   C  a JSON string (double-encoded) holding either A or B (decoded up to twice)
+ * Malformed elements (non-objects, non-string text, non-numeric start) are skipped; `start` and
+ * `duration` numeric strings are coerced. Returns null when no segment array can be found.
+ */
+export function parseTimestampedSegments(raw: unknown): TimestampedSegment[] | null {
+  let parsed: unknown = raw;
+  for (let i = 0; i < 2 && typeof parsed === 'string'; i++) {
+    try { parsed = JSON.parse(parsed); } catch { return null; }
+  }
+  let arr: unknown = null;
+  if (Array.isArray(parsed)) arr = parsed;
+  else if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { data?: unknown }).data)) arr = (parsed as { data: unknown[] }).data;
+  if (!Array.isArray(arr)) return null;
+  const out: TimestampedSegment[] = [];
+  for (const el of arr) {
+    if (!el || typeof el !== 'object' || Array.isArray(el)) continue;
+    const e = el as Record<string, unknown>;
+    if (typeof e.text !== 'string') continue;
+    const start = typeof e.start === 'number' ? e.start : typeof e.start === 'string' && e.start.trim() !== '' ? Number(e.start) : NaN;
+    if (!Number.isFinite(start)) continue;
+    const dur = typeof e.duration === 'number' ? e.duration : typeof e.duration === 'string' ? Number(e.duration) : 0;
+    out.push({ start, duration: Number.isFinite(dur) ? dur : 0, text: e.text });
+  }
+  return out;
+}
+
 /** Pure selection over already-fetched column values. Returns null when all are blank. */
 export function pickTranscript(
   videoId: string,
@@ -82,9 +113,7 @@ export async function* fetchTranscripts(
       if (error) throw new Error(`timestamp fetch failed: ${error.message}`);
       for (const row of (data ?? []) as unknown as Array<{ videoId: string; raw_timestamped_subtitles: unknown }>) {
         const t = found.get(row.videoId);
-        if (t) t.timestamped = Array.isArray(row.raw_timestamped_subtitles)
-          ? (row.raw_timestamped_subtitles as TimestampedSegment[])
-          : null;
+        if (t) t.timestamped = parseTimestampedSegments(row.raw_timestamped_subtitles);
       }
     }
     yield { transcripts: ids.filter((id) => found.has(id)).map((id) => found.get(id)!), missing: remaining };

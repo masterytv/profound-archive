@@ -1,5 +1,5 @@
 /** Pure helpers: outcome classification of batch results and construction of stance-answer rows. */
-import { MAX_ATTEMPTS, RETRYABLE_ERROR_TYPES, raiseMaxTokens } from '../lib/batch';
+import { MAX_ATTEMPTS, isRetryableError, raiseMaxTokens } from '../lib/batch';
 import type { AnswerRow } from './answers';
 import type { PassKind } from './requests';
 
@@ -9,6 +9,8 @@ export interface OutcomeInput {
   resultType: 'succeeded' | 'errored' | 'canceled' | 'expired';
   stopReason?: string | null;
   errorType?: string | null;
+  /** HTTP-like status of an errored result when the body carries one (5xx is retryable even without a type). */
+  errorStatus?: number | null;
   attempt: number;
 }
 
@@ -35,11 +37,11 @@ export function classifyOutcome(i: OutcomeInput, maxAttempts = MAX_ATTEMPTS): Ou
     }
     return { action: 'answers' };
   }
-  // Same retry policy as lib/batch: only overloaded/api/rate-limit errors are transient.
-  if (i.resultType === 'errored' && !(i.errorType && RETRYABLE_ERROR_TYPES.has(i.errorType))) {
+  // Same retry policy as lib/batch (isRetryableError): overloaded/api/rate-limit types, or any 5xx status.
+  if (i.resultType === 'errored' && !isRetryableError(i.errorType, i.errorStatus)) {
     return { action: 'invalid', error: `request_error:${i.errorType ?? 'unknown'}` };
   }
-  const what = i.resultType === 'errored' ? `error:${i.errorType ?? 'unknown'}` : i.resultType;
+  const what = i.resultType === 'errored' ? `error:${i.errorType ?? (i.errorStatus != null ? `status_${i.errorStatus}` : 'unknown')}` : i.resultType;
   return exhausted
     ? { action: 'invalid', error: `request_${what}_after_${i.attempt}_attempts` }
     : { action: 'retry', bumpTokens: false, reason: what };

@@ -9,7 +9,7 @@ import {
   MAX_ATTEMPTS, MAX_BYTES_PER_BATCH, MAX_REQUESTS_PER_BATCH, makeCustomId, parseCustomId, pollBatch, realBatchIds, resolvePending,
   streamResults, submitGuarded, unresolvedMarkers, type BatchRequest, type Effort, type RequestParams,
 } from '../lib/batch';
-import { MODELS, addUsage, assertRetryBudget, emptyTotals, formatUsd, requestCost, type ModelFamily } from '../lib/cost';
+import { MODELS, addUsage, assertRetryBudget, emptyTotals, formatUsd, type ModelFamily } from '../lib/cost';
 import { prepareTranscript } from '../lib/quote';
 import { assertQuestionIdsExist, assertVideoIdsExist, btInsert, btUpdateRun, btUpdateRunIf, type Db } from '../lib/supabase';
 import { fetchTranscripts, type Transcript } from '../lib/transcript';
@@ -20,7 +20,7 @@ import {
   fetchRunsByGroup, fetchStanceRuns, insertRunsIfAbsent, type AnswerRecord, type RawRef, type RunRow,
 } from './db';
 import {
-  DEFAULT_OUTPUT_ASSUMPTION, assertSpendConfirmed, estimateExact, fingerprint, fingerprintLine, groupId,
+  DEFAULT_OUTPUT_ASSUMPTION, assertSpendConfirmed, estimateExact, queuedRetriesWorstUsd, fingerprint, fingerprintLine, groupId,
   outputTokensFor, runIdFor, sha256, type ModelEstimate, type OutputAssumption, type TokenItem,
 } from './estimate';
 import { buildDisputes, firstPassIsReaderA } from './flags';
@@ -175,6 +175,10 @@ export interface RunEstimate {
   effort: Effort;
   fingerprint: string;
   estimate: ModelEstimate;
+  /** Counted prompt tokens per request key, stored in bt_runs.estimate to price retries per request. */
+  promptTokensByKey: Record<string, number>;
+  systemTokens: number;
+  cached: boolean;
   missing: string[];
   tokenMethod: string;
   shas: Map<string, string>;
@@ -218,6 +222,7 @@ export async function estimateRun(
     const batch = pending;
     pending = [];
     items.push(...(await Promise.all(batch.map(async (r): Promise<TokenItem> => ({
+      key: r.key,
       promptTokens: useApi ? await countTokens(client!, r.params) : Math.ceil((r.systemChars + r.userChars) / CHARS_PER_TOKEN),
       systemTokens: sysTokens!, cached, outputTokens: outputTokensFor(g.kind, family, r.questionIds.length, opts.assumption),
     })))));
@@ -238,6 +243,9 @@ export async function estimateRun(
   return {
     family, model: MODELS[family], effort: g.effort[family], fingerprint: fingerprint(lines), missing, shas,
     estimate: estimateExact(MODELS[family], items, ceil),
+    promptTokensByKey: Object.fromEntries(items.map((i) => [i.key!, i.promptTokens])),
+    systemTokens: sysTokens ?? 0,
+    cached,
     tokenMethod: opts.dryRun ? 'chars/3.5 approximation (dry run)' : `countTokens on all ${items.length} requests`,
   };
 }
@@ -324,6 +332,7 @@ export async function runEstimate(
       fingerprint: e.fingerprint, group, assumption: req.options.assumption, tokenMethod: e.tokenMethod,
       cache_note: 'no cache reads assumed', expected_usd: e.estimate.costUsd, ceiling_usd: e.estimate.ceilingUsd,
       mean_prompt_tokens: e.estimate.meanPromptTokens, max_attempts: MAX_ATTEMPTS, max_tokens: g.maxTokens, ...e.estimate,
+      prompt_tokens_by_key: e.promptTokensByKey, system_tokens: e.systemTokens, cached: e.cached,
     },
     script: 'job2/run-stance.ts',
     git_sha: gitSha(),
@@ -426,7 +435,8 @@ async function loadState(rc: RunCtx, needCounts = false): Promise<{ byKey: Map<s
 }
 
 function refOutcome(r: RawRef, attempt: number) {
-  return classifyOutcome({ resultType: r.result_type, stopReason: r.stop_reason, errorType: r.err_type, attempt });
+  const status = r.err_status == null || r.err_status === '' ? null : Number(r.err_status);
+  return classifyOutcome({ resultType: r.result_type, stopReason: r.stop_reason, errorType: r.err_type, errorStatus: Number.isFinite(status) ? status : null, attempt });
 }
 
 /** Actual spend of a run so far (every collected response, all attempts). */
@@ -477,10 +487,13 @@ async function submitPending(rc: RunCtx): Promise<number> {
   await verifyFingerprint(rc);
 
   // Retries must stay inside the approved ceiling unless the human confirmed more.
-  const retries = [...only.values()].filter((o) => o.attempt > 1);
+  const retries = [...only.entries()].filter(([, o]) => o.attempt > 1).map(([key, o]) => ({ key, ...o }));
   if (retries.length) {
     const est = rc.run.estimate ?? {};
-    const queuedWorst = retries.reduce((sum, o) => sum + requestCost(rc.run.model, { inputTokens: est.mean_prompt_tokens ?? 0, outputTokens: o.maxTokens }), 0);
+    // Each retried request is priced on its own counted prompt tokens (Haiku long-context tier per request).
+    const queuedWorst = queuedRetriesWorstUsd(rc.run.model, retries, {
+      promptTokensByKey: est.prompt_tokens_by_key, systemTokens: est.system_tokens, cached: est.cached, meanPromptTokens: est.mean_prompt_tokens,
+    });
     assertRetryBudget({
       approvedCeilingUsd: Number(est.ceiling_usd ?? 0),
       spentUsd: await spentUsd(rc),

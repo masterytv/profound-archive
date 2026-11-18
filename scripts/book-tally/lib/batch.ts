@@ -177,6 +177,11 @@ export interface ClassifiedResult {
   retryReason?: 'transient' | 'truncated';
 }
 
+/** The single retry rule for per-request errors: a transient API error type, or any 5xx status (type may be absent). */
+export function isRetryableError(type?: string | null, status?: number | null): boolean {
+  return (typeof type === 'string' && RETRYABLE_ERROR_TYPES.has(type)) || (typeof status === 'number' && Number.isFinite(status) && status >= 500);
+}
+
 function errorInfo(error: unknown): { type?: string; status?: number } {
   const e = error as { error?: { type?: unknown }; type?: unknown; status?: unknown } | null | undefined;
   const inner = typeof e?.error?.type === 'string' ? e.error.type : typeof e?.type === 'string' && e.type !== 'error' ? e.type : undefined;
@@ -196,7 +201,7 @@ export function classifyResult(r: Anthropic.Messages.MessageBatchIndividualRespo
     }
     case 'errored': {
       const { type, status } = errorInfo(res.error);
-      const retryable = (type !== undefined && RETRYABLE_ERROR_TYPES.has(type)) || (status !== undefined && status >= 500);
+      const retryable = isRetryableError(type, status);
       return {
         customId: r.custom_id, kind: 'errored', error: res.error, errorType: type, retryable,
         ...(retryable ? { retryReason: 'transient' as const } : {}),

@@ -466,6 +466,10 @@ describe('retry budget (B2)', () => {
     const e = h.db.rows('bt_runs')[0].estimate;
     expect(e.ceiling_usd).toBeGreaterThan(e.expected_usd * 5);
     expect(e).toMatchObject({ max_attempts: 3, max_tokens: 16000 });
+    // counted prompt tokens are stored per request key so retries can be priced per request
+    expect(Object.keys(e.prompt_tokens_by_key).sort()).toEqual([...h.db.rows('bt_runs')[0].params.plan.videoIds].sort());
+    expect(Object.values(e.prompt_tokens_by_key).every((n) => typeof n === 'number' && n > 0)).toBe(true);
+    expect(typeof e.system_tokens).toBe('number');
     expect(h.logs.join('\n')).toMatch(/HARD CEILING \$[0-9.]+ \(every attempt at max_tokens=16000, doubling\)/);
     expect(h.logs.join('\n')).toMatch(/--confirm-retries pilot-[0-9a-f]{8}/);
   });

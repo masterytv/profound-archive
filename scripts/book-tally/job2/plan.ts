@@ -69,7 +69,7 @@ export async function pickAvailable(db: Db, order: readonly string[], k: number)
 }
 
 export function goldIdsFromRuns(runs: readonly RunRow[]): string[] | null {
-  const gold = runs.filter((r) => r.params?.mode === 'gold' && r.pass === 'first' && Array.isArray(r.params?.plan?.videoIds));
+  const gold = runs.filter((r) => r.status !== 'canceled' && r.params?.mode === 'gold' && r.pass === 'first' && Array.isArray(r.params?.plan?.videoIds));
   return gold.length ? (gold[gold.length - 1].params.plan.videoIds as string[]) : null;
 }
 

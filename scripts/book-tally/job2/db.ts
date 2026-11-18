@@ -74,11 +74,13 @@ export interface RawRef {
   stop_reason: string | null;
   /** error.type of an errored result (batch error body: {type:'error', error:{type,message}}). */
   err_type: string | null;
+  /** response->>status when the stored error body carries one (string from the JSON path), else null. */
+  err_status?: string | number | null;
 }
 
 export async function fetchRawRefs(db: Db, runId: string): Promise<RawRef[]> {
   return selectAllKeyset<RawRef & Record<string, unknown>>(
-    db, 'bt_raw_responses', 'id, custom_id, result_type, stop_reason:response->>stop_reason, err_type:response->error->error->>type',
+    db, 'bt_raw_responses', 'id, custom_id, result_type, stop_reason:response->>stop_reason, err_type:response->error->error->>type, err_status:response->>status',
     'id', (q) => q.eq('run_id', runId),
   );
 }
