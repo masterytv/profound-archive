@@ -57,8 +57,9 @@ no profile), `anon:<videoId>` (no name). Each unresolved anon video is its own p
 (conservative; overcount bias is reported as a sensitivity row).
 
 1. Name normalization (`lib/names.ts`): NFKD strip accents, lowercase, drop punctuation,
-   drop honorifics/suffixes (dr, rev, reverend, mr, mrs, ms, miss, prof, phd, md, jr, sr, ii,
-   iii, iv), collapse whitespace. `first` = first token, `last` = last token, middle tokens and
+   drop honorifics (dr, rev, reverend, mr, mrs, ms, miss, prof, phd, md), collapse whitespace.
+   Generational suffixes (jr, sr, ii, iii, iv) are kept in `exact_key` (so Jr. and Sr. never
+   exact-match) and dropped only from `core_key`. `first` = first token, `last` = last token, middle tokens and
    single-letter initials ignored for the key. Nickname canonicalization via the checked-in
    `data/nicknames.json` (e.g. bill/will/billy→william, bob/rob/bobby→robert, liz/beth→elizabeth,
    …, documented source). Keys: `exact_key` = normalized full string; `core_key` =
