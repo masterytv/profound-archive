@@ -86,6 +86,19 @@ env:
   # Verified sending domain (mail.projectprofound.org verified in Resend)
   - variable: RESEND_FROM
     value: "Project Profound <noreply@mail.projectprofound.org>"
+  # The newsletter on Resend (src/lib/email/audience.ts, /api/email/weekly-draft, /api/email/resend-webhook).
+  # Off until these are set. To turn it on:
+  #   1. Resend → Audience → Segments: create "Newsletter"; put its ID below and uncomment RESEND_SEGMENT_ID.
+  #   2. Resend → Webhooks: add https://projectprofound.org/api/email/resend-webhook for contact.updated, then
+  #      store its signing secret: firebase apphosting:secrets:set RESEND_WEBHOOK_SECRET (it grants access),
+  #      and uncomment RESEND_WEBHOOK_SECRET. A secret listed here before it exists fails the build.
+  #   3. Optional: NEWSLETTER_NOTIFY_EMAIL gets a "draft ready" email each Thursday.
+  # - variable: RESEND_SEGMENT_ID
+  #   value: "<segment id from Resend>"
+  # - variable: RESEND_WEBHOOK_SECRET
+  #   secret: RESEND_WEBHOOK_SECRET
+  # - variable: NEWSLETTER_NOTIFY_EMAIL
+  #   value: "<your email>"
 
   # Apify API token — kept for potential future use (currently unused)
   - variable: APIFY_API_TOKEN
