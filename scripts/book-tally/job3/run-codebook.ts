@@ -243,7 +243,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     id: runId, job: 'other', pass: 'haiku', model: MODEL, effort, status: 'estimated',
     params: {
       kind: RUN_KIND, codebook_version: cp.codebook.version, prompt: cp.prompt.name, prompt_hash: cp.promptHash,
-      video_ids: built.items.map((i) => i.key), missing_transcripts: built.missing.length,
+      video_ids: built.items.map((i) => i.key), missing_transcripts: built.missing.length, no_transcript_ids: [...built.missing].sort(),
       sample: sampleN ?? null, seed: sampleN !== undefined ? seed : null, max_tokens: maxTokens, max_attempts: maxAttempts,
     },
     estimate: { ...est }, script: SCRIPT,
