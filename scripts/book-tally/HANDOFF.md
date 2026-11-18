@@ -4,6 +4,25 @@ Read this first in a new session. Then read README.md and SPEC.md, and the "Work
 repo-root CLAUDE.md.
 
 ## LATEST (2026-11-18, evening): read this before the older sections below
+
+### Status at the end of 2026-11-18
+- **Gold set:** 44 cards reviewed (cards 1-53 of the review order, 9 skipped as unavailable). The
+  report is `gold-report.ts --first 53`.
+  - All answers right except one fact (f5: "no" for someone never religious, which is misleading;
+    needs "not applicable" in v2).
+  - Quotes: 37/38 are the experiencer's own words.
+  - The owner is satisfied the coding is accurate and paused the review.
+  - Owner rule: words the host says and the guest clearly agrees with count as the experiencer's.
+    Card 14 (q66) was corrected to quote_is_experiencer = Y with a note.
+- **Final tally written** by `job3/rollup.ts` to out/coded_tally_*: 5,523 videos (531 of the
+  deleted channel excluded) and 3,359 people. One video (hRmCDZSwG1Q) had its whole response
+  rejected; its rows count as invalid. Recoding it costs under 1 cent and needs an estimate and the
+  owner's yes.
+- **Caveat:** Job 1 duplicate-person decisions are not done yet (186 Haiku "same" and 285 "unsure"
+  pairs), so the people count may be a few hundred too high. Shares are affected little.
+  Options: the Sonnet pair check (estimate, cap), or the owner reviews the pairs, then the rollup is
+  re-run.
+
 - **Budget: $75 total** (raised from $50 by the owner). Spent so far: **$16.13**.
   - Job 1 pair judging: `j1h-20261118154545`, $0.05.
   - Job 1 name extraction: `j1n-20261118154610`, $0.23.
