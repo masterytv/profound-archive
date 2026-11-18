@@ -33,8 +33,26 @@ repo-root CLAUDE.md.
     final, verified version (554 tests pass), even though its message says WIP.
   - Tests: `tests/job3-*.test.ts`. Local-Postgres suite: `tests/sql/run-local-pg.sh`, which needs
     `runuser -u postgres` and a PGRUN directory postgres can write.
-- **Migration `20261118_002_book_tally_codebook.sql` is NOT APPLIED yet**: the owner applies it.
-  It adds only `bt_coded_answers` and `bt_coded_gold_marks`. Verification queries are at its end.
+- **Migration 002 is APPLIED** (owner, 2026-11-18; both checks passed).
+- **Job 3 runs are DONE.**
+  - Trial `j3c-20261118191643` (40 videos): $0.12.
+  - Full run `j3c-20261118192758` (6,014 videos): $19.56. 35 responses were truncated and then
+    succeeded on retry. One response was rejected; a later run codes that video again. 0.2% of rows
+    are invalid, and 3.1% of answers have an unverified quote.
+  - Total spend so far: about $35.81 of the $75 budget.
+- **Gold set (codebook) is out for marking.** The page is
+  https://claude.ai/artifact/3ZrseB8fhWB4vJks8zQ5ZG. It shows 582 rows from
+  `job3/gold-sheet.ts` with the defaults n=25, seed=20261118, na-per-video=3.
+  - Marks are stored in the page's db collection `marks`, doc `c<coded_answer_id>`, with fields
+    addressed_correct, answer_correct (yn), choice_marks {code: R|W} (mc), missing_answer,
+    quote_is_experiencer and note.
+  - To import:
+    1. Read all docs with ArtifactData `list`.
+    2. Convert each to the `import-gold.ts --file x.json` shape: wrong_choices = codes marked W.
+       For mc rows, answer_correct = N if any answer is W, else Y. Leave it blank on not-addressed
+       rows and where addressed_correct = N.
+    3. Run `import-gold.ts`, then `gold-report.ts`.
+  - The earlier stance-v1 page (5t1QCp9V...) is superseded.
 - **Next steps:**
   1. After the owner applies 002, check read-only that both tables exist and are empty.
   2. Trial: `job3/run-codebook.ts --estimate --sample 40 --budget-usd <cap>`, then the owner's yes,
