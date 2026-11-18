@@ -93,9 +93,11 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
 
   const rows: TallyInputRow[] = [];
   for (const r of done) {
-    rows.push(...(await selectAllKeyset<TallyInputRow & Record<string, unknown>>(
+    // a loop, not push(...rows): one run has ~535k rows, more than a spread call can take
+    const got = await selectAllKeyset<TallyInputRow & Record<string, unknown>>(
       db, 'bt_coded_answers', 'id, video_id, item_key, kind, attempt, addressed, stance, quote_verified, choices, valid', 'id', (q) => q.eq('run_id', r.id),
-    )));
+    );
+    for (const x of got) rows.push(x);
   }
   const codedVideos = new Set(rows.map((r) => r.video_id));
   const noTranscript = new Set(done.flatMap((r) => (r.params?.no_transcript_ids as string[] | undefined) ?? []));

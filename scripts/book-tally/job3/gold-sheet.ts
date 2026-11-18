@@ -126,7 +126,8 @@ export async function selectGold(db: Db, cp: { codebook: Codebook; promptHash: s
   const runIds = await currentCodebookRuns(db, cp.promptHash);
   const all: TallyInputRow[] = [];
   for (const id of runIds) {
-    all.push(...(await selectAllKeyset<TallyInputRow & Record<string, unknown>>(db, 'bt_coded_answers', LIGHT_COLUMNS, 'id', (q) => q.eq('run_id', id))));
+    // a loop, not push(...rows): one run has ~535k rows, more than a spread call can take
+    for (const r of await selectAllKeyset<TallyInputRow & Record<string, unknown>>(db, 'bt_coded_answers', LIGHT_COLUMNS, 'id', (q) => q.eq('run_id', id))) all.push(r);
   }
   const eligible = eligibleVideos(all);
   const videoIds = chooseVideos(eligible, p);
