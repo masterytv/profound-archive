@@ -8,14 +8,13 @@
  *   --dry-run                      like --estimate but offline: char-based token approximation,
  *                                  no API call, no database write
  *   --confirm-spend <group>        submit exactly what that estimate covered (resumes if batch
- *                                  ids were already recorded)
+ *                                  ids were already recorded; settles lost submissions first)
  * Nothing is submitted without --confirm-spend matching an estimate whose request digest still
  * equals the rebuilt requests.
  */
-import { MODELS } from '../lib/cost';
 import { projectFullCost } from './estimate';
 import { CliError, helpText, intOpt, isDirectRun, makeCtx, numOpt, parseCli, runCli, str, type Deps, type OptDef } from './cli';
-import { executeGroup, runEstimate, type Group } from './execute';
+import { cancelEstimate, executeGroup, runEstimate, type Group } from './execute';
 import { assumptionFrom, loadPilot } from './pilot-data';
 import { kindOf, loadQuestions, makePlan, type Mode, type PassOpt } from './plan';
 import { DEFAULT_EFFORT, DEFAULT_MAX_TOKENS, loadStancePrompts } from './requests';
@@ -36,8 +35,11 @@ export const OPTIONS: Record<string, OptDef> = {
   'effort-sonnet': { type: 'string', help: 'default medium' },
   'effort-opus': { type: 'string', help: 'default high' },
   'max-tokens': { type: 'string', help: `max_tokens per request (default ${DEFAULT_MAX_TOKENS})` },
-  'assumed-output-tokens': { type: 'string', help: 'output tokens per 81-question request (default: pilot actuals, else 4000)' },
-  'assumed-output-per-question': { type: 'string', help: 'output tokens per answer in recheck/arbiter (default: pilot actuals, else 60)' },
+  'assumed-output-tokens': { type: 'string', help: 'output tokens (incl. thinking) per 81-question request (default: pilot actuals, else allowance + visible)' },
+  'assumed-visible-per-question': { type: 'string', help: 'visible output tokens per answered question (default: pilot actuals, else 32/60/70)' },
+  'adopt-batch': { type: 'string', help: 'with --confirm-spend: batch id to adopt for a run left in "submitting" after a lost create response' },
+  'confirm-retries': { type: 'string', help: 'group id: allow retries beyond the approved ceiling' },
+  cancel: { type: 'string', help: 'group id of a never-submitted estimate to cancel' },
   'sample-size': { type: 'string', help: 'token-count sample size when requests > 200 (default 120, min 100)' },
   'poll-seconds': { type: 'string', help: 'batch poll interval (default 30)' },
 };
@@ -57,6 +59,8 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const modes = (['pilot', 'gold', 'full'] as const).filter((m) => v[m] === true);
   if (modes.length > 1) throw new CliError('choose only one of --pilot, --gold, --full');
   const confirm = str(v['confirm-spend']);
+  if (str(v.cancel)) { await cancelEstimate(ctx, str(v.cancel)!); return; }
+  if (str(v['adopt-batch']) && !confirm) throw new CliError('--adopt-batch requires --confirm-spend <group>');
   const estimating = v.estimate === true || v['dry-run'] === true;
   if (confirm && estimating) throw new CliError('--confirm-spend cannot be combined with --estimate / --dry-run');
   const passRaw = str(v.pass) ?? 'first';
@@ -66,7 +70,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
 
   if (confirm) {
     // Gate first: nothing below runs (no DB, no API client) unless the confirmation matches.
-    await executeGroup(ctx, confirm, confirm, { mode, pass: v.pass ? pass : undefined }, { pollMs: (intOpt(v['poll-seconds'], 'poll-seconds') ?? 30) * 1000 });
+    await executeGroup(ctx, confirm, confirm, { mode, pass: v.pass ? pass : undefined }, { pollMs: (intOpt(v['poll-seconds'], 'poll-seconds') ?? 30) * 1000, adoptBatch: str(v['adopt-batch']), confirmRetries: str(v['confirm-retries']) });
     return;
   }
   if (!estimating) {
@@ -82,11 +86,13 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
 
   const pilot = await loadPilot(db).catch(() => null);
   const base = assumptionFrom(pilot, kind);
+  const outOverride = intOpt(v['assumed-output-tokens'], 'assumed-output-tokens');
+  const visOverride = numOpt(v['assumed-visible-per-question'], 'assumed-visible-per-question');
   const assumption = {
     ...base,
-    perRequest: intOpt(v['assumed-output-tokens'], 'assumed-output-tokens') ?? base.perRequest,
-    perQuestion: numOpt(v['assumed-output-per-question'], 'assumed-output-per-question') ?? base.perQuestion,
-    source: v['assumed-output-tokens'] || v['assumed-output-per-question'] ? `command-line override (base: ${base.source})` : base.source,
+    ...(outOverride !== undefined ? { perVideoOverride: { haiku: outOverride, sonnet: outOverride } } : {}),
+    ...(visOverride !== undefined ? { visiblePerQuestion: { pilot: visOverride, first: visOverride, recheck: visOverride, arbiter: visOverride } } : {}),
+    source: outOverride !== undefined || visOverride !== undefined ? `command-line override (base: ${base.source})` : base.source,
   };
   const sampleSize = Math.max(100, intOpt(v['sample-size'], 'sample-size') ?? 120);
   const group: Group = {
@@ -113,9 +119,14 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     } else {
       const proj = projectFullCost({
         nVideos: res.ests[0].estimate.requests,
-        haiku: pilot.usage.haiku.rates, sonnet: pilot.usage.sonnet.rates, shares: pilot.stats.shares,
+        haikuPerVideo: [...pilot.usage.haiku.perVideo.values()],
+        sonnetPerVideo: pilot.usage.sonnet.perVideo,
+        flaggedByVideo: pilot.stats.flaggedByVideo,
+        disputedByVideo: pilot.stats.disputedByVideo,
+        pilotVideos: pilot.stats.videos,
+        assumption,
       });
-      ctx.log(`PROJECTION from pilot ${pilot.group} (${MODELS.haiku} first ${proj.firstUsd.toFixed(2)} + recheck ${proj.recheckUsd.toFixed(2)} + arbiter ${proj.arbiterUsd.toFixed(2)} = ${proj.totalUsd.toFixed(2)} USD); the recheck/arbiter estimates follow once the previous pass completes`);
+      ctx.log(`PROJECTION from pilot ${pilot.group} (first ${proj.firstUsd.toFixed(2)} + recheck ${proj.recheckUsd.toFixed(2)} + arbiter ${proj.arbiterUsd.toFixed(2)} = ${proj.totalUsd.toFixed(2)} USD); the recheck/arbiter estimates follow once the previous pass completes`);
     }
   }
 }

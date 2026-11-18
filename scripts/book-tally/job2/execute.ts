@@ -5,30 +5,30 @@
  */
 import type Anthropic from '@anthropic-ai/sdk';
 import {
-  MAX_BYTES_PER_BATCH, MAX_REQUESTS_PER_BATCH, createBatch, makeCustomId, parseCustomId, pollBatch, streamResults,
-  type BatchRequest, type Effort, type RequestParams,
+  MAX_ATTEMPTS, MAX_BYTES_PER_BATCH, MAX_REQUESTS_PER_BATCH, makeCustomId, parseCustomId, pollBatch, realBatchIds, resolvePending,
+  streamResults, submitGuarded, unresolvedMarkers, type BatchRequest, type Effort, type RequestParams,
 } from '../lib/batch';
-import { MODELS, addUsage, emptyTotals, formatUsd, type ModelFamily } from '../lib/cost';
+import { MODELS, addUsage, assertRetryBudget, emptyTotals, formatUsd, requestCost, type ModelFamily } from '../lib/cost';
 import { prepareTranscript } from '../lib/quote';
-import { assertQuestionIdsExist, assertVideoIdsExist, btInsert, btUpdateRun, type Db } from '../lib/supabase';
+import { assertQuestionIdsExist, assertVideoIdsExist, btInsert, btUpdateRun, btUpdateRunIf, type Db } from '../lib/supabase';
 import { fetchTranscripts, type Transcript } from '../lib/transcript';
 import { parseAnswers } from './answers';
 import { CliError, gitSha, type Ctx } from './cli';
 import {
-  answeredRawIds, appendBatchId, ensurePrompts, fetchAnswersByIds, fetchRawRefs, fetchRawResponses, fetchRunsByGroup,
-  fetchUsages, insertRunsIfAbsent, type AnswerRecord, type RawRef, type RunRow,
+  answerCountsByRaw, ensurePrompts, fetchAnswersByIds, fetchRawRefs, fetchRawResponses, fetchRawSummaries, fetchRun,
+  fetchRunsByGroup, fetchStanceRuns, insertRunsIfAbsent, type AnswerRecord, type RawRef, type RunRow,
 } from './db';
 import {
   DEFAULT_OUTPUT_ASSUMPTION, assertSpendConfirmed, estimateExact, estimateStratified, fingerprint, fingerprintLine, groupId,
-  outputTokensFor, runIdFor, type ModelEstimate, type OutputAssumption, type TokenItem,
+  outputTokensFor, runIdFor, sha256, type ModelEstimate, type OutputAssumption, type TokenItem,
 } from './estimate';
 import { buildDisputes, firstPassIsReaderA } from './flags';
-import { familiesOf, loadQuestions, type Mode, type PassOpt, type Plan } from './plan';
+import { familiesOf, findOverlap, loadQuestions, type Mode, type PassOpt, type Plan } from './plan';
 import {
   buildStanceParams, loadStancePrompts, renderArbiterPrompt, renderStancePrompt, type PassKind, type PromptQuestion,
   type Rendered, type StancePrompts, PASS_ROLE,
 } from './requests';
-import { MAX_ATTEMPTS, buildAnswerRows, classifyOutcome, invalidAnswerRows, maxTokensFor } from './rows';
+import { buildAnswerRows, classifyOutcome, invalidAnswerRows, maxTokensFor } from './rows';
 import { stratifiedSample } from './sampling';
 
 // ---------------------------------------------------------------------------------------
@@ -63,6 +63,8 @@ export interface BuiltRequest {
   userChars: number;
   systemChars: number;
   transcriptSource: string;
+  /** sha256 of the exact transcript text sent (recorded in the raw-response metadata). */
+  transcriptSha256: string;
 }
 
 export interface StreamOpts {
@@ -151,7 +153,7 @@ export async function* streamRequests(
             key: t.videoId, kind: g.kind, model: MODELS[family], effort: g.effort[family], maxTokens: g.maxTokens,
             system: rendered.system, user,
           }),
-          userChars: user.length, systemChars: rendered.system.length, transcriptSource: t.source,
+          userChars: user.length, systemChars: rendered.system.length, transcriptSource: t.source, transcriptSha256: sha256(t.text),
         };
       }
     }
@@ -178,6 +180,7 @@ export interface RunEstimate {
   estimate: ModelEstimate;
   missing: string[];
   tokenMethod: string;
+  shas: Map<string, string>;
 }
 
 const CHARS_PER_TOKEN = 3.5;
@@ -219,45 +222,45 @@ export async function estimateRun(
   const lines: string[] = [];
   const sizes: Array<{ id: string; size: number; nQ: number }> = [];
   const keep = new Map<string, BuiltRequest>();
+  const shas = new Map<string, string>();
   const missing: string[] = [];
   for await (const r of streamRequests(bc, g, family)) {
     if ('missing' in r) { missing.push(r.key); continue; }
     lines.push(r.line);
+    shas.set(r.key, r.transcriptSha256);
     sizes.push({ id: r.key, size: r.userChars, nQ: r.questionIds.length });
     if (exact) keep.set(r.key, r);
   }
   log(`  ${MODELS[family]}: built ${lines.length} requests (${missing.length} videos without transcript)`);
   const fp = fingerprint(lines);
   const cached = PASS_ROLE[g.kind].cacheSystem;
-  const outFor = (nQ: number) => outputTokensFor(g.kind, nQ, opts.assumption);
+  const ceil = { maxTokens: g.maxTokens, maxAttempts: MAX_ATTEMPTS };
+  const outFor = (nQ: number) => outputTokensFor(g.kind, family, nQ, opts.assumption);
+  const useApi = client !== null && !opts.dryRun;
 
   const itemFor = async (r: BuiltRequest, sysTokens: number): Promise<TokenItem> => ({
-    promptTokens: client && !opts.dryRun
-      ? await countTokens(client, r.params)
-      : Math.ceil((r.systemChars + r.userChars) / CHARS_PER_TOKEN),
+    promptTokens: useApi ? await countTokens(client!, r.params) : Math.ceil((r.systemChars + r.userChars) / CHARS_PER_TOKEN),
     systemTokens: sysTokens, cached, outputTokens: outFor(r.questionIds.length),
   });
-
-  let sysTokens = 0;
+  const sysTokensOf = async (r: BuiltRequest) => (!cached ? 0 : useApi ? countTokens(client!, r.params, '.') : Math.ceil(r.systemChars / CHARS_PER_TOKEN));
 
   if (exact) {
     const reqs = [...keep.values()];
     if (reqs.length === 0) throw new CliError('no requests could be built (no transcripts?)');
-    if (cached) sysTokens = client && !opts.dryRun ? await countTokens(client, reqs[0].params, '.') : Math.ceil(reqs[0].systemChars / CHARS_PER_TOKEN);
+    const sysTokens = await sysTokensOf(reqs[0]);
     const items = await pooled(reqs, 4, (r) => itemFor(r, sysTokens));
     return {
-      family, model: MODELS[family], effort: g.effort[family], fingerprint: fp, missing,
-      estimate: estimateExact(MODELS[family], items),
+      family, model: MODELS[family], effort: g.effort[family], fingerprint: fp, missing, shas,
+      estimate: estimateExact(MODELS[family], items, ceil),
       tokenMethod: opts.dryRun ? 'chars/3.5 approximation (dry run)' : `countTokens on all ${reqs.length} requests`,
     };
   }
 
   // stratified sample by transcript length, extrapolated
-  const pop = sizes;
-  const sample = stratifiedSample(pop, opts.sampleSize, opts.strata, g.seed);
+  const sample = stratifiedSample(sizes, opts.sampleSize, opts.strata, g.seed);
   const strataSizes: number[] = [];
   {
-    const sorted = [...pop].sort((a, b) => a.size - b.size || (a.id < b.id ? -1 : 1));
+    const sorted = [...sizes].sort((a, b) => a.size - b.size || (a.id < b.id ? -1 : 1));
     const k = Math.max(1, Math.min(opts.strata, sorted.length));
     for (let h = 0; h < k; h++) strataSizes.push(0);
     sorted.forEach((_, i) => { strataSizes[Math.min(k - 1, Math.floor((i * k) / sorted.length))]++; });
@@ -266,32 +269,35 @@ export async function estimateRun(
   const only = new Map([...stratumOf.keys()].map((k) => [k, { attempt: 1, maxTokens: g.maxTokens }]));
   const built: BuiltRequest[] = [];
   for await (const r of streamRequests(bc, g, family, { only })) if (!('missing' in r)) built.push(r);
-  if (cached) sysTokens = client && !opts.dryRun ? await countTokens(client, built[0].params, '.') : Math.ceil(built[0].systemChars / CHARS_PER_TOKEN);
+  const sysTokens = await sysTokensOf(built[0]);
   const items = await pooled(built, 4, (r) => itemFor(r, sysTokens));
   const withStratum = built.map((r, i) => ({ stratum: stratumOf.get(r.key)!, item: items[i] }));
   return {
-    family, model: MODELS[family], effort: g.effort[family], fingerprint: fp, missing,
-    estimate: estimateStratified(MODELS[family], withStratum, strataSizes),
+    family, model: MODELS[family], effort: g.effort[family], fingerprint: fp, missing, shas,
+    estimate: estimateStratified(MODELS[family], withStratum, strataSizes, ceil),
     tokenMethod: `${opts.dryRun ? 'chars/3.5 approximation' : 'countTokens'} on a seeded sample of ${built.length} of ${lines.length} requests, stratified by transcript length into ${strataSizes.length} strata, extrapolated`,
   };
 }
 
 export function formatEstimateLines(group: string, g: Group, ests: RunEstimate[], assumption: OutputAssumption): string[] {
   const out: string[] = [`ESTIMATE group=${group} mode=${g.mode} pass=${g.kind} seed=${g.seed}`];
-  let total = 0;
+  let total = 0, ceiling = 0;
   for (const e of ests) {
     const s = e.estimate;
     total += s.costUsd;
+    ceiling += s.ceilingUsd;
     out.push(
       `  ${e.model} effort=${e.effort}: ${s.requests} requests, ${s.inputTokens.toLocaleString('en-US')} input tokens, ` +
-      `${s.outputTokens.toLocaleString('en-US')} assumed output tokens (${Math.round(s.outputTokens / Math.max(1, s.requests))}/request), ` +
-      `cost ${formatUsd(s.costUsd)} (${formatUsd(s.costUsdNoCacheWrite)} if no cache-write premium applies)`,
+      `${s.outputTokens.toLocaleString('en-US')} assumed output tokens incl. thinking (${Math.round(s.outputTokens / Math.max(1, s.requests))}/request), ` +
+      `expected cost ${formatUsd(s.costUsd)} (${formatUsd(s.costUsdNoCacheWrite)} if no cache-write premium), ` +
+      `HARD CEILING ${formatUsd(s.ceilingUsd)} (every attempt at max_tokens=${g.maxTokens}, doubling)`,
     );
     out.push(`    token count: ${e.tokenMethod}`);
   }
-  out.push(`  TOTAL ${formatUsd(total)} at batch prices (50% discount)`);
+  out.push(`  TOTAL expected ${formatUsd(total)}; hard ceiling ${formatUsd(ceiling)} (batch prices, 50% discount)`);
   out.push(`  output assumption: ${assumption.source}`);
   out.push('  Cache note: batch cache hits are best-effort, so no cache reads are assumed; shared system prompts are priced as cache writes (upper bound).');
+  out.push(`  Retries (truncation/transient) beyond the ceiling need --confirm-retries ${group}.`);
   return out;
 }
 
@@ -314,10 +320,24 @@ export async function runEstimate(
   const ests: RunEstimate[] = [];
   for (const f of families) ests.push(await estimateRun(bc, g, f, req.options, client, ctx.log));
   const skipped = [...new Set(ests.flatMap((e) => e.missing))].sort();
-  const finalPlan: Plan = { ...g.plan, videoIds: g.plan.videoIds.filter((v) => !skipped.includes(v)), skippedNoTranscript: [...new Set([...g.plan.skippedNoTranscript, ...skipped])] };
+  const shas: Record<string, string> = {};
+  for (const e of ests) e.shas.forEach((v, k) => { shas[k] = v; });
+  const finalPlan: Plan = {
+    ...g.plan,
+    videoIds: g.plan.videoIds.filter((v) => !skipped.includes(v)),
+    skippedNoTranscript: [...new Set([...g.plan.skippedNoTranscript, ...skipped])],
+    transcriptSha: shas,
+  };
   const fp = fingerprint(ests.map((e) => e.fingerprint));
-  const assumptionsKey = JSON.stringify({ a: req.options.assumption, s: req.options.sampleSize, st: req.options.strata, dry: req.options.dryRun });
+  const assumptionsKey = JSON.stringify({ a: req.options.assumption, s: req.options.sampleSize, st: req.options.strata, dry: req.options.dryRun, mt: g.maxTokens });
   const group = groupId(g.mode, g.kind, fp, assumptionsKey);
+
+  // S4: refuse to overlap a non-terminal run of the same pass (the same group is the idempotent re-estimate).
+  const overlap = findOverlap(await fetchStanceRuns(db), g.kind, group, finalPlan.videoIds);
+  if (overlap) {
+    throw new CliError(`refusing to estimate: ${overlap.videos} of these videos are already covered by run ${overlap.runId} (status "${overlap.status}", same pass). Finish it, or cancel its estimate with --cancel ${overlap.group}.`);
+  }
+
   for (const l of formatEstimateLines(group, g, ests, req.options.assumption)) ctx.log(l);
   if (skipped.length) ctx.log(`  skipped (no transcript): ${skipped.length}`);
   if (req.options.dryRun) {
@@ -339,7 +359,8 @@ export async function runEstimate(
     },
     estimate: {
       fingerprint: e.fingerprint, group, assumption: req.options.assumption, tokenMethod: e.tokenMethod,
-      cache_note: 'no cache reads assumed', ...e.estimate,
+      cache_note: 'no cache reads assumed', expected_usd: e.estimate.costUsd, ceiling_usd: e.estimate.ceilingUsd,
+      mean_prompt_tokens: e.estimate.meanPromptTokens, max_attempts: MAX_ATTEMPTS, max_tokens: g.maxTokens, ...e.estimate,
     },
     script: 'job2/run-stance.ts',
     git_sha: gitSha(),
@@ -352,12 +373,30 @@ export async function runEstimate(
   return { group, ests, skipped };
 }
 
+/** Marks an estimated (never submitted) group canceled so its videos are free again. */
+export async function cancelEstimate(ctx: Ctx, group: string): Promise<void> {
+  const db = ctx.getDb();
+  const runs = await fetchRunsByGroup(db, group);
+  if (runs.length === 0) throw new CliError(`no runs for group "${group}"`);
+  const notEstimated = runs.filter((r) => r.status !== 'estimated');
+  if (notEstimated.length) throw new CliError(`cannot cancel: ${notEstimated.map((r) => `${r.id} is "${r.status}"`).join(', ')} (only never-submitted estimates can be canceled)`);
+  for (const r of runs) {
+    const n = await btUpdateRunIf(db, r.id, 'estimated', { status: 'canceled', finished_at: ctx.now().toISOString() });
+    if (n !== 1) throw new CliError(`run ${r.id} changed status while canceling`);
+  }
+  ctx.log(`canceled ${runs.length} estimated run(s) of group ${group}`);
+}
+
 // ---------------------------------------------------------------------------------------
 // execution
 // ---------------------------------------------------------------------------------------
 
 export interface ExecOptions {
   pollMs: number;
+  /** Batch id to adopt for a run left in 'submitting' (see lib/batch resolvePending). */
+  adoptBatch?: string;
+  /** Group id the human confirmed retries beyond the approved ceiling for (--confirm-retries). */
+  confirmRetries?: string;
 }
 
 interface RunCtx {
@@ -381,6 +420,13 @@ export function groupFromRun(run: RunRow): Group {
   };
 }
 
+async function reload(rc: RunCtx): Promise<void> {
+  const r = await fetchRun(rc.ctx.getDb(), rc.run.id);
+  if (!r) throw new Error(`run ${rc.run.id} disappeared`);
+  rc.run.status = r.status;
+  rc.run.batch_ids = r.batch_ids ?? [];
+}
+
 /** Rebuilds all requests from the stored plan and checks the digest against the estimate. */
 async function verifyFingerprint(rc: RunCtx): Promise<void> {
   if (rc.verified) return;
@@ -400,7 +446,7 @@ interface KeyState {
   truncated: number;
 }
 
-async function loadState(rc: RunCtx, needAnswered = false): Promise<{ byKey: Map<string, KeyState>; answered: Set<number>; refs: RawRef[] }> {
+async function loadState(rc: RunCtx, needCounts = false): Promise<{ byKey: Map<string, KeyState>; counts: Map<number, number>; refs: RawRef[] }> {
   const db = rc.ctx.getDb();
   const refs = await fetchRawRefs(db, rc.run.id);
   const byKey = new Map<string, KeyState>();
@@ -412,63 +458,102 @@ async function loadState(rc: RunCtx, needAnswered = false): Promise<{ byKey: Map
     s.maxAttempt = Math.max(s.maxAttempt, p.attempt);
     if (r.result_type === 'succeeded' && r.stop_reason === 'max_tokens') s.truncated++;
   }
-  const answered = needAnswered && refs.length ? await answeredRawIds(db, rc.run.id) : new Set<number>();
-  return { byKey, answered, refs };
+  const counts = needCounts && refs.length ? await answerCountsByRaw(db, rc.run.id) : new Map<number, number>();
+  return { byKey, counts, refs };
 }
 
 function refOutcome(r: RawRef, attempt: number) {
   return classifyOutcome({ resultType: r.result_type, stopReason: r.stop_reason, errorType: r.err_type, attempt });
 }
 
+/** Actual spend of a run so far (every collected response, all attempts). */
+async function spentUsd(rc: RunCtx): Promise<number> {
+  const totals = emptyTotals();
+  for (const u of await fetchRawSummaries(rc.ctx.getDb(), rc.run.id)) if (u.usage) addUsage(totals, rc.run.model, u.usage);
+  return totals.costUsd;
+}
+
+/** B1: ask the API whether any batch whose creation response was lost actually exists, before any resubmission. */
+async function resolveRun(rc: RunCtx, adoptBatchId?: string): Promise<void> {
+  const db = rc.ctx.getDb();
+  await reload(rc);
+  if (!adoptBatchId && unresolvedMarkers(rc.run.batch_ids).length === 0) return;
+  const res = await resolvePending({
+    db, client: rc.client, run: rc.run, adoptBatchId, now: rc.ctx.now,
+    poll: { intervalMs: rc.opts.pollMs, sleep: rc.ctx.sleep },
+  });
+  for (const r of res) {
+    rc.ctx.log(`  ${rc.run.id}: pending submission ${r.result === 'adopted' ? `adopted batch ${r.batchId}` : 'confirmed absent (safe to resubmit)'}`);
+  }
+  await reload(rc);
+}
+
 /** Submits (attempt 1 or retries) every key that has no usable result and no pending batch. */
 async function submitPending(rc: RunCtx): Promise<number> {
   const db = rc.ctx.getDb();
+  await resolveRun(rc);
   const { byKey } = await loadState(rc);
   const only = new Map<string, { attempt: number; maxTokens: number }>();
   for (const key of rc.g.plan.videoIds) {
     const s = byKey.get(key);
     if (!s) { only.set(key, { attempt: 1, maxTokens: rc.g.maxTokens }); continue; }
     const last = s.attempts.get(s.maxAttempt)!;
-    const o = refOutcome(last, s.maxAttempt);
-    if (o.action === 'retry') {
+    if (refOutcome(last, s.maxAttempt).action === 'retry') {
       only.set(key, { attempt: s.maxAttempt + 1, maxTokens: maxTokensFor(rc.g.maxTokens, s.truncated) });
     }
   }
   if (only.size === 0) return 0;
   await verifyFingerprint(rc);
-  rc.ctx.log(`  ${rc.run.id}: submitting ${only.size} requests`);
+
+  // Retries must stay inside the approved ceiling unless the human confirmed more.
+  const retries = [...only.values()].filter((o) => o.attempt > 1);
+  if (retries.length) {
+    const est = rc.run.estimate ?? {};
+    const queuedWorst = retries.reduce((sum, o) => sum + requestCost(rc.run.model, { inputTokens: est.mean_prompt_tokens ?? 0, outputTokens: o.maxTokens }), 0);
+    assertRetryBudget({
+      approvedCeilingUsd: Number(est.ceiling_usd ?? 0),
+      spentUsd: await spentUsd(rc),
+      queuedWorstUsd: queuedWorst,
+      confirmedRetries: rc.opts.confirmRetries === rc.run.params.group,
+    });
+  }
+  rc.ctx.log(`  ${rc.run.id}: submitting ${only.size} requests (${retries.length} retries)`);
 
   let buf: BatchRequest[] = [];
   let bytes = 0;
-  const hashes: Rendered['row'][] = [];
+  const prompts: Rendered['row'][] = [];
   let batches = 0;
   const limit = Math.floor(MAX_BYTES_PER_BATCH * 0.85);
   const flush = async () => {
     if (!buf.length) return;
-    await ensurePrompts(db, hashes);
-    const b = await createBatch(rc.client, buf, (id) => appendBatchId(db, rc.run, id, 'submitted'));
-    rc.ctx.log(`  ${rc.run.id}: batch ${b.id} created with ${buf.length} requests`);
-    buf = []; bytes = 0; hashes.length = 0; batches++;
+    await ensurePrompts(db, prompts);
+    await reload(rc);
+    const r = await submitGuarded({
+      db, client: rc.client, runId: rc.run.id, expectedStatus: rc.run.status, requests: buf, now: rc.ctx.now, sleep: rc.ctx.sleep,
+    });
+    await reload(rc);
+    rc.ctx.log(`  ${rc.run.id}: batch ${r.batchId} created with ${buf.length} requests`);
+    buf = []; bytes = 0; prompts.length = 0; batches++;
   };
   for await (const r of streamRequests(rc.bc, rc.g, rc.family, { only })) {
     if ('missing' in r) { rc.ctx.log(`  ${rc.run.id}: transcript now missing for a planned video; skipped`); continue; }
     const customId = makeCustomId({ run: rc.run.id, key: r.key, pass: r.kind, attempt: r.attempt });
     const req: BatchRequest = { custom_id: customId, params: r.params as BatchRequest['params'] };
-    const size = Buffer.byteLength(r.params.system ? JSON.stringify(r.params.system) : '') + Buffer.byteLength(String(r.params.messages[0].content)) + 2000;
+    const size = Buffer.byteLength(JSON.stringify(r.params.system ?? '')) + Buffer.byteLength(String(r.params.messages[0].content)) + 2000;
     if (buf.length > 0 && (buf.length >= MAX_REQUESTS_PER_BATCH || bytes + size > limit)) await flush();
-    buf.push(req); bytes += size; hashes.push(r.rendered.row);
+    buf.push(req); bytes += size; prompts.push(r.rendered.row);
   }
   await flush();
   return batches;
 }
 
-/** Polls every recorded batch not yet collected in this invocation and stores its results. */
+/** Polls every recorded real batch not yet collected in this invocation and stores its results. */
 async function collectBatches(rc: RunCtx): Promise<number> {
   const db = rc.ctx.getDb();
   let stored = 0;
-  for (const batchId of rc.run.batch_ids) {
+  for (const batchId of realBatchIds(rc.run.batch_ids)) {
     if (rc.collected.has(batchId)) continue;
-    await btUpdateRun(db, rc.run.id, { status: 'collecting' });
+    await btUpdateRunIf(db, rc.run.id, 'submitted', { status: 'collecting' });
     const b = await pollBatch(rc.client, batchId, {
       intervalMs: rc.opts.pollMs, sleep: rc.ctx.sleep,
       onTick: (x) => rc.ctx.log(`  ${rc.run.id}: batch ${batchId} ${x.processing_status} (done ${x.request_counts.succeeded + x.request_counts.errored + x.request_counts.expired + x.request_counts.canceled}, processing ${x.request_counts.processing})`),
@@ -484,6 +569,7 @@ async function collectBatches(rc: RunCtx): Promise<number> {
       const message = (r as { message?: Anthropic.Messages.Message }).message;
       const meta: Record<string, unknown> = {
         kind: rc.g.kind, attempt: parts.attempt, batch_id: batchId, requested_model: rc.run.model,
+        transcript_sha256: rc.g.plan.transcriptSha?.[parts.key] ?? null,
         ...(rc.g.kind === 'arbiter' ? { reader_mapping: readerMapping(rc.g.seed, parts.key), reader_note: 'first-pass model = claude-haiku-5-5, recheck model = claude-sonnet-5-5' } : {}),
       };
       const response = message
@@ -504,75 +590,90 @@ async function collectBatches(rc: RunCtx): Promise<number> {
   return stored;
 }
 
-/** Validates and stores answer rows for every raw response that has none yet. */
+/**
+ * Validates and stores answer rows for every raw response that has none yet. Each raw
+ * response's rows go in ONE insert and the inserted count must equal the requested question
+ * count; a raw response with some but not all rows is corruption and stops the run.
+ */
 async function processResults(rc: RunCtx): Promise<number> {
   const db = rc.ctx.getDb();
-  const { answered, refs } = await loadState(rc, true);
-  const todo = refs.filter((r) => {
-    if (answered.has(r.id)) return false;
-    return refOutcome(r, parseCustomId(r.custom_id, rc.run.id).attempt).action !== 'retry';
-  });
+  const { counts, refs } = await loadState(rc, true);
+  const todo: Array<{ ref: RawRef; key: string; attempt: number; qids: number[] }> = [];
+  for (const r of refs) {
+    const p = parseCustomId(r.custom_id, rc.run.id);
+    if (refOutcome(r, p.attempt).action === 'retry') continue;
+    const qids = questionIdsFor(rc.g, p.key);
+    const have = counts.get(r.id) ?? 0;
+    if (have === qids.length && have > 0) continue;
+    if (have !== 0) throw new Error(`raw response ${r.id} (${p.key}) has ${have} of ${qids.length} answer rows; refusing to continue (partial insert)`);
+    todo.push({ ref: r, key: p.key, attempt: p.attempt, qids });
+  }
   if (todo.length === 0) return 0;
-  const missingMem = todo.filter((r) => !rc.mem.has(r.custom_id)).map((r) => r.id);
+  const missingMem = todo.filter((t) => !rc.mem.has(t.ref.custom_id)).map((t) => t.ref.id);
   const fromDb = missingMem.length ? await fetchRawResponses(db, missingMem) : new Map<number, any>();
   let rowsWritten = 0;
   const pageSize = 20;
   for (let i = 0; i < todo.length; i += pageSize) {
     const page = todo.slice(i, i + pageSize);
-    const needTranscript = page
-      .filter((r) => refOutcome(r, parseCustomId(r.custom_id, rc.run.id).attempt).action === 'answers')
-      .map((r) => parseCustomId(r.custom_id, rc.run.id).key);
+    const needTranscript = page.filter((t) => refOutcome(t.ref, t.attempt).action === 'answers').map((t) => t.key);
     const transcripts = new Map<string, Transcript>();
     if (needTranscript.length) {
       for await (const { transcripts: ts } of fetchTranscripts(db, needTranscript, { withTimestamps: true, pageSize })) ts.forEach((t) => transcripts.set(t.videoId, t));
     }
-    const out: ReturnType<typeof buildAnswerRows> = [];
-    const hashes: Rendered['row'][] = [];
-    for (const r of page) {
-      const p = parseCustomId(r.custom_id, rc.run.id);
-      const response = rc.mem.get(r.custom_id) ?? fromDb.get(r.id);
-      const qids = questionIdsFor(rc.g, p.key);
-      const outcome = refOutcome(r, p.attempt);
+    for (const t of page) {
+      const response = rc.mem.get(t.ref.custom_id) ?? fromDb.get(t.ref.id);
+      const outcome = refOutcome(t.ref, t.attempt);
       if (outcome.action === 'retry') continue;
-      const rendered = renderFor(rc.bc, rc.g, p.key);
-      hashes.push(rendered.row);
+      const rendered = renderFor(rc.bc, rc.g, t.key);
+      await ensurePrompts(db, [rendered.row]);
       const base = {
-        runId: rc.run.id, videoId: p.key, kind: rc.g.kind, attempt: p.attempt, model: rc.run.model,
-        modelVersion: (response?.model as string | undefined) ?? null, promptHash: rendered.promptHash, rawId: r.id,
-        cells: rc.g.plan.cells?.[p.key],
+        runId: rc.run.id, videoId: t.key, kind: rc.g.kind, attempt: t.attempt, model: rc.run.model,
+        modelVersion: (response?.model as string | undefined) ?? null, promptHash: rendered.promptHash, rawId: t.ref.id,
+        cells: rc.g.plan.cells?.[t.key],
       };
+      let rows: ReturnType<typeof buildAnswerRows>;
       if (outcome.action === 'invalid') {
-        out.push(...buildAnswerRows({ ...base, transcriptSource: null, rows: invalidAnswerRows(qids, outcome.error) }));
-        continue;
+        rows = buildAnswerRows({ ...base, transcriptSource: null, rows: invalidAnswerRows(t.qids, outcome.error) });
+      } else {
+        const tr = transcripts.get(t.key);
+        const sentSha: string | null | undefined = response?._bt_meta?.transcript_sha256;
+        if (!tr) {
+          rows = buildAnswerRows({ ...base, transcriptSource: null, rows: invalidAnswerRows(t.qids, 'transcript_missing') });
+        } else if (!sentSha || sentSha !== sha256(tr.text)) {
+          // N4: quotes are only checked against the exact text that was sent.
+          rows = buildAnswerRows({
+            ...base, transcriptSource: tr.source,
+            rows: invalidAnswerRows(t.qids, sentSha ? 'transcript_changed' : 'transcript_unverifiable'),
+          });
+        } else {
+          const text = (response?.content as Array<{ type: string; text?: string }> | undefined)?.find((b) => b.type === 'text')?.text ?? '';
+          const parsed = parseAnswers(text, t.qids, {
+            transcript: prepareTranscript(tr.text), segments: tr.timestamped, stopReason: response?.stop_reason ?? null,
+          }, rendered.schema);
+          if (parsed.extraIds.length) rc.ctx.log(`  note: response for one video contained ${parsed.extraIds.length} unrequested question ids (ignored)`);
+          rows = buildAnswerRows({ ...base, transcriptSource: tr.source, rows: parsed.rows });
+        }
       }
-      const t = transcripts.get(p.key);
-      if (!t) {
-        out.push(...buildAnswerRows({ ...base, transcriptSource: null, rows: invalidAnswerRows(qids, 'transcript_missing') }));
-        continue;
-      }
-      const text = (response?.content as Array<{ type: string; text?: string }> | undefined)?.find((b) => b.type === 'text')?.text ?? '';
-      const parsed = parseAnswers(text, qids, {
-        transcript: prepareTranscript(t.text), segments: t.timestamped, stopReason: response?.stop_reason ?? null,
-      }, rendered.schema);
-      if (parsed.extraIds.length) rc.ctx.log(`  note: response for one video contained ${parsed.extraIds.length} unrequested question ids (ignored)`);
-      out.push(...buildAnswerRows({ ...base, transcriptSource: t.source, rows: parsed.rows }));
+      if (rows.length !== t.qids.length || rows.length > 1000) throw new Error(`answer row count ${rows.length} != requested ${t.qids.length} for ${t.key}`);
+      const inserted = await btInsert(db, 'bt_stance_answers', rows as unknown as Array<Record<string, unknown>>, {
+        validateRefs: false, chunkSize: 1000, select: 'id',
+      });
+      if (inserted.length !== rows.length) throw new Error(`inserted ${inserted.length} of ${rows.length} answer rows for ${t.key}`);
+      rowsWritten += rows.length;
     }
-    await ensurePrompts(db, hashes);
-    await btInsert(db, 'bt_stance_answers', out as unknown as Array<Record<string, unknown>>, { validateRefs: false, chunkSize: 500 });
-    rowsWritten += out.length;
     rc.ctx.log(`  ${rc.run.id}: stored ${rowsWritten} answer rows`);
   }
   return rowsWritten;
 }
 
 async function unresolvedKeys(rc: RunCtx): Promise<number> {
-  const { byKey, answered } = await loadState(rc, true);
+  const { byKey, counts } = await loadState(rc, true);
   let n = 0;
   for (const key of rc.g.plan.videoIds) {
     const s = byKey.get(key);
     if (!s) { n++; continue; }
     const last = s.attempts.get(s.maxAttempt)!;
-    if (refOutcome(last, s.maxAttempt).action === 'retry' || !answered.has(last.id)) n++;
+    if (refOutcome(last, s.maxAttempt).action === 'retry' || (counts.get(last.id) ?? 0) !== questionIdsFor(rc.g, key).length) n++;
   }
   return n;
 }
@@ -598,7 +699,7 @@ export async function executeGroup(
     throw new CliError(`refusing to spend: group ${group} is mode=${p0.mode} pass=${p0.pass}, which does not match the flags given`);
   }
   for (const r of runs) {
-    if (!['estimated', 'submitted', 'collecting', 'completed'].includes(r.status)) {
+    if (!['estimated', 'submitting', 'submitted', 'collecting', 'completed'].includes(r.status)) {
       throw new CliError(`refusing to spend: run ${r.id} has status "${r.status}"`);
     }
     if (!r.estimate?.fingerprint) throw new CliError(`refusing to spend: run ${r.id} has no stored estimate`);
@@ -611,29 +712,36 @@ export async function executeGroup(
     ctx, client, bc, g: groupFromRun(run), run, family: run.params.family as ModelFamily, verified: false,
     mem: new Map(), collected: new Set(), opts,
   }));
-  for (const rc of rcs) {
-    if (rc.run.status === 'completed') continue;
-    if (rc.run.batch_ids.length === 0) await submitPending(rc);
+  const active = () => rcs.filter((rc) => rc.run.status !== 'completed');
+
+  // B1: settle any submission whose response was lost, before anything else.
+  if (opts.adoptBatch) {
+    const errors: string[] = [];
+    let adopted = false;
+    for (const rc of active()) {
+      try { await resolveRun(rc, opts.adoptBatch); adopted = true; break; } catch (e) { errors.push(`${rc.run.id}: ${(e as Error).message}`); }
+    }
+    if (!adopted) throw new CliError(`could not adopt batch ${opts.adoptBatch}:\n${errors.join('\n')}`);
+  }
+  for (const rc of active()) await resolveRun(rc);
+
+  for (const rc of active()) {
+    if (realBatchIds(rc.run.batch_ids).length === 0) await submitPending(rc);
   }
   for (let round = 0; round <= MAX_ATTEMPTS; round++) {
     let submitted = 0;
-    for (const rc of rcs) {
-      if (rc.run.status === 'completed') continue;
+    for (const rc of active()) {
       await collectBatches(rc);
       await processResults(rc);
     }
-    for (const rc of rcs) {
-      if (rc.run.status === 'completed') continue;
-      submitted += await submitPending(rc);
-    }
+    for (const rc of active()) submitted += await submitPending(rc);
     if (submitted === 0) break;
   }
   const result: ExecResult = { group, runs: [] };
   for (const rc of rcs) {
     const unresolved = await unresolvedKeys(rc);
-    const usages = await fetchUsages(db, rc.run.id);
     const totals = emptyTotals();
-    for (const u of usages) if (u.usage) addUsage(totals, rc.run.model, u.usage);
+    for (const u of await fetchRawSummaries(db, rc.run.id)) if (u.usage) addUsage(totals, rc.run.model, u.usage);
     if (rc.run.status !== 'completed') {
       await btUpdateRun(db, rc.run.id, {
         status: unresolved === 0 ? 'completed' : 'failed',

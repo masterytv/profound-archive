@@ -8,7 +8,7 @@ import { readActiveQuestions, readNdeVideoIds, type Db } from '../lib/supabase';
 import { fetchTranscripts } from '../lib/transcript';
 import { CliError } from './cli';
 import {
-  countCells, fetchPendingCells, fetchStanceRuns, videosWithFirstPass, type PendingCell, type RunRow,
+  NON_TERMINAL, countCells, fetchPendingCells, fetchStanceRuns, videosWithFirstPass, type PendingCell, type RunRow,
 } from './db';
 import { goldOrder, pilotOrder } from './sampling';
 import { toPromptQuestions, type PassKind, type PromptQuestion } from './requests';
@@ -22,6 +22,8 @@ export interface Plan {
   cells?: Record<string, Array<[number, number, number | null]>>;
   questionIds: number[];
   skippedNoTranscript: string[];
+  /** video -> sha256 of the exact transcript text the requests were built from (set at estimate time). */
+  transcriptSha?: Record<string, string>;
 }
 
 export interface PlanRequest {
@@ -75,6 +77,31 @@ export function pilotIdsFromRuns(runs: readonly RunRow[]): string[] {
   return runs.filter((r) => r.params?.mode === 'pilot').flatMap((r) => (r.params?.plan?.videoIds as string[] | undefined) ?? []);
 }
 
+/** Videos covered by non-terminal runs of the same pass kind (optionally ignoring one group). */
+export function coveredKeys(runs: readonly RunRow[], kind: string, exceptGroup?: string): Map<string, RunRow> {
+  const m = new Map<string, RunRow>();
+  for (const r of runs) {
+    if (r.params?.kind !== kind || r.params?.group === exceptGroup) continue;
+    if (!(NON_TERMINAL as readonly string[]).includes(r.status)) continue;
+    for (const v of (r.params?.plan?.videoIds as string[] | undefined) ?? []) if (!m.has(v)) m.set(v, r);
+  }
+  return m;
+}
+
+/** S4: the first non-terminal run of the same pass that already covers any of these videos. */
+export function findOverlap(
+  runs: readonly RunRow[], kind: string, group: string, videoIds: readonly string[],
+): { runId: string; group: string; status: string; videos: number } | null {
+  const covered = coveredKeys(runs, kind, group);
+  let first: RunRow | null = null;
+  let n = 0;
+  for (const v of videoIds) {
+    const r = covered.get(v);
+    if (r) { n++; first ??= r; }
+  }
+  return first ? { runId: first.id, group: String(first.params.group), status: first.status, videos: n } : null;
+}
+
 function groupCells(cells: readonly PendingCell[]): Plan['cells'] {
   const out: NonNullable<Plan['cells']> = {};
   for (const c of [...cells].sort((a, b) => (a.video_id < b.video_id ? -1 : a.video_id > b.video_id ? 1 : a.question_id - b.question_id))) {
@@ -114,19 +141,23 @@ export async function makePlan(db: Db, req: PlanRequest, log: (s: string) => voi
     }
     // full first: every NDE video without first-pass rows (gold videos are skipped: same pass)
     const done = await videosWithFirstPass(db, questionIds[0]);
-    const todo = nde.filter((v) => !done.has(v)).sort();
-    notes.push(`already have first-pass rows (gold/earlier full): ${nde.length - todo.length}`);
+    const covered = coveredKeys(runs, 'first');
+    const todo = nde.filter((v) => !done.has(v) && !covered.has(v)).sort();
+    notes.push(`already have first-pass rows (gold/earlier full): ${nde.length - todo.length - nde.filter((v) => !done.has(v) && covered.has(v)).length}`);
+    const inFlight = nde.filter((v) => !done.has(v) && covered.has(v)).length;
+    if (inFlight) notes.push(`excluded: ${inFlight} videos covered by a non-terminal first-pass run`);
     if (todo.length === 0) throw new CliError('every NDE video already has first-pass rows; nothing to do');
     return { kind, plan: { videoIds: todo, questionIds, skippedNoTranscript: [] }, notes };
   }
 
   // recheck / arbiter
-  let scope: string[] | undefined;
+  let scope: string[];
   if (req.mode === 'gold') {
-    scope = goldIdsFromRuns(runs) ?? undefined;
-    if (!scope) throw new CliError('no gold first-pass run found; run --gold --pass first first');
+    scope = goldIdsFromRuns(runs) ?? [];
+    if (scope.length === 0) throw new CliError('no gold first-pass run found; run --gold --pass first first');
   } else {
     const nde = await readNdeVideoIds(db);
+    scope = nde;
     const done = await videosWithFirstPass(db, questionIds[0]);
     const skipped = new Set(
       runs.filter((r) => r.params?.mode === 'full' && r.pass === 'first').flatMap((r) => (r.params?.plan?.skippedNoTranscript as string[] | undefined) ?? []),

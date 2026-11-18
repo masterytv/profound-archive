@@ -57,6 +57,11 @@ describe('resolveFinal mirrors bt_final_stances', () => {
     const r = a({ stance: 'yes' });
     expect(resolveFinal(flagged, r, a({ stance: 'no', quoteVerified: false })).status).toBe('unverified');
   });
+  it('an invalid arbiter answer gives status invalid (mirrors the view)', () => {
+    const r = a({ stance: 'yes' });
+    const arb = a({ valid: false, stance: null, confidence: null, quote: null, quoteVerified: false });
+    expect(resolveFinal(flagged, r, arb)).toMatchObject({ resolvedBy: 'arbiter', status: 'invalid' });
+  });
   it('an arbiter not_addressed is final without a quote', () => {
     const arb = a({ stance: 'not_addressed', quote: null, quoteVerified: false });
     expect(resolveFinal(flagged, a({ stance: 'yes' }), arb).status).toBe('final');

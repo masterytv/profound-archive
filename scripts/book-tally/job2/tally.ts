@@ -5,7 +5,7 @@
  * not_addressed is ignored; none addressed -> not_addressed; all addressed equal -> that
  * stance; any conflict or any mixed -> mixed. Each person counts once.
  * Answers with any other status (unverified, invalid, pending_*) are excluded and counted
- * in n_excluded_unverified (with a status breakdown). A person with no 'final' answer for a
+ * in n_excluded_unverified_cells (with a status breakdown; cell counts, not persons). A person with no 'final' answer for a
  * question is not in that question's denominators (n_persons_all_excluded counts them).
  */
 import { wilson } from '../lib/stats';
@@ -34,11 +34,15 @@ export interface TallyRow {
   pct_yes_of_addressed: number | null; yes_ci_lo: number | null; yes_ci_hi: number | null;
   pct_no_of_addressed: number | null; no_ci_lo: number | null; no_ci_hi: number | null;
   pct_mixed_of_addressed: number | null; mixed_ci_lo: number | null; mixed_ci_hi: number | null;
-  n_excluded_unverified: number;
-  n_excl_unverified_quote: number;
-  n_excl_invalid: number;
-  n_excl_pending: number;
+  /** Person-level: persons with no 'final' answer for this question (only excluded cells). */
   n_persons_all_excluded: number;
+  /** Person-level: persons none of whose NDE videos has a usable transcript (same for every question). */
+  n_persons_no_transcript: number;
+  /** Video-cell counts (a person with several videos contributes several cells). */
+  n_excluded_unverified_cells: number;
+  n_excl_unverified_cells: number;
+  n_excl_invalid_cells: number;
+  n_excl_pending_cells: number;
 }
 
 export const TALLY_HEADERS: Array<keyof TallyRow> = [
@@ -48,7 +52,8 @@ export const TALLY_HEADERS: Array<keyof TallyRow> = [
   'pct_yes_of_addressed', 'yes_ci_lo', 'yes_ci_hi',
   'pct_no_of_addressed', 'no_ci_lo', 'no_ci_hi',
   'pct_mixed_of_addressed', 'mixed_ci_lo', 'mixed_ci_hi',
-  'n_excluded_unverified', 'n_excl_unverified_quote', 'n_excl_invalid', 'n_excl_pending', 'n_persons_all_excluded',
+  'n_persons_all_excluded', 'n_persons_no_transcript',
+  'n_excluded_unverified_cells', 'n_excl_unverified_cells', 'n_excl_invalid_cells', 'n_excl_pending_cells',
 ];
 
 const pct = (k: number, n: number): number | null => (n > 0 ? (100 * k) / n : null);
@@ -62,6 +67,7 @@ export function tallyByQuestion(
   rows: readonly FinalRow[],
   personOf: ReadonlyMap<string, string>,
   questions: readonly QuestionMeta[],
+  opts: { noTranscriptPersons?: number } = {},
 ): TallyRow[] {
   // question -> person -> {final stances, excluded counts}
   type Cell = { final: Stance[]; unverified: number; invalid: number; pending: number };
@@ -101,9 +107,10 @@ export function tallyByQuestion(
       pct_yes_of_addressed: pct1(wy.p), yes_ci_lo: pct1(wy.lo), yes_ci_hi: pct1(wy.hi),
       pct_no_of_addressed: pct1(wn.p), no_ci_lo: pct1(wn.lo), no_ci_hi: pct1(wn.hi),
       pct_mixed_of_addressed: pct1(wm.p), mixed_ci_lo: pct1(wm.lo), mixed_ci_hi: pct1(wm.hi),
-      n_excluded_unverified: unv + inv + pend,
-      n_excl_unverified_quote: unv, n_excl_invalid: inv, n_excl_pending: pend,
       n_persons_all_excluded: allExcluded,
+      n_persons_no_transcript: opts.noTranscriptPersons ?? 0,
+      n_excluded_unverified_cells: unv + inv + pend,
+      n_excl_unverified_cells: unv, n_excl_invalid_cells: inv, n_excl_pending_cells: pend,
     };
   });
 }

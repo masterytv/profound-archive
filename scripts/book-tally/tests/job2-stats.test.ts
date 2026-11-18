@@ -45,11 +45,21 @@ describe('pilot statistics (hand computed)', () => {
   });
   it('flagged and dispute shares for the projection', () => {
     // Haiku flagged: A3 (no) and B3 (unverified quote); Sonnet agrees with verified quotes on both -> no disputes
+    expect(st.shares).toMatchObject({ videos: 2, totalCells: 10, flaggedCells: 2, disputedCells: 0, videosWithFlag: 2, videosWithDispute: 0 });
     expect(st.shares.flaggedCellShare).toBeCloseTo(0.2, 12);
-    expect(st.shares.shareVideosWithFlag).toBe(1);
-    expect(st.shares.meanFlaggedPerFlaggedVideo).toBe(1);
     expect(st.shares.disputeShareOfFlagged).toBe(0);
-    expect(st.shares.shareVideosWithDispute).toBe(0);
+    expect([...st.flaggedByVideo]).toEqual([['A', 1], ['B', 1]]);
+    expect(st.disputedByVideo.size).toBe(0);
+  });
+  it('Sonnet disagreement on UNFLAGGED Haiku cells, overall and by Haiku stance, with Wilson intervals', () => {
+    // unflagged: A1,A2,B1 (yes) and A4,A5,B2,B4,B5 (not_addressed); Sonnet disagrees on B1 (mixed) and B2 (yes)
+    expect(st.unflagged.overall).toMatchObject({ k: 2, n: 8, p: 0.25 });
+    expect(st.unflagged.overall.lo).toBeCloseTo(0.0715, 2);
+    expect(st.unflagged.overall.hi).toBeCloseTo(0.5907, 2);
+    expect(st.unflagged.byHaikuStance.yes).toMatchObject({ k: 1, n: 3 });
+    expect(st.unflagged.byHaikuStance.not_addressed).toMatchObject({ k: 1, n: 5 });
+    expect(st.unflagged.byHaikuStance.no).toMatchObject({ k: 0, n: 0, p: null });
+    expect(st.unflagged.sonnetInvalid).toBe(0);
   });
   it('invalid answers are excluded from agreement, counted in the invalid rate, and count as disputes when flagged', () => {
     const h2 = haiku.map((a) => (a.video_id === 'A' && a.question_id === 1 ? mk('A', 1, null, { error: 'missing_answer' }) : a));
@@ -60,7 +70,7 @@ describe('pilot statistics (hand computed)', () => {
     expect(s2.haiku.errors).toEqual({ missing_answer: 1 });
     // A1 invalid is flagged and disputed (Sonnet verified yes does not agree with an invalid reader)
     expect(s2.shares.disputeShareOfFlagged).toBeCloseTo(1 / 3, 12);
-    expect(s2.shares.shareVideosWithDispute).toBe(0.5);
+    expect(s2.shares).toMatchObject({ flaggedCells: 3, disputedCells: 1, videosWithDispute: 1 });
   });
   it('agreement() on an empty set is n/a', () => {
     const e = agreement([]);
@@ -68,19 +78,28 @@ describe('pilot statistics (hand computed)', () => {
     expect(e.kappa4.kappa).toBeNull();
   });
   it('modelAnswerStats handles an empty model', () => expect(modelAnswerStats([]).quoteFailureRate).toBeNull());
-  it('usage stats price actual usage (batch) and the no-cache variant', () => {
+  it('usage is per VIDEO over all attempts; prices every attempt; counts retries and truncation', () => {
     const u = usageStats('claude-haiku-5-5', [
-      { input_tokens: 6000, output_tokens: 4000, cache_creation_input_tokens: 4000 },
-      { input_tokens: 6000, output_tokens: 2000, cache_read_input_tokens: 4000 },
+      { key: 'v1', attempt: 1, resultType: 'succeeded', stopReason: 'max_tokens', usage: { input_tokens: 6000, output_tokens: 4000, cache_creation_input_tokens: 4000, output_tokens_details: { thinking_tokens: 3000 } } as never },
+      { key: 'v1', attempt: 2, resultType: 'succeeded', stopReason: 'end_turn', usage: { input_tokens: 6000, output_tokens: 2000, cache_read_input_tokens: 4000, output_tokens_details: { thinking_tokens: 1000 } } as never },
+      { key: 'v2', attempt: 1, resultType: 'expired', stopReason: null, usage: null },
     ], 81);
     expect(u.totals).toMatchObject({ requests: 2, inputTokens: 12000, outputTokens: 6000, cacheReadTokens: 4000, cacheWriteTokens: 4000 });
-    // r1: (6000*.1 + 4000*.1*1.25 + 4000*.5)/1e6*.5 = 0.00155 ; r2: (600 + 4000*.1*.1 + 1000)/1e6*.5 = 0.000820
+    // r1: (6000*.1 + 4000*.1*1.25 + 4000*.5)/1e6*.5 = 0.00155 ; r2: (600 + 4000*.1*.1 + 1000)/1e6*.5 = 0.00082
     expect(u.totals.costUsd).toBeCloseTo(0.00155 + 0.00082, 10);
-    expect(u.rates.meanPromptTokens).toBe(10000);
-    expect(u.rates.meanOutputTokens).toBe(3000);
-    expect(u.rates.meanOutputPerQuestion).toBeCloseTo(3000 / 81, 10);
+    expect(u.perVideo.get('v1')).toEqual({ inputTokens: 20000, outputTokens: 6000 });
+    expect(u.perVideo.has('v2')).toBe(false);
+    expect(u.rates).toMatchObject({ videos: 1, meanPromptTokens: 20000, meanOutputTokens: 6000, meanThinkingTokens: 4000, meanVisibleTokens: 2000 });
+    expect(u.rates.meanVisiblePerQuestion).toBeCloseTo(2000 / 81, 10);
+    expect(u.retries).toEqual({ rawResponses: 3, retriedAttempts: 1, truncated: 1, errored: 0, expired: 1, canceled: 0, videosWithRetry: 1 });
     // no-cache: r1 (10000*.1 + 2000)/1e6*.5 = .0015 ; r2 (1000 + 1000)/1e6*.5 = .001
     expect(u.costNoCacheUsd).toBeCloseTo(0.0025, 10);
+  });
+  it('thinking is reported as unmeasured when usage does not carry output_tokens_details', () => {
+    const u = usageStats('claude-haiku-5-5', [{ key: 'v1', attempt: 1, resultType: 'succeeded', stopReason: 'end_turn', usage: { input_tokens: 10, output_tokens: 20 } }], 81);
+    expect(u.rates.meanThinkingTokens).toBeNull();
+    expect(u.rates.meanVisiblePerQuestion).toBeNull();
+    expect(u.rates.meanOutputTokens).toBe(20);
   });
 });
 
@@ -108,7 +127,7 @@ describe('person rollup', () => {
     const [t] = tallyByQuestion(rows, personOf, q);
     expect(t).toMatchObject({ n_persons: 3, n_yes: 1, n_no: 0, n_mixed: 1, n_not_addressed: 1, n_addressed: 2 });
     expect(t.pct_yes).toBeCloseTo(100 / 3, 10);
-    expect(t).toMatchObject({ n_excluded_unverified: 2, n_excl_unverified_quote: 1, n_excl_pending: 1, n_excl_invalid: 0, n_persons_all_excluded: 1 });
+    expect(t).toMatchObject({ n_excluded_unverified_cells: 2, n_excl_unverified_cells: 1, n_excl_pending_cells: 1, n_excl_invalid_cells: 0, n_persons_all_excluded: 1, n_persons_no_transcript: 0 });
     expect(t.pct_yes_of_addressed).toBeCloseTo(50, 10);
     expect(t.yes_ci_lo).toBeCloseTo(9.45, 1);
     expect(t.yes_ci_hi).toBeCloseTo(90.55, 1);
@@ -116,7 +135,11 @@ describe('person rollup', () => {
   });
   it('sensitivity (each video its own person) counts the same videos separately', () => {
     const [t] = tallyByQuestion(rows, new Map(rows.map((r) => [r.video_id, r.video_id])), q);
-    expect(t).toMatchObject({ n_persons: 4, n_yes: 2, n_no: 1, n_mixed: 0, n_not_addressed: 1, n_excluded_unverified: 2 });
+    expect(t).toMatchObject({ n_persons: 4, n_yes: 2, n_no: 1, n_mixed: 0, n_not_addressed: 1, n_excluded_unverified_cells: 2 });
+  });
+  it('invalid arbiter results are counted as invalid cells, and no-transcript persons are carried through', () => {
+    const [t] = tallyByQuestion([f('v1', 'yes'), f('v2', null, 'invalid')], new Map([['v1', 'P1'], ['v2', 'P2']]), q, { noTranscriptPersons: 3 });
+    expect(t).toMatchObject({ n_persons: 1, n_excl_invalid_cells: 1, n_excluded_unverified_cells: 1, n_persons_all_excluded: 1, n_persons_no_transcript: 3 });
   });
   it('a question with no data yields nulls, not NaN', () => {
     const [t] = tallyByQuestion([], new Map(), q);

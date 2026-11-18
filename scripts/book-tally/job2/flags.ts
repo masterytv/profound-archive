@@ -35,7 +35,7 @@ export function stancesAgree(first: AnswerLite, recheck: AnswerLite): boolean {
 
 export type ResolvedBy = 'first' | 'recheck' | 'arbiter';
 /** Statuses of the SQL view bt_final_stances. */
-export type FinalStatus = 'final' | 'unverified' | 'pending_recheck' | 'pending_arbiter';
+export type FinalStatus = 'final' | 'unverified' | 'invalid' | 'pending_recheck' | 'pending_arbiter';
 
 export interface Resolution {
   resolvedBy: ResolvedBy | null;
@@ -53,7 +53,7 @@ export function isOk(a: AnswerLite): boolean {
  *  - unflagged first answer -> final = first;
  *  - flagged, no recheck -> pending_recheck;
  *  - recheck agrees (both valid, same stance): ok(recheck) -> recheck; else ok(first) -> first;
- *  - otherwise the arbiter: none yet -> pending_arbiter; ok(arbiter) -> final; else 'unverified'.
+ *  - otherwise the arbiter: none yet -> pending_arbiter; invalid -> 'invalid'; ok -> final; else 'unverified'.
  */
 export function resolveFinal(first: AnswerLite, recheck?: AnswerLite, arbiter?: AnswerLite): Resolution {
   if (!isFlagged(first)) return { resolvedBy: 'first', chosen: first, status: 'final' };
@@ -63,6 +63,7 @@ export function resolveFinal(first: AnswerLite, recheck?: AnswerLite, arbiter?: 
     if (isOk(first)) return { resolvedBy: 'first', chosen: first, status: 'final' };
   }
   if (!arbiter) return { resolvedBy: null, chosen: null, status: 'pending_arbiter' };
+  if (!arbiter.valid) return { resolvedBy: 'arbiter', chosen: arbiter, status: 'invalid' };
   return { resolvedBy: 'arbiter', chosen: arbiter, status: isOk(arbiter) ? 'final' : 'unverified' };
 }
 

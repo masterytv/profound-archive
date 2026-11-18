@@ -3,8 +3,9 @@
  * Pure functions: no DB, no API (the caller supplies counted tokens).
  */
 import { createHash } from 'crypto';
-import { requestCost, type ModelFamily } from '../lib/cost';
-import { MODELS } from '../lib/cost';
+import {
+  MODELS, THINKING_ALLOWANCE, ceilingCost, estimateOutputTokens, projectFromPilot, requestCost, type ModelFamily, type TokenCounts,
+} from '../lib/cost';
 
 // ---------- fingerprint / group id ----------
 
@@ -70,6 +71,16 @@ export function itemCostNoCacheWrite(model: string, it: TokenItem): number {
   return requestCost(model, { inputTokens: it.promptTokens, outputTokens: it.outputTokens });
 }
 
+/** Hard ceiling for ONE request: every attempt used, every output at max_tokens (doubling). */
+export function itemCeiling(model: string, it: TokenItem, maxTokens: number, maxAttempts: number): number {
+  const sys = it.cached ? Math.min(it.systemTokens, it.promptTokens) : 0;
+  return ceilingCost({
+    model, requests: [{ inputTokens: it.promptTokens - sys, cacheWrite5mTokens: sys }], maxTokens, maxAttempts,
+  });
+}
+
+export interface CeilingParams { maxTokens: number; maxAttempts: number }
+
 export interface ModelEstimate {
   model: string;
   requests: number;
@@ -77,17 +88,24 @@ export interface ModelEstimate {
   method: 'exact' | 'stratified_sample';
   inputTokens: number;
   outputTokens: number;
+  /** Expected cost: assumed output tokens, no cache reads, one attempt per request. */
   costUsd: number;
   costUsdNoCacheWrite: number;
+  /** Hard ceiling: all attempts at max_tokens with doubling (lib/cost.ceilingCost). */
+  ceilingUsd: number;
+  meanPromptTokens: number;
 }
 
-export function estimateExact(model: string, items: readonly TokenItem[]): ModelEstimate {
+export function estimateExact(model: string, items: readonly TokenItem[], ceil: CeilingParams): ModelEstimate {
+  const input = items.reduce((s, i) => s + i.promptTokens, 0);
   return {
     model, requests: items.length, countedRequests: items.length, method: 'exact',
-    inputTokens: items.reduce((s, i) => s + i.promptTokens, 0),
+    inputTokens: input,
     outputTokens: items.reduce((s, i) => s + i.outputTokens, 0),
     costUsd: items.reduce((s, i) => s + itemCost(model, i), 0),
     costUsdNoCacheWrite: items.reduce((s, i) => s + itemCostNoCacheWrite(model, i), 0),
+    ceilingUsd: items.reduce((s, i) => s + itemCeiling(model, i, ceil.maxTokens, ceil.maxAttempts), 0),
+    meanPromptTokens: items.length ? input / items.length : 0,
   };
 }
 
@@ -99,8 +117,9 @@ export function estimateStratified(
   model: string,
   sample: ReadonlyArray<{ stratum: number; item: TokenItem }>,
   strataSizes: readonly number[],
+  ceil: CeilingParams,
 ): ModelEstimate {
-  let input = 0, output = 0, cost = 0, costNoWrite = 0, total = 0;
+  let input = 0, output = 0, cost = 0, costNoWrite = 0, ceiling = 0, total = 0;
   strataSizes.forEach((n, h) => {
     total += n;
     if (n === 0) return;
@@ -111,30 +130,40 @@ export function estimateStratified(
     output += mean((i) => i.outputTokens) * n;
     cost += mean((i) => itemCost(model, i)) * n;
     costNoWrite += mean((i) => itemCostNoCacheWrite(model, i)) * n;
+    ceiling += mean((i) => itemCeiling(model, i, ceil.maxTokens, ceil.maxAttempts)) * n;
   });
   return {
     model, requests: total, countedRequests: sample.length, method: 'stratified_sample',
     inputTokens: Math.round(input), outputTokens: Math.round(output), costUsd: cost, costUsdNoCacheWrite: costNoWrite,
+    ceilingUsd: ceiling, meanPromptTokens: total ? input / total : 0,
   };
 }
 
+export type StanceKind = 'pilot' | 'first' | 'recheck' | 'arbiter';
+
+/**
+ * Output-token model (usage.output_tokens includes thinking): per request a fixed thinking
+ * allowance per model family plus visible tokens per answered question. `perVideoOverride`
+ * (pilot actuals: mean output tokens per VIDEO summed over attempts) replaces the model for
+ * the full-question passes (pilot / first).
+ */
 export interface OutputAssumption {
-  perRequest: number;
-  perQuestion: number;
+  thinkingAllowance: Record<ModelFamily, number>;
+  visiblePerQuestion: Record<StanceKind, number>;
+  perVideoOverride?: Partial<Record<ModelFamily, number>>;
   source: string;
 }
 
-/** Documented defaults when no pilot actuals exist (see README): ~25% of 81 answers carry a quote. */
 export const DEFAULT_OUTPUT_ASSUMPTION: OutputAssumption = {
-  perRequest: 4000,
-  perQuestion: 60,
-  source: 'assumption: 4,000 tokens per 81-answer request, 60 per answer in recheck/arbiter (excludes any reasoning tokens effort may add)',
+  thinkingAllowance: { ...THINKING_ALLOWANCE },
+  visiblePerQuestion: { pilot: 32, first: 32, recheck: 60, arbiter: 70 },
+  source: 'assumption: thinking allowance (lib/cost THINKING_ALLOWANCE) + visible tokens per answered question (32 for 81-question passes, 60 recheck, 70 arbiter); no pilot actuals yet',
 };
 
 /** Expected output tokens for a request covering n questions. */
-export function outputTokensFor(kind: 'pilot' | 'first' | 'recheck' | 'arbiter', nQuestions: number, a: OutputAssumption): number {
-  if (kind === 'pilot' || kind === 'first') return a.perRequest;
-  return Math.round(80 + a.perQuestion * nQuestions);
+export function outputTokensFor(kind: StanceKind, family: ModelFamily, nQuestions: number, a: OutputAssumption): number {
+  if ((kind === 'pilot' || kind === 'first') && a.perVideoOverride?.[family] !== undefined) return Math.ceil(a.perVideoOverride[family]!);
+  return estimateOutputTokens(MODELS[family], nQuestions, a.visiblePerQuestion[kind], a.thinkingAllowance[family]);
 }
 
 // ---------- spend gate ----------
@@ -163,7 +192,7 @@ export function assertSpendConfirmed(a: GateArgs): void {
     throw new Error(`Refusing to spend: --confirm-spend "${a.confirm}" does not match estimate group "${a.group}"`);
   }
   const byId = new Map(a.runs.map((r) => [r.id, r]));
-  const allowed = a.allowedStatuses ?? ['estimated', 'submitted', 'collecting'];
+  const allowed = a.allowedStatuses ?? ['estimated', 'submitting', 'submitted', 'collecting'];
   for (const id of a.expectedRunIds) {
     const r = byId.get(id);
     if (!r) throw new Error(`Refusing to spend: no estimate row (bt_runs) for ${id}; run --estimate first`);
@@ -177,35 +206,17 @@ export function assertSpendConfirmed(a: GateArgs): void {
 
 // ---------- full-run projection from pilot actuals ----------
 
-export interface PilotModelRates {
-  requests: number;
-  /** Mean prompt tokens per request (input + cache read + cache write), i.e. billed as plain input. */
-  meanPromptTokens: number;
-  meanOutputTokens: number;
-  /** meanOutputTokens / questions per request (81). */
-  meanOutputPerQuestion: number;
-}
-
-export interface PilotShares {
-  videos: number;
-  questionsPerVideo: number;
-  /** Fraction of videos with >= 1 flagged cell (Haiku pilot answers, first-pass flag rule). */
-  shareVideosWithFlag: number;
-  /** Mean flagged cells per video that has any. */
-  meanFlaggedPerFlaggedVideo: number;
-  /** Fraction of videos with >= 1 disputed cell (flagged and Sonnet disagrees or either invalid). */
-  shareVideosWithDispute: number;
-  meanDisputedPerDisputedVideo: number;
-  /** Cell-level shares, reported for transparency. */
-  flaggedCellShare: number;
-  disputeShareOfFlagged: number;
-}
-
 export interface ProjectionInput {
   nVideos: number;
-  haiku: PilotModelRates;
-  sonnet: PilotModelRates;
-  shares: PilotShares;
+  /** Pilot per-VIDEO actual token counts (all attempts summed), one entry per video. */
+  haikuPerVideo: TokenCounts[];
+  sonnetPerVideo: ReadonlyMap<string, TokenCounts>;
+  /** Pilot cells flagged / disputed per video (Haiku flag rule; dispute = Sonnet disagrees or either invalid). */
+  flaggedByVideo: ReadonlyMap<string, number>;
+  disputedByVideo: ReadonlyMap<string, number>;
+  /** Number of pilot videos the maps above were measured on. */
+  pilotVideos: number;
+  assumption: OutputAssumption;
   /** Extra prompt tokens per disputed question in the arbiter prompt (readers' answers + quotes). */
   arbiterTokensPerDispute?: number;
 }
@@ -217,40 +228,51 @@ export interface Projection {
   totalUsd: number;
   recheckRequests: number;
   arbiterRequests: number;
+  firstLongContextShare: number;
   notes: string[];
 }
 
+const promptOf = (t: TokenCounts) => t.inputTokens + (t.cacheReadTokens ?? 0) + (t.cacheWrite5mTokens ?? 0) + (t.cacheWrite1hTokens ?? 0);
+
 /**
- * Projection of a full run from pilot rates, all at batch prices with no cache reads:
- *  - first: nVideos Haiku requests at the pilot mean tokens;
- *  - recheck: Sonnet on the share of videos with a flagged cell; prompt tokens = Sonnet's pilot
- *    mean (conservative: the recheck prompt lists fewer questions), output = pilot per-answer
- *    tokens x mean flagged cells;
- *  - arbiter: Opus on the share of videos with a disputed cell; prompt = Sonnet pilot mean
- *    (tokenizer proxy) + arbiterTokensPerDispute x disputes, output = Sonnet per-answer x disputes.
+ * Projection of a full run from pilot actuals, batch prices, no cache reads. Every pilot
+ * request is priced individually (lib/cost.projectFromPilot), so the Haiku long-context tier
+ * is decided per request:
+ *  - first: Haiku pilot videos as measured (all attempts summed), scaled to nVideos;
+ *  - recheck: for each pilot video with flagged cells, one Sonnet request with that video's
+ *    Sonnet prompt tokens and output = Sonnet thinking allowance + flagged x visible tokens;
+ *    scaled by the share of videos with a flagged cell;
+ *  - arbiter: same for disputed cells with Opus (prompt = Sonnet prompt + per-dispute tokens).
  */
 export function projectFullCost(i: ProjectionInput): Projection {
   const perDispute = i.arbiterTokensPerDispute ?? 150;
-  const first = i.nVideos * requestCost(MODELS.haiku, {
-    inputTokens: i.haiku.meanPromptTokens, outputTokens: i.haiku.meanOutputTokens,
-  });
-  const recheckReq = i.nVideos * i.shares.shareVideosWithFlag;
-  const recheck = recheckReq * requestCost(MODELS.sonnet, {
-    inputTokens: i.sonnet.meanPromptTokens,
-    outputTokens: i.sonnet.meanOutputPerQuestion * i.shares.meanFlaggedPerFlaggedVideo,
-  });
-  const arbiterReq = i.nVideos * i.shares.shareVideosWithDispute;
-  const arbiter = arbiterReq * requestCost(MODELS.opus, {
-    inputTokens: i.sonnet.meanPromptTokens + perDispute * i.shares.meanDisputedPerDisputedVideo,
-    outputTokens: i.sonnet.meanOutputPerQuestion * i.shares.meanDisputedPerDisputedVideo,
-  });
+  const a = i.assumption;
+  const first = projectFromPilot(MODELS.haiku, i.haikuPerVideo, i.nVideos);
+
+  const rcReqs: TokenCounts[] = [];
+  const arReqs: TokenCounts[] = [];
+  for (const [v, n] of i.flaggedByVideo) {
+    const s = i.sonnetPerVideo.get(v);
+    if (!s || n <= 0) continue;
+    rcReqs.push({ inputTokens: promptOf(s), outputTokens: estimateOutputTokens(MODELS.sonnet, n, a.visiblePerQuestion.recheck, a.thinkingAllowance.sonnet) });
+  }
+  for (const [v, n] of i.disputedByVideo) {
+    const s = i.sonnetPerVideo.get(v);
+    if (!s || n <= 0) continue;
+    arReqs.push({ inputTokens: promptOf(s) + perDispute * n, outputTokens: estimateOutputTokens(MODELS.opus, n, a.visiblePerQuestion.arbiter, a.thinkingAllowance.opus) });
+  }
+  const scale = (n: number) => (i.pilotVideos > 0 ? Math.round((i.nVideos * n) / i.pilotVideos) : 0);
+  const rcTarget = scale(rcReqs.length), arTarget = scale(arReqs.length);
+  const rc = rcReqs.length ? projectFromPilot(MODELS.sonnet, rcReqs, rcTarget) : null;
+  const ar = arReqs.length ? projectFromPilot(MODELS.opus, arReqs, arTarget) : null;
+  const recheckUsd = rc?.totalUsd ?? 0, arbiterUsd = ar?.totalUsd ?? 0;
   return {
-    firstUsd: first, recheckUsd: recheck, arbiterUsd: arbiter, totalUsd: first + recheck + arbiter,
-    recheckRequests: recheckReq, arbiterRequests: arbiterReq,
+    firstUsd: first.totalUsd, recheckUsd, arbiterUsd, totalUsd: first.totalUsd + recheckUsd + arbiterUsd,
+    recheckRequests: rcTarget, arbiterRequests: arTarget, firstLongContextShare: first.longContextShare,
     notes: [
-      'Batch prices (50% discount), no cache reads assumed; Haiku long-context tier ignored (means used).',
-      'Rates come from the pilot sample; confidence intervals on the flagged/dispute shares are not propagated.',
-      'Pilot Sonnet answered all questions; the real recheck sees only flagged ones, so its prompt is smaller (projection is conservative).',
+      'Batch prices (50% discount), no cache reads assumed; each pilot video is priced as its own request (Haiku long-context tier per request).',
+      'First-pass output tokens are pilot actuals per video (thinking included, all attempts summed). Recheck/arbiter output uses the thinking allowance + visible tokens per flagged question.',
+      'The pilot Sonnet answered all questions; the real recheck sees only flagged ones, so its prompt is smaller (projection is conservative).',
     ],
   };
 }

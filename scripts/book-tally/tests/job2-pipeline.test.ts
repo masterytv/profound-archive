@@ -60,7 +60,7 @@ function harness(responder: Responder = standard, n = 12) {
   const logs: string[] = [];
   const makeClient = vi.fn(() => client as unknown as Anthropic);
   const outDir = mkdtempSync(path.join(os.tmpdir(), 'bt-job2-'));
-  const deps = { db: db.asDb(), makeClient, log: (l: string) => logs.push(l), sleep: async () => {}, outDir, now: () => new Date('2026-11-18T00:00:00Z') };
+  const deps = { db: db.asDb(), makeClient, log: (l: string) => logs.push(l), sleep: async () => {}, outDir, now: () => new Date() };
   const run = (args: string[]) => runStance(args, deps);
   const groupOf = () => {
     const l = [...logs].reverse().find((x) => x.startsWith('To submit'));

@@ -99,9 +99,11 @@ class Query implements PromiseLike<{ data: any; error: any }> {
 
   constructor(private db: FakeDb, private table: string) {}
 
-  select(cols = '*') { if (this.op === 'insert') this.returning = cols; else this.cols = cols; return this; }
+  select(cols = '*') { if (this.op === 'insert' || this.op === 'update') this.returning = cols; else this.cols = cols; return this; }
   eq(col: string, val: unknown) { this.filters.push((r) => getPath(r, col) === val); return this; }
   in(col: string, vals: unknown[]) { this.filters.push((r) => vals.includes(getPath(r, col))); return this; }
+  gt(col: string, val: any) { this.filters.push((r) => getPath(r, col) > val); return this; }
+  limit(n: number) { this.rng = [0, n - 1]; return this; }
   order(col: string) { this.orderCol = col; return this; }
   range(a: number, b: number) { this.rng = [a, b]; return this; }
   insert(rows: Row | Row[]) { this.op = 'insert'; this.payload = Array.isArray(rows) ? rows : [rows]; return this; }
@@ -139,9 +141,10 @@ class Query implements PromiseLike<{ data: any; error: any }> {
       if (t !== 'bt_runs') return { data: null, error: { message: `update on ${t} not allowed` } };
       const bad = Object.keys(this.payload).filter((k) => !['status', 'actual_usage', 'batch_ids', 'finished_at'].includes(k));
       if (bad.length) return { data: null, error: { message: `bt_runs: cannot update ${bad.join(',')}` } };
-      for (const r of this.db.rows(t).filter((x) => this.filters.every((f) => f(x)))) Object.assign(r, this.payload);
-      this.db.writes.push({ table: t, op: 'update', n: 1 });
-      return { data: null, error: null };
+      const hit = this.db.rows(t).filter((x) => this.filters.every((f) => f(x)));
+      for (const r of hit) Object.assign(r, this.payload);
+      this.db.writes.push({ table: t, op: 'update', n: hit.length });
+      return { data: this.returning ? this.project(hit, this.returning) : null, error: null };
     }
     let rows = this.db.rows(t).filter((r) => this.filters.every((f) => f(r)));
     if (this.orderCol) rows = [...rows].sort((a, b) => (a[this.orderCol!] < b[this.orderCol!] ? -1 : a[this.orderCol!] > b[this.orderCol!] ? 1 : 0));
@@ -172,21 +175,34 @@ export function message(model: string, answers: unknown[], usage: Record<string,
 }
 
 export class FakeAnthropic {
-  created: Array<{ id: string; requests: FakeBatchRequest[] }> = [];
+  created: Array<{ id: string; requests: FakeBatchRequest[]; created_at: string }> = [];
   countCalls = 0;
+  /** When > 0, the next N create() calls register the batch but throw (a lost response). */
+  loseNextCreates = 0;
+  createOptions: unknown[] = [];
   constructor(private responder: Responder, private tokens = 1000) {}
 
   messages = {
     countTokens: async (_p: unknown) => { this.countCalls++; return { input_tokens: this.tokens }; },
     batches: {
-      create: async ({ requests }: { requests: FakeBatchRequest[] }) => {
+      create: async ({ requests }: { requests: FakeBatchRequest[] }, opts?: unknown) => {
+        this.createOptions.push(opts);
         const id = `msgbatch_${this.created.length + 1}`;
-        this.created.push({ id, requests });
+        this.created.push({ id, requests, created_at: new Date().toISOString() });
+        if (this.loseNextCreates > 0) { this.loseNextCreates--; throw new Error('connection reset (response lost)'); }
         return { id, processing_status: 'in_progress' };
       },
       retrieve: async (id: string) => {
         const b = this.created.find((x) => x.id === id)!;
         return { id, processing_status: 'ended', request_counts: { processing: 0, succeeded: b.requests.length, errored: 0, canceled: 0, expired: 0 } };
+      },
+      list: (_p?: unknown) => {
+        const self = this;
+        return (async function* () {
+          for (const b of [...self.created].reverse()) {
+            yield { id: b.id, created_at: b.created_at, processing_status: 'ended', request_counts: { processing: 0, succeeded: b.requests.length, errored: 0, canceled: 0, expired: 0 } };
+          }
+        })();
       },
       results: async (id: string) => {
         const b = this.created.find((x) => x.id === id)!;
