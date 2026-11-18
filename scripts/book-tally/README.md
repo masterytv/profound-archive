@@ -85,11 +85,24 @@ never undercount them. A sensitivity table shows how much it matters.
    - Every disagreement, and every pair Sonnet calls *unsure*, goes to a human review list.
    - **Every merge is a recorded decision and can be reversed** by adding a `revert` decision.
      The person mapping always uses the latest decision.
+   Notes on the rules:
+   - Generational suffixes (Jr, Sr, II…) are kept for exact matching, so "John Smith Jr." never
+     exactly matches "John Smith Sr.".
+   - The "same first name" rule compares nickname-folded first names, so William and Bill count
+     as the same first name.
+   - A name with only one usable token ("John", "John Jr.", "Dr. John") never identifies a
+     person.
+   - A pair is flagged for review if a chain of merges would join two profiles that a human or
+     the models marked as different people.
 5. **Self-stated names for unnamed videos.** For videos with no recorded speaker name:
    - A model reports a name only if the experiencer states their own name in the transcript, and
      gives the quote.
    - Code checks that the quote is in the transcript and that the name is inside the quote.
    - Host introductions and guesses are never used.
+   - Code also requires a first-person introducer ("my name is", "I'm", "I am", "call me")
+     immediately before the name in the quote.
+   - Very short introductions under 5 words ("I'm Jane Smith") fail the quote-length rule.
+     This is conservative.
    - Every extracted name goes to human review before it is linked.
 
 ## 4. Job 2: stance coding
@@ -188,6 +201,18 @@ Prerequisites:
 - the `bt_*` migration applied by the project owner;
 - environment variables `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (or
   `SUPABASE_SERVICE_KEY`) and `ANTHROPIC_API_KEY` (or `CLAUDE_API`).
+
+**Spend safety.**
+- `--estimate` counts every request's input tokens with the free token-counting endpoint and
+  prints two figures:
+  - an *expected* cost, which includes an allowance for the models' internal reasoning tokens,
+    billed as output;
+  - a hard *ceiling*: every request at its maximum output, across all permitted retry attempts.
+- Retries that would go beyond the approved ceiling need a separate `--confirm-retries`.
+- Submission locks the run before the batch is created.
+- If the program crashes after a batch was created but before it was recorded, it never
+  resubmits on its own. It finds and adopts the existing batch. If it can't find the batch, it
+  refuses and asks a person to `--adopt-batch` or, after 30 minutes, `--void-pending`.
 
 **Every paid step is gated.** You run it with `--estimate`, which prints the token and dollar
 estimate and records it as a run. Only `--confirm-spend <run_id>` then submits it.

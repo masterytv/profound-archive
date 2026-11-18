@@ -354,7 +354,7 @@ describe('guarded submission (lib/batch.submitGuarded) through judge-pairs', () 
     const marker = unresolvedMarkers(h.fake.tables.bt_runs[0].batch_ids as string[])[0].raw;
 
     offset = 5 * 60_000; // five minutes later: batch list shows nothing, but that is not proof
-    await expect(call(['--confirm-spend', id])).rejects.toThrow(/NOTHING is resubmitted.*--void-pending/s);
+    await expect(call(['--confirm-spend', id])).rejects.toThrow(/NOTHING is resubmitted[\s\S]*--void-pending/);
     await expect(call(['--resume', id])).rejects.toThrow(/unresolved submission marker/);
     expect(h.api.create).toHaveBeenCalledTimes(1);
     expect(h.fake.tables.bt_runs[0].status).toBe('submitting');

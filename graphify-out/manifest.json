@@ -5742,9 +5742,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/batch-run.ts": {
-    "mtime": 1795012054.3027158,
-    "seen": 1795012339.1106348,
-    "ast_hash": "dec36c799a18f0f49fc3b4d3fec3f6bc",
+    "mtime": 1795012614.1867065,
+    "seen": 1795012714.841294,
+    "ast_hash": "f6d16deffddf3756d2616fe2aa025f71",
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/build-links.ts": {
@@ -5772,15 +5772,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/export-review.ts": {
-    "mtime": 1795012123.0183587,
-    "seen": 1795012339.1107018,
-    "ast_hash": "4809f24a10b17ce492f02dadf1bac27b",
+    "mtime": 1795012541.967352,
+    "seen": 1795012714.8414571,
+    "ast_hash": "d6d7ae524cef96aecf05e60ecd9ea267",
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/extract-names.ts": {
-    "mtime": 1795012088.701639,
-    "seen": 1795012339.110704,
-    "ast_hash": "ef73abebef8d34ad1b7f4d52c48ad9e6",
+    "mtime": 1795012619.6477532,
+    "seen": 1795012714.841461,
+    "ast_hash": "3ff50e7268a8c493b00e5d32837733fc",
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/find-pairs.ts": {
@@ -5796,15 +5796,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/judge-pairs.ts": {
-    "mtime": 1795012310.1125278,
-    "seen": 1795012339.1107285,
-    "ast_hash": "6400adc370685566e746148fab10d10a",
+    "mtime": 1795012619.6448288,
+    "seen": 1795012714.841533,
+    "ast_hash": "eb1439df2c592cc7184ba056aaa3552c",
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/logic.ts": {
-    "mtime": 1795012169.5149078,
-    "seen": 1795012339.11073,
-    "ast_hash": "35121717b03ded5e97f0638808ad2454",
+    "mtime": 1795012531.185613,
+    "seen": 1795012714.8415358,
+    "ast_hash": "9d2fa58d8ebc21b0356bc0807fb86eea",
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/schema.ts": {
@@ -5820,9 +5820,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/spend.ts": {
-    "mtime": 1795012011.1999035,
-    "seen": 1795012339.1107569,
-    "ast_hash": "ba6cb4da5691282979aa020874d8ecbf",
+    "mtime": 1795012614.1874323,
+    "seen": 1795012714.8416376,
+    "ast_hash": "99eb9e9c162a62575f40b83d3d8f885b",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/answers.ts": {
@@ -5856,9 +5856,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/execute.ts": {
-    "mtime": 1795012197.0847435,
-    "seen": 1795012339.110833,
-    "ast_hash": "b2df8bde913abff6f6530048b03bed88",
+    "mtime": 1795012572.5550258,
+    "seen": 1795012714.8418028,
+    "ast_hash": "9e8e12f4cff01c0e6ed14773094be9df",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/flags.ts": {
@@ -5922,9 +5922,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/rollup.ts": {
-    "mtime": 1795012444.713623,
-    "seen": 1795012496.7937858,
-    "ast_hash": "38fc64f0fa89936ff81ff6d8cf45c3ed",
+    "mtime": 1795012572.5544367,
+    "seen": 1795012714.8421302,
+    "ast_hash": "4941a13c52f8d6d7879a0a27328919cd",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/rows.ts": {
@@ -5934,9 +5934,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/run-stance.ts": {
-    "mtime": 1795012227.2409072,
-    "seen": 1795012339.1110137,
-    "ast_hash": "5ee290dd71e27419f99b0ec4c05f116e",
+    "mtime": 1795012552.6046996,
+    "seen": 1795012714.8421657,
+    "ast_hash": "770950f13c7a136b98186eb083fc81de",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/sampling.ts": {
@@ -5958,9 +5958,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/lib/batch.ts": {
-    "mtime": 1795011714.4765475,
-    "seen": 1795012339.1110632,
-    "ast_hash": "351d6366836fbeb5a2e35ad6adb4663c",
+    "mtime": 1795012546.5127354,
+    "seen": 1795012714.8422642,
+    "ast_hash": "a84ac3fe60d1c5747a7cdfdb95ade7f0",
     "semantic_hash": ""
   },
   "scripts/book-tally/lib/cost.ts": {
@@ -6066,9 +6066,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job1-extract.test.ts": {
-    "mtime": 1795012264.2530499,
-    "seen": 1795012339.111339,
-    "ast_hash": "c3f3f92f98500ac4ab63037027741dab",
+    "mtime": 1795012641.8044825,
+    "seen": 1795012714.842867,
+    "ast_hash": "3902efe74123c7ee077b644839da971b",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job1-fakes.ts": {
@@ -6078,15 +6078,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job1-links.test.ts": {
-    "mtime": 1795010706.2432103,
-    "seen": 1795011030.0179737,
-    "ast_hash": "9d6704d454d1694099c616844119b1ec",
+    "mtime": 1795012665.169724,
+    "seen": 1795012714.8429046,
+    "ast_hash": "932ea09353d5cd93eb7934d43a91200b",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job1-names.test.ts": {
-    "mtime": 1795012260.3665812,
-    "seen": 1795012339.1113658,
-    "ast_hash": "423a7d393f70b3407fd4c91825489773",
+    "mtime": 1795012641.8041,
+    "seen": 1795012714.842908,
+    "ast_hash": "ee5bf652e95692b5e9084b671022aee9",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job1-pairs.test.ts": {
@@ -6096,9 +6096,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job1-spend.test.ts": {
-    "mtime": 1795012240.5509171,
-    "seen": 1795012339.1113899,
-    "ast_hash": "d9f7e1ee7bdb7352d6ee8203abd881bd",
+    "mtime": 1795012691.2089825,
+    "seen": 1795012714.8430321,
+    "ast_hash": "03aa9a59e1aba43243813b49ed7257ab",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-answers.test.ts": {
@@ -6108,9 +6108,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-fakes.ts": {
-    "mtime": 1795012473.7810092,
-    "seen": 1795012496.7944357,
-    "ast_hash": "809ba0588ce8f91f8557078fc7db52af",
+    "mtime": 1795012590.6912355,
+    "seen": 1795012714.8431056,
+    "ast_hash": "02c22ec8fe82f71dd7731d908b8e778c",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-flags.test.ts": {
@@ -6246,9 +6246,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-pipeline.test.ts": {
-    "mtime": 1795012452.412718,
-    "seen": 1795012496.7944398,
-    "ast_hash": "c87bd6b012c3c93ff76125fcee1b502c",
+    "mtime": 1795012620.6882775,
+    "seen": 1795012714.8431427,
+    "ast_hash": "a1fbc27999731535f711d02bfa253fda",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-rows.test.ts": {
@@ -6264,9 +6264,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/README.md": {
-    "mtime": 1795011191.148315,
-    "seen": 1795011202.986876,
-    "ast_hash": "256a3bd28e875725a291c8ccd111356d",
+    "mtime": 1795012501.0917695,
+    "seen": 1795012714.8709526,
+    "ast_hash": "9dfb29574cb0832e13688d5d3ddb85d8",
     "semantic_hash": ""
   },
   "scripts/book-tally/job1/merge-conflicts.ts": {
@@ -6282,9 +6282,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/submit-guard.test.ts": {
-    "mtime": 1795011833.8312309,
-    "seen": 1795012339.111632,
-    "ast_hash": "64f6f067f23c7a686e33c479ddfaf3e8",
+    "mtime": 1795012575.3316774,
+    "seen": 1795012714.8434715,
+    "ast_hash": "c192f210453a10f956e0fb6e0098fe39",
     "semantic_hash": ""
   },
   "package-lock.json": {
