@@ -207,6 +207,11 @@ counted answers *would have been* flagged for a re-check:
 `n_unchecked_flagged_cells` (video-level) and `n_persons_with_unchecked_flagged`
 (person-level). Read a question with a large share of such answers as less certain.
 
+Answers left out because their quote was not found are broken down by the model's original
+stance (`n_excl_unverified_yes`, `_no`, `_mixed`, per question), and the report compares the
+quote-failure rate by stance with 95% intervals; if the rate differs by stance, the exclusion
+itself tilts the tally toward one answer, so check that table before reading shares.
+
 **How to read the numbers.** Every CSV row carries `resolution = haiku_first_pass_unchecked`
 and every file name ends in `_haiku_only`. The gold report (`gold_report_haiku_only.md`) gives
 the evidence for how far the numbers can be trusted:

@@ -156,6 +156,11 @@ Stances: `yes | no | mixed | not_addressed`. Silence is never `no`.
      reported with counts: `invalid`, `unverified_quote`. Among counted answers, those that the
      full pipeline would have flagged (no, mixed, confidence < 70) are reported per question as
      `n_unchecked_flagged_cells` (cells) and `n_persons_with_unchecked_flagged` (persons).
+     Excluded `unverified_quote` cells keep the model's original stance and are broken down per
+     question as `n_excl_unverified_yes/_no/_mixed` (cell level only), and the report compares the
+     quote-failure rate by stance (Wilson CI, n). Haiku `gold-report` counts only marks whose
+     `stance_answer_id` is a counted first-pass answer of the haiku gold videos; the "selection may
+     change" warning ignores candidates without a transcript.
    - `rollup.ts --resolution haiku-first-pass|full` (default `full`, behaviour unchanged). Haiku
      mode: no pending refusal; still refuses on unmapped videos and merge conflicts, and on any
      NDE video with a transcript that lacks a complete first-pass row set (one row per active

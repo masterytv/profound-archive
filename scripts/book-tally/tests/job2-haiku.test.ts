@@ -13,10 +13,10 @@ import { main as importGold } from '../job2/import-gold';
 import { main as goldReport, renderHaikuGoldMarkdown } from '../job2/gold-report';
 import { main as rollup } from '../job2/rollup';
 import { parseCsv } from '../job2/csv';
-import { pilotOrder } from '../job2/sampling';
+import { goldOrder, pilotOrder } from '../job2/sampling';
 import { confidenceBand, haikuGoldStats, type HaikuMark } from '../job2/gold';
 import {
-  HAIKU_RESOLUTION_LABEL, categoryOf, completeVideos, countCategories, haikuCells, latestPerCell, parseResolution, toFinalRows,
+  HAIKU_RESOLUTION_LABEL, categoryOf, completeVideos, countCategories, haikuCells, latestPerCell, parseResolution, quoteFailureByStance, toFinalRows,
   wouldBeFlagged, type FirstPassAnswer,
 } from '../job2/haiku';
 import { tallyByQuestion } from '../job2/tally';
@@ -86,6 +86,32 @@ describe('haiku person rollup (pure)', () => {
       n_persons_all_excluded: 2, n_excl_unverified_cells: 1, n_excl_invalid_cells: 1, n_excl_pending_cells: 0,
       n_unchecked_flagged_cells: 3, n_persons_with_unchecked_flagged: 2,
     });
+  });
+});
+
+describe('excluded unverified_quote cells keep their original stance', () => {
+  const q = [{ id: 1, category: 'c', consumer_question: 'Q1?' }];
+  it('breaks excluded cells down by stance per question and overall (Wilson CI, n), never counting them', () => {
+    const cells = haikuCells([
+      ans({ id: 1, video_id: 'v1', stance: 'yes', quote_verified: false }),
+      ans({ id: 2, video_id: 'v2', stance: 'yes', quote_verified: false }),
+      ans({ id: 3, video_id: 'v3', stance: 'yes' }),
+      ans({ id: 4, video_id: 'v4', stance: 'no', quote_verified: false }),
+      ans({ id: 5, video_id: 'v5', stance: 'no' }),
+      ans({ id: 6, video_id: 'v6', stance: 'no' }),
+      ans({ id: 7, video_id: 'v7', stance: 'mixed', quote_verified: false }),
+      ans({ id: 8, video_id: 'v8', valid: false, stance: null, confidence: null, quote_verified: false }),
+      ans({ id: 9, video_id: 'v9', stance: 'not_addressed', quote_verified: false }),
+    ], [1]);
+    const rows = toFinalRows(cells);
+    expect(rows.find((r) => r.video_id === 'v1')).toMatchObject({ stance: 'yes', status: 'unverified' });
+    expect(rows.find((r) => r.video_id === 'v8')).toMatchObject({ stance: null, status: 'invalid' });
+    const [t] = tallyByQuestion(rows, new Map(rows.map((r) => [r.video_id, `P${r.video_id}`])), q);
+    expect(t).toMatchObject({ n_excl_unverified_yes: 2, n_excl_unverified_no: 1, n_excl_unverified_mixed: 1, n_excl_unverified_cells: 4, n_excl_invalid_cells: 1, n_yes: 1, n_no: 2, n_mixed: 0 });
+    const f = quoteFailureByStance(cells);
+    expect([f.yes.k, f.yes.n, f.no.k, f.no.n, f.mixed.k, f.mixed.n]).toEqual([2, 3, 1, 3, 1, 1]);
+    expect(f.yes.p).toBeCloseTo(2 / 3, 10);
+    expect(f.yes.lo).not.toBeNull();
   });
 });
 
@@ -180,7 +206,7 @@ describe('rollup --resolution haiku-first-pass', () => {
     expect(t[0]).toMatchObject({ question_id: '1', n_persons: '6', n_yes: '6', n_unchecked_flagged_cells: '0', n_persons_with_unchecked_flagged: '0' });
     expect(t[1]).toMatchObject({ question_id: '2', n_persons: '6', n_no: '6', n_yes: '0', n_unchecked_flagged_cells: '12', n_persons_with_unchecked_flagged: '6', n_excl_pending_cells: '0' });
     // q3: a valid claim whose quote is not in the transcript is excluded and reported, never counted
-    expect(t[2]).toMatchObject({ question_id: '3', n_persons: '0', n_excl_unverified_cells: '12', n_persons_all_excluded: '6' });
+    expect(t[2]).toMatchObject({ question_id: '3', n_persons: '0', n_excl_unverified_cells: '12', n_excl_unverified_yes: '12', n_excl_unverified_no: '0', n_excl_unverified_mixed: '0', n_persons_all_excluded: '6' });
     expect(t[3]).toMatchObject({ question_id: '4', n_not_addressed: '6' });
     const sens = parseCsv(h.read('tally_by_question_sensitivity_per_video_haiku_only.csv'));
     expect(sens[1]).toMatchObject({ n_persons: '12', n_no: '12', resolution: HAIKU_RESOLUTION_LABEL });
@@ -189,6 +215,10 @@ describe('rollup --resolution haiku-first-pass', () => {
     expect(rep).toMatch(/gold_report_haiku_only\.md/);
     expect(rep).toContain('excluded, unverified_quote (a claim whose quote was not found in the transcript): 12');
     expect(rep).toContain('would have been flagged for a re-check (no, mixed or confidence < 70) and were NOT re-checked: 12');
+    expect(rep).toMatch(/## Quote-failure rate by stance/);
+    expect(rep).toMatch(/\| yes \| 50\.0% \(12\/24; Wilson 95% CI/); // q1 counted 12 + q3 unverified 12
+    expect(rep).toMatch(/\| no \| 0\.0% \(0\/12; Wilson 95% CI/);
+    expect(rep).toMatch(/\| mixed \| n\/a \(n=0\)/);
     // the full-mode files were not overwritten by the haiku run
     expect(h.read('tally_report.md')).not.toMatch(/Haiku-only/);
   });
@@ -330,7 +360,14 @@ describe('haiku gold: selection, sheet, report, no-spend path', () => {
     writeFileSync(file, csv);
     await importGold(['--file', file], h.deps);
     expect(h.db.rows('bt_gold_marks')).toHaveLength(12);
+    // marks that do not point at a counted first-pass answer of these videos (full-pipeline marks) must not mix in
+    const q3 = h.db.rows('bt_stance_answers').find((r) => r.video_id === goldIds[0] && r.question_id === 3)!; // unverified: not on the sheet
+    h.db.rows('bt_gold_marks').push(
+      { id: 9001, video_id: goldIds[0], question_id: 1, stance_answer_id: 123456, final_stance: 'yes', correct: false, quote_is_experiencer: null, note: null },
+      { id: 9002, video_id: goldIds[0], question_id: 3, stance_answer_id: q3.id, final_stance: 'yes', correct: false, quote_is_experiencer: null, note: null },
+    );
     await goldReport(args, h.deps);
+    expect(h.logs.join('\n')).toMatch(/ignored 2 gold marks that do not refer to a counted first-pass answer/);
     const rep = h.read('gold_report_haiku_only.md');
     expect(rep).toMatch(/no second model re-checked them/);
     expect(rep).toMatch(/\| Y \| 0\.0% \(0\/3; Wilson 95% CI/);
@@ -339,6 +376,24 @@ describe('haiku gold: selection, sheet, report, no-spend path', () => {
     expect(rep).toMatch(/\| >=90 \| 100\.0% \(3\/3;/);
     expect(rep).toMatch(/\| <70 \| n\/a \(n=0\)/);
     expect(rep).toMatch(/\| no \| 0\.0% \(0\/3;/);
+  });
+});
+
+describe('haiku gold selection warning', () => {
+  it('ignores skipped candidates with no transcript; warns for skipped candidates that have one', async () => {
+    const h = harness();
+    await h.firstPass();
+    const nde = h.db.rows('nde_analysis').map((r) => r.video_id as string);
+    const pilotIds = pilotOrder(nde, 20261118).slice(0, 4);
+    const order = goldOrder(nde, 20261118, pilotIds);
+    const args = ['--resolution', 'haiku-first-pass', '--pilot-n', '4', '--gold-n', '3'];
+    h.db.rows('nde_vids').find((r) => r.videoId === order[0])!.subtitles_punctuated = '';
+    h.db.tables.bt_stance_answers = h.db.rows('bt_stance_answers').filter((r) => r.video_id !== order[0]);
+    await goldSheet(args, h.deps);
+    expect(h.logs.filter((l) => /WARNING/.test(l))).toEqual([]);
+    h.db.tables.bt_stance_answers = h.db.rows('bt_stance_answers').filter((r) => r.video_id !== order[1]);
+    await goldSheet(args, h.deps);
+    expect(h.logs.filter((l) => /WARNING: 1 earlier candidates/.test(l))).toHaveLength(1);
   });
 });
 
