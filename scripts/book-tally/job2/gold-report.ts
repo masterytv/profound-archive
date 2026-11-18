@@ -7,11 +7,10 @@ import { writeFileSync } from 'fs';
 import path from 'path';
 import { readActiveQuestions, readNdeVideoIds, selectAll, type Db } from '../lib/supabase';
 import { ensureOutDir, helpText, intOpt, isDirectRun, makeCtx, parseCli, runCli, str, CliError, type Ctx, type Deps, type OptDef } from './cli';
-import { fetchAnswersByIds, fetchStanceRuns } from './db';
-import { isFlagged } from './flags';
+import { fetchStanceRuns } from './db';
 import { CONFIDENCE_BANDS, fmtProportion, goldStats, haikuGoldStats, latestMarks, type GoldMark, type GoldStats, type HaikuGoldStats, type HaikuMark } from './gold';
-import { HAIKU_SUFFIX, parseResolution } from './haiku';
-import { completeEligible, goldIdsFromRuns, haikuGoldSample } from './plan';
+import { HAIKU_SUFFIX, fetchFirstPassAnswers, haikuCells, parseResolution } from './haiku';
+import { completeEligible, goldIdsFromRuns, haikuGoldSample, incompleteSkipped } from './plan';
 
 const OPTIONS: Record<string, OptDef> = {
   resolution: { type: 'string', help: 'full (default) | haiku-first-pass: precision of the unchecked Haiku answers, split by would_be_flagged and confidence band' },
@@ -25,7 +24,7 @@ export function renderHaikuGoldMarkdown(h: HaikuGoldStats, nVideos: number, unli
   const L = [
     '# Gold-set report (Haiku-only, unchecked answers)', '',
     'The answers measured here are the unchecked first-pass answers of one model (Haiku): no second model re-checked them. This report is the only measure of how reliable they are. A human reviewer judged each sampled answer against the video.', '',
-    `${s.nMarked} reviewed cells over ${nVideos} gold videos (latest mark per cell). Intervals are Wilson 95%.${unlinked ? ` ${unlinked} marks without a usable first-pass answer link were left out of the splits.` : ''}`, '',
+    `${s.nMarked} reviewed cells over ${nVideos} gold videos (latest mark per cell). Intervals are Wilson 95%.${unlinked ? ` ${unlinked} marks that do not refer to a counted first-pass answer of these videos were ignored.` : ''}`, '',
     '## Precision per stance', '', '| stance | precision (correct / n) |', '|---|---|',
     `| yes | ${fmtProportion(s.perStance.yes)} |`,
     `| no | ${fmtProportion(s.perStance.no)} |`,
@@ -52,7 +51,11 @@ async function haikuReport(ctx: Ctx, db: Db, seed: number, pilotN: number, goldN
   const qIds = (await readActiveQuestions(db)).map((q) => q.id);
   const s = await haikuGoldSample(db, { seed, pilotN, goldN }, await readNdeVideoIds(db), await fetchStanceRuns(db), completeEligible(db, qIds));
   if (s.chosen.length < goldN) throw new CliError(`only ${s.chosen.length} pilot-disjoint NDE videos with a complete first-pass row set (need ${goldN})`);
-  if (s.skipped.length) ctx.log(`WARNING: ${s.skipped.length} earlier candidates lack a complete first-pass row set; this selection must equal the one gold-sheet used (same seed, pilot-n, gold-n, after the full first pass).`);
+  const incomplete = await incompleteSkipped(db, s.skipped); // no-transcript videos never get rows and do not destabilise the selection
+  if (incomplete.length) ctx.log(`WARNING: ${incomplete.length} earlier candidates have a transcript but lack a complete first-pass row set; this selection must equal the one gold-sheet used (same seed, pilot-n, gold-n, after the full first pass).`);
+  // Only marks on a counted first-pass answer of a haiku gold video count (the answers the haiku sheet lists),
+  // so marks from the full pipeline (recheck/arbiter answers, other videos) cannot mix in.
+  const cells = new Map(haikuCells(await fetchFirstPassAnswers(db, s.chosen, 25), qIds).filter((c) => c.category === 'counted').map((c) => [c.id, c]));
   const raw: Array<GoldMark & { id: number; stance_answer_id: number | null }> = [];
   for (let i = 0; i < s.chosen.length; i += 25) {
     raw.push(...(await selectAll<GoldMark & { id: number; stance_answer_id: number | null }>(
@@ -60,16 +63,16 @@ async function haikuReport(ctx: Ctx, db: Db, seed: number, pilotN: number, goldN
       { orderBy: 'id', filter: (q) => q.in('video_id', s.chosen.slice(i, i + 25)) },
     )));
   }
-  const latest = latestMarks(raw);
+  const eligible = raw.filter((m) => m.stance_answer_id !== null && cells.has(m.stance_answer_id));
+  const ignored = raw.length - eligible.length;
+  if (ignored) ctx.log(`ignored ${ignored} gold marks that do not refer to a counted first-pass answer of the haiku gold videos`);
+  const latest = latestMarks(eligible);
   if (latest.length === 0) throw new CliError('no gold marks imported yet for the haiku gold videos');
-  const answers = await fetchAnswersByIds(db, latest.flatMap((m) => (m.stance_answer_id === null ? [] : [m.stance_answer_id])));
-  const marks: HaikuMark[] = [];
-  let unlinked = 0;
-  for (const m of latest) {
-    const a = m.stance_answer_id === null ? undefined : answers.get(m.stance_answer_id);
-    if (!a) { unlinked++; continue; }
-    marks.push({ ...m, confidence: a.confidence, wouldBeFlagged: isFlagged(a) });
-  }
+  const marks: HaikuMark[] = latest.map((m) => {
+    const c = cells.get(m.stance_answer_id!)!;
+    return { ...m, confidence: c.confidence, wouldBeFlagged: c.flagged };
+  });
+  const unlinked = ignored;
   const stats = haikuGoldStats(marks);
   writeFileSync(path.join(ensureOutDir(ctx), `gold_report${HAIKU_SUFFIX}.md`), renderHaikuGoldMarkdown(stats, s.chosen.length, unlinked));
   ctx.log(`wrote out/gold_report${HAIKU_SUFFIX}.md (${stats.base.nMarked} cells; all-claims precision ${fmtProportion(stats.base.allClaims)})`);

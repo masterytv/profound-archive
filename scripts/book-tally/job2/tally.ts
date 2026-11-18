@@ -50,12 +50,18 @@ export interface TallyRow {
   n_excl_pending_cells: number;
   /** Haiku-only resolution: counted video-cells that would have been flagged for re-check (never re-checked). */
   n_unchecked_flagged_cells: number;
+  /** Haiku-only resolution: excluded unverified_quote cells by the model's ORIGINAL stance (a stance-dependent quote-failure rate would bias the tally unseen). Cell counts; no person-level variant, since one person's cells can differ. */
+  n_excl_unverified_yes: number;
+  n_excl_unverified_no: number;
+  n_excl_unverified_mixed: number;
   /** Haiku-only resolution: counted persons with at least one such unchecked flagged cell for this question. */
   n_persons_with_unchecked_flagged: number;
 }
 
 /** Extra columns of the haiku-only CSVs (the `resolution` column is added by rollup.ts). */
-export const HAIKU_EXTRA_HEADERS: Array<keyof TallyRow> = ['n_persons_with_unchecked_flagged', 'n_unchecked_flagged_cells'];
+export const HAIKU_EXTRA_HEADERS: Array<keyof TallyRow> = [
+  'n_persons_with_unchecked_flagged', 'n_unchecked_flagged_cells', 'n_excl_unverified_yes', 'n_excl_unverified_no', 'n_excl_unverified_mixed',
+];
 
 export const TALLY_HEADERS: Array<keyof TallyRow> = [
   'question_id', 'category', 'consumer_question', 'n_persons',
@@ -82,7 +88,7 @@ export function tallyByQuestion(
   opts: { noTranscriptPersons?: number } = {},
 ): TallyRow[] {
   // question -> person -> {final stances, excluded counts}
-  type Cell = { final: Stance[]; unverified: number; invalid: number; pending: number; flagged: number };
+  type Cell = { final: Stance[]; unverified: number; invalid: number; pending: number; flagged: number; unvByStance: Record<'yes' | 'no' | 'mixed', number> };
   const byQ = new Map<number, Map<string, Cell>>();
   for (const r of rows) {
     const person = personOf.get(r.video_id);
@@ -90,9 +96,12 @@ export function tallyByQuestion(
     let m = byQ.get(r.question_id);
     if (!m) byQ.set(r.question_id, (m = new Map()));
     let c = m.get(person);
-    if (!c) m.set(person, (c = { final: [], unverified: 0, invalid: 0, pending: 0, flagged: 0 }));
+    if (!c) m.set(person, (c = { final: [], unverified: 0, invalid: 0, pending: 0, flagged: 0, unvByStance: { yes: 0, no: 0, mixed: 0 } }));
     if (r.status === 'final' && r.stance) { c.final.push(r.stance); if (r.flagged) c.flagged++; }
-    else if (r.status === 'unverified') c.unverified++;
+    else if (r.status === 'unverified') {
+      c.unverified++;
+      if (r.stance === 'yes' || r.stance === 'no' || r.stance === 'mixed') c.unvByStance[r.stance]++;
+    }
     else if (r.status === 'invalid') c.invalid++;
     else c.pending++;
   }
@@ -100,7 +109,9 @@ export function tallyByQuestion(
     const m = byQ.get(q.id) ?? new Map<string, Cell>();
     const n = { yes: 0, no: 0, mixed: 0, not_addressed: 0 };
     let persons = 0, allExcluded = 0, unv = 0, inv = 0, pend = 0, flagCells = 0, flagPersons = 0;
+    const unvS = { yes: 0, no: 0, mixed: 0 };
     for (const c of m.values()) {
+      for (const k of ['yes', 'no', 'mixed'] as const) unvS[k] += c.unvByStance[k];
       unv += c.unverified; inv += c.invalid; pend += c.pending;
       if (c.final.length === 0) { allExcluded++; continue; }
       persons++;
@@ -126,6 +137,7 @@ export function tallyByQuestion(
       n_excluded_unverified_cells: unv + inv + pend,
       n_excl_unverified_cells: unv, n_excl_invalid_cells: inv, n_excl_pending_cells: pend,
       n_unchecked_flagged_cells: flagCells, n_persons_with_unchecked_flagged: flagPersons,
+      n_excl_unverified_yes: unvS.yes, n_excl_unverified_no: unvS.no, n_excl_unverified_mixed: unvS.mixed,
     };
   });
 }

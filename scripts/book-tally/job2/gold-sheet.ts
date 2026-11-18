@@ -10,7 +10,7 @@ import { ensureOutDir, helpText, intOpt, isDirectRun, makeCtx, parseCli, runCli,
 import { neutralizeFormula, toCsv } from './csv';
 import { fetchStanceRuns } from './db';
 import { NA_ROWS_PER_VIDEO, selectGoldRows, youtubeLink } from './gold';
-import { completeEligible, goldIdsFromRuns, haikuGoldSample } from './plan';
+import { completeEligible, goldIdsFromRuns, haikuGoldSample, incompleteSkipped } from './plan';
 import { HAIKU_SUFFIX, fetchFirstPassAnswers, haikuCells, parseResolution } from './haiku';
 import type { Stance } from './answers';
 
@@ -66,7 +66,8 @@ async function haikuSheet(ctx: Ctx, db: Db, seed: number, pilotN: number, goldN:
   const nde = await readNdeVideoIds(db);
   const s = await haikuGoldSample(db, { seed, pilotN, goldN }, nde, await fetchStanceRuns(db), completeEligible(db, qIds));
   if (s.chosen.length < goldN) throw new CliError(`only ${s.chosen.length} pilot-disjoint NDE videos with a complete first-pass row set (need ${goldN}); finish the first pass first`);
-  if (s.skipped.length) ctx.log(`WARNING: ${s.skipped.length} earlier candidates in the seeded order lack a complete first-pass row set and were skipped; the selection will change when they complete. Build the final sheet after the full first pass.`);
+  const incomplete = await incompleteSkipped(db, s.skipped); // videos without a transcript never get rows and do not make the selection unstable
+  if (incomplete.length) ctx.log(`WARNING: ${incomplete.length} earlier candidates in the seeded order have a transcript but lack a complete first-pass row set and were skipped; the selection will change when they complete. Build the final sheet after the full first pass.`);
   const cells = haikuCells(await fetchFirstPassAnswers(db, s.chosen, 25), qIds).filter((c) => c.category === 'counted');
   const chosen = selectGoldRows(cells.map((c) => ({ ...c, stance: c.stance as Stance, status: 'final' })), seed, NA_ROWS_PER_VIDEO);
   const detail = new Map<number, { quote: string | null; start_seconds: number | null; model: string }>();

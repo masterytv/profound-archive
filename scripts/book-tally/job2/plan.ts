@@ -200,6 +200,14 @@ export function completeEligible(db: Db, questionIds: readonly number[]): Eligib
   return async (page) => completeVideos(await fetchFirstPassAnswers(db, page, 25), questionIds);
 }
 
+/** Walked candidates that were skipped although they HAVE a transcript, i.e. whose first pass is not complete yet. */
+export async function incompleteSkipped(db: Db, skipped: readonly string[]): Promise<string[]> {
+  if (skipped.length === 0) return [];
+  const have = new Set<string>();
+  for (let i = 0; i < skipped.length; i += 25) for (const v of await transcriptEligible(db)(skipped.slice(i, i + 25))) have.add(v);
+  return skipped.filter((v) => have.has(v));
+}
+
 export interface HaikuGoldSample { chosen: string[]; skipped: string[]; pilotExcluded: number }
 
 /**

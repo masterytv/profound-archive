@@ -21,6 +21,8 @@ import path from 'path';
 import { readActiveQuestions, readNdeVideoIds, selectAllKeyset, type Db } from '../lib/supabase';
 import { CliError, ensureOutDir, helpText, isDirectRun, makeCtx, parseCli, runCli, str, type Ctx, type Deps, type OptDef } from './cli';
 import { toCsv } from './csv';
+import { fmtProportion } from './gold';
+import type { Proportion } from '../lib/stats';
 import { VIEW_VIDEO_CHUNK, fetchStanceRuns } from './db';
 import { findMergeConflicts, type MergeConflict } from '../job1/merge-conflicts';
 import {
@@ -28,7 +30,7 @@ import {
 } from './tally';
 import {
   HAIKU_RESOLUTION_LABEL, HAIKU_SUFFIX, completeVideos, countCategories, fetchFirstPassAnswers, haikuCells, parseResolution,
-  toFinalRows, type CategoryCounts,
+  quoteFailureByStance, toFinalRows, type CategoryCounts,
 } from './haiku';
 
 const OPTIONS: Record<string, OptDef> = {
@@ -75,7 +77,7 @@ export const HAIKU_NOTICE = 'Every answer in this tally is the unchecked first-p
 
 export function haikuReport(a: {
   warningText: string; nVideos: number; nPersons: number; noTranscriptVideos: number; noTranscriptPersons: number;
-  incomplete: number; counts: CategoryCounts; nCells: number;
+  incomplete: number; counts: CategoryCounts; nCells: number; quoteFailure: Record<'yes' | 'no' | 'mixed', Proportion>;
 }): string {
   return [
     '# Tally report (Haiku-only, unchecked)', '',
@@ -90,6 +92,12 @@ export function haikuReport(a: {
     `- of the counted cells, would have been flagged for a re-check (no, mixed or confidence < 70) and were NOT re-checked: ${a.counts.counted_flagged}`,
     `- excluded, invalid (schema or coverage failure): ${a.counts.invalid}`,
     `- excluded, unverified_quote (a claim whose quote was not found in the transcript): ${a.counts.unverified_quote}`,
+    '## Quote-failure rate by stance', '',
+    'Share of valid claim answers (by the model\'s original stance) whose quote was NOT found in the transcript and which are therefore excluded. If these differ by stance, the exclusion itself biases the tally; the per-question columns n_excl_unverified_yes / _no / _mixed give the same breakdown.', '',
+    '| original stance | quote failures (failed / valid claims) |', '|---|---|',
+    `| yes | ${fmtProportion(a.quoteFailure.yes)} |`,
+    `| no | ${fmtProportion(a.quoteFailure.no)} |`,
+    `| mixed | ${fmtProportion(a.quoteFailure.mixed)} |`, '',
     '- *_cells columns count video-level answers; n_persons_* columns count persons; n_unchecked_flagged_cells and n_persons_with_unchecked_flagged show how much of each question rests on answers that would normally have been re-checked.', '',
   ].join('\n');
 }
@@ -127,7 +135,7 @@ async function haikuRollup(ctx: Ctx, db: Db, i: HaikuInput): Promise<void> {
   writeFileSync(path.join(dir, `tally_by_question_sensitivity_per_video${HAIKU_SUFFIX}.csv`), toCsv(headers, out(perVideo)));
   writeFileSync(path.join(dir, `tally_report${HAIKU_SUFFIX}.md`), haikuReport({
     warningText, nVideos: i.nde.length, nPersons: new Set(i.personOf.values()).size, noTranscriptVideos: noTranscriptVideos.length,
-    noTranscriptPersons, incomplete: incomplete.length, counts, nCells: cells.length,
+    noTranscriptPersons, incomplete: incomplete.length, counts, nCells: cells.length, quoteFailure: quoteFailureByStance(cells),
   }));
   ctx.log(`wrote out/tally_by_question${HAIKU_SUFFIX}.csv, out/tally_by_question_sensitivity_per_video${HAIKU_SUFFIX}.csv and out/tally_report${HAIKU_SUFFIX}.md (${i.qs.length} questions)`);
 }

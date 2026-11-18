@@ -17,6 +17,7 @@ import { selectAllKeyset, type Db } from '../lib/supabase';
 import { VIEW_VIDEO_CHUNK } from './db';
 import { isFlagged, type AnswerLite } from './flags';
 import type { Stance } from './answers';
+import { wilson, type Proportion } from '../lib/stats';
 import type { FinalRow } from './tally';
 
 export type Resolution = 'full' | 'haiku-first-pass';
@@ -87,7 +88,8 @@ export function haikuCells(rows: readonly FirstPassAnswer[], questionIds: Iterab
 export function toFinalRows(cells: readonly HaikuCell[]): FinalRow[] {
   return cells.map((c) => ({
     video_id: c.video_id, question_id: c.question_id,
-    stance: c.category === 'counted' ? c.stance : null,
+    // an unverified_quote cell keeps the model's original stance so exclusions can be broken down by stance
+    stance: c.category === 'invalid' ? null : c.stance,
     status: c.category === 'counted' ? 'final' : c.category === 'invalid' ? 'invalid' : 'unverified',
     flagged: c.flagged,
   }));
@@ -125,6 +127,20 @@ export async function fetchFirstPassAnswers(db: Db, videoIds: readonly string[],
     out.push(...(await selectAllKeyset<FirstPassAnswer & Record<string, unknown>>(
       db, 'bt_stance_answers', FIRST_PASS_COLS, 'id', (q) => q.eq('pass', 'first').in('video_id', ids),
     )));
+  }
+  return out;
+}
+
+/**
+ * Quote-failure rate by the model's original stance, over valid claim answers (yes / no / mixed):
+ * failures = unverified_quote, n = counted + unverified_quote. A rate that differs by stance means the
+ * exclusion itself is biased toward one stance.
+ */
+export function quoteFailureByStance(cells: readonly HaikuCell[]): Record<'yes' | 'no' | 'mixed', Proportion> {
+  const out = {} as Record<'yes' | 'no' | 'mixed', Proportion>;
+  for (const st of ['yes', 'no', 'mixed'] as const) {
+    const sel = cells.filter((c) => c.stance === st && c.category !== 'invalid');
+    out[st] = wilson(sel.filter((c) => c.category === 'unverified_quote').length, sel.length);
   }
   return out;
 }
