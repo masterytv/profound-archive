@@ -37,9 +37,8 @@ repo-root CLAUDE.md.
 Prefix every command with
 `npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/`.
 
-1. **Check the Haiku-only mode is reviewed.** `job2/haiku.ts`, rollup and gold-sheet
-   `--resolution haiku-first-pass`. If no APPROVE from a reviewer is recorded in git history or in
-   PR masterytv/profound-archive#82, have the reviewer agent review it first.
+1. **Haiku-only mode: reviewed and APPROVED** at 5ceb8b9. The follow-up (quote-failure
+   breakdown by stance, gold fixes) landed in cd80e71, with 454 tests passing. Nothing to do.
 2. **Run the free estimates** (no spend). Each writes a `bt_runs` row with status `estimated`:
    - `job1/judge-pairs.ts --estimate` (Haiku stage)
    - `job1/extract-names.ts --estimate`
