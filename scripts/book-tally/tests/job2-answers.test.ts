@@ -76,9 +76,13 @@ describe('parseAnswers', () => {
     const row = parse([ans(1, 'yes', 90, 'I met my grandmother and she hugged me tightly')], [1]).rows[0];
     expect(row).toMatchObject({ valid: true, stance: 'yes', quoteVerified: false, quoteNormOffset: null, startSeconds: null, error: 'quote_not_found' });
   });
-  it('quote shorter than 5 words, or with an ellipsis, is unverified', () => {
+  it('quote shorter than 5 words is unverified', () => {
     expect(parse([ans(1, 'yes', 90, 'a bright light')], [1]).rows[0]).toMatchObject({ quoteVerified: false, error: 'quote_too_short' });
-    expect(parse([ans(1, 'yes', 90, 'I saw a bright ... end of the tunnel')], [1]).rows[0]).toMatchObject({ quoteVerified: false, error: 'quote_ellipsis' });
+  });
+  it('a gapped or joined quote (words skipped) is unverified; a verbatim span that contains "..." verifies', () => {
+    expect(parse([ans(1, 'yes', 90, 'I saw a bright ... end of the tunnel')], [1]).rows[0]).toMatchObject({ quoteVerified: false, error: 'quote_not_found' });
+    const withDots = { transcript: prepareTranscript('Well... I saw a bright light... and then it was over.') };
+    expect(parse([ans(1, 'yes', 90, 'I saw a bright light... and then')], [1], withDots).rows[0]).toMatchObject({ quoteVerified: true, error: null });
   });
   it('verification ignores case, punctuation and whitespace differences', () => {
     const row = parse([ans(1, 'yes', 90, '  I SAW, a bright light -- at the end of the tunnel!  ')], [1]).rows[0];
