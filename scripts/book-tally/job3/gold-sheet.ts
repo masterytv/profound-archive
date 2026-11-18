@@ -17,6 +17,7 @@
  * joined with " | "; mark columns left blank for the owner). The files hold model-returned quotes: out/
  * is gitignored. Logs print counts only, never quote text.
  */
+import { reviewOrder, stratumOf, BLOCK_SIZE, REVIEW_MIX, type Stratum } from './review-order';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { selectAll, selectAllKeyset, type Db } from '../lib/supabase';
@@ -169,6 +170,9 @@ export interface SheetRow {
   /** multiple choice: the counted answers only. */
   answers: SheetAnswer[];
   confidence: number | null;
+  /** 0-based position in the seeded, stratified review order (job3/review-order.ts). */
+  review_order: number;
+  stratum: Stratum;
 }
 
 export function stanceLabel(item: CodeItem, stance: 'yes' | 'no' | 'mixed'): string {
@@ -177,7 +181,7 @@ export function stanceLabel(item: CodeItem, stance: 'yes' | 'no' | 'mixed'): str
 }
 
 /** `link(quote)` returns the youtube link for a quote (timestamp when it can be aligned). */
-export function buildSheetRow(sel: SelectedRow, title: string, link: (quote: string | null) => string): SheetRow {
+export function buildSheetRow(sel: SelectedRow, title: string, link: (quote: string | null) => string): Omit<SheetRow, 'review_order' | 'stratum'> {
   const { item, row, outcome } = sel;
   const base = {
     coded_answer_id: row.id, video_id: row.video_id, title, item_key: item.key, question_id: item.question_id ?? null,
@@ -200,7 +204,7 @@ export function buildSheetRow(sel: SelectedRow, title: string, link: (quote: str
 export const MARK_COLUMNS = ['addressed_correct', 'answer_correct', 'wrong_choices', 'missing_answer', 'quote_is_experiencer', 'note'] as const;
 
 export const SHEET_HEADERS = [
-  'coded_answer_id', 'video_id', 'title', 'item_key', 'question_id', 'ask', 'question', 'type', 'outcome',
+  'review_order', 'stratum', 'coded_answer_id', 'video_id', 'title', 'item_key', 'question_id', 'ask', 'question', 'type', 'outcome',
   'answer', 'answer_codes', 'quote', 'youtube_link', 'confidence', ...MARK_COLUMNS,
 ] as const;
 
@@ -213,7 +217,7 @@ export function csvRecord(r: SheetRow): Record<string, unknown> {
   const quote = mc ? r.answers.map((a) => a.quote).join(' | ') : r.quote ?? '';
   const link = mc ? r.answers.map((a) => a.youtube_link).join(' | ') : r.youtube_link ?? '';
   return {
-    coded_answer_id: r.coded_answer_id, video_id: r.video_id, title: neutralizeFormula(r.title), item_key: r.item_key, question_id: r.question_id ?? '',
+    review_order: r.review_order + 1, stratum: r.stratum, coded_answer_id: r.coded_answer_id, video_id: r.video_id, title: neutralizeFormula(r.title), item_key: r.item_key, question_id: r.question_id ?? '',
     ask: neutralizeFormula(r.ask), question: neutralizeFormula(r.question ?? ''), type: r.type, outcome: r.outcome,
     answer: neutralizeFormula(answer), answer_codes: mc ? r.answers.map((a) => a.code).join(' ') : '', quote: neutralizeFormula(quote), youtube_link: link,
     confidence: r.confidence ?? '', addressed_correct: '', answer_correct: '', wrong_choices: '', missing_answer: '', quote_is_experiencer: '', note: '',
@@ -228,12 +232,16 @@ export interface SheetHeader {
   codebook_version: string;
   run_ids: string[];
   video_ids: string[];
+  /** Review order: cards per block and the block's make-up. */
+  review_block: number;
+  review_mix: Record<Stratum, number>;
 }
 
 export function sheetHeader(sel: GoldSelection): SheetHeader {
   return {
     n: sel.params.n, seed: sel.params.seed, na_per_video: sel.params.naPerVideo, prompt_hash: sel.promptHash,
     codebook_version: sel.codebookVersion, run_ids: sel.runIds, video_ids: sel.videoIds,
+    review_block: BLOCK_SIZE, review_mix: { ...REVIEW_MIX },
   };
 }
 
@@ -247,16 +255,28 @@ async function readTitles(db: Db, ids: readonly string[]): Promise<Map<string, s
   return titles;
 }
 
+export function orderInput(s: SelectedRow) {
+  return { coded_answer_id: s.row.id, isFact: s.item.key.startsWith('f'), kind: s.item.type, outcome: s.outcome };
+}
+
+/** The review order of a selection (the same function the gold report uses). */
+export function selectionOrder(sel: GoldSelection): Map<number, number> {
+  return reviewOrder(sel.rows.map(orderInput), sel.params.seed);
+}
+
 /** Titles and timestamp links for a selection (reads nde_vids; the transcript never leaves this function). */
 export async function buildSheet(db: Db, sel: GoldSelection): Promise<SheetRow[]> {
   const titles = await readTitles(db, sel.videoIds);
+  const order = selectionOrder(sel);
   const out: SheetRow[] = [];
   for (const v of sel.videoIds) {
     const segments = (await fetchTranscript(db, v, true))?.timestamped ?? null;
     const link = (quote: string | null) => youtubeUrl(v, quote ? alignTimestamp(quote, segments) : null);
-    for (const s of sel.rows.filter((x) => x.row.video_id === v)) out.push(buildSheetRow(s, titles.get(v) ?? '', link));
+    for (const s of sel.rows.filter((x) => x.row.video_id === v)) {
+      out.push({ ...buildSheetRow(s, titles.get(v) ?? '', link), review_order: order.get(s.row.id)!, stratum: stratumOf(orderInput(s)) });
+    }
   }
-  return out;
+  return out.sort((a, b) => a.review_order - b.review_order);
 }
 
 export async function main(argv: string[], deps: Deps = {}): Promise<void> {

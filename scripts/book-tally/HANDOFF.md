@@ -53,6 +53,13 @@ repo-root CLAUDE.md.
        rows and where addressed_correct = N.
     3. Run `import-gold.ts`, then `gold-report.ts`.
   - The earlier stance-v1 page (5t1QCp9V...) is superseded.
+  - **Review in blocks (owner's request, about 1 hour per block).** Every sheet row has a seeded,
+    stratified `review_order` (`job3/review-order.ts`). Each block of 20 holds 8 yes/no questions,
+    6 multiple-choice questions, 3 facts and 3 not-addressed rows. The page shows block 1 first,
+    and "Show the next 20" adds more.
+  - Report on what was marked with `gold-report.ts --first <N>`, using whole blocks: 20, 40, ...
+    It refuses if any of the first N is unmarked. Its "By review group" table holds the unbiased
+    per-group figures; the combined figures mix sampling rates.
 - **Next steps:**
   1. After the owner applies 002, check read-only that both tables exist and are empty.
   2. Trial: `job3/run-codebook.ts --estimate --sample 40 --budget-usd <cap>`, then the owner's yes,

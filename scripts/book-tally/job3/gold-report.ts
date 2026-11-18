@@ -24,11 +24,14 @@ import { selectAll, type Db } from '../lib/supabase';
 import { wilson, type Proportion } from '../lib/stats';
 import { CliError, helpText, isDirectRun, makeCtx, parseCli, runCli, type Deps, type OptDef } from '../job1/cli';
 import { loadCodebookPrompt } from './codebook';
-import { GOLD_OPTIONS, goldParams, selectGold, type GoldSelection } from './gold-sheet';
+import { GOLD_OPTIONS, goldParams, selectGold, selectionOrder, type GoldSelection } from './gold-sheet';
+import { BLOCK_SIZE, REVIEW_MIX, STRATA, stratumOf, type Stratum } from './review-order';
+import { intOpt } from '../job1/cli';
 import { latestMarkByAnswer, MARK_SELECT, readMarksByAnswer, type DbMark } from './import-gold';
 import { countedChoices } from './validate';
 
 const OPTIONS: Record<string, OptDef> = {
+  first: { type: 'string', help: 'report on the first N cards of the seeded review order only (whole blocks of 20 are best); all of them must be marked' },
   ...GOLD_OPTIONS,
   'allow-unmarked': { type: 'boolean', help: 'write out/coded_gold_report_PARTIAL.md (NOT FOR PUBLICATION) although some sheet rows have no mark' },
 };
@@ -128,10 +131,40 @@ export function fmt(p: Proportion): string {
   return `${f(p.p)}% (${p.k}/${p.n}; Wilson 95% CI ${f(p.lo)}-${f(p.hi)}%)`;
 }
 
-export function renderReport(s: GoldStats, h: { codebookVersion: string; promptHash: string; videos: number; params: { n: number; seed: number; naPerVideo: number } }, partial: boolean): string {
+export interface SampleInfo { first: number; sheetRows: number; byStratum: Record<Stratum, GoldStats> }
+
+/** Per review stratum: the figures that are unbiased under the stratified review sample. */
+export function stratumSection(sample: SampleInfo): string[] {
+  const row = (k: Stratum, label: string, what: string, p: Proportion) => `| ${label} | ${what} | ${fmt(p)} |`;
+  const b = sample.byStratum;
+  return [
+    '## By review group (the reliable figures for a review sample)', '',
+    `Cards 1 to ${sample.first} of the seeded review order over the ${sample.sheetRows}-row sheet. Each block of ${BLOCK_SIZE} holds ` +
+    `${REVIEW_MIX.yes_no} yes/no, ${REVIEW_MIX.multiple_choice} multiple-choice, ${REVIEW_MIX.fact} fact and ${REVIEW_MIX.not_addressed} not-addressed cards, ` +
+    'each drawn at random within its group. The groups are sampled at different rates, so read these per-group figures, not the combined ones above.', '',
+    '| group | measure | result (k/n) |', '|---|---|---|',
+    row('yes_no', 'yes/no questions', 'rightly addressed', b.yes_no.addressed.overall),
+    row('yes_no', 'yes/no questions', 'stance correct (of rightly addressed)', mergeStance(b.yes_no)),
+    row('multiple_choice', 'multiple-choice questions', 'rightly addressed', b.multiple_choice.addressed.overall),
+    row('multiple_choice', 'multiple-choice questions', 'listed answers right', b.multiple_choice.mcAnswers),
+    row('fact', 'facts', 'rightly addressed', b.fact.addressed.overall),
+    row('not_addressed', 'not addressed (spot check)', 'truly not addressed', b.not_addressed.notAddressed),
+    `| all counted cards | quote is the experiencer's own words | ${fmt(wilson(STRATA.filter((k) => k !== 'not_addressed').reduce((n, k) => n + b[k].quoteExperiencer.k, 0), STRATA.filter((k) => k !== 'not_addressed').reduce((n, k) => n + b[k].quoteExperiencer.n, 0)))} |`,
+    '',
+  ];
+}
+
+function mergeStance(s: GoldStats): Proportion {
+  const k = s.stance.yes.k + s.stance.no.k + s.stance.mixed.k;
+  const n = s.stance.yes.n + s.stance.no.n + s.stance.mixed.n;
+  return wilson(k, n);
+}
+
+export function renderReport(s: GoldStats, h: { codebookVersion: string; promptHash: string; videos: number; params: { n: number; seed: number; naPerVideo: number } }, partial: boolean, sample?: SampleInfo): string {
   const ids = (xs: readonly number[]) => (xs.length ? xs.slice(0, 50).join(', ') + (xs.length > 50 ? `, ... (${xs.length} in all)` : '') : 'none');
   return [
     partial ? '# Codebook gold-set report: PARTIAL, NOT FOR PUBLICATION' : '# Codebook gold-set report', '',
+    ...(sample ? [`**Review sample:** the first ${sample.first} cards of the seeded review order (of ${sample.sheetRows} on the sheet).`, '', ...stratumSection(sample)] : []),
     ...(partial ? [`**NOT FOR PUBLICATION.** ${s.unmarkedIds.length} of ${s.rows} sheet rows have no mark. The figures below rest on the rows the owner chose to mark, which may not be representative.`, ''] : []),
     `Codebook ${h.codebookVersion}, prompt ${h.promptHash.slice(0, 12)}. ${h.videos} videos; sheet built with n=${h.params.n}, seed=${h.params.seed}, na-per-video=${h.params.naPerVideo}. ` +
     'The owner judged each sampled answer against the video; the latest mark per coded answer is used. Every figure is a proportion with k/n and a Wilson 95% interval.', '',
@@ -190,16 +223,24 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const p = goldParams(v);
   const sel = await selectGold(ctx.db, loadCodebookPrompt(), p);
   if (sel.rows.length === 0) throw new CliError('the gold sheet is empty (no eligible videos)');
-  const rows = reportRows(sel);
-  const { marks, extraMarkIds } = await readSheetMarks(ctx.db, sel, rows);
+  const allRows = reportRows(sel);
+  const first = intOpt(v.first, 'first');
+  const order = selectionOrder(sel);
+  const rows = first === undefined ? allRows : allRows.filter((r) => order.get(r.coded_answer_id)! < first);
+  if (first !== undefined && (first < 1 || rows.length === 0)) throw new CliError('--first must be at least 1');
+  const { marks, extraMarkIds } = await readSheetMarks(ctx.db, sel, allRows);
   const stats = goldStats(rows, marks, extraMarkIds);
+  const sample: SampleInfo | undefined = first === undefined ? undefined : {
+    first: rows.length, sheetRows: allRows.length,
+    byStratum: Object.fromEntries(STRATA.map((k) => [k, goldStats(rows.filter((r) => stratumOf(r) === k), marks)])) as Record<Stratum, GoldStats>,
+  };
   const partial = stats.unmarkedIds.length > 0;
   if (partial && v['allow-unmarked'] !== true) {
     throw new CliError(`${stats.unmarkedIds.length} of ${stats.rows} sheet rows have no mark (first ids: ${stats.unmarkedIds.slice(0, 10).join(', ')}). Mark and import them (import-gold.ts skips blank rows), check --n/--seed/--na-per-video match the sheet, or pass --allow-unmarked for a clearly marked partial report. No report written.`);
   }
   mkdirSync(ctx.outDir, { recursive: true });
   const file = partial ? PARTIAL_FILE : REPORT_FILE;
-  writeFileSync(path.join(ctx.outDir, file), renderReport(stats, { codebookVersion: sel.codebookVersion, promptHash: sel.promptHash, videos: sel.videoIds.length, params: p }, partial));
+  writeFileSync(path.join(ctx.outDir, file), renderReport(stats, { codebookVersion: sel.codebookVersion, promptHash: sel.promptHash, videos: sel.videoIds.length, params: p }, partial, sample));
   ctx.log(`wrote ${file}: ${stats.marked} of ${stats.rows} sheet rows marked; ${stats.extraMarkIds.length} marks not on the sheet; addressed precision ${fmt(stats.addressed.overall)}`);
 }
 
