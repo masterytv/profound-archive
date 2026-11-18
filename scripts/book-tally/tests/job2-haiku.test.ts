@@ -441,17 +441,60 @@ describe('review round 1 fixes', () => {
     const answers = h.db.rows('bt_stance_answers');
     const old = answers.find((r) => r.id === Number(claim.answer_id))!;
     answers.push({ ...old, id: Math.max(...answers.map((r) => r.id as number)) + 1, attempt: 99 });
-    await goldReport(args, h.deps);
+    // its sheet row (the new answer) is now unmarked: refused by default
+    await expect(goldReport(args, h.deps)).rejects.toThrow(/1 of the 12 rows of the Haiku-only gold sheet have no usable mark/);
+    await goldReport([...args, '--allow-unmarked'], h.deps);
     rep = h.read('gold_report_haiku_only.md');
     expect(rep).toMatch(/\| all non-not_addressed answers \| 100\.0% \(5\/5;/);
     expect(rep).toMatch(/2 imported marks were left out/);
+    expect(rep).toContain('Coverage: 11 of 12 sheet rows marked.');
+    expect(rep).toMatch(/WARNING: partial coverage\.\*\* 1 sheet rows have no mark\. [\s\S]*Do not publish them/);
   });
 
   it('gold report refuses when a gold video has no mark (selection moved or partial import) and writes nothing', async () => {
     const { h, args, sheet } = await markedHaikuGold();
     const victim = sheet[0].video_id;
     h.db.tables.bt_gold_marks = h.db.rows('bt_gold_marks').filter((m) => m.video_id !== victim);
-    await expect(goldReport(args, h.deps)).rejects.toThrow(new RegExp(`1 of the 3 gold videos have no mark[\\s\\S]*${victim}[\\s\\S]*no report was written`));
+    await expect(goldReport(args, h.deps)).rejects.toThrow(new RegExp(`4 of the 12 rows of the Haiku-only gold sheet have no usable mark; 1 gold videos have none at all \\(e\\.g\\. ${victim}\\)[\\s\\S]*No report was written`));
     expect(() => h.read('gold_report_haiku_only.md')).toThrow();
+  });
+
+  it('gold report refuses a partly marked sheet (blank rows are skipped on import); --allow-unmarked states the coverage', async () => {
+    const h = harness();
+    await h.firstPass();
+    const args = ['--resolution', 'haiku-first-pass', '--pilot-n', '4', '--gold-n', '3'];
+    await goldSheet(args, h.deps);
+    const sheet = parseCsv(h.read('gold_review_haiku_only.csv'));
+    // the reviewer marks every row except the q2 "no" claim of each video (left blank)
+    const marked = sheet.map((r) => ({ ...r, 'correct (Y/N)': r.question_id === '2' ? '' : 'Y', 'quote_is_experiencer (Y/N)': '' }));
+    const head = Object.keys(marked[0]);
+    const csv = [head.join(','), ...marked.map((r) => head.map((k) => `"${String((r as Record<string, string>)[k]).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const file = path.join(h.outDir, 'partial.csv');
+    writeFileSync(file, csv);
+    await importGold(['--file', file], h.deps);
+    expect(h.db.rows('bt_gold_marks')).toHaveLength(9);
+    await expect(goldReport(args, h.deps)).rejects.toThrow(/3 of the 12 rows of the Haiku-only gold sheet have no usable mark\. Either rows were left blank/);
+    expect(() => h.read('gold_report_haiku_only.md')).toThrow();
+    await goldReport([...args, '--allow-unmarked'], h.deps);
+    const rep = h.read('gold_report_haiku_only.md');
+    expect(rep).toContain('Coverage: 9 of 12 sheet rows marked.');
+    expect(rep).toMatch(/WARNING: partial coverage\.\*\* 3 sheet rows have no mark\. /);
+    expect(rep).toMatch(/\| Y \| n\/a \(n=0\)/);   // every flagged (q2) row was the one left blank
+  });
+
+  it('gold report leaves out marks on counted cells that are not sheet rows (e.g. extra not_addressed rows of another sheet)', async () => {
+    const { h, args, sheet } = await markedHaikuGold();
+    // q4 and q5 are the only not_addressed cells and both are sheet rows here; make a not_addressed
+    // cell that is NOT a sheet row by adding a question the sheet was not built with
+    const v = sheet[0].video_id;
+    const marks = h.db.rows('bt_gold_marks');
+    const firstOfV = h.db.rows('bt_stance_answers').find((r) => r.video_id === v && r.pass === 'first')!;
+    marks.push({ ...marks[0], id: Math.max(...marks.map((m) => m.id as number)) + 1, video_id: v, question_id: 77, stance_answer_id: firstOfV.id, final_stance: 'not_addressed', correct: false });
+    await goldReport(args, h.deps);
+    const rep = h.read('gold_report_haiku_only.md');
+    expect(rep).toContain('Coverage: 12 of 12 sheet rows marked.');
+    expect(rep).not.toMatch(/WARNING: partial coverage/);
+    expect(rep).toMatch(/1 imported marks were left out/);
+    expect(rep).toMatch(/"not_addressed" was right: 100\.0% \(6\/6;/);
   });
 });

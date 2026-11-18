@@ -172,7 +172,8 @@ by Sonnet. The pilot report gives:
 - actual cost, and a full-run cost projected from the pilot's real token usage.
 
 **Gold set (before anything is published).** 25 more random videos (seeded, none from the pilot)
-go through the full pipeline.
+go through the full pipeline. (Haiku-only scope: first pass only, and the sheet holds the counted
+Haiku answers; see "Current scope" in §2. The report refuses to run until every sheet row is marked.)
 - A human marks each answer right or wrong, and whether the quote is the experiencer's own words.
   The review sheet links to the moment in the video where caption timestamps exist.
 - The sheet has every non-`not_addressed` answer, plus 3 random `not_addressed` answers per video
