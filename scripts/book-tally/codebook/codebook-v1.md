@@ -1,6 +1,7 @@
-# Book-tally codebook, v1 (DRAFT for review)
+# Book-tally codebook, v1
 
-Status: **draft, not approved.** Nothing has been coded with this version yet.
+Status: **approved by the owner on 2026-11-18.** The machine-readable copy the coding uses is
+`codebook-v1.json`. Any change makes a new version (v2), never an edit to v1.
 
 ## How every question is coded
 
@@ -19,6 +20,15 @@ For each video and each question, the reader (Haiku) answers in this order:
    - **Conditional**: the question is reported among people with a fact from the next section
      (for example, a violent death). It is also reported for everyone.
 3. **People, not videos.** Answers are combined per person across all their videos, as now.
+
+**What counts as an answer.** An answer counts when it is what the experiencer experienced, or
+learned from their NDE, either during it or afterward through the understanding or connection it gave
+them. It does not matter when in the account they say it. These don't count:
+- beliefs they say they held only before the NDE (for example "I was raised Catholic");
+- things that only an interviewer or host says;
+- other people's accounts.
+
+Answers are not tagged by when the person learned them.
 
 **Rough frequency** (column ≈n): how many of the 6,054 videos the first run marked as addressing the
 question. It is only a guide. That run coded either/or and open questions inconsistently, which is why
@@ -85,7 +95,7 @@ Type: **Y/N** yes/no · **MC** multiple choice · **COND** conditional (conditio
 |---|---|---|---|---|
 | 22 | What happens to someone who dies by suicide — are they punished, or met with compassion? | COND (F0 = suicide attempt) + everyone | **Are people who die by suicide met with compassion?** Yes = compassion. No = punished. | 212 |
 | 23 | Does someone who takes their own life regret it when they cross over? | COND (F0 = suicide attempt) | Yes means they regretted it, or were shown it was a mistake. | 50 |
-| 24 | Is suicide an unforgivable act, or does God understand that depth of desperation? | COND (F0 = suicide attempt) + everyone | **Is suicide understood with compassion, not treated as unforgivable?** Yes = understood. No = unforgivable. *(Very close to Q22: consider merging.)* | 106 |
+| 24 | Is suicide an unforgivable act, or does God understand that depth of desperation? | **Merged into Q22** | Not coded on its own; reports for Q24 use Q22. | 106 |
 | 25 | If someone was murdered or died violently, is their soul protected before the worst of it? | COND (F0 = violence) | Yes means the soul left, or was protected, before the worst of the violence. | 68 |
 | 26 | Do people who die suddenly — in accidents or without warning — get extra help crossing over? | COND (F1) | Yes means they had help crossing over. | 69 |
 | 27 | Can a soul get stuck after a violent death without realizing they've died? | Y/N, broken down by F0 = violence | Yes means a soul can get stuck without realizing it has died. | 103 |
@@ -184,14 +194,11 @@ Type: **Y/N** yes/no · **MC** multiple choice · **COND** conditional (conditio
 | 80 | Do people come back from NDEs struggling and depressed because they miss the peace of the other side? | Y/N | Yes means they came back struggling because they missed the other side. | 985 |
 | 81 | If souls choose their lives for growth, why would anyone choose abuse, illness, or tragedy? | MC | For growth or a lesson · to learn compassion or another specific quality · it was planned before birth · to clear karma · to help others through it · it is not chosen | 363 |
 
-## Open points for the owner
+## Decisions recorded (owner, 2026-11-18)
 
-1. **During the NDE, or a later belief?** Many quotes are the person's opinion today, not something
-   they experienced. For Q21 and Q35, for example, most are teaching or belief, not "I was shown".
-   Proposal: tag every answer *during the NDE* (experienced, shown or told) or *their belief
-   afterward*. Reports could then say "62% of those who answered describe this from the NDE itself".
-2. **Rarely addressed questions** (≈n under 30: Q6, 9, 12, 14, 18, 31, 36, 50, 58): code them anyway,
-   but expect "too few to report".
-3. **Q22 and Q24** ask nearly the same thing: merge them, or keep both?
-4. **The answer lists** are drafted from about 18 real quotes per question. *Other* will show where
-   a list misses something. Any question whose *Other* comes out above about 15% gets its list revised.
+1. No tag for whether an answer came from during the NDE or later. The rule above,
+   *What counts as an answer*, applies instead.
+2. Rarely addressed questions are coded. Whether to report them is decided later.
+3. Q24 is merged into Q22.
+4. The question types, wording and answer lists above are approved.
+5. Multiple-choice answers: up to three per person, so shares can exceed 100%. Reports must say so.
