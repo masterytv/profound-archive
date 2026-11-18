@@ -5916,9 +5916,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/gold-sheet.ts": {
-    "mtime": 1795015366.8641715,
-    "seen": 1795015439.5762749,
-    "ast_hash": "361a1cf3288135de5ff530da2ef0875f",
+    "mtime": 1795016833.0998607,
+    "seen": 1795017225.6183689,
+    "ast_hash": "02e84d89e820f7d042cbbd05019c1341",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/gold.ts": {
@@ -5940,9 +5940,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/pilot-report.ts": {
-    "mtime": 1795014802.9510005,
-    "seen": 1795015219.9972425,
-    "ast_hash": "3ef24882393e25206363f5783cb55e8d",
+    "mtime": 1795016787.431312,
+    "seen": 1795017225.6184638,
+    "ast_hash": "9d88e88551d31fef28eeab76476a6940",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/pilot-stats.ts": {
@@ -5958,15 +5958,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/requests.ts": {
-    "mtime": 1795014802.9510005,
-    "seen": 1795015219.9972463,
-    "ast_hash": "9dbf522b728cde38bc1b6f646bc6b5d4",
+    "mtime": 1795016787.4311693,
+    "seen": 1795017225.6185088,
+    "ast_hash": "ca25a884d2368eea9ca416b6cf4c0663",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/rollup.ts": {
-    "mtime": 1795015054.2145362,
-    "seen": 1795015219.9972472,
-    "ast_hash": "1ec967c1ff5b3e672bc153b4ad151b41",
+    "mtime": 1795016833.1002223,
+    "seen": 1795017225.6185105,
+    "ast_hash": "19529ab096518c2f15dfc7ec9fad4212",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/rows.ts": {
@@ -6042,9 +6042,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/lib/supabase.ts": {
-    "mtime": 1795014802.9528131,
-    "seen": 1795015219.997264,
-    "ast_hash": "94bb0a0a19a35ce9386cbbf80be6db41",
+    "mtime": 1795016787.430988,
+    "seen": 1795017225.6187644,
+    "ast_hash": "1334ee45bdbfd1cb5ff94fe34ddcde78",
     "semantic_hash": ""
   },
   "scripts/book-tally/lib/transcript.ts": {
@@ -6180,15 +6180,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-pipeline.test.ts": {
-    "mtime": 1795015106.7521856,
-    "seen": 1795015219.9972975,
-    "ast_hash": "55aeeccd864c3c843e406d5aa7f86563",
+    "mtime": 1795016851.5522754,
+    "seen": 1795017225.6192832,
+    "ast_hash": "6da66177b5f01c44b55936cb4972ea2a",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-rows.test.ts": {
-    "mtime": 1795014802.9536688,
-    "seen": 1795015219.997299,
-    "ast_hash": "26094e59f981d91c36b613a5bf01fdc4",
+    "mtime": 1795016833.100484,
+    "seen": 1795017225.619285,
+    "ast_hash": "3ee68c2f490e4541ea2305ba47c5510e",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-sampling.test.ts": {
@@ -6342,9 +6342,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-haiku.test.ts": {
-    "mtime": 1795015519.1044726,
-    "seen": 1795015554.7970712,
-    "ast_hash": "502b3b4bbcb0d9559dc5229514efab85",
+    "mtime": 1795016851.5516183,
+    "seen": 1795017225.6192808,
+    "ast_hash": "230c0c1c810286e02046484c3a5c1987",
     "semantic_hash": ""
   },
   "scripts/book-tally/HANDOFF.md": {

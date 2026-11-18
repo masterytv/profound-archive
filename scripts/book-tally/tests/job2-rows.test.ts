@@ -51,12 +51,15 @@ describe('buildAnswerRows', () => {
 describe('request construction', () => {
   const prompts = loadStancePrompts();
   const qs = toPromptQuestions([
-    { id: 2, category: 'b', consumer_question: 'Did you see a light?', question: 'curated 2' },
-    { id: 1, category: 'a', consumer_question: null, question: 'Curated fallback text' },
+    { id: 2, category: 'b', consumer_question: 'Did you see a light?' },
+    { id: 1, category: 'a', consumer_question: '  Did you meet anyone?  ' },
   ]);
-  it('orders questions by id, prefers consumer_question, falls back to question', () => {
-    expect(qs.map((q) => [q.question_id, q.question])).toEqual([[1, 'Curated fallback text'], [2, 'Did you see a light?']]);
+  it('orders questions by id and uses the trimmed consumer_question as the wording', () => {
+    expect(qs.map((q) => [q.question_id, q.question])).toEqual([[1, 'Did you meet anyone?'], [2, 'Did you see a light?']]);
     expect(renderQuestionsJson(qs).split('\n')).toHaveLength(4);
+  });
+  it('refuses an active question with a blank consumer_question (never prompts with other text)', () => {
+    expect(() => toPromptQuestions([{ id: 7, category: 'a', consumer_question: '   ' }])).toThrow(/id 7 is active but has a blank consumer_question/);
   });
   it('renders the stance prompt with the question list and no leftover placeholder', () => {
     const r = renderStancePrompt(prompts, qs);
