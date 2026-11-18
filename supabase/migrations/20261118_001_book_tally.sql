@@ -39,7 +39,7 @@ CREATE TABLE public.bt_runs (
     model         text NOT NULL,
     effort        text CHECK (effort IS NULL OR effort IN ('low','medium','high','xhigh','max')),
     status        text NOT NULL DEFAULT 'estimated'
-                  CHECK (status IN ('estimated','submitted','collecting','completed','failed','canceled')),
+                  CHECK (status IN ('estimated','submitting','submitted','collecting','completed','failed','canceled')),
     params        jsonb NOT NULL DEFAULT '{}'::jsonb,     -- seed, sample ids, flags
     estimate      jsonb,                                  -- printed pre-spend estimate
     actual_usage  jsonb,                                  -- summed usage + cost, bookkeeping
@@ -402,8 +402,8 @@ WHERE a.experience_type = 'nde'
 --   recheck agrees (both valid, same stance) and ok(r) -> final = r (recheck preferred)
 --                                    and ok(f) only      -> final = f (its verified quote)
 --   neither ok / recheck differs / either invalid -> arbiter:
---       no arbiter -> pending_arbiter; ok(a) -> final = a; otherwise unverified
---       (an invalid arbiter row also lands here; it is excluded from tallies).
+--       no arbiter -> pending_arbiter; ok(a) -> final = a; arbiter invalid -> invalid;
+--       arbiter valid but its quote unverified -> unverified (both excluded from tallies).
 -- deciding_pass = pass of the row supplying final_answer_id/stance/quote (NULL while pending).
 -- Tallies must use status = 'final' only.
 CREATE VIEW public.bt_final_stances WITH (security_invoker = true) AS
@@ -438,7 +438,7 @@ j AS (
     SELECT f.video_id, f.question_id, f.flagged,
            f.id AS first_answer_id, r.id AS recheck_answer_id, a.id AS arbiter_answer_id,
            COALESCE(r.id IS NOT NULL AND r.valid AND f.valid AND r.stance = f.stance, false) AS agree,
-           f.ok AS f_ok, r.ok AS r_ok, a.ok AS a_ok
+           f.ok AS f_ok, r.ok AS r_ok, a.ok AS a_ok, a.valid AS a_valid
     FROM f
     LEFT JOIN r ON r.trigger_answer_id = f.id
     LEFT JOIN a ON a.trigger_answer_id = f.id
@@ -458,6 +458,7 @@ resolved AS (
                WHEN j.agree AND (j.r_ok OR j.f_ok) THEN 'final'
                WHEN j.arbiter_answer_id IS NULL THEN 'pending_arbiter'
                WHEN j.a_ok THEN 'final'
+               WHEN NOT j.a_valid THEN 'invalid'
                ELSE 'unverified'
            END AS status
     FROM j

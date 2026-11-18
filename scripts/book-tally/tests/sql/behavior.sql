@@ -22,6 +22,11 @@ INSERT INTO public.bt_prompts VALUES (repeat('a',64),'stance-v1','tmpl',NULL,NUL
 
 -- ---------- immutability ----------
 DO $$ BEGIN
+  UPDATE public.bt_runs SET status='submitting', batch_ids=ARRAY['pending:2026-11-18T00:00:00.000Z:2:abcdef012345'] WHERE id='r1';
+  PERFORM pg_temp.expect((SELECT status FROM public.bt_runs WHERE id='r1')='submitting','submitting status allowed');
+  -- conditional-update shape used by btUpdateRunIf
+  PERFORM pg_temp.expect((SELECT count(*) FROM (UPDATE public.bt_runs SET status='submitted' WHERE id='r1' AND status='estimated' RETURNING id) u)=0,'conditional update with wrong expected status touches 0 rows');
+  PERFORM pg_temp.expect((SELECT count(*) FROM (UPDATE public.bt_runs SET status='submitted' WHERE id='r1' AND status='submitting' RETURNING id) u)=1,'conditional update with right expected status touches 1 row');
   UPDATE public.bt_runs SET status='submitted', batch_ids=ARRAY['b1'], actual_usage='{}'::jsonb, finished_at=now() WHERE id='r1';
   PERFORM pg_temp.expect((SELECT status FROM public.bt_runs WHERE id='r1')='submitted','bookkeeping update allowed');
 END $$;
@@ -125,6 +130,19 @@ DO $$ DECLARE f bigint; r bigint; a bigint; f2 bigint; BEGIN
   PERFORM pg_temp.ans('b19',1,'first','yes',88,'five words in this quote',true,NULL,true,1);
   -- B20 pilot rows never appear
   PERFORM pg_temp.ans('b20',1,'pilot','yes',90,'pilot only quote here ok',true);
+  -- B22 first yes unverified; recheck yes unverified; arbiter INVALID -> status invalid (distinct from unverified)
+  f := pg_temp.ans('b22',1,'first','yes',90,'made up quote words here',false);
+  r := pg_temp.ans('b22',1,'recheck','yes',90,'another made up quote',false,f);
+  a := pg_temp.ans('b22',1,'arbiter',NULL,NULL,NULL,false,f,false,1,r);
+  -- B23 first mixed; recheck differs; arbiter INVALID -> invalid
+  f := pg_temp.ans('b23',1,'first','mixed',80,'sort of felt it happen',true);
+  r := pg_temp.ans('b23',1,'recheck','yes',80,'i did feel it happen',true,f);
+  a := pg_temp.ans('b23',1,'arbiter',NULL,NULL,NULL,false,f,false,1,r);
+  -- B24 arbiter invalid, then a newer valid verified arbiter row for the same first row -> final (latest arbiter wins)
+  f := pg_temp.ans('b24',1,'first','mixed',80,'sort of felt it happen',true);
+  r := pg_temp.ans('b24',1,'recheck','yes',80,'i did feel it happen',true,f);
+  a := pg_temp.ans('b24',1,'arbiter',NULL,NULL,NULL,false,f,false,1,r);
+  a := pg_temp.ans('b24',1,'arbiter','yes',80,'i did feel it happen',true,f,true,2,r);
   -- B21 latest recheck by max id per trigger: older recheck disagrees, newer agrees
   f := pg_temp.ans('b21',1,'first','no',80,'there was no tunnel at all',true);
   r := pg_temp.ans('b21',1,'recheck','yes',80,'i did feel it happen',true,f,true,1);
@@ -157,8 +175,12 @@ DO $$ DECLARE x public.bt_final_stances; BEGIN
   x := pg_temp.fs('b18'); PERFORM pg_temp.expect(x.status='pending_recheck' AND x.arbiter_answer_id IS NULL,'B18 stale recheck/arbiter ignored');
   x := pg_temp.fs('b19'); PERFORM pg_temp.expect((x.status,x.deciding_pass,x.confidence)=('final','first',88),'B19 max(id) wins, not attempt');
   PERFORM pg_temp.expect(NOT EXISTS (SELECT 1 FROM public.bt_final_stances WHERE video_id='b20'),'B20 pilot excluded');
+  x := pg_temp.fs('b22'); PERFORM pg_temp.expect(x.status='invalid' AND x.deciding_pass='arbiter' AND x.stance IS NULL,'B22 invalid arbiter -> invalid');
+  x := pg_temp.fs('b23'); PERFORM pg_temp.expect(x.status='invalid' AND x.final_answer_id = x.arbiter_answer_id,'B23 invalid arbiter -> invalid');
+  x := pg_temp.fs('b24'); PERFORM pg_temp.expect((x.status,x.deciding_pass,x.stance)=('final','arbiter','yes'),'B24 newer arbiter replaces invalid one');
+  PERFORM pg_temp.expect((SELECT status FROM public.bt_final_stances WHERE video_id='b8' AND question_id=1)='unverified','B8 stays unverified (valid arbiter, unverified quote)');
   x := pg_temp.fs('b21'); PERFORM pg_temp.expect((x.status,x.deciding_pass,x.stance)=('final','recheck','no'),'B21 latest recheck by id');
-  PERFORM pg_temp.expect((SELECT count(*) FROM public.bt_final_stances WHERE question_id=1)=21,'one row per cell (b1..b19, b21, c2; pilot b20 excluded)');
+  PERFORM pg_temp.expect((SELECT count(*) FROM public.bt_final_stances WHERE question_id=1)=24,'one row per cell (b1..b19, b21..b24, c2; pilot b20 excluded)');
 END $$;
 
 -- ---------- person map / merges / reversibility ----------
