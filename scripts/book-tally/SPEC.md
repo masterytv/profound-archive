@@ -132,6 +132,17 @@ Stances: `yes | no | mixed | not_addressed`. Silence is never `no`.
    final answer plus 3 random not_addressed rows per video (seeded) for a recall check.
    `import-gold.ts` loads marks into `bt_gold_marks`; `gold-report.ts` reports precision per
    stance with Wilson 95% CI and n. No figure is published before this.
+5b. Haiku-only resolution (current scope; budget decision): only the Haiku first pass runs.
+   `rollup`, `gold-sheet` and `gold-report` take `--resolution haiku-first-pass`: answers are read
+   from `bt_stance_answers` (pass 'first', latest row per cell), not from `bt_final_stances`. Counted
+   = valid AND (not_addressed OR quote verified); invalid and unverified-quote answers are excluded
+   and reported; would-be-flagged answers (no, mixed, confidence < 70) are counted and reported as
+   unchecked. Outputs carry the suffix `_haiku_only` and the label `haiku_first_pass_unchecked`.
+   Gold: 25 seeded pilot-disjoint videos with a complete first-pass row set; sheet
+   `out/gold_review_haiku_only.csv` has every counted non-not_addressed answer plus 3 seeded
+   not_addressed rows per video (all if fewer); the report uses only marks on the current counted
+   first-pass answer and refuses if a gold video has none. Recheck/arbiter groups in any mode
+   except the pilot need `--i-understand-this-is-the-expensive-pass`.
 6. Table `bt_stance_answers` columns include exactly the requested ones: question_id,
    video_id, stance, confidence, quote, quote_verified, model, model_version, prompt_hash,
    run_id, created_at — plus id, pass, attempt, transcript_source, quote_norm_offset,

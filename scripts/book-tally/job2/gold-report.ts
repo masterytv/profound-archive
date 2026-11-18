@@ -7,10 +7,9 @@ import { writeFileSync } from 'fs';
 import path from 'path';
 import { readActiveQuestions, readNdeVideoIds, selectAll, type Db } from '../lib/supabase';
 import { ensureOutDir, helpText, intOpt, isDirectRun, makeCtx, parseCli, runCli, str, CliError, type Ctx, type Deps, type OptDef } from './cli';
-import { fetchAnswersByIds, fetchStanceRuns } from './db';
-import { isFlagged } from './flags';
+import { fetchStanceRuns } from './db';
 import { CONFIDENCE_BANDS, fmtProportion, goldStats, haikuGoldStats, latestMarks, type GoldMark, type GoldStats, type HaikuGoldStats, type HaikuMark } from './gold';
-import { HAIKU_SUFFIX, parseResolution } from './haiku';
+import { HAIKU_SUFFIX, fetchFirstPassAnswers, haikuCells, parseResolution, type HaikuCell } from './haiku';
 import { completeEligible, goldIdsFromRuns, haikuGoldSample } from './plan';
 
 const OPTIONS: Record<string, OptDef> = {
@@ -20,12 +19,12 @@ const OPTIONS: Record<string, OptDef> = {
   'gold-n': { type: 'string', help: 'haiku-first-pass: gold size (default 25; must match gold-sheet)' },
 };
 
-export function renderHaikuGoldMarkdown(h: HaikuGoldStats, nVideos: number, unlinked = 0): string {
+export function renderHaikuGoldMarkdown(h: HaikuGoldStats, nVideos: number, dropped = 0): string {
   const s = h.base;
   const L = [
     '# Gold-set report (Haiku-only, unchecked answers)', '',
     'The answers measured here are the unchecked first-pass answers of one model (Haiku): no second model re-checked them. This report is the only measure of how reliable they are. A human reviewer judged each sampled answer against the video.', '',
-    `${s.nMarked} reviewed cells over ${nVideos} gold videos (latest mark per cell). Intervals are Wilson 95%.${unlinked ? ` ${unlinked} marks without a usable first-pass answer link were left out of the splits.` : ''}`, '',
+    `${s.nMarked} reviewed cells over ${nVideos} gold videos (latest mark per cell). Intervals are Wilson 95%.${dropped ? ` ${dropped} imported marks were left out because they do not refer to the current, counted first-pass Haiku answer of their cell (for example marks from a full-mode gold sheet, or on an answer that was later superseded).` : ''}`, '',
     '## Precision per stance', '', '| stance | precision (correct / n) |', '|---|---|',
     `| yes | ${fmtProportion(s.perStance.yes)} |`,
     `| no | ${fmtProportion(s.perStance.no)} |`,
@@ -48,31 +47,58 @@ export function renderHaikuGoldMarkdown(h: HaikuGoldStats, nVideos: number, unli
   return L.join('\n');
 }
 
+/** Mark row as read from bt_gold_marks. */
+type MarkRow = GoldMark & { id: number; stance_answer_id: number | null };
+
+/**
+ * Keeps only the marks that measure what the Haiku-only tally counts: the mark's answer must be
+ * the CURRENT first-pass answer of its cell (latest id) and that answer must be counted. Marks on
+ * Sonnet/Opus-decided cells, on superseded answers, or on excluded claims are dropped (and counted).
+ * Then the latest kept mark per cell. Pure.
+ */
+export function haikuGoldMarks(raw: readonly MarkRow[], cells: readonly HaikuCell[]): { marks: HaikuMark[]; dropped: number; videosMarked: Set<string> } {
+  const key = (v: string, q: number) => `${v}\u0000${q}`;
+  const current = new Map(cells.map((c) => [key(c.video_id, c.question_id), c]));
+  const kept: MarkRow[] = [];
+  let dropped = 0;
+  for (const m of raw) {
+    const c = current.get(key(m.video_id, m.question_id));
+    if (c && c.category === 'counted' && m.stance_answer_id === c.id) kept.push(m);
+    else dropped++;
+  }
+  const marks = latestMarks(kept).map((m) => {
+    const c = current.get(key(m.video_id, m.question_id))!;
+    return { ...m, confidence: c.confidence, wouldBeFlagged: c.flagged };
+  });
+  return { marks, dropped, videosMarked: new Set(marks.map((m) => m.video_id)) };
+}
+
 async function haikuReport(ctx: Ctx, db: Db, seed: number, pilotN: number, goldN: number): Promise<void> {
   const qIds = (await readActiveQuestions(db)).map((q) => q.id);
   const s = await haikuGoldSample(db, { seed, pilotN, goldN }, await readNdeVideoIds(db), await fetchStanceRuns(db), completeEligible(db, qIds));
   if (s.chosen.length < goldN) throw new CliError(`only ${s.chosen.length} pilot-disjoint NDE videos with a complete first-pass row set (need ${goldN})`);
-  if (s.skipped.length) ctx.log(`WARNING: ${s.skipped.length} earlier candidates lack a complete first-pass row set; this selection must equal the one gold-sheet used (same seed, pilot-n, gold-n, after the full first pass).`);
-  const raw: Array<GoldMark & { id: number; stance_answer_id: number | null }> = [];
+  const raw: MarkRow[] = [];
   for (let i = 0; i < s.chosen.length; i += 25) {
-    raw.push(...(await selectAll<GoldMark & { id: number; stance_answer_id: number | null }>(
+    raw.push(...(await selectAll<MarkRow>(
       db, 'bt_gold_marks', 'id, video_id, question_id, stance_answer_id, final_stance, correct, quote_is_experiencer',
       { orderBy: 'id', filter: (q) => q.in('video_id', s.chosen.slice(i, i + 25)) },
     )));
   }
-  const latest = latestMarks(raw);
-  if (latest.length === 0) throw new CliError('no gold marks imported yet for the haiku gold videos');
-  const answers = await fetchAnswersByIds(db, latest.flatMap((m) => (m.stance_answer_id === null ? [] : [m.stance_answer_id])));
-  const marks: HaikuMark[] = [];
-  let unlinked = 0;
-  for (const m of latest) {
-    const a = m.stance_answer_id === null ? undefined : answers.get(m.stance_answer_id);
-    if (!a) { unlinked++; continue; }
-    marks.push({ ...m, confidence: a.confidence, wouldBeFlagged: isFlagged(a) });
+  if (raw.length === 0) throw new CliError('no gold marks imported yet for the haiku gold videos');
+  const cells = haikuCells(await fetchFirstPassAnswers(db, s.chosen, 25), qIds);
+  const { marks, dropped, videosMarked } = haikuGoldMarks(raw, cells);
+  if (marks.length === 0) throw new CliError(`none of the ${raw.length} imported marks on the haiku gold videos refers to a current, counted first-pass Haiku answer; build and mark the sheet with gold-sheet.ts --resolution haiku-first-pass`);
+  // The sample is re-drawn here; it must be the one the marked sheet was built from. Every chosen
+  // video that has a counted answer was on that sheet, so it must have at least one kept mark.
+  const withCounted = new Set(cells.filter((c) => c.category === 'counted').map((c) => c.video_id));
+  const unmarked = s.chosen.filter((v) => withCounted.has(v) && !videosMarked.has(v));
+  if (unmarked.length) {
+    throw new CliError(`${unmarked.length} of the ${s.chosen.length} gold videos have no mark on their current Haiku answers (e.g. ${unmarked.slice(0, 5).join(', ')}). The gold selection is not the one the marked sheet was built from (seed / pilot-n / gold-n differ, a pilot run was added, or first-pass rows changed), or the sheet was only partly imported. Rebuild the sheet with the same options and mark it again; no report was written.`);
   }
+  if (dropped) ctx.log(`NOTE: ${dropped} imported marks on these videos do not refer to a current, counted first-pass Haiku answer and were left out (see the report).`);
   const stats = haikuGoldStats(marks);
-  writeFileSync(path.join(ensureOutDir(ctx), `gold_report${HAIKU_SUFFIX}.md`), renderHaikuGoldMarkdown(stats, s.chosen.length, unlinked));
-  ctx.log(`wrote out/gold_report${HAIKU_SUFFIX}.md (${stats.base.nMarked} cells; all-claims precision ${fmtProportion(stats.base.allClaims)})`);
+  writeFileSync(path.join(ensureOutDir(ctx), `gold_report${HAIKU_SUFFIX}.md`), renderHaikuGoldMarkdown(stats, s.chosen.length, dropped));
+  ctx.log(`wrote out/gold_report${HAIKU_SUFFIX}.md (${stats.base.nMarked} cells; all-claims precision ${fmtProportion(stats.base.allClaims)}; ${dropped} marks left out)`);
 }
 
 export function renderGoldMarkdown(s: GoldStats, nVideos: number): string {

@@ -5,7 +5,7 @@ repo-root CLAUDE.md.
 
 ## Owner's decisions
 - **Budget: Haiku only.** Run Job 1 and the Job 2 Haiku first pass. **Do NOT run the Job 2 full
-  Sonnet re-check or the Opus arbiter** (`run-stance --full --pass recheck|arbiter`). They may be
+  Sonnet re-check or the Opus arbiter** (`run-stance --gold|--full --pass recheck|arbiter`). They may be
   funded later by a publisher. The code requires an extra flag for those passes; never pass it.
 - **Results.** Publish Job 2 results with `--resolution haiku-first-pass` (rollup and gold sheet).
   The resolution is labelled "unchecked by a second model". Gold-set precision from the owner's
@@ -53,8 +53,10 @@ Prefix every command with
 5. **If the pilot ran**, run `job2/pilot-report.ts --group <id>` and report kappa, agreement, quote
    failure rate and cost. Stop for the owner.
 6. **After the first pass:**
-   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner `out/gold_review.csv`.
-   - After the owner marks it, run `import-gold.ts` and then `gold-report.ts`.
+   - Run `job2/gold-sheet.ts --resolution haiku-first-pass` and give the owner
+     `out/gold_review_haiku_only.csv`.
+   - After the owner marks it, run `job2/import-gold.ts --file <marked csv>` and then
+     `job2/gold-report.ts --resolution haiku-first-pass` (same --seed/--pilot-n/--gold-n as the sheet).
 7. **Job 1 review CSVs:** `job1/export-review.ts`. The owner marks them, then run
    `import-decisions.ts`.
 8. **Rollup:** `job2/rollup.ts --resolution haiku-first-pass`, only after the gold report and the

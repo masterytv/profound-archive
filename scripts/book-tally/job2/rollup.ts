@@ -153,7 +153,8 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
   const missingMap = nde.filter((id) => !personOf.has(id));
   if (missingMap.length) throw new CliError(`${missingMap.length} NDE videos missing from bt_effective_person_map`);
 
-  const resolution = parseResolution(str(v.resolution));
+  let resolution;
+  try { resolution = parseResolution(str(v.resolution)); } catch (e) { throw new CliError((e as Error).message); }
   const qs: QuestionMeta[] = (await readActiveQuestions(db)).map((q) => ({
     id: q.id, category: q.category, consumer_question: q.consumer_question ?? q.question,
   }));

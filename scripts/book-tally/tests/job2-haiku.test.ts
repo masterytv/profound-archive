@@ -377,3 +377,81 @@ describe('expensive pass guard', () => {
     await h.firstPass();
   });
 });
+
+describe('review round 1 fixes', () => {
+  it('gold recheck/arbiter groups need the expensive-pass flag too (flags given or omitted); nothing is submitted without it', async () => {
+    const h = harness(6);
+    await h.run(['--gold', '--gold-n', '3', '--pilot-n', '2', '--estimate']);
+    await h.run(['--gold', '--confirm-spend', h.groupOf()]);
+    await h.run(['--gold', '--pass', 'recheck', '--estimate']);
+    const g = h.groupOf();
+    const created = h.client.created.length;
+    await expect(h.run(['--gold', '--pass', 'recheck', '--confirm-spend', g])).rejects.toThrow(/expensive-pass/);
+    await expect(h.run(['--confirm-spend', g])).rejects.toThrow(/gold recheck pass[\s\S]*expensive pass/);
+    expect(h.client.created.length).toBe(created);
+    await h.run(['--gold', '--pass', 'recheck', '--confirm-spend', g, '--i-understand-this-is-the-expensive-pass']);
+    expect(h.client.created.length).toBeGreaterThan(created);
+    await h.run(['--gold', '--pass', 'arbiter', '--estimate']);
+    const a = h.groupOf();
+    const c2 = h.client.created.length;
+    await expect(h.run(['--confirm-spend', a])).rejects.toThrow(/gold arbiter pass[\s\S]*expensive pass/);
+    expect(h.client.created.length).toBe(c2);
+  });
+
+  it('--resolution haiku-first-pass is refused with --pilot (the pilot always has a Sonnet arm)', async () => {
+    const h = harness(6);
+    await expect(h.run(['--pilot', '--resolution', 'haiku-first-pass', '--estimate'])).rejects.toThrow(/does not apply to --pilot/);
+    expect(h.db.rows('bt_runs')).toHaveLength(0);
+  });
+
+  it('rollup reports a bad --resolution as a CLI error', async () => {
+    const h = harness(6);
+    await expect(rollup(['--resolution', 'sonnet'], h.rdeps)).rejects.toThrow(/--resolution must be one of full, haiku-first-pass/);
+  });
+
+  async function markedHaikuGold() {
+    const h = harness();
+    await h.firstPass();
+    const args = ['--resolution', 'haiku-first-pass', '--pilot-n', '4', '--gold-n', '3'];
+    await goldSheet(args, h.deps);
+    const sheet = parseCsv(h.read('gold_review_haiku_only.csv'));
+    // every answer marked correct
+    const marked = sheet.map((r) => ({ ...r, 'correct (Y/N)': 'Y', 'quote_is_experiencer (Y/N)': r.final_stance === 'not_addressed' ? '' : 'Y' }));
+    const head = Object.keys(marked[0]);
+    const csv = [head.join(','), ...marked.map((r) => head.map((k) => `"${String((r as Record<string, string>)[k]).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const file = path.join(h.outDir, 'marked.csv');
+    writeFileSync(file, csv);
+    await importGold(['--file', file], h.deps);
+    return { h, args, sheet };
+  }
+
+  it('gold report keeps only marks on the current counted first-pass Haiku answer; a later stray or superseded mark is left out and counted', async () => {
+    const { h, args, sheet } = await markedHaikuGold();
+    const claim = sheet.find((r) => r.final_stance === 'yes')!;
+    const marks = h.db.rows('bt_gold_marks');
+    const nextMarkId = () => Math.max(...marks.map((m) => m.id as number)) + 1;
+    // a later mark on the same cell that points at some other answer (e.g. a Sonnet-decided full-mode sheet), marked wrong
+    marks.push({ ...marks.find((m) => m.video_id === claim.video_id && m.question_id === Number(claim.question_id))!, id: nextMarkId(), stance_answer_id: 987654, correct: false });
+    await goldReport(args, h.deps);
+    let rep = h.read('gold_report_haiku_only.md');
+    expect(rep).toMatch(/\| all non-not_addressed answers \| 100\.0% \(6\/6;/);   // the stray mark did not replace the real one
+    expect(rep).toMatch(/1 imported marks were left out/);
+
+    // a first-pass cell re-answered later: its old mark no longer measures what the tally counts
+    const answers = h.db.rows('bt_stance_answers');
+    const old = answers.find((r) => r.id === Number(claim.answer_id))!;
+    answers.push({ ...old, id: Math.max(...answers.map((r) => r.id as number)) + 1, attempt: 99 });
+    await goldReport(args, h.deps);
+    rep = h.read('gold_report_haiku_only.md');
+    expect(rep).toMatch(/\| all non-not_addressed answers \| 100\.0% \(5\/5;/);
+    expect(rep).toMatch(/2 imported marks were left out/);
+  });
+
+  it('gold report refuses when a gold video has no mark (selection moved or partial import) and writes nothing', async () => {
+    const { h, args, sheet } = await markedHaikuGold();
+    const victim = sheet[0].video_id;
+    h.db.tables.bt_gold_marks = h.db.rows('bt_gold_marks').filter((m) => m.video_id !== victim);
+    await expect(goldReport(args, h.deps)).rejects.toThrow(new RegExp(`1 of the 3 gold videos have no mark[\\s\\S]*${victim}[\\s\\S]*no report was written`));
+    expect(() => h.read('gold_report_haiku_only.md')).toThrow();
+  });
+});

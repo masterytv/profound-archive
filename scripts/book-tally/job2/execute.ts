@@ -681,9 +681,13 @@ export interface ExecResult { group: string; runs: Array<{ id: string; unresolve
 
 export const EXPENSIVE_FLAG = 'i-understand-this-is-the-expensive-pass';
 
-/** A stored group that is the full-corpus recheck or arbiter pass. */
+/**
+ * A stored group that runs the recheck (Sonnet) or arbiter (Opus) pass, in ANY mode except the
+ * pilot (gold included: the gold recheck/arbiter is Sonnet/Opus spend too, and the Haiku-only
+ * scope never runs it). The pilot's Sonnet arm is the one Sonnet run that needs no extra flag.
+ */
 export function isExpensiveGroup(params: { mode?: string; pass?: string }): boolean {
-  return params.mode === 'full' && (params.pass === 'recheck' || params.pass === 'arbiter');
+  return params.mode !== 'pilot' && (params.pass === 'recheck' || params.pass === 'arbiter');
 }
 
 /** Entry point for --confirm-spend: verifies the gate, submits, collects, validates, stores. */
@@ -705,7 +709,7 @@ export async function executeGroup(
     throw new CliError(`refusing to spend: group ${group} is mode=${p0.mode} pass=${p0.pass}, which does not match the flags given`);
   }
   if (isExpensiveGroup(p0) && opts.expensiveAck !== true) {
-    throw new CliError(`refusing to spend: group ${group} is the full-corpus ${p0.pass} pass (Sonnet/Opus on every flagged cell; this is the expensive pass and is NOT part of the current Haiku-only scope). Re-run with --confirm-spend ${group} --${EXPENSIVE_FLAG} only if you mean it.`);
+    throw new CliError(`refusing to spend: group ${group} is the ${p0.mode} ${p0.pass} pass (Sonnet/Opus on flagged cells; this is the expensive pass and is NOT part of the current Haiku-only scope). Re-run with --confirm-spend ${group} --${EXPENSIVE_FLAG} only if you mean it.`);
   }
   for (const r of runs) {
     if (!['estimated', 'submitting', 'submitted', 'collecting', 'completed'].includes(r.status)) {

@@ -38,6 +38,18 @@ limits what the code can check (see §5).
 | Second opinion | Claude Sonnet 5.5 (`claude-sonnet-5-5`) | Stronger reader; re-checks the answers most likely to be wrong |
 | Arbiter | Claude Opus 5.5 (`claude-opus-5-5`) | Strongest model; decides only where the first two disagree |
 
+**Current scope: Haiku only.** For budget reasons, only the first pass (Haiku) is run on the whole
+corpus. The Sonnet second opinion and the Opus arbiter described below are built and tested but **not
+run**. Published Job 2 figures therefore use the *Haiku-only resolution* (`--resolution
+haiku-first-pass`), labelled `haiku_first_pass_unchecked` in every output:
+- an answer is counted if it is valid and is either `not_addressed` or has a quote that code found in
+  the transcript; a claim whose quote was not found is excluded and reported, never counted;
+- answers the full pipeline would have sent for a second opinion (`no`, `mixed`, or confidence below
+  70) are counted, flagged, and reported as such, because no second model checked them;
+- the accuracy evidence is the gold set ("Gold set" in §4): a human marks the counted Haiku answers of 25
+  seeded videos, and precision is reported overall, per stance, by the flag and by confidence band, each
+  with its n and a Wilson 95% interval. No figure is published before that report.
+
 - All calls go through Anthropic's **Message Batches API**.
 - **Temperature.** The protocol asked for temperature 0, but these models reject any non-default
   sampling parameter (the API returns an error). So no temperature is sent and outputs are not
