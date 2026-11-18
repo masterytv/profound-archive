@@ -10,8 +10,8 @@ import Anthropic from '@anthropic-ai/sdk';
 /** Explicit base URL: never inherit ANTHROPIC_BASE_URL from the environment. */
 export const ANTHROPIC_BASE_URL = 'https://api.anthropic.com';
 
-/** Key variable names, in priority order. CLAUDE_API is this environment's alias. */
-export const ANTHROPIC_KEY_ENV_NAMES = ['ANTHROPIC_API_KEY', 'CLAUDE_API'] as const;
+/** Key variable names, in priority order. BOOK_TALLY_ANTHROPIC_API_KEY is the dedicated variable (ANTHROPIC_API_KEY is stripped inside Claude Code sessions); CLAUDE_API is a legacy alias. */
+export const ANTHROPIC_KEY_ENV_NAMES = ['BOOK_TALLY_ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY', 'CLAUDE_API'] as const;
 
 export type Env = Record<string, string | undefined>;
 

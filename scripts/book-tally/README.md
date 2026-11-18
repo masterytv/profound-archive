@@ -200,7 +200,7 @@ go through the full pipeline.
 Prerequisites:
 - the `bt_*` migration applied by the project owner;
 - environment variables `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (or
-  `SUPABASE_SERVICE_KEY`) and `ANTHROPIC_API_KEY` (or `CLAUDE_API`).
+  `SUPABASE_SERVICE_KEY`) and `BOOK_TALLY_ANTHROPIC_API_KEY` (falling back to `ANTHROPIC_API_KEY`, then `CLAUDE_API`).
 
 **Spend safety.**
 - `--estimate` counts every request's input tokens with the free token-counting endpoint and
