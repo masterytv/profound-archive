@@ -18,10 +18,16 @@ repo-root CLAUDE.md.
   deleted channel excluded) and 3,359 people. One video (hRmCDZSwG1Q) had its whole response
   rejected; its rows count as invalid. Recoding it costs under 1 cent and needs an estimate and the
   owner's yes.
-- **Caveat:** Job 1 duplicate-person decisions are not done yet (186 Haiku "same" and 285 "unsure"
-  pairs), so the people count may be a few hundred too high. Shares are affected little.
-  Options: the Sonnet pair check (estimate, cap), or the owner reviews the pairs, then the rollup is
-  re-run.
+- **Job 1 duplicates, settled for now:**
+  - Sonnet pair check `j1s-20261118220621` cost $0.78 (cap $20): same 198, unsure 272, different 1.
+    That gave 153 auto-merges (both models said same).
+  - One merge conflict (Maria Lupita Gurule, profiles 458/1005/2642) was resolved by the OWNER:
+    same person, so a merge on pair 14 (import-decisions run j1i-20261118221237).
+  - The owner chose to leave the other 318 review pairs SEPARATE for now. They are listed in
+    out/dedup_review_pairs.csv; the person count may be slightly high.
+  - Re-run tally: 3,229 people (was 3,359). Headline shares moved by 0.5 points or less; the largest
+    change anywhere is 2.4 points (q28 mixed).
+  - Total spend: about $36.59 of $75.
 
 - **Budget: $75 total** (raised from $50 by the owner). Spent so far: **$16.13**.
   - Job 1 pair judging: `j1h-20261118154545`, $0.05.
