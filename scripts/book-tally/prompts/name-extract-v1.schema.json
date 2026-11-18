@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": ["string", "null"] },
+    "quote": { "type": ["string", "null"] }
+  },
+  "required": ["name", "quote"],
+  "additionalProperties": false
+}

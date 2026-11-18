@@ -1,0 +1,4 @@
+# Generated review CSVs / reports (may contain model quotes from transcripts)
+out/
+# vitest cache when run with this directory as root
+node_modules/

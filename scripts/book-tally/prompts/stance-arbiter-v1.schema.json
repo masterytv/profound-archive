@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_id": { "type": "integer" },
+          "stance": { "type": "string", "enum": ["yes", "no", "mixed", "not_addressed"] },
+          "confidence": { "type": "integer" },
+          "quote": { "type": ["string", "null"] }
+        },
+        "required": ["question_id", "stance", "confidence", "quote"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["answers"],
+  "additionalProperties": false
+}
