@@ -14,6 +14,7 @@
  * and model are skipped. Transcripts are read from the DB and sent straight to the API; nothing
  * is printed.
  */
+import { createHash } from 'crypto';
 import { buildParams, MAX_ATTEMPTS, messageText, type Effort } from '../lib/batch';
 import { MODELS } from '../lib/cost';
 import { prepareTranscript } from '../lib/quote';
@@ -31,8 +32,8 @@ const SCRIPT = 'job3/run-codebook.ts';
 const MODEL = MODELS.haiku;
 /** Room for adaptive thinking (billed as output) plus 89 answers; truncated responses retry at double. */
 export const DEFAULT_MAX_TOKENS = 20_000;
-/** Visible answer estimate: about 45 tokens per item over 89 items. Thinking is added from lib/cost.THINKING_ALLOWANCE. */
-export const VISIBLE_TOKENS = 4_000;
+/** Visible answer estimate (89 entries, quotes for the addressed ones); recalibrate from a trial's actual usage. Thinking is added from lib/cost.THINKING_ALLOWANCE. */
+export const VISIBLE_TOKENS = 6_000;
 export const SAMPLE_SALT = 'codebook-trial';
 export const RUN_KIND = 'codebook';
 /** Videos per insert statement: each video's rows go in one statement, so a video is all-or-nothing. */
@@ -75,15 +76,35 @@ export async function buildItems(ctx: Ctx, cp: CodebookPrompt, videoIds: string[
   return { items, transcripts, missing };
 }
 
-/** Videos that already have a complete response stored for this prompt and model (its f0 row is written with the rest). */
-async function codedVideos(ctx: Ctx, promptHash: string): Promise<Set<string>> {
+/** Marks a whole response that failed (bad JSON or schema); such a video stays eligible for a later run. */
+export const REJECTED_PREFIX = 'response rejected:';
+
+/** Short fingerprint of a transcript, stored at estimate time and checked again on resume. */
+export function transcriptSha(text: string): string {
+  return createHash('sha256').update(text, 'utf8').digest('hex').slice(0, 16);
+}
+
+/** Postgres text and jsonb reject NUL characters; a model quote could contain one. */
+export function stripNul<T>(v: T): T {
+  if (typeof v === 'string') return v.replace(/\u0000/g, '') as unknown as T;
+  if (Array.isArray(v)) return v.map(stripNul) as unknown as T;
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, stripNul(x)])) as T;
+  return v;
+}
+
+/**
+ * Videos already coded with this prompt and model. A video counts as coded once one of its responses
+ * was stored (its f0 row is written in the same statement as the rest), unless that response was
+ * rejected as a whole: those videos are coded again by a later run.
+ */
+export async function codedVideos(ctx: Ctx, promptHash: string): Promise<Set<string>> {
   const rows = await readOrEmpty(
-    () => selectAll<{ video_id: string }>(ctx.db, 'bt_coded_answers', 'id, video_id', {
+    () => selectAll<{ video_id: string; valid: boolean; error: string | null }>(ctx.db, 'bt_coded_answers', 'id, video_id, valid, error', {
       orderBy: 'id', filter: (q) => q.eq('item_key', 'f0').eq('prompt_hash', promptHash).eq('model', MODEL),
     }),
     () => ctx.log('note: bt_coded_answers not found (migration 20261118_002 not applied yet); treating as empty'),
   );
-  return new Set(rows.map((r) => r.video_id));
+  return new Set(rows.filter((r) => r.valid || !(r.error ?? '').startsWith(REJECTED_PREFIX)).map((r) => r.video_id));
 }
 
 async function ensurePromptRow(ctx: Ctx, cp: CodebookPrompt): Promise<void> {
@@ -130,13 +151,13 @@ export async function makeHandler(ctx: Ctx, runId: string, cp: CodebookPrompt, t
           if (!c.valid) stats.invalid_rows++;
           if (c.addressed) stats.addressed_rows++;
           if (c.addressed && !c.quote_verified) stats.unverified_quotes++;
-          buf.push({
+          buf.push(stripNul({
             run_id: runId, video_id: r.key, item_key: c.item_key, question_id: c.question_id, kind: c.kind, attempt: r.attempt,
             addressed: c.addressed, stance: c.stance, quote: c.quote, quote_verified: c.quote_verified, quote_norm_offset: c.quote_norm_offset,
             choices: c.choices, confidence: c.confidence, transcript_source: t.source, model: MODEL, model_version: r.message.model,
             prompt_hash: cp.promptHash, codebook_version: CODEBOOK_VERSION, raw_response_id: r.rawId, valid: c.valid,
             error: [c.error, checked.unknownKeys.length && c.item_key === 'f0' ? `unknown keys ignored: ${checked.unknownKeys.join(',')}` : null].filter(Boolean).join('; ') || null,
-          });
+          }));
         }
         doneRaw.add(r.rawId);
         if (++videosInBuf >= VIDEOS_PER_INSERT) await flush();
@@ -144,6 +165,15 @@ export async function makeHandler(ctx: Ctx, runId: string, cp: CodebookPrompt, t
       await flush();
     },
   };
+}
+
+/** Quotes are checked against the transcript read now; refuse if it is not the text that was sent. */
+export function assertTranscriptsUnchanged(stored: Record<string, string> | undefined, now: Built['transcripts']): void {
+  if (!stored) return; // runs estimated before fingerprints were recorded
+  const changed = Object.entries(stored).filter(([id, sha]) => now.get(id) === undefined || transcriptSha(now.get(id)!.text) !== sha).map(([id]) => id);
+  if (changed.length) {
+    throw new CliError(`${changed.length} transcript(s) changed or disappeared since this run was estimated (e.g. ${changed.slice(0, 3).join(', ')}); quotes cannot be checked against the text that was sent. Ask the owner how to proceed.`);
+  }
 }
 
 function parseEffort(v: string | undefined): Effort {
@@ -183,6 +213,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     checkKind(run);
     const ids = (run.params.video_ids ?? []) as string[];
     const built = await buildItems(ctx, cp, ids, (run.effort ?? effort) as Effort, Number(run.params.max_tokens ?? maxTokens));
+    assertTranscriptsUnchanged(run.params.transcript_sha as Record<string, string> | undefined, built.transcripts);
     await ensurePromptRow(ctx, cp);
     const handler = await makeHandler(ctx, run.id, cp, built.transcripts);
     const client = ctx.makeClient();
@@ -245,6 +276,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
       kind: RUN_KIND, codebook_version: cp.codebook.version, prompt: cp.prompt.name, prompt_hash: cp.promptHash,
       video_ids: built.items.map((i) => i.key), missing_transcripts: built.missing.length, no_transcript_ids: [...built.missing].sort(),
       sample: sampleN ?? null, seed: sampleN !== undefined ? seed : null, max_tokens: maxTokens, max_attempts: maxAttempts,
+      transcript_sha: Object.fromEntries([...built.transcripts].map(([id, t]) => [id, transcriptSha(t.text)])),
     },
     estimate: { ...est }, script: SCRIPT,
   });

@@ -83,26 +83,29 @@ function checkEntry(it: CodeItem, e: ModelEntry, cb: Codebook, transcript: Norma
   if (e.stance !== 'none') return bad('multiple-choice item with a stance');
   if (quote !== null) return bad('multiple-choice item with a top-level quote');
   if (e.choices.length === 0) return bad('addressed multiple-choice item without any answer');
-  if (e.choices.length > cb.max_choices) return bad(`more than ${cb.max_choices} answers`);
+  // Structured outputs cannot enforce the answer limit, so problems with single answers drop that
+  // answer (noted in error) instead of the whole item; the item is invalid only when nothing usable is left.
   const allowed = new Set([...(it.choices ?? []).map((c) => c.code), OTHER]);
   const seen = new Set<string>();
   const notes: string[] = [];
   const choices: CheckedChoice[] = [];
   for (const c of e.choices) {
-    if (!allowed.has(c.code)) return bad(`unknown answer code "${c.code}"`);
-    if (seen.has(c.code)) return bad(`answer "${c.code}" given twice`);
-    seen.add(c.code);
+    if (!allowed.has(c.code)) { notes.push(`unknown answer code "${c.code}" dropped`); continue; }
+    if (seen.has(c.code)) { notes.push(`answer "${c.code}" given twice; the repeat dropped`); continue; }
     let other: string | null = null;
     if (c.code === OTHER) {
       const t = (c.other_text ?? '').trim();
-      if (!t) return bad('"other" without a description');
+      if (!t) { notes.push('"other" without a description dropped'); continue; }
       other = t.length > OTHER_TEXT_MAX ? t.slice(0, OTHER_TEXT_MAX) : t;
       if (t.length > OTHER_TEXT_MAX) notes.push('other_text cut');
     }
+    if (choices.length >= cb.max_choices) { notes.push(`more than ${cb.max_choices} answers; "${c.code}" dropped`); continue; }
+    seen.add(c.code);
     const v = verifyQuote(c.quote, transcript);
     if (!v.verified) notes.push(`${c.code}: quote not verified: ${v.reason}`);
     choices.push({ code: c.code, quote: c.quote, other_text: other, quote_verified: v.verified, quote_norm_offset: v.offset, quote_check: v.reason });
   }
+  if (choices.length === 0) return bad(`no usable answer: ${notes.join('; ')}`);
   return {
     ...base, addressed: true, stance: null, quote: null, quote_verified: choices.every((c) => c.quote_verified), quote_norm_offset: null,
     choices, valid: true, error: notes.length ? notes.join('; ') : null,

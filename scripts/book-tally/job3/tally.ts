@@ -33,13 +33,17 @@ export interface TallyInputRow {
   valid: boolean;
 }
 
-/** The latest row per (video, item): highest attempt, then highest id. */
+/**
+ * The latest row per (video, item): the highest id. Rows are only ever appended, so this is the most
+ * recent answer, whether it came from a retry (attempt 2+) or from a later run that coded a video again
+ * after its earlier response was rejected.
+ */
 export function latestRows(rows: readonly TallyInputRow[]): Map<string, TallyInputRow> {
   const out = new Map<string, TallyInputRow>();
   for (const r of rows) {
     const k = `${r.video_id}\u0000${r.item_key}`;
     const cur = out.get(k);
-    if (!cur || r.attempt > cur.attempt || (r.attempt === cur.attempt && r.id > cur.id)) out.set(k, r);
+    if (!cur || r.id > cur.id) out.set(k, r);
   }
   return out;
 }

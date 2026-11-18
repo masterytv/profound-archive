@@ -10,7 +10,7 @@ Step 1, addressed. Set "addressed" to true only if the experiencer clearly speak
 
 Step 2, the answer, only when addressed is true:
 - "yes_no" items: set "stance" to "yes", "no" or "mixed". "yes" means the experiencer's words support the item's yes_means. "no" means they clearly state or describe the opposite (the item's no_means, when one is given). A "no" requires an explicit statement; it is never inferred from the experiencer not mentioning something. "mixed" means they clearly address it but say both, or give a qualified answer that is neither. Put one quote that best supports the stance in "quote". Leave "choices" empty.
-- "multiple_choice" items: choose every answer the experiencer clearly gives, from the item's "choices", at most 3, most important first. Each chosen answer is one entry in "choices" with its code and its own quote. Use the code "other" only when what the experiencer says fits none of the listed choices, and then put a short description of their answer (at most 12 words) in "other_text"; otherwise "other_text" is null. Set "stance" to "none" and "quote" to null.
+- "multiple_choice" items: choose every answer the experiencer clearly gives, from the item's "choices", at most {{MAX_CHOICES}}, most important first. Each chosen answer is one entry in "choices" with its code and its own quote. Use the code "other" only when what the experiencer says fits none of the listed choices, and then put a short description of their answer (at most 12 words) in "other_text"; otherwise "other_text" is null. Set "stance" to "none" and "quote" to null.
 
 When addressed is false: "stance" is "none", "quote" is null and "choices" is empty.
 

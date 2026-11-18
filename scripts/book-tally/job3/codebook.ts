@@ -150,8 +150,8 @@ export function loadCodebookPrompt(promptsDir = PROMPTS_DIR, codebookDir = CODEB
   const prompt = loadPrompt(PROMPT_NAME, promptsDir);
   const schema = JSON.parse(readFileSync(path.join(promptsDir, `${PROMPT_NAME}.schema.json`), 'utf8')) as JsonSchema;
   const items = allItems(codebook).map(renderItem);
-  const system = renderPrompt(prompt.text, { ITEMS_JSON: renderItemsJson(codebook) });
-  const hashInput = { questionList: items, outputSchema: schema };
+  const system = renderPrompt(prompt.text, { ITEMS_JSON: renderItemsJson(codebook), MAX_CHOICES: String(codebook.max_choices) });
+  const hashInput = { questionList: { max_choices: codebook.max_choices, items }, outputSchema: schema };
   return {
     codebook, prompt, system, schema,
     promptHash: computePromptHash({ templateBytes: prompt.bytes, ...hashInput }),

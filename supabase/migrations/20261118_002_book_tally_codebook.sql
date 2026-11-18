@@ -74,9 +74,11 @@ CREATE TABLE public.bt_coded_answers (
     CONSTRAINT bt_coded_answers_verified_has_offset CHECK (
         kind <> 'yn' OR NOT quote_verified OR quote_norm_offset IS NOT NULL
     ),
-    CONSTRAINT bt_coded_answers_cell_key UNIQUE (run_id, video_id, item_key, attempt)
+    CONSTRAINT bt_coded_answers_cell_key UNIQUE (run_id, video_id, item_key, attempt),
+    -- target of the gold marks' composite foreign key (a mark cannot name the wrong video or item)
+    CONSTRAINT bt_coded_answers_id_video_item_key UNIQUE (id, video_id, item_key)
 );
-CREATE INDEX bt_coded_answers_run_idx   ON public.bt_coded_answers (run_id, video_id);
+-- (run_id, video_id) lookups use the leading columns of bt_coded_answers_cell_key.
 CREATE INDEX bt_coded_answers_item_idx  ON public.bt_coded_answers (item_key);
 CREATE INDEX bt_coded_answers_video_idx ON public.bt_coded_answers (video_id, item_key, id DESC);
 CREATE INDEX bt_coded_answers_raw_idx   ON public.bt_coded_answers (raw_response_id);
@@ -84,7 +86,7 @@ CREATE INDEX bt_coded_answers_raw_idx   ON public.bt_coded_answers (raw_response
 -- Owner's gold-set marks on coded answers (latest mark per coded answer wins; append to correct).
 CREATE TABLE public.bt_coded_gold_marks (
     id                    bigserial PRIMARY KEY,
-    coded_answer_id       bigint NOT NULL REFERENCES public.bt_coded_answers(id),
+    coded_answer_id       bigint NOT NULL,
     video_id              text NOT NULL,
     item_key              text NOT NULL,
     addressed_correct     boolean NOT NULL,   -- was "addressed" / "not addressed" right?
@@ -94,7 +96,9 @@ CREATE TABLE public.bt_coded_gold_marks (
     quote_is_experiencer  boolean,            -- every quote shown is the experiencer's own words
     note                  text,
     marked_by             text,
-    created_at            timestamptz NOT NULL DEFAULT now()
+    created_at            timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT bt_coded_gold_marks_answer_fk FOREIGN KEY (coded_answer_id, video_id, item_key)
+        REFERENCES public.bt_coded_answers (id, video_id, item_key)
 );
 CREATE INDEX bt_coded_gold_marks_answer_idx ON public.bt_coded_gold_marks (coded_answer_id, id DESC);
 

@@ -8,7 +8,7 @@ import { createGuardedClient } from '../lib/supabase';
 import { PROMPTS_DIR } from '../lib/prompts';
 import { allItems, checkCodebook, CODEBOOK_DIR, loadCodebook, loadCodebookPrompt, OTHER, renderItem, type Codebook } from '../job3/codebook';
 import { checkCodedResponse, countedChoices, rowOutcome, type ModelEntry } from '../job3/validate';
-import { main as runCodebook } from '../job3/run-codebook';
+import { main as runCodebook, makeHandler } from '../job3/run-codebook';
 import { SpendGateError } from '../job1/spend';
 import { fakeAnthropic, fakeDb, type Row } from './job1-fakes';
 
@@ -116,10 +116,8 @@ describe('checkCodedResponse', () => {
     ['yes/no with choices', { q38: { addressed: true, stance: 'yes' as const, quote: 'a deep calm came over me', choices: [{ code: 'x', quote: 'y', other_text: null }] } }, /with choices/],
     ['multiple choice with a stance', { q78: { addressed: true, stance: 'yes' as const, choices: [{ code: 'love', quote: 'learn how to love one another', other_text: null }] } }, /with a stance/],
     ['multiple choice with no answer', { q78: { addressed: true } }, /without any answer/],
-    ['unknown answer code', { q78: { addressed: true, choices: [{ code: 'to_dance', quote: 'learn how to love one another', other_text: null }] } }, /unknown answer code/],
-    ['an answer twice', { q78: { addressed: true, choices: [{ code: 'love', quote: 'learn how to love', other_text: null }, { code: 'love', quote: 'how to love one another', other_text: null }] } }, /given twice/],
-    ['more than 3 answers', { q78: { addressed: true, choices: ['love', 'learn_grow', 'experience_life', 'clear_karma'].map((code) => ({ code, quote: 'learn how to love one another', other_text: null })) } }, /more than 3/],
-    ['"other" without a description', { q78: { addressed: true, choices: [{ code: OTHER, quote: 'learn how to love one another', other_text: '  ' }] } }, /without a description/],
+    ['only answer has an unknown code', { q78: { addressed: true, choices: [{ code: 'to_dance', quote: 'learn how to love one another', other_text: null }] } }, /no usable answer: unknown answer code/],
+    ['only answer is "other" without a description', { q78: { addressed: true, choices: [{ code: OTHER, quote: 'learn how to love one another', other_text: '  ' }] } }, /no usable answer: "other" without a description/],
     ['confidence out of range', { q1: { confidence: 140 } }, /confidence/],
   ])('invalid: %s', (_n, over, re) => {
     const res = check(full(over as Record<string, Partial<ModelEntry>>));
@@ -127,6 +125,26 @@ describe('checkCodedResponse', () => {
     expect(bad).toHaveLength(1);
     expect(bad[0]).toMatchObject({ addressed: null, stance: null, quote: null, choices: null, error: expect.stringMatching(re) });
     expect(rowOutcome(bad[0])).toBe('invalid');
+  });
+
+  it('single bad answers are dropped with a note; the rest of the item still counts', () => {
+    const res = check(full({
+      q69: { addressed: true, choices: [
+        { code: 'bright_loving_light', quote: 'a deep calm came over me and I was not afraid at all', other_text: null },
+        { code: 'bright_loving_light', quote: 'a deep calm came over me and I was not afraid', other_text: null },
+        { code: 'to_dance', quote: 'The car hit the tree at full speed', other_text: null },
+        { code: 'landscapes', quote: 'The car hit the tree at full speed', other_text: null },
+        { code: 'water', quote: 'everything went dark. Then a deep calm', other_text: null },
+        { code: 'tunnel', quote: 'It was raining that night. The car hit', other_text: null },
+      ] },
+    }));
+    const r = row(res, 'q69');
+    expect(r.valid).toBe(true);
+    expect(r.choices!.map((c) => c.code)).toEqual(['bright_loving_light', 'landscapes', 'water']);
+    expect(r.error).toMatch(/given twice/);
+    expect(r.error).toMatch(/unknown answer code "to_dance" dropped/);
+    expect(r.error).toMatch(/more than 3 answers; "tunnel" dropped/);
+    expect(countedChoices(r)).toEqual(['bright_loving_light', 'landscapes', 'water']);
   });
 
   it('missing and duplicated items are invalid; unknown keys are reported and ignored', () => {
@@ -173,15 +191,15 @@ const answer = (params: Record<string, any>): string => {
   }));
 };
 
-function harness() {
+function harness(stopFor?: (customId: string) => string | undefined) {
   const fake = fakeDb(seed());
   const guarded = createGuardedClient(fake.db as unknown as SupabaseClient);
-  const api = fakeAnthropic({ respond: (_c, p) => answer(p), model: 'claude-haiku-5-5' });
+  const api = fakeAnthropic({ respond: (_c, p) => answer(p), model: 'claude-haiku-5-5', stopFor });
   const makeClient = vi.fn(() => api.client);
   const logs: string[] = [];
   let tick = 0;
   const call = (argv: string[]) => runCodebook(argv, { db: guarded, makeClient, log: (l) => logs.push(l), now: () => new Date(Date.UTC(2026, 10, 19, 10, 0, tick++)), sleep: async () => undefined });
-  return { fake, api, makeClient, logs, call };
+  return { fake, guarded, api, makeClient, logs, call };
 }
 
 describe('run-codebook (mock DB + mock Anthropic)', () => {
@@ -222,9 +240,9 @@ describe('run-codebook (mock DB + mock Anthropic)', () => {
     for (const secret of ['car hit the tree', 'meadow', 'raised Catholic', 'comes back broken']) expect(out).not.toContain(secret);
     for (const o of h.fake.ops.filter((x) => x.op !== 'select')) expect(o.table.startsWith('bt_')).toBe(true);
 
-    // v1 and v2 are coded with this prompt (v3 too: its rows exist, invalid), so nothing is left
+    // v1 and v2 are coded with this prompt; v3's whole response was rejected, so a later run codes it again
     await h.call(['--estimate']);
-    expect(h.logs.at(-1)).toBe('nothing to code');
+    expect(h.fake.tables.bt_runs.at(-1)!.params).toMatchObject({ video_ids: ['v3'] });
   });
 
   it('a cap below the first-attempt worst case is refused at estimate time', async () => {
@@ -249,5 +267,68 @@ describe('run-codebook (mock DB + mock Anthropic)', () => {
     h.fake.tables.bt_coded_answers = [{ id: 1, run_id: 'x', video_id: 'v2', item_key: 'f0', prompt_hash: loadCodebookPrompt().promptHash, model: 'claude-haiku-5-5' }];
     await expect(h.call(['--confirm-spend', String(h.fake.tables.bt_runs[0].id)])).rejects.toThrow(/already have a result since the estimate/);
     expect(h.api.create).not.toHaveBeenCalled();
+  });
+
+  it('a truncated response is retried with a larger max_tokens; only the successful attempt is stored', async () => {
+    const h = harness((cid) => (cid.includes('_v1_') && cid.endsWith('_1') ? 'max_tokens' : undefined));
+    await h.call(['--estimate']);
+    await h.call(['--confirm-spend', String(h.fake.tables.bt_runs[0].id)]);
+    expect(h.api.create).toHaveBeenCalledTimes(2);
+    const retry = h.api.batchRequests.filter((r) => r.custom_id.includes('_v1_'));
+    expect(retry.map((r) => r.params.max_tokens)).toEqual([20000, 40000]);
+    const v1 = h.fake.tables.bt_coded_answers.filter((r) => r.video_id === 'v1');
+    expect(v1).toHaveLength(89);
+    expect(new Set(v1.map((r) => r.attempt))).toEqual(new Set([2]));
+    expect(v1.find((r) => r.item_key === 'q38')).toMatchObject({ stance: 'yes', quote_verified: true });
+  });
+
+  it('truncated on every attempt: nothing stored for that video, which stays eligible for a later run', async () => {
+    const h = harness((cid) => (cid.includes('_v1_') ? 'max_tokens' : undefined));
+    await h.call(['--estimate', '--max-attempts', '2']);
+    await h.call(['--confirm-spend', String(h.fake.tables.bt_runs[0].id)]);
+    expect(h.fake.tables.bt_coded_answers.filter((r) => r.video_id === 'v1')).toEqual([]);
+    expect(h.logs.join('\n')).toMatch(/unresolved after retries 1/);
+    await h.call(['--estimate']);
+    expect((h.fake.tables.bt_runs.at(-1)!.params as { video_ids: string[] }).video_ids).toEqual(expect.arrayContaining(['v1', 'v3']));
+  });
+
+  it('crash after the batch was created: --resume collects without a new batch, and nothing is stored twice', async () => {
+    const crash = harness();
+    await crash.call(['--estimate']);
+    const id = String(crash.fake.tables.bt_runs[0].id);
+    const crashing = fakeAnthropic({ respond: (_c, p) => answer(p), model: 'claude-haiku-5-5', crashOnResults: true });
+    const logs: string[] = [];
+    const deps = (api: ReturnType<typeof fakeAnthropic>) => ({ db: crash.guarded, makeClient: () => api.client, log: (l: string) => logs.push(l), now: () => new Date('2026-11-19T12:00:00Z'), sleep: async () => undefined });
+    await expect(runCodebook(['--confirm-spend', id], deps(crashing))).rejects.toThrow(/simulated crash/);
+    expect(crash.fake.tables.bt_runs[0]).toMatchObject({ status: 'submitted' });
+    expect(crash.fake.tables.bt_coded_answers ?? []).toEqual([]);
+
+    const api2 = fakeAnthropic({ respond: (_c, p) => answer(p), model: 'claude-haiku-5-5', seed: { batch_1: crashing.batchRequests } });
+    await runCodebook(['--resume', id], deps(api2));
+    expect(api2.create).not.toHaveBeenCalled();
+    expect(crash.fake.tables.bt_coded_answers).toHaveLength(89 * 3);
+    expect(crash.fake.tables.bt_runs[0].status).toBe('completed');
+
+    // replaying responses that are already stored adds nothing (the handler skips known raw responses)
+    const raw = crash.fake.tables.bt_raw_responses;
+    const cp = loadCodebookPrompt();
+    const ctx = { db: crash.guarded, log: () => undefined, makeClient: () => api2.client, now: () => new Date(), outDir: '' } as never;
+    const handler = await makeHandler(ctx, id, cp, new Map(vids.map((v) => [v, { text: VT[v], source: 'subtitles_punctuated' as const }])));
+    await handler.onCollected(raw.map((r) => ({
+      customId: String(r.custom_id), key: String(r.custom_id).split('_').slice(-3, -2)[0], attempt: 1, kind: 'succeeded',
+      message: r.response as never, rawId: Number(r.id),
+    })));
+    expect(crash.fake.tables.bt_coded_answers).toHaveLength(89 * 3);
+  });
+
+  it('refuses to resume when a transcript changed after the estimate (quotes would be checked against other text)', async () => {
+    const h = harness();
+    await h.call(['--estimate']);
+    const id = String(h.fake.tables.bt_runs[0].id);
+    const crashing = fakeAnthropic({ respond: (_c, p) => answer(p), model: 'claude-haiku-5-5', crashOnResults: true });
+    const deps = { db: h.guarded, makeClient: () => crashing.client, log: () => undefined, now: () => new Date('2026-11-19T12:00:00Z'), sleep: async () => undefined };
+    await expect(runCodebook(['--confirm-spend', id], deps)).rejects.toThrow(/simulated crash/);
+    h.fake.tables.nde_vids.find((r) => r.videoId === 'v2')!.subtitles_punctuated += ' Something new.';
+    await expect(runCodebook(['--resume', id], deps)).rejects.toThrow(/transcript\(s\) changed or disappeared/);
   });
 });

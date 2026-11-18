@@ -66,6 +66,8 @@ SELECT id, 'v1', 'q78', true, false, ARRAY['love'], true FROM public.bt_coded_an
 SELECT pg_temp.expect_fail($s$UPDATE public.bt_coded_gold_marks SET note = 'x'$s$, '23001', 'gold marks cannot be updated');
 SELECT pg_temp.expect_fail($s$DELETE FROM public.bt_coded_gold_marks$s$, '23001', 'gold marks cannot be deleted');
 SELECT pg_temp.expect_fail($s$INSERT INTO public.bt_coded_gold_marks (coded_answer_id, video_id, item_key, addressed_correct) VALUES (999999, 'v1', 'q1', true)$s$, '23503', 'gold mark must point at a coded answer');
+SELECT pg_temp.expect_fail($s$INSERT INTO public.bt_coded_gold_marks (coded_answer_id, video_id, item_key, addressed_correct) SELECT id, 'v1', 'q1', true FROM public.bt_coded_answers WHERE item_key = 'q78'$s$, '23503', 'gold mark must name the same item as its coded answer');
+SELECT pg_temp.expect_fail($s$INSERT INTO public.bt_coded_gold_marks (coded_answer_id, video_id, item_key, addressed_correct) SELECT id, 'v2', 'q78', true FROM public.bt_coded_answers WHERE item_key = 'q78'$s$, '23503', 'gold mark must name the same video as its coded answer');
 
 -- ---------- access ----------
 DO $$ BEGIN

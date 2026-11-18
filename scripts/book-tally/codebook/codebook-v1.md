@@ -107,7 +107,7 @@ Type: **Y/N** yes/no · **MC** multiple choice · **COND** conditional (conditio
 
 | Q | Question | Type | How it is coded | ≈n |
 |---|---|---|---|---|
-| 30 | When lights flicker, coins appear, or I see my loved one's favorite bird — is that really them contacting me? | Y/N | **Can signs like these be real contact from the dead?** Yes = real contact. | 322 |
+| 30 | When lights flicker, coins appear, or I see my loved one's favorite bird — is that really them contacting me? | Y/N | **Can signs such as flickering lights, coins appearing, or a loved one's favorite bird be real contact from the dead?** Yes = real contact. | 322 |
 | 31 | Why hasn't my deceased loved one visited me in a dream — are they unable to, or upset with me? | MC | They are able to and not upset; it depends on the living person · they are upset · they are unable to | 2 |
 | 32 | Can the people who've crossed over actually hear me when I talk to them out loud? | Y/N | Yes means the dead hear the living. | 188 |
 | 33 | Does my constant grief disturb the peace of the people I've lost — should I try to let go? | Y/N | Yes means grief does affect, or hold back, the dead. | 65 |
