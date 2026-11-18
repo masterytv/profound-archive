@@ -14,6 +14,7 @@
  *    minimum unless the model quotes more surrounding words. This under-reports self-names; it
  *    never invents them.
  *  - The name must also be preceded immediately by a first-person introducer (SELF_INTRODUCERS).
+ *    "this is <name>" is excluded because hosts say it about guests.
  */
 import {
   candidatePairRule, canonicalFirst, coreKey, exactKey, HONORIFICS, isInitialOf, jaroWinkler,
@@ -49,12 +50,23 @@ export const PLACEHOLDER_NAMES = new Set([
   'guest', 'anonymous guest', 'anonymous person', 'nde', 'test', 'tbd', 'undefined', 'null',
 ]);
 
-/** exact_key of a metadata name, or null if blank / placeholder / single token (too ambiguous to key a person). */
+/**
+ * Number of name tokens excluding titles AND generational suffixes (parseName tokens are the
+ * core form): "John Jr." and "Dr. John" have ONE token, "John Smith Jr." has two.
+ */
+export function coreTokenCount(raw: string): number {
+  return parseName(raw).tokens.length;
+}
+
+/**
+ * exact_key of a metadata name, or null if blank / placeholder / fewer than 2 core tokens
+ * (titles and suffixes do not count; too ambiguous to key a person).
+ */
 export function usableNameKey(raw: string | null | undefined): string | null {
   if (!raw) return null;
   const k = exactKey(raw);
   if (!k || PLACEHOLDER_NAMES.has(k)) return null;
-  return k.includes(' ') ? k : null;
+  return coreTokenCount(raw) >= 2 ? k : null;
 }
 
 // ---- name -> profile matching (link proposals) ---------------------------------------
@@ -444,12 +456,13 @@ export function nameInQuote(name: string, quote: string): boolean {
 }
 
 /** First-person introducers accepted immediately before a self-stated name (normalized, apostrophes deleted: "I'm" -> "im"). */
-export const SELF_INTRODUCERS = ['my name is', 'my names', 'i m', 'im', 'i am', 'this is', 'call me', 'they call me'] as const;
+export const SELF_INTRODUCERS = ['my name is', 'my names', 'i m', 'im', 'i am', 'call me', 'they call me'] as const;
 
 /**
  * True iff, at some occurrence of the name inside the quote, the tokens immediately before it
  * (skipping honorifics such as "Dr") end with a first-person introducer. A name merely
- * mentioned ("my guest today is Jane Smith", "thanks Jane Smith") does not pass.
+ * mentioned ("my guest today is Jane Smith", "thanks Jane Smith", "this is Jane Smith" said
+ * about someone else) does not pass; "this is" is deliberately NOT an introducer.
  */
 export function selfIntroducerBefore(name: string, quote: string): boolean {
   const qt = tokenize(quoteNormalize(quote));
@@ -535,8 +548,8 @@ export type SelfNameClass =
 export function classifySelfName(name: string, idx: ProfileIndex): SelfNameClass {
   const key = exactKey(name);
   if (!key) return { kind: 'unusable' };
-  if (!key.includes(' ')) return { kind: 'first_name_only' };
   if (PLACEHOLDER_NAMES.has(key)) return { kind: 'unusable' };
+  if (coreTokenCount(name) < 2) return { kind: 'first_name_only' };
   const m = matchName(name, idx);
   if (m.level === 'exact' || m.level === 'core') return { kind: 'profile', level: m.level, profileId: m.profileId };
   if (m.level === 'ambiguous') return { kind: 'ambiguous', profileIds: m.profileIds };
