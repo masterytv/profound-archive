@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { serializeJsonLd } from '@/lib/json-ld';
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
@@ -37,6 +38,39 @@ export const revalidate = 86400; // ISR: revalidate once per day
 interface VideoPageProps {
     params: Promise<{ id: string }>;
     searchParams: Promise<{ t?: string }>;
+}
+
+// Share cards (iMessage, Slack, social): show the video's own YouTube thumbnail
+// instead of the site-wide default card.
+export async function generateMetadata({ params }: VideoPageProps): Promise<Metadata> {
+    const { id } = await params;
+    const supabase = await createClient();
+    const { data: video } = await supabase
+        .from("nde_vids")
+        .select("title, analysis_nde_summary, thumbnailUrl")
+        .eq("videoId", id)
+        .single();
+    if (!video) return { title: "Video Not Found | Project Profound" };
+
+    const title = video.title ?? "Near-Death Experience";
+    const description = video.analysis_nde_summary
+        ? video.analysis_nde_summary.slice(0, 160)
+        : "An AI-analyzed near-death experience on Project Profound.";
+    const image = video.thumbnailUrl || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+
+    return {
+        title: `${title} | Project Profound`,
+        description,
+        openGraph: {
+            siteName: "Project Profound",
+            type: "article",
+            url: `/video/${id}`,
+            title,
+            description,
+            images: [image],
+        },
+        twitter: { card: "summary_large_image", title, description, images: [image] },
+    };
 }
 
 // --- Helpers ---
