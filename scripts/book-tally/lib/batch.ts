@@ -8,7 +8,9 @@
  *  - results are keyed by custom_id, never by position.
  *  - no sampling parameters are ever sent (these models reject temperature).
  */
+import { createHash } from 'crypto';
 import type Anthropic from '@anthropic-ai/sdk';
+import { btUpdateRunIf, type Db } from './supabase';
 
 export type BatchRequest = Anthropic.Messages.BatchCreateParams.Request;
 export type RequestParams = Anthropic.Messages.MessageCreateParamsNonStreaming;
@@ -115,7 +117,8 @@ export async function createBatch(
     if (seen.has(r.custom_id)) throw new Error(`duplicate custom_id ${r.custom_id}`);
     seen.add(r.custom_id);
   }
-  const batch = await client.messages.batches.create({ requests });
+  // maxRetries: 0 — a transparent SDK retry after a lost response could create a second paid batch.
+  const batch = await client.messages.batches.create({ requests }, { maxRetries: 0 });
   await onCreated(batch.id);
   return batch;
 }
@@ -282,4 +285,269 @@ export async function collectBatch(client: Anthropic, batchId: string, opts: Pol
     if (r.retryable) retryable.push(r.customId);
   }
   return { batch, results, retryable };
+}
+
+// =====================================================================================
+// Guarded submission: never create a paid batch without a durable, conditional record
+// =====================================================================================
+
+/** Marker appended to bt_runs.batch_ids BEFORE batches.create: `pending:<iso>:<nReq>:<sha12>`. */
+export interface PendingMarker {
+  raw: string;
+  at: Date;
+  iso: string;
+  nRequests: number;
+  sha12: string;
+}
+
+const PENDING_RE = /^pending:(\d{4}-\d\d-\d\dT[\d:.]+Z):(\d+):([0-9a-f]{12})$/;
+
+export function isMarker(entry: string): boolean {
+  return entry.startsWith('pending:') || entry.startsWith('void:');
+}
+
+/** The real Anthropic batch ids in bt_runs.batch_ids, with pending/void markers removed. */
+export function realBatchIds(batchIds: readonly string[] | null | undefined): string[] {
+  return (batchIds ?? []).filter((e) => !isMarker(e));
+}
+
+export function parsePendingMarker(raw: string): PendingMarker | null {
+  const m = PENDING_RE.exec(raw);
+  if (!m) return null;
+  return { raw, at: new Date(m[1]), iso: m[1], nRequests: Number(m[2]), sha12: m[3] };
+}
+
+/** First 12 hex chars of sha256 over the sorted custom_ids joined by newlines. */
+export function customIdsSha12(customIds: Iterable<string>): string {
+  return createHash('sha256').update([...customIds].sort().join('\n')).digest('hex').slice(0, 12);
+}
+
+export function makePendingMarker(customIds: readonly string[], now: Date = new Date()): string {
+  return `pending:${now.toISOString()}:${customIds.length}:${customIdsSha12(customIds)}`;
+}
+
+/** Pending markers that are NOT immediately followed by a real id or a void marker. */
+export function unresolvedMarkers(batchIds: readonly string[]): PendingMarker[] {
+  const out: PendingMarker[] = [];
+  batchIds.forEach((entry, i) => {
+    const m = parsePendingMarker(entry);
+    if (!m) return;
+    const next = batchIds[i + 1];
+    if (next === undefined || next.startsWith('pending:')) out.push(m);
+  });
+  return out;
+}
+
+export interface RunState { id: string; status: string; batch_ids: string[] }
+
+async function readRunState(db: Db, runId: string): Promise<RunState> {
+  const { data, error } = await db.from('bt_runs').select('id, status, batch_ids').eq('id', runId);
+  if (error) throw new Error(`read bt_runs ${runId} failed: ${error.message}`);
+  const row = (data ?? [])[0] as { id: string; status: string; batch_ids: string[] | null } | undefined;
+  if (!row) throw new Error(`bt_runs ${runId} not found`);
+  return { id: row.id, status: row.status, batch_ids: row.batch_ids ?? [] };
+}
+
+type Sleep = (ms: number) => Promise<void>;
+const defaultSleep: Sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+export interface SubmitGuardedInput {
+  db: Db;
+  client: Anthropic;
+  runId: string;
+  /** Status the run must have right now (e.g. 'estimated'); everything hinges on this compare-and-set. */
+  expectedStatus: string;
+  requests: BatchRequest[];
+  now?: () => Date;
+  sleep?: Sleep;
+  /** Max total time to keep retrying the "record real batch id" write. Default 120 s. */
+  recordRetryBudgetMs?: number;
+}
+
+export interface SubmitGuardedResult { batchId: string; marker: string }
+
+/**
+ * Safe paid submission:
+ *  a. conditional UPDATE status expectedStatus -> 'submitting' appending a durable
+ *     `pending:<iso>:<nReq>:<sha12>` marker to batch_ids. 0 rows updated => throw (concurrent
+ *     or already submitted); NOTHING is sent.
+ *  b. batches.create with maxRetries 0 (never auto-retried: a lost response must not duplicate spend).
+ *     On failure the run stays 'submitting' with the pending marker; call resolvePending() before
+ *     any resubmission.
+ *  c. append the real batch id and set status 'submitted' in ONE conditional update (retried with
+ *     exponential backoff for ~2 min). If that cannot be recorded the error names the batch id so a
+ *     human can pass it to resolvePending --adopt-batch.
+ */
+export async function submitGuarded(i: SubmitGuardedInput): Promise<SubmitGuardedResult> {
+  const { db, client, runId, expectedStatus, requests } = i;
+  const sleep = i.sleep ?? defaultSleep;
+  if (requests.length === 0) throw new Error('submitGuarded: no requests');
+  const ids = requests.map((r) => r.custom_id);
+  for (const id of ids) {
+    assertValidCustomId(id);
+    if (!id.startsWith(`${runId}_`)) throw new Error(`custom_id "${id}" does not start with "${runId}_"`);
+  }
+  if (new Set(ids).size !== ids.length) throw new Error('duplicate custom_id in requests');
+
+  // a. compare-and-set + durable marker
+  const before = await readRunState(db, runId);
+  if (before.status !== expectedStatus) {
+    throw new Error(`run not in expected status (concurrent or already submitted): ${runId} is "${before.status}", expected "${expectedStatus}"`);
+  }
+  const marker = makePendingMarker(ids, (i.now ?? (() => new Date()))());
+  const n = await btUpdateRunIf(db, runId, expectedStatus, { status: 'submitting', batch_ids: [...before.batch_ids, marker] });
+  if (n === 0) throw new Error(`run not in expected status (concurrent or already submitted): ${runId}`);
+
+  // b. create, never auto-retried
+  let batch: MessageBatch;
+  try {
+    batch = await client.messages.batches.create({ requests }, { maxRetries: 0 });
+  } catch (e) {
+    throw new Error(
+      `batches.create failed or its response was lost; run ${runId} stays "submitting" with marker ${marker}. ` +
+        `Run resolvePending (it checks whether the batch was created) before ANY resubmission. Cause: ${(e as Error).message}`,
+    );
+  }
+
+  // c. record the real id (+ status) durably
+  await recordBatchId(db, runId, batch.id, sleep, i.recordRetryBudgetMs ?? 120_000);
+  return { batchId: batch.id, marker };
+}
+
+async function recordBatchId(db: Db, runId: string, batchId: string, sleep: Sleep, budgetMs: number): Promise<void> {
+  let waited = 0;
+  let delay = 1000;
+  let lastErr: unknown;
+  for (;;) {
+    try {
+      const cur = await readRunState(db, runId);
+      if (cur.batch_ids.includes(batchId) && cur.status !== 'submitting') return;
+      const ids = cur.batch_ids.includes(batchId) ? cur.batch_ids : [...cur.batch_ids, batchId];
+      const n = await btUpdateRunIf(db, runId, 'submitting', { batch_ids: ids, status: 'submitted' });
+      if (n === 1) return;
+      lastErr = new Error(`run ${runId} no longer "submitting" (status "${cur.status}")`);
+    } catch (e) {
+      lastErr = e;
+    }
+    if (waited >= budgetMs) break;
+    const step = Math.min(delay, budgetMs - waited);
+    await sleep(step);
+    waited += step;
+    delay *= 2;
+  }
+  throw new Error(
+    `BATCH CREATED BUT NOT RECORDED: ${batchId} (run ${runId}). It is running and billing. ` +
+      `Record it with resolvePending({ adoptBatchId: "${batchId}" }). Last error: ${(lastErr as Error)?.message ?? lastErr}`,
+  );
+}
+
+export interface PendingResolution {
+  marker: PendingMarker;
+  /** 'adopted': a verified batch was recorded; 'none': no matching batch exists, safe to resubmit those keys. */
+  result: 'adopted' | 'none';
+  batchId?: string;
+}
+
+export interface ResolvePendingInput {
+  db: Db;
+  client: Anthropic;
+  /** Run id; the current batch_ids/status are re-read from the database. */
+  run: { id: string };
+  /** Human-chosen batch to adopt (from a previous "candidates" error). Verified before it is recorded. */
+  adoptBatchId?: string;
+  poll?: PollOptions;
+  now?: () => Date;
+}
+
+/** Window before the marker time in which a matching batch may legitimately have been created. */
+export const PENDING_LOOKBACK_MS = 60_000;
+
+async function batchCustomIds(client: Anthropic, batchId: string, poll?: PollOptions): Promise<string[]> {
+  await pollBatch(client, batchId, poll);
+  const ids: string[] = [];
+  for await (const r of streamResults(client, batchId)) ids.push(r.customId);
+  return ids;
+}
+
+function verifyBatchAgainstMarker(runId: string, batchId: string, ids: string[], marker: PendingMarker): void {
+  const foreign = ids.filter((id) => !id.startsWith(`${runId}_`));
+  if (foreign.length) throw new Error(`batch ${batchId} contains ${foreign.length} custom_id(s) not starting with "${runId}_"; refusing to adopt`);
+  if (ids.length !== marker.nRequests) throw new Error(`batch ${batchId} has ${ids.length} requests, marker expects ${marker.nRequests}; refusing to adopt`);
+  const sha = customIdsSha12(ids);
+  if (sha !== marker.sha12) throw new Error(`batch ${batchId} custom_id hash ${sha} != marker ${marker.sha12}; refusing to adopt`);
+}
+
+function total(c: Anthropic.Messages.MessageBatchRequestCounts): number {
+  return c.canceled + c.errored + c.expired + c.processing + c.succeeded;
+}
+
+/**
+ * Resolves every pending marker that has no following real batch id by asking the API
+ * whether the batch was in fact created. Call this before ANY resubmission.
+ *  - adoptBatchId given: verify (after the batch ends) that every custom_id starts with
+ *    `${run.id}_` and that count + sha match some unresolved marker, then record it.
+ *  - otherwise list batches created at/after (marker time - 60 s) whose request_counts total equals
+ *    nReq: exactly 1 -> verify the same way and adopt; 0 -> result 'none' (a `void:` marker is
+ *    recorded so the check is not repeated); >1 -> throw listing ids/created_at for the human to
+ *    choose with adoptBatchId.
+ */
+export async function resolvePending(i: ResolvePendingInput): Promise<PendingResolution[]> {
+  const { db, client, run } = i;
+  const state = await readRunState(db, run.id);
+  const pending = unresolvedMarkers(state.batch_ids);
+  if (pending.length === 0) return [];
+  const known = new Set(realBatchIds(state.batch_ids));
+  const results: PendingResolution[] = [];
+  let ids = [...state.batch_ids];
+
+  const record = async (marker: PendingMarker, entry: string, adopted: boolean) => {
+    const at = ids.indexOf(marker.raw);
+    ids = [...ids.slice(0, at + 1), entry, ...ids.slice(at + 1)];
+    const fresh = await readRunState(db, run.id);
+    const patch: { batch_ids: string[]; status?: string } = { batch_ids: ids };
+    if (adopted && fresh.status === 'submitting') patch.status = 'submitted';
+    const n = await btUpdateRunIf(db, run.id, fresh.status, patch);
+    if (n === 0) throw new Error(`run ${run.id} changed while recording ${entry}; retry`);
+  };
+
+  if (i.adoptBatchId) {
+    const batchId = i.adoptBatchId;
+    if (known.has(batchId)) throw new Error(`batch ${batchId} is already recorded on run ${run.id}`);
+    const batchIds = await batchCustomIds(client, batchId, i.poll);
+    const sha = customIdsSha12(batchIds);
+    const marker = pending.find((m) => m.sha12 === sha && m.nRequests === batchIds.length);
+    if (!marker) throw new Error(`batch ${batchId} (${batchIds.length} requests, hash ${sha}) matches no unresolved marker of run ${run.id}; refusing to adopt`);
+    verifyBatchAgainstMarker(run.id, batchId, batchIds, marker);
+    await record(marker, batchId, true);
+    return [{ marker, result: 'adopted', batchId }];
+  }
+
+  for (const marker of pending) {
+    const since = marker.at.getTime() - PENDING_LOOKBACK_MS;
+    const candidates: MessageBatch[] = [];
+    for await (const b of client.messages.batches.list({ limit: 100 })) {
+      if (new Date(b.created_at).getTime() < since) break; // newest first
+      if (known.has(b.id)) continue;
+      if (total(b.request_counts) === marker.nRequests) candidates.push(b);
+    }
+    if (candidates.length > 1) {
+      throw new Error(
+        `${candidates.length} batches could be the unrecorded submission for marker ${marker.raw} of run ${run.id}: ` +
+          candidates.map((b) => `${b.id} (created ${b.created_at})`).join(', ') +
+          `. Choose the right one and pass it as adoptBatchId (--adopt-batch).`,
+      );
+    }
+    if (candidates.length === 0) {
+      await record(marker, `void:${(i.now ?? (() => new Date()))().toISOString()}`, false);
+      results.push({ marker, result: 'none' });
+      continue;
+    }
+    const batchId = candidates[0].id;
+    const batchIds = await batchCustomIds(client, batchId, i.poll);
+    verifyBatchAgainstMarker(run.id, batchId, batchIds, marker);
+    await record(marker, batchId, true);
+    known.add(batchId);
+    results.push({ marker, result: 'adopted', batchId });
+  }
+  return results;
 }

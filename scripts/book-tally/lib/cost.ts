@@ -149,3 +149,111 @@ export function addUsage(totals: UsageTotals, model: string, usage: UsageLike, o
 export function formatUsd(n: number): string {
   return `$${n.toFixed(n < 1 ? 4 : 2)}`;
 }
+
+// ---- worst-case ceilings, output modelling, retry budget ----------------------------
+
+/**
+ * ASSUMED fixed per-request thinking allowance (output tokens). usage.output_tokens
+ * includes thinking tokens, so these are guesses to be REPLACED by pilot actuals
+ * (mean output_tokens minus visible tokens) as soon as a pilot has run.
+ */
+export const THINKING_ALLOWANCE: Record<ModelFamily, number> = { haiku: 2000, sonnet: 3000, opus: 5000 };
+
+/**
+ * Output-token model for one request: a fixed thinking allowance plus visible tokens per item
+ * (an "item" is one answer / one judged pair / one extraction in the request).
+ */
+export function estimateOutputTokens(
+  model: string,
+  items: number,
+  visibleTokensPerItem: number,
+  thinkingAllowance: number = THINKING_ALLOWANCE[familyOf(model)],
+): number {
+  return Math.ceil(thinkingAllowance + items * visibleTokensPerItem);
+}
+
+/** True when this request would be priced at the long-context tier (haiku > 100K prompt tokens). */
+export function isLongContext(model: string, t: Pick<TokenCounts, 'inputTokens' | 'cacheReadTokens' | 'cacheWrite5mTokens' | 'cacheWrite1hTokens'>): boolean {
+  const price = PRICES[familyOf(model)];
+  if (!price.longContext || price.longContextThreshold === undefined) return false;
+  const prompt = t.inputTokens + (t.cacheReadTokens ?? 0) + (t.cacheWrite5mTokens ?? 0) + (t.cacheWrite1hTokens ?? 0);
+  return prompt > price.longContextThreshold;
+}
+
+export interface CeilingInput {
+  model: string;
+  /** One entry per request (per-request prompt size decides the haiku tier). */
+  requests: Array<Omit<TokenCounts, 'outputTokens'>>;
+  /** max_tokens of the FIRST attempt. */
+  maxTokens: number;
+  /** Total attempts allowed per request (>= 1), e.g. MAX_ATTEMPTS = 3. */
+  maxAttempts: number;
+  /** When true (default) each retry doubles max_tokens (truncation retries). */
+  doubling?: boolean;
+  batch?: boolean;
+}
+
+/**
+ * Hard upper bound in USD: every request fully used on every attempt, with every output
+ * at max_tokens (doubling per attempt):
+ *   sum over attempts k=1..maxAttempts, over requests: (input + maxTokens * 2^(k-1) output)
+ * priced at batch rates, Haiku long-context tier decided PER REQUEST.
+ */
+export function ceilingCost(c: CeilingInput): number {
+  if (!Number.isInteger(c.maxAttempts) || c.maxAttempts < 1) throw new Error('ceilingCost: maxAttempts must be an integer >= 1');
+  const doubling = c.doubling ?? true;
+  let total = 0;
+  for (let k = 1; k <= c.maxAttempts; k++) {
+    const out = c.maxTokens * (doubling ? 2 ** (k - 1) : 1);
+    for (const r of c.requests) total += requestCost(c.model, { ...r, outputTokens: out }, { batch: c.batch });
+  }
+  return total;
+}
+
+export interface ProjectionResult {
+  perRequestUsd: number;
+  totalUsd: number;
+  /** Share of the pilot's requests priced at the long-context tier. */
+  longContextShare: number;
+  pilotRequests: number;
+}
+
+/**
+ * Projects a full-run cost from pilot per-request actuals (token counts from real usage
+ * objects). Each pilot request is priced INDIVIDUALLY (Haiku tier per request, never from
+ * averaged token counts), the mean cost per request is scaled to `targetRequests`.
+ */
+export function projectFromPilot(
+  model: string,
+  pilotRequests: TokenCounts[],
+  targetRequests: number,
+  opts: CostOptions = {},
+): ProjectionResult {
+  if (pilotRequests.length === 0) throw new Error('projectFromPilot: no pilot requests');
+  const total = estimateCost(model, pilotRequests, opts);
+  const per = total / pilotRequests.length;
+  const long = pilotRequests.filter((r) => isLongContext(model, r)).length;
+  return { perRequestUsd: per, totalUsd: per * targetRequests, longContextShare: long / pilotRequests.length, pilotRequests: pilotRequests.length };
+}
+
+export interface RetryBudgetInput {
+  /** The ceiling the human approved (e.g. from ceilingCost, printed in the estimate). */
+  approvedCeilingUsd: number;
+  /** Actual spend so far (sum of costFromUsage over collected responses). */
+  spentUsd: number;
+  /** Worst-case cost of the batch about to be queued. */
+  queuedWorstUsd: number;
+  /** True only when the human explicitly confirmed retries beyond the approved ceiling. */
+  confirmedRetries?: boolean;
+}
+
+/** Throws unless spent + queued worst case stays within the approved ceiling, or retries were confirmed. */
+export function assertRetryBudget(b: RetryBudgetInput): void {
+  const projected = b.spentUsd + b.queuedWorstUsd;
+  if (projected <= b.approvedCeilingUsd + 1e-9 || b.confirmedRetries === true) return;
+  throw new Error(
+    `Retry budget exceeded: spent ${formatUsd(b.spentUsd)} + queued worst case ${formatUsd(b.queuedWorstUsd)} = ` +
+      `${formatUsd(projected)} > approved ceiling ${formatUsd(b.approvedCeilingUsd)}. ` +
+      `Re-approve with an explicit retry confirmation to continue.`,
+  );
+}

@@ -52,7 +52,12 @@ export interface AnthropicHandle {
   keyEnvName: string;
 }
 
-/** Builds the SDK client. Only call this when an API request is actually about to be made. */
+/**
+ * Builds the SDK client (default SDK retries stay ON for normal calls such as retrieve/results/count_tokens).
+ * Batch CREATION is never retried: batch.ts passes `{ maxRetries: 0 }` per request, because a retried
+ * create after a lost response could start a second paid batch.
+ * Only call this when an API request is actually about to be made.
+ */
 export function createAnthropicClient(env: Env = process.env): AnthropicHandle {
   const { value, envName } = getAnthropicKey(env);
   return {

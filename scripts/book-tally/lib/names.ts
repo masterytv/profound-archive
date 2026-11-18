@@ -5,36 +5,53 @@
 import { readFileSync } from 'fs';
 import path from 'path';
 
-/** Tokens dropped after normalization (honorifics and suffixes). */
-export const HONORIFICS = new Set([
-  'dr', 'rev', 'reverend', 'mr', 'mrs', 'ms', 'miss', 'prof', 'phd', 'md', 'jr', 'sr', 'ii', 'iii', 'iv',
-]);
+/** Titles dropped from every key. */
+export const TITLES = new Set(['dr', 'rev', 'reverend', 'mr', 'mrs', 'ms', 'miss', 'prof', 'phd', 'md']);
 
 /**
- * NFKD strip accents, lowercase, drop punctuation, drop honorifics/suffixes,
- * collapse whitespace. Apostrophes and periods are removed outright
- * ("O'Brien" -> "obrien", "Ph.D." -> "phd"); every other non-alphanumeric
- * character (hyphen, comma, ...) separates tokens ("Smith-Jones" -> "smith jones").
+ * Generational suffixes. KEPT in exact_key (John Smith Sr. and John Smith Jr. are different
+ * people) and dropped only from core_key / first / last.
  */
-export function normalizeName(raw: string): string {
+export const SUFFIXES = new Set(['jr', 'sr', 'ii', 'iii', 'iv']);
+
+/** Titles and suffixes together (for callers that only want a bare name's tokens). */
+export const HONORIFICS = new Set([...TITLES, ...SUFFIXES]);
+
+function baseTokens(raw: string): string[] {
   const t = raw
     .normalize('NFKD')
     .replace(/\p{M}+/gu, '')
     .toLowerCase()
-    .replace(/['‘’ʼ`.]/g, '')
+    .replace(/['\u2018\u2019\u02BC`.]/g, '')
     .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .trim();
-  if (t === '') return '';
-  return t
-    .split(' ')
-    .filter((tok) => tok !== '' && !HONORIFICS.has(tok))
-    .join(' ');
+  return t === '' ? [] : t.split(' ').filter((tok) => tok !== '' && !TITLES.has(tok));
+}
+
+/**
+ * Exact-key form: NFKD strip accents, lowercase, drop punctuation and TITLES, collapse
+ * whitespace; generational suffixes are kept. Apostrophes and periods are removed outright
+ * ("O'Brien" -> "obrien", "Ph.D." -> "phd" -> dropped as a title); every other
+ * non-alphanumeric character separates tokens ("Smith-Jones" -> "smith jones").
+ */
+export function normalizeName(raw: string): string {
+  return baseTokens(raw).join(' ');
+}
+
+/** Core form: like normalizeName but generational suffixes are dropped too. */
+export function normalizeNameCore(raw: string): string {
+  return baseTokens(raw).filter((tok) => !SUFFIXES.has(tok)).join(' ');
 }
 
 export interface ParsedName {
-  /** Normalized full string (the exact_key). */
+  /** Normalized full string including suffixes (the exact_key). */
   full: string;
+  /** Normalized string without suffixes. */
+  core: string;
+  /** Tokens of the core form (no titles, no suffixes). */
   tokens: string[];
+  /** Generational suffixes that were present (jr, sr, ii, iii, iv). */
+  suffixes: string[];
   /** First token ('' if none). */
   first: string;
   /** Last token; '' when the name has a single token. */
@@ -44,11 +61,13 @@ export interface ParsedName {
 }
 
 export function parseName(raw: string): ParsedName {
-  const full = normalizeName(raw);
-  const tokens = full === '' ? [] : full.split(' ');
+  const all = baseTokens(raw);
+  const tokens = all.filter((tok) => !SUFFIXES.has(tok));
   return {
-    full,
+    full: all.join(' '),
+    core: tokens.join(' '),
     tokens,
+    suffixes: all.filter((tok) => SUFFIXES.has(tok)),
     first: tokens[0] ?? '',
     last: tokens.length > 1 ? tokens[tokens.length - 1] : '',
     middle: tokens.length > 2 ? tokens.slice(1, -1) : [],
@@ -78,14 +97,14 @@ export function canonicalFirst(first: string, map: Map<string, string> = (nickMa
 
 // ---- keys -----------------------------------------------------------------
 
-/** exact_key = normalized full string; null when the name is empty. */
+/** exact_key = normalized full string (suffixes kept); null when the name is empty. */
 export function exactKey(raw: string): string | null {
   const full = normalizeName(raw);
   return full === '' ? null : full;
 }
 
 /**
- * core_key = canonical(first) + ' ' + last (middle names and initials ignored).
+ * core_key = canonical(first) + ' ' + last (middle names, initials, titles and suffixes ignored).
  * null when there is no last name (single-token names are too ambiguous to key).
  */
 export function coreKey(raw: string, map?: Map<string, string>): string | null {

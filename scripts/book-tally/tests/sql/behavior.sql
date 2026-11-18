@@ -21,12 +21,14 @@ INSERT INTO public.bt_runs (id, job, model) VALUES ('r1','stance','claude-haiku-
 INSERT INTO public.bt_prompts VALUES (repeat('a',64),'stance-v1','tmpl',NULL,NULL);
 
 -- ---------- immutability ----------
-DO $$ BEGIN
+DO $$ DECLARE n int; BEGIN
   UPDATE public.bt_runs SET status='submitting', batch_ids=ARRAY['pending:2026-11-18T00:00:00.000Z:2:abcdef012345'] WHERE id='r1';
   PERFORM pg_temp.expect((SELECT status FROM public.bt_runs WHERE id='r1')='submitting','submitting status allowed');
   -- conditional-update shape used by btUpdateRunIf
-  PERFORM pg_temp.expect((SELECT count(*) FROM (UPDATE public.bt_runs SET status='submitted' WHERE id='r1' AND status='estimated' RETURNING id) u)=0,'conditional update with wrong expected status touches 0 rows');
-  PERFORM pg_temp.expect((SELECT count(*) FROM (UPDATE public.bt_runs SET status='submitted' WHERE id='r1' AND status='submitting' RETURNING id) u)=1,'conditional update with right expected status touches 1 row');
+  WITH u AS (UPDATE public.bt_runs SET status='submitted' WHERE id='r1' AND status='estimated' RETURNING id) SELECT count(*) INTO n FROM u;
+  PERFORM pg_temp.expect(n=0,'conditional update with wrong expected status touches 0 rows');
+  WITH u AS (UPDATE public.bt_runs SET status='submitted' WHERE id='r1' AND status='submitting' RETURNING id) SELECT count(*) INTO n FROM u;
+  PERFORM pg_temp.expect(n=1,'conditional update with right expected status touches 1 row');
   UPDATE public.bt_runs SET status='submitted', batch_ids=ARRAY['b1'], actual_usage='{}'::jsonb, finished_at=now() WHERE id='r1';
   PERFORM pg_temp.expect((SELECT status FROM public.bt_runs WHERE id='r1')='submitted','bookkeeping update allowed');
 END $$;

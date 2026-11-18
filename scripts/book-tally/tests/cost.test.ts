@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  MODELS, addUsage, costFromUsage, emptyTotals, estimateCost, familyOf, requestCost, usageToCounts,
+  MODELS, THINKING_ALLOWANCE, addUsage, assertRetryBudget, ceilingCost, costFromUsage, emptyTotals, estimateCost,
+  estimateOutputTokens, familyOf, isLongContext, projectFromPilot, requestCost, usageToCounts,
 } from '../lib/cost';
 
 describe('requestCost', () => {
@@ -64,5 +65,84 @@ describe('estimate / usage', () => {
     addUsage(t, MODELS.haiku, { input_tokens: 2000, output_tokens: 200, cache_read_input_tokens: 5000 });
     expect(t).toMatchObject({ requests: 2, inputTokens: 3000, outputTokens: 300, cacheReadTokens: 5000 });
     expect(t.costUsd).toBeGreaterThan(0);
+  });
+});
+
+describe('ceilingCost', () => {
+  it('sums every attempt with max_tokens doubling, at batch price', () => {
+    // sonnet: $2/MTok in, $10/MTok out, batch x0.5. 2 requests, 10k input each, max 4000, 3 attempts.
+    // outputs per request: 4000 + 8000 + 16000 = 28000 ; inputs: 3 attempts * 10k = 30000
+    // per request: (30000*2 + 28000*10)/1e6 = 0.34 ; two requests 0.68 ; batch -> 0.34
+    const c = ceilingCost({ model: MODELS.sonnet, requests: [{ inputTokens: 10_000 }, { inputTokens: 10_000 }], maxTokens: 4000, maxAttempts: 3 });
+    expect(c).toBeCloseTo(0.34, 12);
+  });
+  it('doubling:false keeps max_tokens constant', () => {
+    const c = ceilingCost({ model: MODELS.sonnet, requests: [{ inputTokens: 10_000 }], maxTokens: 4000, maxAttempts: 3, doubling: false });
+    expect(c).toBeCloseTo(((30_000 * 2 + 12_000 * 10) / 1e6) / 2, 12);
+  });
+  it('is never below a single-attempt cost and grows with attempts', () => {
+    const base = { model: MODELS.opus, requests: [{ inputTokens: 1000 }], maxTokens: 1000 };
+    const one = ceilingCost({ ...base, maxAttempts: 1 });
+    expect(one).toBeCloseTo(requestCost(MODELS.opus, { inputTokens: 1000, outputTokens: 1000 }), 12);
+    expect(ceilingCost({ ...base, maxAttempts: 3 })).toBeGreaterThan(one * 3);
+  });
+  it('applies the Haiku long-context tier PER REQUEST (one big request does not reprice the small ones)', () => {
+    const small = { inputTokens: 50_000 };
+    const big = { inputTokens: 150_000 };
+    const c = ceilingCost({ model: MODELS.haiku, requests: [small, big], maxTokens: 1000, maxAttempts: 1 });
+    const expected = requestCost(MODELS.haiku, { ...small, outputTokens: 1000 }) + requestCost(MODELS.haiku, { ...big, outputTokens: 1000 });
+    expect(c).toBeCloseTo(expected, 12);
+    // hand check: small = (50k*0.10 + 1000*0.50)/1e6/2 ; big = (150k*0.50 + 1000*2.50)/1e6/2
+    expect(c).toBeCloseTo((50_000 * 0.1 + 500) / 2e6 + (150_000 * 0.5 + 2500) / 2e6, 12);
+  });
+  it('validates maxAttempts', () => {
+    expect(() => ceilingCost({ model: MODELS.haiku, requests: [], maxTokens: 1, maxAttempts: 0 })).toThrow();
+  });
+});
+
+describe('output model and projections', () => {
+  it('documents the thinking allowance defaults', () => {
+    expect(THINKING_ALLOWANCE).toEqual({ haiku: 2000, sonnet: 3000, opus: 5000 });
+  });
+  it('estimateOutputTokens = thinking allowance + visible tokens per item', () => {
+    expect(estimateOutputTokens(MODELS.haiku, 81, 60)).toBe(2000 + 81 * 60);
+    expect(estimateOutputTokens(MODELS.opus, 1, 100)).toBe(5100);
+    expect(estimateOutputTokens(MODELS.sonnet, 10, 10, 500)).toBe(600);
+  });
+  it('isLongContext only for haiku above 100K prompt tokens (cache counts)', () => {
+    expect(isLongContext(MODELS.haiku, { inputTokens: 100_000 })).toBe(false);
+    expect(isLongContext(MODELS.haiku, { inputTokens: 1, cacheReadTokens: 100_000 })).toBe(true);
+    expect(isLongContext(MODELS.sonnet, { inputTokens: 900_000 })).toBe(false);
+  });
+  it('projectFromPilot prices each pilot request individually, then scales', () => {
+    const pilot = [
+      { inputTokens: 40_000, outputTokens: 3000 },
+      { inputTokens: 40_000, outputTokens: 3000 },
+      { inputTokens: 160_000, outputTokens: 3000 },
+      { inputTokens: 40_000, outputTokens: 3000 },
+    ];
+    const p = projectFromPilot(MODELS.haiku, pilot, 1000);
+    const exact = pilot.reduce((s, r) => s + requestCost(MODELS.haiku, r), 0) / pilot.length;
+    expect(p.perRequestUsd).toBeCloseTo(exact, 12);
+    expect(p.totalUsd).toBeCloseTo(exact * 1000, 9);
+    expect(p.longContextShare).toBe(0.25);
+    // averaging tokens first would price every request at the cheap tier and understate the cost
+    const avgTokens = { inputTokens: 70_000, outputTokens: 3000 };
+    expect(p.perRequestUsd).toBeGreaterThan(requestCost(MODELS.haiku, avgTokens));
+    expect(() => projectFromPilot(MODELS.haiku, [], 10)).toThrow();
+  });
+});
+
+describe('assertRetryBudget', () => {
+  it('passes within the approved ceiling (boundary inclusive)', () => {
+    expect(() => assertRetryBudget({ approvedCeilingUsd: 10, spentUsd: 4, queuedWorstUsd: 6 })).not.toThrow();
+    expect(() => assertRetryBudget({ approvedCeilingUsd: 10, spentUsd: 0, queuedWorstUsd: 1 })).not.toThrow();
+  });
+  it('throws when spent + queued worst case exceeds the ceiling', () => {
+    expect(() => assertRetryBudget({ approvedCeilingUsd: 10, spentUsd: 4, queuedWorstUsd: 6.01 })).toThrow(/Retry budget exceeded/);
+    expect(() => assertRetryBudget({ approvedCeilingUsd: 10, spentUsd: 4, queuedWorstUsd: 6.01, confirmedRetries: false })).toThrow();
+  });
+  it('explicit confirmedRetries lets it through', () => {
+    expect(() => assertRetryBudget({ approvedCeilingUsd: 10, spentUsd: 9, queuedWorstUsd: 50, confirmedRetries: true })).not.toThrow();
   });
 });

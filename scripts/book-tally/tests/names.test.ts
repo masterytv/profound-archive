@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
   candidatePairRule, canonicalFirst, coreKey, exactKey, isInitialOf, jaroWinkler,
-  loadNicknames, normalizeName, parseName,
+  loadNicknames, normalizeName, normalizeNameCore, parseName,
 } from '../lib/names';
 
 describe('normalizeName', () => {
   it('strips accents, case, punctuation, honorifics and suffixes', () => {
-    expect(normalizeName('Dr. José  O’Brien, Jr.')).toBe('jose obrien');
+    expect(normalizeName('Dr. José  O’Brien, Jr.')).toBe('jose obrien jr'); // suffix kept in the exact form
     expect(normalizeName('REV. Mary-Ann Smith, Ph.D.')).toBe('mary ann smith');
-    expect(normalizeName('Mr John Q. Public III')).toBe('john q public');
+    expect(normalizeName('Mr John Q. Public III')).toBe('john q public iii');
+    expect(normalizeNameCore('Mr John Q. Public III')).toBe('john q public');
+    expect(normalizeNameCore('Dr. José  O’Brien, Jr.')).toBe('jose obrien');
     expect(normalizeName('  ')).toBe('');
   });
 });
@@ -29,6 +31,30 @@ describe('parseName / keys', () => {
   it('exact differs but core matches across nickname', () => {
     expect(exactKey('Bill Smith')).not.toBe(exactKey('William Smith'));
     expect(coreKey('Bill Smith')).toBe(coreKey('William Smith'));
+  });
+});
+
+describe('generational suffixes', () => {
+  it('exact_key keeps them, core_key drops them: John Smith Sr. vs Jr.', () => {
+    expect(exactKey('John Smith Sr.')).toBe('john smith sr');
+    expect(exactKey('John Smith Jr.')).toBe('john smith jr');
+    expect(exactKey('John Smith Sr.')).not.toBe(exactKey('John Smith Jr.'));
+    expect(exactKey('John Smith')).not.toBe(exactKey('John Smith Jr'));
+    expect(coreKey('John Smith Sr.')).toBe('john smith');
+    expect(coreKey('John Smith Sr.')).toBe(coreKey('John Smith Jr.'));
+    expect(coreKey('John Smith III')).toBe(coreKey('Johnny Smith IV'));
+  });
+  it('suffixes never become first/last tokens; they are listed separately', () => {
+    const p = parseName('Martin Luther King Jr.');
+    expect([p.first, p.last, p.suffixes, p.full, p.core]).toEqual(['martin', 'king', ['jr'], 'martin luther king jr', 'martin luther king']);
+    expect(parseName('Sammy Davis, Jr.').last).toBe('davis');
+  });
+  it('titles are dropped from every key, suffixes are not titles', () => {
+    expect(exactKey('Dr. Anita Moorjani')).toBe('anita moorjani');
+    expect(exactKey('Rev. Bob Jones Sr')).toBe('bob jones sr');
+  });
+  it('candidate rule still pairs father and son (judge decides)', () => {
+    expect(candidatePairRule('John Smith Sr.', 'John Smith Jr.')).toBe('last_and_first_similar');
   });
 });
 

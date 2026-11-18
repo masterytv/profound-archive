@@ -192,23 +192,45 @@ export async function btInsert<T extends Record<string, unknown>>(
   return out;
 }
 
-/** Updates only the bookkeeping columns of one bt_runs row. */
-export async function btUpdateRun(
-  db: Db,
-  runId: string,
-  patch: Partial<Record<(typeof RUN_BOOKKEEPING_COLUMNS)[number], unknown>>,
-): Promise<void> {
+type RunPatch = Partial<Record<(typeof RUN_BOOKKEEPING_COLUMNS)[number], unknown>>;
+
+function assertBookkeepingPatch(patch: RunPatch): string[] {
   const keys = Object.keys(patch);
   const bad = keys.filter((k) => !(RUN_BOOKKEEPING_COLUMNS as readonly string[]).includes(k));
   if (bad.length) throw new Error(`bt_runs: only ${RUN_BOOKKEEPING_COLUMNS.join(', ')} are updatable (got ${bad.join(', ')})`);
-  if (keys.length === 0) return;
+  return keys;
+}
+
+/** Updates only the bookkeeping columns of one bt_runs row (unconditional). */
+export async function btUpdateRun(db: Db, runId: string, patch: RunPatch): Promise<void> {
+  if (assertBookkeepingPatch(patch).length === 0) return;
   const { error } = await db.from('bt_runs').update(patch).eq('id', runId);
   if (error) throw new Error(`update bt_runs ${runId} failed: ${error.message}`);
 }
 
 /**
- * Paged read of every row. `orderBy` must be a unique column so paging is stable.
- * Never pass transcript columns here; use transcript.ts.
+ * Conditional bookkeeping update: `UPDATE bt_runs SET ... WHERE id = runId AND status = expectedStatus
+ * RETURNING id`. Returns the number of rows updated (0 = the run was not in the expected
+ * status, e.g. a concurrent submitter got there first). This is the compare-and-set used
+ * to guard every paid submission.
+ */
+export async function btUpdateRunIf(db: Db, runId: string, expectedStatus: string, patch: RunPatch): Promise<number> {
+  if (assertBookkeepingPatch(patch).length === 0) throw new Error('btUpdateRunIf: empty patch');
+  const { data, error } = await db
+    .from('bt_runs')
+    .update(patch)
+    .eq('id', runId)
+    .eq('status', expectedStatus)
+    .select('id');
+  if (error) throw new Error(`conditional update bt_runs ${runId} failed: ${error.message}`);
+  return (data ?? []).length;
+}
+
+/**
+ * Paged read of every row (offset paging). `orderBy` must be a unique column so paging is
+ * stable. Stops ONLY on an empty page, never on a short one, because the server may cap
+ * page size below the requested size. For large or concurrently-written tables prefer
+ * selectAllKeyset. Never pass transcript columns here; use transcript.ts.
  */
 export async function selectAll<T = Record<string, unknown>>(
   db: Db,
@@ -218,14 +240,45 @@ export async function selectAll<T = Record<string, unknown>>(
 ): Promise<T[]> {
   const pageSize = opts.pageSize ?? 1000;
   const out: T[] = [];
-  for (let from = 0; ; from += pageSize) {
+  for (let from = 0; ; ) {
     let q = db.from(table).select(columns).order(opts.orderBy, { ascending: true }).range(from, from + pageSize - 1);
     if (opts.filter) q = opts.filter(q);
     const { data, error } = await q;
     if (error) throw new Error(`select from ${table} failed: ${error.message}`);
     const rows = (data ?? []) as unknown as T[];
+    if (rows.length === 0) break;
     out.push(...rows);
-    if (rows.length < pageSize) break;
+    from += rows.length;
+  }
+  return out;
+}
+
+/**
+ * Keyset-paged read of every row: `.gt(orderCol, last).order(orderCol).limit(pageSize)`.
+ * `orderCol` must be UNIQUE and included in `select` (rows with a tied key would be skipped).
+ * Stops ONLY on an empty page. `applyFilters` receives the query builder and returns it.
+ */
+export async function selectAllKeyset<T extends Record<string, unknown> = Record<string, unknown>>(
+  db: Db,
+  table: string,
+  select: string,
+  orderCol: string,
+  applyFilters?: (q: any) => any,
+  pageSize = 1000,
+): Promise<T[]> {
+  const out: T[] = [];
+  let last: unknown = undefined;
+  for (;;) {
+    let q = db.from(table).select(select);
+    if (applyFilters) q = applyFilters(q);
+    if (last !== undefined) q = q.gt(orderCol, last as never);
+    const { data, error } = await q.order(orderCol, { ascending: true }).limit(pageSize);
+    if (error) throw new Error(`keyset select from ${table} failed: ${error.message}`);
+    const rows = (data ?? []) as unknown as T[];
+    if (rows.length === 0) break;
+    out.push(...rows);
+    last = rows[rows.length - 1][orderCol];
+    if (last === undefined || last === null) throw new Error(`keyset select from ${table}: "${orderCol}" must be included in the select list and non-null`);
   }
   return out;
 }
