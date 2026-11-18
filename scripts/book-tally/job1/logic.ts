@@ -112,6 +112,8 @@ export interface LinkPlan {
   multiProfile: Array<{ video_id: string; profile_ids: number[] }>;
   /** Unlinked, unnamed (or unusable-name) videos. These are the name-extraction targets. */
   anonVideoIds: string[];
+  /** Subset of anonVideoIds whose experiencerFullName is blank/null (the ~639 default extraction targets). */
+  anonBlankVideoIds: string[];
   stats: Record<string, number>;
 }
 
@@ -165,6 +167,7 @@ export function planLinks(input: {
 
   const ambiguous: LinkPlan['ambiguous'] = [];
   const anonVideoIds: string[] = [];
+  const anonBlankVideoIds: string[] = [];
   for (const vid of [...nde].sort()) {
     const meta = input.videos.get(vid);
     if (!meta) { stats.nde_videos_missing_in_nde_vids++; continue; }
@@ -200,9 +203,10 @@ export function planLinks(input: {
         evidence: blank ? {} : { reason: 'placeholder_or_single_token_name' }, autoAcceptBy: AUTO_BY.baseline,
       });
       anonVideoIds.push(vid);
+      if (blank) anonBlankVideoIds.push(vid);
     }
   }
-  return { links, ambiguous, multiProfile, anonVideoIds, stats };
+  return { links, ambiguous, multiProfile, anonVideoIds, anonBlankVideoIds, stats };
 }
 
 // ---- persons and candidate pairs ----------------------------------------------------------
@@ -420,7 +424,7 @@ export function decideFromVerdicts(haiku: Verdict | undefined | null, sonnet: Ve
 /**
  * True iff the name's normalized tokens (honorifics dropped) occur as a contiguous run of
  * tokens inside the normalized quote. Uses lib/quote's normalization on BOTH sides so the
- * comparison is consistent with quote verification ("O'Brien" -> "o brien" on both sides).
+ * comparison is consistent with quote verification (apostrophes are deleted on both sides).
  */
 export function nameInQuote(name: string, quote: string): boolean {
   const nameTokens = tokenize(quoteNormalize(name)).filter((t) => !HONORIFICS.has(t));

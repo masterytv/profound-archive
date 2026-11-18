@@ -6,15 +6,19 @@
  *    requested question is invalid;
  *  - exactly one answer per requested question id: missing or duplicated -> that question
  *    is invalid; ids that were not requested are ignored (reported in `extraIds`);
+ *  - validation of coverage/stance/confidence/quote presence is lib/validate-stance (one bad
+ *    item never fails a whole insert chunk); this module adds the envelope and item JSON-schema
+ *    checks and quote verification;
  *  - an answer failing the item schema, with confidence not an integer in 0..100, or a
  *    non-not_addressed stance without a quote is invalid (stance stored as null);
  *  - a quote that fails verification keeps the stance (valid) with quote_verified=false and
  *    error 'quote_<reason>'; such rows are flagged for the recheck, never counted;
- *  - not_addressed ignores any quote (stored as null).
+ *  - not_addressed ignores any quote (stored as null; the row's error carries a note).
  * Invalid rows carry stance/confidence/quote = null and an error string.
  */
 import { alignTimestamp, verifyQuote, type NormalizedTranscript } from '../lib/quote';
 import type { TimestampedSegment } from '../lib/transcript';
+import { validateAnswerSet } from '../lib/validate-stance';
 import { validateSchema, type JsonSchema } from './schema';
 
 export const STANCES = ['yes', 'no', 'mixed', 'not_addressed'] as const;
@@ -86,42 +90,41 @@ export function parseAnswers(
   const envErrors = validateSchema(envelopeSchemaOf(schema), doc);
   if (envErrors.length) return failAll(`schema: ${envErrors[0]}`);
 
+  // Coverage / stance / confidence / quote-presence rules: shared lib validator, so one bad
+  // item can never fail a whole insert chunk.
+  const validated = validateAnswerSet(doc, requestedIds);
+
+  // Item-level JSON-schema check (additional properties, types) for ids answered exactly once.
   const itemSchema = itemSchemaOf(schema);
-  const requested = new Set(requestedIds);
-  const seen = new Map<number, unknown[]>();
-  const extra = new Set<number>();
+  const byId = new Map<number, unknown[]>();
   for (const item of (doc as { answers: unknown[] }).answers) {
     const id = item && typeof item === 'object' ? (item as Record<string, unknown>).question_id : undefined;
-    if (typeof id !== 'number' || !Number.isInteger(id)) continue; // unattributable: cannot belong to a question
-    if (!requested.has(id)) { extra.add(id); continue; }
-    const list = seen.get(id) ?? [];
-    list.push(item);
-    seen.set(id, list);
+    if (typeof id === 'number') (byId.get(id) ?? byId.set(id, []).get(id)!).push(item);
   }
 
-  const rows = requestedIds.map((qid): AnswerRow => {
-    const items = seen.get(qid);
-    if (!items) return invalid(qid, 'missing_answer');
-    if (items.length > 1) return invalid(qid, 'duplicate_answer');
-    const item = items[0] as { stance: string; confidence: number; quote: string | null };
-    const errs = validateSchema(itemSchema, item);
-    if (errs.length) return invalid(qid, `schema: ${errs[0]}`);
-    if (item.confidence < 0 || item.confidence > 100) return invalid(qid, 'bad_confidence');
-    const stance = item.stance as Stance;
-    if (stance === 'not_addressed') {
+  const rows = validated.rows.map((r): AnswerRow => {
+    const qid = r.question_id;
+    if (!r.valid || r.stance === null || r.confidence === null) return invalid(qid, r.error ?? 'invalid');
+    const items = byId.get(qid);
+    if (items && items.length === 1) {
+      const errs = validateSchema(itemSchema, items[0]);
+      if (errs.length) return invalid(qid, `schema: ${errs[0]}`);
+    }
+    if (r.stance === 'not_addressed') {
       return {
-        questionId: qid, valid: true, stance, confidence: item.confidence, quote: null,
-        quoteVerified: false, quoteNormOffset: null, startSeconds: null, error: null,
+        questionId: qid, valid: true, stance: r.stance, confidence: r.confidence, quote: null,
+        quoteVerified: false, quoteNormOffset: null, startSeconds: null, error: r.error,
       };
     }
-    if (item.quote == null || item.quote.trim() === '') return invalid(qid, 'missing_quote');
-    const v = verifyQuote(item.quote, ctx.transcript);
+    if (r.quote == null || r.quote.trim() === '') return invalid(qid, 'missing_quote');
+    const v = verifyQuote(r.quote, ctx.transcript);
     return {
-      questionId: qid, valid: true, stance, confidence: item.confidence, quote: item.quote,
+      questionId: qid, valid: true, stance: r.stance, confidence: r.confidence, quote: r.quote,
       quoteVerified: v.verified, quoteNormOffset: v.verified ? v.offset : null,
-      startSeconds: v.verified ? alignTimestamp(item.quote, ctx.segments) : null,
+      startSeconds: v.verified ? alignTimestamp(r.quote, ctx.segments) : null,
       error: v.verified ? null : `quote_${v.reason}`,
     };
   });
-  return { rows, extraIds: [...extra].sort((a, b) => a - b), envelopeError: null };
+  const extraIds = validated.extras.map((e) => e.question_id).filter((x): x is number => typeof x === 'number').sort((a, b) => a - b);
+  return { rows, extraIds, envelopeError: null };
 }

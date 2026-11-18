@@ -1,8 +1,9 @@
 /**
  * Job 1, step 5: self-stated names for unnamed, unlinked NDE videos (Message Batches API, paid).
  *
- * Targets are the videos build-links leaves as anon:<videoId> (no usable experiencerFullName,
- * in no profile). Haiku returns a name only if the speaker states their own name, with the
+ * Targets are unlinked NDE videos with a blank experiencerFullName (the ~639); with
+ * --include-unusable-names also those whose name is a single token or placeholder (all stay
+ * anon:<videoId> in build-links). Haiku returns a name only if the speaker states their own name, with the
  * verbatim quote. Code then checks (1) the quote verifies against the transcript (lib/quote)
  * and (2) the name's normalized tokens occur inside the normalized quote. Everything is stored
  * in bt_name_extractions; verified multi-token names become PENDING bt_person_links
@@ -39,6 +40,7 @@ const OPTIONS: Record<string, OptDef> = {
   'confirm-spend': { type: 'string', help: 'run_id of an estimated run; submits exactly its requests (spends money)' },
   resume: { type: 'string', help: 'run_id of a submitted run: collect its results (no new spend)' },
   effort: { type: 'string', help: 'low|medium|high|xhigh|max (default medium)' },
+  'include-unusable-names': { type: 'boolean', help: 'also target videos whose metadata name is a single token or placeholder (default: only blank names)' },
   limit: { type: 'string', help: 'only the first N target videos (trial runs)' },
   'sample-size': { type: 'string', help: 'force a stratified token-count sample of this size (min 50) instead of counting all' },
   'max-attempts': { type: 'string', help: 'attempts for errored/expired requests (default 2)' },
@@ -160,11 +162,12 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   // --dry-run and --estimate: find targets
   const world = await loadWorld(db);
   const plan = planLinks(world);
+  const pool = v['include-unusable-names'] === true ? plan.anonVideoIds : plan.anonBlankVideoIds;
   const done = new Set((await readExtractions(ctx)).filter((e) => e.valid && e.prompt_hash === promptHash && e.model === MODEL).map((e) => e.video_id));
-  let targets = plan.anonVideoIds.filter((id) => !done.has(id));
+  let targets = pool.filter((id) => !done.has(id));
   if (limit) targets = targets.slice(0, limit);
-  log(`targets: ${plan.anonVideoIds.length} unnamed unlinked NDE videos; already extracted with this prompt+model: ${plan.anonVideoIds.length - plan.anonVideoIds.filter((id) => !done.has(id)).length}; to extract: ${targets.length}`);
-  log(`  of which no experiencerFullName: ${plan.stats.baseline_anon_no_name}; placeholder/single-token name: ${plan.stats.baseline_anon_unusable_name}`);
+  log(`targets: ${pool.length} unlinked NDE videos (${v['include-unusable-names'] === true ? 'blank + single-token/placeholder names' : 'blank names only'}); already extracted with this prompt+model: ${pool.length - pool.filter((id) => !done.has(id)).length}; to extract: ${targets.length}`);
+  log(`  not targeted unless --include-unusable-names: ${plan.stats.baseline_anon_unusable_name} videos with a single-token or placeholder name`);
   const built = await buildNameItems(ctx, targets, effort);
   log(`requests built: ${built.items.length}; videos without a usable transcript: ${built.missing.length}`);
   if (v['dry-run'] === true) {
@@ -181,7 +184,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const runId = newRunId('j1n', ctx.now());
   await startRun(db, {
     id: runId, job: 'name_extract', pass: 'haiku', model: MODEL, effort, status: 'estimated',
-    params: { prompt: PROMPT_NAME, video_ids: built.items.map((i) => i.key), missing_transcripts: built.missing.length, limit: limit ?? null },
+    params: { prompt: PROMPT_NAME, include_unusable_names: v['include-unusable-names'] === true, video_ids: built.items.map((i) => i.key), missing_transcripts: built.missing.length, limit: limit ?? null },
     estimate: { ...est }, script: SCRIPT,
   });
   printEstimate(log, runId, est);
@@ -201,17 +204,14 @@ async function makeHandler(ctx: Ctx, runId: string, promptHash: string, transcri
       const out: Array<Record<string, unknown>> = [];
       for (const r of rows) {
         if (doneRaw.has(r.rawId)) continue;
+        if (r.kind === 'truncated') { stats.truncated++; continue; } // retried with a larger max_tokens by the driver
         if (r.kind !== 'succeeded' || !r.message) { stats.not_succeeded++; continue; }
         const t = transcripts.get(r.key);
         if (!t) throw new Error(`no transcript loaded for ${r.key}`);
-        let c: Checked;
-        if (r.message.stop_reason === 'max_tokens') {
-          stats.truncated++;
-          c = { valid: false, error: 'truncated at max_tokens', name: null, quote: null, quote_verified: false, name_in_quote: false, quote_norm_offset: null };
-        } else {
-          const p = parseModelJson<{ name: string | null; quote: string | null }>(messageText(r.message), schema);
-          c = p.ok ? checkExtraction(p.value, prepareTranscript(t.text)) : { valid: false, error: p.error, name: null, quote: null, quote_verified: false, name_in_quote: false, quote_norm_offset: null };
-        }
+        const p = parseModelJson<{ name: string | null; quote: string | null }>(messageText(r.message), schema);
+        const c: Checked = p.ok
+          ? checkExtraction(p.value, prepareTranscript(t.text))
+          : { valid: false, error: p.error, name: null, quote: null, quote_verified: false, name_in_quote: false, quote_norm_offset: null };
         if (!c.valid) stats.invalid++;
         else if (c.name === null) stats.no_name++;
         else {

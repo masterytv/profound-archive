@@ -211,8 +211,8 @@ function makeHandler(ctx: Ctx, runId: string, stage: Stage, model: string, promp
       const out: Array<Record<string, unknown>> = [];
       for (const r of rows) {
         if (doneRaw.has(r.rawId)) continue;
+        if (r.kind === 'truncated') { stats.truncated++; continue; } // retried with a larger max_tokens by the driver
         if (r.kind !== 'succeeded' || !r.message) { stats.not_succeeded++; continue; }
-        if (r.message.stop_reason === 'max_tokens') { stats.truncated++; stats.invalid++; continue; }
         const p = parseModelJson<{ verdict: Verdict; reason: string }>(messageText(r.message), schema);
         if (!p.ok) { stats.invalid++; continue; }
         const cid = Number(/^c(\d+)$/.exec(r.key)?.[1]);
@@ -233,7 +233,7 @@ function makeHandler(ctx: Ctx, runId: string, stage: Stage, model: string, promp
 async function finish(ctx: Ctx, runId: string, stage: Stage, out: Awaited<ReturnType<typeof submitRun>>, stats: ReturnType<typeof makeHandler>['stats'], _maxAttempts: number) {
   const { log, db } = ctx;
   const usage = usageSummary(out.usage);
-  log(`run ${runId}: judged ${stats.judged}, invalid ${stats.invalid} (truncated ${stats.truncated}), not succeeded ${stats.not_succeeded}, unresolved after retries ${out.unresolved.length}`);
+  log(`run ${runId}: judged ${stats.judged}, invalid ${stats.invalid}, truncated ${stats.truncated}, not succeeded ${stats.not_succeeded}, unresolved after retries ${out.unresolved.length}`);
   log(`verdicts: ${JSON.stringify(stats.verdicts)}`);
   log(`actual usage: ${JSON.stringify(usage)}`);
   const { cands, judgments, decisions } = await readAll(ctx);

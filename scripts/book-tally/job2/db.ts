@@ -63,10 +63,12 @@ export interface RawRef {
   custom_id: string;
   result_type: 'succeeded' | 'errored' | 'canceled' | 'expired';
   stop_reason: string | null;
+  /** error.type of an errored result (batch error body: {type:'error', error:{type,message}}). */
+  err_type: string | null;
 }
 
 export async function fetchRawRefs(db: Db, runId: string): Promise<RawRef[]> {
-  return selectAll<RawRef>(db, 'bt_raw_responses', 'id, custom_id, result_type, stop_reason:response->>stop_reason', {
+  return selectAll<RawRef>(db, 'bt_raw_responses', 'id, custom_id, result_type, stop_reason:response->>stop_reason, err_type:response->error->error->>type', {
     orderBy: 'id', filter: (q) => q.eq('run_id', runId),
   });
 }

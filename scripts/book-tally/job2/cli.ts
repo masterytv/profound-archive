@@ -100,7 +100,6 @@ export function isDirectRun(file: string): boolean {
 /** Loads .env.local / .env from the repo root (values stay in process.env; never printed). */
 function loadDotenv(): void {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { config } = require('dotenv') as typeof import('dotenv');
     const root = path.join(__dirname, '..', '..', '..');
     for (const f of ['.env.local', '.env']) config({ path: path.join(root, f), quiet: true });

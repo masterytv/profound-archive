@@ -1,9 +1,9 @@
 /** Pure helpers: outcome classification of batch results and construction of stance-answer rows. */
+import { MAX_ATTEMPTS, RETRYABLE_ERROR_TYPES, raiseMaxTokens } from '../lib/batch';
 import type { AnswerRow } from './answers';
 import type { PassKind } from './requests';
 
-export const MAX_ATTEMPTS = 3;
-export const MAX_TOKENS_CAP = 64_000;
+export { MAX_ATTEMPTS };
 
 export interface OutcomeInput {
   resultType: 'succeeded' | 'errored' | 'canceled' | 'expired';
@@ -17,7 +17,6 @@ export type Outcome =
   | { action: 'invalid'; error: string }
   | { action: 'retry'; bumpTokens: boolean; reason: string };
 
-const FATAL_ERROR_TYPES = new Set(['invalid_request_error', 'authentication_error', 'permission_error', 'not_found_error']);
 
 /**
  * What to do with one result:
@@ -36,8 +35,9 @@ export function classifyOutcome(i: OutcomeInput, maxAttempts = MAX_ATTEMPTS): Ou
     }
     return { action: 'answers' };
   }
-  if (i.resultType === 'errored' && i.errorType && FATAL_ERROR_TYPES.has(i.errorType)) {
-    return { action: 'invalid', error: `request_error:${i.errorType}` };
+  // Same retry policy as lib/batch: only overloaded/api/rate-limit errors are transient.
+  if (i.resultType === 'errored' && !(i.errorType && RETRYABLE_ERROR_TYPES.has(i.errorType))) {
+    return { action: 'invalid', error: `request_error:${i.errorType ?? 'unknown'}` };
   }
   const what = i.resultType === 'errored' ? `error:${i.errorType ?? 'unknown'}` : i.resultType;
   return exhausted
@@ -45,8 +45,11 @@ export function classifyOutcome(i: OutcomeInput, maxAttempts = MAX_ATTEMPTS): Ou
     : { action: 'retry', bumpTokens: false, reason: what };
 }
 
+/** max_tokens for the next attempt: lib/batch.raiseMaxTokens applied once per earlier truncation. */
 export function maxTokensFor(base: number, truncatedBefore: number): number {
-  return Math.min(MAX_TOKENS_CAP, base * 2 ** truncatedBefore);
+  let m = base;
+  for (let i = 0; i < truncatedBefore; i++) m = raiseMaxTokens(m);
+  return m;
 }
 
 export function invalidAnswerRows(questionIds: readonly number[], error: string): AnswerRow[] {

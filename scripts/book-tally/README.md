@@ -194,11 +194,11 @@ estimate and records it as a run. Only `--confirm-spend <run_id>` then submits i
 
 ```bash
 npm run test:book-tally                                   # unit tests (no API, no DB)
-npx tsx scripts/book-tally/job1/build-links.ts --dry-run
-npx tsx scripts/book-tally/job1/find-pairs.ts --dry-run
-npx tsx scripts/book-tally/job1/judge-pairs.ts --estimate
-npx tsx scripts/book-tally/job2/run-stance.ts --pilot --estimate
-npx tsx scripts/book-tally/job2/pilot-report.ts --run <run_id>
+npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job1/build-links.ts --dry-run
+npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job1/find-pairs.ts --dry-run
+npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job1/judge-pairs.ts --estimate
+npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job2/run-stance.ts --pilot --estimate
+npx ts-node --transpile-only --project scripts/tsconfig.json scripts/book-tally/job2/pilot-report.ts --run <run_id>
 ```
 
 Outputs (CSV and reports) are written to `scripts/book-tally/out/`. That folder is not committed,

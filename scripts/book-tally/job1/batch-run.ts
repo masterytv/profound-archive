@@ -4,11 +4,13 @@
  * - The batch id is recorded in bt_runs.batch_ids BEFORE polling (lib/batch.createBatch contract).
  * - Every result is stored in bt_raw_responses (UNIQUE run_id+custom_id, so resuming never
  *   duplicates), then handed to the caller's handler with its raw_response id.
- * - errored/expired/canceled requests are re-submitted in a new batch of the same run with
- *   attempt+1 (up to maxAttempts). Invalid-but-billed output is NOT retried automatically.
+ * - lib/batch.selectRetries decides what is re-submitted (expired, canceled, transient errors,
+ *   and 'truncated' results with max_tokens raised) in a new batch of the same run with
+ *   attempt+1, up to maxAttempts. Schema-invalid (but complete) output is NOT retried
+ *   automatically: it was billed, and a retry would be spend beyond the estimate.
  */
 import type Anthropic from '@anthropic-ai/sdk';
-import { collectBatch, makeCustomId, parseCustomId, runBatch, type BatchRequest, type ClassifiedResult, type CollectedBatch, type RequestParams } from '../lib/batch';
+import { collectBatch, makeCustomId, parseCustomId, raiseMaxTokens, runBatch, selectRetries, type BatchRequest, type ClassifiedResult, type CollectedBatch, type RequestParams } from '../lib/batch';
 import { addUsage, emptyTotals, type UsageTotals } from '../lib/cost';
 import { btInsert, btUpdateRun, selectAll } from '../lib/supabase';
 import type { Ctx } from './cli';
@@ -49,7 +51,7 @@ async function processCollected(d: DriverBase, collected: CollectedBatch, usage:
   );
   const fresh: Array<ClassifiedResult> = [];
   for (const r of collected.results.values()) {
-    if (r.kind === 'succeeded' && r.message) addUsage(usage, d.model, r.message.usage as never);
+    if (r.message) addUsage(usage, d.model, r.message.usage as never);
     if (!existing.has(r.customId)) fresh.push(r);
   }
   if (fresh.length) {
@@ -62,8 +64,9 @@ async function processCollected(d: DriverBase, collected: CollectedBatch, usage:
         batch_id: collected.batch.id,
         model: d.model,
         model_version: r.message?.model ?? null,
-        result_type: r.kind,
-        response: r.kind === 'succeeded' ? r.message : r.kind === 'errored' ? { error: r.error ?? null } : {},
+        // a truncated result is a succeeded message whose stop_reason is max_tokens
+        result_type: r.kind === 'truncated' ? 'succeeded' : r.kind,
+        response: r.message ? r.message : r.kind === 'errored' ? { error: r.error ?? null } : {},
       })),
       { select: 'id, custom_id', validateRefs: false, chunkSize: 100 },
     );
@@ -80,7 +83,8 @@ async function processCollected(d: DriverBase, collected: CollectedBatch, usage:
 export async function submitRun(d: DriverBase & { items: Array<{ key: string; params: RequestParams }>; maxAttempts: number }): Promise<RunOutcome> {
   const usage = emptyTotals();
   const batchIds: string[] = [];
-  let pending = d.items;
+  let pending = d.items.map((it) => ({ key: it.key, params: { ...it.params } }));
+  const failed = new Set<string>();
   for (let attempt = 1; attempt <= d.maxAttempts && pending.length > 0; attempt++) {
     const requests: BatchRequest[] = pending.map((it) => ({
       custom_id: makeCustomId({ run: d.runId, key: it.key, pass: d.pass, attempt }),
@@ -97,10 +101,16 @@ export async function submitRun(d: DriverBase & { items: Array<{ key: string; pa
       onTick: (b) => d.ctx.log(`  batch ${b.id}: ${b.processing_status} ${JSON.stringify(b.request_counts)}`),
     });
     await processCollected(d, collected, usage);
-    const retry = new Set(collected.retryable.map((c) => parseCustomId(c, d.runId).key));
-    pending = d.items.filter((it) => retry.has(it.key));
+    const { retry } = selectRetries(collected.results.values(), d.runId, d.maxAttempts);
+    const raise = new Set(retry.filter((r) => r.reason === 'truncated').map((r) => r.parts.key));
+    const again = new Set(retry.map((r) => r.parts.key));
+    failed.clear();
+    for (const r of collected.results.values()) if (r.kind !== 'succeeded') failed.add(parseCustomId(r.customId, d.runId).key);
+    pending = pending
+      .filter((it) => again.has(it.key))
+      .map((it) => (raise.has(it.key) ? { key: it.key, params: { ...it.params, max_tokens: raiseMaxTokens(it.params.max_tokens) } } : it));
   }
-  return { usage, unresolved: pending.map((p) => p.key), batchIds };
+  return { usage, unresolved: [...failed], batchIds };
 }
 
 export async function resumeRun(d: DriverBase & { batchIds: string[] }): Promise<RunOutcome> {
@@ -110,7 +120,7 @@ export async function resumeRun(d: DriverBase & { batchIds: string[] }): Promise
     d.ctx.log(`collecting batch ${id}`);
     const collected = await collectBatch(d.client, id, { sleep: d.ctx.sleep, onTick: (b) => d.ctx.log(`  batch ${b.id}: ${b.processing_status}`) });
     await processCollected(d, collected, usage);
-    for (const c of collected.retryable) failed.add(parseCustomId(c, d.runId).key);
+    for (const r of collected.results.values()) if (r.kind !== 'succeeded') failed.add(parseCustomId(r.customId, d.runId).key);
   }
   return { usage, unresolved: [...failed], batchIds: d.batchIds };
 }
