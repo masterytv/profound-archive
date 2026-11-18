@@ -16,7 +16,7 @@ export default function PrivacyPage() {
                 <li><strong>Information You Provide:</strong> When you use our &quot;Connect&quot; or &quot;Get In Touch&quot; form, we collect personal information such as your full name, email address, and any message you send us. When you create an account or subscribe to our newsletter, we collect your email address and display name.</li>
                 <li><strong>Information for Research:</strong> When you use our research tools — including but not limited to the NDE Video Researcher, AI Analysis of NDE Testimonies, UFO/UAP Video Explorer, UFO/UAP Research Assistant, or Cross-Domain Analysis tools — we may collect the search terms, YouTube URLs, filter selections, and other data you input. This data is primarily used for research purposes to improve our AI models and understand user queries.</li>
                 <li><strong>Automatically Collected Information:</strong> Like most websites, we may collect non-personally-identifying information such as your browser type, language preference, referring site, and the date and time of each visitor request. This helps us understand how visitors use our website and to improve our Services.</li>
-                <li><strong>Newsletter Preferences:</strong> If you subscribe to either the NDE or UFO/UAP newsletter, we store your email address, subscription domain preference (NDE, UAP, or both), and subscription timestamp. You may unsubscribe or manage preferences at any time.</li>
+                <li><strong>Newsletter Preferences:</strong> If you subscribe to either the NDE or UFO/UAP newsletter (here, or through the sign-up form on our sister site soulwisdomcollective.com), we store your email address, subscription domain preference (NDE, UAP, or both), and subscription timestamp. You may unsubscribe or manage preferences at any time.</li>
             </ul>
 
             <h2 className="text-2xl font-bold text-foreground mb-3">2. How We Use Your Information</h2>
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
                 <li><strong>For Research and Development:</strong> Data submitted through our research tools is anonymized and aggregated to train our AI models, validate research scales (such as the Greyson NDE Scale, Veridical Perception scoring, and UAP credibility assessments), and conduct research into Near-Death Experiences and UFO/UAP phenomena. Our goal is to uncover patterns and insights from the data to contribute to the fields of consciousness studies and anomalous phenomena research. We will not use your personal contact information in our research datasets.</li>
                 <li><strong>To Improve Our Services:</strong> We use aggregated, non-identifying data to understand how our Services are being used, which helps us improve the user experience and functionality.</li>
                 <li><strong>To Maintain Security:</strong> We may use information to protect the security and integrity of our Website and Services.</li>
-                <li><strong>To Deliver Newsletters:</strong> We use your email address to send you periodic updates relevant to your selected domain(s) (NDE, UAP, or both). Each email includes an unsubscribe link.</li>
+                <li><strong>To Deliver Newsletters:</strong> We use your email address to send you periodic updates relevant to your selected domain(s) (NDE, UAP, or both). Each email includes an unsubscribe link. Newsletters are sent through Resend (resend.com), which keeps your email address and whether you are subscribed for that purpose only; unsubscribing there or here stops all of our emails to you.</li>
             </ul>
 
             <h2 className="text-2xl font-bold text-foreground mb-3">3. Data Sharing and Disclosure</h2>
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
                   </tr>
                   <tr>
                     <td className="px-4 py-2 font-medium text-foreground">Marketing</td>
-                    <td className="px-4 py-2">ConvertKit newsletter subscription forms and related scripts. No advertising or retargeting cookies.</td>
+                    <td className="px-4 py-2">None at present: the newsletter is sent with Resend and sets no cookies on this site. No advertising or retargeting cookies.</td>
                     <td className="px-4 py-2">Yes</td>
                   </tr>
                 </tbody>

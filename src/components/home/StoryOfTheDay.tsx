@@ -2,18 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Star, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-
-// Seeded shuffle — deterministic within each 24-hour window
-function seededShuffle<T>(array: T[], seed: number): T[] {
-    const shuffled = [...array];
-    let s = seed;
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        s = (s * 1664525 + 1013904223) & 0x7fffffff;
-        const j = s % (i + 1);
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-}
+import { STORY_POOL_SIZE, storyOfTheDay } from "@/lib/story-of-the-day";
 
 type StoryVideo = {
     videoId: string;
@@ -30,8 +19,6 @@ type StoryVideo = {
  */
 export async function StoryOfTheDay() {
     const supabase = await createClient();
-    const ONE_DAY_MS = 86_400_000;
-    const dailySeed = Math.floor(Date.now() / ONE_DAY_MS);
 
     const { data: pool } = await supabase
         .from("nde_vids")
@@ -40,11 +27,11 @@ export async function StoryOfTheDay() {
         .not("analysis_nde_summary", "is", null)
         .not("viewCount", "is", null)
         .order("viewCount", { ascending: false })
-        .limit(100);
+        .limit(STORY_POOL_SIZE);
 
     if (!pool || pool.length === 0) return null;
 
-    const featured = seededShuffle(pool as StoryVideo[], dailySeed)[0];
+    const featured = storyOfTheDay(pool as StoryVideo[]);
     if (!featured) return null;
 
     // Take first two sentences of the AI summary for a teaser

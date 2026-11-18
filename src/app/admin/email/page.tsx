@@ -4,6 +4,7 @@
 
 import type { Metadata } from "next";
 import { EmailCrmClient } from "./EmailCrmClient";
+import { NewsletterResendPanel } from "./NewsletterResendPanel";
 
 export const metadata: Metadata = {
   title: "Email CRM — Admin | Project Profound",
@@ -11,5 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default function AdminEmailPage() {
-  return <EmailCrmClient />;
+  return (
+    <>
+      <NewsletterResendPanel />
+      <EmailCrmClient />
+    </>
+  );
 }

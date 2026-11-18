@@ -23,8 +23,8 @@ import { fetchGeo } from "@/lib/consent/geo"
  * 6. Consent logging: Stores timestamp + choices in localStorage
  *
  * This component emits a CustomEvent "cookie-consent-update" that
- * ConsentGatedScripts listens for to update Google Consent Mode and
- * conditionally load ConvertKit.
+ * ConsentGatedScripts listens for to update Google Consent Mode. (It also
+ * loaded ConvertKit under "marketing" until 2026-11-18; nothing does now.)
  * ───────────────────────────────────────────────────────────────────────────── */
 
 export interface CookiePreferences {
