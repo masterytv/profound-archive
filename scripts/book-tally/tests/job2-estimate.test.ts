@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  assertSpendConfirmed, estimateExact, estimateStratified, fingerprint, fingerprintLine, groupId, itemCeiling, itemCost, itemCostNoCacheWrite,
+  applyBudget, assertSpendConfirmed, estimateExact, estimateStratified, fingerprint, fingerprintLine, groupId, itemCeiling, itemCost, itemCostNoCacheWrite,
   outputTokensFor, projectFullCost, runIdFor, DEFAULT_OUTPUT_ASSUMPTION, type TokenItem,
 } from '../job2/estimate';
 import { main as runStance } from '../job2/run-stance';
@@ -141,5 +141,35 @@ describe('run-stance refuses to spend', () => {
     await expect(runStance(['--bogus'], { db, makeClient })).rejects.toThrow();
     await expect(runStance(['--pilot', '--gold', '--estimate'], { db, makeClient })).rejects.toThrow(/only one/);
     expect(makeClient).not.toHaveBeenCalled();
+  });
+});
+
+describe('applyBudget (run-stance --budget-usd)', () => {
+  const items = (n: number, prompt: number): TokenItem[] =>
+    Array.from({ length: n }, (_, i) => ({ key: `v${i}`, promptTokens: prompt, systemTokens: 1000, cached: true, outputTokens: 4592 }));
+  const haiku = estimateExact('claude-haiku-5-5', items(100, 13000), { maxTokens: 16000, maxAttempts: 3 });
+  const sonnet = estimateExact('claude-sonnet-5-5', items(100, 13000), { maxTokens: 16000, maxAttempts: 3 });
+
+  it('records the first-attempt worst case and the uncapped ceiling; no budget changes nothing', () => {
+    close(haiku.firstAttemptWorstUsd, items(100, 13000).reduce((s, i) => s + itemCeiling('claude-haiku-5-5', i, 16000, 1), 0));
+    expect(haiku.uncappedCeilingUsd).toBe(haiku.ceilingUsd);
+    expect(haiku.budgetUsd).toBeNull();
+    expect(applyBudget([haiku, sonnet], undefined)).toEqual([haiku, sonnet]);
+  });
+  it('splits the budget by first-attempt worst case and caps each ceiling at its share', () => {
+    const totalFirst = haiku.firstAttemptWorstUsd + sonnet.firstAttemptWorstUsd;
+    const budget = totalFirst * 1.2;
+    const [h, s] = applyBudget([haiku, sonnet], budget);
+    close(h.budgetUsd! + s.budgetUsd!, budget);
+    close(h.budgetUsd! / s.budgetUsd!, haiku.firstAttemptWorstUsd / sonnet.firstAttemptWorstUsd);
+    close(h.ceilingUsd, h.budgetUsd!);
+    close(s.ceilingUsd, s.budgetUsd!);
+    expect(h.ceilingUsd + s.ceilingUsd).toBeLessThanOrEqual(budget + 1e-9);
+    expect(h.ceilingUsd).toBeGreaterThanOrEqual(h.firstAttemptWorstUsd);
+    expect(h.uncappedCeilingUsd).toBe(haiku.ceilingUsd);
+  });
+  it('refuses a budget below the group first-attempt worst case', () => {
+    const totalFirst = haiku.firstAttemptWorstUsd + sonnet.firstAttemptWorstUsd;
+    expect(() => applyBudget([haiku, sonnet], totalFirst * 0.99)).toThrow(/group: budget .* is below the first-attempt worst case/);
   });
 });

@@ -4,7 +4,7 @@
  */
 import { createHash } from 'crypto';
 import {
-  MODELS, THINKING_ALLOWANCE, ceilingCost, estimateOutputTokens, projectFromPilot, requestCost, type ModelFamily, type TokenCounts,
+  MODELS, THINKING_ALLOWANCE, cappedCeiling, ceilingCost, splitBudget, estimateOutputTokens, projectFromPilot, requestCost, type ModelFamily, type TokenCounts,
 } from '../lib/cost';
 
 // ---------- fingerprint / group id ----------
@@ -129,20 +129,33 @@ export interface ModelEstimate {
   /** Expected cost: assumed output tokens, no cache reads, one attempt per request. */
   costUsd: number;
   costUsdNoCacheWrite: number;
-  /** Hard ceiling: all attempts at max_tokens with doubling (lib/cost.ceilingCost). */
+  /**
+   * Approved ceiling the retry guard enforces: all attempts at max_tokens with doubling
+   * (lib/cost.ceilingCost), or this run's share of the owner's --budget-usd when lower (applyBudget).
+   */
   ceilingUsd: number;
+  /** Every request once, every response at max_tokens: what the first batch can cost at most. */
+  firstAttemptWorstUsd: number;
+  /** All attempts at max_tokens with doubling, before any budget cap. */
+  uncappedCeilingUsd: number;
+  /** This run's share of the owner's --budget-usd, or null when no budget was given. */
+  budgetUsd: number | null;
   meanPromptTokens: number;
 }
 
 export function estimateExact(model: string, items: readonly TokenItem[], ceil: CeilingParams): ModelEstimate {
   const input = items.reduce((s, i) => s + i.promptTokens, 0);
+  const ceilingAll = items.reduce((s, i) => s + itemCeiling(model, i, ceil.maxTokens, ceil.maxAttempts), 0);
   return {
     model, requests: items.length, countedRequests: items.length, method: 'exact',
     inputTokens: input,
     outputTokens: items.reduce((s, i) => s + i.outputTokens, 0),
     costUsd: items.reduce((s, i) => s + itemCost(model, i), 0),
     costUsdNoCacheWrite: items.reduce((s, i) => s + itemCostNoCacheWrite(model, i), 0),
-    ceilingUsd: items.reduce((s, i) => s + itemCeiling(model, i, ceil.maxTokens, ceil.maxAttempts), 0),
+    ceilingUsd: ceilingAll,
+    firstAttemptWorstUsd: items.reduce((s, i) => s + itemCeiling(model, i, ceil.maxTokens, 1), 0),
+    uncappedCeilingUsd: ceilingAll,
+    budgetUsd: null,
     meanPromptTokens: items.length ? input / items.length : 0,
   };
 }
@@ -157,7 +170,7 @@ export function estimateStratified(
   strataSizes: readonly number[],
   ceil: CeilingParams,
 ): ModelEstimate {
-  let input = 0, output = 0, cost = 0, costNoWrite = 0, ceiling = 0, total = 0;
+  let input = 0, output = 0, cost = 0, costNoWrite = 0, ceiling = 0, first = 0, total = 0;
   strataSizes.forEach((n, h) => {
     total += n;
     if (n === 0) return;
@@ -169,12 +182,32 @@ export function estimateStratified(
     cost += mean((i) => itemCost(model, i)) * n;
     costNoWrite += mean((i) => itemCostNoCacheWrite(model, i)) * n;
     ceiling += mean((i) => itemCeiling(model, i, ceil.maxTokens, ceil.maxAttempts)) * n;
+    first += mean((i) => itemCeiling(model, i, ceil.maxTokens, 1)) * n;
   });
   return {
     model, requests: total, countedRequests: sample.length, method: 'stratified_sample',
     inputTokens: Math.round(input), outputTokens: Math.round(output), costUsd: cost, costUsdNoCacheWrite: costNoWrite,
-    ceilingUsd: ceiling, meanPromptTokens: total ? input / total : 0,
+    ceilingUsd: ceiling, firstAttemptWorstUsd: first, uncappedCeilingUsd: ceiling, budgetUsd: null,
+    meanPromptTokens: total ? input / total : 0,
   };
+}
+
+/**
+ * Caps the runs of one group at the owner's --budget-usd. The budget is split across the runs in
+ * proportion to their first-attempt worst cases (lib/cost.splitBudget); each run's approved
+ * ceiling becomes min(all-attempts ceiling, its share). Throws when the budget cannot cover the
+ * first batch of every run. Without a budget the estimates are returned unchanged.
+ */
+export function applyBudget(ests: readonly ModelEstimate[], budgetUsd: number | undefined): ModelEstimate[] {
+  if (budgetUsd === undefined) return ests.map((e) => ({ ...e }));
+  const totalFirst = ests.reduce((s, e) => s + e.firstAttemptWorstUsd, 0);
+  cappedCeiling({ uncappedUsd: Infinity, firstAttemptWorstUsd: totalFirst, budgetUsd, label: 'group' });
+  const shares = splitBudget(budgetUsd, ests.map((e) => e.firstAttemptWorstUsd));
+  return ests.map((e, i) => ({
+    ...e,
+    budgetUsd: shares[i],
+    ceilingUsd: cappedCeiling({ uncappedUsd: e.uncappedCeilingUsd, firstAttemptWorstUsd: e.firstAttemptWorstUsd, budgetUsd: shares[i], label: e.model }),
+  }));
 }
 
 export type StanceKind = 'pilot' | 'first' | 'recheck' | 'arbiter';

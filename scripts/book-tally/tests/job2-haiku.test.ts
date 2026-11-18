@@ -144,7 +144,7 @@ describe('haiku gold statistics (pure)', () => {
 function world(n = 12) {
   const vids = Array.from({ length: n }, (_, i) => `vidA${String(i + 1).padStart(2, '0')}`);
   return new FakeDb({
-    nde_questions: [1, 2, 3, 4, 5].map((id) => ({ id, category: 'cat', consumer_question: `Question ${id}?`, question: `q${id}`, is_active: true })),
+    nde_questions: [1, 2, 3, 4, 5].map((id) => ({ id, category: 'cat', consumer_question: `Question ${id}?`, is_active: true })),
     nde_analysis: vids.map((v) => ({ video_id: v, experience_type: 'nde' })),
     nde_vids: vids.map((v) => ({
       videoId: v, title: `Title ${v}`, subtitles_punctuated: `Number ${v} here. ${GOOD} and I felt total peace in that room. Then the nurse came in and spoke to me.`,

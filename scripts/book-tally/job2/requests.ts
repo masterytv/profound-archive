@@ -26,11 +26,11 @@ export interface PromptQuestion { question_id: number; category: string | null; 
 export function toPromptQuestions(rows: readonly QuestionRow[]): PromptQuestion[] {
   return [...rows]
     .sort((a, b) => a.id - b.id)
-    .map((r) => ({
-      question_id: r.id,
-      category: r.category,
-      question: (r.consumer_question && r.consumer_question.trim() !== '' ? r.consumer_question : r.question).trim(),
-    }));
+    .map((r) => {
+      const text = (r.consumer_question ?? '').trim();
+      if (text === '') throw new Error(`nde_questions id ${r.id} has no consumer_question; cannot build the prompt`);
+      return { question_id: r.id, category: r.category, question: text };
+    });
 }
 
 /** One JSON object per line inside a JSON array: stable and readable. */

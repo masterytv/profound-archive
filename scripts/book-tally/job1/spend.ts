@@ -10,7 +10,7 @@
 import { createHash } from 'crypto';
 import type Anthropic from '@anthropic-ai/sdk';
 import { realBatchIds, unresolvedMarkers, type RequestParams } from '../lib/batch';
-import { BATCH_DISCOUNT, ceilingCost, estimateOutputTokens, formatUsd, requestCost, THINKING_ALLOWANCE, familyOf } from '../lib/cost';
+import { BATCH_DISCOUNT, cappedCeiling, ceilingCost, estimateOutputTokens, formatUsd, requestCost, THINKING_ALLOWANCE, familyOf } from '../lib/cost';
 import { stableStringify } from '../lib/prompts';
 import { CliError, getRun, type RunRow } from './cli';
 import type { Db } from '../lib/supabase';
@@ -235,8 +235,15 @@ export interface Estimate {
   cost_usd: number;
   /** Every response at max_tokens, first attempt only. */
   worst_case_cost_usd: number;
-  /** Hard ceiling: every request on every attempt, max_tokens doubling per attempt (lib/cost.ceilingCost). */
+  /**
+   * Approved ceiling the retry guard enforces: the all-attempts figure, or the owner's --budget-usd
+   * when that is lower (lib/cost.cappedCeiling).
+   */
   ceiling_usd: number;
+  /** Every request on every attempt, max_tokens doubling per attempt (lib/cost.ceilingCost). */
+  uncapped_ceiling_usd: number;
+  /** Owner-set cap (--budget-usd), or null when none was given. */
+  budget_usd: number | null;
   batch_discount: number;
   digest: string;
   assumptions: string;
@@ -256,6 +263,8 @@ export interface EstimateOptions {
   sampleSize?: number;
   concurrency?: number;
   forceSample?: boolean;
+  /** Owner-set dollar cap on this run (--budget-usd); see lib/cost.cappedCeiling. */
+  budgetUsd?: number;
 }
 
 export async function estimateSpend(o: EstimateOptions): Promise<Estimate> {
@@ -276,7 +285,8 @@ export async function estimateSpend(o: EstimateOptions): Promise<Estimate> {
   const expectedPer = estimateOutputTokens(o.model, 1, o.visibleTokensPerRequest);
   const cost = expectedPerItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: expectedPer }), 0);
   const worst = perItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: o.maxTokens }), 0);
-  const ceiling = ceilingCost({ model: o.model, requests: perItem.map((t) => ({ inputTokens: t })), maxTokens: o.maxTokens, maxAttempts: o.maxAttempts, doubling: true });
+  const uncapped = ceilingCost({ model: o.model, requests: perItem.map((t) => ({ inputTokens: t })), maxTokens: o.maxTokens, maxAttempts: o.maxAttempts, doubling: true });
+  const ceiling = cappedCeiling({ uncappedUsd: uncapped, firstAttemptWorstUsd: worst, budgetUsd: o.budgetUsd });
   return {
     method: sampled ? 'count_tokens_all_expected_cost_from_sample' : 'count_tokens_all',
     model: o.model,
@@ -296,6 +306,8 @@ export async function estimateSpend(o: EstimateOptions): Promise<Estimate> {
     cost_usd: cost,
     worst_case_cost_usd: worst,
     ceiling_usd: ceiling,
+    uncapped_ceiling_usd: uncapped,
+    budget_usd: o.budgetUsd ?? null,
     batch_discount: BATCH_DISCOUNT,
     digest: requestDigest(o.items),
     assumptions:
@@ -312,6 +324,11 @@ export function printEstimate(log: (l: string) => void, runId: string, e: Estima
   log(`  expected output tokens: ${e.expected_output_tokens} (${e.expected_output_tokens_per_request}/request; ${e.assumptions})`);
   log(`  expected cost:          ${formatUsd(e.cost_usd)} (one attempt per request${e.method === 'count_tokens_all' ? '' : `; input side extrapolated from a stratified sample of ${e.expected_cost_sample_size} in ${e.strata} strata`})`);
   log(`  first-attempt worst:    ${formatUsd(e.worst_case_cost_usd)} (every response at max_tokens=${e.max_output_tokens_per_request})`);
-  log(`  HARD CEILING:           ${formatUsd(e.ceiling_usd)} (every request on all ${e.max_attempts} attempts, max_tokens doubling per attempt; exact token counts for all requests)`);
+  if (e.budget_usd !== null && e.budget_usd !== undefined) {
+    log(`  HARD CEILING:           ${formatUsd(e.ceiling_usd)} (your --budget-usd cap: the first batch costs at most the first-attempt worst, and retries run only while spent + their worst case stays within the cap)`);
+    log(`  uncapped ceiling:       ${formatUsd(e.uncapped_ceiling_usd)} (every request on all ${e.max_attempts} attempts, max_tokens doubling; not approved)`);
+  } else {
+    log(`  HARD CEILING:           ${formatUsd(e.ceiling_usd)} (every request on all ${e.max_attempts} attempts, max_tokens doubling per attempt; exact token counts for all requests)`);
+  }
   log(`  to submit:              --confirm-spend ${runId}`);
 }

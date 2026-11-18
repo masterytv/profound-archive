@@ -515,3 +515,24 @@ describe('guarded submission (lib/batch.submitGuarded) through judge-pairs', () 
     expect((h.fake.tables.bt_runs[0].actual_usage as { unresolved: number }).unresolved).toBe(1);
   });
 });
+
+describe('estimateSpend with --budget-usd', () => {
+  const items = [item('a', 'x'.repeat(400)), item('b', 'y'.repeat(800))];
+  const counter = async (p: EstItem['params']) => requestChars(p) * 2;
+  const base = { model: 'claude-haiku-5-5', effort: 'medium', items, counter, visibleTokensPerRequest: 50, maxTokens: 8192, maxAttempts: 3 } as const;
+
+  it('stores the capped ceiling, keeps the uncapped one, and records the budget', async () => {
+    const free = await estimateSpend({ ...base });
+    expect(free.budget_usd).toBeNull();
+    expect(free.ceiling_usd).toBe(free.uncapped_ceiling_usd);
+    const budget = free.worst_case_cost_usd * 1.5;
+    const e = await estimateSpend({ ...base, budgetUsd: budget });
+    expect(e.ceiling_usd).toBe(budget);
+    expect(e.uncapped_ceiling_usd).toBe(free.uncapped_ceiling_usd);
+    expect(e.budget_usd).toBe(budget);
+  });
+  it('refuses a budget below the first-attempt worst case', async () => {
+    const free = await estimateSpend({ ...base });
+    await expect(estimateSpend({ ...base, budgetUsd: free.worst_case_cost_usd / 2 })).rejects.toThrow(/below the first-attempt worst case/);
+  });
+});

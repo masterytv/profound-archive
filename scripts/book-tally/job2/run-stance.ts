@@ -50,6 +50,7 @@ export const OPTIONS: Record<string, OptDef> = {
   'assumed-visible-per-question': { type: 'string', help: 'visible output tokens per answered question (default: pilot actuals, else 32/60/70)' },
   'adopt-batch': { type: 'string', help: 'with --confirm-spend: batch id to adopt for a run left in "submitting" after a lost create response' },
   'confirm-retries': { type: 'string', help: 'group id: allow retries beyond the approved ceiling' },
+  'budget-usd': { type: 'string', help: 'with --estimate: cap the group\'s approved ceiling at this many USD, split across its runs (refused if below the first-attempt worst case); retries must fit under it' },
   'void-pending': { type: 'string', help: 'with --confirm-spend: pending marker (>= 30 min old) confirmed by a human to have produced no batch' },
   cancel: { type: 'string', help: 'group id of a never-submitted estimate to cancel' },
   'poll-seconds': { type: 'string', help: 'batch poll interval (default 30)' },
@@ -131,6 +132,8 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     ...(visOverride !== undefined ? { visiblePerQuestion: { pilot: visOverride, first: visOverride, recheck: visOverride, arbiter: visOverride } } : {}),
     source: outOverride !== undefined || visOverride !== undefined ? `command-line override (base: ${base.source})` : base.source,
   };
+  const budgetUsd = numOpt(v['budget-usd'], 'budget-usd');
+  if (budgetUsd !== undefined && !(budgetUsd > 0)) throw new CliError('--budget-usd must be a positive number of USD');
   const group: Group = {
     mode, pass, kind, seed,
     maxTokens: intOpt(v['max-tokens'], 'max-tokens') ?? DEFAULT_MAX_TOKENS,
@@ -141,6 +144,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     },
     plan: made.plan,
     ...(haiku && mode === 'gold' ? { resolution: 'haiku-first-pass' as const } : {}),
+    ...(budgetUsd !== undefined ? { budgetUsd } : {}),
   };
   const questions = await loadQuestions(db);
   const res = await runEstimate(
