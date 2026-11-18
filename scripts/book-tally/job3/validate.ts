@@ -50,6 +50,9 @@ export interface CodedRow {
   error: string | null;
 }
 
+/** Prefix of the error on every row of a response rejected as a whole; run-codebook codes such videos again. */
+export const REJECTED_PREFIX = 'response rejected:';
+
 /** Longest "other" description kept; longer text is cut (and flagged). */
 export const OTHER_TEXT_MAX = 160;
 
@@ -126,7 +129,7 @@ export function checkCodedResponse(
 ): CheckedResponse {
   const items = allItems(cb);
   if (parsed.ok === false) {
-    const reason = `response rejected: ${parsed.error}`;
+    const reason = `${REJECTED_PREFIX} ${parsed.error}`;
     return { rows: items.map((it) => invalidRow(it, reason)), unknownKeys: [] };
   }
   const byKey = new Map<string, ModelEntry[]>();

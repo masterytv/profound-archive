@@ -8,7 +8,7 @@ import { createGuardedClient } from '../lib/supabase';
 import { PROMPTS_DIR } from '../lib/prompts';
 import { allItems, checkCodebook, CODEBOOK_DIR, loadCodebook, loadCodebookPrompt, OTHER, renderItem, type Codebook } from '../job3/codebook';
 import { checkCodedResponse, countedChoices, rowOutcome, type ModelEntry } from '../job3/validate';
-import { main as runCodebook, makeHandler } from '../job3/run-codebook';
+import { main as runCodebook, makeHandler, stripNul } from '../job3/run-codebook';
 import { SpendGateError } from '../job1/spend';
 import { fakeAnthropic, fakeDb, type Row } from './job1-fakes';
 
@@ -201,6 +201,13 @@ function harness(stopFor?: (customId: string) => string | undefined) {
   const call = (argv: string[]) => runCodebook(argv, { db: guarded, makeClient, log: (l) => logs.push(l), now: () => new Date(Date.UTC(2026, 10, 19, 10, 0, tick++)), sleep: async () => undefined });
   return { fake, guarded, api, makeClient, logs, call };
 }
+
+describe('stripNul', () => {
+  it('removes NUL characters from strings at any depth and keeps everything else as it is', () => {
+    const row = { quote: 'a\u0000b', n: 3, ok: false, none: null, choices: [{ code: 'love', quote: 'x\u0000y', quote_norm_offset: null, quote_verified: true }] };
+    expect(stripNul(row)).toEqual({ quote: 'ab', n: 3, ok: false, none: null, choices: [{ code: 'love', quote: 'xy', quote_norm_offset: null, quote_verified: true }] });
+  });
+});
 
 describe('run-codebook (mock DB + mock Anthropic)', () => {
   it('refuses without a mode or with an unknown run; --dry-run is offline', async () => {

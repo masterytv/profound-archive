@@ -26,7 +26,7 @@ import { parseModelJson } from '../job1/schema';
 import { assertDigestMatches, assertNoOverlappingRuns, assertNothingDoneSince, assertResumable, estimateSpend, printEstimate, requestDigest, sdkTokenCounter, type EstItem } from '../job1/spend';
 import { seededShuffle } from '../job2/sampling';
 import { allItems, CODEBOOK_VERSION, loadCodebookPrompt, type CodebookPrompt } from './codebook';
-import { checkCodedResponse, type ModelEntry } from './validate';
+import { checkCodedResponse, REJECTED_PREFIX, type ModelEntry } from './validate';
 
 const SCRIPT = 'job3/run-codebook.ts';
 const MODEL = MODELS.haiku;
@@ -76,8 +76,6 @@ export async function buildItems(ctx: Ctx, cp: CodebookPrompt, videoIds: string[
   return { items, transcripts, missing };
 }
 
-/** Marks a whole response that failed (bad JSON or schema); such a video stays eligible for a later run. */
-export const REJECTED_PREFIX = 'response rejected:';
 
 /** Short fingerprint of a transcript, stored at estimate time and checked again on resume. */
 export function transcriptSha(text: string): string {
@@ -172,7 +170,7 @@ export function assertTranscriptsUnchanged(stored: Record<string, string> | unde
   if (!stored) return; // runs estimated before fingerprints were recorded
   const changed = Object.entries(stored).filter(([id, sha]) => now.get(id) === undefined || transcriptSha(now.get(id)!.text) !== sha).map(([id]) => id);
   if (changed.length) {
-    throw new CliError(`${changed.length} transcript(s) changed or disappeared since this run was estimated (e.g. ${changed.slice(0, 3).join(', ')}); quotes cannot be checked against the text that was sent. Ask the owner how to proceed.`);
+    throw new CliError(`${changed.length} transcript(s) changed or disappeared since this run was estimated (e.g. ${changed.slice(0, 3).join(', ')}); quotes cannot be checked against the text that was sent. This also blocks --void-pending and --adopt-batch for this run. Ask the owner how to proceed.`);
   }
 }
 
