@@ -20,14 +20,31 @@ repo-root CLAUDE.md.
       are allowed, so shares can exceed 100%, and reports must say so;
     - conditional: reported among people with a fact such as a violent death or a suicide attempt.
       These facts are coded once per video.
-- **Codebook draft**: `codebook/codebook-v1-DRAFT.md`, waiting for the owner's review. After
-  approval:
-  1. new prompt and schema version;
-  2. a NEW migration with new tables (the current `bt_stance_answers` CHECK allows only
-     yes/no/mixed/not_addressed). The owner applies migrations; never run one yourself;
-  3. rollup, gold sheet and reports for the new types;
-  4. estimate, then the owner's yes, then a full Haiku re-run;
-  5. a new gold sheet.
+- **Codebook v1 is APPROVED** (`codebook/codebook-v1.md`; machine copy `codebook-v1.json` from
+  `generate-v1.py`).
+  - Q24 is merged into Q22.
+  - Answers count when they are "what the experiencer experienced or learned from the NDE, during
+    it or after". Beliefs held only before the NDE don't count.
+  - Q30's wording names the signs (a reviewer fix).
+- **Job 3 (codebook coding) is BUILT** in `job3/`. Independent review: APPROVE (commit cc84f16).
+  - `run-codebook.ts`: estimate, `--confirm-spend`, `--resume`, `--sample`, `--budget-usd`.
+  - `rollup.ts`: person tally, per-video sensitivity, report.
+  - `gold-sheet.ts`, `import-gold.ts`, `gold-report.ts`: commit 7780163, labelled WIP. It is the
+    final, verified version (554 tests pass), even though its message says WIP.
+  - Tests: `tests/job3-*.test.ts`. Local-Postgres suite: `tests/sql/run-local-pg.sh`, which needs
+    `runuser -u postgres` and a PGRUN directory postgres can write.
+- **Migration `20261118_002_book_tally_codebook.sql` is NOT APPLIED yet**: the owner applies it.
+  It adds only `bt_coded_answers` and `bt_coded_gold_marks`. Verification queries are at its end.
+- **Next steps:**
+  1. After the owner applies 002, check read-only that both tables exist and are empty.
+  2. Trial: `job3/run-codebook.ts --estimate --sample 40 --budget-usd <cap>`, then the owner's yes,
+     then `--confirm-spend`.
+  3. Inspect the trial: output tokens (recalibrate `VISIBLE_TOKENS`), truncation, "other" rates,
+     and a sample of answers.
+  4. Full run (estimate with a cap, then the owner's yes).
+  5. `job3/gold-sheet.ts`. Build an interactive marking page for the owner, as for stance-v1.
+     Owner marks, then `import-gold.ts`, then `gold-report.ts`.
+  6. `job3/rollup.ts`.
 - **Gold marking is paused.** The interactive sheet https://claude.ai/artifact/5t1QCp9VCp1C13j7wjVcEZ
   is for stance-v1 and is superseded. It holds at most a few owner marks; don't import them.
 - **Job 1 Sonnet pair check**: the owner hasn't decided. Haiku judged 186 pairs same, 285 unsure and
