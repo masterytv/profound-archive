@@ -501,3 +501,13 @@ describe('review round 1 fixes', () => {
     expect(rep).toMatch(/"not_addressed" was right: 100\.0% \(6\/6;/);
   });
 });
+
+describe('fake database fidelity', () => {
+  it('a select naming a column the table does not have fails, as the real database does', async () => {
+    const db = world(2).asDb();
+    const bad = await db.from('nde_questions').select('id, category, consumer_question, question');
+    expect(bad.error?.message).toBe('column nde_questions.question does not exist');
+    const ok = await db.from('nde_questions').select('id, category, consumer_question');
+    expect(ok.error).toBeNull();
+  });
+});
