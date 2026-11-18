@@ -16,7 +16,7 @@
  */
 import type Anthropic from '@anthropic-ai/sdk';
 import {
-  collectBatch, makeCustomId, parseCustomId, PENDING_VOID_MIN_AGE_MS, raiseMaxTokens, realBatchIds, resolvePending, selectRetries, submitGuarded, unresolvedMarkers, voidPending,
+  chunkRequests, collectBatch, makeCustomId, parseCustomId, PENDING_VOID_MIN_AGE_MS, raiseMaxTokens, realBatchIds, resolvePending, selectRetries, submitGuarded, unresolvedMarkers, voidPending,
   type BatchRequest, type ClassifiedResult, type CollectedBatch, type RequestParams,
 } from '../lib/batch';
 import { addUsage, assertRetryBudget, emptyTotals, requestCost, type UsageTotals } from '../lib/cost';
@@ -98,6 +98,8 @@ export interface SubmitInput extends DriverBase {
   perKeyInputTokens: Record<string, number>;
   /** True when --confirm-retries named this run. */
   confirmRetries: boolean;
+  /** Split limits for one batch (default: lib/batch.chunkRequests defaults, under the API's 256 MB / 100k limits). */
+  chunkLimits?: { maxRequests?: number; maxBytes?: number };
 }
 
 export async function submitRun(d: SubmitInput): Promise<RunOutcome> {
@@ -119,20 +121,33 @@ export async function submitRun(d: SubmitInput): Promise<RunOutcome> {
       custom_id: makeCustomId({ run: d.runId, key: it.key, pass: d.pass, attempt }),
       params: it.params,
     }));
-    d.ctx.log(`submitting batch: ${requests.length} requests (attempt ${attempt})`);
-    const { batchId } = await submitGuarded({
-      db: d.ctx.db, client: d.client, runId: d.runId, expectedStatus: attempt === 1 ? 'estimated' : 'submitted',
-      requests, now: d.ctx.now, sleep: d.ctx.sleep,
-    });
-    batchIds.push(batchId);
-    d.ctx.log(`batch ${batchId} recorded in bt_runs.batch_ids; polling`);
-    const collected = await collectBatch(d.client, batchId, {
-      sleep: d.ctx.sleep,
-      onTick: (b) => d.ctx.log(`  batch ${b.id}: ${b.processing_status} ${JSON.stringify(b.request_counts)}`),
-    });
-    await processCollected(d, collected, usage);
-    for (const r of collected.results.values()) ok.set(parseCustomId(r.customId, d.runId).key, r.kind === 'succeeded');
-    const { retry } = selectRetries(collected.results.values(), d.runId, d.maxAttempts);
+    // Large submissions are split under the API's per-batch limits; every part goes through the same
+    // guarded create (status + durable marker first), so a failure leaves at most one unresolved marker.
+    const parts = chunkRequests(requests, d.chunkLimits);
+    const attemptBatchIds: string[] = [];
+    for (const [i, part] of parts.entries()) {
+      d.ctx.log(`submitting batch${parts.length > 1 ? ` ${i + 1}/${parts.length}` : ''}: ${part.length} requests (attempt ${attempt})`);
+      const { batchId } = await submitGuarded({
+        db: d.ctx.db, client: d.client, runId: d.runId, expectedStatus: attempt === 1 && i === 0 ? 'estimated' : 'submitted',
+        requests: part, now: d.ctx.now, sleep: d.ctx.sleep,
+      });
+      batchIds.push(batchId);
+      attemptBatchIds.push(batchId);
+      d.ctx.log(`batch ${batchId} recorded in bt_runs.batch_ids`);
+    }
+    const results: CollectedBatch['results'][] = [];
+    for (const batchId of attemptBatchIds) {
+      d.ctx.log(`polling batch ${batchId}`);
+      const collected = await collectBatch(d.client, batchId, {
+        sleep: d.ctx.sleep,
+        onTick: (b) => d.ctx.log(`  batch ${b.id}: ${b.processing_status} ${JSON.stringify(b.request_counts)}`),
+      });
+      await processCollected(d, collected, usage);
+      results.push(collected.results);
+    }
+    const all = results.flatMap((m) => [...m.values()]);
+    for (const r of all) ok.set(parseCustomId(r.customId, d.runId).key, r.kind === 'succeeded');
+    const { retry } = selectRetries(all, d.runId, d.maxAttempts);
     const raise = new Set(retry.filter((r) => r.reason === 'truncated').map((r) => r.parts.key));
     const again = new Set(retry.map((r) => r.parts.key));
     pending = pending
