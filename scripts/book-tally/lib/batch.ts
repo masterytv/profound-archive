@@ -394,6 +394,13 @@ export async function submitGuarded(i: SubmitGuardedInput): Promise<SubmitGuarde
   if (before.status !== expectedStatus) {
     throw new Error(`run not in expected status (concurrent or already submitted): ${runId} is "${before.status}", expected "${expectedStatus}"`);
   }
+  const stale = unresolvedMarkers(before.batch_ids);
+  if (stale.length > 0) {
+    throw new Error(
+      `run ${runId} has ${stale.length} unresolved pending submission marker(s); refusing to submit. ` +
+        `Run resolvePending, then (only if it reports not_found and 30+ min have passed) voidPending.`,
+    );
+  }
   const marker = makePendingMarker(ids, (i.now ?? (() => new Date()))());
   const n = await btUpdateRunIf(db, runId, expectedStatus, { status: 'submitting', batch_ids: [...before.batch_ids, marker] });
   if (n === 0) throw new Error(`run not in expected status (concurrent or already submitted): ${runId}`);
@@ -443,8 +450,13 @@ async function recordBatchId(db: Db, runId: string, batchId: string, sleep: Slee
 
 export interface PendingResolution {
   marker: PendingMarker;
-  /** 'adopted': a verified batch was recorded; 'none': no matching batch exists, safe to resubmit those keys. */
-  result: 'adopted' | 'none';
+  /**
+   * 'adopted': a verified batch was recorded.
+   * 'not_found': no matching batch was listed. The marker stays UNRESOLVED: the API list can lag
+   * behind a create, so absence is not proof. Callers must refuse to resubmit; only a human
+   * running voidPending (after PENDING_VOID_MIN_AGE_MS) may release the marker.
+   */
+  result: 'adopted' | 'not_found';
   batchId?: string;
 }
 
@@ -459,8 +471,11 @@ export interface ResolvePendingInput {
   now?: () => Date;
 }
 
-/** Window before the marker time in which a matching batch may legitimately have been created. */
-export const PENDING_LOOKBACK_MS = 60_000;
+/** Window before the marker time in which a matching batch may legitimately have been created (clock skew). */
+export const PENDING_LOOKBACK_MS = 10 * 60_000;
+
+/** A pending marker may only be voided by a human once it is at least this old. */
+export const PENDING_VOID_MIN_AGE_MS = 30 * 60_000;
 
 async function batchCustomIds(client: Anthropic, batchId: string, poll?: PollOptions): Promise<string[]> {
   await pollBatch(client, batchId, poll);
@@ -482,14 +497,33 @@ function total(c: Anthropic.Messages.MessageBatchRequestCounts): number {
 }
 
 /**
+ * Batches that could be the submission behind `marker`: created at/after marker time minus
+ * PENDING_LOOKBACK_MS, request_counts total == nReq, not already recorded on the run.
+ * Iterates the auto-paginating list (newest first) until it leaves the window, so every page in
+ * the window is read.
+ */
+async function findCandidates(client: Anthropic, marker: PendingMarker, known: ReadonlySet<string>): Promise<MessageBatch[]> {
+  const since = marker.at.getTime() - PENDING_LOOKBACK_MS;
+  const candidates: MessageBatch[] = [];
+  for await (const b of client.messages.batches.list({ limit: 100 })) {
+    if (new Date(b.created_at).getTime() < since) break;
+    if (known.has(b.id)) continue;
+    if (total(b.request_counts) === marker.nRequests) candidates.push(b);
+  }
+  return candidates;
+}
+
+/**
  * Resolves every pending marker that has no following real batch id by asking the API
  * whether the batch was in fact created. Call this before ANY resubmission.
  *  - adoptBatchId given: verify (after the batch ends) that every custom_id starts with
  *    `${run.id}_` and that count + sha match some unresolved marker, then record it.
- *  - otherwise list batches created at/after (marker time - 60 s) whose request_counts total equals
- *    nReq: exactly 1 -> verify the same way and adopt; 0 -> result 'none' (a `void:` marker is
- *    recorded so the check is not repeated); >1 -> throw listing ids/created_at for the human to
- *    choose with adoptBatchId.
+ *  - otherwise list ALL batches (auto-paginated, newest first) created at/after
+ *    (marker time - PENDING_LOOKBACK_MS) whose request_counts total equals nReq:
+ *    exactly 1 -> verify the same way and adopt; >1 -> throw listing ids/created_at for the human to
+ *    choose with adoptBatchId; 0 -> result 'not_found'. NOTHING is written for 'not_found': the
+ *    marker stays unresolved (the list can lag) and callers must refuse to resubmit.
+ *    Never auto-voids; see voidPending.
  */
 export async function resolvePending(i: ResolvePendingInput): Promise<PendingResolution[]> {
   const { db, client, run } = i;
@@ -523,13 +557,7 @@ export async function resolvePending(i: ResolvePendingInput): Promise<PendingRes
   }
 
   for (const marker of pending) {
-    const since = marker.at.getTime() - PENDING_LOOKBACK_MS;
-    const candidates: MessageBatch[] = [];
-    for await (const b of client.messages.batches.list({ limit: 100 })) {
-      if (new Date(b.created_at).getTime() < since) break; // newest first
-      if (known.has(b.id)) continue;
-      if (total(b.request_counts) === marker.nRequests) candidates.push(b);
-    }
+    const candidates = await findCandidates(client, marker, known);
     if (candidates.length > 1) {
       throw new Error(
         `${candidates.length} batches could be the unrecorded submission for marker ${marker.raw} of run ${run.id}: ` +
@@ -538,8 +566,7 @@ export async function resolvePending(i: ResolvePendingInput): Promise<PendingRes
       );
     }
     if (candidates.length === 0) {
-      await record(marker, `void:${(i.now ?? (() => new Date()))().toISOString()}`, false);
-      results.push({ marker, result: 'none' });
+      results.push({ marker, result: 'not_found' });
       continue;
     }
     const batchId = candidates[0].id;
@@ -550,4 +577,54 @@ export async function resolvePending(i: ResolvePendingInput): Promise<PendingRes
     results.push({ marker, result: 'adopted', batchId });
   }
   return results;
+}
+
+export interface VoidPendingInput {
+  db: Db;
+  client: Anthropic;
+  runId: string;
+  /** The raw pending marker string, exactly as stored in bt_runs.batch_ids (CLI: --void-pending <marker>). */
+  marker: string;
+  now?: () => Date;
+}
+
+/**
+ * Explicit, human-triggered release of a pending marker whose batch could not be found.
+ * Refuses unless ALL hold:
+ *  - the marker exists on the run and is unresolved,
+ *  - it is at least PENDING_VOID_MIN_AGE_MS old (the batch list can lag),
+ *  - a fresh listing finds NO candidate batch (otherwise it throws listing them; adopt instead).
+ * Then it writes `void:<iso>` after the marker and, when no other marker is still unresolved and
+ * the run is "submitting", resets status submitting -> estimated with a conditional update.
+ * Returns the new status ('estimated', or 'submitting' while other markers remain).
+ */
+export async function voidPending(i: VoidPendingInput): Promise<{ status: string; voided: string }> {
+  const now = (i.now ?? (() => new Date()))();
+  const state = await readRunState(i.db, i.runId);
+  const unresolved = unresolvedMarkers(state.batch_ids);
+  const marker = unresolved.find((m) => m.raw === i.marker);
+  if (!marker) throw new Error(`marker "${i.marker}" is not an unresolved pending marker of run ${i.runId}`);
+  const age = now.getTime() - marker.at.getTime();
+  if (age < PENDING_VOID_MIN_AGE_MS) {
+    throw new Error(
+      `refusing to void: marker is ${Math.floor(age / 60_000)} min old; wait at least ` +
+        `${PENDING_VOID_MIN_AGE_MS / 60_000} min (the batch list can lag behind a create)`,
+    );
+  }
+  const candidates = await findCandidates(i.client, marker, new Set(realBatchIds(state.batch_ids)));
+  if (candidates.length > 0) {
+    throw new Error(
+      `refusing to void: ${candidates.length} batch(es) now match marker ${marker.raw}: ` +
+        candidates.map((b) => `${b.id} (created ${b.created_at})`).join(', ') +
+        `. Adopt the right one with adoptBatchId (--adopt-batch).`,
+    );
+  }
+  const voided = `void:${now.toISOString()}`;
+  const at = state.batch_ids.indexOf(marker.raw);
+  const ids = [...state.batch_ids.slice(0, at + 1), voided, ...state.batch_ids.slice(at + 1)];
+  const othersLeft = unresolvedMarkers(ids).length > 0;
+  const reset = state.status === 'submitting' && !othersLeft;
+  const n = await btUpdateRunIf(i.db, i.runId, state.status, { batch_ids: ids, ...(reset ? { status: 'estimated' } : {}) });
+  if (n === 0) throw new Error(`run ${i.runId} changed while voiding; retry`);
+  return { status: reset ? 'estimated' : state.status, voided };
 }

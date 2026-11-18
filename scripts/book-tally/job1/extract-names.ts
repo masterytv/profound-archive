@@ -22,12 +22,12 @@ import { fetchTranscripts, type TranscriptSource } from '../lib/transcript';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { MAX_ATTEMPTS } from '../lib/batch';
-import { approvedBudget, confirmGate, prepareResume, resumeRun, submitRun, usageSummary, type CollectedRow } from './batch-run';
+import { approvedBudget, confirmGate, prepareResume, resumeRun, submitRun, usageSummary, voidPendingCommand, type CollectedRow } from './batch-run';
 import { CliError, finishRun, getRun, helpText, intOpt, isDirectRun, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, str, type Ctx, type Deps, type OptDef } from './cli';
 import { ensurePrompt, loadProfiles, loadWorld } from './data';
 import { classifySelfName, indexProfiles, nameInQuote, planLinks, selfIntroducerBefore, type ProfileRow } from './logic';
 import { parseModelJson, type JsonSchema } from './schema';
-import { assertDigestMatches, assertNothingDoneSince, assertResumable, estimateSpend, printEstimate, requestDigest, sdkTokenCounter, type EstItem } from './spend';
+import { assertDigestMatches, assertNoOverlappingRuns, assertNothingDoneSince, assertResumable, estimateSpend, printEstimate, requestDigest, sdkTokenCounter, type EstItem } from './spend';
 
 const SCRIPT = 'job1/extract-names.ts';
 export const PROMPT_NAME = 'name-extract-v1';
@@ -44,9 +44,10 @@ const OPTIONS: Record<string, OptDef> = {
   effort: { type: 'string', help: 'low|medium|high|xhigh|max (default medium)' },
   'include-unusable-names': { type: 'boolean', help: 'also target videos whose metadata name is a single token or placeholder (default: only blank names)' },
   limit: { type: 'string', help: 'only the first N target videos (trial runs)' },
-  'sample-size': { type: 'string', help: 'force a stratified token-count sample of this size (min 50) instead of counting all' },
+  'sample-size': { type: 'string', help: 'base the EXPECTED-cost line on a stratified sample of this size (min 50); tokens are still counted for ALL requests because the ceiling needs exact counts' },
   'max-attempts': { type: 'string', help: 'attempts per request incl. retries, fixed at --estimate time and part of the approved ceiling (default 3)' },
   'confirm-retries': { type: 'string', help: 'run_id: allow retry batches beyond the approved ceiling for this run' },
+  'void-pending': { type: 'string', help: 'with --resume: release an UNRESOLVED pending submission marker (batch not found at the API); allowed only >= 30 min after the marker, never automatic' },
   'adopt-batch': { type: 'string', help: 'with --resume: record this existing batch id for a run whose submission response was lost (verified before adopting)' },
   'dry-run': { type: 'boolean', help: 'offline: list target counts and transcript availability; no API call, no DB write' },
 };
@@ -57,9 +58,16 @@ export function loadNamePrompt(dir = PROMPTS_DIR) {
   return { prompt, schema, promptHash: computePromptHash({ templateBytes: prompt.bytes, outputSchema: schema }) };
 }
 
+export const NO_SELF_INTRODUCER = 'no_self_introducer';
+
 export interface ExtractionRow {
   id: number; run_id: string; video_id: string; name: string | null; quote: string | null;
-  quote_verified: boolean; name_in_quote: boolean; valid: boolean; prompt_hash: string; model: string;
+  quote_verified: boolean; name_in_quote: boolean; valid: boolean; error?: string | null; prompt_hash: string; model: string;
+}
+
+/** A verified quote containing the name, with no recorded problem (error is null; 'no_self_introducer' excludes it). */
+export function isUsableSelfName(e: Pick<ExtractionRow, 'valid' | 'name' | 'quote_verified' | 'name_in_quote' | 'error'>): boolean {
+  return e.valid && !!e.name && e.quote_verified && e.name_in_quote && (e.error ?? null) === null;
 }
 
 /** Result of checking one model answer against its transcript. Pure. */
@@ -87,15 +95,17 @@ export function checkExtraction(
   if (answer.quote === null || answer.quote.trim() === '') return bad('name without quote');
   const v = verifyQuote(answer.quote, transcript);
   const inQuote = nameInQuote(name, answer.quote);
-  // The name must be introduced in the first person immediately before it; a mere mention
-  // ("my guest today is ...") is rejected. Stored with quote_verified=false, error 'no_self_introducer'.
+  // quote_verified records ONLY whether the quote verified against the transcript (lib/quote).
+  // The name must additionally be introduced in the first person immediately before it; a mere
+  // mention ("my guest today is ...") is recorded with error = 'no_self_introducer' and is
+  // excluded from links and the review CSV by isUsableSelfName(), not by quote_verified.
   const introduced = !v.verified || !inQuote || selfIntroducerBefore(name, answer.quote);
   return {
     valid: true,
-    error: !v.verified ? `quote not verified: ${v.reason}` : !introduced ? 'no_self_introducer' : null,
+    error: !v.verified ? `quote not verified: ${v.reason}` : !introduced ? NO_SELF_INTRODUCER : null,
     name,
     quote: answer.quote,
-    quote_verified: v.verified && introduced,
+    quote_verified: v.verified,
     name_in_quote: inQuote,
     quote_norm_offset: v.offset,
   };
@@ -128,7 +138,7 @@ export async function buildNameItems(ctx: Ctx, videoIds: string[], effort: Effor
 
 async function readExtractions(ctx: Ctx): Promise<ExtractionRow[]> {
   return readOrEmpty(
-    () => selectAll<ExtractionRow>(ctx.db, 'bt_name_extractions', 'id, run_id, video_id, name, quote, quote_verified, name_in_quote, valid, prompt_hash, model', { orderBy: 'id' }),
+    () => selectAll<ExtractionRow>(ctx.db, 'bt_name_extractions', 'id, run_id, video_id, name, quote, quote_verified, name_in_quote, valid, error, prompt_hash, model', { orderBy: 'id' }),
     () => ctx.log('note: bt_name_extractions not found (migration not applied); treating as empty'),
   );
 }
@@ -143,7 +153,8 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const limit = intOpt(v.limit, 'limit');
   const maxAttempts = intOpt(v['max-attempts'], 'max-attempts') ?? MAX_ATTEMPTS;
   if (maxAttempts < 1 || maxAttempts > MAX_ATTEMPTS) throw new CliError(`--max-attempts must be 1..${MAX_ATTEMPTS}`);
-  if (str(v['adopt-batch']) && !str(v.resume)) throw new CliError('--adopt-batch requires --resume <run_id>');
+  if ((str(v['adopt-batch']) || str(v['void-pending'])) && !str(v.resume)) throw new CliError('--adopt-batch and --void-pending require --resume <run_id>');
+  if (str(v['adopt-batch']) && str(v['void-pending'])) throw new CliError('choose only one of --adopt-batch and --void-pending');
   const modes = [v.estimate === true, !!str(v['confirm-spend']), !!str(v.resume), v['dry-run'] === true].filter(Boolean).length;
   if (modes === 0) throw new CliError('refusing to run: choose --dry-run, --estimate, --confirm-spend <run_id> or --resume <run_id> (no paid call is made without a confirmed estimate)');
   if (modes > 1) throw new CliError('choose only one of --dry-run, --estimate, --confirm-spend, --resume');
@@ -160,6 +171,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     const built = await buildNameItems(ctx, ids, (run.effort ?? effort) as Effort);
     const handler = await makeHandler(ctx, run.id, await ensurePrompt(db, prompt, schema), built.transcripts);
     const client = ctx.makeClient();
+    if (str(v['void-pending'])) return voidPendingCommand(ctx, client, run.id, str(v['void-pending'])!);
     const batchIds = await prepareResume(ctx, client, run.id, str(v['adopt-batch']));
     const out = await resumeRun({ ctx, client, runId: run.id, model: MODEL, pass: 'haiku', batchIds, onCollected: handler.onCollected });
     return finish(ctx, run.id, out, handler.stats);
@@ -169,6 +181,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     const ids = (confirmRun.params.video_ids ?? []) as string[];
     const doneNow = new Set((await readExtractions(ctx)).filter((x) => x.valid && x.prompt_hash === promptHash && x.model === MODEL).map((x) => x.video_id));
     assertNothingDoneSince(ids.filter((id) => doneNow.has(id)), 'videos (name extraction)');
+    await assertNoOverlappingRuns(db, confirmRun, 'video_ids');
     const built = await buildNameItems(ctx, ids, (confirmRun.effort ?? effort) as Effort);
     assertDigestMatches(confirmRun, requestDigest(built.items));
     const handler = await makeHandler(ctx, confirmRun.id, await ensurePrompt(db, prompt, schema), built.transcripts);
@@ -221,7 +234,7 @@ async function makeHandler(ctx: Ctx, runId: string, promptHash: string, transcri
     () => undefined,
   );
   const doneRaw = new Set(have.map((r) => r.raw_response_id));
-  const stats = { stored: 0, invalid: 0, truncated: 0, not_succeeded: 0, no_name: 0, name_returned: 0, quote_verified: 0, name_in_quote: 0, fully_verified: 0 };
+  const stats = { stored: 0, invalid: 0, truncated: 0, not_succeeded: 0, no_name: 0, name_returned: 0, quote_verified: 0, name_in_quote: 0, no_self_introducer: 0, fully_verified: 0 };
   return {
     stats,
     onCollected: async (rows: CollectedRow[]) => {
@@ -242,7 +255,8 @@ async function makeHandler(ctx: Ctx, runId: string, promptHash: string, transcri
           stats.name_returned++;
           if (c.quote_verified) stats.quote_verified++;
           if (c.name_in_quote) stats.name_in_quote++;
-          if (c.quote_verified && c.name_in_quote) stats.fully_verified++;
+          if (c.error === NO_SELF_INTRODUCER) stats.no_self_introducer++;
+          else if (c.quote_verified && c.name_in_quote) stats.fully_verified++;
         }
         out.push({
           run_id: runId, video_id: r.key, name: c.name, quote: c.quote, quote_verified: c.quote_verified, name_in_quote: c.name_in_quote,
@@ -263,7 +277,7 @@ export interface SelfLinkResult { inserted: number; first_name_only: number; unu
 export async function createSelfNameLinks(ctx: Ctx, runId: string, profiles: ProfileRow[]): Promise<SelfLinkResult> {
   const { db } = ctx;
   const idx = indexProfiles(profiles);
-  const exts = (await readExtractions(ctx)).filter((e) => e.valid && e.name && e.quote_verified && e.name_in_quote);
+  const exts = (await readExtractions(ctx)).filter(isUsableSelfName);
   const latest = new Map<string, ExtractionRow>();
   for (const e of exts) latest.set(e.video_id, e); // ascending id: last wins
   const links = await selectAll<{ video_id: string; person_key: string }>(db, 'bt_person_links', 'id, video_id, person_key, source', {

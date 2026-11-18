@@ -54,6 +54,42 @@ export function assertResumable(run: RunRow | null, resumeId: string, expect: Pi
   return run;
 }
 
+export const ACTIVE_STATUSES = ['submitting', 'submitted', 'collecting'] as const;
+
+/**
+ * Another run of the same job and stage that is in flight (submitting/submitted/collecting)
+ * and whose request ids (params[idKey]) overlap this run's. Submitting both would pay twice.
+ */
+export function findOverlappingRuns(
+  runs: Array<Pick<RunRow, 'id' | 'job' | 'pass' | 'status' | 'params'>>,
+  run: Pick<RunRow, 'id' | 'job' | 'pass' | 'params'>,
+  idKey: 'candidate_ids' | 'video_ids',
+): Array<{ id: string; status: string; overlap: number }> {
+  const mine = new Set(((run.params[idKey] ?? []) as Array<string | number>).map(String));
+  const out: Array<{ id: string; status: string; overlap: number }> = [];
+  for (const r of runs) {
+    if (r.id === run.id || r.job !== run.job || r.pass !== run.pass) continue;
+    if (!(ACTIVE_STATUSES as readonly string[]).includes(r.status)) continue;
+    const theirs = ((r.params?.[idKey] ?? []) as Array<string | number>).map(String);
+    const overlap = theirs.filter((x) => mine.has(x)).length;
+    if (overlap > 0) out.push({ id: r.id, status: r.status, overlap });
+  }
+  return out;
+}
+
+export async function assertNoOverlappingRuns(db: Db, run: RunRow, idKey: 'candidate_ids' | 'video_ids'): Promise<void> {
+  const { data, error } = await db.from('bt_runs').select('id, job, pass, status, params').eq('job', run.job).eq('pass', run.pass ?? '');
+  if (error) throw new Error(`read bt_runs failed: ${error.message}`);
+  const hits = findOverlappingRuns((data ?? []) as unknown as RunRow[], run, idKey);
+  if (hits.length) {
+    throw new SpendGateError(
+      `refusing to spend: ${hits.length} other ${run.job}/${run.pass} run(s) in flight overlap this run's requests: ` +
+        hits.map((h) => `${h.id} (${h.status}, ${h.overlap} shared)`).join(', ') +
+        `. Collect or resolve them first (--resume), then re-estimate.`,
+    );
+  }
+}
+
 /** Refuses when an estimated id has gained a result since the estimate (the estimate no longer describes the spend). */
 export function assertNothingDoneSince(done: string[], what: string): void {
   if (done.length > 0) {
@@ -177,11 +213,14 @@ async function pool<T, R>(items: T[], concurrency: number, fn: (t: T) => Promise
 }
 
 export interface Estimate {
-  method: 'count_tokens_all' | 'count_tokens_stratified_sample';
+  /** Tokens are ALWAYS counted for every request (free endpoint); sampling may only shape the expected-cost line. */
+  method: 'count_tokens_all' | 'count_tokens_all_expected_cost_from_sample';
   model: string;
   effort: string;
   requests: number;
   counted_requests: number;
+  /** Size of the stratified sample behind the expected-cost line (= requests when not sampling). */
+  expected_cost_sample_size: number;
   strata: number;
   input_tokens: number;
   /** Per-request input tokens (measured, or extrapolated for unsampled requests); used for retry budgets. */
@@ -213,8 +252,7 @@ export interface EstimateOptions {
   visibleTokensPerRequest: number;
   maxTokens: number;
   maxAttempts: number;
-  /** Count every request when there are at most this many; otherwise sample. Default 1000. */
-  countAllUpTo?: number;
+  /** With forceSample: size of the stratified sample behind the EXPECTED-cost line only (min 50). */
   sampleSize?: number;
   concurrency?: number;
   forceSample?: boolean;
@@ -223,26 +261,29 @@ export interface EstimateOptions {
 export async function estimateSpend(o: EstimateOptions): Promise<Estimate> {
   const n = o.items.length;
   const chars = o.items.map((i) => requestChars(i.params));
-  const sampleSize = Math.max(o.sampleSize ?? 100, 50);
-  const all = !o.forceSample && n <= (o.countAllUpTo ?? 1000);
-  const plan: SamplePlan = all
-    ? { strata: [o.items.map((_, i) => i)], sample: o.items.map((_, i) => i) }
-    : planSample(chars, sampleSize);
-  const counted = await pool(plan.sample, o.concurrency ?? 4, (i) => o.counter(o.items[i].params));
-  const measured = new Map(plan.sample.map((idx, k) => [idx, counted[k]]));
-  const perItem = all ? o.items.map((_, i) => measured.get(i)!) : extrapolateTokens(chars, plan, measured);
+  // The ceiling and the per-request budget table need EXACT counts, so every request is counted
+  // (messages.countTokens is free). A sample may only be used for the expected-cost line.
+  const perItem = await pool(o.items, o.concurrency ?? 4, (it) => o.counter(it.params));
+  const sampled = o.forceSample === true && n > 50;
+  const plan: SamplePlan = sampled
+    ? planSample(chars, Math.max(o.sampleSize ?? 100, 50))
+    : { strata: [o.items.map((_, i) => i)], sample: o.items.map((_, i) => i) };
+  const expectedPerItem = sampled
+    ? extrapolateTokens(chars, plan, new Map(plan.sample.map((i) => [i, perItem[i]])))
+    : perItem;
   const input = perItem.reduce((a, b) => a + b, 0);
   const thinking = THINKING_ALLOWANCE[familyOf(o.model)];
   const expectedPer = estimateOutputTokens(o.model, 1, o.visibleTokensPerRequest);
-  const cost = perItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: expectedPer }), 0);
+  const cost = expectedPerItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: expectedPer }), 0);
   const worst = perItem.reduce((s, t) => s + requestCost(o.model, { inputTokens: t, outputTokens: o.maxTokens }), 0);
   const ceiling = ceilingCost({ model: o.model, requests: perItem.map((t) => ({ inputTokens: t })), maxTokens: o.maxTokens, maxAttempts: o.maxAttempts, doubling: true });
   return {
-    method: all ? 'count_tokens_all' : 'count_tokens_stratified_sample',
+    method: sampled ? 'count_tokens_all_expected_cost_from_sample' : 'count_tokens_all',
     model: o.model,
     effort: o.effort,
     requests: n,
-    counted_requests: plan.sample.length,
+    counted_requests: n,
+    expected_cost_sample_size: plan.sample.length,
     strata: plan.strata.length,
     input_tokens: input,
     per_request_input_tokens: Object.fromEntries(o.items.map((it, i) => [it.key, perItem[i]])),
@@ -267,10 +308,10 @@ export async function estimateSpend(o: EstimateOptions): Promise<Estimate> {
 export function printEstimate(log: (l: string) => void, runId: string, e: Estimate): void {
   log(`estimate for run ${runId} (${e.model}, effort ${e.effort}, Message Batches API, ${(e.batch_discount * 100).toFixed(0)}% batch discount)`);
   log(`  requests:               ${e.requests}`);
-  log(`  input tokens:           ${e.input_tokens} (${e.method === 'count_tokens_all' ? `counted exactly on all ${e.counted_requests} requests` : `extrapolated from a stratified sample of ${e.counted_requests} requests in ${e.strata} strata`}${e.count_without_output_config ? '; count_tokens rejected output_config so it is excluded from the count' : ''})`);
+  log(`  input tokens:           ${e.input_tokens} (counted exactly on all ${e.counted_requests} requests (free count_tokens)${e.count_without_output_config ? '; count_tokens rejected output_config so it is excluded from the count' : ''})`);
   log(`  expected output tokens: ${e.expected_output_tokens} (${e.expected_output_tokens_per_request}/request; ${e.assumptions})`);
-  log(`  expected cost:          ${formatUsd(e.cost_usd)} (one attempt per request)`);
+  log(`  expected cost:          ${formatUsd(e.cost_usd)} (one attempt per request${e.method === 'count_tokens_all' ? '' : `; input side extrapolated from a stratified sample of ${e.expected_cost_sample_size} in ${e.strata} strata`})`);
   log(`  first-attempt worst:    ${formatUsd(e.worst_case_cost_usd)} (every response at max_tokens=${e.max_output_tokens_per_request})`);
-  log(`  HARD CEILING:           ${formatUsd(e.ceiling_usd)} (every request on all ${e.max_attempts} attempts, max_tokens doubling per attempt)`);
+  log(`  HARD CEILING:           ${formatUsd(e.ceiling_usd)} (every request on all ${e.max_attempts} attempts, max_tokens doubling per attempt; exact token counts for all requests)`);
   log(`  to submit:              --confirm-spend ${runId}`);
 }

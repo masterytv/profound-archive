@@ -184,6 +184,8 @@ export class FakeAnthropic {
   /** When > 0, the next N create() calls register the batch but throw (a lost response). */
   loseNextCreates = 0;
   createOptions: unknown[] = [];
+  /** Simulates list() lagging behind creates. */
+  hideFromList = false;
   constructor(private responder: Responder, private tokens = 1000) {}
 
   messages = {
@@ -203,7 +205,7 @@ export class FakeAnthropic {
       list: (_p?: unknown) => {
         const self = this;
         return (async function* () {
-          for (const b of [...self.created].reverse()) {
+          for (const b of self.hideFromList ? [] : [...self.created].reverse()) {
             yield { id: b.id, created_at: b.created_at, processing_status: 'ended', request_counts: { processing: 0, succeeded: b.requests.length, errored: 0, canceled: 0, expired: 0 } };
           }
         })();

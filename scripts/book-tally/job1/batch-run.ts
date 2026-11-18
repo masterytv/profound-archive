@@ -3,7 +3,9 @@
  *
  * - Every paid submission goes through lib/batch.submitGuarded: a conditional status change
  *   plus a durable `pending:` marker in bt_runs.batch_ids BEFORE batches.create, create with
- *   maxRetries 0, then the real id is recorded. resolvePending runs before any resubmission.
+ *   maxRetries 0, then the real id is recorded. resolvePending runs before any resubmission;
+ *   a marker whose batch is 'not_found' stays unresolved and blocks resubmission until a human
+ *   runs --void-pending <marker> (lib/batch.voidPending, >= 30 min old). Never auto-voided.
  * - Every result is stored in bt_raw_responses (UNIQUE run_id+custom_id, so resuming never
  *   duplicates), then handed to the caller's handler with its raw_response id.
  * - lib/batch.selectRetries decides what is re-submitted (expired, canceled, transient errors,
@@ -14,11 +16,11 @@
  */
 import type Anthropic from '@anthropic-ai/sdk';
 import {
-  collectBatch, makeCustomId, parseCustomId, raiseMaxTokens, realBatchIds, resolvePending, selectRetries, submitGuarded,
+  collectBatch, makeCustomId, parseCustomId, PENDING_VOID_MIN_AGE_MS, raiseMaxTokens, realBatchIds, resolvePending, selectRetries, submitGuarded, unresolvedMarkers, voidPending,
   type BatchRequest, type ClassifiedResult, type CollectedBatch, type RequestParams,
 } from '../lib/batch';
 import { addUsage, assertRetryBudget, emptyTotals, requestCost, type UsageTotals } from '../lib/cost';
-import { btInsert, btUpdateRunIf, selectAll } from '../lib/supabase';
+import { btInsert, selectAll } from '../lib/supabase';
 import { CliError, getRun, type Ctx, type RunRow } from './cli';
 import { assertSpendConfirmed, type RunExpect } from './spend';
 
@@ -109,6 +111,7 @@ export async function submitRun(d: SubmitInput): Promise<RunOutcome> {
     if (attempt > 1) {
       const resolved = await resolvePending({ db: d.ctx.db, client: d.client, run: { id: d.runId }, now: d.ctx.now });
       if (resolved.length) d.ctx.log(`resolved ${resolved.length} pending submission marker(s) before the retry batch`);
+      await assertNoUnresolved(d.ctx, d.runId);
       const queuedWorst = pending.reduce((s, it) => s + requestCost(d.model, { inputTokens: d.perKeyInputTokens[it.key] ?? meanTok, outputTokens: it.params.max_tokens }), 0);
       assertRetryBudget({ approvedCeilingUsd: d.ceilingUsd, spentUsd: usage.costUsd, queuedWorstUsd: queuedWorst, confirmedRetries: d.confirmRetries });
     }
@@ -139,32 +142,61 @@ export async function submitRun(d: SubmitInput): Promise<RunOutcome> {
   return { usage, unresolved: [...ok.entries()].filter(([, v]) => !v).map(([k]) => k).sort(), batchIds };
 }
 
+/** Instructions printed when a pending submission marker could not be matched to a batch. */
+export function unresolvedInstructions(runId: string, markers: string[]): string {
+  return (
+    `run ${runId} has ${markers.length} unresolved submission marker(s): ${markers.join(' ')}. ` +
+    `The API batch list can lag behind a create, so "not found" is not proof that nothing was created and NOTHING is resubmitted. ` +
+    `Wait a few minutes and re-run --resume ${runId}; if a batch id is known use --resume ${runId} --adopt-batch <id>; ` +
+    `only after at least ${PENDING_VOID_MIN_AGE_MS / 60_000} minutes (and a check of the Anthropic console for a matching batch) release it with ` +
+    `--resume ${runId} --void-pending "<marker>".`
+  );
+}
+
+export async function assertNoUnresolved(ctx: Ctx, runId: string): Promise<void> {
+  const cur = await getRun(ctx.db, runId);
+  const open = unresolvedMarkers(cur?.batch_ids ?? []).map((m) => m.raw);
+  if (open.length) throw new CliError(unresolvedInstructions(runId, open));
+}
+
 /**
  * Brings a run in status submitting/submitted to a state where its REAL batch ids can be
- * collected: resolves pending markers (optionally adopting a human-chosen batch).
+ * collected: resolves pending markers (optionally adopting a human-chosen batch). If no real
+ * batch exists and a marker is still unresolved, refuses with instructions.
  */
 export async function prepareResume(ctx: Ctx, client: Anthropic, runId: string, adoptBatchId?: string): Promise<string[]> {
   const res = await resolvePending({ db: ctx.db, client, run: { id: runId }, adoptBatchId, now: ctx.now });
   for (const r of res) ctx.log(`pending marker ${r.marker.sha12}: ${r.result}${r.batchId ? ` (${r.batchId})` : ''}`);
   const run = await getRun(ctx.db, runId);
   const ids = realBatchIds(run?.batch_ids);
-  if (ids.length === 0) throw new CliError(`run ${runId} has no recorded batch: nothing was created (any pending submission was voided); re-confirm with --confirm-spend ${runId}`);
+  const open = unresolvedMarkers(run?.batch_ids ?? []).map((m) => m.raw);
+  if (ids.length === 0) {
+    if (open.length) throw new CliError(unresolvedInstructions(runId, open));
+    throw new CliError(`run ${runId} has no recorded batch and no pending submission; if it was voided re-confirm with --confirm-spend ${runId}`);
+  }
+  if (open.length) ctx.log(`WARNING: ${unresolvedInstructions(runId, open)}`);
   return ids;
+}
+
+/** `--resume <run> --void-pending <marker>`: the only way to release a 'not_found' marker (>= 30 min old, re-checked by lib). */
+export async function voidPendingCommand(ctx: Ctx, client: Anthropic, runId: string, marker: string): Promise<void> {
+  const r = await voidPending({ db: ctx.db, client, runId, marker, now: ctx.now });
+  ctx.log(`marker voided (${r.voided}); run ${runId} status is now "${r.status}"${r.status === 'estimated' ? `; re-confirm with --confirm-spend ${runId}` : ''}`);
 }
 
 /**
  * --confirm-spend for a run stuck in 'submitting' (create failed or its response was lost):
- * resolve the marker first. A found batch is adopted (collect it with --resume); if none exists
- * the marker is voided and the run goes back to 'estimated' so the confirm can proceed.
+ * resolve the marker first. A found batch is adopted (collect it with --resume). If none is
+ * listed the run is NOT resubmitted: the marker stays unresolved (see unresolvedInstructions).
  */
-export async function recoverSubmitting(ctx: Ctx, client: Anthropic, run: RunRow): Promise<'resubmit' | 'adopted'> {
+export async function recoverSubmitting(ctx: Ctx, client: Anthropic, run: RunRow): Promise<'adopted'> {
   const res = await resolvePending({ db: ctx.db, client, run: { id: run.id }, now: ctx.now });
   for (const r of res) ctx.log(`pending marker ${r.marker.sha12}: ${r.result}${r.batchId ? ` (${r.batchId})` : ''}`);
   const cur = await getRun(ctx.db, run.id);
+  const open = unresolvedMarkers(cur?.batch_ids ?? []).map((m) => m.raw);
+  if (open.length) throw new CliError(unresolvedInstructions(run.id, open));
   if (realBatchIds(cur?.batch_ids).length > 0) return 'adopted';
-  const n = await btUpdateRunIf(ctx.db, run.id, 'submitting', { status: 'estimated' });
-  if (n === 0 && cur?.status !== 'estimated') throw new CliError(`run ${run.id} is "${cur?.status}", cannot reset to estimated`);
-  return 'resubmit';
+  throw new CliError(`run ${run.id} is "${cur?.status}" with no recorded batch; it cannot be confirmed (use --void-pending if a marker was released, then re-estimate if needed)`);
 }
 
 export async function resumeRun(d: DriverBase & { batchIds: string[] }): Promise<RunOutcome> {
@@ -193,11 +225,10 @@ export function usageSummary(u: UsageTotals): Record<string, number> {
  */
 export async function confirmGate(ctx: Ctx, confirmId: string | undefined, expect: RunExpect): Promise<RunRow> {
   if (!confirmId) return assertSpendConfirmed(null, confirmId, expect);
-  let run = await getRun(ctx.db, confirmId);
+  const run = await getRun(ctx.db, confirmId);
   if (run && run.status === 'submitting' && run.job === expect.job && run.pass === expect.pass && run.model === expect.model) {
-    const outcome = await recoverSubmitting(ctx, ctx.makeClient(), run);
-    if (outcome === 'adopted') throw new CliError(`run ${run.id}: the pending submission was found at the API and recorded; collect it with --resume ${run.id}`);
-    run = await getRun(ctx.db, confirmId);
+    await recoverSubmitting(ctx, ctx.makeClient(), run); // throws unless a batch was found
+    throw new CliError(`run ${run.id}: the pending submission was found at the API and recorded; collect it with --resume ${run.id}`);
   }
   return assertSpendConfirmed(run, confirmId, expect);
 }

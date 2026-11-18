@@ -15,6 +15,7 @@ import { readActiveQuestions, readNdeVideoIds, selectAllKeyset, type Db } from '
 import { CliError, ensureOutDir, helpText, isDirectRun, makeCtx, parseCli, runCli, type Deps, type OptDef } from './cli';
 import { toCsv } from './csv';
 import { VIEW_VIDEO_CHUNK, fetchStanceRuns } from './db';
+import { findMergeConflicts, type MergeConflict } from '../job1/merge-conflicts';
 import { TALLY_HEADERS, tallyByQuestion, type FinalRow, type QuestionMeta, type TallyRow } from './tally';
 
 const OPTIONS: Record<string, OptDef> = {
@@ -22,20 +23,7 @@ const OPTIONS: Record<string, OptDef> = {
   'allow-pending': { type: 'boolean', help: 'tally even though pending_recheck/pending_arbiter cells exist (default: fail)' },
 };
 
-export interface MergeConflict { component: string[]; keyA: string; keyB: string }
-export type FindMergeConflicts = (db: Db) => Promise<MergeConflict[]>;
-export interface RollupDeps extends Deps { findMergeConflicts?: FindMergeConflicts }
-
-/** job1's findMergeConflicts (added by the job 1 builder); resolved lazily so this module has no hard import. */
-async function defaultFindMergeConflicts(): Promise<FindMergeConflicts> {
-  for (const mod of ['../job1/data', '../job1/logic', '../job1/find-pairs']) {
-    try {
-      const m = (await import(mod)) as Record<string, unknown>;
-      if (typeof m.findMergeConflicts === 'function') return m.findMergeConflicts as FindMergeConflicts;
-    } catch { /* try the next module */ }
-  }
-  throw new CliError('findMergeConflicts is not available from job1; cannot verify that no merge decisions conflict');
-}
+export interface RollupDeps extends Deps { findMergeConflicts?: (db: Db) => Promise<MergeConflict[]> }
 
 /** NDE videos with no stance row at all. */
 export function uncoveredVideos(nde: readonly string[], rows: ReadonlyArray<{ video_id: string }>): string[] {
@@ -71,9 +59,9 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
   if (unmapped.length) {
     throw new CliError(`${unmapped.length} NDE videos have no accepted person link (bt_unmapped_nde_videos is not empty); e.g. ${unmapped.slice(0, 5).map((r) => r.video_id).join(', ')}. Finish Job 1 first.`);
   }
-  const conflicts = await (deps.findMergeConflicts ?? (await defaultFindMergeConflicts()))(db);
+  const conflicts = await (deps.findMergeConflicts ?? findMergeConflicts)(db);
   if (conflicts.length) {
-    throw new CliError(`${conflicts.length} merge conflict(s) in Job 1 decisions (e.g. ${conflicts[0].keyA} / ${conflicts[0].keyB} are merged transitively but also decided keep_separate); resolve them before tallying.`);
+    throw new CliError(`${conflicts.length} merge conflict(s) in Job 1 decisions (e.g. component ${conflicts[0].component}: ${conflicts[0].conflicting.length} keep_separate decision(s) inside a merged group); resolve them before tallying.`);
   }
   const map = await selectAllKeyset<{ video_id: string; person_key: string }>(db, 'bt_effective_person_map', 'video_id, person_key', 'video_id');
   const personOf = new Map(map.map((m) => [m.video_id, m.person_key]));

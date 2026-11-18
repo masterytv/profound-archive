@@ -14,7 +14,7 @@
  */
 import { projectFullCost } from './estimate';
 import { CliError, helpText, intOpt, isDirectRun, makeCtx, numOpt, parseCli, runCli, str, type Deps, type OptDef } from './cli';
-import { cancelEstimate, executeGroup, runEstimate, type Group } from './execute';
+import { cancelEstimate, executeGroup, runEstimate, voidPendingMarker, type Group } from './execute';
 import { assumptionFrom, loadPilot } from './pilot-data';
 import { kindOf, loadQuestions, makePlan, type Mode, type PassOpt } from './plan';
 import { DEFAULT_EFFORT, DEFAULT_MAX_TOKENS, loadStancePrompts } from './requests';
@@ -39,8 +39,8 @@ export const OPTIONS: Record<string, OptDef> = {
   'assumed-visible-per-question': { type: 'string', help: 'visible output tokens per answered question (default: pilot actuals, else 32/60/70)' },
   'adopt-batch': { type: 'string', help: 'with --confirm-spend: batch id to adopt for a run left in "submitting" after a lost create response' },
   'confirm-retries': { type: 'string', help: 'group id: allow retries beyond the approved ceiling' },
+  'void-pending': { type: 'string', help: 'with --confirm-spend: pending marker (>= 30 min old) confirmed by a human to have produced no batch' },
   cancel: { type: 'string', help: 'group id of a never-submitted estimate to cancel' },
-  'sample-size': { type: 'string', help: 'token-count sample size when requests > 200 (default 120, min 100)' },
   'poll-seconds': { type: 'string', help: 'batch poll interval (default 30)' },
 };
 
@@ -60,6 +60,11 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   if (modes.length > 1) throw new CliError('choose only one of --pilot, --gold, --full');
   const confirm = str(v['confirm-spend']);
   if (str(v.cancel)) { await cancelEstimate(ctx, str(v.cancel)!); return; }
+  if (str(v['void-pending'])) {
+    if (!confirm) throw new CliError('--void-pending requires --confirm-spend <group>');
+    await voidPendingMarker(ctx, confirm, str(v['void-pending'])!);
+    return;
+  }
   if (str(v['adopt-batch']) && !confirm) throw new CliError('--adopt-batch requires --confirm-spend <group>');
   const estimating = v.estimate === true || v['dry-run'] === true;
   if (confirm && estimating) throw new CliError('--confirm-spend cannot be combined with --estimate / --dry-run');
@@ -94,7 +99,6 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     ...(visOverride !== undefined ? { visiblePerQuestion: { pilot: visOverride, first: visOverride, recheck: visOverride, arbiter: visOverride } } : {}),
     source: outOverride !== undefined || visOverride !== undefined ? `command-line override (base: ${base.source})` : base.source,
   };
-  const sampleSize = Math.max(100, intOpt(v['sample-size'], 'sample-size') ?? 120);
   const group: Group = {
     mode, pass, kind, seed,
     maxTokens: intOpt(v['max-tokens'], 'max-tokens') ?? DEFAULT_MAX_TOKENS,
@@ -108,7 +112,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const questions = await loadQuestions(db);
   const res = await runEstimate(
     ctx,
-    { group, options: { sampleSize, strata: 10, assumption, dryRun: v['dry-run'] === true, exactLimit: 200 } },
+    { group, options: { assumption, dryRun: v['dry-run'] === true } },
     loadStancePrompts(),
     questions,
   );

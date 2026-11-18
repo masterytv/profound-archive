@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type Anthropic from '@anthropic-ai/sdk';
 import {
-  customIdsSha12, isMarker, makeCustomId, makePendingMarker, parsePendingMarker, realBatchIds, resolvePending,
-  submitGuarded, unresolvedMarkers, type BatchRequest,
+  PENDING_LOOKBACK_MS, PENDING_VOID_MIN_AGE_MS, customIdsSha12, isMarker, makeCustomId, makePendingMarker, parsePendingMarker,
+  realBatchIds, resolvePending, submitGuarded, unresolvedMarkers, voidPending, type BatchRequest,
 } from '../lib/batch';
 import type { Db } from '../lib/supabase';
 
@@ -43,9 +43,9 @@ function fakeDb(initial: { status: string; batch_ids?: string[] }) {
 
 interface FakeBatch { id: string; created_at: string; counts: number; customIds: string[] }
 
-function fakeClient(opts: { batches?: FakeBatch[]; createBehaviour?: (params: { requests: BatchRequest[] }, o: unknown) => Promise<{ id: string }> } = {}) {
-  const calls = { create: [] as Array<{ n: number; opts: unknown }> };
-  const batches = opts.batches ?? [];
+function fakeClient(opts: { batches?: FakeBatch[]; listPlan?: FakeBatch[][]; createBehaviour?: (params: { requests: BatchRequest[] }, o: unknown) => Promise<{ id: string }> } = {}) {
+  const calls = { create: [] as Array<{ n: number; opts: unknown }>, list: 0 };
+  const batches = opts.batches ?? opts.listPlan?.flat() ?? [];
   const client = {
     messages: {
       batches: {
@@ -62,7 +62,9 @@ function fakeClient(opts: { batches?: FakeBatch[]; createBehaviour?: (params: { 
           })();
         },
         list: () => (async function* () {
-          for (const b of [...batches].sort((a, c) => (a.created_at < c.created_at ? 1 : -1))) {
+          const view = opts.listPlan ? opts.listPlan[Math.min(calls.list, opts.listPlan.length - 1)] : batches;
+          calls.list++;
+          for (const b of [...view].sort((a, c) => (a.created_at < c.created_at ? 1 : -1))) {
             yield { id: b.id, created_at: b.created_at, request_counts: { processing: 0, succeeded: b.counts, errored: 0, canceled: 0, expired: 0 } };
           }
         })(),
@@ -180,14 +182,38 @@ describe('resolvePending', () => {
     const { db } = fakeDb({ status: 'submitted', batch_ids: [marker, 'msgbatch_1'] });
     expect(await resolvePending({ db, client: fakeClient().client, run: { id: RUN } })).toEqual([]);
   });
-  it('0 candidates -> "none", records a void marker so it is not re-checked, status stays submitting', async () => {
-    const { db, state, client } = setup([batch('b_old', '2026-11-18T09:00:00.000Z'), batch('b_wrongcount', '2026-11-18T10:00:30.000Z', 5)]);
-    const r = await resolvePending({ db, client, run: { id: RUN }, now: () => new Date('2026-11-18T10:10:00.000Z') });
-    expect(r.map((x) => x.result)).toEqual(['none']);
-    expect(state.row.batch_ids).toEqual([marker, 'void:2026-11-18T10:10:00.000Z']);
+  it('0 candidates -> "not_found": NOTHING is written, marker stays unresolved (never auto-void)', async () => {
+    const { db, state, client } = setup([batch('b_old', '2026-11-18T08:00:00.000Z'), batch('b_wrongcount', '2026-11-18T10:00:30.000Z', 5)]);
+    const r = await resolvePending({ db, client, run: { id: RUN }, now: () => new Date('2026-11-18T12:00:00.000Z') });
+    expect(r.map((x) => x.result)).toEqual(['not_found']);
+    expect(state.row.batch_ids).toEqual([marker]);
     expect(state.row.status).toBe('submitting');
-    expect(realBatchIds(state.row.batch_ids)).toEqual([]);
-    expect(await resolvePending({ db, client, run: { id: RUN } })).toEqual([]);
+    expect(state.updates).toBe(0);
+    // still unresolved on the next call, and submitting is refused while it is
+    expect((await resolvePending({ db, client, run: { id: RUN } })).map((x) => x.result)).toEqual(['not_found']);
+    await expect(submitGuarded({ db, client, runId: RUN, expectedStatus: 'submitting', requests: reqs(ids(3)) })).rejects.toThrow(/unresolved pending submission marker/);
+  });
+  it('lag: the batch is absent from the first list and present on the second -> not_found, then adopted; never voided', async () => {
+    const real = batch('b_lagged', '2026-11-18T10:00:05.000Z');
+    const { db, state } = fakeDb({ status: 'submitting', batch_ids: [marker] });
+    const { client, calls } = fakeClient({ listPlan: [[], [real]], batches: [real] });
+    const first = await resolvePending({ db, client, run: { id: RUN } });
+    expect(first.map((x) => x.result)).toEqual(['not_found']);
+    expect(state.row.batch_ids).toEqual([marker]);
+    const second = await resolvePending({ db, client, run: { id: RUN } });
+    expect(second).toMatchObject([{ result: 'adopted', batchId: 'b_lagged' }]);
+    expect(state.row.batch_ids).toEqual([marker, 'b_lagged']);
+    expect(state.row.batch_ids.some((e) => e.startsWith('void:'))).toBe(false);
+    expect(calls.list).toBe(2);
+  });
+  it('lookback is 10 minutes before the marker and every page inside the window is read', async () => {
+    expect(PENDING_LOOKBACK_MS).toBe(10 * 60_000);
+    const filler = Array.from({ length: 250 }, (_, k) => batch(`b_fill${k}`, new Date(Date.parse('2026-11-18T10:30:00.000Z') - k * 1000).toISOString(), 99));
+    const inWindow = batch('b_skewed', '2026-11-18T09:51:00.000Z');   // 9 min before the marker: inside
+    const outside = batch('b_toofar', '2026-11-18T09:49:00.000Z', 3, ids(3));  // 11 min before: outside
+    const { db, client } = (() => { const d = fakeDb({ status: 'submitting', batch_ids: [marker] }); return { db: d.db, client: fakeClient({ batches: [...filler, inWindow, outside] }).client }; })();
+    const r = await resolvePending({ db, client, run: { id: RUN } });
+    expect(r).toMatchObject([{ result: 'adopted', batchId: 'b_skewed' }]);
   });
   it('exactly 1 candidate (created 30 s before the marker is still in the window) -> verified, adopted, status submitted', async () => {
     const { db, state, client } = setup([batch('b_match', '2026-11-18T09:59:30.000Z')]);
@@ -224,5 +250,57 @@ describe('resolvePending', () => {
   it('adoptBatchId refuses a batch with foreign custom_ids even if the count matches', async () => {
     const { db, client } = setup([batch('b_foreign', '2026-11-18T10:00:10.000Z', 3, ids(3, 'zzz'))]);
     await expect(resolvePending({ db, client, run: { id: RUN }, adoptBatchId: 'b_foreign' })).rejects.toThrow(/matches no unresolved marker|refusing to adopt/);
+  });
+});
+
+describe('voidPending', () => {
+  const at = new Date('2026-11-18T10:00:00.000Z');
+  const idList = ids(3);
+  const marker = makePendingMarker(idList, at);
+  const mk = (batches: FakeBatch[] = []) => {
+    const { db, state } = fakeDb({ status: 'submitting', batch_ids: [marker] });
+    const { client } = fakeClient({ batches });
+    return { db, state, client };
+  };
+  const at31 = () => new Date(at.getTime() + PENDING_VOID_MIN_AGE_MS + 60_000);
+
+  it('refuses before 30 minutes, even when nothing is listed', async () => {
+    expect(PENDING_VOID_MIN_AGE_MS).toBe(30 * 60_000);
+    const { db, state, client } = mk();
+    await expect(voidPending({ db, client, runId: RUN, marker, now: () => new Date(at.getTime() + 29 * 60_000) })).rejects.toThrow(/refusing to void: marker is 29 min old/);
+    expect(state.row.batch_ids).toEqual([marker]);
+    expect(state.row.status).toBe('submitting');
+    expect(state.updates).toBe(0);
+  });
+  it('refuses when a candidate batch now exists, listing it', async () => {
+    const { db, state, client } = mk([{ id: 'b_appeared', created_at: '2026-11-18T10:00:20.000Z', counts: 3, customIds: idList }]);
+    await expect(voidPending({ db, client, runId: RUN, marker, now: at31 })).rejects.toThrow(/refusing to void: 1 batch\(es\) now match.*b_appeared/);
+    expect(state.row.batch_ids).toEqual([marker]);
+    expect(state.row.status).toBe('submitting');
+  });
+  it('after 30+ min with nothing listed: writes void:<iso>, resets submitting -> estimated, and submission is allowed again', async () => {
+    const { db, state, client } = mk([{ id: 'b_other', created_at: '2026-11-18T10:00:20.000Z', counts: 7, customIds: [] }]);
+    const out = await voidPending({ db, client, runId: RUN, marker, now: at31 });
+    expect(out.status).toBe('estimated');
+    expect(state.row.status).toBe('estimated');
+    expect(state.row.batch_ids).toEqual([marker, out.voided]);
+    expect(out.voided).toMatch(/^void:2026-11-18T10:31:00\.000Z$/);
+    expect(unresolvedMarkers(state.row.batch_ids)).toHaveLength(0);
+    const r = await submitGuarded({ db, client: fakeClient().client, runId: RUN, expectedStatus: 'estimated', requests: reqs(idList) });
+    expect(r.batchId).toBe('msgbatch_new');
+  });
+  it('refuses unknown or already-resolved markers', async () => {
+    const { db, client } = mk();
+    await expect(voidPending({ db, client, runId: RUN, marker: 'pending:2026-11-18T10:00:00.000Z:3:aaaaaaaaaaaa', now: at31 })).rejects.toThrow(/not an unresolved pending marker/);
+    const done = fakeDb({ status: 'submitted', batch_ids: [marker, 'msgbatch_1'] });
+    await expect(voidPending({ db: done.db, client, runId: RUN, marker, now: at31 })).rejects.toThrow(/not an unresolved pending marker/);
+  });
+  it('keeps status "submitting" while another marker is still unresolved', async () => {
+    const m2 = makePendingMarker(ids(2), new Date(at.getTime() + 5 * 60_000));
+    const { db, state } = fakeDb({ status: 'submitting', batch_ids: [marker, m2] });
+    const out = await voidPending({ db, client: fakeClient().client, runId: RUN, marker, now: () => new Date(at.getTime() + 50 * 60_000) });
+    expect(out.status).toBe('submitting');
+    expect(state.row.batch_ids).toEqual([marker, out.voided, m2]);
+    expect(unresolvedMarkers(state.row.batch_ids).map((m) => m.raw)).toEqual([m2]);
   });
 });

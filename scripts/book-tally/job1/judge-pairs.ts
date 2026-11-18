@@ -22,13 +22,13 @@ import { messageText } from '../lib/batch';
 import { MODELS } from '../lib/cost';
 import { loadPrompt, PROMPTS_DIR } from '../lib/prompts';
 import { btInsert, selectAll } from '../lib/supabase';
-import { approvedBudget, confirmGate, prepareResume, resumeRun, submitRun, usageSummary, type CollectedRow } from './batch-run';
+import { approvedBudget, confirmGate, prepareResume, resumeRun, submitRun, usageSummary, voidPendingCommand, type CollectedRow } from './batch-run';
 import { MAX_ATTEMPTS } from '../lib/batch';
 import { CliError, finishRun, type RunRow, getRun, helpText, intOpt, isDirectRun, makeCtx, newRunId, parseCli, readOrEmpty, runCli, startRun, str, type Ctx, type Deps, type OptDef } from './cli';
 import { ensurePrompt } from './data';
 import { decideFromVerdicts, type Verdict } from './logic';
 import { parseModelJson, type JsonSchema } from './schema';
-import { assertDigestMatches, assertNothingDoneSince, assertResumable, estimateSpend, printEstimate, requestDigest, sdkTokenCounter, type EstItem, type TokenCounter } from './spend';
+import { assertDigestMatches, assertNoOverlappingRuns, assertNothingDoneSince, assertResumable, estimateSpend, printEstimate, requestDigest, sdkTokenCounter, type EstItem, type TokenCounter } from './spend';
 import { buildParams, type Effort } from '../lib/batch';
 
 const SCRIPT = 'job1/judge-pairs.ts';
@@ -45,9 +45,10 @@ const OPTIONS: Record<string, OptDef> = {
   resume: { type: 'string', help: 'run_id of a submitted run: collect its results (no new spend)' },
   effort: { type: 'string', help: 'low|medium|high|xhigh|max (default medium)' },
   limit: { type: 'string', help: 'only judge the first N candidates by id (trial runs)' },
-  'sample-size': { type: 'string', help: 'force a stratified token-count sample of this size (min 50) instead of counting all' },
+  'sample-size': { type: 'string', help: 'base the EXPECTED-cost line on a stratified sample of this size (min 50); tokens are still counted for ALL requests because the ceiling needs exact counts' },
   'max-attempts': { type: 'string', help: 'attempts per request incl. retries, fixed at --estimate time and part of the approved ceiling (default 3)' },
   'confirm-retries': { type: 'string', help: 'run_id: allow retry batches beyond the approved ceiling for this run' },
+  'void-pending': { type: 'string', help: 'with --resume: release an UNRESOLVED pending submission marker (batch not found at the API); allowed only >= 30 min after the marker, never automatic' },
   'adopt-batch': { type: 'string', help: 'with --resume: record this existing batch id for a run whose submission response was lost (verified before adopting)' },
   'dry-run': { type: 'boolean', help: 'offline: build requests and print counts; no API call, no DB write' },
 };
@@ -140,7 +141,8 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   const limit = intOpt(v.limit, 'limit');
   const maxAttempts = intOpt(v['max-attempts'], 'max-attempts') ?? MAX_ATTEMPTS;
   if (maxAttempts < 1 || maxAttempts > MAX_ATTEMPTS) throw new CliError(`--max-attempts must be 1..${MAX_ATTEMPTS}`);
-  if (str(v['adopt-batch']) && !str(v.resume)) throw new CliError('--adopt-batch requires --resume <run_id>');
+  if ((str(v['adopt-batch']) || str(v['void-pending'])) && !str(v.resume)) throw new CliError('--adopt-batch and --void-pending require --resume <run_id>');
+  if (str(v['adopt-batch']) && str(v['void-pending'])) throw new CliError('choose only one of --adopt-batch and --void-pending');
   const modes = [v.estimate === true, !!str(v['confirm-spend']), !!str(v.resume), v['dry-run'] === true].filter(Boolean).length;
   if (modes === 0) throw new CliError('refusing to run: choose --dry-run, --estimate, --confirm-spend <run_id> or --resume <run_id> (no paid call is made without a confirmed estimate)');
   if (modes > 1) throw new CliError('choose only one of --dry-run, --estimate, --confirm-spend, --resume');
@@ -168,6 +170,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     const run = assertResumable(await getRun(db, str(v.resume)!), str(v.resume)!, expect);
     const handler = makeHandler(ctx, run.id, stage, model, await ensurePrompt(db, prompt, schema), schema, judgments);
     const client = ctx.makeClient();
+    if (str(v['void-pending'])) return voidPendingCommand(ctx, client, run.id, str(v['void-pending'])!);
     const batchIds = await prepareResume(ctx, client, run.id, str(v['adopt-batch']));
     const out = await resumeRun({ ctx, client, runId: run.id, model, pass: stage, batchIds, onCollected: handler.onCollected });
     return finish(ctx, run.id, stage, out, handler.stats);
@@ -179,6 +182,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
     const picked = cands.filter((c) => wanted.has(c.id)).sort((a, b) => a.id - b.id);
     if (picked.length !== ids.length) throw new CliError('some estimated candidates no longer exist');
     assertNothingDoneSince(ids.filter((id) => latest.get(id)?.[stage]).map(String), `candidates (stage ${stage})`);
+    await assertNoOverlappingRuns(db, confirmRun, 'candidate_ids');
     const items = buildJudgeItems(picked, stage, ((confirmRun.effort ?? effort) as Effort), system, schema);
     assertDigestMatches(confirmRun, requestDigest(items));
     const promptHash = await ensurePrompt(db, prompt, schema);

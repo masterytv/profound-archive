@@ -19,6 +19,7 @@ import { toCsv } from './csv';
 import { loadWorld, youtubeUrl } from './data';
 import { computeMergeConflicts } from './merge-conflicts';
 import { latestJudgments, type CandidateRow, type DecisionRow, type JudgmentRow } from './judge-pairs';
+import { isUsableSelfName } from './extract-names';
 import { classifySelfName, decideFromVerdicts, indexProfiles, orientCandidate, planLinks } from './logic';
 import { LINK_DECISION_COL, LINK_HEADERS, NAME_HEADERS, NOT_APPLICABLE, PAIR_DECISION_COL, PAIR_HEADERS } from './sheets';
 
@@ -145,10 +146,10 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   }
 
   // name extractions
-  const exts = await readAll<{ id: number; video_id: string; name: string | null; quote: string | null; quote_verified: boolean; name_in_quote: boolean; valid: boolean }>(
-    ctx, 'bt_name_extractions', 'id, video_id, name, quote, quote_verified, name_in_quote, valid');
+  const exts = await readAll<{ id: number; video_id: string; name: string | null; quote: string | null; quote_verified: boolean; name_in_quote: boolean; valid: boolean; error: string | null }>(
+    ctx, 'bt_name_extractions', 'id, video_id, name, quote, quote_verified, name_in_quote, valid, error');
   const latestExt = new Map<string, (typeof exts)[number]>();
-  for (const e of exts) if (e.valid && e.name && e.quote_verified && e.name_in_quote) latestExt.set(e.video_id, e);
+  for (const e of exts) if (isUsableSelfName(e)) latestExt.set(e.video_id, e);
   const selfLink = new Map(links.filter((l) => l.source === 'transcript_self_name').map((l) => [l.name_extraction_id ?? -1, l]));
   const starts = new Map<string, number | null>();
   for await (const page of fetchTranscripts(db, [...latestExt.keys()], { pageSize: 20, withTimestamps: true })) {

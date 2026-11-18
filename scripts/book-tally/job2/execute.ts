@@ -4,6 +4,7 @@
  * logs carry counts and ids.
  */
 import type Anthropic from '@anthropic-ai/sdk';
+import * as batchLib from '../lib/batch';
 import {
   MAX_ATTEMPTS, MAX_BYTES_PER_BATCH, MAX_REQUESTS_PER_BATCH, makeCustomId, parseCustomId, pollBatch, realBatchIds, resolvePending,
   streamResults, submitGuarded, unresolvedMarkers, type BatchRequest, type Effort, type RequestParams,
@@ -19,7 +20,7 @@ import {
   fetchRunsByGroup, fetchStanceRuns, insertRunsIfAbsent, type AnswerRecord, type RawRef, type RunRow,
 } from './db';
 import {
-  DEFAULT_OUTPUT_ASSUMPTION, assertSpendConfirmed, estimateExact, estimateStratified, fingerprint, fingerprintLine, groupId,
+  DEFAULT_OUTPUT_ASSUMPTION, assertSpendConfirmed, estimateExact, fingerprint, fingerprintLine, groupId,
   outputTokensFor, runIdFor, sha256, type ModelEstimate, type OutputAssumption, type TokenItem,
 } from './estimate';
 import { buildDisputes, firstPassIsReaderA } from './flags';
@@ -29,7 +30,6 @@ import {
   type Rendered, type StancePrompts, PASS_ROLE,
 } from './requests';
 import { buildAnswerRows, classifyOutcome, invalidAnswerRows, maxTokensFor } from './rows';
-import { stratifiedSample } from './sampling';
 
 // ---------------------------------------------------------------------------------------
 // request streaming
@@ -165,11 +165,8 @@ export async function* streamRequests(
 // ---------------------------------------------------------------------------------------
 
 export interface EstimateOptions {
-  sampleSize: number;
-  strata: number;
   assumption: OutputAssumption;
   dryRun: boolean;
-  exactLimit: number;
 }
 
 export interface RunEstimate {
@@ -195,20 +192,11 @@ async function countTokens(client: Anthropic, p: RequestParams, userOverride?: s
   return r.input_tokens;
 }
 
-/** Runs `fn` over `items` with limited concurrency. */
-async function pooled<T, R>(items: readonly T[], n: number, fn: (x: T) => Promise<R>): Promise<R[]> {
-  const out = new Array<R>(items.length);
-  let next = 0;
-  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => {
-    for (;;) {
-      const i = next++;
-      if (i >= items.length) return;
-      out[i] = await fn(items[i]);
-    }
-  }));
-  return out;
-}
-
+/**
+ * Builds every request and counts input tokens for ALL of them (messages.countTokens is free),
+ * so both the expected cost and the hard ceiling are exact in prompt size; only the output
+ * side is modelled. Requests are streamed (never all held in memory); `--dry-run` uses chars/3.5.
+ */
 export async function estimateRun(
   bc: BuildCtx,
   g: Group,
@@ -217,65 +205,40 @@ export async function estimateRun(
   client: Anthropic | null,
   log: (s: string) => void,
 ): Promise<RunEstimate> {
-  const n = g.plan.videoIds.length;
-  const exact = n <= opts.exactLimit;
   const lines: string[] = [];
-  const sizes: Array<{ id: string; size: number; nQ: number }> = [];
-  const keep = new Map<string, BuiltRequest>();
   const shas = new Map<string, string>();
   const missing: string[] = [];
+  const items: TokenItem[] = [];
+  const cached = PASS_ROLE[g.kind].cacheSystem;
+  const ceil = { maxTokens: g.maxTokens, maxAttempts: MAX_ATTEMPTS };
+  const useApi = client !== null && !opts.dryRun;
+  let sysTokens: number | null = null;
+  let pending: BuiltRequest[] = [];
+  const drain = async () => {
+    const batch = pending;
+    pending = [];
+    items.push(...(await Promise.all(batch.map(async (r): Promise<TokenItem> => ({
+      promptTokens: useApi ? await countTokens(client!, r.params) : Math.ceil((r.systemChars + r.userChars) / CHARS_PER_TOKEN),
+      systemTokens: sysTokens!, cached, outputTokens: outputTokensFor(g.kind, family, r.questionIds.length, opts.assumption),
+    })))));
+  };
   for await (const r of streamRequests(bc, g, family)) {
     if ('missing' in r) { missing.push(r.key); continue; }
     lines.push(r.line);
     shas.set(r.key, r.transcriptSha256);
-    sizes.push({ id: r.key, size: r.userChars, nQ: r.questionIds.length });
-    if (exact) keep.set(r.key, r);
+    if (sysTokens === null) {
+      sysTokens = !cached ? 0 : useApi ? await countTokens(client!, r.params, '.') : Math.ceil(r.systemChars / CHARS_PER_TOKEN);
+    }
+    pending.push(r);
+    if (pending.length >= 8) await drain();
   }
-  log(`  ${MODELS[family]}: built ${lines.length} requests (${missing.length} videos without transcript)`);
-  const fp = fingerprint(lines);
-  const cached = PASS_ROLE[g.kind].cacheSystem;
-  const ceil = { maxTokens: g.maxTokens, maxAttempts: MAX_ATTEMPTS };
-  const outFor = (nQ: number) => outputTokensFor(g.kind, family, nQ, opts.assumption);
-  const useApi = client !== null && !opts.dryRun;
-
-  const itemFor = async (r: BuiltRequest, sysTokens: number): Promise<TokenItem> => ({
-    promptTokens: useApi ? await countTokens(client!, r.params) : Math.ceil((r.systemChars + r.userChars) / CHARS_PER_TOKEN),
-    systemTokens: sysTokens, cached, outputTokens: outFor(r.questionIds.length),
-  });
-  const sysTokensOf = async (r: BuiltRequest) => (!cached ? 0 : useApi ? countTokens(client!, r.params, '.') : Math.ceil(r.systemChars / CHARS_PER_TOKEN));
-
-  if (exact) {
-    const reqs = [...keep.values()];
-    if (reqs.length === 0) throw new CliError('no requests could be built (no transcripts?)');
-    const sysTokens = await sysTokensOf(reqs[0]);
-    const items = await pooled(reqs, 4, (r) => itemFor(r, sysTokens));
-    return {
-      family, model: MODELS[family], effort: g.effort[family], fingerprint: fp, missing, shas,
-      estimate: estimateExact(MODELS[family], items, ceil),
-      tokenMethod: opts.dryRun ? 'chars/3.5 approximation (dry run)' : `countTokens on all ${reqs.length} requests`,
-    };
-  }
-
-  // stratified sample by transcript length, extrapolated
-  const sample = stratifiedSample(sizes, opts.sampleSize, opts.strata, g.seed);
-  const strataSizes: number[] = [];
-  {
-    const sorted = [...sizes].sort((a, b) => a.size - b.size || (a.id < b.id ? -1 : 1));
-    const k = Math.max(1, Math.min(opts.strata, sorted.length));
-    for (let h = 0; h < k; h++) strataSizes.push(0);
-    sorted.forEach((_, i) => { strataSizes[Math.min(k - 1, Math.floor((i * k) / sorted.length))]++; });
-  }
-  const stratumOf = new Map(sample.map((s) => [s.item.id, s.stratum]));
-  const only = new Map([...stratumOf.keys()].map((k) => [k, { attempt: 1, maxTokens: g.maxTokens }]));
-  const built: BuiltRequest[] = [];
-  for await (const r of streamRequests(bc, g, family, { only })) if (!('missing' in r)) built.push(r);
-  const sysTokens = await sysTokensOf(built[0]);
-  const items = await pooled(built, 4, (r) => itemFor(r, sysTokens));
-  const withStratum = built.map((r, i) => ({ stratum: stratumOf.get(r.key)!, item: items[i] }));
+  await drain();
+  if (items.length === 0) throw new CliError('no requests could be built (no transcripts?)');
+  log(`  ${MODELS[family]}: built and counted ${items.length} requests (${missing.length} videos without transcript)`);
   return {
-    family, model: MODELS[family], effort: g.effort[family], fingerprint: fp, missing, shas,
-    estimate: estimateStratified(MODELS[family], withStratum, strataSizes, ceil),
-    tokenMethod: `${opts.dryRun ? 'chars/3.5 approximation' : 'countTokens'} on a seeded sample of ${built.length} of ${lines.length} requests, stratified by transcript length into ${strataSizes.length} strata, extrapolated`,
+    family, model: MODELS[family], effort: g.effort[family], fingerprint: fingerprint(lines), missing, shas,
+    estimate: estimateExact(MODELS[family], items, ceil),
+    tokenMethod: opts.dryRun ? 'chars/3.5 approximation (dry run)' : `countTokens on all ${items.length} requests`,
   };
 }
 
@@ -329,7 +292,7 @@ export async function runEstimate(
     transcriptSha: shas,
   };
   const fp = fingerprint(ests.map((e) => e.fingerprint));
-  const assumptionsKey = JSON.stringify({ a: req.options.assumption, s: req.options.sampleSize, st: req.options.strata, dry: req.options.dryRun, mt: g.maxTokens });
+  const assumptionsKey = JSON.stringify({ a: req.options.assumption, dry: req.options.dryRun, mt: g.maxTokens });
   const group = groupId(g.mode, g.kind, fp, assumptionsKey);
 
   // S4: refuse to overlap a non-terminal run of the same pass (the same group is the idempotent re-estimate).
@@ -482,10 +445,18 @@ async function resolveRun(rc: RunCtx, adoptBatchId?: string): Promise<void> {
     db, client: rc.client, run: rc.run, adoptBatchId, now: rc.ctx.now,
     poll: { intervalMs: rc.opts.pollMs, sleep: rc.ctx.sleep },
   });
-  for (const r of res) {
-    rc.ctx.log(`  ${rc.run.id}: pending submission ${r.result === 'adopted' ? `adopted batch ${r.batchId}` : 'confirmed absent (safe to resubmit)'}`);
-  }
+  const notFound = res.filter((r) => (r.result as string) !== 'adopted');
+  for (const r of res) if ((r.result as string) === 'adopted') rc.ctx.log(`  ${rc.run.id}: pending submission adopted batch ${r.batchId}`);
   await reload(rc);
+  if (notFound.length) {
+    // Never auto-void: a batch may exist that the listing cannot see. A human decides.
+    throw new CliError(
+      `run ${rc.run.id}: no batch found for pending marker ${notFound.map((r) => r.marker.raw).join(', ')}. Do NOT resubmit yet. ` +
+      `Check the Anthropic console for a batch created around ${notFound[0].marker.iso} with ${notFound[0].marker.nRequests} requests; if one exists, ` +
+      `re-run with --confirm-spend ${rc.run.params.group} --adopt-batch <id>. If you are sure none was created and the marker is at least 30 minutes old, ` +
+      `run --confirm-spend ${rc.run.params.group} --void-pending ${notFound[0].marker.raw} and then re-run.`,
+    );
+  }
 }
 
 /** Submits (attempt 1 or retries) every key that has no usable result and no pending batch. */
@@ -676,6 +647,15 @@ async function unresolvedKeys(rc: RunCtx): Promise<number> {
     if (refOutcome(last, s.maxAttempt).action === 'retry' || (counts.get(last.id) ?? 0) !== questionIdsFor(rc.g, key).length) n++;
   }
   return n;
+}
+
+/** Human-only (--void-pending): releases a pending marker whose batch could not be found (lib/batch voidPending enforces age and re-lists). */
+export async function voidPendingMarker(ctx: Ctx, group: string, marker: string): Promise<void> {
+  const db = ctx.getDb();
+  const run = (await fetchRunsByGroup(db, group)).find((r) => (r.batch_ids ?? []).includes(marker));
+  if (!run) throw new CliError(`no run of group "${group}" has the marker "${marker}"`);
+  const r = await batchLib.voidPending({ db, client: ctx.makeClient(), runId: run.id, marker, now: ctx.now });
+  ctx.log(`voided pending marker on run ${run.id}; run status now "${r.status}"; re-run --confirm-spend ${group} to resubmit`);
 }
 
 export interface ExecResult { group: string; runs: Array<{ id: string; unresolved: number; costUsd: number; requests: number }> }

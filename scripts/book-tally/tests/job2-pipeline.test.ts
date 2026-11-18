@@ -310,7 +310,7 @@ describe('gold pipeline, review sheet, marks, rollup', () => {
     // rollup: refuses partial coverage unless allowed; person rollup counts each person once
     const rdeps = { ...h.deps, findMergeConflicts: async () => [] };
     await expect(rollup([], rdeps)).rejects.toThrow(/no stance rows yet/);
-    await expect(rollup(['--allow-partial'], { ...h.deps, findMergeConflicts: async () => [{ component: ['profile:1', 'profile:2'], keyA: 'profile:1', keyB: 'profile:2' }] })).rejects.toThrow(/merge conflict/);
+    await expect(rollup(['--allow-partial'], { ...h.deps, findMergeConflicts: async () => [{ component: 'profile:1', keys: ['profile:1', 'profile:2'], mergeEdges: [1], conflicting: [2] }] })).rejects.toThrow(/merge conflict/);
     await rollup(['--allow-partial'], rdeps);
     // S7: bt_final_stances is only ever read with a video filter of <= 200 ids pushed into the view
     const viewReads = h.db.queries.filter((q) => q.table === 'bt_final_stances');
@@ -421,7 +421,45 @@ describe('guarded submission (B1)', () => {
   });
 });
 
+describe('unfound pending submissions are never auto-voided', () => {
+  it('refuses to resubmit while the marker is unresolved; --void-pending needs a human, an old marker and the group', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const g = h.groupOf();
+    h.client.loseNextCreates = 1;
+    h.client.hideFromList = true;
+    await expect(h.run(['--pilot', '--confirm-spend', g])).rejects.toThrow(/response was lost/);
+    const hRun = () => h.db.rows('bt_runs').find((r) => r.id.endsWith('-h'))!;
+    const marker: string = hRun().batch_ids[0];
+    // the retry finds nothing, but must not resubmit or void by itself
+    await expect(h.run(['--pilot', '--confirm-spend', g])).rejects.toThrow(/no batch found for pending marker[\s\S]*Do NOT resubmit[\s\S]*--adopt-batch[\s\S]*--void-pending/);
+    expect(h.client.created).toHaveLength(1);
+    expect(hRun().status).toBe('submitting');
+    expect(hRun().batch_ids).toEqual([marker]);
+    // --void-pending needs --confirm-spend, and the marker must be old enough
+    await expect(h.run(['--pilot', '--void-pending', marker])).rejects.toThrow(/requires --confirm-spend/);
+    await expect(h.run(['--pilot', '--confirm-spend', g, '--void-pending', marker])).rejects.toThrow(/refusing to void: marker is/);
+    expect(hRun().status).toBe('submitting');
+    // age the marker by two hours (test only), then the human voids it and the run can resubmit
+    hRun().batch_ids[0] = marker.replace(/\d{4}-\d\d-\d\dT[\d:.]+Z/, new Date(Date.now() - 2 * 3600_000).toISOString());
+    await h.run(['--pilot', '--confirm-spend', g, '--void-pending', hRun().batch_ids[0]]);
+    expect(hRun().status).toBe('estimated');
+    expect(hRun().batch_ids[1]).toMatch(/^void:/);
+    await h.run(['--pilot', '--confirm-spend', g]);
+    expect(h.client.created).toHaveLength(3); // the lost one + the resubmission + Sonnet
+    expect(h.db.rows('bt_runs').map((r) => r.status)).toEqual(['completed', 'completed']);
+  });
+});
+
 describe('retry budget (B2)', () => {
+  it('counts tokens for every request (ceiling is never extrapolated from a sample)', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '5', '--estimate']);
+    // 2 models x (5 requests + 1 system-prefix count)
+    expect(h.client.countCalls).toBe(12);
+    expect(h.db.rows('bt_runs')[0].estimate).toMatchObject({ method: 'exact', requests: 5, countedRequests: 5 });
+  });
+
   it('records expected cost and the hard ceiling in the estimate', async () => {
     const h = harness();
     await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
