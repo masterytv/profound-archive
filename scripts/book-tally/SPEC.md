@@ -3,6 +3,13 @@
 Status: design v1, 2026-11-18. The README (for academic reviewers) is derived from this.
 
 ## Ground rules
+- No foreign keys from `bt_*` to existing tables (they would add RI triggers that block the
+  live app from deleting rows in nde_vids / nde_questions / experiencer_profiles). Referential
+  checks against existing tables are done in code at write time. FKs among `bt_*` are fine.
+- A first-pass answer that is invalid (schema/missing) is treated as a disagreement: Sonnet
+  re-checks it and Opus arbitrates. A full run skips (video, question, pass) cells that
+  already have a row from the gold or pilot runs only if they are the same pass; pilot rows
+  never feed `bt_final_stances`.
 - Read-only on every existing table. All writes go to new `bt_*` tables created by
   `supabase/migrations/20261118_001_book_tally.sql` (rollback in `supabase/rollbacks/`).
   The migration is applied by a human after review. Staging and prod share one DB.
@@ -156,5 +163,5 @@ scripts/book-tally/
 ```
 Batch state: each submitted batch id is recorded in `bt_runs.batch_ids` before polling, so a
 crashed run resumes by collecting results; results are keyed by custom_id
-(`<run>:<video>:<pass>[:<attempt>]`), never by position. errored/expired requests are
+(`<run>_<key>_<pass>_<attempt>`, matching the API's `^[A-Za-z0-9_-]{1,64}$`), never by position. errored/expired requests are
 re-submitted in a new batch (same run, attempt+1).
