@@ -5922,9 +5922,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/rollup.ts": {
-    "mtime": 1795012280.3092728,
-    "seen": 1795012339.110945,
-    "ast_hash": "4aad308b30388cc5abca034b0cc0387d",
+    "mtime": 1795012444.713623,
+    "seen": 1795012496.7937858,
+    "ast_hash": "38fc64f0fa89936ff81ff6d8cf45c3ed",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/rows.ts": {
@@ -6108,15 +6108,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-fakes.ts": {
-    "mtime": 1795012296.3005805,
-    "seen": 1795012339.1114335,
-    "ast_hash": "c0592b5748bc55880063eeb9949e2d19",
+    "mtime": 1795012473.7810092,
+    "seen": 1795012496.7944357,
+    "ast_hash": "809ba0588ce8f91f8557078fc7db52af",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-flags.test.ts": {
-    "mtime": 1795010989.0027962,
-    "seen": 1795011030.0179799,
-    "ast_hash": "17f9494e4970e73bbfb062fb7ce48d44",
+    "mtime": 1795012370.92022,
+    "seen": 1795012496.7944376,
+    "ast_hash": "b0d30758ab7550aec082e5e27ac02589",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-sampling.test.ts": {
@@ -6240,15 +6240,15 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-estimate.test.ts": {
-    "mtime": 1795011022.8247337,
-    "seen": 1795011202.9682891,
-    "ast_hash": "c7d463904183ca49261e65cfd79ba1c0",
+    "mtime": 1795012370.9199736,
+    "seen": 1795012496.7944334,
+    "ast_hash": "3c58cf8b79d2b50354ed5b5e8d3e71c2",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-pipeline.test.ts": {
-    "mtime": 1795011163.4999466,
-    "seen": 1795011202.968488,
-    "ast_hash": "672233c41da782226c490fca90a5d33d",
+    "mtime": 1795012452.412718,
+    "seen": 1795012496.7944398,
+    "ast_hash": "c87bd6b012c3c93ff76125fcee1b502c",
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-rows.test.ts": {
@@ -6258,9 +6258,9 @@
     "semantic_hash": ""
   },
   "scripts/book-tally/tests/job2-stats.test.ts": {
-    "mtime": 1795011073.7567368,
-    "seen": 1795011202.9685183,
-    "ast_hash": "79d47019f152925114bc132083ce8cad",
+    "mtime": 1795012452.4189022,
+    "seen": 1795012496.7944822,
+    "ast_hash": "f5a041bb6965ca9390e2a726b7dd2bd8",
     "semantic_hash": ""
   },
   "scripts/book-tally/job2/README.md": {

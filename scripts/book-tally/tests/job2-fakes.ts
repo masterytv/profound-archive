@@ -21,6 +21,8 @@ const SERIAL = new Set(['bt_raw_responses', 'bt_stance_answers', 'bt_gold_marks'
 export class FakeDb {
   tables: Record<string, Row[]> = {};
   writes: Array<{ table: string; op: string; n: number }> = [];
+  /** Every select: table and the sizes of its IN filters (to check filters are pushed into views). */
+  queries: Array<{ table: string; inSizes: number[] }> = [];
   private seq: Record<string, number> = {};
   private clock = 0;
 
@@ -93,6 +95,7 @@ class Query implements PromiseLike<{ data: any; error: any }> {
   private filters: Array<(r: Row) => boolean> = [];
   private orderCol: string | null = null;
   private rng: [number, number] | null = null;
+  private inSizes: number[] = [];
   private op: 'select' | 'insert' | 'update' = 'select';
   private payload: any = null;
   private returning: string | null = null;
@@ -101,8 +104,8 @@ class Query implements PromiseLike<{ data: any; error: any }> {
 
   select(cols = '*') { if (this.op === 'insert' || this.op === 'update') this.returning = cols; else this.cols = cols; return this; }
   eq(col: string, val: unknown) { this.filters.push((r) => getPath(r, col) === val); return this; }
-  in(col: string, vals: unknown[]) { this.filters.push((r) => vals.includes(getPath(r, col))); return this; }
-  gt(col: string, val: any) { this.filters.push((r) => getPath(r, col) > val); return this; }
+  in(col: string, vals: unknown[]) { this.inSizes.push(vals.length); this.filters.push((r) => vals.includes(getPath(r, col))); return this; }
+  gt(col: string, val: any) { this.filters.push((r) => (getPath(r, col) as any) > val); return this; }
   limit(n: number) { this.rng = [0, n - 1]; return this; }
   order(col: string) { this.orderCol = col; return this; }
   range(a: number, b: number) { this.rng = [a, b]; return this; }
@@ -146,6 +149,7 @@ class Query implements PromiseLike<{ data: any; error: any }> {
       this.db.writes.push({ table: t, op: 'update', n: hit.length });
       return { data: this.returning ? this.project(hit, this.returning) : null, error: null };
     }
+    this.db.queries.push({ table: t, inSizes: this.inSizes });
     let rows = this.db.rows(t).filter((r) => this.filters.every((f) => f(r)));
     if (this.orderCol) rows = [...rows].sort((a, b) => (a[this.orderCol!] < b[this.orderCol!] ? -1 : a[this.orderCol!] > b[this.orderCol!] ? 1 : 0));
     if (this.rng) rows = rows.slice(this.rng[0], this.rng[1] + 1);

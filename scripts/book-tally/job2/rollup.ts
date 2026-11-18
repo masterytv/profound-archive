@@ -90,7 +90,7 @@ export async function main(argv: string[], deps: RollupDeps = {}): Promise<void>
   }
 
   const stanceRuns = await fetchStanceRuns(db);
-  const noTranscript = new Set(stanceRuns.flatMap((r) => (r.params?.plan?.skippedNoTranscript as string[] | undefined) ?? []).filter((x) => ndeSet.has(x)));
+  const noTranscript = new Set(stanceRuns.filter((r) => r.status !== 'canceled').flatMap((r) => (r.params?.plan?.skippedNoTranscript as string[] | undefined) ?? []).filter((x) => ndeSet.has(x)));
   const uncoveredAll = uncoveredVideos(nde, rows);
   const noTranscriptVideos = uncoveredAll.filter((x) => noTranscript.has(x));
   const incomplete = uncoveredAll.filter((x) => !noTranscript.has(x));

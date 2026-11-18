@@ -14,8 +14,7 @@ import { main as importGold } from '../job2/import-gold';
 import { main as goldReport } from '../job2/gold-report';
 import { main as rollup } from '../job2/rollup';
 import { loadPilot } from '../job2/pilot-data';
-import { renderPilotMarkdown } from '../job2/pilot-report';
-import { projectFullCost } from '../job2/estimate';
+import { projectPilot, renderPilotMarkdown } from '../job2/pilot-report';
 import { parseCsv } from '../job2/csv';
 import { FakeAnthropic, FakeDb, message, type Responder } from './job2-fakes';
 
@@ -221,6 +220,15 @@ describe('gold pipeline, review sheet, marks, rollup', () => {
     expect(final.filter((r) => r.status === 'pending_recheck').map((r) => r.question_id)).toEqual([2, 2, 2]);
     expect(final.filter((r) => r.status === 'final')).toHaveLength(12);
 
+    // rollup refuses while cells still await the recheck; --allow-pending marks every row loudly
+    const rd0 = { ...h.deps, findMergeConflicts: async () => [] };
+    await expect(rollup(['--allow-partial'], rd0)).rejects.toThrow(/3 cells await the recheck and 0 await the arbiter/);
+    await rollup(['--allow-partial', '--allow-pending'], rd0);
+    const tp = parseCsv(readFileSync(path.join(h.outDir, 'tally_by_question.csv'), 'utf8'));
+    expect(tp[1].WARNING_incomplete_data).toBe('PENDING_CELLS recheck=3 arbiter=0; INCOMPLETE_COVERAGE videos=9');
+    expect(tp[1].n_excl_pending_cells).toBe('3');
+    expect(readFileSync(path.join(h.outDir, 'tally_report.md'), 'utf8')).toContain('WARNING: incomplete data');
+
     // gold recheck (blind Sonnet on flagged questions only; per-video system prompt is not cached)
     const before = h.client.created.length;
     await h.run(['--gold', '--pass', 'recheck', '--estimate']);
@@ -300,8 +308,14 @@ describe('gold pipeline, review sheet, marks, rollup', () => {
     await expect(importGold(['--file', file], h.deps)).rejects.toThrow(/does not match the database/);
 
     // rollup: refuses partial coverage unless allowed; person rollup counts each person once
-    await expect(rollup([], h.deps)).rejects.toThrow(/no stance rows yet/);
-    await rollup(['--allow-partial'], h.deps);
+    const rdeps = { ...h.deps, findMergeConflicts: async () => [] };
+    await expect(rollup([], rdeps)).rejects.toThrow(/no stance rows yet/);
+    await expect(rollup(['--allow-partial'], { ...h.deps, findMergeConflicts: async () => [{ component: ['profile:1', 'profile:2'], keyA: 'profile:1', keyB: 'profile:2' }] })).rejects.toThrow(/merge conflict/);
+    await rollup(['--allow-partial'], rdeps);
+    // S7: bt_final_stances is only ever read with a video filter of <= 200 ids pushed into the view
+    const viewReads = h.db.queries.filter((q) => q.table === 'bt_final_stances');
+    expect(viewReads.length).toBeGreaterThan(0);
+    expect(viewReads.every((q) => q.inSizes.length === 1 && q.inSizes[0] <= 200)).toBe(true);
     const tally = parseCsv(readFileSync(path.join(h.outDir, 'tally_by_question.csv'), 'utf8'));
     expect(tally).toHaveLength(5);
     const persons = new Set(goldIds.map((v) => h.db.rows('bt_effective_person_map').find((m) => m.video_id === v)!.person_key));
@@ -312,7 +326,25 @@ describe('gold pipeline, review sheet, marks, rollup', () => {
 
     // an unmapped NDE video makes the rollup fail loudly
     h.db.rows('bt_unmapped_nde_videos').push({ video_id: 'vidA09' });
-    await expect(rollup(['--allow-partial'], h.deps)).rejects.toThrow(/no accepted person link/);
+    await expect(rollup(['--allow-partial'], rdeps)).rejects.toThrow(/no accepted person link/);
+    h.db.rows('bt_unmapped_nde_videos').length = 0;
+
+    // S6: videos without a transcript are reported apart from incomplete ones, at video and person level
+    const map = h.db.rows('bt_effective_person_map');
+    const person = [...new Set(map.map((m) => m.person_key))].find((p) => map.filter((m) => m.person_key === p).every((m) => !goldIds.includes(m.video_id)))!;
+    const blank = map.filter((m) => m.person_key === person).map((m) => m.video_id);
+    for (const v of blank) h.db.rows('nde_vids').find((r) => r.videoId === v)!.subtitles_punctuated = '';
+    await h.run(['--full', '--estimate']);
+    expect(h.db.rows('bt_runs').find((r) => r.params.mode === 'full')!.params.plan.skippedNoTranscript.sort()).toEqual([...blank].sort());
+    await rollup(['--allow-partial'], rdeps);
+    const t2 = parseCsv(readFileSync(path.join(h.outDir, 'tally_by_question.csv'), 'utf8'));
+    expect(Object.keys(t2[0])).toEqual(expect.arrayContaining(['n_persons_all_excluded', 'n_persons_no_transcript', 'n_excluded_unverified_cells', 'n_excl_invalid_cells', 'WARNING_incomplete_data']));
+    expect(Object.keys(t2[0])).not.toContain('n_excluded_unverified');
+    expect(t2[0].n_persons_no_transcript).toBe('1');
+    expect(t2[0].WARNING_incomplete_data).toBe(`INCOMPLETE_COVERAGE videos=${12 - 3 - blank.length}`);
+    const rep = readFileSync(path.join(h.outDir, 'tally_report.md'), 'utf8');
+    expect(rep).toContain(`videos recorded as having no transcript: ${blank.length}`);
+    expect(rep).toContain('WARNING');
   });
 
   it('full first pass skips videos that already have first-pass rows (gold) and never re-spends on them', async () => {
@@ -337,9 +369,168 @@ describe('pilot report rendering', () => {
     await h.run(['--pilot', '--pilot-n', '4', '--estimate']);
     await h.run(['--pilot', '--confirm-spend', h.groupOf()]);
     const pilot = (await loadPilot(h.db.asDb()))!;
-    const proj = projectFullCost({ nVideos: 6054, haiku: pilot.usage.haiku.rates, sonnet: pilot.usage.sonnet.rates, shares: pilot.stats.shares });
+    const proj = projectPilot(pilot, 6054);
     const md = renderPilotMarkdown(pilot, proj, 6054);
-    for (const s of ['Agreement (Haiku vs Sonnet)', 'Confusion matrix', 'Cohen', 'quote failure rate', 'Projected full run (6054 videos)', 'arbiter (Opus)']) expect(md).toContain(s);
+    for (const s of ['Agreement (Haiku vs Sonnet)', 'Confusion matrix', 'Cohen', 'quote failure rate', 'Projected full run (6054 videos)', 'arbiter (Opus)', 'Sonnet disagreement on Haiku cells that were NOT flagged', 'Retries and truncation', 'per VIDEO']) expect(md).toContain(s);
     expect(proj.totalUsd).toBeGreaterThan(0);
+  });
+});
+
+describe('guarded submission (B1)', () => {
+  it('every create is sent with maxRetries 0 and records a pending marker before the real batch id', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    await h.run(['--pilot', '--confirm-spend', h.groupOf()]);
+    expect(h.client.createOptions).toEqual([{ maxRetries: 0 }, { maxRetries: 0 }]);
+    for (const r of h.db.rows('bt_runs')) {
+      expect(r.batch_ids).toHaveLength(2); // durable pending marker first, then the real id
+      expect(r.batch_ids[0]).toMatch(/^pending:/);
+      expect(r.batch_ids[1]).toMatch(/^msgbatch_/);
+      expect(r.status).toBe('completed');
+    }
+  });
+
+  it('a lost create response leaves the run "submitting"; the next run adopts the batch instead of resubmitting', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const g = h.groupOf();
+    h.client.loseNextCreates = 1;
+    await expect(h.run(['--pilot', '--confirm-spend', g])).rejects.toThrow(/response was lost/);
+    const hRun = () => h.db.rows('bt_runs').find((r) => r.id.endsWith('-h'))!;
+    expect(hRun().status).toBe('submitting');
+    expect(hRun().batch_ids).toHaveLength(1);
+    expect(hRun().batch_ids[0]).toMatch(/^pending:/);
+    await h.run(['--pilot', '--confirm-spend', g]);
+    expect(h.client.created).toHaveLength(2); // the lost one (adopted) + the Sonnet batch; nothing resubmitted
+    expect(hRun().batch_ids.some((x: string) => x.startsWith('pending:'))).toBe(true);
+    expect(hRun().batch_ids.filter((x: string) => x.startsWith('msgbatch_'))).toEqual(['msgbatch_1']);
+    expect(h.db.rows('bt_runs').map((r) => r.status)).toEqual(['completed', 'completed']);
+    expect(h.db.rows('bt_stance_answers')).toHaveLength(20);
+  });
+
+  it('--adopt-batch records a named batch for a run left in "submitting"', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const g = h.groupOf();
+    h.client.loseNextCreates = 1;
+    await expect(h.run(['--pilot', '--confirm-spend', g])).rejects.toThrow(/response was lost/);
+    await expect(h.run(['--pilot', '--adopt-batch', 'msgbatch_1'])).rejects.toThrow(/requires --confirm-spend/);
+    await h.run(['--pilot', '--confirm-spend', g, '--adopt-batch', 'msgbatch_1']);
+    expect(h.client.created).toHaveLength(2);
+    expect(h.db.rows('bt_runs').map((r) => r.status)).toEqual(['completed', 'completed']);
+  });
+});
+
+describe('retry budget (B2)', () => {
+  it('records expected cost and the hard ceiling in the estimate', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const e = h.db.rows('bt_runs')[0].estimate;
+    expect(e.ceiling_usd).toBeGreaterThan(e.expected_usd * 5);
+    expect(e).toMatchObject({ max_attempts: 3, max_tokens: 16000 });
+    expect(h.logs.join('\n')).toMatch(/HARD CEILING \$[0-9.]+ \(every attempt at max_tokens=16000, doubling\)/);
+    expect(h.logs.join('\n')).toMatch(/--confirm-retries pilot-[0-9a-f]{8}/);
+  });
+
+  it('refuses retries beyond the approved ceiling unless --confirm-retries names the group', async () => {
+    let expireKey = '';
+    const responder: Responder = (cid, params) => {
+      const attempt = Number(cid.split('_').pop());
+      if (params.model.includes('sonnet') && attempt === 1 && cid.includes(`_${expireKey}_`)) return { type: 'expired' };
+      const r = standard(cid, params) as { type: 'succeeded'; message: any };
+      if (params.model.includes('sonnet')) r.message.usage.output_tokens = 5_000_000; // spend far beyond the ceiling
+      return r;
+    };
+    const h = harness(responder);
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const g = h.groupOf();
+    expireKey = h.db.rows('bt_runs')[0].params.plan.videoIds[0];
+    await expect(h.run(['--pilot', '--confirm-spend', g])).rejects.toThrow(/Retry budget exceeded/);
+    expect(h.client.created).toHaveLength(2); // no retry batch was created
+    await h.run(['--pilot', '--confirm-spend', g, '--confirm-retries', g]);
+    expect(h.client.created).toHaveLength(3);
+    expect(h.db.rows('bt_runs').map((r) => r.status)).toEqual(['completed', 'completed']);
+  });
+});
+
+describe('answer rows are all-or-nothing per raw response (S3)', () => {
+  it('stops when a raw response has only some of its answer rows', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const g = h.groupOf();
+    await h.run(['--pilot', '--confirm-spend', g]);
+    const rows = h.db.tables.bt_stance_answers;
+    rows.splice(rows.findIndex((r) => r.model.includes('haiku')), 1);
+    for (const r of h.db.rows('bt_runs')) r.status = 'collecting';
+    await expect(h.run(['--pilot', '--confirm-spend', g])).rejects.toThrow(/has 4 of 5 answer rows; refusing to continue/);
+  });
+
+  it('inserts each raw response in a single statement and reports the writes', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '3', '--estimate']);
+    await h.run(['--pilot', '--confirm-spend', h.groupOf()]);
+    const inserts = h.db.writes.filter((w) => w.table === 'bt_stance_answers');
+    expect(inserts.map((w) => w.n)).toEqual(Array(6).fill(5));
+  });
+});
+
+describe('transcript integrity (N4)', () => {
+  it('records the sent transcript hash and marks answers invalid when the text changed before collection', async () => {
+    let changed = '';
+    const h = harness();
+    const responder: Responder = (cid, params) => {
+      if (!changed) {
+        changed = cid.split('_')[1];
+        h.db.rows('nde_vids').find((r) => r.videoId === changed)!.subtitles_punctuated += ' It was edited later.';
+      }
+      return standard(cid, params);
+    };
+    (h.client as unknown as { responder: Responder }).responder = responder;
+    await h.run(['--pilot', '--pilot-n', '3', '--estimate']);
+    await h.run(['--pilot', '--confirm-spend', h.groupOf()]);
+    const raw = h.db.rows('bt_raw_responses');
+    expect(raw.every((r) => /^[0-9a-f]{64}$/.test(r.response._bt_meta.transcript_sha256))).toBe(true);
+    const rows = h.db.rows('bt_stance_answers');
+    const edited = rows.filter((r) => r.video_id === changed);
+    expect(edited).toHaveLength(10);
+    expect(edited.every((r) => !r.valid && r.stance === null && r.error === 'transcript_changed')).toBe(true);
+    const others = rows.filter((r) => r.video_id !== changed);
+    expect(others.length).toBe(20);
+    expect(others.every((r) => r.valid)).toBe(true);
+  });
+});
+
+describe('overlapping runs (S4)', () => {
+  it('refuses a second estimate that overlaps a non-terminal run of the same pass, naming it; --cancel frees it', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '4', '--estimate']);
+    const g = h.groupOf();
+    await expect(h.run(['--pilot', '--pilot-n', '4', '--effort-haiku', 'high', '--estimate'])).rejects.toThrow(/already covered by run pilot-[0-9a-f]{8}-[hs] \(status "estimated"/);
+    await h.run(['--pilot', '--pilot-n', '4', '--estimate']); // identical re-estimate stays idempotent
+    expect(h.db.rows('bt_runs')).toHaveLength(2);
+    await h.run(['--cancel', g]);
+    expect(h.db.rows('bt_runs').map((r) => r.status)).toEqual(['canceled', 'canceled']);
+    await h.run(['--pilot', '--pilot-n', '4', '--effort-haiku', 'high', '--estimate']);
+    expect(h.db.rows('bt_runs')).toHaveLength(4);
+  });
+
+  it('cannot cancel a group that was submitted', async () => {
+    const h = harness();
+    await h.run(['--pilot', '--pilot-n', '2', '--estimate']);
+    const g = h.groupOf();
+    await h.run(['--pilot', '--confirm-spend', g]);
+    await expect(h.run(['--cancel', g])).rejects.toThrow(/only never-submitted estimates/);
+  });
+
+  it('a full first-pass estimate leaves out videos covered by an in-flight gold run', async () => {
+    const h = harness();
+    await h.run(['--gold', '--pilot-n', '4', '--gold-n', '3', '--estimate']);
+    await expect(h.run(['--gold', '--pilot-n', '4', '--gold-n', '3', '--effort-haiku', 'high', '--estimate'])).rejects.toThrow(/already covered/);
+    await h.run(['--full', '--estimate']);
+    const goldIds: string[] = h.db.rows('bt_runs').find((r) => r.params.mode === 'gold')!.params.plan.videoIds;
+    const full = h.db.rows('bt_runs').find((r) => r.params.mode === 'full')!;
+    expect(full.params.plan.videoIds).toHaveLength(9);
+    expect(full.params.plan.videoIds.some((v: string) => goldIds.includes(v))).toBe(false);
+    expect(h.logs.join('\n')).toMatch(/excluded: 3 videos covered by a non-terminal first-pass run/);
   });
 });

@@ -4,6 +4,7 @@ import { fmtProportion, goldStats, latestMarks, parseYN, selectGoldRows, youtube
 import { agreement, modelAnswerStats, pilotStats, usageStats, type PilotAnswer } from '../job2/pilot-stats';
 import { combineStances, tallyByQuestion, type FinalRow } from '../job2/tally';
 import { parseGoldSheet } from '../job2/import-gold';
+import { noTranscriptPersonCount, uncoveredVideos } from '../job2/rollup';
 import type { Stance } from '../job2/answers';
 
 const mk = (video_id: string, question_id: number, stance: Stance | null, o: Partial<PilotAnswer> = {}): PilotAnswer => ({
@@ -241,5 +242,16 @@ describe('csv and gold sheet import parsing', () => {
     expect(r.errors).toHaveLength(4);
     expect(r.errors[0]).toMatch(/^line 5:/);
     expect(r.errors.join('\n')).toMatch(/duplicate row/);
+  });
+});
+
+describe('rollup helpers', () => {
+  it('counts persons none of whose videos has a transcript, not persons with only some', () => {
+    const map = new Map([['v1', 'P1'], ['v2', 'P1'], ['v3', 'P2'], ['v4', 'P2'], ['v5', 'P3']]);
+    expect(noTranscriptPersonCount(map, new Set(['v1', 'v2', 'v3', 'v5']))).toBe(2); // P1 and P3; P2 still has v4
+    expect(noTranscriptPersonCount(map, new Set())).toBe(0);
+  });
+  it('uncoveredVideos lists NDE videos without any stance row', () => {
+    expect(uncoveredVideos(['a', 'b', 'c'], [{ video_id: 'b' }, { video_id: 'b' }])).toEqual(['a', 'c']);
   });
 });
