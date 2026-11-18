@@ -11,6 +11,7 @@ import {
   NON_TERMINAL, countCells, fetchPendingCells, fetchStanceRuns, videosWithFirstPass, type PendingCell, type RunRow,
 } from './db';
 import { goldOrder, pilotOrder } from './sampling';
+import { completeVideos, fetchFirstPassAnswers } from './haiku';
 import { toPromptQuestions, type PassKind, type PromptQuestion } from './requests';
 
 export type Mode = 'pilot' | 'gold' | 'full';
@@ -69,7 +70,7 @@ export async function pickAvailable(db: Db, order: readonly string[], k: number)
 }
 
 export function goldIdsFromRuns(runs: readonly RunRow[]): string[] | null {
-  const gold = runs.filter((r) => r.status !== 'canceled' && r.params?.mode === 'gold' && r.pass === 'first' && Array.isArray(r.params?.plan?.videoIds));
+  const gold = runs.filter((r) => r.status !== 'canceled' && r.params?.mode === 'gold' && r.pass === 'first' && r.params?.resolution !== 'haiku-first-pass' && Array.isArray(r.params?.plan?.videoIds));
   return gold.length ? (gold[gold.length - 1].params.plan.videoIds as string[]) : null;
 }
 
@@ -179,3 +180,76 @@ export async function makePlan(db: Db, req: PlanRequest, log: (s: string) => voi
 
 /** Request keys (video ids) of a plan. */
 export const planKeys = (p: Plan): string[] => p.videoIds;
+
+// ---- Haiku-only gold set (no recheck/arbiter; see haiku.ts) ----
+
+/** Which of a page of videos may be picked. */
+export type Eligible = (page: readonly string[]) => Promise<Set<string>>;
+
+/** Eligible = has a usable transcript (run-stance: sampled videos that may need the first pass). */
+export function transcriptEligible(db: Db): Eligible {
+  return async (page) => {
+    const have = new Set<string>();
+    for await (const { transcripts } of fetchTranscripts(db, page as string[], { pageSize: 25 })) transcripts.forEach((t) => have.add(t.videoId));
+    return have;
+  };
+}
+
+/** Eligible = has a first-pass row for every active question (gold-sheet / gold-report). */
+export function completeEligible(db: Db, questionIds: readonly number[]): Eligible {
+  return async (page) => completeVideos(await fetchFirstPassAnswers(db, page, 25), questionIds);
+}
+
+export interface HaikuGoldSample { chosen: string[]; skipped: string[]; pilotExcluded: number }
+
+/**
+ * The existing seeded gold order (same salt, same pilot exclusion as the full pipeline), taking the
+ * first `goldN` videos that `eligible` accepts. Deterministic once the first pass is complete;
+ * `skipped` lists walked candidates that were not eligible (a non-empty list before the first pass
+ * has finished means the selection can still change).
+ */
+export async function haikuGoldSample(
+  db: Db, req: { seed: number; pilotN: number; goldN: number }, nde: readonly string[], runs: readonly RunRow[], eligible: Eligible,
+): Promise<HaikuGoldSample> {
+  const pilot = await pickAvailable(db, pilotOrder(nde, req.seed), req.pilotN);
+  const exclude = new Set([...pilot.chosen, ...pilot.skipped, ...pilotIdsFromRuns(runs)]);
+  const order = goldOrder(nde, req.seed, exclude);
+  const chosen: string[] = [];
+  const skipped: string[] = [];
+  for (let pos = 0; chosen.length < req.goldN && pos < order.length; ) {
+    const page = order.slice(pos, pos + Math.max(10, req.goldN - chosen.length));
+    pos += page.length;
+    const ok = await eligible(page);
+    for (const id of page) {
+      if (chosen.length >= req.goldN) break;
+      (ok.has(id) ? chosen : skipped).push(id);
+    }
+  }
+  return { chosen, skipped, pilotExcluded: exclude.size };
+}
+
+export interface HaikuGoldPlan { goldIds: string[]; todo: string[]; plan: Plan | null; notes: string[] }
+
+/**
+ * run-stance --gold --resolution haiku-first-pass: the sampled gold videos, and the (normally
+ * empty) subset that still lacks a complete first-pass row set. plan is null when nothing needs
+ * the API (no spend at all); otherwise it covers only the missing videos, first pass, Haiku only.
+ */
+export async function makeHaikuGoldPlan(db: Db, req: { seed: number; pilotN: number; goldN: number }): Promise<HaikuGoldPlan> {
+  const questions = await loadQuestions(db);
+  const questionIds = questions.map((q) => q.question_id);
+  const nde = await readNdeVideoIds(db);
+  const runs = await fetchStanceRuns(db);
+  const s = await haikuGoldSample(db, req, nde, runs, transcriptEligible(db));
+  if (s.chosen.length < req.goldN) throw new CliError(`only ${s.chosen.length} NDE videos with transcripts for the gold set`);
+  const complete = new Set<string>();
+  for (let i = 0; i < s.chosen.length; i += 25) {
+    for (const v of completeVideos(await fetchFirstPassAnswers(db, s.chosen.slice(i, i + 25), 25), questionIds)) complete.add(v);
+  }
+  const todo = s.chosen.filter((v) => !complete.has(v)).sort();
+  const notes = [`NDE videos: ${nde.length}`, `pilot ids excluded: ${s.pilotExcluded}`, `gold videos: ${s.chosen.length}; with a complete first-pass row set: ${s.chosen.length - todo.length}; missing: ${todo.length}`];
+  return {
+    goldIds: s.chosen, todo, notes,
+    plan: todo.length ? { videoIds: todo, questionIds, skippedNoTranscript: s.skipped } : null,
+  };
+}

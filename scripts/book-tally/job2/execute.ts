@@ -43,6 +43,8 @@ export interface Group {
   maxTokens: number;
   effort: Record<ModelFamily, Effort>;
   plan: Plan;
+  /** Set for the Haiku-only gold first pass (run-stance --resolution haiku-first-pass); stored in bt_runs.params. */
+  resolution?: 'haiku-first-pass';
 }
 
 export interface BuildCtx {
@@ -300,7 +302,7 @@ export async function runEstimate(
     transcriptSha: shas,
   };
   const fp = fingerprint(ests.map((e) => e.fingerprint));
-  const assumptionsKey = JSON.stringify({ a: req.options.assumption, dry: req.options.dryRun, mt: g.maxTokens });
+  const assumptionsKey = JSON.stringify({ a: req.options.assumption, dry: req.options.dryRun, mt: g.maxTokens, ...(g.resolution ? { res: g.resolution } : {}) });
   const group = groupId(g.mode, g.kind, fp, assumptionsKey);
 
   // S4: refuse to overlap a non-terminal run of the same pass (the same group is the idempotent re-estimate).
@@ -326,6 +328,7 @@ export async function runEstimate(
     status: 'estimated',
     params: {
       group, mode: g.mode, kind: g.kind, pass: g.pass, seed: g.seed, maxTokens: g.maxTokens, plan: finalPlan,
+      ...(g.resolution ? { resolution: g.resolution } : {}),
       effort: g.effort, family: e.family,
     },
     estimate: {
@@ -369,6 +372,8 @@ export interface ExecOptions {
   adoptBatch?: string;
   /** Group id the human confirmed retries beyond the approved ceiling for (--confirm-retries). */
   confirmRetries?: string;
+  /** --i-understand-this-is-the-expensive-pass: required to submit a full recheck/arbiter group. */
+  expensiveAck?: boolean;
 }
 
 interface RunCtx {
@@ -389,6 +394,7 @@ export function groupFromRun(run: RunRow): Group {
   const p = run.params;
   return {
     mode: p.mode, pass: p.pass, kind: p.kind, seed: p.seed, maxTokens: p.maxTokens, effort: p.effort, plan: p.plan,
+    ...(p.resolution ? { resolution: p.resolution } : {}),
   };
 }
 
@@ -673,6 +679,13 @@ export async function voidPendingMarker(ctx: Ctx, group: string, marker: string)
 
 export interface ExecResult { group: string; runs: Array<{ id: string; unresolved: number; costUsd: number; requests: number }> }
 
+export const EXPENSIVE_FLAG = 'i-understand-this-is-the-expensive-pass';
+
+/** A stored group that is the full-corpus recheck or arbiter pass. */
+export function isExpensiveGroup(params: { mode?: string; pass?: string }): boolean {
+  return params.mode === 'full' && (params.pass === 'recheck' || params.pass === 'arbiter');
+}
+
 /** Entry point for --confirm-spend: verifies the gate, submits, collects, validates, stores. */
 export async function executeGroup(
   ctx: Ctx,
@@ -690,6 +703,9 @@ export async function executeGroup(
   const p0 = runs[0].params;
   if ((expect.mode && expect.mode !== p0.mode) || (expect.pass && p0.mode !== 'pilot' && expect.pass !== p0.pass)) {
     throw new CliError(`refusing to spend: group ${group} is mode=${p0.mode} pass=${p0.pass}, which does not match the flags given`);
+  }
+  if (isExpensiveGroup(p0) && opts.expensiveAck !== true) {
+    throw new CliError(`refusing to spend: group ${group} is the full-corpus ${p0.pass} pass (Sonnet/Opus on every flagged cell; this is the expensive pass and is NOT part of the current Haiku-only scope). Re-run with --confirm-spend ${group} --${EXPENSIVE_FLAG} only if you mean it.`);
   }
   for (const r of runs) {
     if (!['estimated', 'submitting', 'submitted', 'collecting', 'completed'].includes(r.status)) {

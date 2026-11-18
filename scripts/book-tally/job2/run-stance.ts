@@ -9,22 +9,33 @@
  *                                  no API call, no database write
  *   --confirm-spend <group>        submit exactly what that estimate covered (resumes if batch
  *                                  ids were already recorded; settles lost submissions first)
+ *   --resolution haiku-first-pass  Haiku-only scope (budget decision). With --gold: the gold videos are
+ *                                  the pilot-disjoint seeded sample; normally every one already has a
+ *                                  complete first-pass row set, so NOTHING is spent. Any that lack one get
+ *                                  only the Haiku first pass, through the normal estimate/confirm gate.
+ *                                  Never plans or runs recheck/arbiter.
+ *   --i-understand-this-is-the-expensive-pass
+ *                                  required in addition to --confirm-spend for a full-corpus
+ *                                  recheck/arbiter group (Sonnet/Opus). The pilot's Sonnet arm is unaffected.
  * Nothing is submitted without --confirm-spend matching an estimate whose request digest still
  * equals the rebuilt requests.
  */
 import { projectFullCost } from './estimate';
 import { CliError, helpText, intOpt, isDirectRun, makeCtx, numOpt, parseCli, runCli, str, type Deps, type OptDef } from './cli';
-import { cancelEstimate, executeGroup, runEstimate, voidPendingMarker, type Group } from './execute';
+import { EXPENSIVE_FLAG, cancelEstimate, executeGroup, runEstimate, voidPendingMarker, type Group } from './execute';
 import { assumptionFrom, loadPilot } from './pilot-data';
-import { kindOf, loadQuestions, makePlan, type Mode, type PassOpt } from './plan';
+import { parseResolution } from './haiku';
+import { kindOf, loadQuestions, makeHaikuGoldPlan, makePlan, type Mode, type PassOpt } from './plan';
 import { DEFAULT_EFFORT, DEFAULT_MAX_TOKENS, loadStancePrompts } from './requests';
 import type { Effort } from '../lib/batch';
 
 export const OPTIONS: Record<string, OptDef> = {
   pilot: { type: 'boolean', help: 'pilot: 100 seeded videos, Haiku and Sonnet independently, all questions' },
-  gold: { type: 'boolean', help: 'gold set: 25 seeded videos disjoint from the pilot, full pipeline' },
+  gold: { type: 'boolean', help: 'gold set: 25 seeded videos disjoint from the pilot, full pipeline (with --resolution haiku-first-pass: Haiku first pass only, usually no spend)' },
   full: { type: 'boolean', help: 'all NDE videos not already completed for the pass' },
   pass: { type: 'string', help: 'first (default) | recheck | arbiter' },
+  resolution: { type: 'string', help: 'full (default) | haiku-first-pass: Haiku-only scope; with --gold needs no recheck/arbiter and usually no spend' },
+  [EXPENSIVE_FLAG]: { type: 'boolean', help: 'required with --confirm-spend for a full-corpus recheck/arbiter group (the expensive Sonnet/Opus passes)' },
   estimate: { type: 'boolean', help: 'print the cost estimate and record it; spends nothing' },
   'dry-run': { type: 'boolean', help: 'offline estimate (no API call, no DB write)' },
   'confirm-spend': { type: 'string', help: 'group id printed by --estimate; required to submit' },
@@ -72,10 +83,18 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
   if (!['first', 'recheck', 'arbiter'].includes(passRaw)) throw new CliError('--pass must be first, recheck or arbiter');
   const pass = passRaw as PassOpt;
   const mode = modes[0] as Mode | undefined;
+  let resolution;
+  try { resolution = parseResolution(str(v.resolution)); } catch (e) { throw new CliError((e as Error).message); }
+  const haiku = resolution === 'haiku-first-pass';
+  if (haiku && pass !== 'first') throw new CliError('--resolution haiku-first-pass only ever runs the Haiku first pass; it cannot be combined with --pass recheck or --pass arbiter');
+  const ack = v[EXPENSIVE_FLAG] === true;
+  if (confirm && mode === 'full' && pass !== 'first' && !ack) {
+    throw new CliError(`refusing to spend: --pass ${pass} --full is the expensive full-corpus pass; it needs --${EXPENSIVE_FLAG} in addition to --confirm-spend`);
+  }
 
   if (confirm) {
     // Gate first: nothing below runs (no DB, no API client) unless the confirmation matches.
-    await executeGroup(ctx, confirm, confirm, { mode, pass: v.pass ? pass : undefined }, { pollMs: (intOpt(v['poll-seconds'], 'poll-seconds') ?? 30) * 1000, adoptBatch: str(v['adopt-batch']), confirmRetries: str(v['confirm-retries']) });
+    await executeGroup(ctx, confirm, confirm, { mode, pass: v.pass ? pass : undefined }, { pollMs: (intOpt(v['poll-seconds'], 'poll-seconds') ?? 30) * 1000, adoptBatch: str(v['adopt-batch']), confirmRetries: str(v['confirm-retries']), expensiveAck: ack });
     return;
   }
   if (!estimating) {
@@ -85,7 +104,20 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
 
   const seed = intOpt(v.seed, 'seed') ?? 20261118;
   const db = ctx.getDb();
-  const made = await makePlan(db, { mode, pass, seed, pilotN: intOpt(v['pilot-n'], 'pilot-n') ?? 100, goldN: intOpt(v['gold-n'], 'gold-n') ?? 25 }, ctx.log);
+  const planReq = { mode, pass, seed, pilotN: intOpt(v['pilot-n'], 'pilot-n') ?? 100, goldN: intOpt(v['gold-n'], 'gold-n') ?? 25 };
+  let made;
+  if (haiku && mode === 'gold') {
+    const hg = await makeHaikuGoldPlan(db, planReq);
+    for (const n of hg.notes) ctx.log(`plan: ${n}`);
+    if (!hg.plan) {
+      ctx.log(`NO SPEND NEEDED: all ${hg.goldIds.length} gold videos already have a complete first-pass row set. Nothing was estimated, recorded or submitted. Build the sheet with gold-sheet.ts --resolution haiku-first-pass.`);
+      return;
+    }
+    ctx.log(`${hg.todo.length} gold videos lack first-pass rows: only the Haiku first pass is planned for them (no recheck, no arbiter).`);
+    made = { kind: kindOf(mode, pass), plan: hg.plan, notes: [] as string[] };
+  } else {
+    made = await makePlan(db, planReq, ctx.log);
+  }
   const kind = kindOf(mode, pass);
   for (const n of made.notes) ctx.log(`plan: ${n}`);
 
@@ -108,6 +140,7 @@ export async function main(argv: string[], deps: Deps = {}): Promise<void> {
       opus: effortOf(str(v['effort-opus']), DEFAULT_EFFORT.opus, 'effort-opus'),
     },
     plan: made.plan,
+    ...(haiku && mode === 'gold' ? { resolution: 'haiku-first-pass' as const } : {}),
   };
   const questions = await loadQuestions(db);
   const res = await runEstimate(
