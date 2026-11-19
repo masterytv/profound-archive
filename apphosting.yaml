@@ -86,22 +86,20 @@ env:
   # Verified sending domain (mail.projectprofound.org verified in Resend)
   - variable: RESEND_FROM
     value: "Project Profound <noreply@mail.projectprofound.org>"
-  # The newsletter on Resend (src/lib/email/audience.ts, /api/email/weekly-draft, /api/email/resend-webhook).
-  # Off until these are set. To turn it on:
-  #   1. Resend → Audience → Segments: create "NDE of the Week" (Project Profound sign-ups) and "Soul Wisdom Video
-  #      of the Week" (Soul Wisdom sign-ups); put their IDs below and uncomment the two segment lines.
-  #   2. Resend → Webhooks: add https://projectprofound.org/api/email/resend-webhook for contact.updated, then
-  #      store its signing secret: firebase apphosting:secrets:set RESEND_WEBHOOK_SECRET (it grants access),
-  #      and uncomment RESEND_WEBHOOK_SECRET. A secret listed here before it exists fails the build.
-  #   3. Optional: NEWSLETTER_NOTIFY_EMAIL gets a "draft ready" email each Thursday.
-  # - variable: RESEND_SEGMENT_ID
-  #   value: "<NDE of the Week segment id>"
-  # - variable: RESEND_SWC_SEGMENT_ID
-  #   value: "<Soul Wisdom Video of the Week segment id>"
-  # - variable: RESEND_WEBHOOK_SECRET
-  #   secret: RESEND_WEBHOOK_SECRET
+  # The two weekly newsletters on Resend (src/lib/email/audience.ts, /api/email/weekly-draft,
+  # /api/email/resend-webhook). Segment IDs are not secret (Resend → Audience → Segments, created 2026-11-19).
+  - variable: RESEND_SEGMENT_ID          # "NDE of the Week": Project Profound sign-ups
+    value: "619f67ad-9d05-47da-b78b-a5ecf21a9d91"
+  - variable: RESEND_SWC_SEGMENT_ID      # "Soul Wisdom Video of the Week": Soul Wisdom sign-ups
+    value: "facb9055-252b-4d18-b85a-ca79f2f35bf4"
+  # Signing secret of the Resend webhook (contact.updated → /api/email/resend-webhook), in Secret Manager since
+  # 2026-11-19, readable by both backends.
+  - variable: RESEND_WEBHOOK_SECRET
+    secret: RESEND_WEBHOOK_SECRET
+  # Optional: NEWSLETTER_NOTIFY_EMAIL gets a "drafts ready" email each Thursday. This repo is public, so an
+  # address goes in as a secret (firebase apphosting:secrets:set NEWSLETTER_NOTIFY_EMAIL), not a value here:
   # - variable: NEWSLETTER_NOTIFY_EMAIL
-  #   value: "<your email>"
+  #   secret: NEWSLETTER_NOTIFY_EMAIL
 
   # Apify API token — kept for potential future use (currently unused)
   - variable: APIFY_API_TOKEN
