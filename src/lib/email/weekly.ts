@@ -1,11 +1,18 @@
 // src/lib/email/weekly.ts
-// The weekly "NDE of the Week" email (marketing plan step 4, Tom 2026-11-18): the week's most-watched Project
-// Profound Short, PP's story of the day and the newest Soul Wisdom Collective episode, made into a Resend broadcast
-// draft that Tom reads and sends himself (/api/email/weekly-draft). Pure: the feeds are parsed from their text, so
-// the tests need no network. No AI: titles and descriptions are the ones already published.
+// The two weekly emails (marketing plan step 4; Tom 2026-11-19: one per site), each made into a Resend broadcast
+// draft that Tom reads and sends himself (/api/email/weekly-draft):
+//   - "pp", "NDE of the Week": the week's most-watched Project Profound Short and PP's Story of the Day, with one
+//     line about the Soul Wisdom Collective podcast;
+//   - "swc", "Soul Wisdom Video of the Week": the week's most-watched Soul Wisdom video (a Short, clip or episode)
+//     and the newest podcast episode, with one line about Project Profound.
+// Pure: the feeds are parsed from their text, so the tests need no network. No AI: titles and descriptions are the
+// ones already published.
 
 /** The Project Profound YouTube channel (youtube.com/@projectprofound). */
 export const PP_CHANNEL_ID = "UCdK8YJ2vVvEJzx-ERKEX6lQ";
+/** The Soul Wisdom Collective YouTube channel (youtube.com/@SoulWisdomCollective). */
+export const SWC_CHANNEL_ID = "UC-W6WwHWh_hEOasLNryyAhQ";
+export const channelFeedUrl = (channelId: string) => `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 export const PODCAST_FEED_URL = "https://soulwisdomcollective.com/podcast/feed.xml";
 export const PODCAST_LINKS = {
   apple: "https://podcasts.apple.com/us/podcast/soul-wisdom-collective/id6836432434",
@@ -67,12 +74,17 @@ export function parseChannelFeed(xml: string): ChannelVideo[] {
   });
 }
 
-/** The most-viewed Short published in the 7 days before `now`; null when none went out. */
-export function bestShortOfWeek(videos: ChannelVideo[], now: Date): ChannelVideo | null {
+/** The most-viewed video published in the 7 days before `now`, Shorts only if asked; null when none went out. */
+export function bestOfWeek(videos: ChannelVideo[], now: Date, opts: { shortsOnly?: boolean } = {}): ChannelVideo | null {
   const since = now.getTime() - 7 * 86_400_000;
-  const week = videos.filter((v) => v.published.getTime() > since && v.published.getTime() <= now.getTime() && v.url.includes("/shorts/"));
+  const week = videos.filter(
+    (v) => v.published.getTime() > since && v.published.getTime() <= now.getTime() && (!opts.shortsOnly || v.url.includes("/shorts/")),
+  );
   return week.sort((a, b) => b.views - a.views || b.published.getTime() - a.published.getTime())[0] ?? null;
 }
+
+/** PP's Short of the week: the most-viewed Short of the 7 days. */
+export const bestShortOfWeek = (videos: ChannelVideo[], now: Date) => bestOfWeek(videos, now, { shortsOnly: true });
 
 /** The newest episode in the podcast's RSS feed (items are newest first, but sorted here all the same). */
 export function newestEpisode(xml: string): PodcastEpisode | null {
@@ -106,27 +118,50 @@ export function tagged(url: string, campaign: string): string {
   return u.toString();
 }
 
-/** "nde-of-the-week-2026-11-19": the broadcast's name, one a week, also the UTM campaign. */
-export function weekName(now: Date): string {
-  return `nde-of-the-week-${now.toISOString().slice(0, 10)}`;
+export type Newsletter = "pp" | "swc";
+
+/** "nde-of-the-week-2026-11-19" or "swc-video-of-the-week-…": the broadcast's name, one a day, also the UTM campaign. */
+export function weekName(newsletter: Newsletter, now: Date): string {
+  return `${newsletter === "pp" ? "nde-of-the-week" : "swc-video-of-the-week"}-${now.toISOString().slice(0, 10)}`;
 }
 
-export interface WeeklyContent {
+export interface PpWeekly {
+  newsletter: "pp";
   subject: string;
   previewText: string;
   short: ChannelVideo | null;
   story: Story | null;
+}
+
+export interface SwcWeekly {
+  newsletter: "swc";
+  subject: string;
+  previewText: string;
+  video: ChannelVideo | null;
   episode: PodcastEpisode | null;
 }
 
-/** The subject leads with the Short's title (the week's most-watched), else the story's. */
-export function weeklyContent(parts: { short: ChannelVideo | null; story: Story | null; episode: PodcastEpisode | null }): WeeklyContent {
-  const lead = parts.short?.title || parts.story?.title || parts.episode?.title || "This week's near-death experiences";
+/** PP's email: the subject leads with the Short's title (the week's most-watched), else the story's. */
+export function ppWeekly(parts: { short: ChannelVideo | null; story: Story | null }): PpWeekly {
+  const lead = parts.short?.title || parts.story?.title || "This week's near-death experiences";
   return {
+    newsletter: "pp",
     ...parts,
     subject: `NDE of the Week: ${lead}`.slice(0, 120),
-    previewText: [parts.story && "a story from the archive", parts.episode && "a new Soul Wisdom episode"].filter(Boolean).length
-      ? `Plus ${[parts.story && "a story from the archive", parts.episode && "a new Soul Wisdom episode"].filter(Boolean).join(" and ")}.`
-      : "This week's most-watched near-death experience.",
+    previewText: parts.short && parts.story ? "Plus a story from the archive." : "This week's most-watched near-death experience.",
+  };
+}
+
+/** Soul Wisdom's email: the subject leads with the week's most-watched video, else the newest episode. */
+export function swcWeekly(parts: { video: ChannelVideo | null; episode: PodcastEpisode | null }): SwcWeekly {
+  // The video may be the newest episode itself; then the episode is not shown twice.
+  const episode = parts.episode && parts.video && parts.episode.title === parts.video.title ? null : parts.episode;
+  const lead = parts.video?.title || episode?.title || "This week on Soul Wisdom";
+  return {
+    newsletter: "swc",
+    video: parts.video,
+    episode,
+    subject: `Soul Wisdom Video of the Week: ${lead}`.slice(0, 120),
+    previewText: episode ? `Plus our newest episode: ${episode.title}`.slice(0, 140) : "This week's most-watched conversation.",
   };
 }

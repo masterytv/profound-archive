@@ -22,7 +22,7 @@ import { sendFirstStory } from "@/lib/email/sendFirstStory";
 import { render } from "@react-email/render";
 import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
 import { z } from "zod";
-import { addToNewsletter, isNewsletterList } from "@/lib/email/audience";
+import { addToNewsletter, isNewsletterList, NEWSLETTER_OF } from "@/lib/email/audience";
 import { corsHeaders } from "@/lib/email/cors";
 
 // Request shape (S-12). archetype stays a bounded string (compass archetypes,
@@ -100,7 +100,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
       );
       // The newsletter's copy in Resend, for the weekly broadcast (src/lib/email/audience.ts). After the save, and
       // never able to fail the sign-up.
-      addToNewsletter(email).catch(e =>
+      addToNewsletter(email, NEWSLETTER_OF[archetype as keyof typeof NEWSLETTER_OF]).catch(e =>
         console.error("[quiz-lead] Resend newsletter contact failed:", e instanceof Error ? e.message : e)
       );
       return NextResponse.json({ ok: true });
@@ -208,7 +208,7 @@ async function sendWelcomeEmail(lead: { email: string; archetype: string; unsubs
   );
 
   const { error } = await resend.emails.send({
-    from:    EMAIL_FROM,
+    from:    swc?.from ?? EMAIL_FROM,
     to:      [lead.email],
     subject: tmpl?.subject ?? swc?.subject ?? "Welcome to Project Profound",
     html,
@@ -222,10 +222,11 @@ async function sendWelcomeEmail(lead: { email: string; archetype: string; unsubs
 }
 
 const SWC_WELCOME = {
-  subject: "Welcome: NDE of the Week from Soul Wisdom Collective and Project Profound",
+  from: "Soul Wisdom Collective <newsletter@soulwisdomcollective.com>",
+  subject: "Welcome to Soul Wisdom Video of the Week",
   introText:
     "Thank you for signing up on Soul Wisdom Collective. Once a week you'll get one email: the week's most-watched " +
-    "near-death experience Short, a story from the Project Profound archive, and the newest Soul Wisdom Collective episode.",
+    "Soul Wisdom video and our newest podcast episode.",
   ctaText: "Visit Soul Wisdom Collective",
   ctaHref: "https://soulwisdomcollective.com",
 };
