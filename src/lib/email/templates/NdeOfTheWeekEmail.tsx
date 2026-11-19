@@ -60,7 +60,9 @@ export function NdeOfTheWeekEmail({ content, campaign }: Props) {
             <Link href={tagged("https://projectprofound.org", campaign)} style={styles.link}>projectprofound.org</Link>.
           </Text>
           <Text style={styles.paragraph}>
-            Prefer to listen? Tom&apos;s podcast, Soul Wisdom Collective, has the full conversations: on{" "}
+            Check out our spiritual podcast, Soul Wisdom Collective, at{" "}
+            <Link href={tagged("https://soulwisdomcollective.com", campaign)} style={styles.link}>soulwisdomcollective.com</Link>.
+            Also on <Link href={PODCAST_LINKS.youtube} style={styles.link}>YouTube</Link>,{" "}
             <Link href={PODCAST_LINKS.apple} style={styles.link}>Apple Podcasts</Link> and{" "}
             <Link href={PODCAST_LINKS.spotify} style={styles.link}>Spotify</Link>.
           </Text>

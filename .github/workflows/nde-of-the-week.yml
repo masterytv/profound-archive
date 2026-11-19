@@ -1,22 +1,23 @@
-name: Weekly newsletter drafts
+name: NDE of the Week (Monday send)
 
-# Makes the two weekly newsletters as Resend broadcast DRAFTS (src/app/api/email/weekly-draft/route.ts): "NDE of the
-# Week" for Project Profound and "Soul Wisdom Video of the Week". Nothing is sent to subscribers: Tom reads each
-# draft in Resend and presses Send. Thursdays 13:17 UTC (8:17 am EST, 9:17 am
-# EDT). Run by hand from the Actions tab to make this week's draft now; a second run the same day does nothing.
+# Project Profound's weekly email (src/app/api/email/weekly-draft/route.ts). Tom, 2026-11-19: it sends itself every
+# Monday at 9:00 am Eastern. This run, at 11:23 UTC on Mondays (6:23 am EST, 7:23 am EDT), makes the Resend
+# broadcast scheduled for 9:00 am ET and emails Tom the link to cancel it before then. With the app's
+# NEWSLETTER_AUTOSEND=off it makes a draft instead. Run by hand from the Actions tab to do it now; a second run the
+# same day does nothing. Soul Wisdom's weekly email is the soulwisdomnetwork repo's own.
 
 on:
   schedule:
-    - cron: '17 13 * * 4'
+    - cron: '23 11 * * 1'
   workflow_dispatch: {}
 
 jobs:
-  draft:
-    name: Make the weekly drafts
+  send:
+    name: Schedule this week's email
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Ask the app for the draft
+      - name: Ask the app to schedule it
         run: |
           body=$(curl -s --max-time 120 -w "\n%{http_code}" -X POST \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \

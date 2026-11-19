@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "apphosting.yaml": {
-    "mtime": 1795101862.0471642,
-    "seen": 1795102105.693192,
-    "ast_hash": "3cba68efce226808718bf1136c8f3cbc",
+    "mtime": 1795106085.8500137,
+    "seen": 1795106243.868186,
+    "ast_hash": "f7217527fea3a7cd51504618a23b7c11",
     "semantic_hash": ""
   },
   "components.json": {
@@ -1140,9 +1140,9 @@
     "semantic_hash": "625442dad3929362679a8b9bf1f17741"
   },
   "src/app/admin/email/EmailCrmClient.tsx": {
-    "mtime": 1795033883.675054,
-    "seen": 1795034047.7651892,
-    "ast_hash": "e84178c333080e00f16d486ebd997d7c",
+    "mtime": 1795106085.8511596,
+    "seen": 1795106243.8771043,
+    "ast_hash": "618b7fe457d3e6fa4b87f3ada7eb9228",
     "semantic_hash": ""
   },
   "src/app/admin/email/page.tsx": {
@@ -1542,9 +1542,9 @@
     "semantic_hash": "e37c725abfe3d04169e067a233a3f004"
   },
   "src/app/api/email/manage-subs/route.ts": {
-    "mtime": 1795101756.471702,
-    "seen": 1795102105.700944,
-    "ast_hash": "176509df530ef64fef9b3b955ef7ca86",
+    "mtime": 1795106004.4963114,
+    "seen": 1795106243.880369,
+    "ast_hash": "b2e7a056a47896bea6eaf0ca8d688532",
     "semantic_hash": ""
   },
   "src/app/api/email/preview/route.ts": {
@@ -1632,9 +1632,9 @@
     "semantic_hash": "ebaa462bab332811bf4171a6602bf1b7"
   },
   "src/app/api/quiz-lead/route.ts": {
-    "mtime": 1795101844.0249565,
-    "seen": 1795102105.7013416,
-    "ast_hash": "50adde5483bc3dd8ae6d79eca83f2b86",
+    "mtime": 1795106012.100492,
+    "seen": 1795106243.8810508,
+    "ast_hash": "3939d95aecf08e0d06477225903d2f94",
     "semantic_hash": ""
   },
   "src/app/api/research/cases/[videoId]/route.ts": {
@@ -6354,9 +6354,9 @@
     "semantic_hash": ""
   },
   ".github/workflows/nde-of-the-week.yml": {
-    "mtime": 1795101862.0475564,
-    "seen": 1795102105.6929255,
-    "ast_hash": "1030d327e5fe996f0383a42f477eabe0",
+    "mtime": 1795106085.8365839,
+    "seen": 1795106243.8677983,
+    "ast_hash": "3b4bbe8d6292f84fcffee03f19f0c911",
     "semantic_hash": ""
   },
   "scripts/book-tally/codebook/codebook-v1.json": {
@@ -6450,15 +6450,15 @@
     "semantic_hash": ""
   },
   "src/app/admin/email/NewsletterResendPanel.tsx": {
-    "mtime": 1795101862.0467546,
-    "seen": 1795102105.6990309,
-    "ast_hash": "65daf75bd61c6d3b30ec82d8374ca2fb",
+    "mtime": 1795106085.8330407,
+    "seen": 1795106243.877109,
+    "ast_hash": "6359059ffcc17a7e84cb2156008025f1",
     "semantic_hash": ""
   },
   "src/app/api/email/newsletter-sync/route.ts": {
-    "mtime": 1795101756.4771988,
-    "seen": 1795102105.7009463,
-    "ast_hash": "c4892bb3e1783de58e04ac17424df898",
+    "mtime": 1795106085.833031,
+    "seen": 1795106243.880374,
+    "ast_hash": "7a926a156b5219ecf8655a52c88a5e55",
     "semantic_hash": ""
   },
   "src/app/api/email/resend-webhook/route.ts": {
@@ -6468,33 +6468,27 @@
     "semantic_hash": ""
   },
   "src/app/api/email/weekly-draft/route.ts": {
-    "mtime": 1795101844.0246613,
-    "seen": 1795102105.7010741,
-    "ast_hash": "074e73286d9b33bfca095f3bf2e1bfcc",
+    "mtime": 1795106056.009039,
+    "seen": 1795106243.8806376,
+    "ast_hash": "cf1526ba5fec1a96ac2a06d0b47b03f9",
     "semantic_hash": ""
   },
   "src/lib/email/audience.ts": {
-    "mtime": 1795101738.0245085,
-    "seen": 1795102105.7112784,
-    "ast_hash": "d2bc47a7bd96fceda6af2f69a3a1ee76",
-    "semantic_hash": ""
-  },
-  "src/lib/email/cors.ts": {
-    "mtime": 1795033883.6871293,
-    "seen": 1795034047.76642,
-    "ast_hash": "8f883c1ba09703b0cb393d388b490eb9",
+    "mtime": 1795105990.3170352,
+    "seen": 1795106243.8975964,
+    "ast_hash": "45b715534a613b40084e03e81b780c80",
     "semantic_hash": ""
   },
   "src/lib/email/templates/NdeOfTheWeekEmail.tsx": {
-    "mtime": 1795101786.7551553,
-    "seen": 1795102105.7114193,
-    "ast_hash": "4f6dfeeb057a2238aa3fdaf37137393f",
+    "mtime": 1795105137.4026132,
+    "seen": 1795106243.8978047,
+    "ast_hash": "c0a21aefe6f6e6db5b4a60a113b243b2",
     "semantic_hash": ""
   },
   "src/lib/email/weekly.ts": {
-    "mtime": 1795101777.302587,
-    "seen": 1795102105.7114825,
-    "ast_hash": "dfcb431d5cb1f5b310f21c3487f26baf",
+    "mtime": 1795106033.0014322,
+    "seen": 1795106243.8978915,
+    "ast_hash": "f048df6ff855150e95164be23ad9ca70",
     "semantic_hash": ""
   },
   "src/lib/story-of-the-day.ts": {
@@ -6510,9 +6504,9 @@
     "semantic_hash": ""
   },
   "tests/lib/newsletter-weekly.test.ts": {
-    "mtime": 1795101882.3551376,
-    "seen": 1795102105.715188,
-    "ast_hash": "ee015e27a1dcc3ca7ea0bef77809f7fa",
+    "mtime": 1795106110.2417543,
+    "seen": 1795106243.902445,
+    "ast_hash": "f6258add3ec58cb0da1954e84a7a198d",
     "semantic_hash": ""
   },
   "scripts/book-tally/codebook/codebook-v1.md": {
@@ -6525,12 +6519,6 @@
     "mtime": 1795030953.815728,
     "seen": 1795034047.7669914,
     "ast_hash": "5f540b08e50f848b793d83ffd0a2828b",
-    "semantic_hash": ""
-  },
-  "src/lib/email/templates/SwcVideoOfTheWeekEmail.tsx": {
-    "mtime": 1795101803.0005124,
-    "seen": 1795102105.7114222,
-    "ast_hash": "659070ac5b300733587ceb4fcf98a9c1",
     "semantic_hash": ""
   },
   "package-lock.json": {

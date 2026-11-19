@@ -4,10 +4,9 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
-  bestOfWeek, bestShortOfWeek, firstParagraph, newestEpisode, parseChannelFeed, ppWeekly, sentences, swcWeekly, tagged, weekName,
+  bestOfWeek, bestShortOfWeek, firstParagraph, parseChannelFeed, ppWeekly, sendTime, sentences, tagged, weekName,
 } from '@/lib/email/weekly';
-import { emailForms, isNewsletterList, listsOf, NEWSLETTER_OF, segmentIdOf } from '@/lib/email/audience';
-import { allowedOrigin, corsHeaders } from '@/lib/email/cors';
+import { emailForms, isNewsletterList, newsletterSegmentId } from '@/lib/email/audience';
 import { seededShuffle, storyOfTheDay } from '@/lib/story-of-the-day';
 
 const entry = (id: string, title: string, published: string, views: number, kind = 'shorts') => `
@@ -39,22 +38,15 @@ describe('weekly newsletter content', () => {
     // a1 is too old, d4 is not a Short: b2 has the most views of the week.
     expect(bestShortOfWeek(videos, now)?.videoId).toBe('b2');
     expect(bestShortOfWeek(videos, new Date('2026-12-30T00:00:00Z'))).toBeNull();
-    // Soul Wisdom's video of the week may be a full episode: d4 has the most views of the week.
+    // Without shortsOnly, a full video counts too: d4 has the most views of the week.
     expect(bestOfWeek(videos, now)?.videoId).toBe('d4');
   });
 
-  it('takes the newest podcast episode and the first paragraph of a description', () => {
-    const feed = `<rss><channel><item><title>Older</title><description><![CDATA[Old.]]></description><pubDate>Mon, 09 Nov 2026 10:00:00 GMT</pubDate></item>
-      <item><title>Meaning of Life, Pt 2</title><description><![CDATA[What is the meaning of life?
-
-More.]]></description><pubDate>Wed, 18 Nov 2026 17:42:01 GMT</pubDate></item></channel></rss>`;
-    const ep = newestEpisode(feed);
-    expect(ep?.title).toBe('Meaning of Life, Pt 2');
-    expect(firstParagraph(ep!.description)).toBe('What is the meaning of life?');
+  it('takes the first paragraph of a description, and the first sentences of a summary', () => {
+    expect(firstParagraph('What is the meaning of life?\n\nMore.')).toBe('What is the meaning of life?');
     expect(firstParagraph('https://x.y\n\n#tag')).toBe('');
     expect(firstParagraph('word '.repeat(200), 40).endsWith('…')).toBe(true);
     expect(sentences('One. Two! Three? Four.', 3)).toBe('One. Two! Three?');
-    expect(newestEpisode('<rss></rss>')).toBeNull();
   });
 
   it('tags only our own links, and names the week', () => {
@@ -62,50 +54,41 @@ More.]]></description><pubDate>Wed, 18 Nov 2026 17:42:01 GMT</pubDate></item></c
       'https://projectprofound.org/video/x?utm_source=newsletter&utm_medium=email&utm_campaign=nde-of-the-week-2026-11-19',
     );
     expect(tagged('https://www.youtube.com/shorts/b2', 'c')).toBe('https://www.youtube.com/shorts/b2');
-    expect(weekName('pp', new Date('2026-11-19T13:17:00Z'))).toBe('nde-of-the-week-2026-11-19');
-    expect(weekName('swc', new Date('2026-11-19T13:17:00Z'))).toBe('swc-video-of-the-week-2026-11-19');
+    expect(weekName(new Date('2026-11-23T11:23:00Z'))).toBe('nde-of-the-week-2026-11-23');
   });
 
-  it('gives each site its own subject', () => {
+  it('leads the subject with the Short, else the story', () => {
     const short = parseChannelFeed(channel)[1];
     const story = { videoId: 'v', title: 'A Story', channelName: null, summary: null };
     const pp = ppWeekly({ short, story });
     expect(pp.subject).toBe('NDE of the Week: She Saw "Light"');
     expect(pp.previewText).toBe('Plus a story from the archive.');
     expect(ppWeekly({ short: null, story }).subject).toBe('NDE of the Week: A Story');
+  });
 
-    const episode = { title: 'Meaning of Life, Pt 2', description: 'About it.', published: null };
-    const swc = swcWeekly({ video: short, episode });
-    expect(swc.subject).toBe('Soul Wisdom Video of the Week: She Saw "Light"');
-    expect(swc.previewText).toBe('Plus our newest episode: Meaning of Life, Pt 2');
-    // When the video of the week is the newest episode itself, it is not shown twice.
-    expect(swcWeekly({ video: { ...short, title: episode.title }, episode }).episode).toBeNull();
-    expect(swcWeekly({ video: null, episode }).subject).toBe('Soul Wisdom Video of the Week: Meaning of Life, Pt 2');
+  it('sends at 9:00 am Eastern on the morning it runs, in winter and in summer', () => {
+    // Monday 23 Nov 2026, EST (UTC-5): the job runs 6:23 am, the email goes at 9:00 am = 14:00 UTC.
+    expect(sendTime(new Date('2026-11-23T11:23:00Z')).toISOString()).toBe('2026-11-23T14:00:00.000Z');
+    // Monday 8 Jun 2026, EDT (UTC-4): 9:00 am = 13:00 UTC.
+    expect(sendTime(new Date('2026-06-08T11:23:00Z')).toISOString()).toBe('2026-06-08T13:00:00.000Z');
+    // Monday 9 Mar 2026, the day after the clocks went forward.
+    expect(sendTime(new Date('2026-03-09T11:23:00Z')).toISOString()).toBe('2026-03-09T13:00:00.000Z');
+    // A late run (after 9) goes ten minutes later, never in the past.
+    expect(sendTime(new Date('2026-11-23T15:00:00Z')).toISOString()).toBe('2026-11-23T15:10:00.000Z');
   });
 });
 
-describe('newsletter lists and sign-ups from Soul Wisdom', () => {
-  it('puts PP\'s lists in one newsletter and Soul Wisdom sign-ups in the other', () => {
-    expect(isNewsletterList('newsletter_swc')).toBe(true);
+describe('the newsletter lists', () => {
+  it('are Project Profound\'s own; Soul Wisdom sign-ups are not taken here', () => {
+    expect(isNewsletterList('newsletter_nde')).toBe(true);
+    expect(isNewsletterList('newsletter_uap')).toBe(true);
+    expect(isNewsletterList('newsletter_swc')).toBe(false);
     expect(isNewsletterList('griever')).toBe(false);
-    expect(NEWSLETTER_OF.newsletter_swc).toBe('swc');
-    expect(listsOf('pp')).toEqual(['newsletter_nde', 'newsletter_uap']);
-    expect(listsOf('swc')).toEqual(['newsletter_swc']);
     expect(emailForms(' Ann@Example.com ')).toEqual(['Ann@Example.com', 'ann@example.com']);
+    process.env.RESEND_SEGMENT_ID = ' seg-pp ';
+    expect(newsletterSegmentId()).toBe('seg-pp');
     delete process.env.RESEND_SEGMENT_ID;
-    process.env.RESEND_SWC_SEGMENT_ID = ' seg-swc ';
-    expect(segmentIdOf('pp')).toBeNull();
-    expect(segmentIdOf('swc')).toBe('seg-swc');
-    delete process.env.RESEND_SWC_SEGMENT_ID;
-  });
-
-  it('lets only the Soul Wisdom sites (and local dev) post sign-ups from the browser', () => {
-    expect(allowedOrigin('https://soulwisdomcollective.com')).toBe('https://soulwisdomcollective.com');
-    expect(allowedOrigin('https://staging.soulwisdomcollective.com')).toBe('https://staging.soulwisdomcollective.com');
-    expect(allowedOrigin('https://evil.example')).toBeNull();
-    expect(allowedOrigin(null)).toBeNull();
-    expect(corsHeaders('https://evil.example')).toEqual({});
-    expect(corsHeaders('https://soulwisdomcollective.com')['Access-Control-Allow-Origin']).toBe('https://soulwisdomcollective.com');
+    expect(newsletterSegmentId()).toBeNull();
   });
 });
 
@@ -132,23 +115,9 @@ describe('the weekly emails', () => {
     expect(html).toContain('https://www.youtube.com/shorts/b2');
     expect(html).toContain('https://projectprofound.org/video/v9?utm_source=newsletter');
     expect(html).toContain('podcasts.apple.com');
+    expect(html).toContain('spiritual podcast, Soul Wisdom Collective');
+    expect(html).toContain('https://www.youtube.com/@SoulWisdomCollective');
+    expect(html).toContain('https://soulwisdomcollective.com/?utm_source=newsletter');
     expect(html).not.toContain('Four.');
-    expect(html).not.toContain('soulwisdomcollective.com.');
-  });
-
-  it('renders Soul Wisdom\'s with the video, the newest episode and one Project Profound line', async () => {
-    const { render } = await import('@react-email/render');
-    const { SwcVideoOfTheWeekEmail } = await import('@/lib/email/templates/SwcVideoOfTheWeekEmail');
-    const content = swcWeekly({
-      video: parseChannelFeed(channel)[3],
-      episode: { title: 'The Episode', description: 'About it.\n\nMore.', published: null },
-    });
-    const html = await render(SwcVideoOfTheWeekEmail({ content, campaign: 'swc-video-of-the-week-2026-11-19' }));
-    expect(html).toContain('{{{RESEND_UNSUBSCRIBE_URL}}}');
-    expect(html).toContain('Soul Wisdom Video of the Week');
-    expect(html).toContain('The Episode');
-    expect(html).toContain('https://projectprofound.org/?utm_source=newsletter');
-    expect(html).toContain('signed up at soulwisdomcollective.com');
-    expect(html).not.toContain('More.');
   });
 });
