@@ -28,6 +28,8 @@ repo-root CLAUDE.md.
   - Re-run tally: 3,229 people (was 3,359). Headline shares moved by 0.5 points or less; the largest
     change anywhere is 2.4 points (q28 mixed).
   - Total spend: about $36.59 of $75.
+- **Readable tally page (private):** https://claude.ai/artifact/WxYqFDrhbGyAd9GvoE2mAB. It is built from out/coded_tally_by_item.csv
+  plus nde_questions categories, and holds no transcript quotes. Rebuild it after any re-run of the rollup.
 
 - **Budget: $75 total** (raised from $50 by the owner). Spent so far: **$16.13**.
   - Job 1 pair judging: `j1h-20261118154545`, $0.05.
