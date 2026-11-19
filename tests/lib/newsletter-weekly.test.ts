@@ -132,8 +132,10 @@ describe('the weekly emails', () => {
     expect(html).toContain('https://www.youtube.com/shorts/b2');
     expect(html).toContain('https://projectprofound.org/video/v9?utm_source=newsletter');
     expect(html).toContain('podcasts.apple.com');
+    expect(html).toContain('spiritual podcast, Soul Wisdom Collective');
+    expect(html).toContain('https://www.youtube.com/@SoulWisdomCollective');
+    expect(html).toContain('https://soulwisdomcollective.com/?utm_source=newsletter');
     expect(html).not.toContain('Four.');
-    expect(html).not.toContain('soulwisdomcollective.com.');
   });
 
   it('renders Soul Wisdom\'s with the video, the newest episode and one Project Profound line', async () => {

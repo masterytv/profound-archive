@@ -15,6 +15,7 @@ export const SWC_CHANNEL_ID = "UC-W6WwHWh_hEOasLNryyAhQ";
 export const channelFeedUrl = (channelId: string) => `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 export const PODCAST_FEED_URL = "https://soulwisdomcollective.com/podcast/feed.xml";
 export const PODCAST_LINKS = {
+  youtube: "https://www.youtube.com/@SoulWisdomCollective",
   apple: "https://podcasts.apple.com/us/podcast/soul-wisdom-collective/id6836432434",
   spotify: "https://open.spotify.com/show/7lgFLbmk8pLg7b83b3OrbK",
 };
