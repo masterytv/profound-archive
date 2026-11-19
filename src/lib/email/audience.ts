@@ -1,42 +1,26 @@
 // src/lib/email/audience.ts
-// The newsletters' copies of their subscribers in Resend (marketing plan steps 3–4). Tom, 2026-11-18: email stays on
-// Resend, no Kit; 2026-11-19: two weekly emails, one per site. `quiz_leads` stays the list of record; each newsletter
-// has a Resend segment holding the same people, so its weekly email goes out as one Resend broadcast (free up to
-// 1,000 contacts), not one email at a time against the free plan's 100 a day:
-//   - "pp":  Project Profound's "NDE of the Week", to newsletter_nde and newsletter_uap (RESEND_SEGMENT_ID);
-//   - "swc": "Soul Wisdom Video of the Week", to newsletter_swc, the sign-ups from soulwisdomcollective.com
-//            (RESEND_SWC_SEGMENT_ID).
-// Every call here is best-effort: a Resend failure never costs a sign-up or an unsubscribe in PP's own table.
+// Project Profound's newsletter, "NDE of the Week", and its copy of its subscribers in Resend (marketing plan steps
+// 3–4). Tom, 2026-11-18: email stays on Resend; 2026-11-19: one newsletter per site, each on its own system, so this
+// one is Project Profound's only (Soul Wisdom's lives in the soulwisdomnetwork repo, with its own list).
+// `quiz_leads` is the list of record; the Resend segment RESEND_SEGMENT_ID holds the same people, so the weekly
+// email goes out as one Resend broadcast (free up to 1,000 contacts), not one email at a time against the free
+// plan's 100 a day. Every call here is best-effort: a Resend failure never costs a sign-up or an unsubscribe.
 
-// The Resend client is loaded only when a segment is set: its module refuses to load without RESEND_API_KEY,
+// The Resend client is loaded only when the segment is set: its module refuses to load without RESEND_API_KEY,
 // which must never break a sign-up or an unsubscribe.
 const client = async () => (await import("@/lib/email/resend")).resend;
 
-export type Newsletter = "pp" | "swc";
-export const NEWSLETTERS: Newsletter[] = ["pp", "swc"];
-
-/** Which newsletter each list belongs to. newsletter_swc: sign-ups from soulwisdomcollective.com. */
-export const NEWSLETTER_OF = {
-  newsletter_nde: "pp",
-  newsletter_uap: "pp",
-  newsletter_swc: "swc",
-} as const satisfies Record<string, Newsletter>;
-export type NewsletterList = keyof typeof NEWSLETTER_OF;
-export const NEWSLETTER_LISTS = Object.keys(NEWSLETTER_OF) as NewsletterList[];
+/** The lists that make up the newsletter. */
+export const NEWSLETTER_LISTS = ["newsletter_nde", "newsletter_uap"] as const;
+export type NewsletterList = (typeof NEWSLETTER_LISTS)[number];
 
 export function isNewsletterList(list: string): list is NewsletterList {
-  return list in NEWSLETTER_OF;
+  return (NEWSLETTER_LISTS as readonly string[]).includes(list);
 }
 
-/** The lists whose subscribers get one newsletter. */
-export function listsOf(newsletter: Newsletter): NewsletterList[] {
-  return NEWSLETTER_LISTS.filter((l) => NEWSLETTER_OF[l] === newsletter);
-}
-
-/** The Resend segment a newsletter goes to; null leaves Resend out for it (local runs, or before it is set up). */
-export function segmentIdOf(newsletter: Newsletter): string | null {
-  const v = newsletter === "pp" ? process.env.RESEND_SEGMENT_ID : process.env.RESEND_SWC_SEGMENT_ID;
-  return v?.trim() || null;
+/** The Resend segment the newsletter goes to; null leaves Resend out (local runs, or before it is set up). */
+export function newsletterSegmentId(): string | null {
+  return process.env.RESEND_SEGMENT_ID?.trim() || null;
 }
 
 /** Resend answers "already exists" (409, or a validation error naming it) for a contact or membership it has. */
@@ -49,8 +33,8 @@ function alreadyExists(error: { message?: string; statusCode?: number | null } |
  * Puts the person in the newsletter's segment, subscribed. Someone who unsubscribed from a broadcast and signs up
  * again has asked for it, so they are subscribed again.
  */
-export async function addToNewsletter(email: string, newsletter: Newsletter): Promise<"added" | "updated" | "skipped"> {
-  const segmentId = segmentIdOf(newsletter);
+export async function addToNewsletter(email: string): Promise<"added" | "updated" | "skipped"> {
+  const segmentId = newsletterSegmentId();
   if (!segmentId) return "skipped";
   const resend = await client();
   const created = await resend.contacts.create({ email, unsubscribed: false, segments: [{ id: segmentId }] });
@@ -63,9 +47,9 @@ export async function addToNewsletter(email: string, newsletter: Newsletter): Pr
   return "updated";
 }
 
-/** Takes the person out of one newsletter's segment; their other newsletter is left alone. Unknown is fine. */
-export async function removeFromNewsletter(email: string, newsletter: Newsletter): Promise<void> {
-  const segmentId = segmentIdOf(newsletter);
+/** Takes the person out of the newsletter's segment. Unknown is fine. */
+export async function removeFromNewsletter(email: string): Promise<void> {
+  const segmentId = newsletterSegmentId();
   if (!segmentId) return;
   const resend = await client();
   const { error } = await resend.contacts.segments.remove({ email, segmentId });

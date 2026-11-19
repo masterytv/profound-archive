@@ -1,17 +1,17 @@
 # Graph Report - profound-archive  (2026-11-19)
 
 ## Corpus Check
-- 1093 files · ~1,304,303 words
+- 1091 files · ~1,302,911 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 13 file(s) not represented in the graph (top: (none) 8, .nix 1, .csv 1)
 
 ## Summary
-- 9009 nodes · 20281 edges · 409 communities (345 shown, 64 thin omitted)
+- 8986 nodes · 20217 edges · 405 communities (339 shown, 66 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 611 edges (avg confidence: 0.86)
 - Token cost: 2,268,391 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f990020f`
+- Built from commit: `220b8ad7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,11 +19,11 @@
 - Bundled Phenomenology Batch Script
 - shadcn UI Primitives
 - Search Result Cards & Buttons
-- share-core.test.ts
+- my-experiences/[id]/page.tsx
 - Video Topic Research (TOPICS.md)
 - app/video/[id]/page.tsx
-- plan.ts
-- app/blog/page.tsx
+- job2/rollup.ts
+- createClient
 - EvidenceStrengthCard.tsx
 - Corpus Atlas Stats Aggregation
 - Bundled Stream/HTTP Runtime
@@ -33,8 +33,8 @@
 - Bundled HTTP Client Internals
 - app/video-explore/page.tsx
 - app/video/[id]/page.tsx
-- job2/rollup.ts
-- lucide-react
+- job1/cli.ts
+- home-v2/page.tsx
 - extract-names.ts
 - uap-batch-triad.ts
 - Corpus Atlas Batch Digests
@@ -57,7 +57,7 @@
 - Bundled tslib Helpers
 - answers.ts
 - dotenv
-- intake-uap.ts
+- classify-uap.ts
 - uap-phenomenology.ts
 - _addCheck()
 - merge-digests.mjs
@@ -98,11 +98,11 @@
 - pricing.ts
 - Frontend Route Map (Next.js App Router)
 - checkRateLimit
-- dashboard/page.tsx
+- supabase.ts
 - env
-- UapPhenomenologyResult (complete output schema)
+- UAP Entity Taxonomy (18 Types)
 - steps (2)
-- zod
+- react
 - 81 Curated NDE Big Questions
 - NDE book direction 5: Who Owns the Light
 - estimate.ts
@@ -117,7 +117,7 @@
 - env (3)
 - env (4)
 - env (5)
-- getBudgetStatus
+- pauseGate
 - retrieve.mjs
 - Top 25: Repeat Experiencers (2+ videos)
 - Top 25: UAP Encounters by Contact Depth
@@ -131,28 +131,28 @@
 - Afterlife Map structured-stats report (6
 - unified-site-header.tsx
 - 111 NDE Story Posts
-- next
+- @supabase/supabase-js
 - compute-channel-scores.ts
 - components.tsx
 - ExperienceShell.tsx
-- afterlife-map.tsx
+- app/experiencer/page.tsx
 - share-maintenance.yml
 - CLAUDE.md Agent Working Rules
-- job1-extract.test.ts
+- ref_path
 - MusicVideoBanner.tsx
-- uap-intelligence-graph.tsx
+- uap-timeline-graph.tsx
 - Top 25: NDE by Veridical (rvnde) Score
 - rapid-process.ts
 - rebuild-viz-caches.ts
 - Short Maker research API (read-only)
 - generate
 - uap-knowledge-batch.ts
-- uap-search-result-card.tsx
+- EncounterTaxonomy.tsx
 - ChannelUniverseMap.tsx
 - blog-verify.ts
 - uap/analytics/route.ts
 - normalize-entities.ts
-- VizPageShell
+- pilot-report.ts
 - pull.mjs
 - fix-chase-demayo-profile.mjs
 - generate-penny-audio.ts
@@ -167,7 +167,7 @@
 - UAP book direction 3: The Benevolent Cap
 - UAP book direction 5: Contact as Practic
 - makeRequest()
-- config.ts
+- isShareEnabled
 - bulk-generate-contactee-profiles.ts
 - digest.mjs
 - uap/video/[id]/page.tsx
@@ -177,7 +177,7 @@
 - Phase 1 - Hardening Task Checklist
 - Chart gallery (13 charts)
 - experience/[slug]/page.tsx
-- uap-timeline-graph.tsx
+- admin/uap/blog/page.tsx
 - isShareEnabled
 - GEMINI.md AI Context & Routing File
 - UAP Intake Orchestrator (uap-intake.ts)
@@ -211,12 +211,12 @@
 - Questions Nobody Has Asked Yet
 - app/blog/[slug]/page.tsx
 - experience/registry.ts
-- globe-graph.tsx
+- scanner/route.ts
 - Channel Focus Chart (4-Axis Diamond)
-- emails.ts
+- channels.ts
 - recharts
 - uapStats
-- flags.ts
+- search.ts
 - NDE experiencer profiles (2,820)
 - NDE book direction 2: Feeling What You M
 - UAP narrative atlas (8,394 videos, 7,017
@@ -230,29 +230,29 @@
 - admin/share/actions.ts
 - generate-penny-audio.mjs
 - Cross-domain direction 7: Proof by Slipp
-- Book 1: You Do Not Have to Die to Know Me
+- retrieve.mjs (pgvector semantic search)
 - uap-contactee-dedup.ts
 - unsubscribe/page.tsx
 - hasValidCronSecret
 - Sprint V1: Foundation + NDE Element Netw
 - cron/route.ts
-- main
+- extractUapKnowledge
 - send-emails
 - send-digest
 - maintenance
 - openai
-- lucide-react
+- next
 - "node_modules/@supabase/supabase-js/node (2)
 - compilerOptions (2)
 - wrapAiClient
-- uap/blog/[slug]/page.tsx
+- app/uap/channels/page.tsx
 - Tom Wood (Founder, Project Profound)
 - PRD: Share Your Experience (Project Profound)
 - uap-reanalyze-all.ts
 - analyzeUapPhenomenology (src/lib/ai/uap-phenomenology.ts)
-- hynek-space-graph.tsx
+- journey-flow.ts
 - scripts
-- verify_clips.py clip verification
+- AllTypesClient.tsx
 - uap-generate-facts.mjs
 - Corpus Atlas Appendix: Top-25 Lists
 - inner_stringify()
@@ -260,16 +260,16 @@
 - "node_modules/@supabase/supabase-js/node (4)
 - intake.ts
 - config.ts
-- [series]/page.tsx
+- ContentDNA.tsx
 - shortmaker-research.test.ts
-- channel-constellation-graph.tsx
+- Book 1: You Do Not Have to Die to Know Me
 - uap-event-backfill.ts
 - 07-corpus-bias.mjs
 - 05-audit-packets.mjs
 - shortmaker/types.ts
 - scanner-discover.yml
 - uap-scanner-discover.yml
-- uap-phenomenology-graph.tsx
+- resend.ts
 - Book-tally pipeline — design spec (lead-authored; agents implement against this)
 - greeter_stats.py (read-only PostgREST stats)
 - [id]/route.tsx
@@ -285,13 +285,13 @@
 - ARCHITECTURE: Share Your Experience
 - Share Your Experience: setup and testing
 - UAP book direction 8: The Witness Ladder
-- research/methodology/page.tsx
+- serializeJsonLd
 - NDE Experience Engine
-- app/uap/blog/page.tsx
-- about/[slug]/page.tsx
+- UapPhenomenologyResult (complete output schema)
+- uap_channel_scores (Intelligence Value, Speaker Credibility)
 - TriadScoresPanel.tsx
 - quiz-lead/route.ts
-- sanitizeMarkdownLinks
+- ChannelRankingsBox.tsx
 - seed-questions-bulk.ts
 - uap-generate-facts.mjs
 - Cross-domain direction 3: The Clock and 
@@ -304,42 +304,42 @@
 - ces-feedback-widget.tsx
 - admin/scanner/queue/page.tsx
 - admin/intake/page.tsx
-- methodology/transformation/page.tsx
+- matcher.ts
 - blog-generate.ts
 - draft
 - uap/intake/page.tsx
 - domains.ts
-- NDE Compassionate Chatbot (/chat-compassionate)
-- uap/questions/page.tsx
+- transcript-processor.ts
+- extract.ts
 - export-review.ts
 - env (7)
 - rate-limit.ts
 - wf-discover.mjs
-- user-questions/route.ts
+- uap-test-pipeline.ts
 - Top 25: Multiple-NDE Experiencers (summa
 - carousel.tsx
 - Peak in Darien case
 - _parse
 - uap-encounter-context.ts
-- visualize/page.tsx
+- viz-compute-uap-phenomenology.ts
 - wrapAiClient
 - 00-dump-corpus.mjs
 - chart.tsx
 - get
 - zod
 - people/[slug]/page.tsx
-- next-themes
+- robots.ts
 - LLM error characteristics (inflation, interviewer confusion, paraphrased quotes)
 - wf-audit.mjs
 - 03-mine-phrases.mjs
-- job1/schema.ts
+- job1-decisions.test.ts
 - search3/route.ts
-- admin/scanner/page.tsx
-- experiencer/[id]/route.ts
-- channel/[id]/route.ts
+- broadcast/route.ts
+- Queue Priority System (priority, source_type, source_id)
+- entity-summaries.ts
 - uap/experiencer/page.tsx
 - Oracle Crontab Schedule
-- usePhaseNavigation.ts
+- agreement/page.tsx
 - Shareable OG Stats Card & SVG Badge
 - Advisory AI Review Integration
 - snip.mjs
@@ -349,50 +349,46 @@
 - hasNextPage()
 - "node_modules/@supabase/supabase-js/node (6)
 - howler@^2.2.4
-- AdminSidebar.tsx
+- clsx
 - Gap: Veridical Evidence (127 profiles with avg_veridical_score >= 20)
 - mammoth
 - uap/scanner/queue/page.tsx
-- nde_analysis table
+- Video Page (video/[id]/page.tsx)
 - Category 3: Consciousness Alteration
 - package.json
 - State Management
 - tailwind-merge
-- Questions Synthesis Prompt v1 (Academic Researcher, archived)
+- @google-analytics/data@^5.2.1
 - Project Profound
-- @radix-ui/react-accordion
+- @radix-ui/react-alert-dialog
 - "node_modules/@supabase/supabase-js/node (7)
-- @types/howler@^2.2.12
+- @radix-ui/react-avatar
 - unpdf
 - @radix-ui/react-checkbox
-- templates/page.tsx
+- @radix-ui/react-menubar
 - llms.txt/route.ts
 - @radix-ui/react-dialog
 - SearchResultCard
-- @radix-ui/react-label
+- @radix-ui/react-popover
 - postcss.config.mjs
-- profiles/page.tsx
+- @radix-ui/react-progress
 - placeholder-data.ts
 - placeholder-images.ts
 - uap/search/route.ts
 - @radix-ui/react-radio-group
 - POST /api/cron/channel-score-snapshot
 - Guest Prominence Index (GPI)
-- @radix-ui/react-scroll-area
-- logo-preview/page.tsx
-- resources/page.tsx
+- @radix-ui/react-separator
+- react-day-picker
+- react-is@^19.2.4
 - @radix-ui/react-switch
-- enrich-channels.ts
-- @radix-ui/react-tabs
+- tus-js-client
 - @radix-ui/react-tooltip
 - date-fns@^4.1.0
 - resend
 - @radix-ui/react-collapsible
 - @supabase/auth-ui-react
 - @radix-ui/react-toast
-- react-dom@^19.2.3
-- react-globe.gl
-- @supabase/auth-ui-shared
 - tailwindcss-animate@^1.0.7
 - @hookform/resolvers
 - accumulateDelta()
@@ -417,7 +413,7 @@
 2. `lucide-react` - 236 edges
 3. `cn()` - 220 edges
 4. `@supabase/supabase-js` - 215 edges
-5. `react` - 205 edges
+5. `react` - 204 edges
 6. `createClient()` - 75 edges
 7. `Button` - 73 edges
 8. `vitest` - 69 edges
@@ -427,12 +423,12 @@
 ## Surprising Connections (you probably didn't know these)
 - `5. Security` --references--> `hasValidCronSecret()`  [INFERRED]
   directives/ARCHITECTURE-SHARE-YOUR-EXPERIENCE.md → src/lib/auth/cron-auth.ts
+- `Read-only corpus access (RPC POST and GET selects only)` --semantically_similar_to--> `Sensitivity and accuracy checklist`  [INFERRED] [semantically similar]
+  scripts/corpus-atlas/README.md → research/video-scripts/who-meets-you-script.md
 - `NDE Transformation Index (NDE-TI, 10 domains, 0-50)` --semantically_similar_to--> `NDE Transformation Index (NDE-TI)`  [INFERRED] [semantically similar]
   methodology/METHODOLOGY.md → docs/scales/UAP-CTI.md
 - `Video Intake pipeline (intake.ts / intake-uap.ts)` --semantically_similar_to--> `UAP Intake Pipeline`  [INFERRED] [semantically similar]
   docs/workflows/video_processing.md → methodology/METHODOLOGY.md
-- `Read-only corpus access (RPC POST and GET selects only)` --semantically_similar_to--> `Sensitivity and accuracy checklist`  [INFERRED] [semantically similar]
-  scripts/corpus-atlas/README.md → research/video-scripts/who-meets-you-script.md
 - `Punctuate-Chunk-Embed-Store ETL chain` --semantically_similar_to--> `Transcript acquisition & processing (captions, punctuation, cleaning, chunking)`  [INFERRED] [semantically similar]
   docs/workflows/video_processing.md → methodology/METHODOLOGY.md
 
@@ -474,47 +470,47 @@
 - **Secret rotation flow across Secret Manager, apphosting.yaml and Oracle VM** — docs_deployment_setup_steps_secret_rotation_procedure, docs_learnings_pinned_secret_versions, docs_learnings_key_rotation_three_consumers, docs_secrets_inventory_rotate_additively, docs_environment_google_secret_manager [INFERRED 0.85]
 - **Channel Analytics Suite on uap_channel_scores** — directives_sprint_uap_channel_scores, directives_sprint_channel_universe_map, directives_sprint_channel_scorecard, directives_sprint_channel_archetypes, directives_sprint_channel_personality_code, directives_sprint_encounter_diversity_index, directives_sprint_channel_score_history [INFERRED 0.85]
 
-## Communities (409 total, 64 thin omitted)
+## Communities (405 total, 66 thin omitted)
 
 ### Community 0 - "Bundled Phenomenology Batch Script"
 Cohesion: 0.01
 Nodes (24): RFC-6749, [(_AbstractPage_client = /* @__PURE__ */ new WeakMap(), Symbol.asyncIterator)](), analyzeUapPhenomenology(), cleanParams(), createNamespace(), createNamespaceIfNotExists(), custom(), dropNamespace() (+16 more)
 
 ### Community 1 - "shadcn UI Primitives"
-Cohesion: 0.04
-Nodes (85): class-variance-authority, ExperienceType, InteractiveBadgesProps, OverallTone, TONE_CONFIG, TRIGGER_LABELS, TriggerCategory, TYPE_CONFIG (+77 more)
+Cohesion: 0.03
+Nodes (112): class-variance-authority, Collection, Domain, DOMAIN_CONFIG, DomainSection(), Favorite, SavedSearch, FacetCount (+104 more)
 
 ### Community 2 - "Search Result Cards & Buttons"
-Cohesion: 0.07
-Nodes (61): react, @supabase/supabase-js, AdminChannelManagement(), ChannelRow, CompassionateChatPage(), DashboardPage(), LoginContent(), LoginPage() (+53 more)
+Cohesion: 0.05
+Nodes (62): ARCHETYPE_ENTRIES, EmailProfilesPage(), handleRestoreDefault(), update(), ProfileData, SEED_PROFILES, ARCHETYPE_ENTRIES, EmailTemplatesPage() (+54 more)
 
-### Community 3 - "share-core.test.ts"
-Cohesion: 0.08
-Nodes (30): geminiConfigured(), geminiJson(), GeminiJsonResult, geminiModel(), GeminiResponse, CRISIS_PATTERNS, isCrisisTopic(), MAX_TEXT_CHARS (+22 more)
+### Community 3 - "my-experiences/[id]/page.tsx"
+Cohesion: 0.07
+Nodes (41): AdminShareChannelsPage(), dynamic, AdminSharePage(), dynamic, FILTERS, updateIntroPreferencesAction(), dynamic, metadata (+33 more)
 
 ### Community 4 - "Video Topic Research (TOPICS.md)"
 Cohesion: 0.07
 Nodes (74): Project Profound Video Topics: Research and Ranking, Afterlife Experiences (channel), Anthony Chene production (channel), Beyond with Heather Tesch (channel), Coming Home (channel), Crossing Over NDE (channel), Dorothy Shelton (channel), Dr. Mayim Bialik (channel) (+66 more)
 
 ### Community 5 - "app/video/[id]/page.tsx"
+Cohesion: 0.10
+Nodes (30): formatDate(), formatViewCount(), getLevelColor(), revalidate, RvndeDetailItem, RvndeDetailsSection(), VideoPageAlt1(), VideoPageProps (+22 more)
+
+### Community 6 - "job2/rollup.ts"
 Cohesion: 0.06
-Nodes (47): formatDate(), formatViewCount(), getLevelColor(), revalidate, RvndeDetailItem, RvndeDetailsSection(), VideoPageAlt1(), VideoPageProps (+39 more)
+Nodes (107): MergeConflict, Ctx, Deps, ensureOutDir(), helpText(), intOpt(), isDirectRun(), loadDotenv() (+99 more)
 
-### Community 6 - "plan.ts"
-Cohesion: 0.09
-Nodes (63): CliError, Ctx, Deps, helpText(), intOpt(), isDirectRun(), loadDotenv(), makeCtx() (+55 more)
-
-### Community 7 - "app/blog/page.tsx"
-Cohesion: 0.25
-Nodes (8): BlogIndexPage(), BlogPost, CATEGORIES, CATEGORY_COLORS, CATEGORY_LABELS, metadata, PostCard(), revalidate
+### Community 7 - "createClient"
+Cohesion: 0.07
+Nodes (31): POST(), GET(), CATEGORY_LABELS, GET(), runtime, GET(), BlogIndexPage(), BlogPost (+23 more)
 
 ### Community 8 - "EvidenceStrengthCard.tsx"
-Cohesion: 0.15
-Nodes (32): ContactForm, ContactSection(), CvndePage(), GreysonScalePage(), metadata, TransformationScalePage(), Card, CardContent (+24 more)
+Cohesion: 0.08
+Nodes (57): ContactForm, ContactSection(), CvndePage(), GreysonScalePage(), metadata, TransformationScalePage(), ExperienceType, InteractiveBadgesProps (+49 more)
 
 ### Community 9 - "Corpus Atlas Stats Aggregation"
 Cohesion: 0.10
-Nodes (32): args, CONTACT_BANDS, decade(), esc(), EVIDENCE_BANDS, fmtCell(), fmtInt(), GREYSON_BANDS (+24 more)
+Nodes (30): args, channelStats(), CONTACT_BANDS, esc(), EVIDENCE_BANDS, fmtCell(), fmtInt(), GREYSON_BANDS (+22 more)
 
 ### Community 10 - "Bundled Stream/HTTP Runtime"
 Cohesion: 0.06
@@ -767,8 +763,8 @@ Nodes (55): abort(), aborted(), _addChatCompletion(), _addMessage(), _addRun(), 
   }, Symbol.asyncIterator)](), __classPrivateFieldGet2() (+47 more)
 
 ### Community 11 - "UAP Entity Detail Pages"
-Cohesion: 0.05
-Nodes (76): buildClient(), EVENT_TYPE_CONFIG, EventDetailPage(), generateMetadata(), getEvent(), getLinkedContactees(), getLinkedVideos(), getRelatedEvents() (+68 more)
+Cohesion: 0.09
+Nodes (50): buildClient(), EVENT_TYPE_CONFIG, EventDetailPage(), generateMetadata(), getEvent(), getLinkedContactees(), getLinkedVideos(), getRelatedEvents() (+42 more)
 
 ### Community 12 - "contacts.ts"
 Cohesion: 0.09
@@ -776,79 +772,79 @@ Nodes (40): addChannelAction(), deleteContactAction(), fail(), importContactsAct
 
 ### Community 13 - "job3/gold-sheet.ts"
 Cohesion: 0.04
-Nodes (80): youtubeUrl(), CodeItem, Band, BANDS, confidenceBand(), fmt(), goldStats(), main() (+72 more)
+Nodes (73): CodeItem, Band, BANDS, confidenceBand(), fmt(), goldStats(), main(), OPTIONS (+65 more)
 
 ### Community 14 - "Bundled HTTP Client Internals"
 Cohesion: 0.05
 Nodes (59): accept(), addOutputText(), authHeaders(), __awaiter(), adopt(), fulfilled(), rejected(), step() (+51 more)
 
 ### Community 15 - "app/video-explore/page.tsx"
-Cohesion: 0.08
-Nodes (34): getSmartTagConditions(), metadata, PageProps, revalidate, VideoExplorePage(), Slider, AdvancedFilters(), AdvancedFiltersProps (+26 more)
+Cohesion: 0.09
+Nodes (31): getSmartTagConditions(), metadata, PageProps, revalidate, VideoExplorePage(), ExperienceBadgesProps, ExperienceType, OverallTone (+23 more)
 
 ### Community 16 - "app/video/[id]/page.tsx"
-Cohesion: 0.07
-Nodes (45): CoreElementsGrid(), CoreElementsGridProps, ELEMENT_META, ElementDetection, getConfidenceColor(), getConfidenceDot(), EntitiesWrapper, EntityEncounter (+37 more)
+Cohesion: 0.09
+Nodes (37): CoreElementsGrid(), CoreElementsGridProps, ELEMENT_META, ElementDetection, getConfidenceColor(), getConfidenceDot(), EntitiesWrapper, EntityEncounter (+29 more)
 
-### Community 17 - "job2/rollup.ts"
-Cohesion: 0.06
-Nodes (64): MergeConflict, Stance, ensureOutDir(), csvCell(), neutralizeFormula(), parseCsv(), parseCsvRows(), toCsv() (+56 more)
+### Community 17 - "job1/cli.ts"
+Cohesion: 0.09
+Nodes (61): linkKey(), main(), OPTIONS, Deps, finishRun(), gitSha(), helpText(), isDirectRun() (+53 more)
 
-### Community 18 - "lucide-react"
-Cohesion: 0.06
-Nodes (45): POST(), GET(), CATEGORY_LABELS, GET(), runtime, GET(), buildUrl(), ExperiencerDirectoryPage() (+37 more)
+### Community 18 - "home-v2/page.tsx"
+Cohesion: 0.16
+Nodes (16): HomeV2(), revalidate, seededShuffle(), BigQuestionsGrid(), CATEGORY_COLORS, FEATURED_SLUGS, QuestionRow, BrowseSearchPanel() (+8 more)
 
 ### Community 19 - "extract-names.ts"
-Cohesion: 0.05
-Nodes (117): approvedBudget(), assertNoUnresolved(), CollectedRow, confirmGate(), DriverBase, prepareResume(), processCollected(), recoverSubmitting() (+109 more)
+Cohesion: 0.06
+Nodes (104): approvedBudget(), assertNoUnresolved(), CollectedRow, confirmGate(), DriverBase, prepareResume(), processCollected(), recoverSubmitting() (+96 more)
 
 ### Community 20 - "uap-batch-triad.ts"
-Cohesion: 0.06
-Nodes (42): analyzeOneVideo(), args, BATCH_LIMIT, CONCURRENCY, DRY_RUN, processWithConcurrency(), worker(), runBatchTriadAnalysis() (+34 more)
+Cohesion: 0.05
+Nodes (38): args, BATCH_LIMIT, CONCURRENCY, DRY_RUN, processWithConcurrency(), worker(), runBatchTriadAnalysis(), sleep() (+30 more)
 
 ### Community 21 - "Corpus Atlas Batch Digests"
 Cohesion: 0.09
 Nodes (42): ApiError, asJson(), buildCards(), clip(), compareIds(), completeDigest(), completeWithModel(), DEFAULTS (+34 more)
 
 ### Community 22 - "Admin Blog Generation"
-Cohesion: 0.06
-Nodes (41): AdminBlogPage(), BlogRow, CATEGORY_COLORS, CATEGORY_LABELS, dynamic, metadata, PublishToggleButton(), AdminUapBlogPage() (+33 more)
+Cohesion: 0.12
+Nodes (25): AdminBlogPage(), BlogRow, CATEGORY_COLORS, CATEGORY_LABELS, dynamic, metadata, PublishToggleButton(), AUTHORS (+17 more)
 
 ### Community 23 - "UAP Video Explorer"
 Cohesion: 0.08
-Nodes (42): metadata, PageProps, parseArrayParam(), parseBoolParam(), revalidate, UapVideoExplorePage(), UfoIcon(), CONTENT_TYPE_LABELS (+34 more)
+Nodes (41): metadata, PageProps, parseArrayParam(), parseBoolParam(), revalidate, UapVideoExplorePage(), CONTENT_TYPE_LABELS, DECADE_LABELS (+33 more)
 
 ### Community 24 - "[handle]/page.tsx"
-Cohesion: 0.04
-Nodes (75): recharts@^3.5.1, recharts, buildClient(), ChannelRow, formatCount(), generateMetadata(), getAllChannelScoresForMap(), getChannel() (+67 more)
+Cohesion: 0.09
+Nodes (34): buildClient(), ChannelRow, formatCount(), generateMetadata(), getAllChannelScoresForMap(), getChannel(), getChannelScores(), getChannelTrajectory() (+26 more)
 
 ### Community 25 - "UAP Knowledge-Base Directories"
 Cohesion: 0.08
 Nodes (38): buildClient(), buildUrl(), EVENT_TYPE_CONFIG, EventCard(), EventsPage(), getEvents(), metadata, revalidate (+30 more)
 
 ### Community 26 - "build-case.ts"
-Cohesion: 0.08
-Nodes (45): AnalysisRow, buildCase(), buildCaseDetail(), CaseRows, ChannelRow, channelUrl(), clipText(), clipWords() (+37 more)
+Cohesion: 0.09
+Nodes (34): AnalysisRow, buildCase(), buildCaseDetail(), CaseRows, ChannelRow, channelUrl(), clipWords(), ELEMENT_MIN_CONFIDENCE (+26 more)
 
 ### Community 27 - "ref_path"
-Cohesion: 0.04
-Nodes (87): counts, lines, probes, ROOT, samples, env, vitest, JsonSchema (+79 more)
+Cohesion: 0.05
+Nodes (64): JsonSchema, allItems(), checkCodebook(), Choice, Codebook, CODEBOOK_DIR, CODEBOOK_VERSION, CodebookPrompt (+56 more)
 
 ### Community 28 - "weekly-draft/route.ts"
-Cohesion: 0.10
-Nodes (42): @react-email/components, channel(), compose(), draft(), fetchText(), Outcome, POST(), todaysStory() (+34 more)
+Cohesion: 0.13
+Nodes (32): channel(), easternTime(), fetchText(), POST(), tellTom(), todaysStory(), StoryOfTheDay(), StoryVideo (+24 more)
 
 ### Community 29 - "uap-reanalyze-batch.mjs"
 Cohesion: 0.29
 Nodes (6): args, __dirname, DRY_RUN, main(), sleep(), supabase
 
 ### Community 30 - "archetypes.ts"
-Cohesion: 0.06
-Nodes (41): email(), CompassPage(), metadata, AllTypesPage(), metadata, handleSubmit(), accentMap, AllTypesClient() (+33 more)
+Cohesion: 0.14
+Nodes (20): CompassPage(), metadata, QuizClient(), handleWriteInSubmit(), QuizQuestion(), QuizQuestionProps, FREQUENCIES, QuizResult() (+12 more)
 
 ### Community 31 - "batch.ts"
-Cohesion: 0.04
-Nodes (73): @anthropic-ai/sdk, collectBatches(), Job 2 - stance tally (usage), RollupDeps, assertValidCustomId(), batchCustomIds(), BuildParamsInput, ClassifiedResult (+65 more)
+Cohesion: 0.05
+Nodes (48): assertValidCustomId(), BatchRequest, BuildParamsInput, ClassifiedResult, CollectedBatch, createBatch(), CustomIdParts, customIdsSha12() (+40 more)
 
 ### Community 32 - "ExplorerControls.tsx"
 Cohesion: 0.09
@@ -856,23 +852,23 @@ Nodes (28): FILTER_OPTIONS, getClassColor(), GreysonExplorerPage(), metadata, Pa
 
 ### Community 33 - "execute.ts"
 Cohesion: 0.05
-Nodes (92): AnswerRow, gitSha(), answerCountsByRaw(), ensurePrompts(), fetchAnswersByIds(), fetchRawRefs(), fetchRawResponses(), fetchRun() (+84 more)
+Nodes (88): AnswerRow, CliError, numOpt(), answerCountsByRaw(), ensurePrompts(), fetchRawRefs(), fetchRawResponses(), fetchRun() (+80 more)
 
 ### Community 34 - "uap-blog-article.ts"
-Cohesion: 0.11
-Nodes (30): maxDuration, POST(), streamResponse(), ArticleDraft, stripMarkdownLinks(), ArticleReference, ArticleDraft, ArticleStep (+22 more)
+Cohesion: 0.10
+Nodes (31): maxDuration, POST(), streamResponse(), ArticleDraft, stripMarkdownLinks(), filterOverusedCitations(), ArticleReference, ArticleDraft (+23 more)
 
 ### Community 35 - "People worth a deeper look"
-Cohesion: 0.13
-Nodes (19): Appendix: the experiencers, Bob Lazar, Brazilian AFINAL experiencer cluster, Chris Bledsoe, UAP contactee profiles (3,440), Herbert Schirmer, Natalie Sudman (combat NDE), People worth a deeper look (+11 more)
+Cohesion: 0.12
+Nodes (21): Appendix: the experiencers, Bob Lazar, Brazilian AFINAL experiencer cluster, Chris Bledsoe, UAP contactee profiles (3,440), Herbert Schirmer, Natalie Sudman (combat NDE), People worth a deeper look (+13 more)
 
 ### Community 36 - "parse"
 Cohesion: 0.10
 Nodes (22): asResponse(), brand(), catch(), createZodEnum(), default(), execute(), exists(), finally() (+14 more)
 
 ### Community 37 - "UAP Program Intelligence"
-Cohesion: 0.06
-Nodes (56): ClaimsSection(), cleanText(), EmptySectionMessage(), LegislativeSection(), LocationsSection(), OrganizationsSection(), PersonsSection(), ProgramsSection() (+48 more)
+Cohesion: 0.05
+Nodes (64): ClaimsSection(), cleanText(), EmptySectionMessage(), LegislativeSection(), LocationsSection(), OrganizationsSection(), PersonsSection(), ProgramsSection() (+56 more)
 
 ### Community 38 - "Bundled tslib Helpers"
 Cohesion: 0.06
@@ -886,45 +882,45 @@ Nodes (20): envelopeSchemaOf(), invalid(), itemSchemaOf(), parseAnswers(), Parse
 Cohesion: 0.33
 Nodes (8): dryRun, EventSeed, fuzzyMatch(), main(), normalizeForMatch(), resolveContacteeIds(), supabase, WELL_KNOWN_EVENTS
 
-### Community 41 - "intake-uap.ts"
-Cohesion: 0.09
-Nodes (35): main(), main(), processVideo(), clearVideoData(), getSupabase(), main(), runVideo(), TEST_VIDEOS (+27 more)
+### Community 41 - "classify-uap.ts"
+Cohesion: 0.36
+Nodes (6): main(), classifyUapContent(), FEW_SHOT_EXAMPLES, getOpenAIClient(), UapClassificationResult, UAPClassificationSchema
 
 ### Community 42 - "uap-phenomenology.ts"
 Cohesion: 0.05
-Nodes (58): cleanText(), ConsciousnessPanel(), CraftPanel(), CRITERIA_LABELS, EmotionalProgressionBar(), EncounterFlowTimeline(), EntityList(), EvidencePanel() (+50 more)
+Nodes (59): cleanText(), ConsciousnessPanel(), CraftPanel(), CRITERIA_LABELS, EmotionalProgressionBar(), EncounterFlowTimeline(), EntityList(), EvidenceBreakdown (+51 more)
 
 ### Community 43 - "_addCheck()"
 Cohesion: 0.06
 Nodes (33): _addCheck(), base64(), base64url(), cidr(), cuid(), cuid2(), date(), datetime() (+25 more)
 
 ### Community 44 - "merge-digests.mjs"
-Cohesion: 0.10
-Nodes (35): ATLAS-narrative.md (narrative atlas), merged-openai section digests (gpt-5.6-luna), Merged section digests (18, Claude subagents), ApiError, checkQuotes(), completeSection(), completeWithModel(), DEFAULTS (+27 more)
+Cohesion: 0.11
+Nodes (32): ApiError, checkQuotes(), completeSection(), completeWithModel(), DEFAULTS, DOMAIN_NOTES, estimateUsd(), fixRejectedParam() (+24 more)
 
 ### Community 45 - "quiz-lead/route.ts"
 Cohesion: 0.13
-Nodes (23): BodySchema, EMAIL_LIMIT, IP_LIMIT, POST(), adminClient(), BodySchema, EMAIL_LIMIT, handlePost() (+15 more)
+Nodes (26): BodySchema, EMAIL_LIMIT, IP_LIMIT, POST(), adminClient(), BodySchema, EMAIL_LIMIT, IP_LIMIT (+18 more)
 
 ### Community 46 - "blog-story.ts"
-Cohesion: 0.11
-Nodes (28): generateQuestions(), generateStories(), main(), parseArgs(), applyVoicePass(), assembleStoryContext(), ExperiencerCandidate, formatTimestampedTranscript() (+20 more)
+Cohesion: 0.09
+Nodes (34): generateQuestions(), generateStories(), main(), parseArgs(), APPLY, main(), sanitizeMarkdownLinks(), GLADWELL_VOICE_RULES (+26 more)
 
 ### Community 47 - "app/page.tsx"
-Cohesion: 0.13
-Nodes (27): AnimatedNumber(), ConsciousnessStats(), Props, StatItem, CrossDomainPreview(), anonClient(), BlogPostPreview, fetchHomepageStats() (+19 more)
+Cohesion: 0.06
+Nodes (34): AnimatedNumber(), ConsciousnessStats(), Props, StatItem, CrossDomainPreview(), anonClient(), BlogPostPreview, fetchHomepageStats() (+26 more)
 
 ### Community 48 - "blog-article.ts"
-Cohesion: 0.08
-Nodes (50): ArticleContext, ArticleStepStatus, assembleContext(), assembleGuideContext(), AUTHOR_ROTATION, BlogArticleResult, BlogArticleStatus, draftArticle() (+42 more)
+Cohesion: 0.07
+Nodes (53): maxDuration, POST(), streamResponse(), claudeChat(), ArticleContext, ArticleStep, ArticleStepStatus, assembleContext() (+45 more)
 
 ### Community 49 - "Corpus atlas: statistical half"
 Cohesion: 0.09
-Nodes (30): appendix-top-lists.md (top-25 lists), Corpus atlas: statistical half, stats tables (tables.md and stats/*.json), UAP tier 1-2 corpus (8,394 videos), Under-oath claims cluster, aggregate.mjs (stats tables), Batch digests (348, six fixed sections), Corpus Atlas (+22 more)
+Nodes (30): appendix-top-lists.md (top-25 lists), Corpus atlas: statistical half, stats tables (tables.md and stats/*.json), aggregate.mjs (stats tables), ATLAS-narrative.md (narrative atlas), Batch digests (348, six fixed sections), Corpus Atlas, Google Drive book sources (DRIVE_SOURCES.md) (+22 more)
 
 ### Community 50 - "subtitles-brightdata.ts"
-Cohesion: 0.11
-Nodes (29): main(), BrightDataRecord, BrightDataTranscriptEntry, decodeHtmlEntities(), fail(), fetchCaptionsBrightData(), forgetJob(), languageOf() (+21 more)
+Cohesion: 0.15
+Nodes (22): main(), BrightDataRecord, BrightDataTranscriptEntry, decodeHtmlEntities(), fail(), fetchCaptionsBrightData(), forgetJob(), languageOf() (+14 more)
 
 ### Community 51 - "PRD UAP Route Architecture"
 Cohesion: 0.08
@@ -939,20 +935,20 @@ Cohesion: 0.11
 Nodes (25): main(), parseArgs(), toSlug(), BATCH_SIZE, main(), ONLY_NEW, main(), main() (+17 more)
 
 ### Community 54 - "questions/[slug]/page.tsx"
-Cohesion: 0.12
-Nodes (18): dynamicParams, fetchQuestionData(), formatDate(), formatViewCount(), generateMetadata(), generateStaticParams(), getServiceClient(), MoreVideo (+10 more)
+Cohesion: 0.13
+Nodes (17): dynamicParams, fetchQuestionData(), formatDate(), formatViewCount(), generateMetadata(), generateStaticParams(), getServiceClient(), MoreVideo (+9 more)
 
 ### Community 55 - "shortmaker-research.test.ts"
-Cohesion: 0.12
-Nodes (44): maxDuration, POST(), validSecret(), assemblyConfigured(), deleteRemoteTranscript(), fetchTranscript(), formatTranscript(), submitTranscription() (+36 more)
+Cohesion: 0.10
+Nodes (51): maxDuration, POST(), validSecret(), ActionResult, CRISIS_PATTERNS, isCrisisTopic(), assemblyConfigured(), deleteRemoteTranscript() (+43 more)
 
 ### Community 56 - "nde_vids table"
-Cohesion: 0.15
-Nodes (18): channels.scanner_enabled flag, channels table, clear_nde_with_names view, get_channel_stats() RPC, nde_chatbot_chunks table (RAG), nde_punctuated_embeddings table, nde_vids table, supabase/seed.sql (+10 more)
+Cohesion: 0.11
+Nodes (27): get_unanalyzed_greyson_videos(), /api/run-greyson-batch, nde_vids and nde_analysis RLS policy (public read, admin write), channels.scanner_enabled flag, channels table, clear_nde_with_names view, get_channel_stats() RPC, nde_analysis table (+19 more)
 
 ### Community 57 - "pilot-stats.ts"
 Cohesion: 0.08
-Nodes (50): RunOutcome, fetchRawSummaries(), RunRow, RunCtx, GoldStats, HaikuGoldStats, answersOf(), assumptionFrom() (+42 more)
+Nodes (45): Stance, AnswerRecord, AnswerLite, buildDisputes(), CONFIDENCE_THRESHOLD, DisputeInput, FinalStatus, firstPassIsReaderA() (+37 more)
 
 ### Community 58 - "NDE Transformation Index (NDE-TI)"
 Cohesion: 0.08
@@ -963,12 +959,12 @@ Cohesion: 0.07
 Nodes (28): audit, auditDir, candidates, CANONICAL_IDS, docIndex, docs, edges, ELEMENT_TO_PLACE (+20 more)
 
 ### Community 60 - "isAdminUser"
-Cohesion: 0.12
-Nodes (22): DELETE(), maxDuration, POST(), supabase, DELETE(), PATCH(), GET(), getSupabaseAdmin() (+14 more)
+Cohesion: 0.07
+Nodes (38): DELETE(), GET(), getAdminClient(), PATCH(), POST(), PUT(), requireAdmin(), DELETE() (+30 more)
 
 ### Community 61 - "Active Project Rules & Constraints (LEAR"
 Cohesion: 0.09
-Nodes (19): Supabase Auth via @supabase/ssr (browser + server clients), Typesense server decommissioned, A-1 Scripts duplicate pipeline logic, Active Project Rules & Constraints (LEARNINGS), Historical Context, Pipelines & Resolved Bugs, Intake Pipeline Architecture (14 steps), Password recovery fix (recovery_sent_at check), pgvector insert batches of 5 (+11 more)
+Nodes (18): Supabase Auth via @supabase/ssr (browser + server clients), Typesense server decommissioned, Active Project Rules & Constraints (LEARNINGS), Historical Context, Pipelines & Resolved Bugs, Intake Pipeline Architecture (14 steps), Password recovery fix (recovery_sent_at check), pgvector insert batches of 5, Scanner queue logic (scan_queue vs nde_vids.intake_status, two-phase cron) (+10 more)
 
 ### Community 62 - "constructor()"
 Cohesion: 0.07
@@ -991,32 +987,32 @@ Cohesion: 0.20
 Nodes (8): BlogCategoryPage(), BlogPost, CATEGORY_COLORS, CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, PostCard(), revalidate, VALID_CATEGORIES
 
 ### Community 67 - "Deployment Guide"
-Cohesion: 0.10
-Nodes (26): Oracle VM Worker (profound-worker), rapid-process.ts pm2 UAP batch processor, Deployment Guide, apphosting.staging.yaml overrides (NOINDEX_SITE), apphosting.yaml base config, CI workflow (.github/workflows/ci.yml), Console rollback (emergency only), Oracle VM deploy (git pull main + pm2 restart) (+18 more)
+Cohesion: 0.11
+Nodes (23): rapid-process.ts pm2 UAP batch processor, Deployment Guide, apphosting.staging.yaml overrides (NOINDEX_SITE), apphosting.yaml base config, CI workflow (.github/workflows/ci.yml), Console rollback (emergency only), Post-deploy verification (x-robots-tag, robots.txt), Promote staging to production via PR (+15 more)
 
 ### Community 68 - "UAP Contact Depth Scale (UAP-CDS, 0-32)"
-Cohesion: 0.08
-Nodes (28): NDE-TI AI Prompt Template (JSON output), CD-1a Anomalous Perception, CD-1b Structured Form, CD-1c Proximity, CD-1d Physical Effects, CD-2a Entity Perceived, CD-2b Bilateral Awareness, CD-2c Communication (+20 more)
+Cohesion: 0.07
+Nodes (30): NDE-TI AI Prompt Template (JSON output), CD-1a Anomalous Perception, CD-1b Structured Form, CD-1c Proximity, CD-1d Physical Effects, CD-2a Entity Perceived, CD-2b Bilateral Awareness, CD-2c Communication (+22 more)
 
 ### Community 69 - "dependencies"
 Cohesion: 0.07
-Nodes (29): dependencies, @anthropic-ai/sdk@^0.115.0, class-variance-authority@^0.7.1, dotenv@^17.2.3, embla-carousel-react@^8.6.0, lucide-react@^0.561.0, next@^16.0.10, openai@^6.17.0 (+21 more)
+Nodes (28): dependencies, @anthropic-ai/sdk@^0.115.0, class-variance-authority@^0.7.1, dotenv@^17.2.3, embla-carousel-react@^8.6.0, gsap@^3.14.2, @gsap/react@^2.1.2, lucide-react@^0.561.0 (+20 more)
 
 ### Community 70 - "plan.ts"
-Cohesion: 0.10
-Nodes (36): countCells(), fetchPendingCells(), NON_TERMINAL, PendingCell, RawSummary, videosWithFirstPass(), VIEW_VIDEO_CHUNK, coveredKeys() (+28 more)
+Cohesion: 0.11
+Nodes (32): countCells(), fetchPendingCells(), NON_TERMINAL, PendingCell, RawSummary, RunRow, videosWithFirstPass(), coveredKeys() (+24 more)
 
 ### Community 71 - "nde-batch-analysis.ts"
-Cohesion: 0.06
-Nodes (39): main(), parseArgs(), PipelineConfig, PIPELINES, runBatch(), saveCoreElements(), saveGreyson(), saveJourneyFlow() (+31 more)
+Cohesion: 0.11
+Nodes (24): main(), parseArgs(), PipelineConfig, PIPELINES, runBatch(), saveCoreElements(), saveGreyson(), saveJourneyFlow() (+16 more)
 
 ### Community 72 - "stats.ts"
 Cohesion: 0.13
 Nodes (23): fontSerif, FounderPage(), metadata, revalidate, GET(), getPageConfig(), PageConfig, runtime (+15 more)
 
 ### Community 73 - "AfterlifeScene"
-Cohesion: 0.12
-Nodes (4): AfterlifeMap(), hex(), AfterlifeScene, glowTexture()
+Cohesion: 0.07
+Nodes (16): AfterlifeScene, CATEGORY_COLOR, glowTexture(), NodeHit, NodeRec, SceneCallbacks, SPINE, AfterlifeMapData (+8 more)
 
 ### Community 74 - "blog-research.ts"
 Cohesion: 0.18
@@ -1027,48 +1023,48 @@ Cohesion: 0.11
 Nodes (18): uap_analysis Table, UAP RLS Policies (public read, service_role write), Triad Analysis Pipeline (src/lib/ai/uap-triad/), Contact Depth Scale (0-28), Revised Veridical NDE Scale (cvNDE), FREE Foundation Survey (2018), Greyson NDE Scale (0-32), Hynek Classification (CE1-CE5) (+10 more)
 
 ### Community 76 - "isDebugBypass"
-Cohesion: 0.07
-Nodes (41): checkAuth(), dynamic, getSupabaseAdmin(), maxDuration, POST(), checkAuth(), dynamic, GET() (+33 more)
+Cohesion: 0.06
+Nodes (42): checkAuth(), dynamic, getSupabaseAdmin(), maxDuration, POST(), checkAuth(), dynamic, GET() (+34 more)
 
 ### Community 77 - "app/share/actions.ts"
-Cohesion: 0.09
-Nodes (44): acceptAgreementAction(), ActionResult, attachMediaAction(), changeDisplayModeAction(), createDraftAction(), deleteStoryAction(), editStoryAction(), fail() (+36 more)
+Cohesion: 0.10
+Nodes (36): acceptAgreementAction(), attachMediaAction(), changeDisplayModeAction(), createDraftAction(), deleteStoryAction(), editStoryAction(), fail(), finishReviewAction() (+28 more)
 
 ### Community 78 - "@supabase/ssr"
 Cohesion: 0.31
 Nodes (11): checkSuperAdmin(), getAdminSupabase(), getChatbotConfig(), publishPrompt(), saveStagingPrompt(), ChatbotEditor(), handlePublish(), handleSave() (+3 more)
 
 ### Community 79 - "pricing.ts"
-Cohesion: 0.12
-Nodes (25): CACHE_READ_FACTOR, CACHE_WRITE_FACTOR, CostEstimate, estimateCost(), estimateQuotaCost(), GPT_55, GPT_56_LUNA, GPT_56_SOL (+17 more)
+Cohesion: 0.09
+Nodes (30): batchCost(), BLOG_CLAUDE_MODEL, ClaudeChatArgs, ClaudeChatResult, getClient(), CACHE_READ_FACTOR, CACHE_WRITE_FACTOR, CostEstimate (+22 more)
 
 ### Community 80 - "Frontend Route Map (Next.js App Router)"
-Cohesion: 0.10
-Nodes (24): Admin Layout (role-based sidebar), /api/chat-compassionate, ChatPopup, CuratedVideoColumn, ExplorerControls, ExplorerVideoCard, Resources Page (ResourceCard, BookCard, SectionHeader), VideoThumbnailCard (+16 more)
+Cohesion: 0.11
+Nodes (22): Admin Layout (role-based sidebar), /api/chat-compassionate, ChatPopup, CuratedVideoColumn, ExplorerControls, ExplorerVideoCard, Resources Page (ResourceCard, BookCard, SectionHeader), VideoThumbnailCard (+14 more)
 
 ### Community 81 - "checkRateLimit"
-Cohesion: 0.24
+Cohesion: 0.22
 Nodes (23): dynamic, GET(), RATE_LIMIT, dynamic, GET(), RATE_LIMIT, dynamic, GET() (+15 more)
 
-### Community 82 - "dashboard/page.tsx"
-Cohesion: 0.14
-Nodes (20): Collection, Domain, DOMAIN_CONFIG, DomainSection(), Favorite, SavedSearch, AlertDialogAction, AlertDialogCancel (+12 more)
+### Community 82 - "supabase.ts"
+Cohesion: 0.10
+Nodes (24): Job 2 - stance tally (usage), readRunState(), recordBatchId(), submitGuarded(), assertAllExist(), assertBookkeepingPatch(), assertBtTable(), assertProfileIdsExist() (+16 more)
 
 ### Community 83 - "env"
 Cohesion: 0.05
 Nodes (41): default, description, required, concurrency, cancel-in-progress, group, APP_URL, CRON_SECRET (+33 more)
 
-### Community 84 - "UapPhenomenologyResult (complete output schema)"
-Cohesion: 0.12
-Nodes (24): Argus UFO AI Data (NUFORC reports), NDE<->UAP Cross-Domain Comparison, Epic 6.1 Phenomenology Pipeline, Epic 6.2 Research Breakdown UI (UapResearchBreakdown, UapEncounterContextCard), Unified Consciousness Homepage, Video Explore Filter Sidebar (UapFilterSidebar, uap_explore_facets), Video Tone Backfill (technical debt), Bullard's Abduction Sequence (+16 more)
+### Community 84 - "UAP Entity Taxonomy (18 Types)"
+Cohesion: 0.22
+Nodes (10): NDE<->UAP Cross-Domain Comparison, Epic 6.1 Phenomenology Pipeline, Unified Consciousness Homepage, Bullard's Abduction Sequence, UAP Entity Taxonomy (18 Types), FREE Foundation Survey, John Mack Harvard Abduction Research, NDE Research Breakdown (PhenomenologyCard, EntityEncounters, JourneyFlowTimeline) (+2 more)
 
 ### Community 85 - "steps (2)"
 Cohesion: 0.08
 Nodes (24): NEXT_PUBLIC_SUPABASE_URL, OPENROUTER_API_KEY, SUPABASE_SERVICE_ROLE_KEY, limit, jobs, knowledge-batch, name, runs-on (+16 more)
 
-### Community 86 - "zod"
-Cohesion: 0.14
-Nodes (21): @radix-ui/react-slot@^1.2.3, @radix-ui/react-slot, react-hook-form, zod, ContactForm(), onSubmit(), formSchema, contactFormSchema (+13 more)
+### Community 86 - "react"
+Cohesion: 0.06
+Nodes (37): @radix-ui/react-slot@^1.2.3, @radix-ui/react-slot, react, react-hook-form, ContactForm(), onSubmit(), formSchema, contactFormSchema (+29 more)
 
 ### Community 87 - "81 Curated NDE Big Questions"
 Cohesion: 0.09
@@ -1079,24 +1075,24 @@ Cohesion: 0.14
 Nodes (25): NDE book direction 8: Two at the Threshold (shared death), NDE book direction 5: Who Owns the Light (one light, many names), UAP book direction 11: One Anomalous Ecology, UAP book direction 10: Where the Light Meets the Craft, Cross-domain direction 5: Strangers and Relatives, NDE theme: belief reversal, NDE theme: deceased relatives, guides, angels and religious figures, NDE theme: nonhuman, extraterrestrial and machine beings (+17 more)
 
 ### Community 89 - "estimate.ts"
-Cohesion: 0.08
-Nodes (50): applyBudget(), CeilingParams, DEFAULT_OUTPUT_ASSUMPTION, estimateExact(), estimateStratified(), FingerprintParts, GateArgs, itemCeiling() (+42 more)
+Cohesion: 0.06
+Nodes (69): RunOutcome, gitSha(), insertRunsIfAbsent(), applyBudget(), assertSpendConfirmed(), CeilingParams, DEFAULT_OUTPUT_ASSUMPTION, estimateExact() (+61 more)
 
 ### Community 90 - "phenomenology-entities.ts"
 Cohesion: 0.09
 Nodes (23): dynamic, GET(), maxDuration, supabase, analyzePhenomenologyEntities(), CommunicationMethod, EmotionalQuality, EmotionEntry (+15 more)
 
 ### Community 91 - "logQuota"
-Cohesion: 0.21
-Nodes (21): GET(), getAdminSupabase(), normalizeErrorPattern(), POST(), logQuota(), discoverNewUapVideos(), filterOutShorts(), getExistingUapVideoIds() (+13 more)
+Cohesion: 0.18
+Nodes (24): GET(), getAdminSupabase(), normalizeErrorPattern(), POST(), logQuota(), discoverNewUapVideos(), filterOutShorts(), getExistingUapVideoIds() (+16 more)
 
 ### Community 92 - "uap-knowledge.ts"
 Cohesion: 0.08
 Nodes (21): bool, ClaimSchema, ConsciousnessConnectionSchema, ContentSafetySchema, EntityDiscussedSchema, EVIDENCE_LEVEL, KnowledgeMetadataSchema, KnowledgeOutcome (+13 more)
 
 ### Community 93 - "Production-Hardening Improvement Plan"
-Cohesion: 0.13
-Nodes (22): Static-Analysis Baseline, Lint baseline: 206 problems, nde-batch-analysis.ts cron comment bug (*/ ends block comment), react-hooks/rules-of-hooks conditional hook landmine, Toolchain (TypeScript strict, ESLint flat config, Vitest), Typecheck baseline: 26 errors in 1 file, Database setup (supabase db reset), Production-Hardening Improvement Plan (+14 more)
+Cohesion: 0.11
+Nodes (24): Static-Analysis Baseline, Lint baseline: 206 problems, nde-batch-analysis.ts cron comment bug (*/ ends block comment), react-hooks/rules-of-hooks conditional hook landmine, Toolchain (TypeScript strict, ESLint flat config, Vitest), Typecheck baseline: 26 errors in 1 file, Database setup (supabase db reset), Production-Hardening Improvement Plan (+16 more)
 
 ### Community 94 - "devDependencies"
 Cohesion: 0.08
@@ -1126,9 +1122,9 @@ Nodes (23): BATCH_LIMIT, CRON_SECRET, LOOP_COUNT, SITE_URL, limit, loops, jobs, 
 Cohesion: 0.08
 Nodes (23): BATCH_LIMIT, CRON_SECRET, LOOP_COUNT, SITE_URL, limit, loops, jobs, run-batch (+15 more)
 
-### Community 101 - "getBudgetStatus"
-Cohesion: 0.12
-Nodes (20): maxDuration, POST(), streamResponse(), dynamic, GET(), Row, UsageSummary, GET() (+12 more)
+### Community 101 - "pauseGate"
+Cohesion: 0.13
+Nodes (23): maxDuration, POST(), GET(), maxDuration, maxDuration, POST(), dynamic, GET() (+15 more)
 
 ### Community 102 - "retrieve.mjs"
 Cohesion: 0.17
@@ -1147,8 +1143,8 @@ Cohesion: 0.12
 Nodes (23): RAF Bentwaters / Rendlesham Incident (1980), Bob Lazar, David Grusch, Dr. Steven Greer, George Knapp, HISTORY / Ancient Aliens (channel), Jeremy Corbell (WEAPONIZED), Jesse Michels (channel) (+15 more)
 
 ### Community 106 - "app/channels/page.tsx"
-Cohesion: 0.13
-Nodes (20): ANALYSIS_SORT_KEYS, ChannelsPage(), metadata, revalidate, SORT_OPTIONS, ChannelCard(), ChannelStats, formatNumber() (+12 more)
+Cohesion: 0.14
+Nodes (18): ANALYSIS_SORT_KEYS, ChannelsPage(), metadata, revalidate, SORT_OPTIONS, ChannelStats, ChannelListRow(), formatNumber() (+10 more)
 
 ### Community 107 - "app/questions/page.tsx"
 Cohesion: 0.11
@@ -1156,11 +1152,11 @@ Nodes (18): CATEGORY_META, CATEGORY_ORDER, metadata, NdeQuestion, PART_ANCHORS, 
 
 ### Community 108 - "logic.ts"
 Cohesion: 0.06
-Nodes (60): checkExtraction(), createSelfNameLinks(), AUTO_BY, buildPairInput(), buildPersons(), channelsAndTitles(), classifySelfName(), clip() (+52 more)
+Nodes (59): createSelfNameLinks(), isUsableSelfName(), AUTO_BY, buildPairInput(), buildPersons(), channelsAndTitles(), classifySelfName(), clip() (+51 more)
 
 ### Community 109 - "operations/route.ts"
-Cohesion: 0.09
-Nodes (31): fmtNum(), fmtUsd(), OperationsDashboard(), ProcessCard(), QuotaBar(), StatCard(), metadata, OperationsPage() (+23 more)
+Cohesion: 0.10
+Nodes (30): fmtNum(), fmtUsd(), OperationsDashboard(), ProcessCard(), QuotaBar(), StatCard(), metadata, OperationsPage() (+22 more)
 
 ### Community 110 - "cross-domain-data.ts"
 Cohesion: 0.15
@@ -1182,9 +1178,9 @@ Nodes (22): HeaderPreviewPage(), DOMAIN_CONFIG, Props, DOMAIN_CONFIG, Newsletter
 Cohesion: 0.10
 Nodes (22): Angie Fenimore, Anita Moorjani (also filed under dean-radin), Category: Hell and Judgment (6), Category: The Life Review (7), Contradiction: Hell Self-Made vs Literal and Eternal, Distressing NDEs at 10 to 20 Percent, Eben Alexander, 108 Experiencers With Stories (do not re-propose) (+14 more)
 
-### Community 115 - "next"
-Cohesion: 0.02
-Nodes (53): nextConfig, next, maxDuration, buildClient(), GET(), runtime, dynamic, supabase (+45 more)
+### Community 115 - "@supabase/supabase-js"
+Cohesion: 0.05
+Nodes (37): @supabase/supabase-js, main(), supabase, VideoRow, buildClient(), escapeXml(), formatCount(), GET() (+29 more)
 
 ### Community 116 - "compute-channel-scores.ts"
 Cohesion: 0.14
@@ -1198,9 +1194,9 @@ Nodes (30): GET(), revalidate, ClaimDistribution(), DailyFactCard(), EFFECT_ICON
 Cohesion: 0.13
 Nodes (16): assets, resolveAsset(), ExperienceShell(), ExperienceShellProps, ShellState, CueConfig, useAudioCrossfade(), VoiceLineConfig (+8 more)
 
-### Community 119 - "afterlife-map.tsx"
-Cohesion: 0.12
-Nodes (18): CATEGORY_LABEL, STRATA, AfterlifeMap, AfterlifeMapPage(), CATEGORY_COLOR, NodeHit, NodeRec, SceneCallbacks (+10 more)
+### Community 119 - "app/experiencer/page.tsx"
+Cohesion: 0.16
+Nodes (19): buildUrl(), ExperiencerDirectoryPage(), getLastName(), metadata, revalidate, SORT_OPTIONS, SortOption, fetchCuratedVideos() (+11 more)
 
 ### Community 120 - "share-maintenance.yml"
 Cohesion: 0.11
@@ -1210,17 +1206,17 @@ Nodes (17): APP_DIRECT_URL, CRON_SECRET, jobs, maintenance, runs-on, steps, time
 Cohesion: 0.12
 Nodes (20): CLAUDE.md Agent Working Rules, Firebase App Hosting Auto-Deploy, graphify Knowledge Graph Rules, main Branch (Production, branch-protected), staging Branch (staging.projectprofound.org), Oracle Cloud Always-On Worker (profound-worker), UAP GitHub Actions Cron Pipelines, uap_scan_queue Table (+12 more)
 
-### Community 122 - "job1-extract.test.ts"
-Cohesion: 0.16
-Nodes (18): createGuardedClient(), answerFor(), harness(), seed(), T, vids, Err, fakeAnthropic() (+10 more)
+### Community 122 - "ref_path"
+Cohesion: 0.06
+Nodes (35): counts, lines, probes, ROOT, samples, env, vitest, createGuardedClient() (+27 more)
 
 ### Community 123 - "MusicVideoBanner.tsx"
-Cohesion: 0.26
-Nodes (12): FeaturedVideoPlayer(), FeaturedVideoPlayerProps, MusicVideoBanner(), MusicVideoCard(), MusicVideoStrip(), DialogDescription, DialogTitle, FEATURED_VIDEO (+4 more)
+Cohesion: 0.21
+Nodes (15): FeaturedVideoPlayer(), FeaturedVideoPlayerProps, MusicVideoBanner(), MusicVideoStrip(), DialogContent, DialogDescription, DialogFooter(), DialogHeader() (+7 more)
 
-### Community 124 - "uap-intelligence-graph.tsx"
-Cohesion: 0.12
-Nodes (17): react-force-graph-3d, CATEGORIES, ElementEdge, ElementNode, GraphData, NdeElementGraph, NdeElementsPage(), UapIntelligenceGraph (+9 more)
+### Community 124 - "uap-timeline-graph.tsx"
+Cohesion: 0.04
+Nodes (89): react-force-graph-3d, three, AfterlifeMap(), CATEGORY_LABEL, hex(), STRATA, AfterlifeMap, AfterlifeMapPage() (+81 more)
 
 ### Community 125 - "Top 25: NDE by Veridical (rvnde) Score"
 Cohesion: 0.15
@@ -1235,8 +1231,8 @@ Cohesion: 0.17
 Nodes (19): maxDuration, POST(), COORD_LOOKUP, extractPhenomTags(), INTEL_CATEGORY_COLORS, normalizeStateKey(), PHENOM_CATEGORY_COLORS, PHENOM_LABEL_MAP (+11 more)
 
 ### Community 128 - "Short Maker research API (read-only)"
-Cohesion: 0.14
-Nodes (18): Internal API Routes, GET /api/research/cases/{videoId}, GET /api/research/cases (hybrid reciprocal-rank search), GET /api/research/counts, POST /api/search3 (30 req/min per IP), Short Maker research API (read-only), User Search flow (/api/search3), SHORTMAKER_API_KEY (+10 more)
+Cohesion: 0.12
+Nodes (20): Internal API Routes, GET /api/research/cases/{videoId}, GET /api/research/cases (hybrid reciprocal-rank search), GET /api/research/counts, POST /api/search3 (30 req/min per IP), Short Maker zod contract (types.ts, API_VERSION), Short Maker research API (read-only), User Search flow (/api/search3) (+12 more)
 
 ### Community 129 - "generate"
 Cohesion: 0.10
@@ -1244,19 +1240,19 @@ Nodes (20): default, description, required, name, runs-on, steps, timeout-minute
 
 ### Community 130 - "uap-knowledge-batch.ts"
 Cohesion: 0.10
-Nodes (18): args, DRY_RUN, LIMIT, MAX_WAIT_MIN, MODEL, NO_SAVE, OFFSET, OUT_FILE (+10 more)
+Nodes (23): args, collectResults(), DRY_RUN, LIMIT, main(), MAX_WAIT_MIN, MODEL, NO_SAVE (+15 more)
 
-### Community 131 - "uap-search-result-card.tsx"
-Cohesion: 0.16
-Nodes (19): CONTENT_TYPE_LABELS, FilterBar(), groupResultsByVideo(), SearchDocument, SearchHit, SearchResponse, UapSearchContent(), UapSearchPage() (+11 more)
+### Community 131 - "EncounterTaxonomy.tsx"
+Cohesion: 0.12
+Nodes (19): recharts@^3.5.1, recharts, BarTooltip(), CoverageBarChart(), CoverageBarChartProps, CoverageItem, CoverageSectionData, EventProgramCoverageSection() (+11 more)
 
 ### Community 132 - "ChannelUniverseMap.tsx"
 Cohesion: 0.18
 Nodes (18): buildClient(), ChannelUniversePage(), getAllChannelScores(), getAllChannelTrajectories(), metadata, revalidate, ChannelScorePoint, ChannelUniverseMap() (+10 more)
 
 ### Community 133 - "blog-verify.ts"
-Cohesion: 0.14
-Nodes (19): BLOG_CLAUDE_MODEL, claudeChat(), ClaudeChatArgs, ClaudeChatResult, getClient(), checkLink(), extractAndVerifyClaims(), getOpenAI() (+11 more)
+Cohesion: 0.21
+Nodes (15): checkLink(), extractAndVerifyClaims(), getOpenAI(), getPageMetadata(), hasTitleKeywordOverlap(), LinkInfo, questionToSlug(), sanitizeMalformedLinks() (+7 more)
 
 ### Community 134 - "uap/analytics/route.ts"
 Cohesion: 0.15
@@ -1266,9 +1262,9 @@ Nodes (15): UAP Content Classifier (classify-uap.ts), 3rd Party Integrations (Op
 Cohesion: 0.15
 Nodes (18): POST /api/cron/normalize-entities, pg_cron triggers (trigger_recompute_channel_scores, trigger_normalize_entities), POST /api/cron/recompute-channel-scores, maxDuration, POST(), ABBREVIATIONS, CanonicalEntity, executeMerge() (+10 more)
 
-### Community 136 - "VizPageShell"
-Cohesion: 0.30
-Nodes (15): ChannelConstellationGraph(), makeAxis(), makeLabel(), GlobeGraph(), HynekSpaceGraph(), makeAxis(), makeLabel(), NdeElementGraph() (+7 more)
+### Community 136 - "pilot-report.ts"
+Cohesion: 0.19
+Nodes (18): fetchRawSummaries(), answersOf(), assumptionFrom(), loadPilot(), PilotData, usageOf(), OPTIONS, pc() (+10 more)
 
 ### Community 137 - "pull.mjs"
 Cohesion: 0.14
@@ -1295,8 +1291,8 @@ Cohesion: 0.08
 Nodes (27): choices(), cond(), slug(), strip_md(), yn(), app_get(), app_post(), download() (+19 more)
 
 ### Community 143 - "UAP Intake Orchestrator (uap-intake.ts)"
-Cohesion: 0.14
-Nodes (18): Caption Fetch Failure Differentiation (caption_fetch_failed, quota_exceeded), classify-uap.ts Content Classifier, Unified UAP Intake Pipeline (intake-uap.ts / processUapVideoIntake), Keyword-Monitored Channels (uap_keyword_monitors), KnowledgePanel component, Punctuation & Embedding Pipelines (punctuate-uap.ts, embed-uap.ts), Queue Priority System (priority, source_type, source_id), Triad Batch Orchestrator (uap-batch-triad.ts) (+10 more)
+Cohesion: 0.19
+Nodes (14): Caption Fetch Failure Differentiation (caption_fetch_failed, quota_exceeded), classify-uap.ts Content Classifier, Unified UAP Intake Pipeline (intake-uap.ts / processUapVideoIntake), KnowledgePanel component, Punctuation & Embedding Pipelines (punctuate-uap.ts, embed-uap.ts), Triad Batch Orchestrator (uap-batch-triad.ts), uap_analysis table, uap_channels table (+6 more)
 
 ### Community 144 - "UAP Evidence Strength Scale (UAP-ESS)"
 Cohesion: 0.10
@@ -1326,9 +1322,9 @@ Nodes (19): NDE book direction 1: Sent Back (the return problem), UAP book direc
 Cohesion: 0.07
 Nodes (30): addRequestID(), calculateDefaultRetryTimeoutMillis(), _callApiKey(), CancelReadableStream(), defaultParseResponse(), encodeUTF8(), fetchWithTimeout(), findDoubleNewlineIndex() (+22 more)
 
-### Community 151 - "config.ts"
-Cohesion: 0.06
-Nodes (42): dynamic, JoinPage(), metadata, REASONS, Shell(), dynamic, ExperiencesPage(), metadata (+34 more)
+### Community 151 - "isShareEnabled"
+Cohesion: 0.11
+Nodes (29): dynamic, ExperiencesPage(), metadata, TABS, typeLabel(), dynamic, ExperienceStoryPage(), generateMetadata() (+21 more)
 
 ### Community 152 - "bulk-generate-contactee-profiles.ts"
 Cohesion: 0.16
@@ -1351,28 +1347,28 @@ Cohesion: 0.11
 Nodes (17): aliases, components, hooks, lib, ui, utils, iconLibrary, rsc (+9 more)
 
 ### Community 157 - "use-toast.ts"
-Cohesion: 0.13
-Nodes (22): Toast, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastTitle, toastVariants, ToastViewport (+14 more)
+Cohesion: 0.09
+Nodes (35): DashboardPage(), CONTENT_TYPE_LABELS, FilterBar(), groupResultsByVideo(), SearchDocument, SearchHit, SearchResponse, UapSearchContent() (+27 more)
 
 ### Community 158 - "Phase 1 - Hardening Task Checklist"
-Cohesion: 0.14
-Nodes (17): Short Maker zod contract (types.ts, API_VERSION), IS_DEBUG_MODE, AI-6 Malformed blog link constructs (112 of 174 rows), Phase 1 - Security hardening, S-13 Public questions/[slug] Claude auto-generation cost abuse, S-1 Public AI endpoints without rate limit, S-2 email/manage-subs IDOR, S-4 IS_DEBUG_MODE auth bypass (+9 more)
+Cohesion: 0.13
+Nodes (18): POST /api/chat-compassionate, IS_DEBUG_MODE, AI-6 Malformed blog link constructs (112 of 174 rows), Phase 1 - Security hardening, S-13 Public questions/[slug] Claude auto-generation cost abuse, S-1 Public AI endpoints without rate limit, S-2 email/manage-subs IDOR, S-4 IS_DEBUG_MODE auth bypass (+10 more)
 
 ### Community 159 - "Chart gallery (13 charts)"
-Cohesion: 0.14
-Nodes (16): Dr. Bruce Greyson (as experiencer), 15 core theme vocabulary (experiencer profiles), Child experiencers (heuristic), 15 NDE core elements, NDE vs UAP cross-domain comparison, Cross-domain emotional contrast (love vs fear), Greyson scale (saturated at 30), NDE journey sequences (+8 more)
+Cohesion: 0.13
+Nodes (17): Dr. Bruce Greyson (as experiencer), 15 core theme vocabulary (experiencer profiles), Child experiencers (heuristic), 15 NDE core elements, NDE vs UAP cross-domain comparison, Cross-domain emotional contrast (love vs fear), Greyson scale (saturated at 30), NDE journey sequences (+9 more)
 
 ### Community 160 - "experience/[slug]/page.tsx"
 Cohesion: 0.14
 Nodes (15): experienceConfigs, ExperiencePage(), generateMetadata(), PageProps, audioCueSchema, backgroundSchema, experienceConfigSchema, experienceMetaSchema (+7 more)
 
-### Community 161 - "uap-timeline-graph.tsx"
-Cohesion: 0.16
-Nodes (16): UapTimelineGraph, UapTimelinePage(), ColorMode, ENTITY_COLORS, ENTITY_HEX, ENTITY_LABELS, getDecadeMarkers(), HYNEK_COLORS (+8 more)
+### Community 161 - "admin/uap/blog/page.tsx"
+Cohesion: 0.13
+Nodes (16): AdminUapBlogPage(), BlogRow, CATEGORY_COLORS, CATEGORY_LABELS, dynamic, metadata, UapPublishToggleButton(), DeletePostButton() (+8 more)
 
 ### Community 162 - "isShareEnabled"
-Cohesion: 0.09
-Nodes (38): AdminSharePage(), dynamic, FILTERS, POST(), dynamic, ExperienceStoryPage(), generateMetadata(), typeLabel() (+30 more)
+Cohesion: 0.14
+Nodes (22): POST(), expireOldIntros(), toDirectoryEntry(), PUBLIC_MEDIA_BUCKET, YOUTUBE_MIN_AGE_HOURS, buildQueue(), db(), ensureImage() (+14 more)
 
 ### Community 163 - "GEMINI.md AI Context & Routing File"
 Cohesion: 0.13
@@ -1387,8 +1383,8 @@ Cohesion: 0.24
 Nodes (7): Cross-Domain UNION Views (all_experiences, all_embeddings), Database Capacity (27 GB on 8 GB plan), Expansion Risk Analysis, all_experiences_view SQL View, Common Semantic Analysis Columns, Discovery: Project Profound Expansion (Gemini), Gemini Phased Roadmap (MVP to Community)
 
 ### Community 166 - "Environment Variables"
-Cohesion: 0.10
-Nodes (21): External API Integrations, Compassionate chat model gpt-5.6-luna with gpt-4o-mini fallback, OpenAI integration, Supabase integration, POST /api/chat-compassionate, pg_cron SQL-only jobs (VACUUM, MV refresh), Pre-Computed Data layers (uap_channel_stats_mv, uap_channel_scores, uap_canonical_*), Environment Variables (+13 more)
+Cohesion: 0.13
+Nodes (16): External API Integrations, Compassionate chat model gpt-5.6-luna with gpt-4o-mini fallback, OpenAI integration, Supabase integration, Environment Variables, Blog pipeline keys (OPENROUTER_API_KEY, TAVILY_API_KEY, FAL_API_KEY), CRON_SECRET, Intake pipeline keys (SUPADATA_API_KEY, YOUTUBE_API_KEY) (+8 more)
 
 ### Community 167 - "System Architecture"
 Cohesion: 0.16
@@ -1403,8 +1399,8 @@ Cohesion: 0.12
 Nodes (16): default, description, required, name, runs-on, steps, timeout-minutes, count (+8 more)
 
 ### Community 170 - "index.ts"
-Cohesion: 0.29
-Nodes (10): gsap@^3.14.2, gsap, MemoryPhase(), dissolve(), elevate(), fade(), transitionRegistry, pushThrough() (+2 more)
+Cohesion: 0.38
+Nodes (7): gsap, dissolve(), elevate(), fade(), transitionRegistry, pushThrough(), safeDuration()
 
 ### Community 171 - "Top 25: UAP Encounters by Evidence Score"
 Cohesion: 0.18
@@ -1440,11 +1436,11 @@ Nodes (15): Full Entity Resolution (uap_canonical_persons/programs/orgs), Channe
 
 ### Community 179 - "dotenv"
 Cohesion: 0.04
-Nodes (36): supabase, dotenv, fetchAllPlaylistVideoIds(), main(), supabase, supabase, { Client }, require (+28 more)
+Nodes (38): openai, supabase, supabase, dotenv, fetchAllPlaylistVideoIds(), main(), supabase, supabase (+30 more)
 
 ### Community 180 - "Documentation Index"
 Cohesion: 0.07
-Nodes (32): Database Migrations Workflow, add_search_logs migration example, supabase db push (CI/CD), supabase db reset, supabase/migrations/ directory, collections RLS policy, favorites RLS policy, nde_chat_logs RLS policy (+24 more)
+Nodes (34): Database Migrations Workflow, add_search_logs migration example, supabase db push (CI/CD), supabase db reset, supabase/migrations/ directory, collections RLS policy, favorites RLS policy, nde_chat_logs RLS policy (+26 more)
 
 ### Community 181 - "snapshot"
 Cohesion: 0.12
@@ -1459,8 +1455,8 @@ Cohesion: 0.12
 Nodes (15): videos_per_tick, jobs, uap-scanner-process, name, on, workflow_dispatch, name, run (+7 more)
 
 ### Community 184 - "quote.ts"
-Cohesion: 0.13
-Nodes (23): nameRunIndexes(), selfIntroducerBefore(), ParseContext, alignTimestamp(), MIN_QUOTE_TOKENS, normalize(), NormalizedTranscript, prepareTranscript() (+15 more)
+Cohesion: 0.19
+Nodes (17): checkExtraction(), nameInQuote(), nameRunIndexes(), selfIntroducerBefore(), ParseContext, alignTimestamp(), MIN_QUOTE_TOKENS, normalize() (+9 more)
 
 ### Community 185 - "UAP theme: disclosure, secrecy and insti"
 Cohesion: 0.22
@@ -1495,36 +1491,36 @@ Cohesion: 0.20
 Nodes (11): Category: Why We're Here (6), Contradiction: Pre-Birth Planning vs Flexible Plan and Mistakes, Questions Nobody Has Asked Yet, Gap: Aftermath on Marriage, Job and Faith, Gap: Combat NDEs (18 profiles), Gap: Deathbed Visions vs Returner Reports, Gap: Accounts That Disagree With the Consensus (188 low-score profiles), Gap: Free Will Inside Pre-Birth Planning (+3 more)
 
 ### Community 193 - "app/blog/[slug]/page.tsx"
-Cohesion: 0.18
-Nodes (14): BlogPost, BlogPostPage(), CATEGORY_COLORS, generateMetadata(), getPost(), Ref, REF_TYPE_LABEL, revalidate (+6 more)
+Cohesion: 0.10
+Nodes (26): BlogPost, BlogPostPage(), CATEGORY_COLORS, generateMetadata(), getPost(), Ref, REF_TYPE_LABEL, revalidate (+18 more)
 
 ### Community 194 - "experience/registry.ts"
-Cohesion: 0.25
-Nodes (11): ParallaxTarget, usePointerParallax(), phaseRegistry, RendererProps, CanvasPhase(), CanvasPhaseProps, MemoryPhaseProps, ScenePhase() (+3 more)
-
-### Community 195 - "globe-graph.tsx"
 Cohesion: 0.22
-Nodes (8): CRAFT_LABELS, ENTITY_LABELS, GlobeData, GlobePoint, HYNEK_COLORS, HYNEK_LABELS, GeographyPage(), GlobeGraph
+Nodes (13): ParallaxTarget, usePointerParallax(), phaseRegistry, RendererProps, CanvasPhase(), CanvasPhaseProps, MemoryPhase(), MemoryPhaseProps (+5 more)
+
+### Community 195 - "scanner/route.ts"
+Cohesion: 0.20
+Nodes (15): EXCLUDED_VIDEOS, main(), supabase, GET(), getAdminSupabase(), normalizeNdeErrorPattern(), POST(), GET() (+7 more)
 
 ### Community 196 - "Channel Focus Chart (4-Axis Diamond)"
 Cohesion: 0.36
 Nodes (10): Channel Focus Chart (4-Axis Diamond), Channel Personality Code (3-letter), Channel Scoring System, Encounter Score (depth + impact ratio), Intelligence Value Axis (Y-axis, 0-100), Research Score (intelligence + credibility ratio), Speaker Credibility Axis (X-axis composite), uap_encounters table (evidence/contact depth/transformation scores) (+2 more)
 
-### Community 197 - "emails.ts"
-Cohesion: 0.35
-Nodes (15): expireOldIntros(), respondToIntro(), siteUrl(), button(), channelInviteEmail(), Email, escapeHtml(), introAcceptedEmail() (+7 more)
+### Community 197 - "channels.ts"
+Cohesion: 0.09
+Nodes (49): dynamic, JoinPage(), metadata, REASONS, Shell(), ChannelOption, createInvite(), db() (+41 more)
 
 ### Community 198 - "recharts"
-Cohesion: 0.33
-Nodes (9): metadata, UsagePage(), BreakdownTable(), COLORS, fetchUsage(), fmtUsd(), StatCard(), UsageDashboard() (+1 more)
+Cohesion: 0.18
+Nodes (13): metadata, UsagePage(), BreakdownTable(), COLORS, fetchUsage(), fmtUsd(), StatCard(), UsageDashboard() (+5 more)
 
 ### Community 199 - "uapStats"
-Cohesion: 0.26
-Nodes (20): band(), channelStats(), Counter, crossStats(), crosstabTable(), distTable(), histBands(), mean() (+12 more)
+Cohesion: 0.23
+Nodes (22): band(), Counter, crossStats(), crosstabTable(), decade(), distTable(), groupMeans(), histBands() (+14 more)
 
-### Community 200 - "flags.ts"
-Cohesion: 0.21
-Nodes (14): AnswerRecord, AnswerLite, CONFIDENCE_THRESHOLD, DisputeEntry, DisputeInput, FinalStatus, isFlagged(), isOk() (+6 more)
+### Community 200 - "search.ts"
+Cohesion: 0.18
+Nodes (17): clipText(), fetchCaseRows(), momentFrom(), passesFilters(), CANDIDATE_MOMENTS, EMBED_MODEL, groupByVideo(), Grouped (+9 more)
 
 ### Community 201 - "NDE experiencer profiles (2,820)"
 Cohesion: 0.18
@@ -1539,24 +1535,24 @@ Cohesion: 0.20
 Nodes (14): UAP book direction 4: The Body as Archive, UAP book direction 7: Missing Time, UAP book direction 12: The Negative Case, UAP theme: evidence disputes, skepticism and conventional explanations, UAP theme: historical cases and archival reconstruction, UAP theme: implants and monitoring devices, UAP theme: research, commentary and mediated formats, UAP narrative atlas (8,394 videos, 7,017 encounters) (+6 more)
 
 ### Community 204 - "EmailCrmClient.tsx"
-Cohesion: 0.13
-Nodes (14): CrmStats, EmailCrmClient(), handleBroadcast(), loadCampaigns(), FREQ_LABELS, Lead, NEWSLETTER_ENTRIES, StatCard() (+6 more)
+Cohesion: 0.15
+Nodes (12): CrmStats, EmailCrmClient(), handleBroadcast(), loadCampaigns(), FREQ_LABELS, Lead, NEWSLETTER_ENTRIES, StatCard() (+4 more)
 
 ### Community 205 - "Appendix: What the Corpus Already Says About Itself"
 Cohesion: 0.24
 Nodes (11): Appendix: What the Corpus Already Says About Itself, Blog Inventory (231 posts, 797,523 words), blog_posts Table (231 published), Hynek Encounter Classification (CE4 most common), 81 NDE Big-Question Posts, nde_questions Table (81 rows), scratch/corpus-atlas Pulls (2026-09-08), uap_daily_facts Table (30 rows) (+3 more)
 
 ### Community 206 - "Query"
-Cohesion: 0.12
-Nodes (3): FakeDb, getPath(), Query
+Cohesion: 0.07
+Nodes (19): @anthropic-ai/sdk, FakeAnthropic, FakeBatchRequest, FakeDb, getPath(), message(), Query, Responder (+11 more)
 
 ### Community 207 - "experience/types.ts"
 Cohesion: 0.19
 Nodes (11): ExperienceMeta, ForegroundLayer, MemoryCard, NarrativePosition, PhaseType, TransitionFn, TransitionType, ContentWarning() (+3 more)
 
 ### Community 208 - "@supabase/ssr"
-Cohesion: 0.25
-Nodes (10): @supabase/ssr@^0.7.0, @supabase/ssr, checkAdmin(), deleteUser(), getSupabase(), toggleBanUser(), updateUserRole(), AdminUsersPage() (+2 more)
+Cohesion: 0.11
+Nodes (19): @supabase/ssr@^0.7.0, @supabase/ssr, checkAdmin(), deleteUser(), getSupabase(), toggleBanUser(), updateUserRole(), AdminSidebar() (+11 more)
 
 ### Community 209 - "greyson.ts"
 Cohesion: 0.16
@@ -1567,8 +1563,8 @@ Cohesion: 0.18
 Nodes (11): UAP Program Mega-Analysis Proposal, Consciousness Interface (consciousness-assisted technology), Five Core Extraction Domains (Network, Geography, Technology, Psi, Cover-up), Hitchhiker Effect, Pass 1: Network & Geography Extractor, Pass 2: Tech & Psi Extractor, Pass 3: Evidence & Secrecy Extractor, Secrecy Knowledge Graph (+3 more)
 
 ### Community 211 - "admin/share/actions.ts"
-Cohesion: 0.13
-Nodes (30): adminDeleteAction(), createInviteAction(), fail(), releaseHeldAction(), resendInviteAction(), Result, retryProcessingAction(), revokeInviteAction() (+22 more)
+Cohesion: 0.17
+Nodes (22): adminDeleteAction(), createInviteAction(), fail(), releaseHeldAction(), resendInviteAction(), Result, retryProcessingAction(), revokeInviteAction() (+14 more)
 
 ### Community 212 - "generate-penny-audio.mjs"
 Cohesion: 0.19
@@ -1578,9 +1574,9 @@ Nodes (9): env, envContent, envPath, generateSFX(), generateTTS(), AMBIENT_LOOPS
 Cohesion: 0.32
 Nodes (13): NDE book direction 3: Evidence at the Ceiling (vivid is not veridical), Cross-domain direction 7: Proof by Slipper, Proof by Radar, NDE tension: vividness versus evidential rating, NDE theme: evidential or veridical perception, UAP theme: physical traces, bodily effects and instrument corroboration, UAP tension: instruments and traces versus consciousness and testimony, 0anEeY30Zig: Betty Hill abduction interview (archive max evidence 26, contact depth 32), 911eSfXSrIA: Evidence of the Afterlife, five medically verified NDE cases (Veridical 27) (+5 more)
 
-### Community 214 - "Book 1: You Do Not Have to Die to Know Me"
-Cohesion: 0.07
-Nodes (26): David Parker after-death communication, Amber Cavanagh clip: not even a millisecond, Batch digests (six-section format), corpus-atlas CLI tools, gpt-5.6-luna model (gpt-4o-mini fallback), match_uap_chatbot_chunks RPC, merge-digests.mjs (level-1 merge), nde_chatbot_match RPC (nde_chatbot_chunks) (+18 more)
+### Community 214 - "retrieve.mjs (pgvector semantic search)"
+Cohesion: 0.12
+Nodes (13): Batch digests (six-section format), corpus-atlas CLI tools, gpt-5.6-luna model (gpt-4o-mini fallback), match_uap_chatbot_chunks RPC, merge-digests.mjs (level-1 merge), nde_chatbot_match RPC (nde_chatbot_chunks), NODE_USE_ENV_PROXY=1 requirement, retrieve.mjs (pgvector semantic search) (+5 more)
 
 ### Community 215 - "uap-contactee-dedup.ts"
 Cohesion: 0.27
@@ -1591,20 +1587,20 @@ Cohesion: 0.19
 Nodes (8): ALL_LISTS, FREQ_OPTIONS, ListState, Shell(), UnsubscribeContent(), handleEmailLookup(), mergeSubscriptions(), UnsubscribePage()
 
 ### Community 217 - "hasValidCronSecret"
-Cohesion: 0.07
-Nodes (45): maxDuration, POST(), dynamic, maxDuration, POST(), GET(), handleDiscover(), POST() (+37 more)
+Cohesion: 0.10
+Nodes (27): dynamic, maxDuration, POST(), GET(), handleTick(), POST(), dynamic, GET() (+19 more)
 
 ### Community 218 - "Sprint V1: Foundation + NDE Element Netw"
 Cohesion: 0.21
 Nodes (11): VIZ-SPRINT: 3D Visualization System, /api/viz/nde-elements route, /api/viz/uap-timeline route, react-force-graph-3d + three, Shared Viz Components (VizPageShell, VizLegend, VizNodeTooltip), Sprint V1: Foundation + NDE Element Network, Sprint V7: UAP Timeline Helix, Sprint V8: Unified Similarity Space (UMAP) - planned (+3 more)
 
 ### Community 219 - "cron/route.ts"
-Cohesion: 0.10
-Nodes (27): @react-email/render, POST(), adminClient(), computeNextSend(), GET(), GET(), getServiceClient(), dynamic (+19 more)
+Cohesion: 0.15
+Nodes (20): @react-email/components, @react-email/render, adminClient(), computeNextSend(), GET(), dynamic, GET(), revalidate (+12 more)
 
-### Community 220 - "main"
-Cohesion: 0.29
-Nodes (10): batchCost(), collectResults(), main(), usd(), buildKnowledgeParams(), extractUapKnowledge(), failedExtractionRowUpdate(), getAnthropic() (+2 more)
+### Community 220 - "extractUapKnowledge"
+Cohesion: 0.50
+Nodes (4): buildKnowledgeParams(), extractUapKnowledge(), getAnthropic(), parseKnowledgeMessage()
 
 ### Community 221 - "send-emails"
 Cohesion: 0.17
@@ -1619,12 +1615,12 @@ Cohesion: 0.17
 Nodes (11): jobs, maintenance, name, runs-on, steps, timeout-minutes, name, on (+3 more)
 
 ### Community 224 - "openai"
-Cohesion: 0.09
-Nodes (25): { createClient }, { OpenAI }, supabase, openai, supabase, openai, ChatChunk, createChatChunks() (+17 more)
+Cohesion: 0.11
+Nodes (22): { createClient }, { OpenAI }, supabase, openai, ChatChunk, createChatChunks(), main(), main() (+14 more)
 
-### Community 225 - "lucide-react"
-Cohesion: 0.03
-Nodes (45): lucide-react, BlogEditPage(), BlogPost, FieldBlock(), AdminUserQuestionsPage(), formatDate(), UserQuestion, formatDuration() (+37 more)
+### Community 225 - "next"
+Cohesion: 0.02
+Nodes (58): nextConfig, lucide-react, next, ContactForm(), AboutNewPage(), metadata, PLATFORM_FEATURES, RESEARCH_DOMAINS (+50 more)
 
 ### Community 226 - ""node_modules/@supabase/supabase-js/node (2)"
 Cohesion: 0.20
@@ -1635,12 +1631,12 @@ Cohesion: 0.17
 Nodes (11): compilerOptions, baseUrl, esModuleInterop, module, moduleResolution, outDir, paths, sourceMap (+3 more)
 
 ### Community 228 - "wrapAiClient"
-Cohesion: 0.09
-Nodes (35): ClassificationResult, classifyExperience(), getOpenAIClient(), generateNdeSummary(), getOpenAIClient(), NDE_SUMMARY_PROMPT, NdeSummaryResult, containsWords() (+27 more)
+Cohesion: 0.08
+Nodes (40): ClassificationResult, classifyExperience(), getOpenAIClient(), analyzeCvndeScore(), classifyCvndeScore(), CVNDE_ANALYSIS_PROMPT, CvndeAnalysisResult, CvndeCriteria (+32 more)
 
-### Community 229 - "uap/blog/[slug]/page.tsx"
-Cohesion: 0.20
-Nodes (11): BlogPost, CATEGORY_COLORS, generateMetadata(), getPost(), Ref, REF_TYPE_LABEL, revalidate, UapBlogPostPage() (+3 more)
+### Community 229 - "app/uap/channels/page.tsx"
+Cohesion: 0.17
+Nodes (14): buildClient(), buildUrl(), ChannelStat, formatCompact(), metadata, revalidate, SORT_OPTIONS, SortValue (+6 more)
 
 ### Community 230 - "Tom Wood (Founder, Project Profound)"
 Cohesion: 0.12
@@ -1652,23 +1648,23 @@ Nodes (18): 10. Risks, 11. Decisions on the v0.2 open questions (2026-11-09), 1.
 
 ### Community 232 - "uap-reanalyze-all.ts"
 Cohesion: 0.07
-Nodes (49): main(), supabase, TRIAL_IDS, main(), VIDEO_IDS, main(), supabase, VideoRow (+41 more)
+Nodes (65): main(), supabase, TRIAL_IDS, main(), VIDEO_IDS, analyzeOneVideo(), main(), processVideo() (+57 more)
 
 ### Community 233 - "analyzeUapPhenomenology (src/lib/ai/uap-phenomenology.ts)"
-Cohesion: 0.22
-Nodes (10): Channel Archetypes (Primary/Secondary/Tertiary), Channel Personality Code (I/E, D/B, A/N), Channel Scorecard (4-axis radar + letter grade), Encounter Diversity Index (Shannon), TriadScoresPanel component, UAP-CDS Contact Depth Scale, UAP-CET Contact Experience Triad, uap_channel_scores (Intelligence Value, Speaker Credibility) (+2 more)
+Cohesion: 0.47
+Nodes (5): TriadScoresPanel component, UAP-CDS Contact Depth Scale, UAP-CET Contact Experience Triad, UAP-CTI Contact Transformation Index, UAP-ESS Evidence Strength Scale
 
-### Community 234 - "hynek-space-graph.tsx"
-Cohesion: 0.20
-Nodes (10): three, EncounterPoint, ENTITY_LABELS, HYNEK_COLORS, HYNEK_HEX, HYNEK_LABELS, HynekCluster, HynekData (+2 more)
+### Community 234 - "journey-flow.ts"
+Cohesion: 0.16
+Nodes (14): dynamic, GET(), maxDuration, supabase, analyzeJourneyFlow(), ELEMENT_SYNONYMS, getOpenAIClient(), JOURNEY_FLOW_PROMPT (+6 more)
 
 ### Community 235 - "scripts"
 Cohesion: 0.17
 Nodes (12): scripts, build, dev, lint, postbuild, start, test, test:book-tally (+4 more)
 
-### Community 236 - "verify_clips.py clip verification"
-Cohesion: 0.22
-Nodes (9): Clip verification table (14 of 14 PASS), Channel permission requests, nde_vids.raw_timestamped_subtitles, TOPICS.md (video topic list), verify_clips.py clip verification, Project Profound /video/[id] route, who-meets-you-clips.csv, Who Meets You When You Die (production script) (+1 more)
+### Community 236 - "AllTypesClient.tsx"
+Cohesion: 0.18
+Nodes (12): email(), AllTypesPage(), metadata, handleSubmit(), accentMap, AllTypesClient(), ArchetypeCard(), handleSubmit() (+4 more)
 
 ### Community 237 - "uap-generate-facts.mjs"
 Cohesion: 0.25
@@ -1691,24 +1687,24 @@ Cohesion: 0.25
 Nodes (7): "node_modules/@supabase/supabase-js/node_modules/@supabase/auth-js/dist/main/lib/fetch.js"(), handleError2(), _handleRequest2(), hasSession(), _request(), _sessionResponse(), _sessionResponsePassword()
 
 ### Community 242 - "intake.ts"
-Cohesion: 0.08
-Nodes (35): main(), parseArgs(), main(), EXCLUDED_VIDEOS, main(), supabase, GET(), getAdminSupabase() (+27 more)
+Cohesion: 0.10
+Nodes (26): main(), parseArgs(), main(), GET(), handleDiscoverAll(), POST(), GET(), handleDiscover() (+18 more)
 
 ### Community 243 - "config.ts"
-Cohesion: 0.10
-Nodes (34): acceptConductAction(), fail(), member(), requestIntroAction(), Result, ConductPage(), dynamic, metadata (+26 more)
+Cohesion: 0.13
+Nodes (22): acceptConductAction(), fail(), member(), requestIntroAction(), Result, ConductPage(), dynamic, metadata (+14 more)
 
-### Community 244 - "[series]/page.tsx"
-Cohesion: 0.25
-Nodes (6): BlogPost, BlogSeriesPage(), CATEGORY_COLORS, CATEGORY_LABELS, PostCard(), revalidate
+### Community 244 - "ContentDNA.tsx"
+Cohesion: 0.19
+Nodes (13): BUCKET_LABELS, CONTENT_COLORS, CONTENT_LABELS, ContentDNAData, ContentDNASection(), ContentEvolutionArc(), ContentEvolutionProps, ContentTimeline() (+5 more)
 
 ### Community 245 - "shortmaker-research.test.ts"
 Cohesion: 0.11
 Nodes (16): CaseResponseSchema, CountsResponseSchema, ExperiencersResponseSchema, SearchResponseSchema, ANALYSES, AUTH, builder(), b (+8 more)
 
-### Community 246 - "channel-constellation-graph.tsx"
-Cohesion: 0.20
-Nodes (8): ARCHETYPE_COLORS, ARCHETYPE_HEX, Channel, ConstellationData, ChannelConstellationGraph, ChannelConstellationPage(), VizLoadingState(), VizPageShellProps
+### Community 246 - "Book 1: You Do Not Have to Die to Know Me"
+Cohesion: 0.21
+Nodes (12): Amber Cavanagh clip: not even a millisecond, Book 1 Sections, Round 2 (v1 and v2), Book 1 Title Options and Marketing Titles, Book 1 Working Doc (topic map), Book 1: You Do Not Have to Die to Know Me, Content Sources Google Drive Index, Google Drive connector (read_file_content, search_files parentId), NDE-ANALYSIS-FRAMEWORK.md (Drive doc) (+4 more)
 
 ### Community 247 - "uap-event-backfill.ts"
 Cohesion: 0.31
@@ -1723,8 +1719,8 @@ Cohesion: 0.22
 Nodes (6): DomainConfig / getDomainConfig (src/lib/config/domains.ts), NDE -> UAP Term Map, NDE Vertical (Reference Implementation), SPRINT: UAP Vertical for Project Profound, analyzeUapPhenomenology (src/lib/ai/uap-phenomenology.ts), NDE phenomenology-entities.ts (copy-modify source)
 
 ### Community 250 - "shortmaker/types.ts"
-Cohesion: 0.05
-Nodes (44): cache, clearCountsCache(), countArchive(), fmt(), monthYear(), PageQuery, readAllPages(), chunks() (+36 more)
+Cohesion: 0.06
+Nodes (37): cache, clearCountsCache(), countArchive(), fmt(), monthYear(), PageQuery, readAllPages(), CaseFilters (+29 more)
 
 ### Community 251 - "scanner-discover.yml"
 Cohesion: 0.20
@@ -1734,9 +1730,9 @@ Nodes (9): jobs, scanner-discover, name, on, workflow_dispatch, runs-on, steps, 
 Cohesion: 0.20
 Nodes (9): jobs, uap-scanner-discover, name, on, workflow_dispatch, name, run, runs-on (+1 more)
 
-### Community 253 - "uap-phenomenology-graph.tsx"
-Cohesion: 0.21
-Nodes (9): UapPhenomenologyGraph, UapPhenomenologyPage(), CATEGORIES, DEFAULT_ENABLED, GraphData, PhenomEdge, PhenomNode, TooltipData (+1 more)
+### Community 253 - "resend.ts"
+Cohesion: 0.24
+Nodes (10): GET(), getServiceClient(), EMAIL_FROM, EMAIL_REPLY_TO, rawResend, FeedbackDigestEmail(), FeedbackDigestEmailProps, FeedbackEntry (+2 more)
 
 ### Community 254 - "Book-tally pipeline — design spec (lead-authored; agents implement against this)"
 Cohesion: 0.11
@@ -1744,7 +1740,7 @@ Nodes (16): 1. Data, 2. Models and settings, 3. Job 1: who is the same person?, 
 
 ### Community 255 - "greeter_stats.py (read-only PostgREST stats)"
 Cohesion: 0.11
-Nodes (16): Anita Moorjani (father: go back), Confirmed NDE set (isNde = clear_nde, 6,454 videos), Deceased-relative encounters (1,972 videos), greeter_stats.py (read-only PostgREST stats), Kerr et al. (2014) end-of-life dreams and visions, Motion graphics briefs (GFX-0 to GFX-9), nde_analysis.entities encounters (entity_type, identity, emotional_quality), aggregate.mjs (offline stats) (+8 more)
+Nodes (18): Confirmed NDE set (isNde = clear_nde, 6,454 videos), Clip verification table (14 of 14 PASS), Deceased-relative encounters (1,972 videos), greeter_stats.py (read-only PostgREST stats), Kerr et al. (2014) end-of-life dreams and visions, Motion graphics briefs (GFX-0 to GFX-9), nde_analysis.entities encounters (entity_type, identity, emotional_quality), Channel permission requests (+10 more)
 
 ### Community 256 - "[id]/route.tsx"
 Cohesion: 0.47
@@ -1775,8 +1771,8 @@ Cohesion: 0.29
 Nodes (9): AXES, ChannelFocusChart(), ChannelFocusChartProps, ChannelFocusData, formatRatio(), getFocusLabel(), getPoint(), GRID_STEPS (+1 more)
 
 ### Community 263 - "app/layout.tsx"
-Cohesion: 0.05
-Nodes (38): ContactForm(), AboutNewPage(), metadata, PLATFORM_FEATURES, RESEARCH_DOMAINS, VALUES, dynamic, metadata (+30 more)
+Cohesion: 0.07
+Nodes (28): dynamic, metadata, RootLayout(), ChatPopup(), DOMAIN_CONFIG, DomainKey, Message, NDE_QUESTIONS (+20 more)
 
 ### Community 264 - "env (6)"
 Cohesion: 0.22
@@ -1798,33 +1794,33 @@ Nodes (8): 1. Database (shared staging/production database: these ARE production
 Cohesion: 0.25
 Nodes (9): UAP book direction 9: The Ocean Below the Sky, UAP book direction 8: The Witness Ladder, UAP theme: multi-witness and mass sightings, UAP theme: military, aviation and official witnesses, UAP theme: stigma, credibility and psychological aftermath, UAP tension: advanced yet fallible; the failure of force, UAP tension: mass witnessing versus private revelation, UAP theme: underwater objects and transmedium craft (+1 more)
 
-### Community 269 - "research/methodology/page.tsx"
-Cohesion: 0.36
-Nodes (8): CautionBox(), InfoCard(), metadata, MethodologyPage(), Prose(), SectionHeading(), SubHeading(), TOC_SECTIONS
+### Community 269 - "serializeJsonLd"
+Cohesion: 0.05
+Nodes (49): AuthorData, AuthorPage(), AUTHORS, buildClient(), dynamic, CautionBox(), InfoCard(), metadata (+41 more)
 
 ### Community 270 - "NDE Experience Engine"
-Cohesion: 0.17
-Nodes (11): 988 / findahelpline crisis line, Experience asset pipeline (image, audio, TTS), Experience content warning gate (988 link), ExperienceShell orchestrator, gsap, @gsap/react, howler dependencies, NDE Experience App Development Plan, NDE Experience Engine, Penny anaphylaxis demo (Through the Void) (+3 more)
+Cohesion: 0.09
+Nodes (19): Anita Moorjani (father: go back), 988 / findahelpline crisis line, David Parker after-death communication, Experience asset pipeline (image, audio, TTS), Experience content warning gate (988 link), ExperienceShell orchestrator, gsap, @gsap/react, howler dependencies, NDE Experience App Development Plan (+11 more)
 
-### Community 271 - "app/uap/blog/page.tsx"
+### Community 271 - "UapPhenomenologyResult (complete output schema)"
+Cohesion: 0.27
+Nodes (10): Argus UFO AI Data (NUFORC reports), Epic 6.2 Research Breakdown UI (UapResearchBreakdown, UapEncounterContextCard), Craft Observation Schema, Emotional Progression (phase-mapped), UAP Encounter Flow (7 Phases), The Five Observables (AATIP), Physical & Environmental Effects (4 categories), UAP Sensory Channels (9 Modalities) (+2 more)
+
+### Community 272 - "uap_channel_scores (Intelligence Value, Speaker Credibility)"
 Cohesion: 0.25
-Nodes (8): BlogPost, CATEGORIES, CATEGORY_COLORS, CATEGORY_LABELS, metadata, PostCard(), revalidate, UapBlogIndexPage()
-
-### Community 272 - "about/[slug]/page.tsx"
-Cohesion: 0.29
-Nodes (5): AuthorData, AuthorPage(), AUTHORS, buildClient(), dynamic
+Nodes (8): Channel Archetypes (Primary/Secondary/Tertiary), Channel Personality Code (I/E, D/B, A/N), Channel Scorecard (4-axis radar + letter grade), Encounter Diversity Index (Shannon), uap_channel_scores (Intelligence Value, Speaker Credibility), Video Explore Filter Sidebar (UapFilterSidebar, uap_explore_facets), Video Tone Backfill (technical debt), Hynek Classification (CE1-CE5)
 
 ### Community 273 - "TriadScoresPanel.tsx"
 Cohesion: 0.18
 Nodes (18): ContactDepthBreakdown, CriterionDetail, CriterionGrid(), EvidenceBreakdown, formatCriterionLabel(), getContactCategories(), getContactLevel(), getContactTotalScore() (+10 more)
 
 ### Community 274 - "quiz-lead/route.ts"
-Cohesion: 0.13
-Nodes (24): adminClient(), GET(), POST(), PostSchema, POST(), POST(), addToNewsletter(), alreadyExists() (+16 more)
+Cohesion: 0.17
+Nodes (18): adminClient(), GET(), POST(), PostSchema, POST(), POST(), addToNewsletter(), alreadyExists() (+10 more)
 
-### Community 275 - "sanitizeMarkdownLinks"
+### Community 275 - "ChannelRankingsBox.tsx"
 Cohesion: 0.39
-Nodes (5): APPLY, main(), sanitizeMarkdownLinks(), findContentDamage(), gatePublishStatus()
+Nodes (7): ChannelRankingsBox(), ChannelRankingsBoxProps, ChannelRankingsData, formatCadence(), formatRatio(), formatViewsPerVideo(), getRankBadge()
 
 ### Community 276 - "seed-questions-bulk.ts"
 Cohesion: 0.25
@@ -1855,8 +1851,8 @@ Cohesion: 0.29
 Nodes (8): createTable(), createTableIfNotExists(), dropTable(), listTables(), loadTable(), namespaceToPath2(), tableExists(), updateTable()
 
 ### Community 283 - "Database Functions"
-Cohesion: 0.13
-Nodes (16): Channel Archetype Classification, Channel Rankings and Badge Tiers, Diversity Index (Shannon), uap_vids (content_type, engagement), clean_subtitles() / clean_subtitle_data(), Database Functions, get_all_subtitles_text(), get_unanalyzed_greyson_videos() (+8 more)
+Cohesion: 0.15
+Nodes (14): Channel Archetype Classification, Channel Rankings and Badge Tiers, Diversity Index (Shannon), uap_vids (content_type, engagement), clean_subtitles() / clean_subtitle_data(), Database Functions, get_all_subtitles_text(), match_nde_moments_semantic() (+6 more)
 
 ### Community 284 - ""node_modules/@supabase/supabase-js/node (5)"
 Cohesion: 0.46
@@ -1874,9 +1870,9 @@ Nodes (6): NdeScannerQueuePage(), normalizeError(), QueueItem, QueueResponse, ST
 Cohesion: 0.29
 Nodes (7): IntakePage(), IntakeResult, IntakeStep, JobRecord, resultBadge, StepStatusIcon(), TERMINAL_STATUSES
 
-### Community 288 - "methodology/transformation/page.tsx"
+### Community 288 - "matcher.ts"
 Cohesion: 0.25
-Nodes (7): ADAPTED_DOMAINS, metadata, SCORE_LEVELS, SCORING_ANCHORS, SHARED_DOMAINS, TransformationPage(), UAP_DOMAINS
+Nodes (4): ARCHETYPE_FILTERS, ARCHETYPE_ORDER, ArchetypeFilter, MatchedVideo
 
 ### Community 289 - "blog-generate.ts"
 Cohesion: 0.25
@@ -1884,7 +1880,7 @@ Nodes (5): CesDashboardPage(), DashboardRow, FeedbackRow, getServiceClient(), Pa
 
 ### Community 290 - "draft"
 Cohesion: 0.14
-Nodes (13): name, runs-on, steps, timeout-minutes, jobs, draft, name, on (+5 more)
+Nodes (13): jobs, send, name, on, schedule, workflow_dispatch, cron, name (+5 more)
 
 ### Community 291 - "uap/intake/page.tsx"
 Cohesion: 0.33
@@ -1894,33 +1890,33 @@ Nodes (6): IntakeResult, IntakeStep, JobRecord, resultBadge, StepStatusIcon(), U
 Cohesion: 0.25
 Nodes (4): Domain, DOMAIN_CONFIGS, DomainConfig, UapTrack
 
-### Community 293 - "NDE Compassionate Chatbot (/chat-compassionate)"
-Cohesion: 0.57
-Nodes (7): DELETE(), GET(), getAdminClient(), PATCH(), POST(), PUT(), requireAdmin()
+### Community 293 - "transcript-processor.ts"
+Cohesion: 0.36
+Nodes (7): CaptionSegment, ChatChunk, createChatChunks(), createSearchChunks(), ProcessedTranscripts, processTranscripts(), SearchChunk
 
-### Community 294 - "uap/questions/page.tsx"
-Cohesion: 0.29
-Nodes (3): AdminUapQuestionsPage(), CATEGORY_COLORS, UapQuestion
+### Community 294 - "extract.ts"
+Cohesion: 0.38
+Nodes (4): MAX_TEXT_CHARS, assertMagic(), extractText(), normalizeExtracted()
 
 ### Community 295 - "export-review.ts"
-Cohesion: 0.06
-Nodes (79): linkKey(), main(), OPTIONS, Deps, finishRun(), gitSha(), helpText(), isDirectRun() (+71 more)
+Cohesion: 0.08
+Nodes (43): cell(), parseCsv(), parseCsvRows(), ParsedCsv, toCsv(), ToCsvOptions, RFC-4180, youtubeUrl() (+35 more)
 
 ### Community 296 - "env (7)"
 Cohesion: 0.29
 Nodes (6): env, value, variable, runConfig, maxInstances, minInstances
 
 ### Community 297 - "rate-limit.ts"
-Cohesion: 0.11
-Nodes (22): getOpenAIClient(), getServiceClient(), POST(), RATE_LIMIT, ChatSource, getUapChatResponse(), RATE_LIMIT, UapChatResponse (+14 more)
+Cohesion: 0.15
+Nodes (15): ChatSource, getUapChatResponse(), RATE_LIMIT, UapChatResponse, ChatSource, Message, UapChatUI(), metadata (+7 more)
 
 ### Community 298 - "wf-discover.mjs"
 Cohesion: 0.29
 Nodes (6): all, extra, inventory, meta, PLACE_SCHEMA, REGIONS
 
-### Community 299 - "user-questions/route.ts"
-Cohesion: 0.29
-Nodes (5): GET(), getAdminSupabase(), dynamic, GET(), supabase
+### Community 299 - "uap-test-pipeline.ts"
+Cohesion: 0.43
+Nodes (6): clearVideoData(), getSupabase(), main(), runVideo(), TEST_VIDEOS, TestVideo
 
 ### Community 300 - "Top 25: Multiple-NDE Experiencers (summa"
 Cohesion: 0.33
@@ -1940,15 +1936,15 @@ Nodes (24): addIssueToContext(), datetimeRegex(), floatSafeRemainder(), _getCach
 
 ### Community 304 - "uap-encounter-context.ts"
 Cohesion: 0.13
-Nodes (24): main(), supabase, cleanText(), ConnectedCasesList(), isStated(), LocationCard(), MilitaryCard(), UapEncounterContextCard() (+16 more)
+Nodes (23): main(), supabase, cleanText(), ConnectedCasesList(), isStated(), LocationCard(), MilitaryCard(), UapEncounterContextCard() (+15 more)
 
-### Community 305 - "visualize/page.tsx"
+### Community 305 - "viz-compute-uap-phenomenology.ts"
 Cohesion: 0.33
-Nodes (6): domainColors, NDE_VISUALIZATIONS, UAP_VISUALIZATIONS, VisualizePage(), VizCard, VizCardGrid()
+Nodes (6): CATEGORY_COLORS, extractTags(), LABEL_MAP, main(), PhenomBreakdown, sb
 
 ### Community 306 - "wrapAiClient"
-Cohesion: 0.10
-Nodes (30): dynamic, ipRequestMap, isRateLimited(), POST(), supabase, checkAutoGenRateLimit(), deduplicateByVideo(), dynamic (+22 more)
+Cohesion: 0.09
+Nodes (30): Academic researcher voice, Questions Synthesis Prompt v1 (Academic Researcher, archived), JSON output (shortAnswer + 3 paragraphs), Malcolm Gladwell as best friend voice (8th-grade level), anthropic/claude-sonnet-4-5 via OpenRouter (temp 0.7), Questions Synthesis Prompt v2 (Compassionate Friend, active), JSON output (shortAnswer + 3 paragraphs), dynamic (+22 more)
 
 ### Community 307 - "00-dump-corpus.mjs"
 Cohesion: 0.22
@@ -1963,12 +1959,16 @@ Cohesion: 0.29
 Nodes (8): download(), get(), getBucket(), _getFinalPath(), getPublicUrl(), info(), listBuckets(), transformOptsToQueryString()
 
 ### Community 310 - "zod"
-Cohesion: 0.29
-Nodes (10): getServiceClient(), PATCH(), PatchSchema, POST(), PostSchema, RATE_LIMIT, h, makeReq() (+2 more)
+Cohesion: 0.26
+Nodes (11): zod, getServiceClient(), PATCH(), PatchSchema, POST(), PostSchema, RATE_LIMIT, h (+3 more)
 
 ### Community 311 - "people/[slug]/page.tsx"
 Cohesion: 0.33
 Nodes (9): buildClient(), generateMetadata(), generateStaticParams(), getPersonData(), PersonMention, PersonPage(), revalidate, toSlug() (+1 more)
+
+### Community 312 - "robots.ts"
+Cohesion: 0.67
+Nodes (3): robots(), AI_BOTS, shouldNoindex()
 
 ### Community 313 - "LLM error characteristics (inflation, interviewer confusion, paraphrased quotes)"
 Cohesion: 0.29
@@ -1982,41 +1982,41 @@ Nodes (5): AUDIT_SCHEMA, BATCHES, flat, meta, summary
 Cohesion: 0.08
 Nodes (20): counts, headCounts, INTRO, introRe, lines, ROOT, STOP, dir (+12 more)
 
-### Community 316 - "job1/schema.ts"
-Cohesion: 0.53
-Nodes (5): Parsed, SUPPORTED, typeMatches(), typeOf(), validateAgainstSchema()
+### Community 316 - "job1-decisions.test.ts"
+Cohesion: 0.24
+Nodes (8): CandidateRow, JudgmentRow, Verdict, Parsed, SUPPORTED, typeMatches(), typeOf(), validateAgainstSchema()
 
 ### Community 317 - "search3/route.ts"
 Cohesion: 0.50
 Nodes (7): fetchFacets(), getOpenAIClient(), getSupabaseClient(), handleKeywordSearch(), handleSemanticSearch(), POST(), RATE_LIMIT
 
-### Community 318 - "admin/scanner/page.tsx"
-Cohesion: 0.40
-Nodes (5): AggregateStats, Channel, QueueStats, ScannerAdminPage(), StatCard()
+### Community 318 - "broadcast/route.ts"
+Cohesion: 0.47
+Nodes (4): POST(), BroadcastEmail(), BroadcastEmailProps, styles
 
-### Community 319 - "experiencer/[id]/route.ts"
-Cohesion: 0.60
-Nodes (4): DELETE(), EDITABLE_FIELDS, getServiceClient(), PUT()
+### Community 319 - "Queue Priority System (priority, source_type, source_id)"
+Cohesion: 0.50
+Nodes (4): Keyword-Monitored Channels (uap_keyword_monitors), Queue Priority System (priority, source_type, source_id), Playlist Support (uap_playlists, uap-playlist-discover.ts), uap_scan_queue table
 
-### Community 320 - "channel/[id]/route.ts"
-Cohesion: 0.70
-Nodes (4): buildClient(), escapeXml(), formatCount(), GET()
+### Community 320 - "entity-summaries.ts"
+Cohesion: 0.83
+Nodes (3): generateEntitySummary(), generateMissingSummariesForVideo(), getVideoTitlesForEntity()
 
 ### Community 321 - "uap/experiencer/page.tsx"
-Cohesion: 0.12
-Nodes (22): buildUrl(), getLastName(), metadata, revalidate, SORT_OPTIONS, SortValue, UapExperiencerPage(), generateMetadata() (+14 more)
+Cohesion: 0.10
+Nodes (31): buildUrl(), getLastName(), metadata, revalidate, SORT_OPTIONS, SortValue, UapExperiencerPage(), ContacteeProfilePage() (+23 more)
 
 ### Community 322 - "Oracle Crontab Schedule"
-Cohesion: 0.38
-Nodes (7): Authentication Flow, /admin/* route protection, User roles (user, admin, super_admin) in profiles, isAdminUser() admin guard, Architecture Map (as actually wired), src/proxy.ts middleware (session refresh, admin gate), proxy.ts session persistence (no middleware.ts)
+Cohesion: 0.21
+Nodes (11): Authentication Flow, /admin/* route protection, User roles (user, admin, super_admin) in profiles, Oracle VM Worker (profound-worker), pg_cron SQL-only jobs (VACUUM, MV refresh), Pre-Computed Data layers (uap_channel_stats_mv, uap_channel_scores, uap_canonical_*), Oracle VM deploy (git pull main + pm2 restart), isAdminUser() admin guard (+3 more)
 
 ### Community 324 - "Shareable OG Stats Card & SVG Badge"
 Cohesion: 0.40
 Nodes (5): Claim Your Channel Flow (deferred), Automated Daily Fact Card (uap_daily_facts), Shareable OG Stats Card & SVG Badge, Backlog: Revenue & Growth Strategy, SEO Infrastructure: Dynamic OG Images & Structured Data
 
 ### Community 325 - "Advisory AI Review Integration"
-Cohesion: 0.60
-Nodes (5): Advisory AI Review Integration, Consciousness & Cognition Alteration Framework, Ontological Shock Rating, The Oz Factor (Jenny Randles), Screen Memory
+Cohesion: 0.47
+Nodes (6): Advisory AI Review Integration, Consciousness & Cognition Alteration Framework, Entity interaction_type enum, Ontological Shock Rating, The Oz Factor (Jenny Randles), Screen Memory
 
 ### Community 326 - "snip.mjs"
 Cohesion: 0.18
@@ -2038,10 +2038,6 @@ Nodes (5): getNextPage(), getPaginatedItems(), hasNextPage(), maybeObj(), nextPa
 Cohesion: 0.50
 Nodes (3): "node_modules/@supabase/supabase-js/node_modules/@supabase/auth-js/dist/main/lib/web3/ethereum.js"(), createSiweMessage(), getAddress()
 
-### Community 333 - "AdminSidebar.tsx"
-Cohesion: 0.32
-Nodes (6): AdminSidebar(), NavItem, NavSection, NDE_NAV, UAP_NAV, AdminLayout()
-
 ### Community 334 - "Gap: Veridical Evidence (127 profiles with avg_veridical_score >= 20)"
 Cohesion: 0.20
 Nodes (9): Category: Will I Still Be Me? (6), Gap: Do NDErs and Contactees Describe the Same Beings, Gap: No Personal Questions Asked of the UAP Corpus, Gap: Veridical Evidence (127 profiles with avg_veridical_score >= 20), Misrouted UAP Slugs Answered by NDE Engine (u68-u71, u86-u91), Four NDE Guides (evidence-focused), Pam Reynolds Case, 35 UAP Big-Question Posts (institutional only) (+1 more)
@@ -2050,57 +2046,33 @@ Nodes (9): Category: Will I Still Be Me? (6), Gap: Do NDErs and Contactees Descr
 Cohesion: 0.33
 Nodes (6): normalizeError(), QueueItem, QueueResponse, STATUS_TABS, statusColor, UapScannerQueuePage()
 
-### Community 337 - "nde_analysis table"
-Cohesion: 0.13
-Nodes (18): nde_vids and nde_analysis RLS policy (public read, admin write), nde_analysis table, ChannelAnalysisSummary, CoreElementsGrid, EntityEncounters, ExpandableDescription, ExperienceBadges, GreysonScoreCard (+10 more)
+### Community 337 - "Video Page (video/[id]/page.tsx)"
+Cohesion: 0.33
+Nodes (6): GreysonScoreCard, TransformationScoreCard, Video Page (video/[id]/page.tsx), /video/[id], Greyson NDE Scale, Greyson NDE Scale (structural parallel)
 
 ### Community 338 - "Category 3: Consciousness Alteration"
 Cohesion: 0.20
 Nodes (10): CD-3a Altered State, CD-3b Transportation, CD-3c Time Distortion, CD-4a Cosmic Knowledge, CD-4b Ontological Shock, CD-4c Emotional Overwhelm, CD-4d Pattern / Recurrence, Category 3: Consciousness Alteration (+2 more)
 
 ### Community 339 - "package.json"
-Cohesion: 0.08
-Nodes (23): clsx@^2.1.1, @google-analytics/data@^5.2.1, @gsap/react@^2.1.2, @radix-ui/react-avatar@^1.1.3, @radix-ui/react-dropdown-menu@^2.1.6, @radix-ui/react-menubar@^1.1.6, react-day-picker@^9.12.0, @tailwindcss/typography@^0.5.19 (+15 more)
+Cohesion: 0.09
+Nodes (21): next-themes@^0.4.6, patch-package@^8.0.1, @radix-ui/react-dropdown-menu@^2.1.6, @radix-ui/react-label@^2.1.2, @radix-ui/react-tabs@^1.1.3, react-dom@^19.2.3, @supabase/auth-ui-shared@^0.1.8, @tailwindcss/typography@^0.5.19 (+13 more)
 
 ### Community 340 - "State Management"
-Cohesion: 0.20
-Nodes (6): ChannelCard, ChannelSearch, SiteHeader, /channels, Auth State (Supabase Auth Helpers), State Management
-
-### Community 342 - "Questions Synthesis Prompt v1 (Academic Researcher, archived)"
-Cohesion: 0.31
-Nodes (7): Academic researcher voice, Questions Synthesis Prompt v1 (Academic Researcher, archived), JSON output (shortAnswer + 3 paragraphs), Malcolm Gladwell as best friend voice (8th-grade level), anthropic/claude-sonnet-4-5 via OpenRouter (temp 0.7), Questions Synthesis Prompt v2 (Compassionate Friend, active), JSON output (shortAnswer + 3 paragraphs)
+Cohesion: 0.14
+Nodes (9): ChannelAnalysisSummary, ChannelCard, ChannelSearch, ExpandableDescription, SimilarExperiences (pgvector), SiteHeader, /channel/[channelId], Auth State (Supabase Auth Helpers) (+1 more)
 
 ### Community 343 - "Project Profound"
 Cohesion: 0.50
 Nodes (3): Hard problem of consciousness, Project Profound Methodology Summary, Project Profound
 
-### Community 349 - "templates/page.tsx"
-Cohesion: 0.22
-Nodes (5): ARCHETYPE_ENTRIES, EmailTemplatesPage(), EXTRA_TEMPLATES, SEED_PROFILES, Template
-
 ### Community 352 - "SearchResultCard"
 Cohesion: 0.67
 Nodes (3): AddToCollectionButton, FavoriteButton, SearchResultCard
 
-### Community 355 - "profiles/page.tsx"
-Cohesion: 0.29
-Nodes (6): ARCHETYPE_ENTRIES, EmailProfilesPage(), handleRestoreDefault(), update(), ProfileData, SEED_PROFILES
-
 ### Community 359 - "uap/search/route.ts"
 Cohesion: 0.50
 Nodes (7): fetchFacets(), getOpenAIClient(), getSupabaseClient(), handleKeywordSearch(), handleSemanticSearch(), POST(), RATE_LIMIT
-
-### Community 364 - "logo-preview/page.tsx"
-Cohesion: 0.60
-Nodes (5): LogoPreviewPage(), PreviewFooter(), PreviewHeader(), PreviewMobileHeader(), PreviewMobileSheet()
-
-### Community 365 - "resources/page.tsx"
-Cohesion: 0.53
-Nodes (5): BookCard(), metadata, ResourceCard(), ResourcesPage(), SectionHeader()
-
-### Community 367 - "enrich-channels.ts"
-Cohesion: 0.50
-Nodes (4): fetchYouTubeChannels(), main(), supabase, YouTubeChannel
 
 ## Ambiguous Edges - Review These
 - `The Other Side NDE (channel)` → `Carrie Kohan`  [AMBIGUOUS]
@@ -2124,22 +2096,22 @@ Nodes (4): fetchYouTubeChannels(), main(), supabase, YouTubeChannel
 
 ## Knowledge Gaps
 - **334 isolated node(s):** `RFC-6749`, `RFC-4180`, `RFC-4180`, `RFC-4180`, `Barbara Bartolome` (+329 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 3096 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 3087 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **66 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `@supabase/supabase-js` connect `Search Result Cards & Buttons` to `UAP Entity Detail Pages`, `lucide-react`, `extract-names.ts`, `uap-batch-triad.ts`, `Admin Blog Generation`, `[handle]/page.tsx`, `UAP Knowledge-Base Directories`, `build-case.ts`, `ref_path`, `weekly-draft/route.ts`, `uap-reanalyze-batch.mjs`, `archetypes.ts`, `batch.ts`, `uap-blog-article.ts`, `dotenv`, `intake-uap.ts`, `quiz-lead/route.ts`, `blog-story.ts`, `app/page.tsx`, `blog-article.ts`, `experiencer-profile.ts`, `questions/[slug]/page.tsx`, `isAdminUser`, `pipeline/presentation-stats.ts`, `entity-sync.ts`, `dependencies`, `nde-batch-analysis.ts`, `stats.ts`, `isDebugBypass`, `pricing.ts`, `checkRateLimit`, `dashboard/page.tsx`, `phenomenology-entities.ts`, `logQuota`, `getBudgetStatus`, `operations/route.ts`, `cross-domain-data.ts`, `unified-site-header.tsx`, `next`, `compute-channel-scores.ts`, `components.tsx`, `job1-extract.test.ts`, `rapid-process.ts`, `rebuild-viz-caches.ts`, `uap-knowledge-batch.ts`, `uap-search-result-card.tsx`, `ChannelUniverseMap.tsx`, `normalize-entities.ts`, `generate-penny-audio.ts`, `blog-image.ts`, `bulk-generate-contactee-profiles.ts`, `uap/video/[id]/page.tsx`, `isShareEnabled`, `uap-build-canonical-persons.mjs`, `cross-domain/page.tsx`, `dotenv`, `batch.ts`, `app/experiencer/[slug]/page.tsx`, `app/blog/[slug]/page.tsx`, `greyson.ts`, `uap-contactee-dedup.ts`, `hasValidCronSecret`, `cron/route.ts`, `openai`, `lucide-react`, `wrapAiClient`, `uap/blog/[slug]/page.tsx`, `uap-reanalyze-all.ts`, `uap-generate-facts.mjs`, `intake.ts`, `[series]/page.tsx`, `uap-event-backfill.ts`, `shortmaker/types.ts`, `[id]/route.tsx`, `buildFingerprint`, `generate-entity-summaries/route.ts`, `chat-compassionate/route.ts`, `about/[slug]/page.tsx`, `quiz-lead/route.ts`, `sanitizeMarkdownLinks`, `seed-questions-bulk.ts`, `uap-generate-facts.mjs`, `blog-generate.ts`, `NDE Compassionate Chatbot (/chat-compassionate)`, `rate-limit.ts`, `user-questions/route.ts`, `uap-encounter-context.ts`, `wrapAiClient`, `00-dump-corpus.mjs`, `zod`, `people/[slug]/page.tsx`, `search3/route.ts`, `experiencer/[id]/route.ts`, `channel/[id]/route.ts`, `uap/experiencer/page.tsx`, `package.json`, `uap/search/route.ts`, `enrich-channels.ts`?**
-  _High betweenness centrality (0.185) - this node is a cross-community bridge._
+- **Why does `next` connect `next` to `shadcn UI Primitives`, `Search Result Cards & Buttons`, `my-experiences/[id]/page.tsx`, `app/video/[id]/page.tsx`, `createClient`, `EvidenceStrengthCard.tsx`, `UAP Entity Detail Pages`, `contacts.ts`, `app/video-explore/page.tsx`, `home-v2/page.tsx`, `Admin Blog Generation`, `UAP Video Explorer`, `[handle]/page.tsx`, `UAP Knowledge-Base Directories`, `weekly-draft/route.ts`, `archetypes.ts`, `ExplorerControls.tsx`, `uap-blog-article.ts`, `UAP Program Intelligence`, `quiz-lead/route.ts`, `app/page.tsx`, `blog-article.ts`, `experiencer-profile.ts`, `questions/[slug]/page.tsx`, `shortmaker-research.test.ts`, `isAdminUser`, `pipeline/presentation-stats.ts`, `[category]/page.tsx`, `dependencies`, `nde-batch-analysis.ts`, `stats.ts`, `isDebugBypass`, `app/share/actions.ts`, `@supabase/ssr`, `checkRateLimit`, `react`, `phenomenology-entities.ts`, `logQuota`, `pauseGate`, `app/channels/page.tsx`, `app/questions/page.tsx`, `operations/route.ts`, `unified-site-header.tsx`, `@supabase/supabase-js`, `compute-channel-scores.ts`, `components.tsx`, `app/experiencer/page.tsx`, `MusicVideoBanner.tsx`, `uap-timeline-graph.tsx`, `rebuild-viz-caches.ts`, `EncounterTaxonomy.tsx`, `ChannelUniverseMap.tsx`, `normalize-entities.ts`, `isShareEnabled`, `uap/video/[id]/page.tsx`, `use-toast.ts`, `experience/[slug]/page.tsx`, `admin/uap/blog/page.tsx`, `isShareEnabled`, `cross-domain/page.tsx`, `[channelId]/page.tsx`, `app/experiencer/[slug]/page.tsx`, `app/blog/[slug]/page.tsx`, `scanner/route.ts`, `channels.ts`, `recharts`, `EmailCrmClient.tsx`, `experience/types.ts`, `@supabase/ssr`, `greyson.ts`, `admin/share/actions.ts`, `unsubscribe/page.tsx`, `hasValidCronSecret`, `cron/route.ts`, `wrapAiClient`, `app/uap/channels/page.tsx`, `uap-reanalyze-all.ts`, `journey-flow.ts`, `AllTypesClient.tsx`, `uap-generate-facts.mjs`, `intake.ts`, `config.ts`, `shortmaker-research.test.ts`, `resend.ts`, `[id]/route.tsx`, `buildFingerprint`, `analytics-dashboard.tsx`, `generate-entity-summaries/route.ts`, `ChannelScorecard.tsx`, `app/layout.tsx`, `chat-compassionate/route.ts`, `serializeJsonLd`, `TriadScoresPanel.tsx`, `quiz-lead/route.ts`, `ces-feedback-widget.tsx`, `blog-generate.ts`, `rate-limit.ts`, `wrapAiClient`, `zod`, `people/[slug]/page.tsx`, `robots.ts`, `search3/route.ts`, `broadcast/route.ts`, `uap/experiencer/page.tsx`, `agreement/page.tsx`, `package.json`, `uap/search/route.ts`?**
+  _High betweenness centrality (0.210) - this node is a cross-community bridge._
 - **What connects `RFC-6749`, `RFC-4180`, `RFC-4180` to the rest of the system?**
   _334 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Bundled Phenomenology Batch Script` be split into smaller, more focused modules?**
   _Cohesion score 0.00952914798206278 - nodes in this community are weakly interconnected._
-- **Why does `next` connect `next` to `shadcn UI Primitives`, `Search Result Cards & Buttons`, `app/video/[id]/page.tsx`, `app/blog/page.tsx`, `EvidenceStrengthCard.tsx`, `UAP Entity Detail Pages`, `contacts.ts`, `app/video-explore/page.tsx`, `lucide-react`, `Admin Blog Generation`, `UAP Video Explorer`, `[handle]/page.tsx`, `UAP Knowledge-Base Directories`, `weekly-draft/route.ts`, `archetypes.ts`, `ExplorerControls.tsx`, `uap-blog-article.ts`, `quiz-lead/route.ts`, `app/page.tsx`, `experiencer-profile.ts`, `questions/[slug]/page.tsx`, `shortmaker-research.test.ts`, `isAdminUser`, `pipeline/presentation-stats.ts`, `[category]/page.tsx`, `dependencies`, `nde-batch-analysis.ts`, `stats.ts`, `isDebugBypass`, `app/share/actions.ts`, `@supabase/ssr`, `checkRateLimit`, `dashboard/page.tsx`, `phenomenology-entities.ts`, `logQuota`, `getBudgetStatus`, `app/channels/page.tsx`, `app/questions/page.tsx`, `operations/route.ts`, `unified-site-header.tsx`, `compute-channel-scores.ts`, `components.tsx`, `afterlife-map.tsx`, `MusicVideoBanner.tsx`, `uap-intelligence-graph.tsx`, `rebuild-viz-caches.ts`, `uap-search-result-card.tsx`, `ChannelUniverseMap.tsx`, `normalize-entities.ts`, `config.ts`, `uap/video/[id]/page.tsx`, `experience/[slug]/page.tsx`, `uap-timeline-graph.tsx`, `isShareEnabled`, `cross-domain/page.tsx`, `[channelId]/page.tsx`, `app/experiencer/[slug]/page.tsx`, `app/blog/[slug]/page.tsx`, `globe-graph.tsx`, `EmailCrmClient.tsx`, `experience/types.ts`, `@supabase/ssr`, `greyson.ts`, `admin/share/actions.ts`, `unsubscribe/page.tsx`, `hasValidCronSecret`, `cron/route.ts`, `lucide-react`, `wrapAiClient`, `uap/blog/[slug]/page.tsx`, `uap-reanalyze-all.ts`, `hynek-space-graph.tsx`, `uap-generate-facts.mjs`, `intake.ts`, `config.ts`, `[series]/page.tsx`, `shortmaker-research.test.ts`, `channel-constellation-graph.tsx`, `uap-phenomenology-graph.tsx`, `[id]/route.tsx`, `buildFingerprint`, `analytics-dashboard.tsx`, `generate-entity-summaries/route.ts`, `ChannelScorecard.tsx`, `app/layout.tsx`, `chat-compassionate/route.ts`, `research/methodology/page.tsx`, `app/uap/blog/page.tsx`, `about/[slug]/page.tsx`, `TriadScoresPanel.tsx`, `quiz-lead/route.ts`, `ces-feedback-widget.tsx`, `methodology/transformation/page.tsx`, `blog-generate.ts`, `NDE Compassionate Chatbot (/chat-compassionate)`, `uap/questions/page.tsx`, `rate-limit.ts`, `user-questions/route.ts`, `visualize/page.tsx`, `wrapAiClient`, `zod`, `people/[slug]/page.tsx`, `search3/route.ts`, `admin/scanner/page.tsx`, `experiencer/[id]/route.ts`, `channel/[id]/route.ts`, `uap/experiencer/page.tsx`, `AdminSidebar.tsx`, `package.json`, `uap/search/route.ts`, `logo-preview/page.tsx`, `resources/page.tsx`?**
-  _High betweenness centrality (0.185) - this node is a cross-community bridge._
+- **Why does `@supabase/supabase-js` connect `@supabase/supabase-js` to `shadcn UI Primitives`, `Search Result Cards & Buttons`, `my-experiences/[id]/page.tsx`, `createClient`, `UAP Entity Detail Pages`, `extract-names.ts`, `uap-batch-triad.ts`, `Admin Blog Generation`, `[handle]/page.tsx`, `UAP Knowledge-Base Directories`, `build-case.ts`, `ref_path`, `weekly-draft/route.ts`, `uap-reanalyze-batch.mjs`, `uap-blog-article.ts`, `dotenv`, `classify-uap.ts`, `quiz-lead/route.ts`, `blog-story.ts`, `app/page.tsx`, `blog-article.ts`, `experiencer-profile.ts`, `questions/[slug]/page.tsx`, `isAdminUser`, `pipeline/presentation-stats.ts`, `entity-sync.ts`, `dependencies`, `nde-batch-analysis.ts`, `stats.ts`, `isDebugBypass`, `pricing.ts`, `checkRateLimit`, `supabase.ts`, `react`, `phenomenology-entities.ts`, `logQuota`, `pauseGate`, `operations/route.ts`, `cross-domain-data.ts`, `unified-site-header.tsx`, `compute-channel-scores.ts`, `components.tsx`, `ref_path`, `rapid-process.ts`, `rebuild-viz-caches.ts`, `uap-knowledge-batch.ts`, `ChannelUniverseMap.tsx`, `normalize-entities.ts`, `generate-penny-audio.ts`, `blog-image.ts`, `bulk-generate-contactee-profiles.ts`, `uap/video/[id]/page.tsx`, `use-toast.ts`, `admin/uap/blog/page.tsx`, `uap-build-canonical-persons.mjs`, `cross-domain/page.tsx`, `dotenv`, `batch.ts`, `app/experiencer/[slug]/page.tsx`, `app/blog/[slug]/page.tsx`, `scanner/route.ts`, `recharts`, `search.ts`, `greyson.ts`, `uap-contactee-dedup.ts`, `hasValidCronSecret`, `cron/route.ts`, `openai`, `next`, `wrapAiClient`, `app/uap/channels/page.tsx`, `uap-reanalyze-all.ts`, `journey-flow.ts`, `uap-generate-facts.mjs`, `intake.ts`, `uap-event-backfill.ts`, `shortmaker/types.ts`, `resend.ts`, `[id]/route.tsx`, `buildFingerprint`, `generate-entity-summaries/route.ts`, `chat-compassionate/route.ts`, `serializeJsonLd`, `quiz-lead/route.ts`, `seed-questions-bulk.ts`, `uap-generate-facts.mjs`, `matcher.ts`, `blog-generate.ts`, `rate-limit.ts`, `uap-test-pipeline.ts`, `uap-encounter-context.ts`, `viz-compute-uap-phenomenology.ts`, `wrapAiClient`, `00-dump-corpus.mjs`, `zod`, `people/[slug]/page.tsx`, `search3/route.ts`, `broadcast/route.ts`, `entity-summaries.ts`, `uap/experiencer/page.tsx`, `package.json`, `uap/search/route.ts`?**
+  _High betweenness centrality (0.200) - this node is a cross-community bridge._
 - **Should `shadcn UI Primitives` be split into smaller, more focused modules?**
-  _Cohesion score 0.03897019925938988 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.03165245782695447 - nodes in this community are weakly interconnected._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
