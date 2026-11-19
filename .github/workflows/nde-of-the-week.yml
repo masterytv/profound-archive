@@ -1,7 +1,8 @@
-name: NDE of the Week (newsletter draft)
+name: Weekly newsletter drafts
 
-# Makes the weekly newsletter as a Resend broadcast DRAFT (src/app/api/email/weekly-draft/route.ts). Nothing is
-# sent to subscribers: Tom reads the draft in Resend and presses Send. Thursdays 13:17 UTC (8:17 am EST, 9:17 am
+# Makes the two weekly newsletters as Resend broadcast DRAFTS (src/app/api/email/weekly-draft/route.ts): "NDE of the
+# Week" for Project Profound and "Soul Wisdom Video of the Week". Nothing is sent to subscribers: Tom reads each
+# draft in Resend and presses Send. Thursdays 13:17 UTC (8:17 am EST, 9:17 am
 # EDT). Run by hand from the Actions tab to make this week's draft now; a second run the same day does nothing.
 
 on:
@@ -11,7 +12,7 @@ on:
 
 jobs:
   draft:
-    name: Make the weekly draft
+    name: Make the weekly drafts
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isAdminUser } from "@/lib/auth/admin-guard";
 import { z } from "zod";
-import { addToNewsletter, emailForms, isNewsletterList, NEWSLETTER_LISTS, unsubscribeFromNewsletter } from "@/lib/email/audience";
+import { addToNewsletter, emailForms, isNewsletterList, listsOf, NEWSLETTER_OF, removeFromNewsletter } from "@/lib/email/audience";
 
 // POST request shape (S-12).
 const PostSchema = z.object({
@@ -130,21 +130,22 @@ export async function POST(req: NextRequest) {
     })
   );
 
-  // Keep the newsletter's copy in Resend in step (src/lib/email/audience.ts): off when no newsletter list is left
-  // on for this address, on when one was turned on. Best-effort: PP's own table above is what counts.
-  if (updates.some((u) => isNewsletterList(u.archetype))) {
+  // Keep each newsletter's copy in Resend in step (src/lib/email/audience.ts): in its segment while one of its lists
+  // is on for this address, out of it when none is. Best-effort: PP's own table above is what counts.
+  const touched = new Set(updates.flatMap((u) => (isNewsletterList(u.archetype) ? [NEWSLETTER_OF[u.archetype]] : [])));
+  for (const newsletter of touched) {
     try {
       const { data: stillOn } = await supabase
         .from("quiz_leads")
         .select("id")
         .in("email", emailForms(email))
-        .in("archetype", [...NEWSLETTER_LISTS])
+        .in("archetype", listsOf(newsletter))
         .eq("is_active", true)
         .limit(1);
-      if (stillOn?.length) await addToNewsletter(email);
-      else await unsubscribeFromNewsletter(email);
+      if (stillOn?.length) await addToNewsletter(email, newsletter);
+      else await removeFromNewsletter(email, newsletter);
     } catch (e) {
-      console.error("[manage-subs] Resend newsletter sync failed:", e instanceof Error ? e.message : e);
+      console.error(`[manage-subs] Resend ${newsletter} sync failed:`, e instanceof Error ? e.message : e);
     }
   }
 

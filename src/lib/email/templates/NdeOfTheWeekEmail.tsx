@@ -1,5 +1,6 @@
 // src/lib/email/templates/NdeOfTheWeekEmail.tsx
-// The weekly "NDE of the Week" newsletter (src/lib/email/weekly.ts), sent by Tom as a Resend broadcast. Resend fills
+// Project Profound's weekly "NDE of the Week" (src/lib/email/weekly.ts), sent by Tom as a Resend broadcast to PP's
+// sign-ups. The Soul Wisdom Collective podcast gets one line (Tom, 2026-11-19: one email per site). Resend fills
 // {{{RESEND_UNSUBSCRIBE_URL}}} for each person; an unsubscribe there switches off PP's lists too
 // (/api/email/resend-webhook).
 
@@ -8,17 +9,17 @@ import {
   Img, Link, Preview, Section, Text, Hr,
 } from "@react-email/components";
 import * as React from "react";
-import type { WeeklyContent } from "@/lib/email/weekly";
+import type { PpWeekly } from "@/lib/email/weekly";
 import { firstParagraph, PODCAST_LINKS, sentences, tagged } from "@/lib/email/weekly";
 
 interface Props {
-  content: WeeklyContent;
+  content: PpWeekly;
   /** The UTM campaign: the broadcast's name. */
   campaign: string;
 }
 
 export function NdeOfTheWeekEmail({ content, campaign }: Props) {
-  const { short, story, episode } = content;
+  const { short, story } = content;
   return (
     <Html lang="en">
       <Head />
@@ -53,26 +54,18 @@ export function NdeOfTheWeekEmail({ content, campaign }: Props) {
             </Section>
           )}
 
-          {episode && (
-            <Section style={styles.section}>
-              <Text style={styles.label}>New on the Soul Wisdom Collective podcast</Text>
-              <Heading as="h2" style={styles.subheading}>{episode.title}</Heading>
-              {firstParagraph(episode.description) && <Text style={styles.paragraph}>{firstParagraph(episode.description)}</Text>}
-              <Text style={styles.paragraph}>
-                Listen on <Link href={PODCAST_LINKS.apple} style={styles.link}>Apple Podcasts</Link> or{" "}
-                <Link href={PODCAST_LINKS.spotify} style={styles.link}>Spotify</Link>, or watch at{" "}
-                <Link href={tagged("https://soulwisdomcollective.com", campaign)} style={styles.link}>soulwisdomcollective.com</Link>.
-              </Text>
-            </Section>
-          )}
-
           <Hr style={{ borderColor: "#e2e8f0", margin: "8px 0 24px" }} />
           <Text style={styles.paragraph}>
             Search thousands of near-death experiences at{" "}
             <Link href={tagged("https://projectprofound.org", campaign)} style={styles.link}>projectprofound.org</Link>.
           </Text>
+          <Text style={styles.paragraph}>
+            Prefer to listen? Tom&apos;s podcast, Soul Wisdom Collective, has the full conversations: on{" "}
+            <Link href={PODCAST_LINKS.apple} style={styles.link}>Apple Podcasts</Link> and{" "}
+            <Link href={PODCAST_LINKS.spotify} style={styles.link}>Spotify</Link>.
+          </Text>
           <Text style={styles.footer}>
-            You&apos;re receiving this because you subscribed at projectprofound.org or soulwisdomcollective.com.{" "}
+            You&apos;re receiving this because you subscribed at projectprofound.org.{" "}
             <Link href="{{{RESEND_UNSUBSCRIBE_URL}}}" style={{ color: "#94a3b8" }}>Unsubscribe</Link>
           </Text>
         </Container>
