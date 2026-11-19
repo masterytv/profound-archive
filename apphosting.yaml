@@ -86,18 +86,21 @@ env:
   # Verified sending domain (mail.projectprofound.org verified in Resend)
   - variable: RESEND_FROM
     value: "Project Profound <noreply@mail.projectprofound.org>"
-  # The two weekly newsletters on Resend (src/lib/email/audience.ts, /api/email/weekly-draft,
-  # /api/email/resend-webhook). Segment IDs are not secret (Resend → Audience → Segments, created 2026-11-19).
+  # NDE of the Week on Resend (src/lib/email/audience.ts, /api/email/weekly-draft, /api/email/resend-webhook).
+  # The segment ID is not secret (Resend → Audience → Segments, created 2026-11-19). Soul Wisdom's newsletter is
+  # the soulwisdomnetwork repo's own (Tom, 2026-11-19).
   - variable: RESEND_SEGMENT_ID          # "NDE of the Week": Project Profound sign-ups
     value: "619f67ad-9d05-47da-b78b-a5ecf21a9d91"
-  - variable: RESEND_SWC_SEGMENT_ID      # "Soul Wisdom Video of the Week": Soul Wisdom sign-ups
-    value: "facb9055-252b-4d18-b85a-ca79f2f35bf4"
+  # Set to "off" to stop Monday's automatic send: the job then makes a draft for Tom to send by hand.
+  - variable: NEWSLETTER_AUTOSEND
+    value: "on"
   # Signing secret of the Resend webhook (contact.updated → /api/email/resend-webhook), in Secret Manager since
   # 2026-11-19, readable by both backends.
   - variable: RESEND_WEBHOOK_SECRET
     secret: RESEND_WEBHOOK_SECRET
-  # Optional: NEWSLETTER_NOTIFY_EMAIL gets a "drafts ready" email each Thursday. This repo is public, so an
-  # address goes in as a secret (firebase apphosting:secrets:set NEWSLETTER_NOTIFY_EMAIL), not a value here:
+  # Monday's "scheduled, cancel here" email goes to PP's own inbox (EMAIL_REPLY_TO) unless NEWSLETTER_NOTIFY_EMAIL
+  # is set. This repo is public, so an address goes in as a secret
+  # (firebase apphosting:secrets:set NEWSLETTER_NOTIFY_EMAIL), not a value here:
   # - variable: NEWSLETTER_NOTIFY_EMAIL
   #   secret: NEWSLETTER_NOTIFY_EMAIL
 
