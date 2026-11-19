@@ -1,15 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import Script from "next/script"
 import {
-  getStoredConsent,
   CONSENT_KEY,
   CONSENT_VERSION,
   type CookiePreferences,
 } from "@/components/cookie-consent"
 import { CONSENT_REQUIRED_REGIONS } from "@/lib/consent/regions"
-import { fetchGeo } from "@/lib/consent/geo"
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * ConsentGatedScripts — Google Consent Mode v2 with geo-scoped defaults.
@@ -31,13 +29,12 @@ import { fetchGeo } from "@/lib/consent/geo"
  * - A previously saved banner choice is applied synchronously from
  *   localStorage BEFORE the first hit fires — no React timing races.
  *
- * ConvertKit (marketing) is not gtag-managed, so it uses /api/geo directly:
- * explicit consent wins; otherwise it defaults on only outside the
- * consent-required regions, and never against a GPC signal.
+ * The ConvertKit (Kit) script that used to load here under "marketing"
+ * consent was removed on 2026-11-18: the newsletter stays on Resend
+ * (marketing plan, Tom), so no marketing script loads at all.
  * ───────────────────────────────────────────────────────────────────────────── */
 
 const GA_MEASUREMENT_ID = "G-FLY0JWVM4X"
-const CONVERTKIT_ID = "893453eeff"
 
 declare global {
   interface Window {
@@ -46,33 +43,11 @@ declare global {
   }
 }
 
-/** Global Privacy Control — a browser-level opt-out signal we honor. */
-function hasGpcSignal(): boolean {
-  if (typeof navigator === "undefined") return false
-  return (
-    (navigator as Navigator & { globalPrivacyControl?: boolean })
-      .globalPrivacyControl === true
-  )
-}
-
 export default function ConsentGatedScripts() {
-  const [consent, setConsent] = useState<CookiePreferences | null>(null)
-  const [requiresConsent, setRequiresConsent] = useState<boolean | null>(null)
-
   useEffect(() => {
-    // Check on mount
-    setConsent(getStoredConsent())
-
-    // Where is this visitor? Only ConvertKit gating depends on this — GA's
-    // regional behavior is enforced by Consent Mode itself.
-    fetchGeo()
-      .then((geo) => setRequiresConsent(geo.requiresConsent))
-      .catch(() => setRequiresConsent(true)) // unknown → safest assumption
-
     // Listen for consent changes (from CookieConsent component)
     function handleUpdate(e: Event) {
       const detail = (e as CustomEvent).detail as CookiePreferences
-      setConsent(detail)
       // Forward the choice to Consent Mode immediately — this flips GA between
       // full measurement (cookies) and anonymous cookieless pings.
       window.gtag?.("consent", "update", {
@@ -82,13 +57,6 @@ export default function ConsentGatedScripts() {
     window.addEventListener("cookie-consent-update", handleUpdate)
     return () => window.removeEventListener("cookie-consent-update", handleUpdate)
   }, [])
-
-  // ConvertKit: explicit choice wins; no choice → default on only outside
-  // consent-required regions, and never against a GPC opt-out.
-  const loadConvertKit =
-    consent !== null
-      ? consent.marketing
-      : requiresConsent === false && !hasGpcSignal()
 
   return (
     <>
@@ -144,14 +112,6 @@ export default function ConsentGatedScripts() {
         });
       `}</Script>
 
-      {/* ── ConvertKit ── consent, or default-on outside EEA/UK */}
-      {loadConvertKit && (
-        <Script
-          strategy="lazyOnload"
-          data-uid={CONVERTKIT_ID}
-          src={`https://project-profound.kit.com/${CONVERTKIT_ID}/index.js`}
-        />
-      )}
     </>
   )
 }

@@ -22,6 +22,8 @@ import { sendFirstStory } from "@/lib/email/sendFirstStory";
 import { render } from "@react-email/render";
 import { checkRateLimit, isRateLimited, rateLimitResponse } from "@/lib/rate-limit";
 import { z } from "zod";
+import { addToNewsletter, isNewsletterList, NEWSLETTER_OF } from "@/lib/email/audience";
+import { corsHeaders } from "@/lib/email/cors";
 
 // Request shape (S-12). archetype stays a bounded string (compass archetypes,
 // newsletter_* lists, and admin test sends all flow through here).
@@ -48,7 +50,18 @@ function adminClient() {
   );
 }
 
+// The Soul Wisdom site's form posts here from another origin (src/lib/email/cors.ts).
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req.headers.get("origin")) });
+}
+
 export async function POST(req: NextRequest) {
+  const res = await handlePost(req);
+  for (const [k, v] of Object.entries(corsHeaders(req.headers.get("origin")))) res.headers.set(k, v);
+  return res;
+}
+
+async function handlePost(req: NextRequest): Promise<NextResponse> {
   const ipLimited = checkRateLimit(req, IP_LIMIT);
   if (ipLimited) return ipLimited;
 
@@ -64,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = adminClient();
-    const isNewsletter = archetype === "newsletter_nde" || archetype === "newsletter_uap";
+    const isNewsletter = isNewsletterList(archetype);
 
     if (isNewsletter) {
       // ── Newsletter: simple upsert, idempotent ──
@@ -84,6 +97,11 @@ export async function POST(req: NextRequest) {
 
       sendWelcomeEmail(upserted).catch(e =>
         console.error("[quiz-lead] welcome email failed:", e)
+      );
+      // The newsletter's copy in Resend, for the weekly broadcast (src/lib/email/audience.ts). After the save, and
+      // never able to fail the sign-up.
+      addToNewsletter(email, NEWSLETTER_OF[archetype as keyof typeof NEWSLETTER_OF]).catch(e =>
+        console.error("[quiz-lead] Resend newsletter contact failed:", e instanceof Error ? e.message : e)
       );
       return NextResponse.json({ ok: true });
     }
@@ -176,19 +194,23 @@ async function sendWelcomeEmail(lead: { email: string; archetype: string; unsubs
 
   const unsubscribeUrl = `https://projectprofound.org/unsubscribe?token=${lead.unsubscribe_token}`;
 
+  // Sign-ups from the Soul Wisdom Collective site get a welcome that says where they signed up, unless the
+  // admin email page has a "newsletter_swc_welcome" template.
+  const swc = lead.archetype === "newsletter_swc" ? SWC_WELCOME : null;
+
   const html = await render(
     WelcomeEmail({
-      introText:      tmpl?.intro_text ?? undefined,
-      ctaText:        tmpl?.cta_text   ?? undefined,
-      ctaHref:        tmpl?.cta_href   ?? undefined,
+      introText: tmpl?.intro_text ?? swc?.introText ?? undefined,
+      ctaText: tmpl?.cta_text ?? swc?.ctaText ?? undefined,
+      ctaHref: tmpl?.cta_href ?? swc?.ctaHref ?? undefined,
       unsubscribeUrl,
     })
   );
 
   const { error } = await resend.emails.send({
-    from:    EMAIL_FROM,
+    from:    swc?.from ?? EMAIL_FROM,
     to:      [lead.email],
-    subject: tmpl?.subject ?? "Welcome to Project Profound",
+    subject: tmpl?.subject ?? swc?.subject ?? "Welcome to Project Profound",
     html,
   });
 
@@ -198,3 +220,13 @@ async function sendWelcomeEmail(lead: { email: string; archetype: string; unsubs
     console.log(`[quiz-lead] Welcome email sent to ${lead.email}`);
   }
 }
+
+const SWC_WELCOME = {
+  from: "Soul Wisdom Collective <newsletter@soulwisdomcollective.com>",
+  subject: "Welcome to Soul Wisdom Video of the Week",
+  introText:
+    "Thank you for signing up on Soul Wisdom Collective. Once a week you'll get one email: the week's most-watched " +
+    "Soul Wisdom video and our newest podcast episode.",
+  ctaText: "Visit Soul Wisdom Collective",
+  ctaHref: "https://soulwisdomcollective.com",
+};
