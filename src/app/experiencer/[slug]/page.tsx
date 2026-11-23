@@ -120,8 +120,15 @@ export async function generateMetadata({
     return {
         title,
         description,
-        openGraph: { title, description, type: "profile", images: [`/api/og/experiencer?slug=${slug}`] },
-        twitter: { card: "summary_large_image", title, description },
+        // The size and type spelled out, so Facebook shows the picture the first time a link is shared rather than
+        // after it has fetched it once (its own advice for images it hasn't seen).
+        openGraph: {
+            title,
+            description,
+            type: "profile",
+            images: [{ url: `/api/og/experiencer?slug=${slug}`, width: 1200, height: 630, type: "image/png", alt: `${profile.full_name}'s near-death experience on Project Profound` }],
+        },
+        twitter: { card: "summary_large_image", title, description, images: [`/api/og/experiencer?slug=${slug}`] },
     };
 }
 
