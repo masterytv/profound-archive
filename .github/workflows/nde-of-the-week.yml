@@ -1,14 +1,16 @@
-name: NDE of the Week (Monday send)
+name: NDE of the Week (Monday send, made from Sunday)
 
 # Project Profound's weekly email (src/app/api/email/weekly-draft/route.ts). Tom, 2026-11-19: it sends itself every
-# Monday at 9:00 am Eastern. This run, at 11:23 UTC on Mondays (6:23 am EST, 7:23 am EDT), makes the Resend
-# broadcast scheduled for 9:00 am ET and emails Tom the link to cancel it before then. With the app's
-# NEWSLETTER_AUTOSEND=off it makes a draft instead. Run by hand from the Actions tab to do it now; a second run the
-# same day does nothing. Soul Wisdom's weekly email is the soulwisdomnetwork repo's own.
+# Monday at 9:00 am Eastern. The app makes the Resend broadcast, scheduled for Monday 9:00 am ET, on the first call
+# within 36 hours of it, and emails Tom the link to cancel it before then; earlier calls do nothing. Google Cloud
+# Scheduler calls it on Sunday evening (Tom, 2026-11-24: GitHub started this job hours late, then skipped it); this
+# workflow is the backup, on Sunday and Monday at 11:23 UTC (6:23 am EST, 7:23 am EDT), and a second call for the same
+# Monday does nothing. With the app's NEWSLETTER_AUTOSEND=off it makes a draft instead. Run by hand from the Actions
+# tab to do it now. Soul Wisdom's weekly email is the soulwisdomnetwork repo's own.
 
 on:
   schedule:
-    - cron: '23 11 * * 1'
+    - cron: '23 11 * * 0,1'
   workflow_dispatch: {}
 
 jobs:
