@@ -49,3 +49,8 @@ Rules:
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 - A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
+
+## Claude model ids
+Read the Claude model from the `CLAUDE_MODEL` env var (see `BLOG_CLAUDE_MODEL` in
+`src/lib/ai/claude.ts`); never hardcode a model id in app code. A model swap is then one env
+change in apphosting.yaml or the Firebase console, plus a price row in `src/lib/ai/pricing.ts`.
