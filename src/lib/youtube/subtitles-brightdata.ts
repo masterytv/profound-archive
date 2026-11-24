@@ -48,6 +48,8 @@ import { logQuota } from '@/lib/ai/usage-tracker';
 import type { CaptionFetchResult, CaptionSegment, CaptionFailureReason } from './subtitles';
 
 const DATASET_ID = 'gd_lk56epmy2i5g7lzu0k'; // Bright Data "YouTube Videos by URL"
+// Input option for the transcript track; the docs' example uses the full name.
+const TRANSCRIPTION_LANGUAGE = 'English';
 const BASE = 'https://api.brightdata.com/datasets/v3';
 const POLL_INTERVAL_MS = 20_000;
 // One attempt waits 8 min. Longer buys little: if the job outlives this
@@ -322,7 +324,13 @@ export async function fetchCaptionsBrightData(videoId: string): Promise<CaptionF
             {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify([{ url: videoUrl }]),
+                // Ask for the English track. YouTube auto-dubs mean a video can
+                // carry ar/es/hi/… tracks ahead of English (2026-11-20 incident).
+                // `transcription_language` is an INPUT field documented for this
+                // dataset (example value "English") — it is not the output-field
+                // selection the header warns about. The returned language is
+                // still verified by checkCaptionLanguage() in subtitles.ts.
+                body: JSON.stringify([{ url: videoUrl, transcription_language: TRANSCRIPTION_LANGUAGE }]),
             },
         );
         const body = await res.text();
