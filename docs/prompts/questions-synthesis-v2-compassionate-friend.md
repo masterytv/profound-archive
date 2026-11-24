@@ -44,6 +44,6 @@ Return ONLY a valid JSON object in this exact structure, no markdown wrapping:
 ```
 
 ## Notes
-- Temperature: 0.7
-- Model: `anthropic/claude-sonnet-4-5` via OpenRouter
+- Temperature: 0.7 (sent only to legacy models; Sonnet 5.5 rejects it and runs at its default)
+- Model: `CLAUDE_MODEL`, default `claude-sonnet-5-5`, via `claudeChat()` on the Anthropic API (was `anthropic/claude-sonnet-4-5` via OpenRouter)
 - Numbering: videos are passed as `[1] Video Title\n...` in the context, so Claude cites by number only.
