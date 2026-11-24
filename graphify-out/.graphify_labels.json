@@ -1,6 +1,5 @@
 {
   "0": "Bundled Phenomenology Batch Script",
-  "1": "shadcn UI Primitives",
   "2": "Search Result Cards & Buttons",
   "4": "Video Topic Research (TOPICS.md)",
   "9": "Corpus Atlas Stats Aggregation",
@@ -18,7 +17,6 @@
   "46": "blog-story.ts",
   "48": "blog-article.ts",
   "49": "Corpus atlas: statistical half",
-  "50": "subtitles-brightdata.ts",
   "51": "PRD UAP Route Architecture",
   "52": "_objectSpread22()",
   "53": "experiencer-profile.ts",
@@ -119,7 +117,6 @@
   "241": "\"node_modules/@supabase/supabase-js/node (4)",
   "251": "scanner-discover.yml",
   "252": "uap-scanner-discover.yml",
-  "262": "ChannelScorecard.tsx",
   "264": "env (6)",
   "268": "UAP book direction 8: The Witness Ladder",
   "278": "Cross-domain direction 3: The Clock and ",
