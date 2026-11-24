@@ -3,12 +3,15 @@
 // step 4), to the newsletter's segment (RESEND_SEGMENT_ID).
 //
 // Tom, 2026-11-19: it sends itself on Mondays at 9:00 am Eastern. So:
-//   - called by .github/workflows/nde-of-the-week.yml (CRON_SECRET) on Monday mornings, it makes the broadcast
-//     SCHEDULED for 9:00 am ET (sendTime), and emails Tom that it is scheduled, with the link to cancel it in
-//     Resend before then. With NEWSLETTER_AUTOSEND=off it makes a draft instead, for Tom to send by hand;
-//   - called by an admin (the "Make this week's draft now" button), it only ever makes a DRAFT.
+//   - called with CRON_SECRET (Google Cloud Scheduler on Sunday evening, and .github/workflows/nde-of-the-week.yml on
+//     Sunday and Monday as the backup; Tom 2026-11-24, after GitHub ran it late and then not at all), it makes the
+//     broadcast as soon as Monday's send is within 36 hours (nextSend), SCHEDULED for 9:00 am ET, and emails Tom that
+//     it is scheduled, with the link to cancel it in Resend before then. Earlier than that it does nothing
+//     ("not yet"). With NEWSLETTER_AUTOSEND=off it makes a draft instead, for Tom to send by hand;
+//   - called by an admin (the "Make this week's draft now" button), it only ever makes a DRAFT, under its own name,
+//     so it never stops the scheduled one.
 // Nothing is made when there is nothing to put in it (no Short this week and no story): Tom gets an alert instead.
-// One broadcast a day: a second call the same day returns the first ("skipped").
+// One broadcast per Monday: a second call for the same Monday returns the first ("skipped").
 // The alert goes to NEWSLETTER_NOTIFY_EMAIL, else to PP's own inbox (EMAIL_REPLY_TO); NEWSLETTER_FROM overrides
 // the sender.
 
@@ -20,7 +23,7 @@ import { isAdminUser } from "@/lib/auth/admin-guard";
 import { EMAIL_FROM, EMAIL_REPLY_TO, resend } from "@/lib/email/resend";
 import { newsletterSegmentId } from "@/lib/email/audience";
 import {
-  bestShortOfWeek, channelFeedUrl, parseChannelFeed, PP_CHANNEL_ID, ppWeekly, sendTime, weekName, type Story,
+  bestShortOfWeek, channelFeedUrl, nextSend, parseChannelFeed, PP_CHANNEL_ID, ppWeekly, weekName, type Story,
 } from "@/lib/email/weekly";
 import { NdeOfTheWeekEmail } from "@/lib/email/templates/NdeOfTheWeekEmail";
 import { STORY_POOL_SIZE, storyOfTheDay } from "@/lib/story-of-the-day";
@@ -65,7 +68,12 @@ export async function POST(req: NextRequest) {
   if (!segmentId) return NextResponse.json({ error: "Set RESEND_SEGMENT_ID first (the Resend segment)" }, { status: 400 });
 
   const now = new Date();
-  const name = weekName(now);
+  const send = fromSchedule ? nextSend(now) : null;
+  if (fromSchedule && !send) {
+    return NextResponse.json({ ok: true, status: "not yet", nextSendDay: nextSend(now, undefined, undefined, Infinity)?.day ?? null });
+  }
+  // The scheduled one is named for its Monday; an admin's draft for the day it was made, so it never blocks it.
+  const name = send ? weekName(new Date(`${send.day}T12:00:00Z`)) : `nde-of-the-week-draft-${now.toISOString().slice(0, 10)}`;
   const existing = await resend.broadcasts.list();
   const already = existing.data?.data.find((b) => b.name === name);
   if (already) {
@@ -74,7 +82,8 @@ export async function POST(req: NextRequest) {
 
   const [feed, story] = await Promise.all([
     fetchText(channelFeedUrl(process.env.PP_YOUTUBE_CHANNEL_ID || PP_CHANNEL_ID)),
-    todaysStory(now).catch(() => null),
+    // The Story of the Day of the day it goes out, as the home page will show it then.
+    todaysStory(send?.at ?? now).catch(() => null),
   ]);
   const content = ppWeekly({ short: feed ? bestShortOfWeek(parseChannelFeed(feed), now) : null, story });
   if (!content.short && !content.story) {
@@ -85,7 +94,7 @@ export async function POST(req: NextRequest) {
   }
 
   const autosend = fromSchedule && process.env.NEWSLETTER_AUTOSEND !== "off";
-  const at = sendTime(now);
+  const at = send?.at ?? now;
   const html = await render(NdeOfTheWeekEmail({ content, campaign: name }));
   const base = {
     segmentId,

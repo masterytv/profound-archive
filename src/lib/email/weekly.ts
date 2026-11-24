@@ -142,3 +142,25 @@ export function sendTime(now: Date, hour = 9): Date {
   const soonest = now.getTime() + 10 * 60_000;
   return new Date(Math.max(at, soonest));
 }
+
+/**
+ * The email is made ahead (Tom, 2026-11-24): GitHub started Monday's job hours late, then skipped it, so a run any time
+ * in the 36 hours before the send makes it, scheduled in Resend for 9:00 am ET, and Resend sends it on time. The job
+ * runs on Sunday and Monday (and Google Cloud Scheduler calls it on Sunday evening), so a missed run has another go.
+ */
+export const MAKE_AHEAD_HOURS = 36;
+/** Monday (0 is Sunday). */
+export const SEND_WEEKDAY = 1;
+
+/**
+ * The next send: its New York day (YYYY-MM-DD) and when it goes, or null while it is more than `aheadHours` away. On
+ * the send day itself, 9:00 am ET, or ten minutes from now past that (a run that came late still sends that day).
+ */
+export function nextSend(now: Date, weekday = SEND_WEEKDAY, hour = 9, aheadHours = MAKE_AHEAD_HOURS): { day: string; at: Date } | null {
+  const ny = new Date(now.getTime() + newYorkOffsetMinutes(now) * 60_000); // New York wall clock, read as UTC
+  const days = (weekday - ny.getUTCDay() + 7) % 7;
+  const noon = new Date(Date.UTC(ny.getUTCFullYear(), ny.getUTCMonth(), ny.getUTCDate() + days, 12));
+  const at = days === 0 ? sendTime(now, hour) : sendTime(noon, hour);
+  if (at.getTime() - now.getTime() > aheadHours * 3_600_000) return null;
+  return { day: noon.toISOString().slice(0, 10), at };
+}

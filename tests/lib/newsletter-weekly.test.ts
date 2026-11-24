@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
-  bestOfWeek, bestShortOfWeek, firstParagraph, parseChannelFeed, ppWeekly, sendTime, sentences, tagged, weekName,
+  bestOfWeek, bestShortOfWeek, firstParagraph, nextSend, parseChannelFeed, ppWeekly, sendTime, sentences, tagged, weekName,
 } from '@/lib/email/weekly';
 import { emailForms, isNewsletterList, newsletterSegmentId } from '@/lib/email/audience';
 import { seededShuffle, storyOfTheDay } from '@/lib/story-of-the-day';
@@ -119,5 +119,32 @@ describe('the weekly emails', () => {
     expect(html).toContain('https://www.youtube.com/@SoulWisdomCollective');
     expect(html).toContain('https://soulwisdomcollective.com/?utm_source=newsletter');
     expect(html).not.toContain('Four.');
+  });
+});
+
+describe('making the email ahead (Tom, 2026-11-24)', () => {
+  const at = (d: Date) => d.toISOString();
+  it('makes Monday\'s email from Sunday, scheduled for 9:00 am ET', () => {
+    // Sunday 2026-11-29, 6:00 pm EST.
+    expect(nextSend(new Date('2026-11-29T23:00:00Z'))).toEqual({ day: '2026-11-30', at: new Date('2026-11-30T14:00:00Z') });
+    // A GitHub run on Sunday morning, even hours late: still within 36 hours.
+    expect(nextSend(new Date('2026-11-29T11:23:00Z'))?.day).toBe('2026-11-30');
+  });
+
+  it('does nothing earlier in the week', () => {
+    expect(nextSend(new Date('2026-11-28T15:00:00Z'))).toBeNull(); // Saturday 10 am
+    expect(nextSend(new Date('2026-11-24T15:00:00Z'))).toBeNull(); // Tuesday
+    expect(nextSend(new Date('2026-11-24T15:00:00Z'), undefined, undefined, Infinity)?.day).toBe('2026-11-30');
+  });
+
+  it('on Monday itself sends at 9, or ten minutes after a late run', () => {
+    expect(at(nextSend(new Date('2026-11-30T11:23:00Z'))!.at)).toBe('2026-11-30T14:00:00.000Z');
+    expect(at(nextSend(new Date('2026-11-30T19:00:00Z'))!.at)).toBe('2026-11-30T19:10:00.000Z');
+  });
+
+  it('keeps 9:00 am Eastern across the clock change, and names the email for its Monday', () => {
+    // Sunday 2027-03-14 is the day clocks go forward: Monday's 9:00 am is EDT.
+    expect(nextSend(new Date('2027-03-14T22:00:00Z'))).toEqual({ day: '2027-03-15', at: new Date('2027-03-15T13:00:00Z') });
+    expect(weekName(new Date('2026-11-30T12:00:00Z'))).toBe('nde-of-the-week-2026-11-30');
   });
 });
