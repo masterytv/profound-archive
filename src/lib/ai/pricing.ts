@@ -26,6 +26,7 @@ export const MODEL_PRICES: Record<string, ModelPrice> = {
     // claude-sonnet-5 has intro pricing of $2/$10 through 2026-08-31; list price below.
     'claude-haiku-4-5': { inputPerM: 1, outputPerM: 5 },
     'claude-sonnet-5': { inputPerM: 3, outputPerM: 15 },
+    'claude-sonnet-5-5': { inputPerM: 2, outputPerM: 10 }, // blog pipeline default from 2026-11
     'claude-sonnet-4-5': { inputPerM: 3, outputPerM: 15 }, // blog pipeline
     // OpenRouter (OpenAI passthrough)
     'openai/gpt-4o': { inputPerM: 2.5, outputPerM: 10 },

@@ -52,7 +52,9 @@ The UAP Video Processor runs via `pg_cron` inside Supabase (replaces unreliable 
 ### Blog Pipeline
 | Variable | Description | Scope |
 |---|---|---|
-| `OPENROUTER_API_KEY` | OpenRouter key (Claude Sonnet 4.5 for article drafting + voice pass) | Server-only |
+| `ANTHROPIC_API_KEY` | Anthropic key for every `claudeChat()` call (blog drafts, voice pass, fact corrections, questions autogen) | Server-only |
+| `CLAUDE_MODEL` | Optional. Claude model for `claudeChat()`; defaults to `claude-sonnet-5-5`. Add a price row in `src/lib/ai/pricing.ts` when changing it | Server-only |
+| ~~`OPENROUTER_API_KEY`~~ | **Retired 2026-08-04** — replaced by `ANTHROPIC_API_KEY` | — |
 | `TAVILY_API_KEY` | Tavily Search API key (research + fact-checking, free tier 1K credits/mo) | Server-only |
 | `FAL_API_KEY` | fal.ai key for hero image generation (Flux Dev) | Server-only |
 | ~~`PERPLEXITY_API_KEY`~~ | **Deprecated May 2026** — quota exhausted, replaced by Tavily | — |
