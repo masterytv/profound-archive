@@ -8,7 +8,7 @@
  * 3 stages:
  * 1. Claim extraction + fact-checking (GPT-4o-mini + Tavily search)
  * 2. Link validation (health + relevance + fix/strip)
- * 3. Correction pass (Claude Sonnet 4.5 — surgical fact fixes only)
+ * 3. Correction pass (Claude via claudeChat(), Sonnet 5.5 by default — surgical fact fixes only)
  */
 
 import OpenAI from 'openai';
