@@ -29,12 +29,29 @@ import Anthropic from '@anthropic-ai/sdk';
 import { logUsage } from './usage-tracker';
 
 /**
- * Sonnet 4.5 — unchanged from what the pipeline ran on OpenRouter, so the
- * prompts keep their tuned behaviour. It is legacy but active, and one of the
- * last models that still accepts an assistant prefill; Sonnet 4.6+ returns 400.
- * Moving off the prefill is a prerequisite for upgrading past it.
+ * Model for every claudeChat() call (blog articles, story drafts, fact
+ * corrections, questions-autogen). Set CLAUDE_MODEL to change it without a
+ * code change; never type a model id anywhere else.
+ *
+ * Sonnet 4.5 retires on the API on 2026-11-30, so the default is Sonnet 5.5.
+ * Sonnet 4.6+ rejects an assistant prefill and non-default sampling
+ * parameters (temperature) with a 400, so claudeChat() only sends those to
+ * the legacy models that still take them (see LEGACY_PARAMS_MODEL below).
  */
-export const BLOG_CLAUDE_MODEL = 'claude-sonnet-4-5';
+export const BLOG_CLAUDE_MODEL = process.env.CLAUDE_MODEL?.trim() || 'claude-sonnet-5-5';
+
+/** Models that still accept an assistant prefill and `temperature`. */
+const LEGACY_PARAMS_MODEL = /^(anthropic\/)?claude-(3|(sonnet|haiku|opus)-4-5)/;
+
+/** Sonnet 5.5 is the only model that accepts `thinking: {type: 'between_tools'}`. */
+const BETWEEN_TOOLS_MODEL = /^claude-sonnet-5-5/;
+
+/**
+ * On models without prefill support, a JSON-only instruction in the system
+ * prompt stands in for the '{' prefill.
+ */
+const JSON_ONLY_INSTRUCTION =
+    'Respond with only the JSON object, starting with "{". No prose before or after it, and no code fences.';
 
 let client: Anthropic | null = null;
 
@@ -54,9 +71,9 @@ export interface ClaudeChatArgs {
     maxTokens: number;
     temperature?: number;
     /**
-     * Assistant prefill, e.g. '{' to force a bare JSON object. The model
-     * continues from it, so it is prepended to the returned text and callers
-     * get the complete value.
+     * Assistant prefill, e.g. '{' to force a bare JSON object. Legacy models
+     * continue from it; newer ones reject a prefill, so they get a JSON-only
+     * instruction instead. Either way the returned text starts with it.
      */
     prefill?: string;
     model?: string;
@@ -77,8 +94,14 @@ export interface ClaudeChatResult {
 export async function claudeChat(args: ClaudeChatArgs): Promise<ClaudeChatResult> {
     const model = args.model ?? BLOG_CLAUDE_MODEL;
 
+    const legacy = LEGACY_PARAMS_MODEL.test(model);
+    const usePrefill = Boolean(args.prefill) && legacy;
+
     const messages: Anthropic.MessageParam[] = [{ role: 'user', content: args.user }];
-    if (args.prefill) messages.push({ role: 'assistant', content: args.prefill });
+    if (usePrefill) messages.push({ role: 'assistant', content: args.prefill! });
+
+    const system =
+        args.prefill && !legacy ? `${args.system}\n\n${JSON_ONLY_INSTRUCTION}` : args.system;
 
     try {
         const message = await getClient()
@@ -88,9 +111,16 @@ export async function claudeChat(args: ClaudeChatArgs): Promise<ClaudeChatResult
                     max_tokens: args.maxTokens,
                     // Cached: batch runs send the same system prompt for every article, so
                     // after the first it is read back at a tenth of the input price.
-                    system: [{ type: 'text', text: args.system, cache_control: { type: 'ephemeral' } }],
+                    system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
                     messages,
-                    ...(args.temperature !== undefined ? { temperature: args.temperature } : {}),
+                    ...(legacy && args.temperature !== undefined ? { temperature: args.temperature } : {}),
+                    // Sonnet 5.5 thinks by default, and thinking tokens count against
+                    // max_tokens (truncation is fatal here). between_tools turns extended
+                    // thinking off, matching how Sonnet 4.5 ran these prompts. The SDK's
+                    // types predate the value, hence the cast.
+                    ...(BETWEEN_TOOLS_MODEL.test(model)
+                        ? { thinking: { type: 'between_tools' } as unknown as Anthropic.ThinkingConfigParam }
+                        : {}),
                 },
                 args.timeoutMs !== undefined ? { timeout: args.timeoutMs } : undefined,
             )
@@ -114,9 +144,16 @@ export async function claudeChat(args: ClaudeChatArgs): Promise<ClaudeChatResult
             status: 'success',
         });
 
-        const block = message.content.find((b): b is Anthropic.TextBlock => b.type === 'text');
+        if (message.stop_reason === 'refusal') {
+            throw new Error(`Claude declined the request (${args.operation})`);
+        }
+
+        const raw = message.content
+            .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+            .map((b) => b.text)
+            .join('');
         return {
-            text: (args.prefill ?? '') + (block?.text ?? ''),
+            text: usePrefill ? args.prefill + raw : withPrefix(raw, args.prefill),
             truncated: message.stop_reason === 'max_tokens',
         };
     } catch (err) {
@@ -129,4 +166,15 @@ export async function claudeChat(args: ClaudeChatArgs): Promise<ClaudeChatResult
         });
         throw err;
     }
+}
+
+/**
+ * Without a real prefill the model writes the whole value itself, sometimes
+ * inside a code fence. Strip a leading fence and make sure the text starts
+ * with the prefix callers expect, so they still get the complete value.
+ */
+function withPrefix(text: string, prefix: string | undefined): string {
+    if (!prefix) return text;
+    const t = text.trimStart().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+    return t.startsWith(prefix) ? t : prefix + t;
 }
